@@ -89,3 +89,19 @@ Phát hiện:
 - yt-dlp khớp 104/104 video đối chiếu được → số liệu không do lỗi provider.
 - **Tải nội dung caption bị HTTP 429 sau khoảng 100 request trong ~10 phút, kể cả bằng yt-dlp.** Liệt kê track vẫn chạy. Sau đó cả video từng tải được cũng 429. 9 video có track zh chưa đo được (ghi nhầm là `network`, đã sửa phân loại; chạy lại bằng `--retry-errors` khi hết chặn).
 - Việc chọn 3 video đầu của `search.list` có thể bỏ sót bản lyric video khác có CC (IN-05). Chưa thử mở rộng ứng viên.
+
+## Kết quả chạy lần 2 — mở rộng ứng viên (2026-09-24)
+
+41 bài chưa dùng được được tìm thêm ~7 video mỗi bài (`search.list` "… 歌词", top 10). Tổng 454 video / 50 bài.
+
+| | Dùng được |
+|---|---|
+| Mức video | 13/454 (3%) |
+| Mức bài | 12/50 (24%) |
+| Trần lý thuyết nếu 4 video còn bị 429 đều đạt | 16/50 (32%) |
+
+- Theo nhóm (mức bài): Đại lục 3/12, Đài Loan/HK/SG-MY 1/12, OST 5/10, Douyin 3/10, band/indie 0/6.
+- 24/50 bài không có bất kỳ video ứng viên nào có track tiếng Trung. 29 video có track zh; 11 trong số đó là pinyin Latin, 14 đạt.
+- Mở rộng ứng viên chỉ nâng mức bài từ 18% lên 24%. Trần 32% vẫn dưới ngưỡng 40% đã chốt → **rơi vào vùng "dừng xem xét"** dù 4 video còn lại đo ra thế nào.
+- Còn 4 video chưa đo do 429 (chạy lại: `--retry-errors`).
+- Giới hạn: ứng viên chỉ từ top-10 `search.list`; không loại trừ có bản lyric video có CC ở ngoài top 10.

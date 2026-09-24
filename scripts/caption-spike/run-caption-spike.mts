@@ -30,6 +30,7 @@ const seen = new Set<string>(
   existsSync(RESULTS) ? readFileSync(RESULTS, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l).videoId) : [],
 );
 const provider = new YoutubeInnertubeCaptionProvider();
+let consecutiveBlocked = 0; // cầu dao: sau 3 lần 429 liên tiếp thì thôi tải nội dung, tránh kéo dài việc bị chặn
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function measure(song: any, cand: any): Promise<SpikeRow> {
@@ -48,7 +49,9 @@ async function measure(song: any, cand: any): Promise<SpikeRow> {
     } else {
       row.bestTrack = `${best.lang}/${best.kind}`;
       row.kind = best.kind;
+      if (consecutiveBlocked >= 3) throw new CaptionError("blocked", "Bỏ qua tải nội dung vì đang bị chặn 429");
       const raw = await provider.fetchLines(cand.videoId, best);
+      consecutiveBlocked = 0;
       const lines = cleanCaptionLines(raw);
       writeFileSync(`${OUT_DIR}/raw/${cand.videoId}.json`, JSON.stringify({ track: best.lang, lines }));
       row.quality = assessLyricQuality(lines);
@@ -56,6 +59,7 @@ async function measure(song: any, cand: any): Promise<SpikeRow> {
       row.trackIsRomanized = lines.length > 0 && row.quality.hanLineRatio === 0;
     }
   } catch (e) {
+    if ((e as CaptionError).type === "blocked" && !String((e as Error).message).startsWith("Bỏ qua")) consecutiveBlocked++;
     // Kiểm tra theo tên: tsx có thể nạp lớp CaptionError hai lần nên instanceof không đáng tin.
     row.errorType = (e as CaptionError).name === "CaptionError" ? (e as CaptionError).type : "network";
   }
