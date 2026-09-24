@@ -8,4 +8,17 @@ Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựn
 
 ## Trạng thái
 
-Chưa scaffold code. Bước tiếp theo: M0 (spike lấy caption) và scaffold Next.js + Supabase theo `docs/PRD.md` mục 10.
+M0 đang làm: scaffold xong (Next.js 16, Supabase, Vitest, Playwright). Tiếp theo: lấy caption YouTube cho 50 bài C-pop. Kế hoạch: [`plans/260924-1827-m0-caption-spike-and-scaffold/`](plans/260924-1827-m0-caption-spike-and-scaffold/plan.md).
+
+## Chạy thử
+
+```
+cp .env.example .env.local   # điền key, không commit
+npm install
+npm run dev
+npm run build && npm run lint
+npm run test                 # Vitest
+npm run test:e2e             # Playwright (cổng 3100)
+```
+
+Cần Node ≥ 20.9 (khuyến nghị 22, vì `@supabase/supabase-js` sắp bỏ Node 20).

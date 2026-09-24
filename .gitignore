@@ -25,3 +25,8 @@ test-results/
 .DS_Store
 *.log
 .vercel
+
+# tsbuildinfo, next-env, spike output
+*.tsbuildinfo
+next-env.d.ts
+spike-output/
