@@ -56,7 +56,8 @@ async function measure(song: any, cand: any): Promise<SpikeRow> {
       row.trackIsRomanized = lines.length > 0 && row.quality.hanLineRatio === 0;
     }
   } catch (e) {
-    row.errorType = e instanceof CaptionError ? e.type : "network";
+    // Kiểm tra theo tên: tsx có thể nạp lớp CaptionError hai lần nên instanceof không đáng tin.
+    row.errorType = (e as CaptionError).name === "CaptionError" ? (e as CaptionError).type : "network";
   }
   row.latencyMs = Date.now() - t0;
   row.usable = decideUsable(row.quality, row.coverage, row.kind);

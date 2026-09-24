@@ -70,3 +70,22 @@
 
 ## Security
 - Raw caption chỉ ở `spike-output/` local. Không upload lên đâu.
+
+## Kết quả chạy lần 1 (2026-09-24, IP nhà, chưa hoàn tất)
+
+150 video / 50 bài (3 ứng viên mỗi bài, từ `search.list`). Số liệu dưới đây là mức sàn vì 9 video chưa đo được (xem bên dưới).
+
+| | Dùng được (manual, Hán, coverage ≥ 50%) |
+|---|---|
+| Mức video | 9/150 (6%) |
+| Mức bài | 9/50 (18%) |
+
+Theo nhóm (mức bài): Đại lục 3/12, Đài Loan/HK/SG-MY 1/12, OST 4/10, Douyin 1/10, band/indie 0/6.
+Theo vai trò (mức video): MV chính thức 2/40, lyric video 5/67, khác 1/42.
+
+Phát hiện:
+- 127/150 video không có track tiếng Trung. Track tự động (asr) gần như không có: 8 video có asr, không cái nào tiếng Trung. STT phía client không được "kéo xuống" bởi caption tự động.
+- 4 video có track `zh` nhưng là pinyin Latin → loại đúng bởi IN-03.
+- yt-dlp khớp 104/104 video đối chiếu được → số liệu không do lỗi provider.
+- **Tải nội dung caption bị HTTP 429 sau khoảng 100 request trong ~10 phút, kể cả bằng yt-dlp.** Liệt kê track vẫn chạy. Sau đó cả video từng tải được cũng 429. 9 video có track zh chưa đo được (ghi nhầm là `network`, đã sửa phân loại; chạy lại bằng `--retry-errors` khi hết chặn).
+- Việc chọn 3 video đầu của `search.list` có thể bỏ sót bản lyric video khác có CC (IN-05). Chưa thử mở rộng ứng viên.
