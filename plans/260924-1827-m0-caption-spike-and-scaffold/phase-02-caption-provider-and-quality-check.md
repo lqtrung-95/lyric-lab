@@ -63,13 +63,13 @@ Phân loại phồn/giản: dùng bảng ký tự nhỏ đủ cho heuristic (ví
 9. Commit: `feat(captions): add video id parser and youtube caption provider (IN-01, IN-02, IN-03)`.
 
 ## Todo
-- [ ] parseVideoId + test
-- [ ] types, errors
-- [ ] pickBestChineseTrack + test
-- [ ] clean + assess + test
-- [ ] InnerTube provider (A, B)
-- [ ] Data API track lister
-- [ ] Commit
+- [x] parseVideoId + test
+- [x] types, errors
+- [x] pickBestChineseTrack + test
+- [x] clean + assess + test
+- [x] InnerTube provider (A, B)
+- [x] Data API track lister (bỏ, YAGNI)
+- [x] Commit
 
 ## Success criteria
 - Unit test xanh, coverage `lib/youtube` + logic thuần `lib/captions` ≥ 90%.
@@ -82,3 +82,13 @@ Phân loại phồn/giản: dùng bảng ký tự nhỏ đủ cho heuristic (ví
 ## Security
 - Validate `videoId` bằng regex trước mọi request (PRD §7).
 - Data API key chỉ đọc qua `server-env`.
+
+## Kết quả thực hiện (2026-09-24)
+
+Done. Phát hiện khi thử với video thật:
+- Client `WEB` của InnerTube trả `UNPLAYABLE` cho mọi video thử. `ANDROID` và `IOS` trả được danh sách track → provider thử ANDROID rồi IOS.
+- Tải `baseUrl` với `fmt=json3` chạy được từ IP nhà (bài 晴天 bản lyric: 38 dòng, 228 giây).
+- **Track `zh` có thể là pinyin Latin, không phải chữ Hán.** Bản lyric 晴天 thử ra `hanLineRatio = 0`. Chỉ dựa vào mã ngôn ngữ là sai; bộ kiểm tra tỉ lệ chữ Hán (IN-03) chặn đúng trường hợp này. Phase 3 cần thống kê riêng nhóm "track zh nhưng là pinyin".
+- MV chính thức 晴天 (kênh nghệ sĩ) không có track nào → đúng giả định "MV chính thức hay không có caption".
+- Bỏ `youtube-data-api-track-lister`: InnerTube đã liệt kê track. Data API chỉ dùng để tìm video và lấy thời lượng ở phase 3 (YAGNI).
+- Script chạy bằng `tsx` phải đặt đuôi `.mts` (package đang là CommonJS).
