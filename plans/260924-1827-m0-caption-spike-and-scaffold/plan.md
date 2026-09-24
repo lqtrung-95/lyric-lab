@@ -23,7 +23,7 @@ Scaffold dựng song song vì code lấy caption viết luôn vào `lib/captions
 
 | # | Phase | File | Ước lượng | Trạng thái |
 |---|---|---|---|---|
-| 1 | Scaffold Next.js + Supabase + test tooling | [phase-01](phase-01-scaffold-nextjs-supabase-tooling.md) | 0,5–1 ngày | todo |
+| 1 | Scaffold Next.js + Supabase + test tooling | [phase-01](phase-01-scaffold-nextjs-supabase-tooling.md) | 0,5–1 ngày | done |
 | 2 | `parseVideoId` + `CaptionProvider` + quality check | [phase-02](phase-02-caption-provider-and-quality-check.md) | 1–1,5 ngày | done |
 | 3 | Dataset 50 bài + spike runner (IP nhà) | [phase-03](phase-03-dataset-and-spike-runner.md) | 1 ngày | todo |
 | 4 | Kiểm tra lấy caption từ IP cloud (Vercel preview) | [phase-04](phase-04-cloud-ip-fetch-check.md) | 0,5 ngày | todo |
