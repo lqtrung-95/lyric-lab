@@ -1,6 +1,6 @@
 ---
 title: M3 — Ôn tập FSRS + tài khoản ẩn danh/Google + giới hạn theo tài khoản
-status: phase 1-3 xong (2026-09-25); tiếp theo phase 4
+status: phase 1-4 code xong (2026-09-25); E2E cần đăng nhập ẩn danh chưa xác nhận do Supabase 429; tiếp theo phase 5
 created: 2026-09-25
 refs: docs/PRD.md §6.4 (RV-01..03), §6.5 (AC-01..04), §7 (rate limit), §8.2 (bảng user_*); design/S2-*, S7-*, settings-*; CLAUDE.md quy tắc 4, 6, 8, 9
 ---

@@ -11,6 +11,8 @@ export interface ReviewSession {
   newPerDay: number;
   /** Số thẻ đang chờ ôn hôm nay (đến hạn + thẻ mới trong hạn mức). */
   total: number;
+  /** Tổng số thẻ của người dùng (để phân biệt "chưa có thẻ" với "hôm nay đã ôn xong"). */
+  cardCount: number;
 }
 
 const DEFAULT_NEW_PER_DAY = 15;
@@ -26,17 +28,18 @@ export async function loadReviewSession(now = new Date()): Promise<ReviewSession
   const newPerDay = profile.data?.new_cards_per_day ?? DEFAULT_NEW_PER_DAY;
   const { start, end } = dayBounds(now, profile.data?.timezone ?? DEFAULT_TIMEZONE);
 
-  const [due, fresh, started] = await Promise.all([
+  const [due, fresh, started, all] = await Promise.all([
     sb.from("user_cards").select(CARD_COLUMNS).neq("state", 0).lte("due", now.toISOString()),
     sb.from("user_cards").select(CARD_COLUMNS).eq("state", 0).order("created_at").limit(Math.max(newPerDay, 1)),
     sb.from("review_logs").select("id", { count: "exact", head: true }).eq("state", 0).gte("reviewed_at", start.toISOString()).lt("reviewed_at", end.toISOString()),
+    sb.from("user_cards").select("item_key", { count: "exact", head: true }),
   ]);
-  const error = due.error ?? fresh.error ?? started.error;
+  const error = due.error ?? fresh.error ?? started.error ?? all.error;
   if (error) throw new Error(error.message);
 
   const cards = [...(due.data ?? []), ...(fresh.data ?? [])] as ReviewCard[];
   const queue = buildReviewQueue({ cards, now, newPerDay, newStartedToday: started.count ?? 0 });
-  return { queue, newPerDay, total: queue.length };
+  return { queue, newPerDay, total: queue.length, cardCount: all.count ?? 0 };
 }
 
 /** Ghi kết quả chấm: cập nhật thẻ rồi thêm nhật ký. Trả id nhật ký để hoàn tác. */

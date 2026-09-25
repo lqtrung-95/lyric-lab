@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/brand/logo-mark";
 import { Icon } from "@/components/ui/icon";
+import { DueBadge } from "@/components/review/due-badge";
 import { NAV_LINKS, isNavActive } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -33,6 +34,7 @@ export function SiteHeader() {
                   }`}
                 >
                   {link.label}
+                  {link.href === "/review" && <DueBadge />}
                 </Link>
               );
             })}

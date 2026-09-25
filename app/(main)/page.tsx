@@ -1,4 +1,5 @@
 import { PasteLinkForm } from "@/components/home/paste-link-form";
+import { TodayReviewCard } from "@/components/home/today-review-card";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
 
 export default function HomePage() {
@@ -13,6 +14,7 @@ export default function HomePage() {
           <PasteLinkForm />
         </div>
       </section>
+      <TodayReviewCard />
       <RecentSongsSection />
     </>
   );

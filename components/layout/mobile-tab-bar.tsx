@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
+import { DueBadge } from "@/components/review/due-badge";
 import { NAV_LINKS, isNavActive } from "./nav-links";
 
 /** Tab bar dưới cùng cho mobile (ẩn từ md trở lên). */
@@ -25,7 +26,10 @@ export function MobileTabBar() {
                 active ? "font-medium text-primary" : "text-on-surface-variant"
               }`}
             >
-              <Icon name={link.icon} filled={active} size={24} />
+              <span className="relative">
+                <Icon name={link.icon} filled={active} size={24} />
+                {link.href === "/review" && <DueBadge floating />}
+              </span>
               <span className="mt-0.5 text-label-sm">{link.label}</span>
             </Link>
           );

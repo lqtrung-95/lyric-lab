@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { notifyDueCountChanged } from "@/lib/review/due-count-event";
 import { pushLearnerChange, startLearnerSync } from "@/lib/user-data/learner-sync-client";
 import {
   initialLearnerState, markKnown, parseLearnerState, setLevel, toggleSaved, unmarkKnown,
@@ -33,7 +34,7 @@ export function useLearnerState() {
     const prev = readLearnerState();
     const next = fn(prev);
     writeLearnerState(next);
-    void pushLearnerChange(prev, next);
+    void pushLearnerChange(prev, next).then(notifyDueCountChanged);
   }, []);
 
   return {
