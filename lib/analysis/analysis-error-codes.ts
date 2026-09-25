@@ -4,6 +4,7 @@ export type AnalysisErrorCode =
   | "video_not_found"
   | "no_lyrics"
   | "rate_limited"
+  | "auth_required"
   | "analysis_failed"
   | "server_error";
 

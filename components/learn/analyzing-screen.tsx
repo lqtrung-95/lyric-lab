@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useReducer, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import type { AnalysisErrorCode } from "@/lib/analysis/analysis-error-codes";
 import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
 import { AnalysisErrorView } from "./analysis-error-view";
@@ -16,32 +17,46 @@ export function AnalyzingScreen({ videoId }: { videoId: string }) {
   const [state, dispatch] = useReducer(progressReducer, initialProgress);
 
   useEffect(() => {
-    const source = new EventSource(`/api/analyze/${videoId}`);
-    let finished = false;
-    const on = <T,>(event: string, handler: (data: T) => void) =>
-      source.addEventListener(event, (e) => handler(JSON.parse((e as MessageEvent).data)));
+    let cancelled = false;
+    let source: EventSource | null = null;
 
-    on<{ title: string; channelTitle: string }>("meta", (d) => dispatch({ type: "meta", ...d }));
-    on<{ step: "lyrics" | "analysis" }>("step", (d) => dispatch({ type: "step", step: d.step }));
-    on("done", () => {
-      finished = true;
-      source.close();
-      dispatch({ type: "done" });
-      router.refresh();
+    // Server cần phiên (ẩn danh cũng được) để tính hạn mức theo tài khoản: mở phiên xong mới mở luồng.
+    ensureAnonymousSession().then((hasSession) => {
+      if (cancelled) return;
+      if (!hasSession) return dispatch({ type: "error", code: "auth_required" });
+
+      const es = new EventSource(`/api/analyze/${videoId}`);
+      source = es;
+      let finished = false;
+      const on = <T,>(event: string, handler: (data: T) => void) =>
+        es.addEventListener(event, (e) => handler(JSON.parse((e as MessageEvent).data)));
+
+      on<{ title: string; channelTitle: string }>("meta", (d) => dispatch({ type: "meta", ...d }));
+      on<{ step: "lyrics" | "analysis" }>("step", (d) => dispatch({ type: "step", step: d.step }));
+      on("done", () => {
+        finished = true;
+        es.close();
+        dispatch({ type: "done" });
+        router.refresh();
+      });
+      on<{ code: AnalysisErrorCode }>("error", (d) => {
+        finished = true;
+        es.close();
+        dispatch({ type: "error", code: d.code });
+      });
+      // Mất kết nối trước khi có kết quả: báo lỗi chung (EventSource sẽ tự nối lại nếu không đóng).
+      es.onerror = () => {
+        if (finished) return;
+        finished = true;
+        es.close();
+        dispatch({ type: "error", code: "server_error" });
+      };
     });
-    on<{ code: AnalysisErrorCode }>("error", (d) => {
-      finished = true;
-      source.close();
-      dispatch({ type: "error", code: d.code });
-    });
-    // Mất kết nối trước khi có kết quả: báo lỗi chung (EventSource sẽ tự nối lại nếu không đóng).
-    source.onerror = () => {
-      if (finished) return;
-      finished = true;
-      source.close();
-      dispatch({ type: "error", code: "server_error" });
+
+    return () => {
+      cancelled = true;
+      source?.close();
     };
-    return () => source.close();
   }, [videoId, attempt, router]);
 
   const active = activeStepIndex(state.step);

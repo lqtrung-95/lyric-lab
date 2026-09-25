@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import type { TermEntry } from "@/lib/lookup/build-term-entry";
 import type { TermExplanation } from "@/lib/lookup/explain-schema";
 import { fetchExplanation, fetchTermEntry, type FetchResult } from "@/lib/lookup/lookup-client";
@@ -36,7 +37,10 @@ export function useTermLookup(videoId: string, word: WordSelection | null): Look
       if (!controller.signal.aborted) setResults((r) => ({ ...r, [key]: { ...r[key], ...p } }));
     };
     fetchTermEntry(word.term, controller.signal).then((entry) => patch({ entry }));
-    fetchExplanation({ videoId, lineIndex: word.lineIndex, term: word.term }, controller.signal).then((meaning) => patch({ meaning }));
+    // Giải nghĩa bằng LLM tính hạn mức theo tài khoản nên cần phiên (thường đã có từ trang trước).
+    ensureAnonymousSession()
+      .then(() => fetchExplanation({ videoId, lineIndex: word.lineIndex, term: word.term }, controller.signal))
+      .then((meaning) => patch({ meaning }));
     return () => {
       // Đổi từ khi còn yêu cầu dở dang: bỏ chúng và cho phép tra lại lần sau. Đã xong hết thì giữ kết quả.
       if (pending > 0) {

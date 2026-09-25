@@ -22,7 +22,7 @@ export async function lookupTermEntry(term: string): Promise<TermEntry | null> {
 }
 
 /** Phụ thuộc thật cho `explainTerm`: cache `term_explanations`, từ điển, Groq. */
-export function createExplainDeps(allowLlmCall: () => boolean): ExplainDeps {
+export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>): ExplainDeps {
   const sb = createSupabaseServiceClient();
   const key = (r: { videoId: string; lineIndex: number; term: string }) => ({
     video_id: r.videoId, line_index: r.lineIndex, term: r.term, explain_lang: EXPLAIN_LANG, prompt_version: PROMPT_VERSION,

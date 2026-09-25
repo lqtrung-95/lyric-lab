@@ -1,3 +1,5 @@
+import { getCurrentUser } from "@/lib/auth/current-user";
+import { consumeUsage } from "@/lib/rate-limit/consume-usage";
 import { ExplainError, explainTerm } from "@/lib/lookup/explain-term";
 import { explainRequestSchema } from "@/lib/lookup/explain-schema";
 import { createExplainDeps } from "@/lib/lookup/server-lookup";
@@ -7,8 +9,8 @@ import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-// Mỗi lần gọi LLM tốn token: 100 lần/ngày/IP (lớp chặn thô). Kết quả đã cache không tính.
-const limiter = new InMemoryRateLimiter(100, 24 * 60 * 60 * 1000);
+// Mỗi lần gọi LLM tốn token: hạn mức chính theo tài khoản (DB); 300 lần/ngày/IP là lớp chặn thô phụ. Kết quả đã cache không tính.
+const ipLimiter = new InMemoryRateLimiter(300, 24 * 60 * 60 * 1000);
 
 /** POST /api/explain {videoId, lineIndex, term} → nghĩa của từ trong đúng câu hát, tiếng Việt (LS-06). */
 export async function POST(req: Request) {
@@ -19,6 +21,8 @@ export async function POST(req: Request) {
   } catch {
     return Response.json({ error: "invalid_json" }, { status: 400 });
   }
+  const user = await getCurrentUser();
+  if (!user) return Response.json({ error: "auth_required" }, { status: 401 });
   const parsed = explainRequestSchema.safeParse(body);
   if (!parsed.success) return Response.json({ error: "invalid_request" }, { status: 400 });
 
@@ -27,7 +31,7 @@ export async function POST(req: Request) {
     if (!analysis) return Response.json({ error: "analysis_not_found" }, { status: 404 });
 
     const started = Date.now();
-    const result = await explainTerm(analysis.lines, parsed.data, createExplainDeps(() => limiter.tryConsume(ip)));
+    const result = await explainTerm(analysis.lines, parsed.data, createExplainDeps(async () => ipLimiter.tryConsume(ip) && (await consumeUsage(user, "explain"))));
     console.info(JSON.stringify({ event: "explain", videoId: parsed.data.videoId, fromCache: result.fromCache, model: result.model, ms: Date.now() - started }));
     return Response.json(result);
   } catch (error) {

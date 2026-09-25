@@ -30,7 +30,7 @@ export interface ExplainDeps {
   chat: ChatFn;
   models?: string[];
   /** Gọi trước khi tốn token LLM (để áp giới hạn tần suất). Trả false để từ chối. */
-  allowLlmCall?: () => boolean;
+  allowLlmCall?: () => boolean | Promise<boolean>;
 }
 
 const HAN = /\p{Script=Han}/u;
@@ -48,7 +48,7 @@ export async function explainTerm(lines: AnalyzedLine[], req: ExplainRequest, de
   const cached = await deps.readCache(req);
   if (cached) return { ...cached, fromCache: true };
 
-  if (deps.allowLlmCall && !deps.allowLlmCall()) throw new ExplainError("rate_limited", "Vượt giới hạn giải nghĩa");
+  if (deps.allowLlmCall && !(await deps.allowLlmCall())) throw new ExplainError("rate_limited", "Vượt giới hạn giải nghĩa");
 
   const prompt = buildExplainPrompt({
     term: req.term, line: line.text, lineTranslation: line.translation, dictionaryMeanings: await deps.dictionaryMeanings(req.term),

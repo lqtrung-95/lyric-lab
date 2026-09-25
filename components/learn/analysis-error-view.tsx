@@ -31,6 +31,12 @@ const COPY: Record<AnalysisErrorCode, ErrorCopy> = {
     body: "Mỗi ngày có giới hạn số bài mới để giữ dịch vụ miễn phí. Bài đã học vẫn mở được bình thường, mai bạn thử lại nhé.",
     retry: false,
   },
+  auth_required: {
+    icon: "warning",
+    title: "Chưa mở được phiên học",
+    body: "Trình duyệt chưa tạo được phiên làm việc. Hãy kiểm tra kết nối (và cho phép cookie) rồi thử lại.",
+    retry: true,
+  },
   analysis_failed: {
     icon: "warning",
     title: "Phân tích chưa thành công",
