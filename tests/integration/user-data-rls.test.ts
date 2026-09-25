@@ -114,12 +114,13 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
 
   it("merge_user_data: luật gộp (thẻ nhiều lượt ôn thắng, cài đặt đích thắng, từ đã biết hợp lại)", async () => {
     // A (ẩn danh) → B (đã đăng nhập). Chuẩn bị B: hồ sơ riêng, thẻ trùng ít lượt ôn hơn, thẻ riêng, từ đã biết riêng.
-    await service.from("user_profiles").insert({ user_id: bId, level: 5 });
-    await service.from("user_cards").insert([
-      card(bId, "vocab:词", { reps: 1, meaning: "của B" }),
-      card(bId, "vocab:riêngB"),
-    ]);
-    await service.from("user_known_terms").insert({ user_id: bId, item_key: "vocab:riêngB" });
+    const setup = [];
+    setup.push(await service.from("user_profiles").insert({ user_id: bId, level: 5 }));
+    // Chèn từng hàng: PostgREST điền null cho cột thiếu khi mảng có hàng khác bộ khóa, làm hỏng giá trị mặc định.
+    setup.push(await service.from("user_cards").insert(card(bId, "vocab:词", { reps: 1, meaning: "của B" })));
+    setup.push(await service.from("user_cards").insert(card(bId, "vocab:riêngB")));
+    setup.push(await service.from("user_known_terms").insert({ user_id: bId, item_key: "vocab:riêngB" }));
+    setup.forEach((r) => expect(r.error).toBeNull());
     await service.from("user_cards").update({ reps: 4, meaning: "của A" }).eq("user_id", aId).eq("item_key", "vocab:词");
 
     const { error } = await service.rpc("merge_user_data", { p_from: aId, p_to: bId });

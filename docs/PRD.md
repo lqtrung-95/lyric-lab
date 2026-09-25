@@ -169,7 +169,7 @@ Mức ưu tiên: **P0** = bắt buộc cho MVP, **P1** = nên có trong MVP, **P
 | ID | Yêu cầu | Ưu tiên | Acceptance criteria |
 | --- | --- | --- | --- |
 | RV-01 | Flashcard SRS | P0 | Thuật toán FSRS. 4 nút: Quên, Khó, Được, Dễ. Mặt trước: chữ Hán + nút nghe đoạn. Mặt sau: nghĩa, pinyin, Hán Việt, tên bài |
-| RV-02 | Hàng đợi ôn hằng ngày | P0 | Trang chủ hiển thị số thẻ đến hạn. Tối đa 20 thẻ mới/ngày (tuỳ chỉnh được) |
+| RV-02 | Hàng đợi ôn hằng ngày | P0 | Trang chủ hiển thị số thẻ đến hạn. Mặc định tối đa 15 thẻ mới/ngày (tuỳ chỉnh được) |
 | RV-03 | Màn tổng kết sau bài | P1 | Số từ đã lưu, đã biết, % từ vựng bài đã hiểu |
 | RV-04 | Luyện điền từ khi nghe | P2 | Ẩn các từ đã xem trước trong lời. Video tự dừng cuối câu chờ người dùng gõ pinyin hoặc chọn đáp án |
 | RV-05 | Shadowing | P2 | Ghi âm câu hát, phát lại xen kẽ với bản gốc |
