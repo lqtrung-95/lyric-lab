@@ -1,6 +1,6 @@
 ---
 title: M3 — Ôn tập FSRS + tài khoản ẩn danh/Google + giới hạn theo tài khoản
-status: draft — chờ user duyệt
+status: user đã duyệt 2026-09-25 (chờ user bật Anonymous sign-ins trước phase 1)
 created: 2026-09-25
 refs: docs/PRD.md §6.4 (RV-01..03), §6.5 (AC-01..04), §7 (rate limit), §8.2 (bảng user_*); design/S2-*, S7-*, settings-*; CLAUDE.md quy tắc 4, 6, 8, 9
 ---
@@ -64,3 +64,10 @@ Nhắc học/thông báo, xuất Anki (RV-06), luyện điền từ (RV-04), sha
 3. Đăng nhập Google khi tài khoản Google đó đã có dữ liệu: **gộp** dữ liệu ẩn danh vào (đúng AC-02, phức tạp hơn) hay chỉ **đăng nhập và bỏ** dữ liệu ẩn danh?
 4. Bật **captcha Turnstile** cho đăng nhập ẩn danh (khuyến nghị trước khi công khai)?
 5. "Lưu" một từ **tạo thẻ ôn ngay** (vào hàng đợi theo hạn mức thẻ mới/ngày), đúng không?
+
+## Quyết định của user (2026-09-25)
+1. Đồng ý cắt bớt; các tính năng bị cắt chuyển vào `docs/backlog.md`.
+2. Thẻ mới/ngày mặc định **15** (không phải 20 của PRD; PRD RV-02 cho chỉnh được, cần cập nhật lại câu chữ PRD).
+3. Gộp dữ liệu ẩn danh khi Google đã có tài khoản; luật gộp: hiển thị màn xác nhận số thẻ/từ sẽ gộp; thẻ trùng giữ bản có nhiều lượt ôn hơn (bằng nhau thì bản ôn gần nhất); cài đặt của tài khoản đã đăng nhập thắng; quyền sở hữu dữ liệu ẩn danh chứng minh bằng mã một lần cấp trước khi chuyển hướng sang Google.
+4. Bật captcha Turnstile cho đăng nhập ẩn danh (làm trước khi công khai; cần Cloudflare site key/secret).
+5. "Lưu" tạo thẻ ôn ngay (vào hàng đợi theo hạn mức thẻ mới/ngày).
