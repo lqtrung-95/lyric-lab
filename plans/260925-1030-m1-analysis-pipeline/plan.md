@@ -59,3 +59,7 @@ Kiểm tra thật trên video đầu tiên của 50 bài (đi từ tiêu đề v
 - Pinyin của CC-CEDICT được đổi sang dạng có dấu (`pinyin-tone-marks.ts`); từ nhiều âm gắn cấp HSK đúng cách đọc.
 - Âm Hán Việt = ghép âm đầu tiên của từng chữ (Unihan); chữ thiếu trong bảng thì trả null, không đoán. Chưa đo độ phủ trên lời thật.
 - Migration: `supabase/migrations/20260925000001_dictionary_tables.sql` (`dict_words`, `dict_hanzi_sino_viet`, RLS chỉ đọc công khai). **Chưa áp dụng**: không có thông tin kết nối DB/CLI, cần user chạy trong Supabase SQL Editor rồi mới chạy `scripts/dictionary/import-dictionary.mts`.
+
+## Nạp từ điển (2026-09-25) — xong
+Migration đã chạy; import bằng `NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/dictionary/import-dictionary.mts` (Node 20 thiếu WebSocket gốc mà supabase-js cần; Node 22 không cần cờ). Kết quả: `dict_words` 125.126 mục, `dict_hanzi_sino_viet` 8.306 chữ; anon key đọc được (RLS ok).
+**Chất lượng Hán Việt (Unihan) — giới hạn đã đo trên 10 từ mẫu:** tra bằng dạng phồn thể (chữ giản thể thường thiếu hoặc ra âm Nôm). Đúng 7/10; sai/thiếu: 离 → "li" (chuẩn "ly"), 袋 → "đãy" (chuẩn "đại"), 亮 không có. Unihan lẫn âm Nôm, không đánh dấu nguồn. Cần nguồn Hán Việt tốt hơn (vd. Wiktionary tiếng Việt) trước khi hiển thị cho người dùng; hiện chưa làm. Quy tắc 2 vẫn giữ: Hán Việt lấy từ từ điển, không lấy từ LLM.

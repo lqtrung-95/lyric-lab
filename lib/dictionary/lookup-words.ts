@@ -26,9 +26,17 @@ export async function lookupWords(client: DictQueryClient, words: string[]): Pro
   return result;
 }
 
-/** Chọn mục chính của từ nhiều âm: ưu tiên mục có cấp HSK (cấp thấp nhất), sau đó mục đầu tiên. */
+// Mục chỉ là biến thể / tham chiếu sang mục khác (vd. 咲 → biến thể của 笑) không nên làm mục chính.
+const VARIANT = /^(old |archaic |erhua |japanese |korean )?(variant|see |used in )/i;
+
+/**
+ * Chọn mục chính của từ nhiều âm: bỏ mục biến thể nếu còn lựa chọn khác, ưu tiên mục có cấp HSK
+ * (cấp thấp nhất), sau đó mục đầu tiên.
+ */
 export function pickPrimaryEntry(entries: DictWordRow[]): DictWordRow | null {
   if (entries.length === 0) return null;
-  const withLevel = entries.filter((e) => e.hsk_level !== null).sort((a, b) => a.hsk_level! - b.hsk_level!);
-  return withLevel[0] ?? entries[0];
+  const nonVariant = entries.filter((e) => !VARIANT.test(e.meanings[0] ?? ""));
+  const pool = nonVariant.length > 0 ? nonVariant : entries;
+  const withLevel = pool.filter((e) => e.hsk_level !== null).sort((a, b) => a.hsk_level! - b.hsk_level!);
+  return withLevel[0] ?? pool[0];
 }

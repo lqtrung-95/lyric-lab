@@ -39,6 +39,11 @@ describe("pickPrimaryEntry", () => {
   it("ưu tiên mục có cấp HSK thấp nhất", () => {
     expect(pickPrimaryEntry([row("行", "háng"), row("行", "xíng", 2), row("行", "x", 5)])?.pinyin).toBe("xíng");
   });
+  it("bỏ mục biến thể khi còn mục khác", () => {
+    const variant = { ...row("笑", "xiào"), traditional: "咲", meanings: ["variant of 笑[xiao4]"] };
+    expect(pickPrimaryEntry([variant, row("笑", "xiào")])?.traditional).toBe("笑");
+    expect(pickPrimaryEntry([variant])?.traditional).toBe("咲");
+  });
   it("không có cấp HSK → mục đầu; rỗng → null", () => {
     expect(pickPrimaryEntry([row("a", "1"), row("a", "2")])?.pinyin).toBe("1");
     expect(pickPrimaryEntry([])).toBeNull();
