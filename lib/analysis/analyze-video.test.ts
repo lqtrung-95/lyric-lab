@@ -54,6 +54,16 @@ describe("analyzeVideo", () => {
     expect(calls.n).toBe(1);
   });
 
+  it("báo tiến trình theo thứ tự khi chạy pipeline, không báo khi dùng cache", async () => {
+    const { db } = fakeDb();
+    const steps: string[] = [];
+    const withProgress = { ...deps(db, { n: 0 }), onProgress: (s: string) => steps.push(s) };
+    await analyzeVideo(video, withProgress);
+    expect(steps).toEqual(["lyrics", "analysis"]);
+    await analyzeVideo(video, withProgress);
+    expect(steps).toEqual(["lyrics", "analysis"]);
+  });
+
   it("không có lời → ném NoLyricsError, không gọi LLM, không ghi cache", async () => {
     const { db, store } = fakeDb();
     const calls = { n: 0 };

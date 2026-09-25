@@ -1,6 +1,6 @@
 ---
 title: M2 — Giao diện Xem trước (S4) + Nghe (S5) và luồng dán link (S1, S3, S6)
-status: draft — chờ user duyệt
+status: user đã duyệt 2026-09-25 — đang làm (phase 1–2 xong)
 created: 2026-09-25
 refs: docs/PRD.md §5, §6.1–6.3 (IN-01,04,05; PV-01..09; LS-01..10), §7, §8; docs/design-brief.md §2–5; design/*.html; CLAUDE.md quy tắc 3–9
 ---
@@ -32,8 +32,8 @@ Stitch project "Custom Design Project" (`13937936699626462675`, theme "Warm Lite
 ## Phases
 | # | Phase | Nội dung | Ước lượng |
 |---|---|---|---|
-| 1 | Nền UI | Token Tailwind v4 từ theme Stitch, font (next/font), dark mode, icon, layout + thanh nav (3 mục, mobile tab bar), thư mục `components/` | 1 ngày |
-| 2 | S1 + S3 + API | Ô dán link (IN-01, lỗi ngay không gọi server), API SSE, màn tiến trình 3 bước + nút hủy (IN-04), lỗi không có lời (IN-05), bài đã học gần đây (localStorage) | 1,5 ngày |
+| 1 ✅ | Nền UI | Token Tailwind v4 từ theme Stitch, font (next/font), dark mode, icon, layout + thanh nav (3 mục, mobile tab bar), thư mục `components/` | 1 ngày |
+| 2 ✅ | S1 + S3 + API | Ô dán link (IN-01, lỗi ngay không gọi server), API SSE, màn tiến trình 3 bước + nút hủy (IN-04), lỗi không có lời (IN-05), bài đã học gần đây (localStorage) | 1,5 ngày |
 | 3 | S4 Xem trước | Tóm tắt + tag (PV-01), thẻ từ vựng (PV-02) và ngữ pháp (PV-03), lọc level (PV-04), Đã biết + Hoàn tác (PV-05), Lưu (PV-06), Nghe thử ±0,5 giây (PV-07), Báo sai (PV-09, ghi `item_reports`), thẻ dùng chung với S5 | 2 ngày |
 | 4 | S5 Nghe | Player + lời chạy theo nhạc, tự cuộn (LS-01,02), pinyin/dịch bật tắt nhớ lựa chọn (LS-03), tô sáng từ vựng/ngữ pháp bằng hai kiểu khác nhau, không chỉ màu (LS-04), panel "Đang hát" / bottom sheet (LS-05), bấm câu để nhảy (LS-07), lặp câu (LS-08), tốc độ (LS-09), phím tắt (LS-10) | 2,5 ngày |
 | 5 | S6 Tra từ | Bấm từ bất kỳ → popover: mục có sẵn dùng ngay; từ khác tra từ điển + LLM giải nghĩa theo ngữ cảnh, cache `term_explanations` (LS-06, ≤ 1,5 s; cache ≤ 200 ms) | 1,5 ngày |
@@ -54,3 +54,11 @@ Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanati
 3. Icon: thiết kế dùng Material Symbols. Đề xuất dùng bộ này (tải subset để nhẹ) cho đúng hình; hay đổi sang lucide-react cho gọn?
 4. Trạng thái "Đã biết/Lưu" tạm lưu localStorage đến M3: chấp nhận?
 5. Có muốn tải nốt S2, S7, Cài đặt từ Stitch vào `design/` để dùng ở M3 không? (mình làm được, chỉ vài phút)
+
+## Kết quả phase 1–2 (2026-09-25)
+- User duyệt toàn bộ đề xuất: bỏ mẹo nhớ chữ, ẩn streak, "Đã biết", thumbnail YouTube, Material Symbols (subset qua `icon_names`), localStorage tạm, tải S2/S7/Cài đặt về `design/` **khi bắt đầu M3** (chưa tải).
+- Phase 1: token Tailwind v4 từ Stitch (`app/globals.css`, sáng + tối tự suy ra theo Material 3), font Be Vietnam Pro / Noto Serif / Noto Serif SC qua Google Fonts (chữ Hán cắt unicode-range), icon subset, `SiteHeader`, `MobileTabBar`, `ThemeToggle` (nhớ lựa chọn, theo hệ thống mặc định), logo từ Stitch (`public/logo.svg`, `LogoMark`).
+- Phase 2: S1 (`PasteLinkForm` báo lỗi ngay không gọi server, nút Dán clipboard; `RecentSongsSection` từ localStorage), API `GET /api/analyze/[videoId]` (SSE `meta` → `step` → `done` | `error`, giới hạn 10 bài mới/ngày/IP trong bộ nhớ, gộp yêu cầu trùng, log JSON mỗi lần phân tích), S3 (`AnalyzingScreen` 3 bước + Hủy, `AnalysisErrorView` theo mã lỗi), `next.config`: `serverExternalPackages: ["@node-rs/jieba"]` (binding native), thumbnail `i.ytimg.com`.
+- Kiểm tra thật: video đã cache → `done` ngay; bài mới → `lyrics` → `analysis` → `done` (~15 s tổng, LLM ~5 s); bài không có lời → lỗi `no_lyrics`; videoId sai → 400. E2E: 5 test xanh.
+- Bỏ: chip "bài mẫu" của S1 (không có video hư cấu để trỏ tới, quy tắc 7) và thẻ "đến hạn hôm nay" (M3).
+- Node 20: supabase-js cần WebSocket → service client dùng `ws` làm transport; Node ≥ 22 không cần.

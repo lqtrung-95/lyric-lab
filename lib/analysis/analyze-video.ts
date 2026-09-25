@@ -20,7 +20,11 @@ export interface AnalyzeVideoDeps extends LyricsDeps {
   /** Bảng âm Hán Việt cho các chữ phồn thể cho trước. */
   lookupSinoViet(chars: string[]): Promise<Map<string, string[]>>;
   models?: string[];
+  /** Báo bước đang chạy (để hiện tiến trình). Không gọi khi đọc từ cache. */
+  onProgress?: (step: AnalyzeStep) => void;
 }
+
+export type AnalyzeStep = "lyrics" | "analysis";
 
 export interface AnalyzeVideoResult {
   analysis: SongAnalysis;
@@ -35,6 +39,7 @@ export async function analyzeVideo(video: VideoMeta, deps: AnalyzeVideoDeps): Pr
   const cached = await getCachedAnalysis(deps.cache, key);
   if (cached) return { analysis: cached, fromCache: true, attempts: [] };
 
+  deps.onProgress?.("lyrics");
   const lyrics = await getLyricsForVideo(video, deps);
   const lines = tokenizeLyricLines(normalizeLyricLines(lyrics.lines));
   const dictionary = await deps.lookupDictionary(collectHanTerms(lines));
@@ -42,6 +47,7 @@ export async function analyzeVideo(video: VideoMeta, deps: AnalyzeVideoDeps): Pr
   const chars = [...new Set(candidates.flatMap((c) => [...c.traditional]))];
   const sinoViet = await deps.lookupSinoViet(chars);
 
+  deps.onProgress?.("analysis");
   const { analysis, attempts } = await analyzeLyrics({
     videoId: video.videoId, lyricsSource: lyrics.source, lines, candidates, dictionary, sinoViet,
     chat: deps.chat, models: deps.models,
