@@ -1,6 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { existsSync } from "node:fs";
 import ws from "ws";
+import { Rating } from "ts-fsrs";
+import { gradeCard, newCardFields } from "@/lib/srs/fsrs-scheduler";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // Test tích hợp trên Supabase thật (cần đã chạy migration user_accounts và bật Anonymous sign-ins).
@@ -110,6 +112,25 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
       Array.from({ length: 8 }, () => service.rpc("consume_usage", { p_user: bId, p_kind: "explain", p_limit: 3 })),
     );
     expect(results.filter((r) => r.data === true)).toHaveLength(3);
+  });
+
+  it("chấm thẻ: chủ sở hữu cập nhật thẻ, ghi rồi hoàn tác nhật ký (cùng thao tác với review-repo)", async () => {
+    const before = newCardFields(new Date());
+    const { next, log } = gradeCard(before, Rating.Good, new Date());
+    const upd = await a.from("user_cards").update(next).eq("item_key", "vocab:词");
+    expect(upd.error).toBeNull();
+    const ins = await a.from("review_logs").insert({ ...log, user_id: aId, item_key: "vocab:词" }).select("id").single();
+    expect(ins.error).toBeNull();
+    const { data: graded } = await a.from("user_cards").select("state,reps").eq("item_key", "vocab:词").single();
+    expect(graded).toEqual({ state: 1, reps: 1 });
+
+    await a.from("user_cards").update(before).eq("item_key", "vocab:词");
+    expect((await a.from("review_logs").delete().eq("id", ins.data!.id)).error).toBeNull();
+    const { data: restored } = await a.from("user_cards").select("state,reps").eq("item_key", "vocab:词").single();
+    expect(restored).toEqual({ state: 0, reps: 0 });
+    // B không xóa được nhật ký của A.
+    expect((await b.from("review_logs").delete().eq("user_id", aId)).error).toBeNull();
+    expect((await service.from("review_logs").select("id").eq("user_id", aId)).data).toHaveLength(1);
   });
 
   it("merge_user_data: luật gộp (thẻ nhiều lượt ôn thắng, cài đặt đích thắng, từ đã biết hợp lại)", async () => {
