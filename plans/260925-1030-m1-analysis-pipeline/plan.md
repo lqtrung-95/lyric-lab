@@ -74,3 +74,10 @@ Chạy thật phase 1→4 trên 6 bài (`scripts/caption-spike/analysis-pipeline
 - Phase 6: migration `supabase/migrations/20260925000002_song_cache_tables.sql` (`songs`, `song_analyses`, khóa cache theo quy tắc 8, RLS bật và **không có policy** nên chỉ service role đọc/ghi), `song-analysis-cache.ts`, `supabase-cache-db.ts`, `analyzeVideo` (cache → lời → … → lưu). **Chưa áp dụng migration** (cần user chạy trong SQL Editor). Cache lưu toàn bộ `SongAnalysis` gồm cả lời (đúng PRD §8.2); gỡ nội dung theo yêu cầu bằng `delete from songs where video_id = ...` (cascade). Đây là điểm rủi ro bản quyền cần user quyết: lưu toàn văn hay chỉ lưu từ vựng/ngữ pháp rồi lấy lại lời khi xem.
 - Phase 7: `scripts/eval/run-eval-batch.mts` (chạy pipeline thật, cache dạng file, xuất `eval-output/eval-sheet.csv`) và `scripts/eval/score-eval-sheet.mts` (tính tỉ lệ thẻ sai từ cột `verdict`: ok | sai_nghia | sai_pinyin | khong_dang_hoc). `eval-output/` bị gitignore vì chứa lời bài hát.
 - Hán Việt: đổi nguồn sang Wiktionary (có nhãn Hán Việt rõ ràng, CC BY-SA 4.0), Unihan chỉ làm dự phòng vì lẫn âm Nôm (少年 → "thiểu nên").
+
+## Kết quả chạy 50 bài (2026-09-25)
+- Groq gói miễn phí: 8.000 token/phút (gpt-oss-120b) và 1.000 token đầu ra/phút (qwen) → lần chạy đầu chỉ 11/50 bài. Đã sửa: `createGroqChat` chờ theo retry-after rồi thử lại (≤ 3 lần), `max_completion_tokens` 4.500, model dự phòng đổi sang `openai/gpt-oss-20b`, runner nghỉ 25 giây/bài. Khi ra mắt cần gói trả phí (Developer tier) hoặc hàng đợi.
+- Chạy lại: **42/50 bài có phân tích** (84%); 8 bài còn lại đều `NoLyricsError` (演员, 凉凉, 无羁, 风起时, 红颜劫, 成都, 双截棍, 大风吹). Tất cả do gpt-oss-120b, không cần model dự phòng.
+- 697 mục xem trước, TB 13,6 từ + 3,0 ngữ pháp/bài; 96% từ có Hán Việt, 16% từ ngoài HSK, 98% dòng có bản dịch; 15 bài có < 3 ngữ pháp (bị loại do không khớp lời) và 1 bài < 8 từ.
+- Độ trễ LLM 4–8 giây/bài; đọc từ cache Supabase ~100 ms.
+- **Chưa xong:** user chấm `eval-output/eval-sheet.csv` (cột `verdict`) rồi chạy `npx tsx scripts/eval/score-eval-sheet.mts` để có tỉ lệ thẻ sai (mục tiêu ≤ 3%). Mới chấm được 1 model/prompt; chưa đo độ lệch timestamp LRC so với video.
