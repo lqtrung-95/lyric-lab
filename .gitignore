@@ -31,3 +31,4 @@ test-results/
 next-env.d.ts
 spike-output/
 data-cache/
+eval-output/

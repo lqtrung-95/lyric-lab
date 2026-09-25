@@ -7,7 +7,7 @@ import { parseHskVocabulary } from "@/lib/dictionary/parse-hsk-vocabulary";
 import { parseViReadings } from "@/lib/dictionary/parse-wiktionary-vi-readings";
 
 const OUT = "data-cache/hanviet-wiktionary.json";
-const BATCH = 50;
+const BATCH = 20; // lô nhỏ để tránh quá thời gian/giới hạn dung lượng
 const API = "https://en.wiktionary.org/w/api.php";
 
 const cedict = parseCedict(readFileSync("data-cache/cedict_ts.u8", "utf8"));
@@ -26,12 +26,12 @@ for (let i = 0; i < todo.length; i += BATCH) {
     action: "query", prop: "revisions", rvprop: "content", rvslots: "main", format: "json", formatversion: "2", titles: titles.join("|"),
   }).toString();
   let json;
-  for (let attempt = 0; attempt < 3 && !json; attempt++) {
+  for (let attempt = 0; attempt < 5 && !json; attempt++) {
     try {
       const res = await fetch(url, { headers: { "User-Agent": "lyric-lab-dictionary-import (personal project)" }, signal: AbortSignal.timeout(60_000) });
       if (res.ok) json = await res.json();
-      else await new Promise((r) => setTimeout(r, 5000));
-    } catch { await new Promise((r) => setTimeout(r, 5000)); }
+      else { console.log(`HTTP ${res.status} ở lô ${i}, thử lại`); await new Promise((r) => setTimeout(r, 10_000 * (attempt + 1))); }
+    } catch (e) { console.log(`Lỗi ${(e as Error).message} ở lô ${i}, thử lại`); await new Promise((r) => setTimeout(r, 10_000 * (attempt + 1))); }
   }
   if (!json) throw new Error(`Thất bại ở lô ${i}`);
   const found = new Map<string, string>(json.query.pages.map((p: { title: string; revisions?: { slots: { main: { content: string } } }[] }) => [p.title, p.revisions?.[0]?.slots.main.content ?? ""]));

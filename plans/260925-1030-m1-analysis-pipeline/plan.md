@@ -18,9 +18,9 @@ Thay đổi so với PRD nhờ kết quả M0: bước "Lấy lời" có 2 ngu�
 | 2 ✅ | Chuẩn hóa lời | Làm sạch (đã có `cleanCaptionLines`), phồn → giản thể để tra cứu (`opencc-js`), giữ bản gốc để hiển thị, bỏ dòng nhạc lý (vd. "Re So So Si…") | 1 ngày |
 | 3 ✅ | Từ điển | Migration Supabase + nạp CC-CEDICT (CC BY-SA), danh sách HSK, âm Hán Việt (Unihan `kVietnamese`); hàm tra: pinyin, nghĩa, level, Hán Việt | 1,5 ngày |
 | 4 ✅ | Tách từ + ứng viên | `@node-rs/jieba` (binary dựng sẵn, chạy được trên Vercel; `nodejieba` cần biên dịch native); tính tần suất, level, ứng viên | 1 ngày |
-| 5 | LLM + validate | Groq (Llama 3.3 70B) + model dự phòng; schema Zod cho `SongAnalysis`; ghép vị trí `occurrences`, loại mục không khớp; pinyin/level/Hán Việt luôn từ từ điển; `promptVersion` | 2 ngày |
-| 6 | Cache | Bảng `songs`, `song_analyses` (key: videoId + ngôn ngữ học + ngôn ngữ giải thích + promptVersion), RLS chỉ server ghi; chính sách lưu lời theo mục rủi ro pháp lý | 1 ngày |
-| 7 | Bộ đánh giá | 50 bài, đáp án do người chấm; script chạy khi đổi prompt/model; đo % thẻ sai | 1,5 ngày + thời gian chấm của user |
+| 5 ✅ | LLM + validate | Groq (Llama 3.3 70B) + model dự phòng; schema Zod cho `SongAnalysis`; ghép vị trí `occurrences`, loại mục không khớp; pinyin/level/Hán Việt luôn từ từ điển; `promptVersion` | 2 ngày |
+| 6 🟡 | Cache (code xong, chờ user chạy migration 2) | Bảng `songs`, `song_analyses` (key: videoId + ngôn ngữ học + ngôn ngữ giải thích + promptVersion), RLS chỉ server ghi; chính sách lưu lời theo mục rủi ro pháp lý | 1 ngày |
+| 7 🟡 | Bộ đánh giá (công cụ xong, chờ chạy 50 bài + user chấm) | 50 bài, đáp án do người chấm; script chạy khi đổi prompt/model; đo % thẻ sai | 1,5 ngày + thời gian chấm của user |
 
 Phụ thuộc: 1 → 2 → (3 ∥ 4) → 5 → 6 → 7.
 
@@ -67,3 +67,10 @@ Migration đã chạy; import bằng `NODE_OPTIONS=--experimental-websocket npx 
 ## Kết quả phase 4 (2026-09-25)
 `lib/analysis/`: `tokenizeLyricLines` (`@node-rs/jieba`, tắt HMM, token giữ bản gốc phồn thể), `collectHanTerms`, `buildVocabCandidates` (bỏ hư từ + từ 1 chữ cơ bản, xếp theo số lần xuất hiện rồi cấp HSK).
 Chạy thật phase 1→4 trên 6 bài (`scripts/caption-spike/analysis-pipeline-e2e-check.mts`): 73–117 từ/bài, **90–95% có trong từ điển**, 37–60 ứng viên/bài, phân bố cấp HSK 1–7 và không có cấp (từ ngoài HSK). Đủ đầu vào cho LLM.
+
+## Kết quả phase 5–7 (2026-09-25)
+- Phase 5, `lib/analysis/`: `buildAnalysisPrompt` (`PROMPT_VERSION = "v1"`), `llm-output-schema` (Zod), `validateLlmOutput` (từ vựng phải thuộc danh sách ứng viên; ngữ pháp phải khớp dòng lời thật, chỉ giữ dòng khớp; mục không khớp bị loại), `assembleSongAnalysis` (pinyin/HSK/Hán Việt/vị trí từ từ điển và tách từ), `analyzeLyrics` (model chính → dự phòng, coi < 6 từ hợp lệ là thất bại), `createGroqChat`.
+- Model: Groq hiện không còn Llama 3.3; dùng `openai/gpt-oss-120b` (chính) và `qwen/qwen3.8-27b` (dự phòng). Thử thật trên một bài: 4–6 giây/lần, 10–12 từ + 3–5 ngữ pháp + dịch đủ mọi dòng. Validate bắt được cả hai kiểu lỗi: gpt-oss đưa ngữ pháp không khớp lời, qwen bịa từ ngoài danh sách ứng viên.
+- Phase 6: migration `supabase/migrations/20260925000002_song_cache_tables.sql` (`songs`, `song_analyses`, khóa cache theo quy tắc 8, RLS bật và **không có policy** nên chỉ service role đọc/ghi), `song-analysis-cache.ts`, `supabase-cache-db.ts`, `analyzeVideo` (cache → lời → … → lưu). **Chưa áp dụng migration** (cần user chạy trong SQL Editor). Cache lưu toàn bộ `SongAnalysis` gồm cả lời (đúng PRD §8.2); gỡ nội dung theo yêu cầu bằng `delete from songs where video_id = ...` (cascade). Đây là điểm rủi ro bản quyền cần user quyết: lưu toàn văn hay chỉ lưu từ vựng/ngữ pháp rồi lấy lại lời khi xem.
+- Phase 7: `scripts/eval/run-eval-batch.mts` (chạy pipeline thật, cache dạng file, xuất `eval-output/eval-sheet.csv`) và `scripts/eval/score-eval-sheet.mts` (tính tỉ lệ thẻ sai từ cột `verdict`: ok | sai_nghia | sai_pinyin | khong_dang_hoc). `eval-output/` bị gitignore vì chứa lời bài hát.
+- Hán Việt: đổi nguồn sang Wiktionary (có nhãn Hán Việt rõ ràng, CC BY-SA 4.0), Unihan chỉ làm dự phòng vì lẫn âm Nôm (少年 → "thiểu nên").
