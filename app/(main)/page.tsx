@@ -1,4 +1,5 @@
 import { PasteLinkForm } from "@/components/home/paste-link-form";
+import { OnboardingBanner } from "@/components/home/onboarding-banner";
 import { TodayReviewCard } from "@/components/home/today-review-card";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
 
@@ -14,6 +15,7 @@ export default function HomePage() {
           <PasteLinkForm />
         </div>
       </section>
+      <OnboardingBanner />
       <TodayReviewCard />
       <RecentSongsSection />
     </>

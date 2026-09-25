@@ -20,6 +20,9 @@ const SCREENS = [
   { name: "trang chủ", url: "/" },
   { name: "xem trước", url: "/dev/preview-fixture" },
   { name: "nghe", url: "/dev/listen-fixture" },
+  { name: "ôn tập (chưa có thẻ)", url: "/review" },
+  { name: "cài đặt", url: "/settings" },
+  { name: "làm quen", url: "/welcome" },
 ];
 
 for (const theme of ["light", "dark"] as const) {
