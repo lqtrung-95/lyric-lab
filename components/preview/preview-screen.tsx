@@ -48,6 +48,7 @@ export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
     const entry: SavedItem = {
       key: itemKey(item), videoId: analysis.videoId, type: item.type, term: item.term,
       lineIndex: line?.index ?? item.occurrences[0]?.lineIndex ?? 0, start: line?.start ?? item.occurrences[0]?.start ?? 0, savedAt: Date.now(),
+      reading: item.reading, sinoViet: item.sinoViet, level: item.level, meaning: item.meaningInContext,
     };
     toggleSaved(entry);
   };

@@ -25,3 +25,13 @@ async function start(): Promise<boolean> {
     return false;
   }
 }
+
+/** Đã có phiên (ẩn danh hoặc Google) trong trình duyệt chưa. Không tạo phiên mới. */
+export async function hasExistingSession(): Promise<boolean> {
+  try {
+    const { data } = await createSupabaseBrowserClient().auth.getSession();
+    return Boolean(data.session);
+  } catch {
+    return false;
+  }
+}

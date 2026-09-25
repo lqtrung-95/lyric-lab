@@ -39,3 +39,6 @@ export async function seedFixtureSong() {
 export async function removeFixtureSong() {
   await client().from("songs").delete().eq("video_id", E2E_VIDEO_ID);
 }
+
+/** Client service role cho test cần đọc/dọn dữ liệu người dùng thật. */
+export const serviceClientForTests = client;

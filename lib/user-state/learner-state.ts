@@ -1,6 +1,6 @@
 import type { PreviewItem } from "@/lib/analysis/analysis-types";
 
-// Trạng thái học của người dùng, lưu trong trình duyệt cho tới khi có tài khoản (M3). Toàn bộ hàm là thuần để test được.
+// Trạng thái học của người dùng: bản làm việc trong trình duyệt (đồng bộ lên Supabase ở `lib/user-data`). Toàn bộ hàm là thuần để test được.
 export const LEARNER_STATE_KEY = "lyric-lab-learner-state";
 export const DEFAULT_LEVEL = 3;
 export const MAX_LEVEL = 7; // 7 = nhóm 7–9 của HSK 3.0
@@ -14,7 +14,15 @@ export interface SavedItem {
   lineIndex: number;
   start: number;
   savedAt: number;
+  /** Ảnh chụp để dựng thẻ ôn mà không cần tải lại bài (thẻ cũ lưu trước khi có tài khoản thì thiếu `meaning`). */
+  reading?: string;
+  sinoViet?: string;
+  level?: number | null;
+  meaning?: string;
 }
+
+/** Phần ảnh chụp của một mục, lấy từ PreviewItem hoặc từ kết quả tra từ. */
+export type CardSnapshot = Pick<SavedItem, "reading" | "sinoViet" | "level" | "meaning">;
 
 export interface LearnerState {
   level: number;

@@ -1,42 +1,39 @@
 "use client";
 
-import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { pushLearnerChange, startLearnerSync } from "@/lib/user-data/learner-sync-client";
 import {
-  LEARNER_STATE_KEY, initialLearnerState, markKnown, parseLearnerState, setLevel, toggleSaved, unmarkKnown,
+  initialLearnerState, markKnown, parseLearnerState, setLevel, toggleSaved, unmarkKnown,
   type LearnerState, type SavedItem,
 } from "./learner-state";
-
-const EVENT = "lyric-lab-learner-state";
+import { LEARNER_STATE_EVENT, readLearnerRaw, readLearnerState, writeLearnerState } from "./local-learner-store";
 
 function subscribe(onChange: () => void) {
   window.addEventListener("storage", onChange);
-  window.addEventListener(EVENT, onChange);
+  window.addEventListener(LEARNER_STATE_EVENT, onChange);
   return () => {
     window.removeEventListener("storage", onChange);
-    window.removeEventListener(EVENT, onChange);
+    window.removeEventListener(LEARNER_STATE_EVENT, onChange);
   };
 }
-function readRaw(): string | null {
-  try {
-    return localStorage.getItem(LEARNER_STATE_KEY);
-  } catch {
-    return null;
-  }
-}
 
-/** Trạng thái học từ localStorage (đồng bộ giữa các tab). Bọc sau hook này để M3 đổi sang Supabase mà không sửa giao diện. */
+/**
+ * Trạng thái học: đọc/ghi localStorage ngay (không chờ mạng) và đồng bộ với Supabase ở nền.
+ * Lần đầu có phiên thì nhập dữ liệu cũ hoặc tải bản đã lưu về (đăng nhập ở thiết bị khác).
+ */
 export function useLearnerState() {
-  const raw = useSyncExternalStore(subscribe, readRaw, () => null);
+  const raw = useSyncExternalStore(subscribe, readLearnerRaw, () => null);
   const state = useMemo(() => parseLearnerState(raw), [raw]);
 
+  useEffect(() => {
+    void startLearnerSync();
+  }, []);
+
   const update = useCallback((fn: (s: LearnerState) => LearnerState) => {
-    const next = fn(parseLearnerState(readRaw()));
-    try {
-      localStorage.setItem(LEARNER_STATE_KEY, JSON.stringify(next));
-    } catch {
-      // localStorage bị chặn: thay đổi chỉ tồn tại tới khi tải lại trang.
-    }
-    window.dispatchEvent(new Event(EVENT));
+    const prev = readLearnerState();
+    const next = fn(prev);
+    writeLearnerState(next);
+    void pushLearnerChange(prev, next);
   }, []);
 
   return {

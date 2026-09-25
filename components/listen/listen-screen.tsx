@@ -5,7 +5,7 @@ import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
 import { buildPreviewView } from "@/lib/preview/build-preview-view";
-import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
+import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { ListenTopBar } from "./listen-top-bar";
@@ -84,16 +84,17 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
     const entry: SavedItem = {
       key: itemKey(item), videoId: analysis.videoId, type: item.type, term: item.term,
       lineIndex: occurrence?.lineIndex ?? 0, start: occurrence?.start ?? 0, savedAt: Date.now(),
+      reading: item.reading, sinoViet: item.sinoViet, level: item.level, meaning: item.meaningInContext,
     };
     learner.toggleSaved(entry);
   };
 
-  const saveWord = (term: string) => {
+  const saveWord = (term: string, snapshot: CardSnapshot) => {
     if (!word) return;
     const line = lines[word.lineIndex];
     learner.toggleSaved({
       key: itemKey({ type: "vocab", term }), videoId: analysis.videoId, type: "vocab", term,
-      lineIndex: word.lineIndex, start: line?.start ?? 0, savedAt: Date.now(),
+      lineIndex: word.lineIndex, start: line?.start ?? 0, savedAt: Date.now(), ...snapshot,
     });
   };
 
