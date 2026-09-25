@@ -24,6 +24,8 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/dev/listen-fixture");
   await page.evaluate(() => localStorage.clear());
   await page.reload();
+  // Stub YouTube nạp trễ và tự đặt lại thời gian về 0: chờ nó sẵn sàng trước khi test đổi thời gian.
+  await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
 });
 
 test("lời chạy theo thời gian phát và panel 'Đang hát' đổi theo câu", async ({ page }) => {

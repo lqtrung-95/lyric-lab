@@ -8,8 +8,8 @@ Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựn
 
 ## Trạng thái
 
-- M0 (spike nguồn lời), M1 (pipeline phân tích), M2 (giao diện Xem trước + Nghe + tra từ): **xong**. M3 (flashcard SRS, tài khoản ẩn danh + Google) chưa làm.
-- Kế hoạch và kết quả từng mốc: [`plans/`](plans/) (M0: `260924-1827-…`, M1: `260925-1030-…`, M2: `260925-1401-…`); báo cáo M0: `plans/reports/`.
+- M0 (spike nguồn lời), M1 (pipeline phân tích), M2 (giao diện Xem trước + Nghe + tra từ): **xong**. M3 (flashcard FSRS, tài khoản ẩn danh + Google, thư viện, tổng kết bài, hạn mức theo tài khoản): **code xong**; còn chờ thử tay đăng nhập Google, bật captcha Turnstile trước khi công khai.
+- Kế hoạch và kết quả từng mốc: [`plans/`](plans/) (M0: `260924-1827-…`, M1: `260925-1030-…`, M2: `260925-1401-…`, M3: `260925-1540-…`); báo cáo M0: `plans/reports/`.
 
 ## Chạy thử
 
@@ -25,7 +25,7 @@ npm run test:e2e             # Playwright, cổng 3100
 
 ### Cơ sở dữ liệu (Supabase)
 
-Chạy lần lượt các file trong `supabase/migrations/` bằng Supabase SQL Editor (dictionary → cache phân tích → báo sai → giải nghĩa từ). Sau đó nạp từ điển:
+Chạy lần lượt các file trong `supabase/migrations/` bằng Supabase SQL Editor (dictionary → cache phân tích → báo sai → giải nghĩa từ → dữ liệu người dùng → mã gộp tài khoản). Cần bật Anonymous sign-ins và Manual linking trong Supabase; test tích hợp chạy với `NODE_OPTIONS=--experimental-websocket` trên Node 20. Sau đó nạp từ điển:
 
 ```
 # tải CC-CEDICT, HSK 3.0, Unihan vào data-cache/ (xem plans/260925-1030-m1-analysis-pipeline/plan.md), rồi:

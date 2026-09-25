@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
@@ -14,6 +15,7 @@ import type { WordSelection } from "./lyric-line-row";
 import { SingingPanel } from "./singing-panel";
 import { TransportControls } from "./transport-controls";
 import { usePlaybackSync } from "./use-playback-sync";
+import { useSongProgress } from "./use-song-progress";
 import { useTermLookup } from "./use-term-lookup";
 import { WordPopover } from "./word-popover";
 
@@ -31,6 +33,7 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
   const [loopIndex, setLoopIndex] = useState<number | null>(null);
   const [word, setWord] = useState<WordSelection | null>(null);
   const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex);
+  const { completed } = useSongProgress(analysis.videoId, lines, currentIndex);
   const lookup = useTermLookup(analysis.videoId, word);
   const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
 
@@ -126,6 +129,12 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
           />
+          {completed && (
+            <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary-container/50 p-space-md">
+              <p className="text-body-md text-on-secondary-container">Bạn đã nghe tới cuối bài.</p>
+              <Link href={`/learn/${analysis.videoId}/summary`} className="inline-flex min-h-11 items-center rounded-full bg-secondary px-5 text-label-md font-medium text-on-secondary">Xem tổng kết</Link>
+            </div>
+          )}
           <LyricList
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}

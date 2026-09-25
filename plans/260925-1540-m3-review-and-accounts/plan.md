@@ -1,6 +1,6 @@
 ---
 title: M3 — Ôn tập FSRS + tài khoản ẩn danh/Google + giới hạn theo tài khoản
-status: phase 1-5 code xong (2026-09-25); chờ migration 6, Google thật và nâng rate limit để xác nhận E2E; tiếp theo phase 6
+status: code xong 6/6 phase (2026-09-25); còn thử tay Google OAuth và bật Turnstile trước khi công khai
 created: 2026-09-25
 refs: docs/PRD.md §6.4 (RV-01..03), §6.5 (AC-01..04), §7 (rate limit), §8.2 (bảng user_*); design/S2-*, S7-*, settings-*; CLAUDE.md quy tắc 4, 6, 8, 9
 ---

@@ -22,6 +22,7 @@ const SCREENS = [
   { name: "nghe", url: "/dev/listen-fixture" },
   { name: "ôn tập (chưa có thẻ)", url: "/review" },
   { name: "cài đặt", url: "/settings" },
+  { name: "thư viện", url: "/library" },
   { name: "làm quen", url: "/welcome" },
 ];
 
