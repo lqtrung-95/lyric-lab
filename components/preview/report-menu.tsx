@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
-import { REPORT_REASONS, REPORT_REASON_LABELS, type ReportReason } from "@/lib/analysis/report-schema";
+import { REPORT_REASONS, REPORT_REASON_LABELS, type ReportReason } from "@/lib/analysis/report-reasons";
 
 interface ReportMenuProps {
   videoId: string;
@@ -14,6 +14,7 @@ interface ReportMenuProps {
 /** Menu ⋯ "Báo sai" với 3 lý do (PV-09). Gửi tới /api/reports. */
 export function ReportMenu({ videoId, itemId, promptVersion, termLabel }: ReportMenuProps) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
 
   async function send(reason: ReportReason) {
@@ -31,14 +32,23 @@ export function ReportMenu({ videoId, itemId, promptVersion, termLabel }: Report
   }
 
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onKeyDown={(e) => {
+        // Escape đóng menu dù focus đang ở nút mở hay ở một mục trong menu, rồi trả focus về nút mở.
+        if (e.key === "Escape" && open) {
+          setOpen(false);
+          triggerRef.current?.focus();
+        }
+      }}
+    >
       <button
+        ref={triggerRef}
         type="button"
         aria-label={`Báo sai thẻ ${termLabel}`}
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
         className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
       >
         <Icon name="more_horiz" size={20} />

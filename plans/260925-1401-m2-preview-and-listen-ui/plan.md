@@ -1,6 +1,6 @@
 ---
 title: M2 — Giao diện Xem trước (S4) + Nghe (S5) và luồng dán link (S1, S3, S6)
-status: user đã duyệt 2026-09-25 — đang làm (phase 1–5 xong)
+status: hoàn thành 2026-09-25 (phase 1–6 xong; còn 2 việc cần người: đo timestamp bằng tai, chạy migration 3 và 4)
 created: 2026-09-25
 refs: docs/PRD.md §5, §6.1–6.3 (IN-01,04,05; PV-01..09; LS-01..10), §7, §8; docs/design-brief.md §2–5; design/*.html; CLAUDE.md quy tắc 3–9
 ---
@@ -37,7 +37,7 @@ Stitch project "Custom Design Project" (`13937936699626462675`, theme "Warm Lite
 | 3 ✅ | S4 Xem trước | Tóm tắt + tag (PV-01), thẻ từ vựng (PV-02) và ngữ pháp (PV-03), lọc level (PV-04), Đã biết + Hoàn tác (PV-05), Lưu (PV-06), Nghe thử ±0,5 giây (PV-07), Báo sai (PV-09, ghi `item_reports`), thẻ dùng chung với S5 | 2 ngày |
 | 4 ✅ | S5 Nghe | Player + lời chạy theo nhạc, tự cuộn (LS-01,02), pinyin/dịch bật tắt nhớ lựa chọn (LS-03), tô sáng từ vựng/ngữ pháp bằng hai kiểu khác nhau, không chỉ màu (LS-04), panel "Đang hát" / bottom sheet (LS-05), bấm câu để nhảy (LS-07), lặp câu (LS-08), tốc độ (LS-09), phím tắt (LS-10) | 2,5 ngày |
 | 5 ✅ | S6 Tra từ | Bấm từ bất kỳ → popover: mục có sẵn dùng ngay; từ khác tra từ điển + LLM giải nghĩa theo ngữ cảnh, cache `term_explanations` (LS-06, ≤ 1,5 s; cache ≤ 200 ms) | 1,5 ngày |
-| 6 | Hoàn thiện | a11y WCAG 2.2 AA (nút thật, vùng bấm ≥ 44 px, tương phản, bàn phím), responsive 390/1440, `noindex`, Playwright E2E (dán link → xem trước → nghe, dùng fixture 夜车) | 1,5 ngày |
+| 6 ✅ | Hoàn thiện | a11y WCAG 2.2 AA (nút thật, vùng bấm ≥ 44 px, tương phản, bàn phím), responsive 390/1440, `noindex`, Playwright E2E (dán link → xem trước → nghe, dùng fixture 夜车) | 1,5 ngày |
 
 Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanations`, `item_reports` (user chạy trong SQL Editor như trước).
 
@@ -89,3 +89,18 @@ Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanati
 - Hạn chế đã biết: cụm nhiều chữ mà jieba coi là một token nhưng không có trong từ điển (vd. "许多年") hiện "Chưa có trong từ điển" và chỉ có nghĩa theo ngữ cảnh; chưa tra từng chữ thành phần. Nút Báo sai của popover chưa có (PV-09 mới ở thẻ xem trước).
 - Sửa kèm theo: vòng viền focus toàn cục chuyển vào `@layer base` để lớp tiện ích (`outline-none`) ghi đè được.
 - Kiểm thử: 221 unit, 27 E2E xanh (thêm 6 E2E tra từ với API giả).
+
+## Kết quả phase 6 (2026-09-25)
+- **Truy cập (WCAG 2.2 AA):** axe-core tự động trên trang chủ, xem trước, nghe × sáng/tối × desktop/mobile, popover tra từ đang mở và màn lỗi (23 kiểm tra, 0 vi phạm sau khi sửa). Sửa: số thứ tự câu tương phản 4,47 → dùng `on-surface-variant`. Thêm liên kết "Bỏ qua tới nội dung chính" (WCAG 2.4.1, `#main`), Escape đóng menu Báo sai kể cả khi focus ở mục trong menu, vòng focus toàn cục chuyển vào `@layer base`.
+- **Vùng bấm ≥ 44 px:** kiểm tra tự động mọi nút/liên kết ở 390 và 1440 px; sửa logo, số câu (36 → 44), nút tốc độ 1x. Ngoại lệ có chủ đích: từ trong lời hát (liên kết nằm giữa câu, WCAG 2.5.8).
+- **Responsive:** không tràn ngang ở 360/390/768/1024/1440 px trên 3 màn chính (test tự động). Đã đối chiếu ảnh chụp Playwright desktop sáng/tối và mobile.
+- **Bàn phím:** 5 test (skip link, dán link + Enter, thẻ xem trước bằng Space/Enter, menu báo sai + Escape, popover tra từ trả focus).
+- **E2E luồng thật:** seed bài hư cấu 夜车 (`e2eFixture1`) vào Supabase thật rồi dán link → xem trước → nghe → bấm từ → quay lại thấy bài ở "gần đây"; thêm 2 test biên (videoId sai → 404, vào thẳng /listen của bài chưa phân tích → chuyển về trang bài học). Tự bỏ qua nếu thiếu khóa Supabase; dọn dữ liệu seed sau khi chạy.
+- **Hiệu năng (bản production, localhost):** JS ban đầu gzip: trang chủ 182 KB, trang phân tích 189 KB, xem trước 189 KB, nghe 182 KB (ngưỡng PRD ≤ 200 KB). Phát hiện và sửa: `zod` (~95 KB gzip) bị kéo xuống trình duyệt qua `report-schema` → tách `report-reasons.ts` không phụ thuộc zod (trang bài học từ 278 KB còn 189 KB). Chưa đo LCP trên 4G thật (PRD ≤ 2,0 s) và 60 fps khi cuộn lời.
+- Tổng: 221 unit, 58 E2E xanh; lint, tsc, build sạch.
+
+## Còn lại của M2 (cần người)
+- Chạy migration 3 (`item_reports`) và 4 (`term_explanations`) trong Supabase SQL Editor.
+- Đo độ lệch timestamp LRC so với video (LS-02 ≤ 300 ms): nghe kiểm tra tay ~10 bài, nếu lệch thì thêm chỉnh offset ±0,5 s.
+- Đo LCP/FPS trên thiết bị thật; deploy Vercel (M0 phase 4 vẫn dở: thử caption/LRCLIB từ IP cloud).
+- Giới hạn tần suất hiện ở bộ nhớ từng instance; giới hạn theo tài khoản ẩn danh làm ở M3 — **chưa nên công khai URL trước đó**.

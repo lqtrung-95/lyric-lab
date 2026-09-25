@@ -18,7 +18,7 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
     <>
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title={analysis ? "Xem trước" : "Đang phân tích"} />
-      <main className="pt-16">
+      <main id="main" tabIndex={-1} className="pt-16 outline-none">
         {analysis && song ? (
           <>
             <RememberSong videoId={videoId} title={song.title} channelTitle={song.channelTitle} />

@@ -13,7 +13,7 @@ export default function PreviewFixturePage() {
     <>
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title="Xem trước" />
-      <main className="pt-16">
+      <main id="main" tabIndex={-1} className="pt-16 outline-none">
         <PreviewScreen analysis={yeCheAnalysis} song={yeCheSong} />
       </main>
     </>

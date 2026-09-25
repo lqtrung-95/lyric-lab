@@ -8,17 +8,36 @@ Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựn
 
 ## Trạng thái
 
-M0 đang làm: scaffold xong (Next.js 16, Supabase, Vitest, Playwright). Tiếp theo: lấy caption YouTube cho 50 bài C-pop. Kế hoạch: [`plans/260924-1827-m0-caption-spike-and-scaffold/`](plans/260924-1827-m0-caption-spike-and-scaffold/plan.md).
+- M0 (spike nguồn lời), M1 (pipeline phân tích), M2 (giao diện Xem trước + Nghe + tra từ): **xong**. M3 (flashcard SRS, tài khoản ẩn danh + Google) chưa làm.
+- Kế hoạch và kết quả từng mốc: [`plans/`](plans/) (M0: `260924-1827-…`, M1: `260925-1030-…`, M2: `260925-1401-…`); báo cáo M0: `plans/reports/`.
 
 ## Chạy thử
 
+Cần Node ≥ 20.9 (khuyến nghị 22). Tạo `.env.local` từ `.env.example` và điền khóa (Supabase, Groq, YouTube Data API); không commit file này.
+
 ```
-cp .env.example .env.local   # điền key, không commit
 npm install
-npm run dev
+npm run dev                  # http://localhost:3000
 npm run build && npm run lint
-npm run test                 # Vitest
-npm run test:e2e             # Playwright (cổng 3100)
+npm run test                 # Vitest (unit)
+npm run test:e2e             # Playwright, cổng 3100
 ```
 
-Cần Node ≥ 20.9 (khuyến nghị 22, vì `@supabase/supabase-js` sắp bỏ Node 20).
+### Cơ sở dữ liệu (Supabase)
+
+Chạy lần lượt các file trong `supabase/migrations/` bằng Supabase SQL Editor (dictionary → cache phân tích → báo sai → giải nghĩa từ). Sau đó nạp từ điển:
+
+```
+# tải CC-CEDICT, HSK 3.0, Unihan vào data-cache/ (xem plans/260925-1030-m1-analysis-pipeline/plan.md), rồi:
+npx tsx --env-file=.env.local scripts/dictionary/import-dictionary.mts
+```
+
+Node 20 cần thêm `NODE_OPTIONS=--experimental-websocket` khi chạy các script dùng `@supabase/supabase-js` ngoài Next.
+
+### Thử giao diện không cần AI
+
+`/dev/preview-fixture` và `/dev/listen-fixture` (chỉ ngoài production) hiển thị bài hư cấu 夜车. Test E2E dùng các trang này, YouTube IFrame API giả, và một bài hư cấu được seed vào Supabase để kiểm tra luồng dán link → xem trước → nghe (bỏ qua nếu thiếu khóa Supabase).
+
+### Ghi công dữ liệu
+
+Từ điển dùng CC-CEDICT (CC BY-SA 4.0, MDBG), danh sách HSK 3.0 từ `drkameleon/complete-hsk-vocabulary` (MIT), âm Hán Việt từ Wiktionary (CC BY-SA 4.0) và Unihan (Unicode License). Lời bài hát lấy từ caption YouTube hoặc LRCLIB.

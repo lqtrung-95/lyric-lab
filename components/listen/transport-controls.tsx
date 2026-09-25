@@ -67,7 +67,7 @@ export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loop
             type="button"
             aria-pressed={r === rate}
             onClick={() => onRate(r)}
-            className={`min-h-11 rounded-full px-3 text-label-sm font-semibold ${r === rate ? "bg-primary text-on-primary" : "bg-surface-container-highest text-on-surface"}`}
+            className={`min-h-11 min-w-11 rounded-full px-3 text-label-sm font-semibold ${r === rate ? "bg-primary text-on-primary" : "bg-surface-container-highest text-on-surface"}`}
           >
             {r === 1 ? "1x" : `${String(r).replace(".", ",")}x`}
           </button>

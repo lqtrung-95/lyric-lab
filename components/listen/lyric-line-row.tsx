@@ -46,7 +46,7 @@ function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights
         type="button"
         aria-label={`Phát từ câu ${line.index + 1}`}
         onClick={(e) => { e.stopPropagation(); onSeek(line.index); }}
-        className={`mt-0.5 min-h-11 w-9 shrink-0 text-left text-label-sm ${active ? "font-bold text-primary" : "text-outline"}`}
+        className={`mt-0.5 min-h-11 w-11 shrink-0 text-left text-label-sm ${active ? "font-bold text-primary" : "text-on-surface-variant"}`}
       >
         {String(line.index + 1).padStart(2, "0")}
       </button>

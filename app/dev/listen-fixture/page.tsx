@@ -13,7 +13,7 @@ export default function ListenFixturePage() {
     <>
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title="Nghe" />
-      <main className="pt-16">
+      <main id="main" tabIndex={-1} className="pt-16 outline-none">
         <ListenScreen analysis={yeCheAnalysis} song={yeCheSong} />
       </main>
     </>

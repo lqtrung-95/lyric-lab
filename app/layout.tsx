@@ -26,7 +26,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href={googleFontsUrl()} />
       </head>
-      <body className="min-h-dvh">{children}</body>
+      <body className="min-h-dvh">
+        {/* Liên kết bỏ qua thanh điều hướng cho người dùng bàn phím và trình đọc màn hình (WCAG 2.4.1). */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-primary focus:px-4 focus:py-3 focus:text-label-md focus:font-semibold focus:text-on-primary"
+        >
+          Bỏ qua tới nội dung chính
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

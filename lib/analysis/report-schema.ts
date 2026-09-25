@@ -1,14 +1,6 @@
 import { z } from "zod";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
-
-export const REPORT_REASONS = ["wrong_meaning", "wrong_pinyin", "not_worth_learning"] as const;
-export type ReportReason = (typeof REPORT_REASONS)[number];
-
-export const REPORT_REASON_LABELS: Record<ReportReason, string> = {
-  wrong_meaning: "Sai nghĩa",
-  wrong_pinyin: "Sai pinyin",
-  not_worth_learning: "Không đáng học",
-};
+import { REPORT_REASONS } from "./report-reasons";
 
 export const reportRequestSchema = z.object({
   videoId: z.string().refine(isValidVideoId, "videoId không hợp lệ"),

@@ -18,7 +18,7 @@ export default async function ListenPage({ params }: { params: Promise<{ videoId
     <>
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title="Nghe" />
-      <main className="pt-16">
+      <main id="main" tabIndex={-1} className="pt-16 outline-none">
         <ListenScreen analysis={analysis} song={song} />
       </main>
     </>
