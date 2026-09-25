@@ -10,9 +10,12 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
+import type { WordSelection } from "./lyric-line-row";
 import { SingingPanel } from "./singing-panel";
 import { TransportControls } from "./transport-controls";
 import { usePlaybackSync } from "./use-playback-sync";
+import { useTermLookup } from "./use-term-lookup";
+import { WordPopover } from "./word-popover";
 
 interface ListenScreenProps {
   analysis: SongAnalysis;
@@ -26,7 +29,10 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
   const [loopIndex, setLoopIndex] = useState<number | null>(null);
+  const [word, setWord] = useState<WordSelection | null>(null);
   const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex);
+  const lookup = useTermLookup(analysis.videoId, word);
+  const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
 
   const known = useMemo(() => new Set(learner.state.known), [learner.state.known]);
   const savedKeys = useMemo(() => new Set(learner.state.saved.map((s) => s.key)), [learner.state.saved]);
@@ -82,6 +88,15 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
     learner.toggleSaved(entry);
   };
 
+  const saveWord = (term: string) => {
+    if (!word) return;
+    const line = lines[word.lineIndex];
+    learner.toggleSaved({
+      key: itemKey({ type: "vocab", term }), videoId: analysis.videoId, type: "vocab", term,
+      lineIndex: word.lineIndex, start: line?.start ?? 0, savedAt: Date.now(),
+    });
+  };
+
   const title = analysis.track?.title ?? song.title;
   const artist = analysis.track?.artist ?? song.channelTitle;
 
@@ -114,13 +129,20 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
-            onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={seekToLine}
+            onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={seekToLine} onWord={setWord}
           />
         </div>
         <div className="lg:sticky lg:top-24 lg:col-span-5">
           <SingingPanel line={lines[currentIndex] ?? null} items={currentItems} savedKeys={savedKeys} onToggleSave={saveFromPanel} />
         </div>
       </div>
+      {word && (
+        <WordPopover
+          word={word} item={wordItem} lookup={lookup}
+          saved={savedKeys.has(itemKey({ type: "vocab", term: wordItem?.term ?? (lookup.entry?.ok && lookup.entry.value ? lookup.entry.value.term : word.term) }))}
+          onClose={() => setWord(null)} onPlayLine={() => seekToLine(word.lineIndex)} onToggleSave={saveWord}
+        />
+      )}
     </>
   );
 }

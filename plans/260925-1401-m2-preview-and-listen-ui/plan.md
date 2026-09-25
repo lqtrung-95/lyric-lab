@@ -1,6 +1,6 @@
 ---
 title: M2 — Giao diện Xem trước (S4) + Nghe (S5) và luồng dán link (S1, S3, S6)
-status: user đã duyệt 2026-09-25 — đang làm (phase 1–4 xong)
+status: user đã duyệt 2026-09-25 — đang làm (phase 1–5 xong)
 created: 2026-09-25
 refs: docs/PRD.md §5, §6.1–6.3 (IN-01,04,05; PV-01..09; LS-01..10), §7, §8; docs/design-brief.md §2–5; design/*.html; CLAUDE.md quy tắc 3–9
 ---
@@ -36,7 +36,7 @@ Stitch project "Custom Design Project" (`13937936699626462675`, theme "Warm Lite
 | 2 ✅ | S1 + S3 + API | Ô dán link (IN-01, lỗi ngay không gọi server), API SSE, màn tiến trình 3 bước + nút hủy (IN-04), lỗi không có lời (IN-05), bài đã học gần đây (localStorage) | 1,5 ngày |
 | 3 ✅ | S4 Xem trước | Tóm tắt + tag (PV-01), thẻ từ vựng (PV-02) và ngữ pháp (PV-03), lọc level (PV-04), Đã biết + Hoàn tác (PV-05), Lưu (PV-06), Nghe thử ±0,5 giây (PV-07), Báo sai (PV-09, ghi `item_reports`), thẻ dùng chung với S5 | 2 ngày |
 | 4 ✅ | S5 Nghe | Player + lời chạy theo nhạc, tự cuộn (LS-01,02), pinyin/dịch bật tắt nhớ lựa chọn (LS-03), tô sáng từ vựng/ngữ pháp bằng hai kiểu khác nhau, không chỉ màu (LS-04), panel "Đang hát" / bottom sheet (LS-05), bấm câu để nhảy (LS-07), lặp câu (LS-08), tốc độ (LS-09), phím tắt (LS-10) | 2,5 ngày |
-| 5 | S6 Tra từ | Bấm từ bất kỳ → popover: mục có sẵn dùng ngay; từ khác tra từ điển + LLM giải nghĩa theo ngữ cảnh, cache `term_explanations` (LS-06, ≤ 1,5 s; cache ≤ 200 ms) | 1,5 ngày |
+| 5 ✅ | S6 Tra từ | Bấm từ bất kỳ → popover: mục có sẵn dùng ngay; từ khác tra từ điển + LLM giải nghĩa theo ngữ cảnh, cache `term_explanations` (LS-06, ≤ 1,5 s; cache ≤ 200 ms) | 1,5 ngày |
 | 6 | Hoàn thiện | a11y WCAG 2.2 AA (nút thật, vùng bấm ≥ 44 px, tương phản, bàn phím), responsive 390/1440, `noindex`, Playwright E2E (dán link → xem trước → nghe, dùng fixture 夜车) | 1,5 ngày |
 
 Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanations`, `item_reports` (user chạy trong SQL Editor như trước).
@@ -79,3 +79,13 @@ Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanati
 - Ngữ pháp gạch chân cần vị trí ký tự: `validateLlmOutput` giờ lưu `occurrences[].ranges` (tính bằng `grammarCharRanges` trên bản giản thể, độ dài giữ nguyên với bản gốc). **Bài đã cache trước đó chưa có `ranges`** → chưa gạch chân được ngữ pháp trong lời (vẫn thấy ở panel); phân tích lại (đổi `PROMPT_VERSION` hoặc xóa cache) để có.
 - Chưa làm: tra từ bấm vào từ bất kỳ (S6, phase 5); từ trong lời hiện chưa bấm được. Chưa đo độ lệch timestamp LRC (LS-02 ≤ 300 ms): cần nghe tay ~10 bài.
 - Kiểm thử: 209 unit, 21 E2E xanh (E2E dùng YouTube IFrame API giả điều khiển được qua `window.__t`, dữ liệu 夜车 hư cấu tại `/dev/listen-fixture`). Đã chụp ảnh Playwright desktop sáng/tối và mobile để đối chiếu.
+
+## Kết quả phase 5 (2026-09-25)
+- Từ trong lời giờ là nút bấm (`lyric-line-row`; token Hán bấm được, dấu câu/chữ Latin không); bấm từ không làm video nhảy, bấm câu thì nhảy. `buildLineSegments` trả nhóm theo token (giữ token nguyên khi ngữ pháp cắt ngang).
+- S6 `WordPopover`: chữ Hán, pinyin, Hán Việt, cấp HSK, "Nghĩa trong bài" (tiếng Việt), "Từ điển" (nghĩa tiếng Anh), Nghe câu này, Lưu. Desktop: thẻ nổi góc dưới phải (không che cột lời); mobile: bottom sheet. Esc đóng và trả focus về từ vừa bấm. Không tự mở khi đang nghe.
+- Từ có sẵn trong danh sách học (có `itemId`): hiện tức thì, không gọi mạng. Từ khác: `GET /api/lookup?term=` (từ điển + Hán Việt + cấp, `Cache-Control` 1 ngày) và `POST /api/explain` (LLM) chạy song song, phần nào xong hiện trước; kết quả giữ lại nên bấm lại tức thì.
+- `POST /api/explain`: từ phải là token thật của dòng đó (chặn dùng API để hỏi LLM tùy ý), đọc cache `term_explanations` trước, prompt bám nghĩa từ điển, `gpt-oss-20b` rồi dự phòng `gpt-oss-120b`, trần 400 token đầu ra (thêm `maxTokens` cho `createGroqChat`), 100 lần gọi LLM/ngày/IP, mã lỗi 400/404/429/502.
+- Đo thật (chưa có bảng cache): giải nghĩa mất khoảng 1,2–2,0 giây; từ điển trả gần như tức thì nên phần từ điển hiện trước. **Migration mới chờ user chạy:** `supabase/migrations/20260925000004_term_explanations.sql` (sau đó lần bấm lặp lại ~200 ms, khớp LS-06). Chưa chạy migration thì vẫn dùng được, chỉ không có cache.
+- Hạn chế đã biết: cụm nhiều chữ mà jieba coi là một token nhưng không có trong từ điển (vd. "许多年") hiện "Chưa có trong từ điển" và chỉ có nghĩa theo ngữ cảnh; chưa tra từng chữ thành phần. Nút Báo sai của popover chưa có (PV-09 mới ở thẻ xem trước).
+- Sửa kèm theo: vòng viền focus toàn cục chuyển vào `@layer base` để lớp tiện ích (`outline-none`) ghi đè được.
+- Kiểm thử: 221 unit, 27 E2E xanh (thêm 6 E2E tra từ với API giả).

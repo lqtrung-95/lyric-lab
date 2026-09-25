@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
-import { LyricLineRow, type LineState } from "./lyric-line-row";
+import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-row";
 import { ViewToggles } from "./view-toggles";
 
 // Sau khi người dùng tự cuộn, tạm ngừng tự cuộn theo lời để không giật màn hình.
@@ -19,10 +19,11 @@ interface LyricListProps {
   onTogglePinyin: () => void;
   onToggleTranslation: () => void;
   onSeek: (index: number) => void;
+  onWord: (word: WordSelection) => void;
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, onSeek }: LyricListProps) {
+export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, onSeek, onWord }: LyricListProps) {
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
@@ -74,7 +75,7 @@ export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, sho
           <Icon name="format_quote" size={20} className="text-primary" />
           Lời ca & nhịp điệu
         </h2>
-        <p className="text-label-sm text-on-surface-variant">Bấm vào câu để nhảy tới đó</p>
+        <p className="text-label-sm text-on-surface-variant">Bấm câu để nhảy tới đó · bấm từ để tra</p>
         <ViewToggles
           className="flex md:hidden"
           showPinyin={showPinyin} showTranslation={showTranslation}
@@ -94,6 +95,7 @@ export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, sho
               highlights={highlightsByLine.get(line.index)!}
               sinoVietById={sinoVietById}
               onSeek={onSeek}
+              onWord={onWord}
             />
           );
         })}

@@ -3,6 +3,8 @@ export interface ChatRequest {
   model: string;
   system: string;
   user: string;
+  /** Trần token đầu ra; Groq tính giá trị này vào hạn mức token/phút nên yêu cầu ngắn nên đặt thấp. */
+  maxTokens?: number;
 }
 export type ChatFn = (req: ChatRequest) => Promise<string>;
 
@@ -35,7 +37,7 @@ export function createGroqChat(
   fetchFn: typeof fetch = fetch,
   sleep: (ms: number) => Promise<void> = (ms) => new Promise((r) => setTimeout(r, ms)),
 ): ChatFn {
-  return async ({ model, system, user }) => {
+  return async ({ model, system, user, maxTokens = MAX_COMPLETION_TOKENS }) => {
     for (let attempt = 0; ; attempt++) {
       const res = await fetchFn(ENDPOINT, {
         method: "POST",
@@ -44,7 +46,7 @@ export function createGroqChat(
           model,
           messages: [{ role: "system", content: system }, { role: "user", content: user }],
           temperature: 0.3,
-          max_completion_tokens: MAX_COMPLETION_TOKENS,
+          max_completion_tokens: maxTokens,
           response_format: { type: "json_object" },
           ...modelParams(model),
         }),
