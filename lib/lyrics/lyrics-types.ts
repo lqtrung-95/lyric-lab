@@ -40,3 +40,13 @@ export interface LrclibItem {
   instrumental: boolean;
   syncedLyrics: string | null;
 }
+
+/** Dòng lời sau chuẩn hóa: `text` giữ bản gốc để hiển thị, `simplified` dùng để tra từ điển và so khớp. */
+export interface NormalizedLyricLine {
+  index: number;
+  text: string;
+  simplified: string;
+  start: number;
+  end: number;
+  hasHan: boolean;
+}
