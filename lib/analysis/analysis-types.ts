@@ -27,3 +27,45 @@ export interface VocabCandidate {
   meanings: string[];
   occurrences: VocabOccurrence[];
 }
+
+export type LyricsSourceLabel = "youtube_caption" | "lrclib";
+
+/**
+ * Mục xem trước (PRD §8.2). `level` là cấp HSK 3.0 lấy từ từ điển (1–6, 7 = nhóm 7–9); từ ngoài HSK là null.
+ * Với ngữ pháp, `level` là ước lượng của LLM (không có từ điển cho ngữ pháp).
+ */
+export interface PreviewItem {
+  id: string;
+  type: "vocab" | "grammar";
+  term: string;
+  reading?: string;
+  sinoViet?: string;
+  level: number | null;
+  meaningInContext: string;
+  explanation?: string;
+  example?: { zh: string; vi: string };
+  commonMistake?: string;
+  occurrences: VocabOccurrence[];
+  priority: number;
+}
+
+export interface AnalyzedLine {
+  index: number;
+  text: string;
+  start: number;
+  end: number;
+  pinyin: string;
+  translation?: string;
+  tokens: { text: string; itemId?: string }[];
+}
+
+export interface SongAnalysis {
+  videoId: string;
+  lyricsSource: LyricsSourceLabel;
+  summary: string;
+  moods: string[];
+  lines: AnalyzedLine[];
+  items: PreviewItem[];
+  promptVersion: string;
+  model: string;
+}
