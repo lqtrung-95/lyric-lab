@@ -66,6 +66,7 @@ export function ReviewScreen() {
   const done = Math.max(0, s.initialTotal - s.remaining);
   return (
     <div className="mx-auto flex max-w-3xl flex-col items-center gap-space-md">
+      <h1 className="sr-only">Ôn tập</h1>
       <div className="w-full">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-low px-4 text-label-md text-on-surface-variant hover:bg-surface-container-high">

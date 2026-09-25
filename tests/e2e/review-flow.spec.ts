@@ -36,8 +36,9 @@ test("Lưu → ôn: lật bằng Space, chấm bằng phím 3, ghi FSRS và nh�
     await page.keyboard.press("4");
     await expect(page.getByRole("heading", { name: "Xong buổi ôn hôm nay" })).toBeVisible();
 
-    const { data: card } = await sb.from("user_cards").select("state,reps").eq("user_id", userId).eq("item_key", "vocab:离开").single();
-    expect(card).toMatchObject({ reps: 2 });
+    // Ghi Supabase chạy nền sau khi giao diện đã chuyển thẻ: chờ tới khi thấy đủ.
+    await expect.poll(async () => (await sb.from("user_cards").select("reps").eq("user_id", userId).eq("item_key", "vocab:离开").single()).data?.reps).toBe(2);
+    const { data: card } = await sb.from("user_cards").select("state").eq("user_id", userId).eq("item_key", "vocab:离开").single();
     expect(card!.state).toBeGreaterThan(0);
     const logs = await sb.from("review_logs").select("rating").eq("user_id", userId).order("id");
     expect(logs.data?.map((l) => l.rating)).toEqual([3, 4]);
