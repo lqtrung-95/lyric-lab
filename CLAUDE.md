@@ -40,7 +40,7 @@ docs/                # PRD, design brief
 
 ## Quy tắc bắt buộc
 
-1. **Không bao giờ để LLM tự viết hoặc đoán lời bài hát.** Lời chỉ lấy từ caption (hoặc STT về sau). LLM chỉ phân tích lời đã có.
+1. **Không bao giờ để LLM tự viết hoặc đoán lời bài hát.** Lời chỉ lấy từ nguồn có sẵn: caption YouTube trước, kho lời đồng bộ (LRCLIB) khi không có caption (hoặc STT về sau). LLM chỉ phân tích lời đã có.
 2. **Pinyin, level HSK, âm Hán Việt lấy từ từ điển**, không lấy từ LLM.
 3. Mỗi `PreviewItem` phải khớp được vị trí trong lời thật. Mục không khớp thì loại bỏ.
 4. **API key chỉ ở server.** Không dùng biến `NEXT_PUBLIC_*` cho key AI hoặc YouTube Data API.
