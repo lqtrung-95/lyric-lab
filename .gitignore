@@ -30,3 +30,4 @@ test-results/
 *.tsbuildinfo
 next-env.d.ts
 spike-output/
+data-cache/

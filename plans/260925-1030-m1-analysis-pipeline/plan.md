@@ -15,8 +15,8 @@ Thay đổi so với PRD nhờ kết quả M0: bước "Lấy lời" có 2 ngu�
 | # | Phase | Nội dung | Ước lượng |
 |---|---|---|---|
 | 1 ✅ | `LyricsProvider` | Interface gộp `CaptionProvider` + `LrclibProvider`; thứ tự ưu tiên; chọn bản LRCLIB theo tên + độ dài video (loại bản lệch > 10s, cover/live); nhãn nguồn `youtube_caption` / `lrclib`; Vitest bằng fixture hư cấu | 1 ngày |
-| 2 | Chuẩn hóa lời | Làm sạch (đã có `cleanCaptionLines`), phồn → giản thể để tra cứu (`opencc-js`), giữ bản gốc để hiển thị, bỏ dòng nhạc lý (vd. "Re So So Si…") | 1 ngày |
-| 3 | Từ điển | Migration Supabase + nạp CC-CEDICT (CC BY-SA), danh sách HSK, âm Hán Việt (Unihan `kVietnamese`); hàm tra: pinyin, nghĩa, level, Hán Việt | 1,5 ngày |
+| 2 ✅ | Chuẩn hóa lời | Làm sạch (đã có `cleanCaptionLines`), phồn → giản thể để tra cứu (`opencc-js`), giữ bản gốc để hiển thị, bỏ dòng nhạc lý (vd. "Re So So Si…") | 1 ngày |
+| 3 🟡 | Từ điển (code xong, chờ chạy migration + nạp dữ liệu) | Migration Supabase + nạp CC-CEDICT (CC BY-SA), danh sách HSK, âm Hán Việt (Unihan `kVietnamese`); hàm tra: pinyin, nghĩa, level, Hán Việt | 1,5 ngày |
 | 4 | Tách từ + ứng viên | `@node-rs/jieba` (binary dựng sẵn, chạy được trên Vercel; `nodejieba` cần biên dịch native); tính tần suất, level, ứng viên | 1 ngày |
 | 5 | LLM + validate | Groq (Llama 3.3 70B) + model dự phòng; schema Zod cho `SongAnalysis`; ghép vị trí `occurrences`, loại mục không khớp; pinyin/level/Hán Việt luôn từ từ điển; `promptVersion` | 2 ngày |
 | 6 | Cache | Bảng `songs`, `song_analyses` (key: videoId + ngôn ngữ học + ngôn ngữ giải thích + promptVersion), RLS chỉ server ghi; chính sách lưu lời theo mục rủi ro pháp lý | 1 ngày |
@@ -51,3 +51,11 @@ Kiểm tra thật trên video đầu tiên của 50 bài (đi từ tiêu đề v
 ## Câu hỏi mở
 - LRCLIB: điều khoản/giới hạn tốc độ khi dùng cho app công khai; có nên tự mirror dữ liệu không.
 - Lệch mốc thời gian LRC so với video: đo tay 10 bài trước khi chốt cách xử lý (offset do người dùng chỉnh, hay tự phát hiện).
+
+## Kết quả phase 2–3 (2026-09-25)
+- Phase 2: `lib/lyrics/normalize-lyric-lines.ts` (bỏ credit, chú âm phù hiệu, solfege; thêm bản giản thể; `hasHan`).
+- Phase 3, nguồn dữ liệu (tải vào `data-cache/`, đã gitignore, không commit): CC-CEDICT (CC BY-SA 4.0, 125.101 mục), `drkameleon/complete-hsk-vocabulary` (MIT; dùng bộ `new-*` = HSK 3.0 chuẩn 2021, 10.969 từ), Unihan `kVietnamese` (8.306 chữ).
+- **Giới hạn HSK 3.0:** danh sách nguồn chỉ có cấp 1–6 và nhóm "7–9" gộp chung (lưu là cấp 7). Không tách được 7, 8, 9 riêng. Bộ `newest-*` trong cùng dataset không có tài liệu nên không dùng.
+- Pinyin của CC-CEDICT được đổi sang dạng có dấu (`pinyin-tone-marks.ts`); từ nhiều âm gắn cấp HSK đúng cách đọc.
+- Âm Hán Việt = ghép âm đầu tiên của từng chữ (Unihan); chữ thiếu trong bảng thì trả null, không đoán. Chưa đo độ phủ trên lời thật.
+- Migration: `supabase/migrations/20260925000001_dictionary_tables.sql` (`dict_words`, `dict_hanzi_sino_viet`, RLS chỉ đọc công khai). **Chưa áp dụng**: không có thông tin kết nối DB/CLI, cần user chạy trong Supabase SQL Editor rồi mới chạy `scripts/dictionary/import-dictionary.mts`.
