@@ -1,6 +1,6 @@
 ---
 title: M1 — Pipeline phân tích (lời → từ vựng/ngữ pháp có vị trí)
-status: draft — chờ user duyệt
+status: user đã duyệt 2026-09-25 — đang làm (phase 1 xong)
 created: 2026-09-25
 refs: docs/PRD.md §6.1, §8.1, §8.2, §8.3, §10 (M1); plans/260925-1004-lyrics-source-strategy-after-m0/plan.md
 ---
@@ -14,7 +14,7 @@ Thay đổi so với PRD nhờ kết quả M0: bước "Lấy lời" có 2 ngu�
 ## Phases
 | # | Phase | Nội dung | Ước lượng |
 |---|---|---|---|
-| 1 | `LyricsProvider` | Interface gộp `CaptionProvider` + `LrclibProvider`; thứ tự ưu tiên; chọn bản LRCLIB theo tên + độ dài video (loại bản lệch > 10s, cover/live); nhãn nguồn `youtube_caption` / `lrclib`; Vitest bằng fixture hư cấu | 1 ngày |
+| 1 ✅ | `LyricsProvider` | Interface gộp `CaptionProvider` + `LrclibProvider`; thứ tự ưu tiên; chọn bản LRCLIB theo tên + độ dài video (loại bản lệch > 10s, cover/live); nhãn nguồn `youtube_caption` / `lrclib`; Vitest bằng fixture hư cấu | 1 ngày |
 | 2 | Chuẩn hóa lời | Làm sạch (đã có `cleanCaptionLines`), phồn → giản thể để tra cứu (`opencc-js`), giữ bản gốc để hiển thị, bỏ dòng nhạc lý (vd. "Re So So Si…") | 1 ngày |
 | 3 | Từ điển | Migration Supabase + nạp CC-CEDICT (CC BY-SA), danh sách HSK, âm Hán Việt (Unihan `kVietnamese`); hàm tra: pinyin, nghĩa, level, Hán Việt | 1,5 ngày |
 | 4 | Tách từ + ứng viên | `@node-rs/jieba` (binary dựng sẵn, chạy được trên Vercel; `nodejieba` cần biên dịch native); tính tần suất, level, ứng viên | 1 ngày |
@@ -29,7 +29,20 @@ Phụ thuộc: 1 → 2 → (3 ∥ 4) → 5 → 6 → 7.
 - Khóa Groq chỉ ở server (quy tắc 4).
 - Fixture/test chỉ dùng bài hư cấu 夜车 (quy tắc 7). Bộ đánh giá 50 bài thật cần lời thật → **lưu ngoài repo** (thư mục ignore) và chỉ commit đáp án dạng ID/từ, không kèm lời.
 
-## Cần từ user
+## Quyết định của user (2026-09-25)
+- Duyệt kế hoạch M1.
+- Level dùng **HSK 3.0 (9 cấp)**, không phải 2.0. Hệ quả: PRD (`level: 1–6`), design brief (chọn level HSK1–6, bộ lọc) và onboarding cần cập nhật lên 1–9 (7–9 là nhóm nâng cao trong HSK 3.0). Nguồn danh sách từ HSK 3.0 cần tìm ở phase 3; nếu không có nguồn tin cậy thì phải hỏi lại.
+- Đã thêm `.env.local`: Supabase (URL, anon, service role), Groq, YouTube Data API.
+- User tự chấm đáp án bộ đánh giá (phase 7).
+
+## Kết quả phase 1 (2026-09-25)
+Code: `lib/lyrics/*` (`getLyricsForVideo`, `LrclibProvider`, `pickLrclibVersion`, `buildLrclibQueries`, `parseLrc`), `lib/text/to-simplified-chinese.ts`, `lib/youtube/fetch-video-meta.ts`.
+Kiểm tra thật trên video đầu tiên của 50 bài (đi từ tiêu đề video, giống người dùng dán link), `scripts/caption-spike/lyrics-provider-e2e-check.mts`:
+- Có lời: **42/50 (84%)** (LRCLIB 40, caption YouTube 2; caption tải nội dung đang bị 429 trên IP này nên phần lớn rơi sang LRCLIB).
+- Không có: 8 bài, đều "LRCLIB có kết quả nhưng không bản nào khớp tên + độ dài ≤ 10s" (演员, 凉凉, 无羁, 风起时, 红颜劫, 成都, 双截棍, 大风吹). Cần xem lại từng ca (video là bản live/remix, hay tên bài lệch) — chưa xử lý.
+- Ghi chú kỹ thuật: tìm LRCLIB bằng tiêu đề nguyên bản gần như không ra (vd. "晴天 Sunny Day"); phải rút cụm chữ Hán và đổi giản thể (lần chạy đầu 29/50, sau khi sửa 42/50).
+
+## Cần từ user (đã xong, giữ để tham chiếu)
 1. **Duyệt kế hoạch** này (CLAUDE.md: lập kế hoạch → chờ duyệt → code).
 2. HSK 2.0 (6 cấp) hay 3.0 (9 cấp)? (PRD câu hỏi mở; đề xuất 2.0 vì PRD và design dùng HSK1–6).
 3. Project Supabase Cloud (URL, anon key, service role key) trước phase 3; Groq API key trước phase 5.

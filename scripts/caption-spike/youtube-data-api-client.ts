@@ -1,3 +1,5 @@
+import { parseIsoDuration } from "@/lib/youtube/parse-iso-duration";
+
 // Data API v3 chỉ dùng để tìm video và lấy thời lượng (search.list 100 đơn vị, videos.list 1 đơn vị).
 export interface SearchHit {
   videoId: string;
@@ -36,10 +38,4 @@ export async function getDurations(ids: string[], key: string): Promise<Record<s
     for (const v of json.items) out[v.id] = parseIsoDuration(v.contentDetails.duration);
   }
   return out;
-}
-
-export function parseIsoDuration(iso: string): number {
-  const m = iso.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/);
-  if (!m) return 0;
-  return Number(m[1] ?? 0) * 3600 + Number(m[2] ?? 0) * 60 + Number(m[3] ?? 0);
 }
