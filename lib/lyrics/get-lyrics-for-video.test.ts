@@ -32,6 +32,7 @@ describe("getLyricsForVideo", () => {
   it("không có track → dùng LRCLIB", async () => {
     const r = await getLyricsForVideo(video, { captions: captions({ listTracks: async () => [] }), lrclib: lrclib([lrclibItem]) });
     expect(r.source).toBe("lrclib");
+    expect(r.track).toEqual({ title: "夜车", artist: "歌手甲" });
     expect(r.lines[0]).toMatchObject({ text: "窗外的城市慢慢睡了", start: 0 });
     expect(r.attempts.map((a) => a.outcome)).toEqual(["no_data", "used"]);
   });

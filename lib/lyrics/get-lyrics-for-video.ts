@@ -83,5 +83,5 @@ async function tryLrclib(video: VideoMeta, lrclib: LrclibSearch, attempts: Lyric
     return null;
   }
   attempts.push({ source, outcome: "used", detail: `id=${picked.item.id} gap=${picked.gapSec.toFixed(1)}s` });
-  return { lines, script: quality.script };
+  return { lines, script: quality.script, track: { title: picked.item.trackName, artist: picked.item.artistName } };
 }

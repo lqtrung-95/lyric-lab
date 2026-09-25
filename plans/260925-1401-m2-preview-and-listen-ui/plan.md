@@ -1,6 +1,6 @@
 ---
 title: M2 — Giao diện Xem trước (S4) + Nghe (S5) và luồng dán link (S1, S3, S6)
-status: user đã duyệt 2026-09-25 — đang làm (phase 1–2 xong)
+status: user đã duyệt 2026-09-25 — đang làm (phase 1–3 xong)
 created: 2026-09-25
 refs: docs/PRD.md §5, §6.1–6.3 (IN-01,04,05; PV-01..09; LS-01..10), §7, §8; docs/design-brief.md §2–5; design/*.html; CLAUDE.md quy tắc 3–9
 ---
@@ -34,7 +34,7 @@ Stitch project "Custom Design Project" (`13937936699626462675`, theme "Warm Lite
 |---|---|---|---|
 | 1 ✅ | Nền UI | Token Tailwind v4 từ theme Stitch, font (next/font), dark mode, icon, layout + thanh nav (3 mục, mobile tab bar), thư mục `components/` | 1 ngày |
 | 2 ✅ | S1 + S3 + API | Ô dán link (IN-01, lỗi ngay không gọi server), API SSE, màn tiến trình 3 bước + nút hủy (IN-04), lỗi không có lời (IN-05), bài đã học gần đây (localStorage) | 1,5 ngày |
-| 3 | S4 Xem trước | Tóm tắt + tag (PV-01), thẻ từ vựng (PV-02) và ngữ pháp (PV-03), lọc level (PV-04), Đã biết + Hoàn tác (PV-05), Lưu (PV-06), Nghe thử ±0,5 giây (PV-07), Báo sai (PV-09, ghi `item_reports`), thẻ dùng chung với S5 | 2 ngày |
+| 3 ✅ | S4 Xem trước | Tóm tắt + tag (PV-01), thẻ từ vựng (PV-02) và ngữ pháp (PV-03), lọc level (PV-04), Đã biết + Hoàn tác (PV-05), Lưu (PV-06), Nghe thử ±0,5 giây (PV-07), Báo sai (PV-09, ghi `item_reports`), thẻ dùng chung với S5 | 2 ngày |
 | 4 | S5 Nghe | Player + lời chạy theo nhạc, tự cuộn (LS-01,02), pinyin/dịch bật tắt nhớ lựa chọn (LS-03), tô sáng từ vựng/ngữ pháp bằng hai kiểu khác nhau, không chỉ màu (LS-04), panel "Đang hát" / bottom sheet (LS-05), bấm câu để nhảy (LS-07), lặp câu (LS-08), tốc độ (LS-09), phím tắt (LS-10) | 2,5 ngày |
 | 5 | S6 Tra từ | Bấm từ bất kỳ → popover: mục có sẵn dùng ngay; từ khác tra từ điển + LLM giải nghĩa theo ngữ cảnh, cache `term_explanations` (LS-06, ≤ 1,5 s; cache ≤ 200 ms) | 1,5 ngày |
 | 6 | Hoàn thiện | a11y WCAG 2.2 AA (nút thật, vùng bấm ≥ 44 px, tương phản, bàn phím), responsive 390/1440, `noindex`, Playwright E2E (dán link → xem trước → nghe, dùng fixture 夜车) | 1,5 ngày |
@@ -62,3 +62,12 @@ Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanati
 - Kiểm tra thật: video đã cache → `done` ngay; bài mới → `lyrics` → `analysis` → `done` (~15 s tổng, LLM ~5 s); bài không có lời → lỗi `no_lyrics`; videoId sai → 400. E2E: 5 test xanh.
 - Bỏ: chip "bài mẫu" của S1 (không có video hư cấu để trỏ tới, quy tắc 7) và thẻ "đến hạn hôm nay" (M3).
 - Node 20: supabase-js cần WebSocket → service client dùng `ws` làm transport; Node ≥ 22 không cần.
+
+## Kết quả phase 3 (2026-09-25)
+- S4 đầy đủ: `PreviewScreen` (client) + `PreviewHeader`, `LevelFilterBar`, `VocabCard`, `GrammarCard`, `QuoteBox`, `ReportMenu`, `LevelSelect`. Logic thuần có test: `buildPreviewView` (lọc theo level/chip/"Đã biết", đếm mục ẩn), `preview-format` (mốc giờ, nhãn cấp, dạng chữ Hán đúng như trong lời, đoạn nghe thử), `learner-state` (level, đã biết, đã lưu).
+- Level: HSK 1–6 và "7–9" (nhóm gộp của HSK 3.0); mặc định HSK 3; mục ngoài HSK (16%) luôn hiện. Trạng thái học ở localStorage sau hook `useLearnerState` để M3 đổi sang Supabase.
+- **Khác thiết kế có chủ đích:** thanh nghe thử (PV-07) là khung video nổi ≥ 200 px chứ không phải thanh chỉ có âm thanh, vì điều khoản YouTube yêu cầu player nhúng luôn nhìn thấy được. Player chỉ tạo sau lần bấm ▶ đầu tiên. Đoạn phát: đầu câu lùi 0,3 s tới hết câu (tối đa 8 s), tự dừng rồi ẩn.
+- Tên bài: pipeline giờ mang `track { title, artist }` từ LRCLIB vào `SongAnalysis` (tiêu đề video YouTube lẫn nhãn MV); bài đã cache trước đó chưa có nên dùng tiêu đề YouTube. Chưa dịch tên bài sang tiếng Việt (cần đổi prompt).
+- Báo sai (PV-09): `POST /api/reports` (Zod, 30 báo/ngày/IP) ghi bảng `item_reports`. **Migration mới chờ user chạy:** `supabase/migrations/20260925000003_item_reports.sql`. Chưa chạy migration thì bấm báo sai sẽ nhận lỗi "Chưa gửi được".
+- `/dev/preview-fixture` (chỉ ngoài production) hiển thị bài hư cấu 夜车 để thử giao diện và chạy E2E: 8 test mới (lọc level, chip, đã biết + hoàn tác, lưu, nghe thử tự dừng với YouTube API giả, báo sai, CTA dính ở mobile). Tổng E2E: 13 xanh; unit: 190 xanh.
+- Chưa làm ở S4: nút "Đã lưu bài"/"Chia sẻ" của thiết kế (thuộc thư viện M3), cột level ở nav ("HSK 3 ▾") mới có trong thanh lọc.

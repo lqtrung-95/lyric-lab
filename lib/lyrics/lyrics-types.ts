@@ -17,8 +17,15 @@ export interface LyricsAttempt {
   detail?: string;
 }
 
+/** Tên bài và nghệ sĩ sạch (chỉ có khi lời đến từ kho LRCLIB; tiêu đề video YouTube thường lẫn nhãn MV). */
+export interface TrackInfo {
+  title: string;
+  artist: string;
+}
+
 export interface LyricsResult {
   source: LyricsSource;
+  track?: TrackInfo;
   lines: CaptionLine[];
   script: ChineseScript;
   attempts: LyricsAttempt[];

@@ -49,7 +49,7 @@ export async function analyzeVideo(video: VideoMeta, deps: AnalyzeVideoDeps): Pr
 
   deps.onProgress?.("analysis");
   const { analysis, attempts } = await analyzeLyrics({
-    videoId: video.videoId, lyricsSource: lyrics.source, lines, candidates, dictionary, sinoViet,
+    videoId: video.videoId, lyricsSource: lyrics.source, track: lyrics.track, lines, candidates, dictionary, sinoViet,
     chat: deps.chat, models: deps.models,
   });
   await saveAnalysis(deps.cache, key, video, analysis);

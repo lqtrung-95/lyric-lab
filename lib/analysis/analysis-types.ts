@@ -61,6 +61,8 @@ export interface AnalyzedLine {
 
 export interface SongAnalysis {
   videoId: string;
+  /** Tên bài và nghệ sĩ sạch, nếu nguồn lời cung cấp (LRCLIB). */
+  track?: { title: string; artist: string };
   lyricsSource: LyricsSourceLabel;
   summary: string;
   moods: string[];

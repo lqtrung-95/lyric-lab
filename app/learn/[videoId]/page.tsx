@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
+import { LearnMobileHeader } from "@/components/layout/learn-mobile-header";
+import { SiteHeader } from "@/components/layout/site-header";
 import { AnalyzingScreen } from "@/components/learn/analyzing-screen";
 import { RememberSong } from "@/components/learn/remember-song";
-import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
-import { SiteHeader } from "@/components/layout/site-header";
+import { PreviewScreen } from "@/components/preview/preview-screen";
 import { readCachedAnalysis, readSongRow } from "@/lib/analysis/server-deps";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
@@ -15,21 +16,18 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
 
   return (
     <>
-      <SiteHeader />
-      <main className="mx-auto max-w-7xl px-gutter pb-28 pt-24 md:px-6 md:pb-16 lg:px-12">
-        {analysis ? (
+      <div className="hidden md:block"><SiteHeader /></div>
+      <LearnMobileHeader title={analysis ? "Xem trước" : "Đang phân tích"} />
+      <main className="pt-16">
+        {analysis && song ? (
           <>
-            {song && <RememberSong videoId={videoId} title={song.title} channelTitle={song.channelTitle} />}
-            {/* Bản xem trước (S4) làm ở phase 3. */}
-            <h1 className="font-serif text-headline-lg">{song?.title}</h1>
-            <p className="mt-space-md text-body-lg text-on-surface-variant">{analysis.summary}</p>
-            <p className="mt-space-md text-label-md text-on-surface-variant">{analysis.items.length} mục học · nguồn lời: {analysis.lyricsSource}</p>
+            <RememberSong videoId={videoId} title={song.title} channelTitle={song.channelTitle} />
+            <PreviewScreen analysis={analysis} song={song} />
           </>
         ) : (
-          <AnalyzingScreen videoId={videoId} />
+          <div className="mx-auto max-w-7xl px-gutter pt-space-lg md:px-6 lg:px-12"><AnalyzingScreen videoId={videoId} /></div>
         )}
       </main>
-      <MobileTabBar />
     </>
   );
 }

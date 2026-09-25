@@ -9,6 +9,7 @@ import type { ValidatedOutput } from "./validate-llm-output";
 export interface AssembleInput {
   videoId: string;
   lyricsSource: LyricsSourceLabel;
+  track?: { title: string; artist: string };
   lines: TokenizedLine[];
   llm: Pick<LlmOutput, "summary" | "moods">;
   validated: ValidatedOutput;
@@ -63,6 +64,7 @@ export function assembleSongAnalysis(input: AssembleInput): SongAnalysis {
   return {
     videoId: input.videoId,
     lyricsSource: input.lyricsSource,
+    track: input.track,
     summary: input.llm.summary,
     moods: input.llm.moods,
     lines: analyzedLines,

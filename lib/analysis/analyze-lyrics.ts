@@ -14,6 +14,7 @@ const MIN_VOCAB_ITEMS = 6;
 export interface AnalyzeInput {
   videoId: string;
   lyricsSource: LyricsSourceLabel;
+  track?: { title: string; artist: string };
   lines: TokenizedLine[];
   candidates: VocabCandidate[];
   dictionary: ReadonlyMap<string, DictWordRow[]>;
