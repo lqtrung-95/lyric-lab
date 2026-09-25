@@ -307,7 +307,7 @@ Lời bài hát có bản quyền, nên sản phẩm không xây dựng một kh
 
 | Rủi ro | Khả năng | Tác động | Giảm thiểu |
 | --- | --- | --- | --- |
-| Nhiều video không có caption lời | Cao | Cao | MVP chỉ nhận video có caption, gợi ý bản lyrics video. STT qua extension ở v1.x |
+| Nhiều video không có caption lời | Đã xảy ra (76% bài) | Cao | Nguồn lời: caption YouTube → LRCLIB (M0: phủ 86%). STT qua extension ở v1.x |
 | Caption tự động sai với giọng hát | Cao | Trung bình | Ưu tiên caption do người đăng tải. Kiểm tra tỉ lệ chữ Hán. Gắn nhãn "tự động" |
 | Khiếu nại bản quyền lời | Trung bình | Cao | Các nguyên tắc trên, quy trình gỡ nhanh, license khi có doanh thu |
 | YouTube đổi hoặc chặn cách lấy caption | Trung bình | Cao | Tách lớp `CaptionProvider` để thay nguồn dễ dàng. Cache bền vững |
@@ -332,7 +332,7 @@ MVP dự kiến mất khoảng 6 tuần cho một người làm bán thời gian
 **Câu hỏi mở:**
 
 - [x] Làm lại trên codebase AI-Lyric-Universe hay dựng mới? → **Dựng mới bằng Next.js** (repo này). Repo cũ chỉ để tham khảo.
-- [ ] Tỉ lệ video C-pop có caption lời dùng được thực tế là bao nhiêu? (trả lời ở M0)
+- [x] Tỉ lệ video C-pop có caption lời dùng được thực tế là bao nhiêu? → **24% số bài** (12/50), quá thấp. LRCLIB phủ 86%. Xem `plans/reports/m0-caption-and-lyrics-source-spike-260925-1030-results-report.md`
 - [ ] Level lấy theo HSK 2.0 (6 cấp) hay HSK 3.0 (9 cấp)?
 - [ ] Tên sản phẩm chính thức: giữ "Lyric Lab", dùng lại "AI Lyric Universe", hay tên khác?
 - [ ] Mô hình thu phí sau này: freemium theo số bài mới/ngày, hay gói Pro mở khóa luyện tập và xuất Anki?
