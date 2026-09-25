@@ -1,6 +1,6 @@
 ---
 title: M0 — Spike caption YouTube (50 bài C-pop) + scaffold Next.js/Supabase
-status: câu hỏi mở đã chốt, chờ lệnh bắt đầu phase 1
+status: hoàn thành 2026-09-25 (kết quả: plans/reports/m0-caption-and-lyrics-source-spike-260925-1030-results-report.md)
 created: 2026-09-24
 branch: claude/m0-youtube-captions-cpop-a91b2e
 refs: docs/PRD.md §6.1 (IN-01..IN-05), §8, §9, §10 (M0)
@@ -25,9 +25,9 @@ Scaffold dựng song song vì code lấy caption viết luôn vào `lib/captions
 |---|---|---|---|---|
 | 1 | Scaffold Next.js + Supabase + test tooling | [phase-01](phase-01-scaffold-nextjs-supabase-tooling.md) | 0,5–1 ngày | done |
 | 2 | `parseVideoId` + `CaptionProvider` + quality check | [phase-02](phase-02-caption-provider-and-quality-check.md) | 1–1,5 ngày | done |
-| 3 | Dataset 50 bài + spike runner (IP nhà) | [phase-03](phase-03-dataset-and-spike-runner.md) | 1 ngày | todo |
-| 4 | Kiểm tra lấy caption từ IP cloud (Vercel preview) | [phase-04](phase-04-cloud-ip-fetch-check.md) | 0,5 ngày | todo |
-| 5 | Báo cáo + quyết định Go/No-go STT | [phase-05](phase-05-spike-report-and-decision.md) | 0,5 ngày | todo |
+| 3 ✅ | Dataset 50 bài + spike runner (IP nhà) | [phase-03](phase-03-dataset-and-spike-runner.md) | 1 ngày | done |
+| 4 ✅ | Kiểm tra lấy caption từ IP cloud (Vercel) | [phase-04](phase-04-cloud-ip-fetch-check.md) | 0,5 ngày | done |
+| 5 ✅ | Báo cáo + quyết định Go/No-go STT | [phase-05](phase-05-spike-report-and-decision.md) | 0,5 ngày | done |
 
 Phụ thuộc: 1 → 2 → (3 ∥ 4) → 5.
 

@@ -310,7 +310,7 @@ Lời bài hát có bản quyền, nên sản phẩm không xây dựng một kh
 | Nhiều video không có caption lời | Đã xảy ra (76% bài) | Cao | Nguồn lời: caption YouTube → LRCLIB (M0: phủ 86%). STT qua extension ở v1.x |
 | Caption tự động sai với giọng hát | Cao | Trung bình | Ưu tiên caption do người đăng tải. Kiểm tra tỉ lệ chữ Hán. Gắn nhãn "tự động" |
 | Khiếu nại bản quyền lời | Trung bình | Cao | Các nguyên tắc trên, quy trình gỡ nhanh, license khi có doanh thu |
-| YouTube đổi hoặc chặn cách lấy caption | Trung bình | Cao | Tách lớp `CaptionProvider` để thay nguồn dễ dàng. Cache bền vững |
+| YouTube đổi hoặc chặn cách lấy caption | Đã xảy ra (M0: IP Vercel bị chặn 6/6 video) | Cao | Nguồn chính là LRCLIB; caption YouTube chỉ là nguồn phụ khi chạy từ IP dân cư. Tách lớp `CaptionProvider`/`LyricsProvider` để thay nguồn. Cache bền vững |
 | LLM giải thích sai | Trung bình | Trung bình | Pinyin và level lấy từ từ điển. Validate vị trí. Bộ đánh giá. Nút "Báo sai" |
 | Chi phí AI tăng khi có nhiều bài mới | Thấp | Trung bình | Cache toàn cục, rate limit, model rẻ cho bước đơn giản |
 | Người dùng bỏ qua Xem trước | Trung bình | Thấp | Đo tỉ lệ bỏ qua. Thử nghiệm A/B phiên bản rút gọn 5 thẻ |

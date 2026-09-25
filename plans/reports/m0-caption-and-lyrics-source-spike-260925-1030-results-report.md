@@ -1,6 +1,6 @@
 # M0 — Spike nguồn lời cho 50 bài C-pop (kết quả)
 
-Ngày: 2026-09-25 · Chạy từ IP nhà · Phase 4 (IP Vercel) chưa làm.
+Ngày: 2026-09-25 · Chạy từ IP nhà và từ Vercel (iad1).
 
 ## Phương pháp
 - 50 bài (5 nhóm, chỉ tiếng Phổ thông), danh sách `scripts/caption-spike/cpop-sample-songs.json`. 454 video ứng viên (3 từ `search.list` + ~7 từ tìm "歌词" cho 41 bài chưa dùng được).
@@ -29,9 +29,18 @@ Caption theo nhóm: OST 5/10, Douyin 3/10, Đại lục 3/12, Đài Loan 1/12, b
 2. Rủi ro pháp lý của LRCLIB là quyết định của user; giảm thiểu ở `plans/260925-1004-lyrics-source-strategy-after-m0/plan.md`.
 3. M1 cần: chọn bản LRCLIB theo độ dài video, offset thời gian, xử lý phồn thể (bài Đài Loan chủ yếu phồn thể).
 
+## Kết quả từ IP cloud (Vercel, vùng iad1, route `/api/debug/caption-probe`)
+| Nguồn | Kết quả từ Vercel |
+|---|---|
+| Caption YouTube | **Bị chặn 6/6 video**: InnerTube trả `LOGIN_REQUIRED — Sign in to confirm you're not a bot` ngay ở bước liệt kê track (~250 ms), kể cả video mà máy nhà lấy được caption |
+| LRCLIB | Ổn định 6/6: 20 kết quả, cả 20 có lời đồng bộ, ~150 ms |
+| Phân tích đầu-cuối trên Vercel | 4/4 bài mới xong sau 9–12 giây, cả 4 dùng lời LRCLIB |
+
+Kết luận: **trên production, LRCLIB là nguồn lời duy nhất thực tế**; caption YouTube chỉ dùng được từ IP dân cư (máy nhà) và không thể là nguồn dự phòng trên cloud nếu không có proxy/PO token. Provider caption vẫn được thử trước (tốn ~250 ms rồi rơi sang LRCLIB) và được giữ lại vì rẻ và có thể chạy được ở môi trường khác; nếu cần giảm độ trễ có thể đảo thứ tự hoặc tắt bằng cờ môi trường.
+
 ## Việc còn lại của M0
-- Phase 4: thử caption + LRCLIB từ IP Vercel (chờ project Vercel).
-- Chạy lại 4 video bị 429 (`--retry-errors`) khi hết chặn.
+- Chạy lại 4 video bị 429 trên máy nhà: bỏ qua (không còn ảnh hưởng quyết định vì caption không dùng được trên cloud).
+- Tắt route thăm dò sau khi dùng xong: xóa biến `CAPTION_PROBE_SECRET` trên Vercel (route tự trả 404).
 
 ## Câu hỏi mở
 - Mức lệch timestamp thực tế của LRC so với video (chưa đo; cần kiểm tra tay 10 bài).
