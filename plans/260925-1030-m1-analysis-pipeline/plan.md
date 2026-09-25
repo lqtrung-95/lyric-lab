@@ -16,8 +16,8 @@ Thay đổi so với PRD nhờ kết quả M0: bước "Lấy lời" có 2 ngu�
 |---|---|---|---|
 | 1 ✅ | `LyricsProvider` | Interface gộp `CaptionProvider` + `LrclibProvider`; thứ tự ưu tiên; chọn bản LRCLIB theo tên + độ dài video (loại bản lệch > 10s, cover/live); nhãn nguồn `youtube_caption` / `lrclib`; Vitest bằng fixture hư cấu | 1 ngày |
 | 2 ✅ | Chuẩn hóa lời | Làm sạch (đã có `cleanCaptionLines`), phồn → giản thể để tra cứu (`opencc-js`), giữ bản gốc để hiển thị, bỏ dòng nhạc lý (vd. "Re So So Si…") | 1 ngày |
-| 3 🟡 | Từ điển (code xong, chờ chạy migration + nạp dữ liệu) | Migration Supabase + nạp CC-CEDICT (CC BY-SA), danh sách HSK, âm Hán Việt (Unihan `kVietnamese`); hàm tra: pinyin, nghĩa, level, Hán Việt | 1,5 ngày |
-| 4 | Tách từ + ứng viên | `@node-rs/jieba` (binary dựng sẵn, chạy được trên Vercel; `nodejieba` cần biên dịch native); tính tần suất, level, ứng viên | 1 ngày |
+| 3 ✅ | Từ điển | Migration Supabase + nạp CC-CEDICT (CC BY-SA), danh sách HSK, âm Hán Việt (Unihan `kVietnamese`); hàm tra: pinyin, nghĩa, level, Hán Việt | 1,5 ngày |
+| 4 ✅ | Tách từ + ứng viên | `@node-rs/jieba` (binary dựng sẵn, chạy được trên Vercel; `nodejieba` cần biên dịch native); tính tần suất, level, ứng viên | 1 ngày |
 | 5 | LLM + validate | Groq (Llama 3.3 70B) + model dự phòng; schema Zod cho `SongAnalysis`; ghép vị trí `occurrences`, loại mục không khớp; pinyin/level/Hán Việt luôn từ từ điển; `promptVersion` | 2 ngày |
 | 6 | Cache | Bảng `songs`, `song_analyses` (key: videoId + ngôn ngữ học + ngôn ngữ giải thích + promptVersion), RLS chỉ server ghi; chính sách lưu lời theo mục rủi ro pháp lý | 1 ngày |
 | 7 | Bộ đánh giá | 50 bài, đáp án do người chấm; script chạy khi đổi prompt/model; đo % thẻ sai | 1,5 ngày + thời gian chấm của user |
@@ -63,3 +63,7 @@ Kiểm tra thật trên video đầu tiên của 50 bài (đi từ tiêu đề v
 ## Nạp từ điển (2026-09-25) — xong
 Migration đã chạy; import bằng `NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/dictionary/import-dictionary.mts` (Node 20 thiếu WebSocket gốc mà supabase-js cần; Node 22 không cần cờ). Kết quả: `dict_words` 125.126 mục, `dict_hanzi_sino_viet` 8.306 chữ; anon key đọc được (RLS ok).
 **Chất lượng Hán Việt (Unihan) — giới hạn đã đo trên 10 từ mẫu:** tra bằng dạng phồn thể (chữ giản thể thường thiếu hoặc ra âm Nôm). Đúng 7/10; sai/thiếu: 离 → "li" (chuẩn "ly"), 袋 → "đãy" (chuẩn "đại"), 亮 không có. Unihan lẫn âm Nôm, không đánh dấu nguồn. Cần nguồn Hán Việt tốt hơn (vd. Wiktionary tiếng Việt) trước khi hiển thị cho người dùng; hiện chưa làm. Quy tắc 2 vẫn giữ: Hán Việt lấy từ từ điển, không lấy từ LLM.
+
+## Kết quả phase 4 (2026-09-25)
+`lib/analysis/`: `tokenizeLyricLines` (`@node-rs/jieba`, tắt HMM, token giữ bản gốc phồn thể), `collectHanTerms`, `buildVocabCandidates` (bỏ hư từ + từ 1 chữ cơ bản, xếp theo số lần xuất hiện rồi cấp HSK).
+Chạy thật phase 1→4 trên 6 bài (`scripts/caption-spike/analysis-pipeline-e2e-check.mts`): 73–117 từ/bài, **90–95% có trong từ điển**, 37–60 ứng viên/bài, phân bố cấp HSK 1–7 và không có cấp (từ ngoài HSK). Đủ đầu vào cho LLM.
