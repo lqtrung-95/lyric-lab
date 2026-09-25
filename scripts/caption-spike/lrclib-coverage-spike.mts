@@ -8,7 +8,8 @@ interface LrclibItem { trackName: string; artistName: string; duration: number; 
 
 const songs = JSON.parse(readFileSync("scripts/caption-spike/cpop-sample-songs.json", "utf8"));
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const rows: Record<string, unknown>[] = [];
+interface Row { songId: number; group: string; titleMatch: boolean; strictMatch: boolean; verdict: string | null; durationGapSec: number | null; [k: string]: unknown }
+const rows: Row[] = [];
 
 for (const song of songs) {
   let items: LrclibItem[] = [];
@@ -44,11 +45,11 @@ mkdirSync("spike-output", { recursive: true });
 writeFileSync("spike-output/lrclib-results.json", JSON.stringify(rows, null, 2));
 
 const n = rows.length;
-const cnt = (f: (r: any) => boolean) => rows.filter(f).length;
+const cnt = (f: (r: Row) => boolean) => rows.filter(f).length;
 console.log("\n--- Tổng hợp ---");
 console.log(`Có lời đồng bộ khớp tên bài: ${cnt((r) => r.titleMatch)}/${n}; khớp cả nghệ sĩ: ${cnt((r) => r.strictMatch)}/${n}`);
 console.log(`Chữ Hán đạt (verdict ok): ${cnt((r) => r.verdict === "ok")}/${n}`);
 console.log(`Độ dài lệch ≤ 10s so với ít nhất một video ứng viên: ${cnt((r) => r.durationGapSec !== null && r.durationGapSec <= 10)}/${n}`);
 const byGroup: Record<string, { t: number; ok: number }> = {};
-rows.forEach((r: any) => { const g = (byGroup[r.group] ??= { t: 0, ok: 0 }); g.t++; if (r.verdict === "ok") g.ok++; });
+rows.forEach((r) => { const g = (byGroup[r.group] ??= { t: 0, ok: 0 }); g.t++; if (r.verdict === "ok") g.ok++; });
 console.log("Theo nhóm:", byGroup);

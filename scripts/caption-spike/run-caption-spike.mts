@@ -25,7 +25,7 @@ if (args.includes("--retry-errors") && existsSync(RESULTS)) {
     .filter((l) => !["network", "blocked"].includes(JSON.parse(l).errorType));
   writeFileSync(RESULTS, kept.map((l) => l + "\n").join(""));
 }
-const songs = JSON.parse(readFileSync(DATASET, "utf8"));
+const songs: Song[] = JSON.parse(readFileSync(DATASET, "utf8"));
 const seen = new Set<string>(
   existsSync(RESULTS) ? readFileSync(RESULTS, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l).videoId) : [],
 );
@@ -33,7 +33,10 @@ const provider = new YoutubeInnertubeCaptionProvider();
 let consecutiveBlocked = 0; // cầu dao: sau 3 lần 429 liên tiếp thì thôi tải nội dung, tránh kéo dài việc bị chặn
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function measure(song: any, cand: any): Promise<SpikeRow> {
+interface Candidate { videoId: string; role: string; durationSec: number }
+interface Song { id: number; group: string; candidates: Candidate[] }
+
+async function measure(song: Song, cand: Candidate): Promise<SpikeRow> {
   const t0 = Date.now();
   const row: SpikeRow = {
     songId: song.id, videoId: cand.videoId, group: song.group, role: cand.role, durationSec: cand.durationSec,
