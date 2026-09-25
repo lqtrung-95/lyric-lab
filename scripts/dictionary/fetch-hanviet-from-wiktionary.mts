@@ -3,6 +3,7 @@
 // Chạy: npx tsx scripts/dictionary/fetch-hanviet-from-wiktionary.mts
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { parseCedict } from "@/lib/dictionary/parse-cedict";
+import { parseHskVocabulary } from "@/lib/dictionary/parse-hsk-vocabulary";
 import { parseViReadings } from "@/lib/dictionary/parse-wiktionary-vi-readings";
 
 const OUT = "data-cache/hanviet-wiktionary.json";
@@ -10,7 +11,10 @@ const BATCH = 50;
 const API = "https://en.wiktionary.org/w/api.php";
 
 const cedict = parseCedict(readFileSync("data-cache/cedict_ts.u8", "utf8"));
-const chars = [...new Set(cedict.flatMap((e) => [...e.traditional]).filter((c) => /\p{Script=Han}/u.test(c)))];
+const isHan = (c: string) => /\p{Script=Han}/u.test(c);
+// Chữ trong từ HSK tải trước (phục vụ phần lớn lời hát); phần còn lại sau.
+const hskChars = parseHskVocabulary(JSON.parse(readFileSync("data-cache/hsk-complete.json", "utf8"))).flatMap((w) => [...w.traditional]).filter(isHan);
+const chars = [...new Set([...hskChars, ...cedict.flatMap((e) => [...e.traditional]).filter(isHan)])];
 const done: Record<string, string[]> = existsSync(OUT) ? JSON.parse(readFileSync(OUT, "utf8")) : {};
 const todo = chars.filter((c) => !(c in done));
 console.log(`${chars.length} chữ, còn ${todo.length} chữ cần tải`);
