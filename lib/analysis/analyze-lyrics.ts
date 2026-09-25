@@ -7,7 +7,8 @@ import { llmOutputSchema } from "./llm-output-schema";
 import { validateLlmOutput, type Dropped } from "./validate-llm-output";
 
 // Model chính, rồi model dự phòng khi lỗi hoặc kết quả quá nghèo (PRD §7: tự chuyển model khi nhà cung cấp lỗi).
-export const DEFAULT_MODELS = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b"];
+// qwen/qwen3.8-27b bị loại: hạn mức đầu ra 1.000 token/phút không đủ cho một phân tích.
+export const DEFAULT_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"];
 const MIN_VOCAB_ITEMS = 6;
 
 export interface AnalyzeInput {

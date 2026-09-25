@@ -11,6 +11,8 @@ import { YoutubeInnertubeCaptionProvider } from "@/lib/captions/youtube-innertub
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { LrclibProvider } from "@/lib/lyrics/lrclib-provider";
 
+// Nghỉ giữa các bài để không vượt hạn mức token/phút của Groq (gói miễn phí 8.000).
+const PACE_MS = Number(process.env.EVAL_PACE_MS ?? 30_000);
 const ids = process.argv.slice(2).map(Number);
 const songs = JSON.parse(readFileSync("scripts/caption-spike/cpop-sample-songs.json", "utf8")).filter((s: { id: number }) => ids.length === 0 || ids.includes(s.id));
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, { auth: { persistSession: false } });
@@ -50,9 +52,11 @@ for (const song of songs) {
       const line = analysis.lines.find((l) => l.index === it.occurrences[0]?.lineIndex);
       sheet.push([song.id, song.title, it.id, it.type, it.term, it.reading, it.level, it.sinoViet, it.meaningInContext, line?.text, "", ""].map(esc).join(","));
     }
+    if (!fromCache) await new Promise((r) => setTimeout(r, PACE_MS));
     console.log(`#${song.id} ${song.title}: ${fromCache ? "cache" : analysis.model} | ${analysis.items.length} mục | ${attempts.map((a) => `${a.model}:${a.latencyMs}ms`).join(" ")}`);
   } catch (e) {
-    console.log(`#${song.id} ${song.title}: BỎ QUA (${(e as Error).name}: ${(e as Error).message.slice(0, 80)})`);
+    const attempts = (e as { attempts?: { model: string; error?: string }[] }).attempts;
+    console.log(`#${song.id} ${song.title}: BỎ QUA (${(e as Error).name}: ${(e as Error).message.slice(0, 80)})`, attempts ? JSON.stringify(attempts.map((a) => `${a.model}: ${a.error?.slice(0, 120)}`)) : "");
   }
 }
 writeFileSync("eval-output/eval-sheet.csv", "﻿" + sheet.join("\n") + "\n");
