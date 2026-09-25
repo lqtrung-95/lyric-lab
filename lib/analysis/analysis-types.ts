@@ -16,6 +16,8 @@ export interface VocabOccurrence {
   lineIndex: number;
   /** Thời điểm bắt đầu của dòng chứa từ (giây). */
   start: number;
+  /** Với ngữ pháp: vị trí ký tự [từ, đến) của công thức trong dòng, để gạch chân khi nghe. */
+  ranges?: [number, number][];
 }
 
 /** Từ ứng viên (đã tra từ điển) để đưa cho LLM chọn. */

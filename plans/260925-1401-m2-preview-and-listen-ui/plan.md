@@ -1,6 +1,6 @@
 ---
 title: M2 — Giao diện Xem trước (S4) + Nghe (S5) và luồng dán link (S1, S3, S6)
-status: user đã duyệt 2026-09-25 — đang làm (phase 1–3 xong)
+status: user đã duyệt 2026-09-25 — đang làm (phase 1–4 xong)
 created: 2026-09-25
 refs: docs/PRD.md §5, §6.1–6.3 (IN-01,04,05; PV-01..09; LS-01..10), §7, §8; docs/design-brief.md §2–5; design/*.html; CLAUDE.md quy tắc 3–9
 ---
@@ -35,7 +35,7 @@ Stitch project "Custom Design Project" (`13937936699626462675`, theme "Warm Lite
 | 1 ✅ | Nền UI | Token Tailwind v4 từ theme Stitch, font (next/font), dark mode, icon, layout + thanh nav (3 mục, mobile tab bar), thư mục `components/` | 1 ngày |
 | 2 ✅ | S1 + S3 + API | Ô dán link (IN-01, lỗi ngay không gọi server), API SSE, màn tiến trình 3 bước + nút hủy (IN-04), lỗi không có lời (IN-05), bài đã học gần đây (localStorage) | 1,5 ngày |
 | 3 ✅ | S4 Xem trước | Tóm tắt + tag (PV-01), thẻ từ vựng (PV-02) và ngữ pháp (PV-03), lọc level (PV-04), Đã biết + Hoàn tác (PV-05), Lưu (PV-06), Nghe thử ±0,5 giây (PV-07), Báo sai (PV-09, ghi `item_reports`), thẻ dùng chung với S5 | 2 ngày |
-| 4 | S5 Nghe | Player + lời chạy theo nhạc, tự cuộn (LS-01,02), pinyin/dịch bật tắt nhớ lựa chọn (LS-03), tô sáng từ vựng/ngữ pháp bằng hai kiểu khác nhau, không chỉ màu (LS-04), panel "Đang hát" / bottom sheet (LS-05), bấm câu để nhảy (LS-07), lặp câu (LS-08), tốc độ (LS-09), phím tắt (LS-10) | 2,5 ngày |
+| 4 ✅ | S5 Nghe | Player + lời chạy theo nhạc, tự cuộn (LS-01,02), pinyin/dịch bật tắt nhớ lựa chọn (LS-03), tô sáng từ vựng/ngữ pháp bằng hai kiểu khác nhau, không chỉ màu (LS-04), panel "Đang hát" / bottom sheet (LS-05), bấm câu để nhảy (LS-07), lặp câu (LS-08), tốc độ (LS-09), phím tắt (LS-10) | 2,5 ngày |
 | 5 | S6 Tra từ | Bấm từ bất kỳ → popover: mục có sẵn dùng ngay; từ khác tra từ điển + LLM giải nghĩa theo ngữ cảnh, cache `term_explanations` (LS-06, ≤ 1,5 s; cache ≤ 200 ms) | 1,5 ngày |
 | 6 | Hoàn thiện | a11y WCAG 2.2 AA (nút thật, vùng bấm ≥ 44 px, tương phản, bàn phím), responsive 390/1440, `noindex`, Playwright E2E (dán link → xem trước → nghe, dùng fixture 夜车) | 1,5 ngày |
 
@@ -71,3 +71,11 @@ Phụ thuộc: 1 → 2 → 3 → 4 → 5 → 6. Migration mới: `term_explanati
 - Báo sai (PV-09): `POST /api/reports` (Zod, 30 báo/ngày/IP) ghi bảng `item_reports`. **Migration mới chờ user chạy:** `supabase/migrations/20260925000003_item_reports.sql`. Chưa chạy migration thì bấm báo sai sẽ nhận lỗi "Chưa gửi được".
 - `/dev/preview-fixture` (chỉ ngoài production) hiển thị bài hư cấu 夜车 để thử giao diện và chạy E2E: 8 test mới (lọc level, chip, đã biết + hoàn tác, lưu, nghe thử tự dừng với YouTube API giả, báo sai, CTA dính ở mobile). Tổng E2E: 13 xanh; unit: 190 xanh.
 - Chưa làm ở S4: nút "Đã lưu bài"/"Chia sẻ" của thiết kế (thuộc thư viện M3), cột level ở nav ("HSK 3 ▾") mới có trong thanh lọc.
+
+## Kết quả phase 4 (2026-09-25)
+- Màn Nghe `/learn/[videoId]/listen` (chưa có phân tích thì chuyển về `/learn/[videoId]`): `ListenScreen` + `LyricList`/`LyricLineRow`, `TransportControls`, `SingingPanel`, `ListenTopBar`, `ViewToggles`, hook `usePlaybackSync`.
+- Đồng bộ (LS-02): poll `getCurrentTime()` mỗi 100 ms, `findCurrentLineIndex` tìm nhị phân (giữ câu trước trong khoảng lặng, hết bài sau câu cuối 3 s), chỉ đổi state khi sang câu khác; dòng lời `memo`. Tự cuộn đưa câu vào giữa phần màn hình còn trống **dưới video dính**, tạm dừng 4 s sau khi người dùng tự cuộn, tôn trọng `prefers-reduced-motion`.
+- LS-03 pinyin/dịch nhớ ở localStorage; LS-04 từ vựng = tô nền + viền + nhãn ẩn "Từ vựng:", ngữ pháp = gạch chân theo ký tự (khác nhau về hình dạng, không chỉ màu); LS-05 panel "Đang hát" (cột phải desktop, bottom sheet thu gọn mặc định trên mobile); LS-07 bấm câu để nhảy; LS-08 lặp câu (quay về đầu câu khi tới hết câu, đổi câu thì chuyển vòng lặp); LS-09 0,5x/0,75x/1x; LS-10 phím tắt (Space, ←/→, L; bỏ qua khi gõ vào ô nhập hoặc có phím bổ trợ; Space trên nút để nút tự xử lý).
+- Ngữ pháp gạch chân cần vị trí ký tự: `validateLlmOutput` giờ lưu `occurrences[].ranges` (tính bằng `grammarCharRanges` trên bản giản thể, độ dài giữ nguyên với bản gốc). **Bài đã cache trước đó chưa có `ranges`** → chưa gạch chân được ngữ pháp trong lời (vẫn thấy ở panel); phân tích lại (đổi `PROMPT_VERSION` hoặc xóa cache) để có.
+- Chưa làm: tra từ bấm vào từ bất kỳ (S6, phase 5); từ trong lời hiện chưa bấm được. Chưa đo độ lệch timestamp LRC (LS-02 ≤ 300 ms): cần nghe tay ~10 bài.
+- Kiểm thử: 209 unit, 21 E2E xanh (E2E dùng YouTube IFrame API giả điều khiển được qua `window.__t`, dữ liệu 夜车 hư cấu tại `/dev/listen-fixture`). Đã chụp ảnh Playwright desktop sáng/tối và mobile để đối chiếu.

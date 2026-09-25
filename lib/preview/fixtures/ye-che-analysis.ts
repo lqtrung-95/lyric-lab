@@ -22,7 +22,7 @@ const lines: AnalyzedLine[] = [
     [{ text: "等" }, { text: "天亮", itemId: "vocab:天亮" }, { text: "了" }, { text: "我们" }, { text: "再" }, { text: "出发", itemId: "vocab:出发" }]),
 ];
 
-const occ = (i: number) => [{ lineIndex: i, start: i * 5 }];
+const occ = (i: number, ranges?: [number, number][]) => [{ lineIndex: i, start: i * 5, ranges }];
 const vocab = (term: string, reading: string, sinoViet: string, level: number, meaning: string, note: string, lineIndex: number, priority: number): PreviewItem => ({
   id: `vocab:${term}`, type: "vocab", term, reading, sinoViet, level, meaningInContext: meaning, explanation: note, occurrences: occ(lineIndex), priority,
 });
@@ -37,19 +37,19 @@ const items: PreviewItem[] = [
   vocab("天亮", "tiān liàng", "thiên lượng", 5, "trời sáng, rạng đông", "Tượng trưng khởi đầu mới", 5, 75),
   vocab("出发", "chū fā", "xuất phát", 2, "khởi hành, lên đường", "Khép lại bài bằng ý bắt đầu lại", 5, 55),
   {
-    id: "grammar:0", type: "grammar", term: "从来没 + V + 过", level: 4, priority: 88, occurrences: occ(1),
+    id: "grammar:0", type: "grammar", term: "从来没 + V + 过", level: 4, priority: 88, occurrences: occ(1, [[1, 4], [5, 6]]),
     meaningInContext: "Chưa từng bao giờ làm gì",
     example: { zh: "我从来没去过北京。", vi: "Tôi chưa từng đến Bắc Kinh." },
     commonMistake: "Hay quên 过 ở cuối câu.",
   },
   {
-    id: "grammar:1", type: "grammar", term: "A 比 B 还 + tính từ", level: 4, priority: 72, occurrences: occ(2),
+    id: "grammar:1", type: "grammar", term: "A 比 B 还 + tính từ", level: 4, priority: 72, occurrences: occ(2, [[3, 4], [6, 7]]),
     meaningInContext: "A còn … hơn cả B",
     example: { zh: "今天比昨天还冷。", vi: "Hôm nay còn lạnh hơn cả hôm qua." },
     commonMistake: "Dùng 很 sau 比: ✗ 他比我很高.",
   },
   {
-    id: "grammar:2", type: "grammar", term: "就算 … 也 …", level: 5, priority: 68, occurrences: occ(3),
+    id: "grammar:2", type: "grammar", term: "就算 … 也 …", level: 5, priority: 68, occurrences: occ(3, [[0, 2], [6, 7]]),
     meaningInContext: "Cho dù … thì vẫn …",
     example: { zh: "就算下雨，我也要去。", vi: "Cho dù trời mưa, tôi vẫn đi." },
     commonMistake: "Bỏ 也 vì tiếng Việt lược được “thì/vẫn”.",

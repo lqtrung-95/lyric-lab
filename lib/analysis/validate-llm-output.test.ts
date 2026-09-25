@@ -47,7 +47,7 @@ describe("validateLlmOutput", () => {
       { pattern: "就算 … 也 …", explanation: "e", example: { zh: "z", vi: "v" }, lineIndexes: [1], priority: 60 },
     ] }, lines, candidates);
     expect(v.grammar).toHaveLength(1);
-    expect(v.grammar[0].occurrences).toEqual([{ lineIndex: 1, start: 5 }]);
+    expect(v.grammar[0].occurrences).toEqual([{ lineIndex: 1, start: 5, ranges: [[1, 4], [5, 6]] }]);
     expect(v.dropped[0]).toMatchObject({ kind: "grammar", ref: "就算 … 也 …" });
   });
 

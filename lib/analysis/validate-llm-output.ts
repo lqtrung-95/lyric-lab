@@ -28,20 +28,10 @@ export interface ValidatedOutput {
   dropped: Dropped[];
 }
 
-const HAN_RUN = /\p{Script=Han}+/gu;
+import { grammarCharRanges } from "./grammar-ranges";
 
 /** Mọi cụm chữ Hán trong công thức phải xuất hiện theo thứ tự trong dòng (bỏ qua A, B, V, O, dấu +). */
-export function patternMatchesLine(pattern: string, lineSimplified: string): boolean {
-  const runs = pattern.match(HAN_RUN);
-  if (!runs) return false;
-  let from = 0;
-  for (const run of runs) {
-    const at = lineSimplified.indexOf(run, from);
-    if (at < 0) return false;
-    from = at + run.length;
-  }
-  return true;
-}
+export const patternMatchesLine = (pattern: string, lineSimplified: string): boolean => grammarCharRanges(pattern, lineSimplified).length > 0;
 
 /**
  * Áp quy tắc: từ vựng phải nằm trong danh sách ứng viên (đã có vị trí thật); ngữ pháp phải khớp ít nhất một
@@ -72,7 +62,9 @@ export function validateLlmOutput(out: LlmOutput, lines: TokenizedLine[], candid
   for (const g of out.grammar) {
     const matched = [...new Set(g.lineIndexes)]
       .map((i) => lineByIndex.get(i))
-      .filter((l): l is TokenizedLine => !!l && patternMatchesLine(g.pattern, l.simplified));
+      .filter((l): l is TokenizedLine => !!l)
+      .map((line) => ({ line, ranges: grammarCharRanges(g.pattern, line.simplified) }))
+      .filter((m) => m.ranges.length > 0);
     if (matched.length === 0) {
       dropped.push({ kind: "grammar", ref: g.pattern, reason: "công thức không khớp dòng lời nào được nêu" });
       continue;
@@ -80,7 +72,7 @@ export function validateLlmOutput(out: LlmOutput, lines: TokenizedLine[], candid
     grammar.push({
       pattern: g.pattern, explanation: g.explanation, example: g.example, commonMistake: g.commonMistake,
       level: g.level, priority: g.priority,
-      occurrences: matched.map((l) => ({ lineIndex: l.index, start: l.start })),
+      occurrences: matched.map(({ line, ranges }) => ({ lineIndex: line.index, start: line.start, ranges })),
     });
   }
 
