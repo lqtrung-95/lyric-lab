@@ -55,7 +55,20 @@ export function ReviewScreen() {
   if (s.status === "empty") {
     return s.cardCount === 0
       ? <ReviewMessage icon="style" title="Chưa có thẻ nào để ôn" body="Khi xem trước một bài, bấm “Lưu” ở từ vựng hoặc ngữ pháp bạn muốn nhớ, thẻ sẽ xuất hiện ở đây." action={{ href: "/app", label: "Chọn bài hát" }} />
-      : <ReviewMessage icon="check_circle" title="Hôm nay bạn đã ôn xong" body="Không còn thẻ nào đến hạn. Thẻ mới sẽ tới theo hạn mức mỗi ngày, quay lại vào ngày mai nhé." action={{ href: "/app", label: "Học bài mới" }} />;
+      : s.waitingNew > 0
+        ? (
+          <ReviewMessage
+            icon="check_circle" title="Bạn đã học đủ thẻ mới hôm nay"
+            body={`Hôm nay bạn đã học ${s.newStarted}/${s.newPerDay} thẻ mới và không còn thẻ nào đến hạn. Còn ${s.waitingNew} thẻ mới đang chờ, sẽ tới dần theo hạn mức mỗi ngày.`}
+          >
+            <div className="mt-space-lg flex flex-col justify-center gap-space-sm sm:flex-row">
+              <button type="button" onClick={() => void s.learnMore(Math.min(10, s.waitingNew))}
+                className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Học thêm {Math.min(10, s.waitingNew)} thẻ mới</button>
+              <Link href="/settings" className="inline-flex min-h-11 items-center justify-center rounded-full px-6 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Đổi hạn mức mỗi ngày</Link>
+            </div>
+          </ReviewMessage>
+        )
+        : <ReviewMessage icon="check_circle" title="Hôm nay bạn đã ôn xong" body="Không còn thẻ nào đến hạn. Quay lại vào ngày mai nhé." action={{ href: "/app", label: "Học bài mới" }} />;
   }
   if (s.status === "finished" || !card) {
     return (

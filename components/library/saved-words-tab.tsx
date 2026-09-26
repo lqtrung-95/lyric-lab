@@ -2,9 +2,13 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Icon } from "@/components/ui/icon";
+import { PronounceButton } from "@/components/ui/pronounce-button";
 import { SelectField } from "@/components/ui/select-field";
+import { Spinner } from "@/components/ui/spinner";
 import { filterSavedItems, type SavedFilter } from "@/lib/library/filter-saved-items";
 import { levelLabel } from "@/lib/preview/preview-format";
+import { useSongSnippet } from "./use-song-snippet";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 
 
@@ -12,6 +16,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 export function SavedWordsTab() {
   const { state, toggleSaved } = useLearnerState();
   const [filter, setFilter] = useState<SavedFilter>({ query: "", level: "all", kind: "all" });
+  const { play, player, loadingKey, error } = useSongSnippet();
   const items = useMemo(() => filterSavedItems(state.saved, filter), [state.saved, filter]);
 
   if (state.saved.length === 0) {
@@ -51,24 +56,36 @@ export function SavedWordsTab() {
       ) : (
         <ul className="mt-space-sm divide-y divide-surface-container-high rounded-2xl bg-surface-container-lowest shadow-sm">
           {items.map((item) => (
-            <li key={item.key} className="flex flex-wrap items-center justify-between gap-3 p-space-md">
-              <div className="min-w-0">
-                <p className="flex flex-wrap items-baseline gap-x-3">
-                  <span lang="zh" className="font-serif text-headline-md text-on-surface">{item.term}</span>
-                  {item.reading && <span className="text-pinyin-reading text-primary">{item.reading}</span>}
-                  {item.sinoViet && <span className="text-hanviet-reading uppercase tracking-wider text-secondary">{item.sinoViet}</span>}
-                </p>
-                <p className="text-body-md text-on-surface-variant">{item.meaning}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant">{levelLabel(item.level ?? null)}</span>
-                {item.videoId && <Link href={`/learn/${item.videoId}`} className="inline-flex min-h-11 items-center rounded-full px-3 text-label-md font-medium text-primary hover:bg-surface-container">Xem bài</Link>}
-                <button type="button" onClick={() => toggleSaved(item)} aria-label={`Bỏ lưu ${item.term}`} className="min-h-11 rounded-full px-3 text-label-md text-on-surface-variant hover:bg-surface-container">Bỏ lưu</button>
+            <li key={item.key} className="p-space-md">
+              {/* Nội dung chiếm phần còn lại và tự cắt nghĩa quá dài (2 dòng); cụm nút giữ nguyên kích thước nên không bị đẩy xuống. */}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+                <div className="min-w-0 flex-1">
+                  <p className="flex flex-wrap items-baseline gap-x-3">
+                    <span lang="zh" className="font-serif text-headline-md text-on-surface">{item.term}</span>
+                    {item.reading && <span className="text-pinyin-reading text-primary">{item.reading}</span>}
+                    {item.sinoViet && <span className="text-hanviet-reading uppercase tracking-wider text-secondary">{item.sinoViet}</span>}
+                  </p>
+                  <p title={item.meaning} className="mt-0.5 line-clamp-2 text-body-md text-on-surface-variant">{item.meaning}</p>
+                </div>
+                <div className="flex shrink-0 flex-wrap items-center gap-1 sm:flex-nowrap">
+                  {item.type === "vocab" && <PronounceButton text={item.term} />}
+                  {item.videoId && (
+                    <button type="button" onClick={() => play(item)} aria-busy={loadingKey === item.key} aria-label={`Nghe đoạn hát chứa ${item.term}`} title="Nghe đoạn hát chứa từ này"
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary hover:bg-surface-container-high">
+                      {loadingKey === item.key ? <Spinner size={18} /> : <Icon name="play_circle" size={24} />}
+                    </button>
+                  )}
+                  <span className="mx-1 shrink-0 rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant">{levelLabel(item.level ?? null)}</span>
+                  {item.videoId && <Link href={`/learn/${item.videoId}`} className="inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-label-md font-medium text-primary hover:bg-surface-container">Xem bài</Link>}
+                  <button type="button" onClick={() => toggleSaved(item)} aria-label={`Bỏ lưu ${item.term}`} className="min-h-11 shrink-0 rounded-full px-3 text-label-md text-on-surface-variant hover:bg-surface-container">Bỏ lưu</button>
+                </div>
               </div>
             </li>
           ))}
         </ul>
       )}
+      {error && <p role="alert" className="mt-space-sm text-label-md text-error">{error}</p>}
+      {player}
     </div>
   );
 }

@@ -34,6 +34,9 @@ function writeLocal(videoId: string, offset: number) {
   window.dispatchEvent(new Event(EVENT));
 }
 
+/** Độ lệch lời đã lưu của một bài, đọc một lần (không phải hook): dùng trong trình xử lý sự kiện. 0 nếu chưa chỉnh. */
+export const readLyricOffset = (videoId: string): number => parseOffsets(readRaw())[videoId] ?? 0;
+
 /**
  * Độ lệch lời của một bài (giây), lưu trong trình duyệt và đồng bộ lên tài khoản khi đã có phiên.
  * Khi mở bài mà máy này chưa có bản cục bộ thì lấy bản trên tài khoản (chỉnh ở thiết bị khác).

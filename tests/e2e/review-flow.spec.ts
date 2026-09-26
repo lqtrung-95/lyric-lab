@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { hasSupabaseEnv, serviceClientForTests } from "./helpers/seed-analysis";
+import { seedCards } from "./helpers/seed-cards";
 
 // Luồng ôn trên Supabase thật: Lưu từ (tạo thẻ New) → Ôn tập → lật → chấm → ghi FSRS + nhật ký → hoàn tác.
 test.skip(!hasSupabaseEnv, "cần cấu hình Supabase");
@@ -83,5 +84,29 @@ test("nút 'Hoàn tác' căn giữa ở màn kết thúc buổi ôn", async ({ p
     expect(Math.abs(centerX(undo!) - centerX(message!))).toBeLessThanOrEqual(2);
   } finally {
     if (userId) await sb.auth.admin.deleteUser(userId);
+  }
+});
+
+test("hết hạn mức thẻ mới: nói rõ còn bao nhiêu thẻ đang chờ và cho học thêm ngay", async ({ page }) => {
+  const sb = serviceClientForTests();
+  const userId = await seedCards(page);
+  try {
+    // Hạn mức 2 thẻ mới/ngày và đã học đủ 2 thẻ hôm nay → 4 thẻ mới còn lại phải chờ.
+    await sb.from("user_profiles").upsert({ user_id: userId, new_cards_per_day: 2 });
+    const { data: cards } = await sb.from("user_cards").select("item_key,due,stability,difficulty,elapsed_days,scheduled_days,learning_steps,reps,lapses,state,last_review").eq("user_id", userId).order("created_at").limit(2);
+    for (const c of cards!) {
+      await sb.from("review_logs").insert({ user_id: userId, item_key: c.item_key, rating: 3, state: 0, due: c.due, stability: 0, difficulty: 0, elapsed_days: 0, scheduled_days: 5 });
+      await sb.from("user_cards").update({ state: 2, reps: 1, stability: 5, difficulty: 5, scheduled_days: 5, due: new Date(Date.now() + 5 * 86_400_000).toISOString(), last_review: new Date().toISOString() }).eq("user_id", userId).eq("item_key", c.item_key);
+    }
+    await page.goto("/review");
+    await expect(page.getByRole("heading", { name: "Bạn đã học đủ thẻ mới hôm nay" })).toBeVisible();
+    await expect(page.getByText("Hôm nay bạn đã học 2/2 thẻ mới")).toBeVisible();
+    await expect(page.getByText("Còn 4 thẻ mới đang chờ")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Đổi hạn mức mỗi ngày" })).toHaveAttribute("href", "/settings");
+    await page.getByRole("button", { name: "Học thêm 4 thẻ mới" }).click();
+    await expect(page.getByText("Còn 4 thẻ")).toBeVisible(); // hàng đợi có đủ 4 thẻ
+    await expect(page.getByRole("heading", { level: 2 })).toBeVisible();
+  } finally {
+    await sb.auth.admin.deleteUser(userId);
   }
 });

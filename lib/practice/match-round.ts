@@ -13,6 +13,9 @@ export interface MatchRound {
 }
 
 const MAX_MEANING = 38;
+// Nghĩa ngắn gọn (một cụm từ) hợp làm ô ghép; câu giải thích dài hoặc có trích dẫn từ thì không.
+const CLEAN_MEANING = 30;
+const isClean = (meaning: string, term: string) => meaning.length <= CLEAN_MEANING && !meaning.includes(term) && !/["“”]/.test(meaning);
 
 /** Nghĩa ngắn gọn để hiện trên ô ghép: lấy phần đầu (trước dấu ; hoặc ,) và cắt cho vừa ô. */
 export function shortMeaning(meaning: string): string {
@@ -28,8 +31,10 @@ export function buildMatchRound(cards: MatchCard[], size: number, rng?: Rng): Ma
   const seenTerm = new Set<string>();
   const seenMeaning = new Set<string>();
   const chosen: { card: MatchCard; meaning: string }[] = [];
-  for (const card of shuffle(cards, rng)) {
-    const meaning = shortMeaning(card.meaning);
+  const candidates = shuffle(cards, rng).map((card) => ({ card, meaning: shortMeaning(card.meaning) }));
+  // Ưu tiên thẻ có nghĩa ngắn gọn; thiếu thì mới bù bằng thẻ có nghĩa dài (đã cắt ngắn).
+  const ordered = [...candidates.filter((c) => isClean(c.meaning, c.card.term)), ...candidates.filter((c) => !isClean(c.meaning, c.card.term))];
+  for (const { card, meaning } of ordered) {
     const key = meaning.toLowerCase();
     if (!meaning || seenTerm.has(card.term) || seenMeaning.has(key)) continue;
     seenTerm.add(card.term);

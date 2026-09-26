@@ -83,7 +83,7 @@ export function MatchGame({ cards }: { cards: ReviewCard[] }) {
   }
 
   const cell = (id: string, selected: boolean, wrong: boolean) =>
-    `flex min-h-14 w-full items-center justify-center rounded-2xl px-3 py-2 text-center transition-colors ${matched.has(id) ? "bg-secondary-container/60 text-on-secondary-container opacity-70" : wrong ? "bg-error-container/60 text-on-error-container anim-note-shake" : selected ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container"}`;
+    `flex h-20 w-full items-center justify-center overflow-hidden rounded-2xl px-3 py-2 text-center transition-colors ${matched.has(id) ? "bg-secondary-container/60 text-on-secondary-container opacity-70" : wrong ? "bg-error-container/60 text-on-error-container anim-note-shake" : selected ? "bg-primary text-on-primary" : "bg-surface-container-lowest text-on-surface shadow-sm hover:bg-surface-container"}`;
 
   return (
     <div>
@@ -97,7 +97,7 @@ export function MatchGame({ cards }: { cards: ReviewCard[] }) {
           {round.lefts.map((l) => (
             <li key={l.id}>
               <button type="button" disabled={matched.has(l.id)} aria-pressed={left === l.id} onClick={() => pickLeft(l.id)} className={cell(l.id, left === l.id, wrongPair?.[0] === l.id)}>
-                <span><span lang="zh" className="font-serif text-headline-md">{l.text}</span>{l.sub && <span className="block text-label-sm opacity-80">{l.sub}</span>}</span>
+                <span className="min-w-0"><span lang="zh" className="block truncate font-serif text-headline-md leading-tight">{l.text}</span>{l.sub && <span className="block truncate text-label-sm opacity-80">{l.sub}</span>}</span>
                 {matched.has(l.id) && <span className="sr-only"> (đã ghép)</span>}
               </button>
             </li>
@@ -107,7 +107,7 @@ export function MatchGame({ cards }: { cards: ReviewCard[] }) {
           {round.rights.map((r) => (
             <li key={r.id}>
               <button type="button" disabled={matched.has(r.id)} aria-pressed={right === r.id} onClick={() => pickRight(r.id)} className={cell(r.id, right === r.id, wrongPair?.[1] === r.id)}>
-                <span className="text-body-md font-medium">{r.text}</span>
+                <span className="line-clamp-2 text-body-md font-medium">{r.text}</span>
                 {matched.has(r.id) && <span className="sr-only"> (đã ghép)</span>}
               </button>
             </li>

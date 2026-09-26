@@ -15,6 +15,8 @@ export interface ReviewSession {
   newStartedToday: number;
   /** Tổng số thẻ của người dùng (để phân biệt "chưa có thẻ" với "hôm nay đã ôn xong"). */
   cardCount: number;
+  /** Số thẻ mới đã lưu nhưng chưa vào hàng đợi hôm nay vì hết hạn mức thẻ mới. */
+  waitingNew: number;
 }
 
 const DEFAULT_NEW_PER_DAY = 15;
@@ -22,26 +24,35 @@ const DEFAULT_TIMEZONE = "Asia/Ho_Chi_Minh";
 export const CARD_COLUMNS =
   "item_key,kind,term,pinyin,han_viet,hsk_level,meaning,video_id,line_index,created_at,due,stability,difficulty,elapsed_days,scheduled_days,learning_steps,reps,lapses,state,last_review";
 
-/** Tải hàng đợi ôn hôm nay: thẻ đến hạn + thẻ mới trong phần hạn mức còn lại (đếm từ nhật ký ôn theo múi giờ người dùng). */
-export async function loadReviewSession(now = new Date()): Promise<ReviewSession> {
+/**
+ * Tải hàng đợi ôn hôm nay: thẻ đến hạn + thẻ mới trong phần hạn mức còn lại (đếm từ nhật ký ôn theo múi giờ người dùng).
+ * `bonusNew` cho phép học thêm thẻ mới ngoài hạn mức hôm nay (người dùng bấm "Học thêm"), không đổi cài đặt.
+ */
+export async function loadReviewSession(now = new Date(), bonusNew = 0): Promise<ReviewSession> {
   const sb = createSupabaseBrowserClient();
   const profile = await sb.from("user_profiles").select("new_cards_per_day,timezone").maybeSingle();
   if (profile.error) throw new Error(profile.error.message);
   const newPerDay = profile.data?.new_cards_per_day ?? DEFAULT_NEW_PER_DAY;
   const { start, end } = dayBounds(now, profile.data?.timezone ?? DEFAULT_TIMEZONE);
 
-  const [due, fresh, started, all] = await Promise.all([
+  const limit = newPerDay + bonusNew;
+  const [due, fresh, started, all, newTotal] = await Promise.all([
     sb.from("user_cards").select(CARD_COLUMNS).neq("state", 0).lte("due", now.toISOString()),
-    sb.from("user_cards").select(CARD_COLUMNS).eq("state", 0).order("created_at").limit(Math.max(newPerDay, 1)),
+    sb.from("user_cards").select(CARD_COLUMNS).eq("state", 0).order("created_at").limit(Math.max(limit, 1)),
     sb.from("review_logs").select("id", { count: "exact", head: true }).eq("state", 0).gte("reviewed_at", start.toISOString()).lt("reviewed_at", end.toISOString()),
     sb.from("user_cards").select("item_key", { count: "exact", head: true }),
+    sb.from("user_cards").select("item_key", { count: "exact", head: true }).eq("state", 0),
   ]);
-  const error = due.error ?? fresh.error ?? started.error ?? all.error;
+  const error = due.error ?? fresh.error ?? started.error ?? all.error ?? newTotal.error;
   if (error) throw new Error(error.message);
 
   const cards = [...(due.data ?? []), ...(fresh.data ?? [])] as ReviewCard[];
-  const queue = buildReviewQueue({ cards, now, newPerDay, newStartedToday: started.count ?? 0 });
-  return { queue, newPerDay, total: queue.length, cardCount: all.count ?? 0, newStartedToday: started.count ?? 0 };
+  const queue = buildReviewQueue({ cards, now, newPerDay: limit, newStartedToday: started.count ?? 0 });
+  const queuedNew = queue.filter((c) => c.state === 0).length;
+  return {
+    queue, newPerDay, total: queue.length, cardCount: all.count ?? 0, newStartedToday: started.count ?? 0,
+    waitingNew: Math.max(0, (newTotal.count ?? 0) - queuedNew),
+  };
 }
 
 /** Ghi kết quả chấm: cập nhật thẻ rồi thêm nhật ký. Trả id nhật ký để hoàn tác. */

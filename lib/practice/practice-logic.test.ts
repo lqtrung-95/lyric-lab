@@ -108,6 +108,18 @@ describe("match round", () => {
     expect(new Set(round.rights.map((r) => r.text.toLowerCase())).size).toBe(3);
   });
 
+  it("ưu tiên nghĩa ngắn gọn hơn câu giải thích dài; thiếu mới bù bằng nghĩa dài", () => {
+    const pool = [
+      { item_key: "v:1", term: "蔓延", pinyin: null, meaning: "Từ \"蔓延\" ở đây mang nghĩa là cảm giác lan rộng khắp nơi" },
+      { item_key: "v:2", term: "波澜", pinyin: null, meaning: "cơn sóng" },
+      { item_key: "v:3", term: "玻璃", pinyin: null, meaning: "kính" },
+      { item_key: "v:4", term: "戒", pinyin: null, meaning: "khó bỏ" },
+    ];
+    const two = buildMatchRound(pool, 3, seededRng(4)).lefts.map((l) => l.id).sort();
+    expect(two).toEqual(["v:2", "v:3", "v:4"]); // câu dài bị loại khi đủ thẻ ngắn
+    expect(buildMatchRound(pool, 4, seededRng(4)).lefts.map((l) => l.id)).toContain("v:1"); // hết thẻ ngắn thì dùng lại
+  });
+
   it("giới hạn theo size", () => {
     expect(buildMatchRound(cards, 2, seededRng(2)).lefts).toHaveLength(2);
   });

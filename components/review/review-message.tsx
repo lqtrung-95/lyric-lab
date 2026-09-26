@@ -3,7 +3,7 @@ import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
 
 /** Màn trạng thái của trang Ôn tập: chưa có thẻ, đã ôn xong, hoặc lỗi. */
-export function ReviewMessage({ icon, title, body, action }: { icon: IconName; title: string; body: string; action?: { href: string; label: string } }) {
+export function ReviewMessage({ icon, title, body, action, children }: { icon: IconName; title: string; body: string; action?: { href: string; label: string }; children?: React.ReactNode }) {
   return (
     <div className="mx-auto mt-space-lg max-w-xl rounded-2xl bg-surface-container-low p-space-lg text-center">
       <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-container-high text-primary">
@@ -16,6 +16,7 @@ export function ReviewMessage({ icon, title, body, action }: { icon: IconName; t
           {action.label}
         </Link>
       )}
+      {children}
     </div>
   );
 }

@@ -27,6 +27,10 @@ export function useReviewSession() {
   const [queue, setQueue] = useState<ReviewCard[]>([]);
   const [initialTotal, setInitialTotal] = useState(0);
   const [cardCount, setCardCount] = useState(0);
+  const [waitingNew, setWaitingNew] = useState(0);
+  const [newStarted, setNewStarted] = useState(0);
+  const [newPerDay, setNewPerDay] = useState(0);
+  const bonus = useRef(0);
   const [contexts, setContexts] = useState<Record<string, ReviewContext | null>>({});
   const [canUndo, setCanUndo] = useState(false);
   const [saveError, setSaveError] = useState(false);
@@ -49,6 +53,9 @@ export function useReviewSession() {
         if (cancelled) return;
         userId.current = data.session?.user.id ?? null;
         setCardCount(session.cardCount);
+        setWaitingNew(session.waitingNew);
+        setNewStarted(session.newStartedToday);
+        setNewPerDay(session.newPerDay);
         setInitialTotal(session.total);
         setQueue(session.queue);
         setStatus(session.total > 0 ? "active" : "empty");
@@ -58,6 +65,22 @@ export function useReviewSession() {
       }
     })();
     return () => { cancelled = true; };
+  }, [loadContexts]);
+
+  /** Học thêm `count` thẻ mới ngoài hạn mức hôm nay (không đổi cài đặt): nạp lại hàng đợi với phần cộng thêm. */
+  const learnMore = useCallback(async (count: number) => {
+    bonus.current += count;
+    setStatus("loading");
+    try {
+      const session = await loadReviewSession(new Date(), bonus.current);
+      setWaitingNew(session.waitingNew);
+      setInitialTotal(session.total);
+      setQueue(session.queue);
+      setStatus(session.total > 0 ? "active" : "empty");
+      loadContexts(session.queue);
+    } catch {
+      setStatus("error");
+    }
   }, [loadContexts]);
 
   const grade = useCallback((rating: Grade) => {
@@ -100,6 +123,7 @@ export function useReviewSession() {
   const current = queue[0] ?? null;
   return {
     status, current, remaining: queue.length, initialTotal, cardCount, canUndo, saveError, grade, undo,
+    waitingNew, newStarted, newPerDay, learnMore,
     context: current?.video_id ? contexts[current.video_id] ?? null : null,
   };
 }
