@@ -152,7 +152,7 @@ Tương tác trên thẻ: **Lưu** (bật/tắt, đổi màu ngay), **Đã biế
 
 - **Mặt trước:** chữ Hán lớn, nút ▶ nghe đoạn hát chứa từ, tên bài nhỏ phía dưới.
 - **Mặt sau:** pinyin, âm Hán Việt, nghĩa, ghi chú ngữ cảnh, ví dụ.
-- 4 nút đánh giá: Quên / Khó / Được / Dễ, mỗi nút ghi lần ôn tiếp theo ("10 phút", "1 ngày", "3 ngày", "7 ngày").
+- 4 nút đánh giá: Quên / Khó / Được / Dễ, mỗi nút ghi lần ôn tiếp theo. Lịch tính theo ngày, không có bước học tính bằng phút: thẻ mới ra 1 / 2 / 5 / 10 ngày, các lần sau FSRS giãn dần (trần 180 ngày).
 - Thanh tiến độ phiên ôn ("8 / 14"). Màn kết thúc phiên đơn giản, không pháo hoa.
 - Thẻ ngữ pháp: mặt trước là câu ví dụ bị khuyết phần cấu trúc, mặt sau là công thức + giải thích.
 

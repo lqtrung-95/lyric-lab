@@ -25,7 +25,7 @@ function readRaw() {
 export function RecentSongsSection() {
   const raw = useSyncExternalStore(subscribe, readRaw, () => null);
   const songs = useMemo(() => parseRecentSongs(raw).slice(0, 8), [raw]);
-  const { remove, toast } = useSongRemoval();
+  const { remove, toast, dialog } = useSongRemoval();
 
   // Chưa mở bài nào thì bỏ phần này (NewcomerSteps và gợi ý đã đảm nhận), tránh một khối "trống".
   if (songs.length === 0) return null;
@@ -39,7 +39,8 @@ export function RecentSongsSection() {
           </li>
         ))}
       </ul>
-      {toast}
+      {dialog}
+    {toast}
     </section>
   );
 }

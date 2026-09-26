@@ -122,7 +122,7 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
     const ins = await a.from("review_logs").insert({ ...log, user_id: aId, item_key: "vocab:词" }).select("id").single();
     expect(ins.error).toBeNull();
     const { data: graded } = await a.from("user_cards").select("state,reps").eq("item_key", "vocab:词").single();
-    expect(graded).toEqual({ state: 1, reps: 1 });
+    expect(graded).toEqual({ state: 2, reps: 1 }); // lịch tính theo ngày: chấm lần đầu vào thẳng trạng thái Review
 
     await a.from("user_cards").update(before).eq("item_key", "vocab:词");
     expect((await a.from("review_logs").delete().eq("id", ins.data!.id)).error).toBeNull();

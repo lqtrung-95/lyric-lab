@@ -30,22 +30,22 @@ test("Lưu → ôn: lật bằng Space, chấm bằng phím 3, ghi FSRS và nh�
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     await page.keyboard.press("3");
 
-    // Thẻ mới chấm "Được" sang bước học (hẹn lại vài phút) nên còn quay lại trong buổi; chấm "Dễ" để kết thúc.
-    await expect(page.getByRole("heading", { name: "离开", exact: true })).toBeVisible();
-    await page.keyboard.press("Space");
-    await page.keyboard.press("4");
+    // Lịch ôn tính theo ngày: thẻ mới chấm "Được" hẹn 5 ngày sau nên rời hàng đợi ngay, buổi ôn kết thúc.
     await expect(page.getByRole("heading", { name: "Xong buổi ôn hôm nay" })).toBeVisible();
 
-    // Ghi Supabase chạy nền sau khi giao diện đã chuyển thẻ: chờ tới khi thấy đủ.
-    await expect.poll(async () => (await sb.from("user_cards").select("reps").eq("user_id", userId).eq("item_key", "vocab:离开").single()).data?.reps).toBe(2);
-    const { data: card } = await sb.from("user_cards").select("state").eq("user_id", userId).eq("item_key", "vocab:离开").single();
-    expect(card!.state).toBeGreaterThan(0);
+    // Ghi Supabase chạy nền sau khi giao diện đã chuyển: chờ tới khi thấy đủ.
+    await expect.poll(async () => (await sb.from("user_cards").select("reps").eq("user_id", userId).eq("item_key", "vocab:离开").single()).data?.reps).toBe(1);
+    const { data: card } = await sb.from("user_cards").select("state,due,last_review").eq("user_id", userId).eq("item_key", "vocab:离开").single();
+    expect(card!.state).toBe(2);
+    const days = (Date.parse(card!.due) - Date.parse(card!.last_review!)) / 86_400_000;
+    expect(days).toBe(5);
     const logs = await sb.from("review_logs").select("rating").eq("user_id", userId).order("id");
-    expect(logs.data?.map((l) => l.rating)).toEqual([3, 4]);
+    expect(logs.data?.map((l) => l.rating)).toEqual([3]);
 
     await page.getByRole("button", { name: /Hoàn tác/ }).click();
     await expect(page.getByRole("heading", { name: "离开", exact: true })).toBeVisible();
-    await expect.poll(async () => (await sb.from("review_logs").select("id").eq("user_id", userId)).data?.length).toBe(1);
+    await expect.poll(async () => (await sb.from("review_logs").select("id").eq("user_id", userId)).data?.length).toBe(0);
+    await expect.poll(async () => (await sb.from("user_cards").select("reps").eq("user_id", userId).eq("item_key", "vocab:离开").single()).data?.reps).toBe(0);
   } finally {
     if (userId) await sb.auth.admin.deleteUser(userId);
   }

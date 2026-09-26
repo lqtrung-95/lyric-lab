@@ -30,13 +30,23 @@ function fetchSummary(): Promise<ReviewSummary | null> {
   return inflight;
 }
 
-/** Tóm tắt buổi ôn hôm nay; null khi chưa biết hoặc chưa có phiên (người mới chưa có thẻ nào). Tự làm mới khi chấm/lưu thẻ. */
-export function useReviewSummary(): ReviewSummary | null {
-  const [summary, setSummary] = useState<ReviewSummary | null>(null);
+export interface ReviewSummaryState {
+  summary: ReviewSummary | null;
+  /** Đã hỏi xong (kể cả khi kết quả là "chưa có phiên"): giao diện dùng để hiện khung chờ cho tới lúc này, tránh nhảy bố cục. */
+  loaded: boolean;
+}
+
+/** Tóm tắt buổi ôn hôm nay kèm cờ đã tải xong. Tự làm mới khi chấm/lưu thẻ. */
+export function useReviewSummaryState(): ReviewSummaryState {
+  const [state, setState] = useState<ReviewSummaryState>({ summary: null, loaded: false });
 
   useEffect(() => {
     let cancelled = false;
-    const refresh = () => { void fetchSummary().then((s) => { if (!cancelled && s) setSummary(s); }); };
+    const refresh = () => {
+      void fetchSummary().then((summary) => {
+        if (!cancelled) setState((prev) => ({ summary: summary ?? prev.summary, loaded: true }));
+      });
+    };
     refresh();
     window.addEventListener(DUE_COUNT_EVENT, refresh);
     return () => {
@@ -45,5 +55,8 @@ export function useReviewSummary(): ReviewSummary | null {
     };
   }, []);
 
-  return summary;
+  return state;
 }
+
+/** Tóm tắt buổi ôn hôm nay; null khi chưa biết hoặc chưa có phiên (người mới chưa có thẻ nào). */
+export const useReviewSummary = (): ReviewSummary | null => useReviewSummaryState().summary;

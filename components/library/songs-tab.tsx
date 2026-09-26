@@ -25,7 +25,7 @@ export function SongsTab() {
     fetch("/api/library/songs").then((r) => r.json()).then((d) => setRemote(d.songs ?? []), () => setRemote([]));
   }, []);
   useEffect(() => { load(); }, [load]);
-  const { remove, toast } = useSongRemoval(load);
+  const { remove, toast, dialog } = useSongRemoval(load);
 
   const songs = useMemo(() => mergeLibrarySongs(remote ?? [], parseRecentSongs(recentRaw)), [remote, recentRaw]);
 
@@ -50,6 +50,7 @@ export function SongsTab() {
         </li>
       ))}
     </ul>
+    {dialog}
     {toast}
     </>
   );

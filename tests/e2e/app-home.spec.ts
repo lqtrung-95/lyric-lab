@@ -78,3 +78,21 @@ test.describe("tiếp tục nghe tại vị trí đã dừng", () => {
     expect(await page.evaluate(() => (window as unknown as { __seeks?: number[] }).__seeks ?? [])).toEqual([]);
   });
 });
+
+test("bảng 'Hôm nay' hiện khung chờ cùng kích thước rồi mới hiện nội dung, không nhảy bố cục", async ({ page }) => {
+  await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
+  await page.route("**/api/discover**", (r) => r.fulfill({ json: { songs: [], hasMore: false } }));
+  await page.route("**/api/library/songs", async (r) => { await new Promise((res) => setTimeout(res, 1200)); return r.fulfill({ json: { songs: [] } }); });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/app");
+  const panel = page.locator("section[aria-labelledby='today-heading']");
+  await expect(panel).toHaveAttribute("aria-busy", "true");
+  await expect(panel.getByRole("status")).toContainText("Đang tải");
+  await expect(panel.getByText("Chưa biết học bài nào?")).toHaveCount(0); // chưa hiện nội dung "mặc định" tạm thời
+  const loadingHeight = (await panel.boundingBox())!.height;
+
+  await expect(panel.getByText("Chưa biết học bài nào?")).toBeVisible();
+  await expect(panel).toHaveAttribute("aria-busy", "false");
+  const loadedHeight = (await panel.boundingBox())!.height;
+  expect(Math.abs(loadedHeight - loadingHeight)).toBeLessThanOrEqual(12);
+});
