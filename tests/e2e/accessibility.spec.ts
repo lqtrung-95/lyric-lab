@@ -3,6 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { stubYouTube } from "./helpers/youtube-stub";
 
 // Kiểm tra tự động WCAG 2.2 AA (axe) trên các màn chính, cả giao diện sáng và tối, desktop và mobile.
+// Hiệu ứng hiện dần khi cuộn làm khối còn ẩn (độ mờ 0) bị axe tính sai tương phản: kiểm tra ở chế độ giảm chuyển động (hiệu ứng tắt).
+test.use({ reducedMotion: "reduce" });
+
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 async function audit(page: Page, label: string) {

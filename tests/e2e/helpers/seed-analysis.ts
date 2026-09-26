@@ -21,7 +21,7 @@ const client = () =>
 export async function seedFixtureSong() {
   const sb = client();
   const { error: songError } = await sb.from("songs").upsert(
-    { video_id: E2E_VIDEO_ID, title: "Bài mẫu E2E", channel_title: "Kênh mẫu", duration_sec: 30 },
+    { video_id: E2E_VIDEO_ID, title: "Bài mẫu E2E", channel_title: "Kênh mẫu", duration_sec: 30, listed: false },
     { onConflict: "video_id" },
   );
   if (songError) throw new Error(`Seed songs: ${songError.message}`);

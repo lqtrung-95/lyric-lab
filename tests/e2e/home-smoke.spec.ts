@@ -55,3 +55,25 @@ test("đã có phiên (cookie Supabase) vào '/' thì tự chuyển sang /app; ?
   await expect(page).toHaveURL(/\/\?landing$/);
   await expect(page.getByRole("heading", { name: "Bấm vào một từ được tô sáng" })).toBeVisible();
 });
+
+test.describe("hiệu ứng hiện dần trên trang giới thiệu", () => {
+  test("khối dưới màn hình bắt đầu ẩn và hiện ra khi cuộn tới", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    const faq = page.locator("[data-reveal]").filter({ has: page.locator("#faq") });
+    await expect(faq).toHaveAttribute("data-reveal", "hidden");
+    await page.locator("#faq").scrollIntoViewIfNeeded();
+    await expect(faq).toHaveAttribute("data-reveal", "shown");
+    await expect(faq).toBeVisible();
+  });
+
+  test("giảm chuyển động: không ẩn khối nào và không có animation", async ({ browser }) => {
+    const context = await browser.newContext({ reducedMotion: "reduce", baseURL: "http://localhost:3100" });
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator('[data-reveal="hidden"]')).toHaveCount(0);
+    const animation = await page.locator(".anim-float").first().evaluate((el) => getComputedStyle(el).animationName);
+    expect(animation).toBe("none");
+    await context.close();
+  });
+});

@@ -10,7 +10,7 @@ export function LandingHero() {
     <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden rounded-[2rem] bg-surface-container-low px-space-md py-space-xl md:px-space-xl lg:py-16">
       {/* Nền: vệt sáng đỏ mực và chữ Hán mờ làm điểm nhấn văn chương. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_88%_8%,color-mix(in_srgb,var(--primary-container)_20%,transparent),transparent),radial-gradient(50%_50%_at_5%_100%,color-mix(in_srgb,var(--secondary-container)_55%,transparent),transparent)]" />
-      <span aria-hidden="true" lang="zh" className="pointer-events-none absolute -bottom-16 right-2 -z-10 font-serif text-[22rem] leading-none text-primary/[0.05] md:text-[30rem]">歌</span>
+      <span aria-hidden="true" lang="zh" className="anim-drift pointer-events-none absolute -bottom-16 right-2 -z-10 font-serif text-[22rem] leading-none text-primary/[0.05] md:text-[30rem]">歌</span>
 
       <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
         <div>

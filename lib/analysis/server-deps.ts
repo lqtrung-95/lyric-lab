@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { YoutubeInnertubeCaptionProvider } from "@/lib/captions/youtube-innertube-caption-provider";
 import { getServerEnv } from "@/lib/env/server-env";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
@@ -30,11 +31,35 @@ export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): Ana
   };
 }
 
-/** Đọc phân tích đã cache (khóa theo quy tắc 8), luôn ở dạng giản thể (xem `simplifyDeep`). */
-export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis | null> {
+class NotFoundInCache extends Error {}
+
+async function loadAnalysis(videoId: string): Promise<SongAnalysis | null> {
   const cache = createSupabaseCacheDb(createSupabaseServiceClient());
   const analysis = await getCachedAnalysis(cache, { videoId, learnLang: LEARN_LANG, explainLang: EXPLAIN_LANG, promptVersion: PROMPT_VERSION });
   return analysis ? repairLinePinyin(simplifyDeep(analysis)) : null;
+}
+
+// Phân tích của một bài gần như bất biến (khóa theo promptVersion) nên giữ trong cache của Next 1 giờ để mở lại bài không phải
+// chờ Supabase. Chỉ cache kết quả CÓ: "chưa phân tích" ném lỗi để không bị cache (bài vừa phân tích xong phải hiện ngay).
+// Gỡ bài theo yêu cầu (`delete from songs`) sẽ hết hiệu lực trong tối đa 1 giờ.
+const analysisCache = unstable_cache(
+  async (videoId: string) => {
+    const analysis = await loadAnalysis(videoId);
+    if (!analysis) throw new NotFoundInCache();
+    return analysis;
+  },
+  ["song-analysis", PROMPT_VERSION],
+  { revalidate: 3600, tags: ["song-analysis"] },
+);
+
+/** Đọc phân tích đã cache (khóa theo quy tắc 8), luôn ở dạng giản thể (xem `simplifyDeep`) và có pinyin không lẫn chữ Hán. */
+export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis | null> {
+  try {
+    return await analysisCache(videoId);
+  } catch (error) {
+    if (error instanceof NotFoundInCache) return null;
+    throw error;
+  }
 }
 
 const HAN = /\p{Script=Han}/u;
@@ -57,9 +82,25 @@ async function repairLinePinyin(analysis: SongAnalysis): Promise<SongAnalysis> {
   };
 }
 
-/** Tiêu đề và kênh của bài đã lưu (để hiện ở giao diện). */
-export async function readSongRow(videoId: string): Promise<{ title: string; channelTitle: string; durationSec: number } | null> {
-  const { data } = await createSupabaseServiceClient()
-    .from("songs").select("title,channel_title,duration_sec").eq("video_id", videoId).maybeSingle();
-  return data ? { title: simplifyDeep(data.title), channelTitle: simplifyDeep(data.channel_title), durationSec: data.duration_sec } : null;
+interface SongRow { title: string; channelTitle: string; durationSec: number }
+
+const songRowCache = unstable_cache(
+  async (videoId: string): Promise<SongRow> => {
+    const { data } = await createSupabaseServiceClient()
+      .from("songs").select("title,channel_title,duration_sec").eq("video_id", videoId).maybeSingle();
+    if (!data) throw new NotFoundInCache();
+    return { title: simplifyDeep(data.title), channelTitle: simplifyDeep(data.channel_title), durationSec: data.duration_sec };
+  },
+  ["song-row"],
+  { revalidate: 3600, tags: ["song-row"] },
+);
+
+/** Tiêu đề và kênh của bài đã lưu (để hiện ở giao diện). Cache 1 giờ như phân tích; bài chưa có thì không bị cache. */
+export async function readSongRow(videoId: string): Promise<SongRow | null> {
+  try {
+    return await songRowCache(videoId);
+  } catch (error) {
+    if (error instanceof NotFoundInCache) return null;
+    throw error;
+  }
 }

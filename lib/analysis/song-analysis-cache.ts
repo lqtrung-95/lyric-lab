@@ -1,4 +1,5 @@
 import type { SongAnalysis } from "./analysis-types";
+import { averageVocabLevel } from "./song-level-average";
 import type { VideoMeta } from "@/lib/lyrics/lyrics-types";
 
 /** Khóa cache (quy tắc 8): videoId + ngôn ngữ học + ngôn ngữ giải thích + phiên bản prompt. */
@@ -14,7 +15,7 @@ type DbResult<T> = PromiseLike<{ data: T; error: { message: string } | null }>;
 /** Phần tối thiểu của Supabase client mà cache cần (để test bằng đối tượng giả). */
 export interface CacheDb {
   selectAnalysis(key: CacheKey): DbResult<{ analysis: SongAnalysis }[] | null>;
-  upsertSong(row: { video_id: string; title: string; channel_title: string; duration_sec: number }): DbResult<unknown>;
+  upsertSong(row: { video_id: string; title: string; channel_title: string; duration_sec: number; level_avg: number | null }): DbResult<unknown>;
   upsertAnalysis(row: {
     video_id: string; learn_lang: string; explain_lang: string; prompt_version: string;
     lyrics_source: string; model: string; analysis: SongAnalysis;
@@ -30,6 +31,7 @@ export async function getCachedAnalysis(db: CacheDb, key: CacheKey): Promise<Son
 export async function saveAnalysis(db: CacheDb, key: CacheKey, video: VideoMeta, analysis: SongAnalysis): Promise<void> {
   const song = await db.upsertSong({
     video_id: video.videoId, title: video.title, channel_title: video.channelTitle, duration_sec: video.durationSec,
+    level_avg: averageVocabLevel(analysis.items),
   });
   if (song.error) throw new Error(`Ghi bài hát lỗi: ${song.error.message}`);
   const saved = await db.upsertAnalysis({

@@ -10,13 +10,15 @@ interface SongCardProps {
   /** Có thì hiện thanh tiến độ nghe (thư viện); không có thì hiện nút phát trên ảnh (trang chủ). */
   progress?: { fraction: number; label: string };
   sizes: string;
+  /** Nhãn nhỏ dưới tên kênh (vd. cấp HSK trung bình, số người đã học ở tab Khám phá). */
+  meta?: string;
 }
 
 /**
  * Thẻ bài hát dùng chung cho trang chủ và thư viện. Thẻ luôn cao bằng nhau trong một hàng: tiêu đề chiếm chỗ 2 dòng
  * và phần chân (kênh, tiến độ) dính đáy, nên bài có tiêu đề ngắn hay dài đều thẳng hàng.
  */
-export function SongCard({ videoId, title, channelTitle, progress, sizes }: SongCardProps) {
+export function SongCard({ videoId, title, channelTitle, progress, sizes, meta }: SongCardProps) {
   return (
     <Link
       href={`/learn/${videoId}`}
@@ -33,6 +35,7 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes }: Song
       <div className="flex flex-1 flex-col p-space-md">
         <p className="line-clamp-2 min-h-12 text-body-md font-medium text-on-surface">{title}</p>
         <p className="mt-1 truncate text-label-md text-on-surface-variant">{channelTitle}</p>
+        {meta && <p className="mt-1 text-label-sm font-medium text-secondary">{meta}</p>}
         {progress && (
           <div className="mt-auto flex items-center gap-2 pt-space-sm">
             <div

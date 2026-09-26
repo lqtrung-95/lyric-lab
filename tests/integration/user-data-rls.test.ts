@@ -38,7 +38,7 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
     service = createClient(url!, serviceKey!, clientOptions);
     ({ client: a, id: aId } = await signInAnon());
     ({ client: b, id: bId } = await signInAnon());
-    await service.from("songs").upsert({ video_id: SONG, title: "rls test", channel_title: "test", duration_sec: 1 });
+    await service.from("songs").upsert({ video_id: SONG, title: "rls test", channel_title: "test", duration_sec: 1, listed: false });
 
     const own = await Promise.all([
       a.from("user_profiles").insert({ user_id: aId, level: 3 }),

@@ -8,6 +8,7 @@ import { FinalCta } from "@/components/landing/final-cta";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingHero } from "@/components/landing/landing-hero";
 import { LiveDemo } from "@/components/landing/live-demo";
+import { Reveal } from "@/components/landing/reveal";
 import { ProblemSolution } from "@/components/landing/problem-solution";
 import { landingJsonLd } from "@/lib/seo/landing-json-ld";
 
@@ -29,15 +30,15 @@ export default function LandingPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(landingJsonLd(DESCRIPTION)) }} />
       <LandingHero />
-      <ProblemSolution />
-      <LiveDemo />
-      <BeforeAfter />
-      <HowItWorks />
-      <FeatureShowcase />
-      <AudienceLevels />
-      <FeaturesGrid />
-      <FaqSection />
-      <FinalCta />
+      <Reveal><ProblemSolution /></Reveal>
+      <Reveal><LiveDemo /></Reveal>
+      <Reveal><BeforeAfter /></Reveal>
+      <Reveal><HowItWorks /></Reveal>
+      <Reveal><FeatureShowcase /></Reveal>
+      <Reveal><AudienceLevels /></Reveal>
+      <Reveal><FeaturesGrid /></Reveal>
+      <Reveal><FaqSection /></Reveal>
+      <Reveal><FinalCta /></Reveal>
     </>
   );
 }

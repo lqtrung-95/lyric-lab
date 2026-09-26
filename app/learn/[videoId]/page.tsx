@@ -11,8 +11,9 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
   const { videoId } = await params;
   if (!isValidVideoId(videoId)) notFound();
 
-  const analysis = await readCachedAnalysis(videoId);
-  const song = analysis ? await readSongRow(videoId) : null;
+  // Hai truy vấn độc lập: chạy song song (bài chưa phân tích thì `song` bị bỏ qua bên dưới).
+  const [analysis, songRow] = await Promise.all([readCachedAnalysis(videoId), readSongRow(videoId)]);
+  const song = analysis ? songRow : null;
 
   return (
     <>

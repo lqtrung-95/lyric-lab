@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { DiscoverTab } from "./discover-tab";
 import { SavedWordsTab } from "./saved-words-tab";
 import { SongsTab } from "./songs-tab";
 
 const TABS = [
-  { id: "songs", label: "Bài hát" },
+  { id: "songs", label: "Bài hát của tôi" },
+  { id: "discover", label: "Khám phá" },
   { id: "words", label: "Từ đã lưu" },
 ] as const;
 
-/** Thư viện (S9): tab Bài hát và tab Từ đã lưu, có trạng thái rỗng cho cả hai. */
+/** Thư viện (S9): tab Bài hát của tôi, Khám phá (bài người khác đã phân tích) và Từ đã lưu, có trạng thái rỗng. */
 export function LibraryScreen() {
   const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("songs");
   return (
@@ -24,7 +26,7 @@ export function LibraryScreen() {
         ))}
       </div>
       <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="mt-space-lg">
-        {tab === "songs" ? <SongsTab /> : <SavedWordsTab />}
+        {tab === "songs" ? <SongsTab /> : tab === "discover" ? <DiscoverTab /> : <SavedWordsTab />}
       </div>
     </div>
   );

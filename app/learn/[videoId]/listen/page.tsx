@@ -10,8 +10,9 @@ export default async function ListenPage({ params }: { params: Promise<{ videoId
   if (!isValidVideoId(videoId)) notFound();
 
   // Chưa có phân tích thì về trang bài học để chạy phân tích trước.
-  const analysis = await readCachedAnalysis(videoId);
-  const song = analysis ? await readSongRow(videoId) : null;
+  // Hai truy vấn độc lập: chạy song song (bài chưa phân tích thì `song` bị bỏ qua bên dưới).
+  const [analysis, songRow] = await Promise.all([readCachedAnalysis(videoId), readSongRow(videoId)]);
+  const song = analysis ? songRow : null;
   if (!analysis || !song) redirect(`/learn/${videoId}`);
 
   return (

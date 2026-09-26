@@ -43,11 +43,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ videoId:
       const fail = (code: AnalysisErrorCode) => send("error", { code });
 
       try {
-        const video = await fetchVideoMeta(videoId);
+        // Hai việc độc lập (hỏi YouTube và đọc cache): chạy song song để bài đã phân tích mở nhanh hơn.
+        const [video, cached] = await Promise.all([fetchVideoMeta(videoId), readCachedAnalysis(videoId)]);
         if (!video) return fail("video_not_found");
         send("meta", { title: video.title, channelTitle: video.channelTitle, durationSec: video.durationSec });
 
-        if (await readCachedAnalysis(videoId)) return send("done", { fromCache: true });
+        if (cached) return send("done", { fromCache: true });
 
         const running = inFlight.get(videoId);
         if (!running) {
