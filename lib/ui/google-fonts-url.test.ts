@@ -8,10 +8,10 @@ describe("googleFontsUrl", () => {
     expect(new Set(ICON_NAMES).size).toBe(ICON_NAMES.length);
   });
 
-  it("URL chứa đủ họ font và danh sách icon", () => {
+  it("URL chỉ chứa font icon và đúng danh sách icon (chữ được tự host bằng next/font)", () => {
     const url = googleFontsUrl();
-    expect(url).toContain("Be+Vietnam+Pro");
-    expect(url).toContain("Noto+Serif+SC");
+    expect(url).toContain("Material+Symbols+Outlined");
+    expect(url).not.toContain("Noto+Serif");
     expect(url).toContain(`icon_names=${[...ICON_NAMES].join(",")}`);
   });
 });

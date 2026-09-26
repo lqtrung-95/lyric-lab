@@ -7,6 +7,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
 import { createGroqChat } from "./groq-chat";
+import { simplifyDeep } from "./simplify-analysis";
 import { getCachedAnalysis } from "./song-analysis-cache";
 import { createSupabaseCacheDb } from "./supabase-cache-db";
 import type { SongAnalysis } from "./analysis-types";
@@ -28,15 +29,16 @@ export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): Ana
   };
 }
 
-/** Đọc phân tích đã cache (khóa theo quy tắc 8). */
+/** Đọc phân tích đã cache (khóa theo quy tắc 8), luôn ở dạng giản thể (xem `simplifyDeep`). */
 export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis | null> {
   const cache = createSupabaseCacheDb(createSupabaseServiceClient());
-  return getCachedAnalysis(cache, { videoId, learnLang: LEARN_LANG, explainLang: EXPLAIN_LANG, promptVersion: PROMPT_VERSION });
+  const analysis = await getCachedAnalysis(cache, { videoId, learnLang: LEARN_LANG, explainLang: EXPLAIN_LANG, promptVersion: PROMPT_VERSION });
+  return analysis ? simplifyDeep(analysis) : null;
 }
 
 /** Tiêu đề và kênh của bài đã lưu (để hiện ở giao diện). */
 export async function readSongRow(videoId: string): Promise<{ title: string; channelTitle: string; durationSec: number } | null> {
   const { data } = await createSupabaseServiceClient()
     .from("songs").select("title,channel_title,duration_sec").eq("video_id", videoId).maybeSingle();
-  return data ? { title: data.title, channelTitle: data.channel_title, durationSec: data.duration_sec } : null;
+  return data ? { title: simplifyDeep(data.title), channelTitle: simplifyDeep(data.channel_title), durationSec: data.duration_sec } : null;
 }

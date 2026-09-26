@@ -1,6 +1,13 @@
 import type { Metadata, Viewport } from "next";
+import { Be_Vietnam_Pro, Lora, Noto_Serif_SC } from "next/font/google";
 import { googleFontsUrl } from "@/lib/ui/google-fonts-url";
 import "./globals.css";
+
+// Font tự host (tải lúc build, phục vụ cùng domain): không phụ thuộc CDN lúc chạy và luôn có bộ glyph tiếng Việt.
+// Lora cho tiêu đề (dấu tiếng Việt vẽ chuẩn), Be Vietnam Pro cho nội dung, Noto Serif SC cho chữ Hán (giản thể).
+const sans = Be_Vietnam_Pro({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["300", "400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-be-vietnam-pro" });
+const serif = Lora({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-lora" });
+const hanzi = Noto_Serif_SC({ weight: ["400", "500", "600", "700"], preload: false, display: "swap", variable: "--font-noto-serif-sc" });
 
 export const metadata: Metadata = {
   title: { default: "Lyric Lab", template: "%s · Lyric Lab" },
@@ -19,7 +26,7 @@ const THEME_INIT = `try{var t=localStorage.getItem('lyric-lab-theme');if(t==='da
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" className={`${sans.variable} ${serif.variable} ${hanzi.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />

@@ -214,9 +214,9 @@
 }
 
 :root {
-  /* Chữ Hán rơi về Noto Serif SC khi Noto Serif (Latin, tiếng Việt) không có glyph. */
-  --font-serif-stack: "Noto Serif", "Noto Serif SC", "Songti SC", "Noto Serif CJK SC", serif;
-  --font-sans-stack: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Biến --font-* do next/font đặt trên <html>. Chữ Hán rơi về Noto Serif SC khi Lora không có glyph. */
+  --font-serif-stack: var(--font-lora), var(--font-noto-serif-sc), "Songti SC", "Noto Serif CJK SC", serif;
+  --font-sans-stack: var(--font-be-vietnam-pro), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 html {
