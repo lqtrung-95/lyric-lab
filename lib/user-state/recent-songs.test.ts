@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addRecentSong, parseRecentSongs, type RecentSong } from "./recent-songs";
+import { addRecentSong, parseRecentSongs, type RecentSong, removeRecentSong } from "./recent-songs";
 
 const song = (videoId: string, openedAt = 1): RecentSong => ({ videoId, title: `t-${videoId}`, channelTitle: "c", openedAt });
 
@@ -21,5 +21,11 @@ describe("parseRecentSongs", () => {
     expect(parseRecentSongs("{không phải json")).toEqual([]);
     expect(parseRecentSongs('{"a":1}')).toEqual([]);
     expect(parseRecentSongs(JSON.stringify([song("a"), { videoId: 1 }]))).toHaveLength(1);
+  });
+
+  it("removeRecentSong bỏ đúng bài, giữ thứ tự, không đổi khi không có", () => {
+    const list = [1, 2, 3].map((n) => ({ videoId: `id${n}`, title: `t${n}`, channelTitle: "c", openedAt: n }));
+    expect(removeRecentSong(list, "id2").map((s) => s.videoId)).toEqual(["id1", "id3"]);
+    expect(removeRecentSong(list, "none")).toEqual(list);
   });
 });

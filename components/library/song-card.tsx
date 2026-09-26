@@ -12,17 +12,20 @@ interface SongCardProps {
   sizes: string;
   /** Nhãn nhỏ dưới tên kênh (vd. cấp HSK trung bình, số người đã học ở tab Khám phá). */
   meta?: string;
+  /** Có thì hiện nút xóa bài khỏi danh sách (nút nằm ngoài liên kết, không lồng trong thẻ <a>). */
+  onRemove?: () => void;
 }
 
 /**
  * Thẻ bài hát dùng chung cho trang chủ và thư viện. Thẻ luôn cao bằng nhau trong một hàng: tiêu đề chiếm chỗ 2 dòng
  * và phần chân (kênh, tiến độ) dính đáy, nên bài có tiêu đề ngắn hay dài đều thẳng hàng.
  */
-export function SongCard({ videoId, title, channelTitle, progress, sizes, meta }: SongCardProps) {
+export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, onRemove }: SongCardProps) {
   return (
-    <Link
+    <div className="group relative h-full">
+      <Link
       href={`/learn/${videoId}`}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_1px_8px_rgba(30,26,22,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(30,26,22,0.1)]"
+      className="flex h-full flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_1px_8px_rgba(30,26,22,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(30,26,22,0.1)]"
     >
       <div className="relative aspect-video shrink-0 bg-surface-container-high">
         <Image src={videoThumbnailUrl(videoId, "mqdefault")} alt="" fill sizes={sizes} className="object-cover" />
@@ -48,6 +51,15 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes, meta }
           </div>
         )}
       </div>
-    </Link>
+      </Link>
+      {onRemove && (
+        <button
+          type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}
+          className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white opacity-90 backdrop-blur-sm transition-opacity hover:bg-black/75 focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+        >
+          <Icon name="close" size={20} />
+        </button>
+      )}
+    </div>
   );
 }

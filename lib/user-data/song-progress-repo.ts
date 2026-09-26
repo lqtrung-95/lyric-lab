@@ -22,3 +22,34 @@ export async function saveSongProgress(videoId: string, positionSec: number, com
     // Bỏ qua.
   }
 }
+
+export interface ProgressRow {
+  video_id: string;
+  last_position_sec: number;
+  completed: boolean;
+  lyric_offset_sec: number;
+  updated_at: string;
+}
+
+/** Xóa tiến độ nghe của một bài khỏi tài khoản (bài rời khỏi "Bài hát của tôi"). Trả hàng đã xóa để hoàn tác; null nếu không có phiên/không có hàng. */
+export async function deleteSongProgress(videoId: string): Promise<ProgressRow | null> {
+  try {
+    if (!(await hasExistingSession())) return null;
+    const { data } = await createSupabaseBrowserClient().from("user_song_progress").delete().eq("video_id", videoId)
+      .select("video_id,last_position_sec,completed,lyric_offset_sec,updated_at").maybeSingle();
+    return data ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Khôi phục hàng tiến độ vừa xóa (nút "Hoàn tác"). */
+export async function restoreSongProgress(row: ProgressRow): Promise<void> {
+  try {
+    const sb = createSupabaseBrowserClient();
+    const userId = (await sb.auth.getSession()).data.session?.user.id;
+    if (userId) await sb.from("user_song_progress").upsert({ ...row, user_id: userId });
+  } catch {
+    // Bỏ qua.
+  }
+}

@@ -15,6 +15,9 @@ export function addRecentSong(list: RecentSong[], song: RecentSong, max = MAX_RE
   return [song, ...list.filter((s) => s.videoId !== song.videoId)].slice(0, max);
 }
 
+/** Bỏ một bài khỏi danh sách (giữ thứ tự các bài còn lại). */
+export const removeRecentSong = (list: RecentSong[], videoId: string): RecentSong[] => list.filter((s) => s.videoId !== videoId);
+
 export function parseRecentSongs(raw: string | null): RecentSong[] {
   if (!raw) return [];
   try {

@@ -2,6 +2,7 @@
 
 import { useMemo, useSyncExternalStore } from "react";
 import { SongCard } from "@/components/library/song-card";
+import { useSongRemoval } from "@/components/library/use-song-removal";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
 
 function subscribe(onChange: () => void) {
@@ -24,6 +25,7 @@ function readRaw() {
 export function RecentSongsSection() {
   const raw = useSyncExternalStore(subscribe, readRaw, () => null);
   const songs = useMemo(() => parseRecentSongs(raw).slice(0, 8), [raw]);
+  const { remove, toast } = useSongRemoval();
 
   // Chưa mở bài nào thì bỏ phần này (NewcomerSteps và gợi ý đã đảm nhận), tránh một khối "trống".
   if (songs.length === 0) return null;
@@ -33,10 +35,11 @@ export function RecentSongsSection() {
       <ul className="mt-space-md grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
         {songs.map((song) => (
           <li key={song.videoId}>
-            <SongCard videoId={song.videoId} title={song.title} channelTitle={song.channelTitle} sizes="(min-width:1024px) 25vw, 50vw" />
+            <SongCard videoId={song.videoId} title={song.title} channelTitle={song.channelTitle} sizes="(min-width:1024px) 25vw, 50vw" onRemove={() => remove(song.videoId, song.title)} />
           </li>
         ))}
       </ul>
+      {toast}
     </section>
   );
 }

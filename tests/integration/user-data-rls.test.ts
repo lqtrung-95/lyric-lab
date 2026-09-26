@@ -143,6 +143,20 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
     await a.from("user_song_progress").upsert({ user_id: aId, video_id: SONG, lyric_offset_sec: 0 });
   });
 
+  it("bỏ bài khỏi danh sách: chủ sở hữu xóa và khôi phục được hàng tiến độ; người khác không xóa được", async () => {
+    await a.from("user_song_progress").upsert({ user_id: aId, video_id: SONG, last_position_sec: 12, completed: false });
+    await b.from("user_song_progress").delete().eq("video_id", SONG); // của A: RLS làm việc này không có tác dụng
+    expect((await service.from("user_song_progress").select("video_id").eq("user_id", aId).eq("video_id", SONG)).data).toHaveLength(1);
+
+    const removed = await a.from("user_song_progress").delete().eq("video_id", SONG)
+      .select("video_id,last_position_sec,completed,lyric_offset_sec,updated_at").maybeSingle();
+    expect(removed.data).toMatchObject({ video_id: SONG, last_position_sec: 12 });
+    expect((await a.from("user_song_progress").select("video_id").eq("video_id", SONG)).data).toEqual([]);
+
+    expect((await a.from("user_song_progress").upsert({ ...removed.data!, user_id: aId })).error).toBeNull();
+    expect((await a.from("user_song_progress").select("last_position_sec").eq("video_id", SONG).single()).data).toEqual({ last_position_sec: 12 });
+  });
+
   it("merge_user_data: luật gộp (thẻ nhiều lượt ôn thắng, cài đặt đích thắng, từ đã biết hợp lại)", async () => {
     // A (ẩn danh) → B (đã đăng nhập). Chuẩn bị B: hồ sơ riêng, thẻ trùng ít lượt ôn hơn, thẻ riêng, từ đã biết riêng.
     const setup = [];
