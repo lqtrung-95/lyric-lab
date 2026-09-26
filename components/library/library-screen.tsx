@@ -12,8 +12,10 @@ const TABS = [
 ] as const;
 
 /** Thư viện (S9): tab Bài hát của tôi, Khám phá (bài người khác đã phân tích) và Từ đã lưu, có trạng thái rỗng. */
-export function LibraryScreen() {
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("songs");
+export type LibraryTab = (typeof TABS)[number]["id"];
+
+export function LibraryScreen({ initialTab = "songs" }: { initialTab?: LibraryTab }) {
+  const [tab, setTab] = useState<LibraryTab>(initialTab);
   return (
     <div>
       <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Thư viện</h1>

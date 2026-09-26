@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { OnboardingBanner } from "@/components/home/onboarding-banner";
 import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
-import { TodayPanel } from "@/components/home/today-panel";
+import { NewcomerSteps } from "@/components/home/newcomer-steps";
+import { NextActionPanel } from "@/components/home/next-action-panel";
+import { RecommendedSongs } from "@/components/home/recommended-songs";
 
 // Trang làm việc của người dùng: không cần công cụ tìm kiếm lập chỉ mục (trang giới thiệu ở "/").
 export const metadata: Metadata = { title: "Trang chủ", robots: { index: false, follow: false } };
 
-/** Trang chủ của app: bên trái dán link bài mới, bên phải bảng "Hôm nay"; bên dưới là bài học gần đây. */
+/** Trang chủ của app: bên trái dán link bài mới, bên phải bảng "Hôm nay" (một hành động nổi bật + mục tiêu ngày); bên dưới là bài gần đây và gợi ý theo level. */
 export default function AppHomePage() {
   return (
     <>
@@ -23,10 +25,12 @@ export default function AppHomePage() {
             <PasteLinkForm />
           </div>
         </section>
-        <TodayPanel />
+        <NextActionPanel />
       </div>
       <OnboardingBanner />
+      <NewcomerSteps />
       <RecentSongsSection />
+      <RecommendedSongs />
     </>
   );
 }

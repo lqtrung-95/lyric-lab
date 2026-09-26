@@ -11,6 +11,8 @@ export interface ReviewSession {
   newPerDay: number;
   /** Số thẻ đang chờ ôn hôm nay (đến hạn + thẻ mới trong hạn mức). */
   total: number;
+  /** Số thẻ mới đã bắt đầu học trong ngày hôm nay (cho vòng tròn mục tiêu ngày). */
+  newStartedToday: number;
   /** Tổng số thẻ của người dùng (để phân biệt "chưa có thẻ" với "hôm nay đã ôn xong"). */
   cardCount: number;
 }
@@ -39,7 +41,7 @@ export async function loadReviewSession(now = new Date()): Promise<ReviewSession
 
   const cards = [...(due.data ?? []), ...(fresh.data ?? [])] as ReviewCard[];
   const queue = buildReviewQueue({ cards, now, newPerDay, newStartedToday: started.count ?? 0 });
-  return { queue, newPerDay, total: queue.length, cardCount: all.count ?? 0 };
+  return { queue, newPerDay, total: queue.length, cardCount: all.count ?? 0, newStartedToday: started.count ?? 0 };
 }
 
 /** Ghi kết quả chấm: cập nhật thẻ rồi thêm nhật ký. Trả id nhật ký để hoàn tác. */

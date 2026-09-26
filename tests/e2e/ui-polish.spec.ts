@@ -14,6 +14,7 @@ const heights = async (page: import("@playwright/test").Page) =>
 test("thẻ bài hát ở thư viện và trang chủ cao bằng nhau dù tiêu đề dài ngắn khác nhau", async ({ page }) => {
   await seed(page);
   await page.route("**/api/library/songs", (r) => r.fulfill({ json: { songs: [] } }));
+  await page.route("**/api/discover**", (r) => r.fulfill({ json: { songs: [], hasMore: false } }));
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/library");
   await expect(page.locator("ul a[href^='/learn/']")).toHaveCount(3);

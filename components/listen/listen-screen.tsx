@@ -25,10 +25,12 @@ import { WordPopover } from "./word-popover";
 interface ListenScreenProps {
   analysis: SongAnalysis;
   song: { title: string; channelTitle: string; durationSec?: number };
+  /** Giây để tua tới khi player sẵn sàng (tiếp tục bài nghe dở). */
+  startAt?: number;
 }
 
 /** Màn Nghe (S5): video nhúng + lời chạy theo nhạc + panel "Đang hát". Mọi tô sáng dùng cùng bộ lọc level/"Đã biết" với màn xem trước. */
-export function ListenScreen({ analysis, song }: ListenScreenProps) {
+export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const { offset, setOffset } = useLyricOffset(analysis.videoId);
   // Mọi thứ trong màn Nghe (đồng bộ, tô sáng, tua, lặp câu, tiến độ) dùng mốc đã cộng độ lệch người dùng chỉnh.
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
@@ -56,6 +58,8 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
   );
 
   useEffect(() => { controller?.setRate(prefs.rate); }, [controller, prefs.rate]);
+  // Tiếp tục nghe: tua một lần tới chỗ đã dừng (không tự phát, người dùng bấm phát khi sẵn sàng).
+  useEffect(() => { if (controller && startAt) controller.seekTo(startAt); }, [controller, startAt]);
 
   const seekToLine = useCallback((index: number) => {
     const line = lines[index];

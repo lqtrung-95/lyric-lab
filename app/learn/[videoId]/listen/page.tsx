@@ -5,8 +5,11 @@ import { ListenScreen } from "@/components/listen/listen-screen";
 import { readCachedAnalysis, readSongRow } from "@/lib/analysis/server-deps";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
-export default async function ListenPage({ params }: { params: Promise<{ videoId: string }> }) {
+export default async function ListenPage({ params, searchParams }: { params: Promise<{ videoId: string }>; searchParams: Promise<{ t?: string }> }) {
   const { videoId } = await params;
+  // `?t=84`: mở đúng chỗ đang nghe dở (giây). Giá trị sai bị bỏ qua.
+  const t = Number((await searchParams).t);
+  const startAt = Number.isFinite(t) && t > 0 && t < 36000 ? t : undefined;
   if (!isValidVideoId(videoId)) notFound();
 
   // Chưa có phân tích thì về trang bài học để chạy phân tích trước.
@@ -20,7 +23,7 @@ export default async function ListenPage({ params }: { params: Promise<{ videoId
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title="Nghe" />
       <main id="main" tabIndex={-1} className="pt-16 outline-none">
-        <ListenScreen analysis={analysis} song={song} />
+        <ListenScreen analysis={analysis} song={song} startAt={startAt} />
       </main>
     </>
   );
