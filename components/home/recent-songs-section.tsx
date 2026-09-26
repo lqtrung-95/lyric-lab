@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
+import { Icon } from "@/components/ui/icon";
 import { SongCard } from "@/components/library/song-card";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
 
@@ -41,6 +42,17 @@ export function RecentSongsSection() {
               <SongCard videoId={song.videoId} title={song.title} channelTitle={song.channelTitle} sizes="(min-width:1024px) 25vw, 50vw" />
             </li>
           ))}
+          {/* Ô mời thêm bài: lấp chỗ trống khi có ít hơn một hàng bài hát và dẫn người dùng về ô dán link. */}
+          {songs.length < 4 && (
+            <li>
+              <a href="#video-link" onClick={() => document.getElementById("video-link")?.focus()}
+                className="flex h-full min-h-56 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-outline-variant p-space-md text-center text-on-surface-variant transition-colors hover:border-primary hover:bg-surface-container-low hover:text-primary">
+                <Icon name="add" size={32} />
+                <span className="text-label-md font-medium">Thêm bài hát mới</span>
+                <span className="text-label-sm">Dán link YouTube ở phía trên</span>
+              </a>
+            </li>
+          )}
         </ul>
       )}
     </section>
