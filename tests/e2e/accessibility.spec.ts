@@ -17,7 +17,8 @@ async function setTheme(page: Page, theme: "light" | "dark") {
 }
 
 const SCREENS = [
-  { name: "trang chủ", url: "/" },
+  { name: "trang giới thiệu", url: "/" },
+  { name: "trang chủ app", url: "/app" },
   { name: "xem trước", url: "/dev/preview-fixture" },
   { name: "nghe", url: "/dev/listen-fixture" },
   { name: "ôn tập (chưa có thẻ)", url: "/review" },

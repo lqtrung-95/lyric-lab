@@ -18,7 +18,7 @@ test("thẻ bài hát ở thư viện và trang chủ cao bằng nhau dù tiêu 
   await page.goto("/library");
   await expect(page.locator("ul a[href^='/learn/']")).toHaveCount(3);
   expect(new Set(await heights(page)).size).toBe(1);
-  await page.goto("/");
+  await page.goto("/app");
   await expect(page.locator("ul a[href^='/learn/']")).toHaveCount(3);
   expect(new Set(await heights(page)).size).toBe(1);
 });
@@ -35,7 +35,7 @@ test("dán link đúng: nút chuyển sang trạng thái đang mở và bị kh�
 test("bấm liên kết sang trang server chậm: hiện thanh tiến trình rồi tắt khi trang mới hiện", async ({ page }) => {
   await seed(page);
   await page.route("**/api/analyze/**", () => new Promise(() => {}));
-  await page.goto("/");
+  await page.goto("/app");
   await page.route(/\/learn\/aaaaaaaaaaa/, async (route) => { await new Promise((r) => setTimeout(r, 1500)); return route.continue(); });
   const bar = page.locator("div.pointer-events-none.fixed.top-0[aria-hidden='true']");
   await page.getByRole("link", { name: /Tên ngắn/ }).click();

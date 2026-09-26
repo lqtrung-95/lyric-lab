@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { stubYouTube } from "./helpers/youtube-stub";
 
 // Bố cục responsive (360 → 1440 px) và vùng bấm ≥ 44 px (WCAG 2.2 AA, CLAUDE.md quy tắc 9).
-const SCREENS = ["/", "/dev/preview-fixture", "/dev/listen-fixture"];
+const SCREENS = ["/", "/app", "/dev/preview-fixture", "/dev/listen-fixture"];
 const WIDTHS = [360, 390, 768, 1024, 1440];
 
 for (const url of SCREENS) {

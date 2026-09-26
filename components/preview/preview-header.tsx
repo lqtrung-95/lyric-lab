@@ -21,7 +21,7 @@ export function PreviewHeader({ analysis, song, listenHref }: PreviewHeaderProps
     <section className="bg-surface-container-low px-gutter py-space-lg shadow-sm md:px-6 lg:px-12">
       <div className="mx-auto flex max-w-7xl flex-col gap-space-lg">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href="/" className="hidden min-h-11 items-center gap-2 text-label-md text-on-surface-variant hover:text-primary md:inline-flex">
+          <Link href="/app" className="hidden min-h-11 items-center gap-2 text-label-md text-on-surface-variant hover:text-primary md:inline-flex">
             <Icon name="arrow_back" size={18} />
             Trở về Trang chủ
           </Link>

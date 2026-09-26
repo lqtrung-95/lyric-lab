@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
+import { SITE_URL } from "@/lib/seo/site-url";
 import { googleFontsUrl } from "@/lib/ui/google-fonts-url";
 import "./globals.css";
 
@@ -11,6 +12,7 @@ const sans = Be_Vietnam_Pro({ subsets: ["latin", "latin-ext", "vietnamese"], wei
 const serif = Lora({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-lora" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: { default: "Lyric Lab", template: "%s · Lyric Lab" },
   description: "Học tiếng Trung qua bài hát: xem trước từ vựng, nghe với lời chạy theo nhạc, ôn bằng flashcard.",
 };

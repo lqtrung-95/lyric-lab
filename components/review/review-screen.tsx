@@ -54,13 +54,13 @@ export function ReviewScreen() {
   }
   if (s.status === "empty") {
     return s.cardCount === 0
-      ? <ReviewMessage icon="style" title="Chưa có thẻ nào để ôn" body="Khi xem trước một bài, bấm “Lưu” ở từ vựng hoặc ngữ pháp bạn muốn nhớ, thẻ sẽ xuất hiện ở đây." action={{ href: "/", label: "Chọn bài hát" }} />
-      : <ReviewMessage icon="check_circle" title="Hôm nay bạn đã ôn xong" body="Không còn thẻ nào đến hạn. Thẻ mới sẽ tới theo hạn mức mỗi ngày, quay lại vào ngày mai nhé." action={{ href: "/", label: "Học bài mới" }} />;
+      ? <ReviewMessage icon="style" title="Chưa có thẻ nào để ôn" body="Khi xem trước một bài, bấm “Lưu” ở từ vựng hoặc ngữ pháp bạn muốn nhớ, thẻ sẽ xuất hiện ở đây." action={{ href: "/app", label: "Chọn bài hát" }} />
+      : <ReviewMessage icon="check_circle" title="Hôm nay bạn đã ôn xong" body="Không còn thẻ nào đến hạn. Thẻ mới sẽ tới theo hạn mức mỗi ngày, quay lại vào ngày mai nhé." action={{ href: "/app", label: "Học bài mới" }} />;
   }
   if (s.status === "finished" || !card) {
     return (
       <div>
-        <ReviewMessage icon="check_circle" title="Xong buổi ôn hôm nay" body={`Bạn đã ôn ${s.initialTotal} thẻ. Lịch ôn kế tiếp đã được FSRS xếp cho từng thẻ.`} action={{ href: "/", label: "Học bài mới" }} />
+        <ReviewMessage icon="check_circle" title="Xong buổi ôn hôm nay" body={`Bạn đã ôn ${s.initialTotal} thẻ. Lịch ôn kế tiếp đã được FSRS xếp cho từng thẻ.`} action={{ href: "/app", label: "Học bài mới" }} />
         {s.canUndo && <UndoButton onClick={() => { setFlipped(false); void s.undo(); }} />}
       </div>
     );
@@ -72,7 +72,7 @@ export function ReviewScreen() {
       <h1 className="sr-only">Ôn tập</h1>
       <div className="w-full">
         <div className="flex items-center justify-between gap-3">
-          <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-low px-4 text-label-md text-on-surface-variant hover:bg-surface-container-high">
+          <Link href="/app" className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-low px-4 text-label-md text-on-surface-variant hover:bg-surface-container-high">
             <Icon name="close" size={18} />
             Thoát
           </Link>

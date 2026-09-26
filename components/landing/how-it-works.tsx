@@ -11,7 +11,7 @@ const STEPS: { icon: IconName; title: string; body: string }[] = [
 /** Bốn bước từ dán link tới ôn tập. */
 export function HowItWorks() {
   return (
-    <section aria-labelledby="how-heading" className="mt-24">
+    <section id="how" aria-labelledby="how-heading" className="mt-24 scroll-mt-24">
       <p className="text-label-md font-semibold uppercase tracking-widest text-secondary">Cách hoạt động</p>
       <h2 id="how-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Từ một bài hát yêu thích đến vốn từ của bạn</h2>
       <ol className="mt-space-lg grid gap-space-md sm:grid-cols-2 lg:grid-cols-4">

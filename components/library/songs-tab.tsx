@@ -30,7 +30,7 @@ export function SongsTab() {
   if (songs.length === 0) {
     return (
       <p className="rounded-2xl bg-surface-container-low p-space-lg text-body-md text-on-surface-variant">
-        Chưa có bài nào. <Link href="/" className="font-medium text-primary underline">Dán link YouTube</Link> để bắt đầu bài học đầu tiên.
+        Chưa có bài nào. <Link href="/app" className="font-medium text-primary underline">Dán link YouTube</Link> để bắt đầu bài học đầu tiên.
       </p>
     );
   }

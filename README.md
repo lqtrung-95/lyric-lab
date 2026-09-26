@@ -6,6 +6,12 @@ Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựn
 - Thiết kế: [`docs/design-brief.md`](docs/design-brief.md), file design trong [`design/`](design/)
 - Hướng dẫn cho Claude Code: [`CLAUDE.md`](CLAUDE.md)
 
+## Cấu trúc trang
+
+- `/`: trang giới thiệu (marketing, được lập chỉ mục). Người đã có phiên tự chuyển sang `/app`; thêm `?landing` để xem lại.
+- `/app`: trang chủ của app; cùng với `/library`, `/review`, `/settings`, `/learn/...` đều `noindex`.
+- Ảnh chia sẻ mạng xã hội (`app/(marketing)/opengraph-image.png`) là ảnh chụp, dựng lại nếu đổi thông điệp. Đặt `NEXT_PUBLIC_SITE_URL` khi có tên miền riêng.
+
 ## Trạng thái
 
 - M0 (spike nguồn lời), M1 (pipeline phân tích), M2 (giao diện Xem trước + Nghe + tra từ): **xong**. M3 (flashcard FSRS, tài khoản ẩn danh + Google, thư viện, tổng kết bài, hạn mức theo tài khoản): **code xong**; còn chờ thử tay đăng nhập Google, bật captcha Turnstile trước khi công khai.

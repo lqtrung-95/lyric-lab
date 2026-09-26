@@ -37,8 +37,8 @@ test("dán link → xem trước → nghe, và bài xuất hiện ở 'Bài hát
   await expect(page.getByRole("dialog")).toContainText("ly khai".toUpperCase(), { ignoreCase: true });
   await page.keyboard.press("Escape");
 
-  // Về trang chủ: bài vừa mở nằm trong danh sách gần đây.
-  await page.goto("/");
+  // Vào trang chủ của app: bài vừa mở nằm trong danh sách gần đây.
+  await page.goto("/app");
   await expect(page.getByRole("link", { name: /Bài mẫu E2E/ })).toBeVisible();
 });
 

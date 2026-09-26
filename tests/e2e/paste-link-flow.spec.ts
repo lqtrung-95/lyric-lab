@@ -23,5 +23,5 @@ test("link đúng chuyển sang trang bài học và hiện lỗi 'không có l�
   await expect(page.getByRole("heading", { name: "Bài mẫu" })).toBeVisible();
   await expect(page.getByRole("alert").filter({ hasText: "Chưa tìm được lời" })).toBeVisible();
   await page.getByRole("link", { name: "Dán link khác" }).click();
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/app$/);
 });

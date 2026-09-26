@@ -96,7 +96,7 @@ export function AnalyzingScreen({ videoId }: { videoId: string }) {
           </ol>
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/app")}
             className="mt-space-lg min-h-11 rounded-full px-6 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high"
           >
             Hủy

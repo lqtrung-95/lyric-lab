@@ -42,7 +42,7 @@ export function SongSummaryScreen({ analysis, title }: { analysis: SongAnalysis;
           <Link href="/review" className={`${action} bg-primary text-on-primary hover:bg-primary-container`}>Ôn ngay {dueCount} thẻ</Link>
         ) : null}
         <Link href={`/learn/${analysis.videoId}/listen`} className={`${action} bg-surface-container-high text-on-surface hover:bg-surface-container-highest`}>Nghe lại</Link>
-        <Link href="/" className={`${action} bg-surface-container-high text-on-surface hover:bg-surface-container-highest`}>Bài mới</Link>
+        <Link href="/app" className={`${action} bg-surface-container-high text-on-surface hover:bg-surface-container-highest`}>Bài mới</Link>
       </div>
     </div>
   );

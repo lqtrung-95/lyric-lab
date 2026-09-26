@@ -11,7 +11,7 @@ const FAQ = [
 /** Câu hỏi thường gặp (mở/đóng bằng <details>, dùng được bằng bàn phím). */
 export function FaqSection() {
   return (
-    <section aria-labelledby="faq-heading" className="mt-24">
+    <section id="faq" aria-labelledby="faq-heading" className="mt-24 scroll-mt-24">
       <h2 id="faq-heading" className="font-serif text-headline-lg-mobile md:text-headline-xl">Câu hỏi thường gặp</h2>
       <div className="mt-space-lg divide-y divide-outline-variant/50 rounded-3xl bg-surface-container-lowest px-space-md shadow-[0_1px_10px_rgba(30,26,22,0.06)]">
         {FAQ.map((f) => (

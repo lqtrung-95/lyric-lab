@@ -52,7 +52,7 @@ export function MergeConfirm() {
       <div className={wrap}>
         <h1 className="font-serif text-headline-md text-on-surface">Không có dữ liệu cần gộp</h1>
         <p className="mt-space-sm text-body-md text-on-surface-variant">Bạn đã đăng nhập vào tài khoản Google của mình.</p>
-        <Link href="/" className="mt-space-md inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-medium text-on-primary">Về trang chủ</Link>
+        <Link href="/app" className="mt-space-md inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-medium text-on-primary">Về trang chủ</Link>
       </div>
     );
   }
@@ -68,7 +68,7 @@ export function MergeConfirm() {
       </p>
       <div className="mt-space-md flex flex-wrap justify-center gap-space-sm">
         <button type="button" onClick={confirm} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Gộp dữ liệu</button>
-        <Link href="/" className="inline-flex min-h-11 items-center rounded-full px-6 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Bỏ qua</Link>
+        <Link href="/app" className="inline-flex min-h-11 items-center rounded-full px-6 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Bỏ qua</Link>
       </div>
     </div>
   );

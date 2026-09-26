@@ -13,7 +13,7 @@ const FEATURES: { icon: IconName; title: string; body: string; accent?: boolean 
 /** Lưới sáu điểm mạnh; hai ô tô nền xanh nhấn vào Hán Việt và giản thể. */
 export function FeaturesGrid() {
   return (
-    <section aria-labelledby="features-heading" className="mt-24">
+    <section id="features" aria-labelledby="features-heading" className="mt-24 scroll-mt-24">
       <p className="text-label-md font-semibold uppercase tracking-widest text-secondary">Dành cho người Việt học tiếng Trung</p>
       <h2 id="features-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Học chậm mà chắc, bằng thứ bạn vốn đã thích nghe</h2>
       <ul className="mt-space-lg grid gap-space-md md:grid-cols-2 lg:grid-cols-3">

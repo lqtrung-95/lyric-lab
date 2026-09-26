@@ -71,7 +71,7 @@ export function AnalysisErrorView({ code, onRetry }: { code: AnalysisErrorCode; 
           </button>
         )}
         <Link
-          href="/"
+          href="/app"
           className="flex min-h-11 items-center rounded-full bg-surface-container-high px-6 text-label-md font-medium text-on-surface"
         >
           Dán link khác

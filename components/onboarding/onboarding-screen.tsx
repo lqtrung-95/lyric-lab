@@ -25,7 +25,7 @@ export function OnboardingScreen() {
       // Bỏ qua: chỉ để ẩn lời mời làm quen ở trang chủ.
     }
     await saveProfile({ newCardsPerDay: perDay, onboarded: true });
-    router.push("/");
+    router.push("/app");
   }
 
   const choice = "flex min-h-11 items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-on-primary-container bg-surface-container-low hover:bg-surface-container";
