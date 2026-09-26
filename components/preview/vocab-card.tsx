@@ -3,6 +3,7 @@
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
 import { displayTermForm, levelLabel, lineForItem } from "@/lib/preview/preview-format";
+import { PronounceButton } from "@/components/ui/pronounce-button";
 import { QuoteBox } from "./quote-box";
 import { ReportMenu } from "./report-menu";
 
@@ -40,7 +41,10 @@ export function VocabCard({ item, lines, videoId, promptVersion, saved, onPlay, 
               )}
             </p>
           </div>
-          <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant">{levelLabel(item.level)}</span>
+          <div className="flex items-center gap-2">
+            <PronounceButton text={hanzi} />
+            <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant">{levelLabel(item.level)}</span>
+          </div>
         </div>
         <p className="text-body-md font-medium text-on-surface">{item.meaningInContext}</p>
         {item.explanation && <p className="text-label-md text-on-surface-variant">{item.explanation}</p>}

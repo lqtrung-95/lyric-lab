@@ -1,4 +1,5 @@
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
+import { withSubwordEntries } from "./build-line-pinyin";
 import { getLyricsForVideo, type LyricsDeps } from "@/lib/lyrics/get-lyrics-for-video";
 import type { VideoMeta } from "@/lib/lyrics/lyrics-types";
 import { normalizeLyricLines } from "@/lib/lyrics/normalize-lyric-lines";
@@ -46,10 +47,11 @@ export async function analyzeVideo(video: VideoMeta, deps: AnalyzeVideoDeps): Pr
   const candidates = buildVocabCandidates(lines, dictionary);
   const chars = [...new Set(candidates.flatMap((c) => [...c.traditional]))];
   const sinoViet = await deps.lookupSinoViet(chars);
+  const pinyinDictionary = await withSubwordEntries(deps.lookupDictionary, dictionary, lines.flatMap((l) => l.tokens.map((t) => t.simplified)));
 
   deps.onProgress?.("analysis");
   const { analysis, attempts } = await analyzeLyrics({
-    videoId: video.videoId, lyricsSource: lyrics.source, track: lyrics.track, lines, candidates, dictionary, sinoViet,
+    videoId: video.videoId, lyricsSource: lyrics.source, track: lyrics.track, lines, candidates, dictionary, pinyinDictionary, sinoViet,
     chat: deps.chat, models: deps.models,
   });
   await saveAnalysis(deps.cache, key, video, analysis);

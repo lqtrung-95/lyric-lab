@@ -1,3 +1,4 @@
+import { PronounceButton } from "@/components/ui/pronounce-button";
 import { Icon } from "@/components/ui/icon";
 import type { ReviewContext, ReviewLine } from "@/lib/review/review-context-types";
 import { levelLabel } from "@/lib/preview/preview-format";
@@ -35,7 +36,10 @@ export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: Fl
       </div>
 
       <div className="flex flex-col items-center px-6 pb-8 pt-8 text-center sm:px-12">
-        <h2 lang="zh" className="font-serif text-[56px] font-medium leading-tight tracking-wide text-on-surface sm:text-[72px]">{card.term}</h2>
+        <div className="flex items-center gap-3">
+          <h2 lang="zh" className="font-serif text-[56px] font-medium leading-tight tracking-wide text-on-surface sm:text-[72px]">{card.term}</h2>
+          {card.kind === "vocab" && <PronounceButton text={card.term} />}
+        </div>
 
         {!flipped ? (
           <p className="mt-6 text-body-md text-on-surface-variant">Nhớ nghĩa của từ này rồi bấm Space (hoặc “Đổi mặt thẻ”) để kiểm tra.</p>

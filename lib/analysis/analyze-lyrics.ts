@@ -18,6 +18,7 @@ export interface AnalyzeInput {
   lines: TokenizedLine[];
   candidates: VocabCandidate[];
   dictionary: ReadonlyMap<string, DictWordRow[]>;
+  pinyinDictionary?: ReadonlyMap<string, DictWordRow[]>;
   sinoViet: ReadonlyMap<string, string[]>;
   chat: ChatFn;
   models?: string[];

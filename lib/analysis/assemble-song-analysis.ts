@@ -1,6 +1,6 @@
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
-import { pickPrimaryEntry } from "@/lib/dictionary/lookup-words";
 import { sinoVietForWord } from "@/lib/dictionary/sino-viet";
+import { buildLinePinyin } from "./build-line-pinyin";
 import type { AnalyzedLine, LyricsSourceLabel, PreviewItem, SongAnalysis, TokenizedLine } from "./analysis-types";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
 import type { LlmOutput } from "./llm-output-schema";
@@ -14,6 +14,8 @@ export interface AssembleInput {
   llm: Pick<LlmOutput, "summary" | "moods">;
   validated: ValidatedOutput;
   dictionary: ReadonlyMap<string, DictWordRow[]>;
+  /** Từ điển dùng riêng để ghép pinyin dòng lời (gồm cả đoạn con của từ không có nguyên từ); mặc định là `dictionary`. */
+  pinyinDictionary?: ReadonlyMap<string, DictWordRow[]>;
   /** Bảng âm Hán Việt theo chữ phồn thể. */
   sinoViet: ReadonlyMap<string, string[]>;
   model: string;
@@ -54,9 +56,7 @@ export function assembleSongAnalysis(input: AssembleInput): SongAnalysis {
     text: line.text,
     start: line.start,
     end: line.end,
-    pinyin: line.tokens
-      .map((t) => (t.isHan ? pickPrimaryEntry(dictionary.get(t.simplified) ?? [])?.pinyin ?? t.text : t.text))
-      .join(" "),
+    pinyin: buildLinePinyin(line.tokens, input.pinyinDictionary ?? dictionary),
     translation: validated.translations.get(line.index),
     tokens: line.tokens.map((t) => ({ text: t.text, itemId: itemIdByTerm.get(t.simplified) })),
   }));

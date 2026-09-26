@@ -7,6 +7,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
 import { createGroqChat } from "./groq-chat";
+import { buildLinePinyin, withSubwordEntries } from "./build-line-pinyin";
 import { simplifyDeep } from "./simplify-analysis";
 import { getCachedAnalysis } from "./song-analysis-cache";
 import { createSupabaseCacheDb } from "./supabase-cache-db";
@@ -33,7 +34,27 @@ export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): Ana
 export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis | null> {
   const cache = createSupabaseCacheDb(createSupabaseServiceClient());
   const analysis = await getCachedAnalysis(cache, { videoId, learnLang: LEARN_LANG, explainLang: EXPLAIN_LANG, promptVersion: PROMPT_VERSION });
-  return analysis ? simplifyDeep(analysis) : null;
+  return analysis ? repairLinePinyin(simplifyDeep(analysis)) : null;
+}
+
+const HAN = /\p{Script=Han}/u;
+
+/**
+ * Bài đã cache trước khi có cách ghép pinyin theo đoạn con có thể còn chữ Hán lẫn trong dòng pinyin (token như 好了吗
+ * không có nguyên từ trong từ điển). Tính lại pinyin cho đúng những dòng đó từ token và từ điển, không gọi LLM.
+ */
+async function repairLinePinyin(analysis: SongAnalysis): Promise<SongAnalysis> {
+  if (!analysis.lines.some((l) => HAN.test(l.pinyin))) return analysis;
+  const sb = createSupabaseServiceClient();
+  const lookup = (terms: string[]) => lookupWords(sb as never, terms);
+  const words = analysis.lines.filter((l) => HAN.test(l.pinyin)).flatMap((l) => l.tokens.map((t) => t.text)).filter((w) => HAN.test(w));
+  const dictionary = await withSubwordEntries(lookup, await lookup(words), words);
+  return {
+    ...analysis,
+    lines: analysis.lines.map((l) =>
+      HAN.test(l.pinyin) ? { ...l, pinyin: buildLinePinyin(l.tokens.map((t) => ({ text: t.text, simplified: t.text })), dictionary) } : l,
+    ),
+  };
 }
 
 /** Tiêu đề và kênh của bài đã lưu (để hiện ở giao diện). */
