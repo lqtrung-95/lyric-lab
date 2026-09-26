@@ -9,6 +9,9 @@ export interface ClozeCandidate {
   card: ReviewCard;
   line: ReviewLine;
   videoId: string;
+  /** Tên bài (từ API ngữ cảnh) để hiện ở danh sách chọn bài của Karaoke. */
+  title: string;
+  lineIndex: number;
 }
 
 /**
@@ -27,8 +30,11 @@ export function useClozeCandidates(cards: ReviewCard[]): ClozeCandidate[] | unde
       if (cancelled) return;
       const contexts = new Map(entries);
       const list = withSource.flatMap((card) => {
-        const line = contexts.get(card.video_id as string)?.lines[card.line_index as number];
-        return line && line.text.includes(card.term) ? [{ card, line, videoId: card.video_id as string }] : [];
+        const ctx = contexts.get(card.video_id as string);
+        const line = ctx?.lines[card.line_index as number];
+        return line && line.text.includes(card.term)
+          ? [{ card, line, videoId: card.video_id as string, title: ctx?.title ?? "", lineIndex: card.line_index as number }]
+          : [];
       });
       setResult({ key, list });
     });

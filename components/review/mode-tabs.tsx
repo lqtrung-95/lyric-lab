@@ -9,6 +9,7 @@ const MODES = [
   { href: "/review/cloze", label: "Điền lời" },
   { href: "/review/match", label: "Ghép cặp" },
   { href: "/review/listen", label: "Nghe và chọn" },
+  { href: "/review/karaoke", label: "Karaoke" },
 ];
 
 /** Thanh chuyển chế độ ôn tập: ôn thẻ chuẩn (theo lịch FSRS) và ba chế độ luyện dạng game. */

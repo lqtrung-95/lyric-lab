@@ -11,6 +11,7 @@ import { snippetRange } from "@/lib/preview/preview-format";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import type { ClozeCandidate } from "./cloze-questions";
+import { ClozeLine } from "./cloze-line";
 import { PracticeSummary } from "./practice-summary";
 
 const ROUND = 8;
@@ -85,14 +86,7 @@ export function ClozeGame({ candidates, poolTerms, grade }: Props) {
     <div>
       <p className="text-label-md text-on-surface-variant">Câu <strong className="text-on-surface">{index + 1}</strong> / {questions.length}</p>
       <section aria-label="Câu hát cần điền" className="mt-space-sm rounded-3xl bg-surface-container-low p-space-lg">
-        <p lang="zh" className="font-serif text-[30px] leading-snug text-on-surface">
-          {q.cloze.before}
-          <span className={`mx-1 inline-block min-w-16 rounded-lg border-b-4 px-2 text-center ${answered ? (picked === q.card.term ? "border-secondary bg-secondary-container/50 text-on-secondary-container" : "border-primary bg-primary-container/30 text-primary") : "border-outline bg-surface-container-high text-transparent"}`}>
-            {answered ? q.card.term : "＿＿"}
-            {!answered && <span className="sr-only">chỗ trống</span>}
-          </span>
-          {q.cloze.after}
-        </p>
+        <ClozeLine before={q.cloze.before} after={q.cloze.after} answer={q.card.term} reveal={picked === null ? null : picked === q.card.term ? "correct" : "wrong"} />
         <p className="mt-2 text-body-md text-on-surface-variant">Gợi ý nghĩa của từ cần điền: <strong className="text-on-surface">{q.card.meaning}</strong></p>
         {answered && <p className="mt-1 text-label-md text-on-surface-variant">{q.line.pinyin}{q.line.translation ? ` · ${q.line.translation}` : ""}</p>}
         <button type="button" onClick={replay} className="mt-space-sm inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-high px-4 text-label-md font-medium text-on-surface hover:bg-surface-container-highest">Nghe lại câu hát</button>
