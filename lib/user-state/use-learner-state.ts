@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/track";
 import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
 import { notifyDueCountChanged } from "@/lib/review/due-count-event";
 import { pushLearnerChange, startLearnerSync } from "@/lib/user-data/learner-sync-client";
@@ -42,6 +43,9 @@ export function useLearnerState() {
     setLevel: useCallback((level: number) => update((s) => setLevel(s, level)), [update]),
     markKnown: useCallback((key: string) => update((s) => markKnown(s, key)), [update]),
     unmarkKnown: useCallback((key: string) => update((s) => unmarkKnown(s, key)), [update]),
-    toggleSaved: useCallback((item: SavedItem) => update((s) => toggleSaved(s, item)), [update]),
+    toggleSaved: useCallback((item: SavedItem) => {
+      update((s) => toggleSaved(s, item));
+      track("card_saved");
+    }, [update]),
   };
 }

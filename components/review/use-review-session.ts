@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/track";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Grade } from "ts-fsrs";
 import { fetchReviewContext } from "@/lib/review/review-context-client";
@@ -92,7 +93,10 @@ export function useReviewSession() {
     const graded: ReviewCard = { ...card, ...next };
     const rest = requeueAfterGrade(queue.slice(1), graded, now);
     setQueue(rest);
-    if (rest.length === 0) setStatus("finished");
+    if (rest.length === 0) {
+      setStatus("finished");
+      track("review_session_done");
+    }
 
     const logId = writes.current
       .then(() => saveGrade(uid, card.item_key, next, log))

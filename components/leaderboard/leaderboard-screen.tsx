@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
+import { track } from "@/lib/analytics/track";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { formatTimeLeft } from "@/lib/leaderboard/week";
 import { NicknameForm } from "./nickname-form";
@@ -43,6 +44,7 @@ export function LeaderboardScreen() {
     if (!res) return "network";
     if (!res.ok) return ((await res.json().catch(() => ({}))) as { error?: string }).error ?? "server_error";
     setEditing(false);
+    if ((body as { optedIn?: boolean }).optedIn) track("leaderboard_joined");
     setReload((n) => n + 1);
     return null;
   }

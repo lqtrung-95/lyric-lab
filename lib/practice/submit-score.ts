@@ -1,3 +1,4 @@
+import { track } from "@/lib/analytics/track";
 import type { PracticeMode } from "./scoring";
 
 export interface RoundResult {
@@ -12,6 +13,7 @@ export interface RoundResult {
  * điểm chỉ là phần thưởng phụ, không được làm gián đoạn việc học.
  */
 export async function submitRoundScore(mode: PracticeMode, result: RoundResult): Promise<boolean> {
+  track("practice_round_done", { mode });
   try {
     const res = await fetch("/api/practice/score", {
       method: "POST", headers: { "Content-Type": "application/json" },

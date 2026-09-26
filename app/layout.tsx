@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { googleFontsUrl } from "@/lib/ui/google-fonts-url";
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </a>
         <NavigationProgress />
         {children}
+        <Analytics />
       </body>
     </html>
   );

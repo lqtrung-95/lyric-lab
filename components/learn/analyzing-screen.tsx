@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics/track";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useReducer, useState } from "react";
@@ -25,6 +26,7 @@ export function AnalyzingScreen({ videoId }: { videoId: string }) {
       if (cancelled) return;
       if (!hasSession) return dispatch({ type: "error", code: "auth_required" });
 
+      track("analysis_started");
       const es = new EventSource(`/api/analyze/${videoId}`);
       source = es;
       let finished = false;
