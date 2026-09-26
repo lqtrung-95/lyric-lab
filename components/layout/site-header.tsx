@@ -17,7 +17,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-8">
           <Link href="/" className="flex min-h-11 items-center gap-2 transition-opacity hover:opacity-90">
             <LogoMark size={32} />
-            <span className="font-serif text-headline-md tracking-tight text-primary">Lyric Lab</span>
+            <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Lyric <span className="text-primary">Lab</span></span>
           </Link>
           <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 rounded-full bg-surface-container-low/70 p-1 md:flex">
             {NAV_LINKS.map((link) => {

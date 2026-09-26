@@ -1,5 +1,6 @@
 "use client";
 
+import { SelectField } from "@/components/ui/select-field";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { levelLabel } from "@/lib/preview/preview-format";
 
@@ -11,17 +12,16 @@ export function LevelSelect({ className = "" }: { className?: string }) {
   return (
     <label className={`inline-flex items-center gap-2 text-label-md text-on-surface-variant ${className}`}>
       <span>Level của bạn</span>
-      <select
+      <SelectField
         value={state.level}
         onChange={(e) => setLevel(Number(e.target.value))}
-        className="min-h-11 rounded-full bg-surface-container-high px-3 text-label-md font-semibold text-secondary"
       >
         {LEVELS.map((l) => (
           <option key={l} value={l}>
             {levelLabel(l)}
           </option>
         ))}
-      </select>
+      </SelectField>
     </label>
   );
 }

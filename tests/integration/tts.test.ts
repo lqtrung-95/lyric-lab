@@ -33,4 +33,19 @@ describe.skipIf(!enabled)("giọng đọc Azure + kho lưu", () => {
     const { synthesizeWithAzure, TtsUnavailableError } = await import("@/lib/tts/azure-speech");
     await expect(synthesizeWithAzure("你好", "sai-khoa", region!)).rejects.toBeInstanceOf(TtsUnavailableError);
   });
+
+  it("tổng hợp trước cho danh sách từ: tạo file mới, lần sau bỏ qua từ đã có, từ không hợp lệ bị lọc", async () => {
+    const { prewarmTts } = await import("@/lib/tts/prewarm-tts");
+    const { TTS_BUCKET } = await import("@/lib/tts/tts-audio-store");
+    const { ttsStoragePath } = await import("@/lib/tts/tts-text");
+    const sb = createClient(url!, serviceKey!, { auth: { persistSession: false }, realtime: { transport: ws as never } });
+    const terms = ["预热甲", "預熱乙", "abc", "预热甲"]; // trùng, phồn thể (đổi giản thể), không có chữ Hán
+    try {
+      expect(await prewarmTts(sb, terms)).toBe(2);
+      expect((await sb.storage.from(TTS_BUCKET).exists(ttsStoragePath("预热乙"))).data).toBe(true);
+      expect(await prewarmTts(sb, terms)).toBe(0);
+    } finally {
+      await sb.storage.from(TTS_BUCKET).remove([ttsStoragePath("预热甲"), ttsStoragePath("预热乙")]);
+    }
+  });
 });

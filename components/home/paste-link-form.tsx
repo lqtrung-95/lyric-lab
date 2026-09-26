@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { Spinner } from "@/components/ui/spinner";
 import { parseVideoId } from "@/lib/youtube/parse-video-id";
 
 /** Ô dán link YouTube. Link sai định dạng báo lỗi ngay, không gọi server (IN-01). */
@@ -10,6 +11,7 @@ export function PasteLinkForm() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   function submit(value: string) {
     const videoId = parseVideoId(value);
@@ -19,6 +21,7 @@ export function PasteLinkForm() {
       return;
     }
     setError(null);
+    setPending(true);
     router.push(`/learn/${videoId}`);
   }
 
@@ -76,10 +79,12 @@ export function PasteLinkForm() {
         </div>
         <button
           type="submit"
-          className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-container px-6 text-label-md font-semibold text-on-primary-container transition-opacity hover:opacity-90"
+          disabled={pending}
+          aria-busy={pending}
+          className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-container px-6 text-label-md font-semibold text-on-primary-container transition-opacity hover:opacity-90 disabled:opacity-70"
         >
-          Phân tích bài hát
-          <Icon name="arrow_forward" size={18} />
+          {pending ? "Đang mở bài hát…" : "Phân tích bài hát"}
+          {pending ? <Spinner size={16} /> : <Icon name="arrow_forward" size={18} />}
         </button>
       </div>
       {error && (

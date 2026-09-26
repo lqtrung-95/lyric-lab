@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { SelectField } from "@/components/ui/select-field";
 import { playChinese } from "@/lib/speech/play-chinese";
 import { CLOUD_VOICE, VOICE_KEY, listChineseVoices, readPreferredVoice, speechSupported } from "@/lib/speech/speak-chinese";
 
@@ -32,10 +33,10 @@ export function VoiceSection() {
       <h2 id="voice-heading" className="font-serif text-headline-md text-on-surface">Giọng đọc</h2>
       <label className="mt-space-sm inline-flex items-center gap-2 text-label-md text-on-surface-variant">
         <span>Giọng tiếng Trung</span>
-        <select value={chosen} onChange={(e) => choose(e.target.value)} className="min-h-11 max-w-[18rem] rounded-full bg-surface-container-high px-3 text-label-md font-semibold text-secondary">
+        <SelectField value={chosen} onChange={(e) => choose(e.target.value)} className="max-w-[18rem]">
           <option value={CLOUD_VOICE}>Giọng AI tự nhiên (khuyên dùng)</option>
           {names.map((n) => <option key={n} value={n}>{n} (thiết bị)</option>)}
-        </select>
+        </SelectField>
       </label>
       <p className="mt-1 text-label-md text-on-surface-variant">Giọng AI cần kết nối mạng; khi không dùng được, nút loa tự đọc bằng giọng của thiết bị. Đổi giọng sẽ đọc thử một câu.</p>
     </section>

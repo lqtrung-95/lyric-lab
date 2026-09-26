@@ -263,3 +263,12 @@ body {
 @layer base {
   :focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
 }
+
+/* Thanh tiến trình chuyển trang: chạy nhanh lúc đầu rồi chậm dần, tới 85% thì chờ trang mới thật sự hiện. */
+@keyframes nav-progress {
+  from { width: 0; }
+  to { width: 85%; }
+}
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}

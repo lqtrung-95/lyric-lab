@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SelectField } from "@/components/ui/select-field";
 import { LevelSelect } from "@/components/preview/level-select";
 import { DEFAULT_PROFILE, NEW_CARDS_OPTIONS, fetchProfile, saveProfile } from "@/lib/user-data/profile-repo";
 import { notifyDueCountChanged } from "@/lib/review/due-count-event";
@@ -31,10 +32,9 @@ export function LearningSection() {
         <div>
           <label className="inline-flex items-center gap-2 text-label-md text-on-surface-variant">
             <span>Thẻ mới mỗi ngày</span>
-            <select value={perDay} onChange={(e) => change(Number(e.target.value))}
-              className="min-h-11 rounded-full bg-surface-container-high px-3 text-label-md font-semibold text-secondary">
+            <SelectField value={perDay} onChange={(e) => change(Number(e.target.value))}>
               {[...new Set([...NEW_CARDS_OPTIONS, perDay])].sort((a, b) => a - b).map((n) => <option key={n} value={n}>{n} thẻ</option>)}
-            </select>
+            </SelectField>
           </label>
           <p className="mt-1 text-label-md text-on-surface-variant">Thẻ cần ôn lại không bị giới hạn; chỉ thẻ mới theo hạn mức này.</p>
           {failed && <p role="alert" className="mt-1 text-label-md text-error">Chưa lưu được thiết lập. Kiểm tra kết nối nhé.</p>}

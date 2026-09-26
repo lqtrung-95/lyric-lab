@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { toAnalysisErrorCode, type AnalysisErrorCode } from "@/lib/analysis/analysis-error-codes";
 import { analyzeVideo } from "@/lib/analysis/analyze-video";
@@ -5,6 +6,8 @@ import { createAnalyzeDeps, readCachedAnalysis } from "@/lib/analysis/server-dep
 import { encodeSseEvent } from "@/lib/http/sse";
 import { consumeUsage } from "@/lib/rate-limit/consume-usage";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
+import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
+import { prewarmTts } from "@/lib/tts/prewarm-tts";
 import { fetchVideoMeta } from "@/lib/youtube/fetch-video-meta";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
@@ -68,6 +71,12 @@ export async function GET(req: Request, { params }: { params: Promise<{ videoId:
           attempts: result.attempts.map((a) => ({ model: a.model, ok: a.ok, ms: a.latencyMs, dropped: a.dropped?.length ?? 0 })),
         }));
         send("done", { fromCache: false });
+        // Sau khi đã trả kết quả cho người dùng: tổng hợp sẵn giọng đọc cho các từ vựng của bài để bấm loa là nghe ngay.
+        const vocabTerms = result.analysis.items.filter((i) => i.type === "vocab").map((i) => i.term);
+        after(async () => {
+          const created = await prewarmTts(createSupabaseServiceClient(), vocabTerms).catch(() => 0);
+          console.info(JSON.stringify({ event: "tts_prewarm", videoId, created }));
+        });
       } catch (error) {
         console.error(JSON.stringify({ event: "analysis_error", videoId, name: (error as Error)?.name, message: (error as Error)?.message }));
         fail(toAnalysisErrorCode(error));

@@ -1,11 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { SongCard } from "./song-card";
 import { mergeLibrarySongs, type RemoteSongProgress } from "@/lib/library/merge-library-songs";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
-import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
 
 const noop = () => () => {};
 const readRecent = () => {
@@ -39,21 +38,10 @@ export function SongsTab() {
     <ul className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-3">
       {songs.map((song) => (
         <li key={song.videoId}>
-          <Link href={`/learn/${song.videoId}`} className="group block overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_1px_8px_rgba(30,26,22,0.06)] hover:shadow-[0_4px_16px_rgba(30,26,22,0.1)]">
-            <div className="relative aspect-video bg-surface-container-high">
-              <Image src={videoThumbnailUrl(song.videoId, "mqdefault")} alt="" fill sizes="(min-width:1024px) 33vw, 50vw" className="object-cover" />
-            </div>
-            <div className="p-space-md">
-              <p className="line-clamp-2 text-body-md font-medium text-on-surface">{song.title}</p>
-              <p className="mt-1 truncate text-label-md text-on-surface-variant">{song.channelTitle}</p>
-              <div className="mt-space-sm flex items-center gap-2">
-                <div role="progressbar" aria-label="Tiến độ nghe" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(song.progress * 100)} className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-container-highest">
-                  <div className="h-full bg-primary" style={{ width: `${song.progress * 100}%` }} />
-                </div>
-                <span className="text-label-sm text-on-surface-variant">{song.completed ? "Đã nghe hết" : song.progress > 0 ? `${Math.round(song.progress * 100)}%` : "Chưa nghe"}</span>
-              </div>
-            </div>
-          </Link>
+          <SongCard
+            videoId={song.videoId} title={song.title} channelTitle={song.channelTitle} sizes="(min-width:1024px) 33vw, 50vw"
+            progress={{ fraction: song.progress, label: song.completed ? "Đã nghe hết" : song.progress > 0 ? `${Math.round(song.progress * 100)}%` : "Chưa nghe" }}
+          />
         </li>
       ))}
     </ul>

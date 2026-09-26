@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { SelectField } from "@/components/ui/select-field";
 import { filterSavedItems, type SavedFilter } from "@/lib/library/filter-saved-items";
 import { levelLabel } from "@/lib/preview/preview-format";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 
-const field = "min-h-11 rounded-full bg-surface-container-high px-3 text-label-md text-on-surface";
 
 /** Tab "Từ đã lưu" (S9): tìm kiếm, lọc theo cấp HSK và loại; mỗi từ dẫn về bài chứa nó và có thể bỏ lưu. */
 export function SavedWordsTab() {
@@ -27,22 +27,22 @@ export function SavedWordsTab() {
         <label className="flex-1 basis-56">
           <span className="sr-only">Tìm từ đã lưu</span>
           <input type="search" value={filter.query} onChange={(e) => setFilter({ ...filter, query: e.target.value })} placeholder="Tìm chữ Hán, pinyin, nghĩa…"
-            className={`${field} w-full`} />
+            className="min-h-11 w-full rounded-full bg-surface-container-high px-4 text-label-md text-on-surface" />
         </label>
         <label className="flex items-center gap-2 text-label-md text-on-surface-variant">
           <span>Cấp</span>
-          <select value={filter.level} onChange={(e) => setFilter({ ...filter, level: e.target.value === "all" ? "all" : Number(e.target.value) })} className={field}>
+          <SelectField value={filter.level} onChange={(e) => setFilter({ ...filter, level: e.target.value === "all" ? "all" : Number(e.target.value) })}>
             <option value="all">Tất cả</option>
             {[1, 2, 3, 4, 5, 6, 7].map((l) => <option key={l} value={l}>{levelLabel(l)}</option>)}
-          </select>
+          </SelectField>
         </label>
         <label className="flex items-center gap-2 text-label-md text-on-surface-variant">
           <span>Loại</span>
-          <select value={filter.kind} onChange={(e) => setFilter({ ...filter, kind: e.target.value as SavedFilter["kind"] })} className={field}>
+          <SelectField value={filter.kind} onChange={(e) => setFilter({ ...filter, kind: e.target.value as SavedFilter["kind"] })}>
             <option value="all">Tất cả</option>
             <option value="vocab">Từ vựng</option>
             <option value="grammar">Ngữ pháp</option>
-          </select>
+          </SelectField>
         </label>
       </div>
       <p role="status" className="mt-space-sm text-label-md text-on-surface-variant">{items.length} / {state.saved.length} mục</p>

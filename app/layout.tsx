@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Lora } from "next/font/google";
+import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { googleFontsUrl } from "@/lib/ui/google-fonts-url";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Bỏ qua tới nội dung chính
         </a>
+        <NavigationProgress />
         {children}
       </body>
     </html>
