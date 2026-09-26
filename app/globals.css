@@ -214,8 +214,8 @@
 }
 
 :root {
-  /* Biến --font-* do next/font đặt trên <html>. Chữ Hán rơi về Noto Serif SC khi Lora không có glyph. */
-  --font-serif-stack: var(--font-lora), var(--font-noto-serif-sc), "Songti SC", "Noto Serif CJK SC", serif;
+  /* Biến --font-* do next/font đặt trên <html>. Chữ Hán rơi về Noto Serif SC (link Google Fonts) khi Lora không có glyph. */
+  --font-serif-stack: var(--font-lora), "Noto Serif SC", "Songti SC", "Noto Serif CJK SC", serif;
   --font-sans-stack: var(--font-be-vietnam-pro), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
