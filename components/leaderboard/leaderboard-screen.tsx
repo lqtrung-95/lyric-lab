@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { formatTimeLeft } from "@/lib/leaderboard/week";
 import { NicknameForm } from "./nickname-form";
@@ -37,6 +38,7 @@ export function LeaderboardScreen() {
   }, [scope, reload]);
 
   async function saveProfile(body: object): Promise<string | null> {
+    if (!(await ensureAnonymousSession())) return "network";
     const res = await fetch("/api/leaderboard/profile", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).catch(() => null);
     if (!res) return "network";
     if (!res.ok) return ((await res.json().catch(() => ({}))) as { error?: string }).error ?? "server_error";

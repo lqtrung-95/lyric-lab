@@ -112,6 +112,15 @@ test.describe("chế độ luyện tập", () => {
     expect(data!.every((c) => c.state === 0 && c.reps === 0)).toBe(true);
   });
 
+  test("điểm một lượt được ghi lên bảng; điểm bất thường bị từ chối", async ({ page }) => {
+    await page.goto("/review/pinyin");
+    const post = (body: object) => page.request.post("/api/practice/score", { data: body });
+    expect((await post({ mode: "pinyin", points: 500, correct: 5, total: 6, durationSec: 40 })).ok()).toBe(true);
+    expect((await post({ mode: "pinyin", points: 6000, correct: 6, total: 6, durationSec: 2 })).ok()).toBe(false);
+    const { data } = await sb.from("practice_scores").select("points,mode").eq("user_id", userId);
+    expect(data).toEqual([{ points: 500, mode: "pinyin" }]);
+  });
+
   test("Điền lời: chọn đúng/sai, hiện đáp án, phím 1–4 hoạt động và kết thúc có kết quả", async ({ page }) => {
     const { data: rows } = await sb.from("user_cards").select("item_key,video_id,line_index").eq("user_id", userId);
     const videoId = rows![0].video_id as string;
