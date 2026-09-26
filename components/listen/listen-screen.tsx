@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
@@ -11,6 +11,7 @@ import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/lea
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
+import { MiniTransportBar, useIsInView } from "./mini-transport-bar";
 import { SyncPanel } from "./sync-panel";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
@@ -36,6 +37,9 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
   const [quickSync, setQuickSync] = useState(false);
+  // Thanh điều khiển đầy đủ cuộn khuất thì hiện thanh thu gọn nổi để vẫn điều khiển được khi đọc lời.
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const controlsInView = useIsInView(controlsRef);
   const { containerRef, controller, failed } = useYouTubePlayer(analysis.videoId);
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
@@ -143,12 +147,14 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
               </p>
             )}
           </div>
+          <div ref={controlsRef}>
           <TransportControls
             ready={!!controller} playing={playing} onTogglePlay={togglePlay}
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
           />
+          </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
           {completed && (
             <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary-container/50 p-space-md">
@@ -161,6 +167,11 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
             onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={setWord}
+          />
+          <MiniTransportBar
+            visible={!controlsInView} ready={!!controller} playing={playing} onTogglePlay={togglePlay}
+            onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
+            looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
           />
         </div>
         <div className="lg:sticky lg:top-24 lg:col-span-5">

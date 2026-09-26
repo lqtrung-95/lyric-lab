@@ -26,15 +26,13 @@ export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQui
 
   return (
     <section aria-label="Chỉnh lời khớp nhạc" className="rounded-xl bg-surface-container-low p-space-md">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <button type="button" aria-expanded={show} onClick={() => setOpen((o) => !o)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-label-md font-semibold text-primary hover:bg-surface-container">
-            <Icon name="tune" size={20} />
-            Lời bị lệch? Chỉnh lời
-          </button>
-          {offset !== 0 && <span className="ml-1 rounded-full bg-primary/10 px-2 py-1 text-label-sm text-primary">Đang lệch {fmt(offset)}</span>}
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" aria-expanded={show} onClick={() => setOpen((o) => !o)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-label-md font-semibold text-primary hover:bg-surface-container">
+          <Icon name="tune" size={20} />
+          Lời bị lệch? Chỉnh lời
+        </button>
+        {offset !== 0 && <span className="inline-flex min-h-8 items-center rounded-full bg-primary/10 px-3 text-label-sm font-medium text-primary">Đang lệch {fmt(offset)}</span>}
       </div>
 
       {risk === "likely_off" && offset === 0 && !show && (

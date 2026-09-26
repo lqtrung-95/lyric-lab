@@ -221,6 +221,9 @@
 
 html {
   background: var(--surface);
+  /* Cuộn tới một phần tử (neo, focus bằng bàn phím) thì chừa chỗ cho thanh đầu trang và thanh điều khiển nổi ở đáy. */
+  scroll-padding-top: 5rem;
+  scroll-padding-bottom: 6rem;
 }
 
 body {

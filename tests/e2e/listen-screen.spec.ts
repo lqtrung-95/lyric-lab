@@ -138,9 +138,48 @@ test.describe("chỉnh lời lệch nhạc", () => {
     await expect(line(page, 3)).toHaveAttribute("aria-current", "true");
   });
 
+  test("nhãn 'Đang lệch' căn giữa dọc với nút 'Chỉnh lời'", async ({ page }) => {
+    await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+    await page.getByRole("button", { name: "Lời muộn hơn 0,5 giây" }).click();
+    const centerY = async (locator: import("@playwright/test").Locator) => {
+      const box = (await locator.boundingBox())!;
+      return box.y + box.height / 2;
+    };
+    const button = page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" });
+    const badge = page.getByText("Đang lệch +0.5 giây");
+    await expect(badge).toBeVisible();
+    // Poll: bố cục có thể còn đang ổn định ngay sau khi bấm.
+    await expect.poll(async () => Math.abs((await centerY(button)) - (await centerY(badge)))).toBeLessThanOrEqual(1);
+  });
+
   test("bảng chỉnh lời mở ra đạt axe", async ({ page }) => {
     await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
     await expect(page.getByRole("button", { name: "Đồng bộ nhanh" })).toBeVisible();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  });
+});
+
+test.describe("thanh điều khiển nhanh khi cuộn xuống", () => {
+  test("hiện khi thanh chính cuộn khuất, điều khiển được và ẩn lại khi cuộn lên", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const mini = page.getByRole("group", { name: "Điều khiển nhanh" });
+    await expect(mini).toHaveCount(0); // thanh chính đang thấy: chưa cần thanh thu gọn
+    await page.setViewportSize({ width: 1280, height: 520 });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect(mini).toBeVisible();
+
+    await mini.getByRole("button", { name: /Tạm dừng|Phát/ }).click();
+    expect((await calls(page)).some((c) => c === "pause" || c === "play")).toBe(true);
+    await mini.getByRole("button", { name: "Tới 5 giây" }).click();
+    expect((await calls(page)).some((c) => c.startsWith("seek:"))).toBe(true);
+    await mini.getByRole("button", { name: /^Tốc độ 1x/ }).click();
+    expect((await calls(page)).includes("rate:0.5")).toBe(true);
+    // Chỉ kiểm tra thanh thu gọn (các dòng lời mờ dần là thiết kế có sẵn, đã được kiểm tra riêng ở accessibility.spec).
+    expect((await new AxeBuilder({ page }).include('[aria-label="Điều khiển nhanh"]').analyze()).violations).toEqual([]);
+
+    // Cuộn lên đầu: khi cửa sổ đủ cao để thấy thanh chính thì thanh thu gọn ẩn lại.
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(mini).toHaveCount(0);
   });
 });
