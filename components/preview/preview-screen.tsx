@@ -7,6 +7,8 @@ import { SnippetPlayer, type SnippetRequest } from "@/components/player/snippet-
 import { Icon } from "@/components/ui/icon";
 import { buildPreviewView, type LevelFilter } from "@/lib/preview/build-preview-view";
 import { displayTermForm, snippetRange } from "@/lib/preview/preview-format";
+import { shiftLines } from "@/lib/listen/lyric-offset";
+import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { GrammarCard } from "./grammar-card";
@@ -40,8 +42,10 @@ export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
   const listenHref = `/learn/${analysis.videoId}/listen`;
   const vocabShown = showAllVocab ? view.vocab : view.vocab.slice(0, DEFAULT_VOCAB_SHOWN);
 
+  const { offset } = useLyricOffset(analysis.videoId);
   const play = (item: PreviewItem, line: AnalyzedLine) => {
-    const { start, end } = snippetRange(line);
+    // Đoạn nghe thử cũng theo độ lệch lời người dùng đã chỉnh ở màn Nghe.
+    const { start, end } = snippetRange(shiftLines([line], offset)[0]);
     setSnippet((prev) => ({ nonce: (prev?.nonce ?? 0) + 1, label: displayTermForm(item, analysis.lines), start, end }));
   };
   const save = (item: PreviewItem, line: AnalyzedLine | null) => {

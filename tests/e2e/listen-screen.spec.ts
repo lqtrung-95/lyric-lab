@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 // Màn Nghe với dữ liệu mẫu hư cấu "夜车" (6 câu, mỗi câu 5 giây: câu n bắt đầu ở 5*(n-1)).
@@ -106,4 +107,40 @@ test("mobile: panel 'Đang hát' thu gọn mặc định, mở ra thấy thẻ c
   await expect(page.getByRole("complementary").getByText("rời đi, rời khỏi")).toBeHidden();
   await toggle.click();
   await expect(page.getByRole("complementary").getByText("rời đi, rời khỏi")).toBeVisible();
+});
+
+test.describe("chỉnh lời lệch nhạc", () => {
+  test("nút ±0,5s dịch mốc lời, được nhớ sau khi tải lại và đặt lại được", async ({ page }) => {
+    await setTime(page, 10.5); // câu 3 bắt đầu ở 10s
+    await expect(line(page, 3)).toHaveAttribute("aria-current", "true");
+    await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+    await page.getByRole("button", { name: "Lời muộn hơn 0,5 giây" }).click();
+    await page.getByRole("button", { name: "Lời muộn hơn 0,5 giây" }).click();
+    await expect(page.getByText("Đang lệch +1 giây")).toBeVisible();
+    await expect(line(page, 2)).toHaveAttribute("aria-current", "true"); // câu 3 giờ bắt đầu ở 11s
+    await page.reload();
+    await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+    await setTime(page, 10.5);
+    await expect(line(page, 2)).toHaveAttribute("aria-current", "true");
+    await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+    await page.getByRole("button", { name: "Đặt lại (không lệch)" }).click();
+    await expect(line(page, 3)).toHaveAttribute("aria-current", "true");
+  });
+
+  test("đồng bộ nhanh: bấm dòng đang được hát đặt độ lệch, có bù phản xạ 0,25s", async ({ page }) => {
+    await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+    await page.getByRole("button", { name: "Đồng bộ nhanh" }).click();
+    await setTime(page, 12.25); // ca sĩ vừa bắt đầu hát câu 3 (mốc gốc 10s) nhưng lời đang lệch
+    await line(page, 3).getByRole("button").first().click();
+    await expect(page.getByText("Đang lệch +2 giây")).toBeVisible();
+    expect((await calls(page)).filter((c) => c.startsWith("seek:"))).toEqual([]); // chế độ này không tua video
+    await setTime(page, 12.5);
+    await expect(line(page, 3)).toHaveAttribute("aria-current", "true");
+  });
+
+  test("bảng chỉnh lời mở ra đạt axe", async ({ page }) => {
+    await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+    await expect(page.getByRole("button", { name: "Đồng bộ nhanh" })).toBeVisible();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  });
 });

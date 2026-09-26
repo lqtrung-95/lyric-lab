@@ -5,10 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
+import { estimateSyncRisk, offsetFromLineClick, shiftLines } from "@/lib/listen/lyric-offset";
 import { buildPreviewView } from "@/lib/preview/build-preview-view";
 import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
+import { SyncPanel } from "./sync-panel";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
 import type { WordSelection } from "./lyric-line-row";
@@ -21,12 +24,16 @@ import { WordPopover } from "./word-popover";
 
 interface ListenScreenProps {
   analysis: SongAnalysis;
-  song: { title: string; channelTitle: string };
+  song: { title: string; channelTitle: string; durationSec?: number };
 }
 
 /** Màn Nghe (S5): video nhúng + lời chạy theo nhạc + panel "Đang hát". Mọi tô sáng dùng cùng bộ lọc level/"Đã biết" với màn xem trước. */
 export function ListenScreen({ analysis, song }: ListenScreenProps) {
-  const { lines } = analysis;
+  const { offset, setOffset } = useLyricOffset(analysis.videoId);
+  // Mọi thứ trong màn Nghe (đồng bộ, tô sáng, tua, lặp câu, tiến độ) dùng mốc đã cộng độ lệch người dùng chỉnh.
+  const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
+  const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
+  const [quickSync, setQuickSync] = useState(false);
   const { containerRef, controller, failed } = useYouTubePlayer(analysis.videoId);
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
@@ -57,6 +64,14 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
     controller.play();
     setLoopIndex((prev) => (prev === null ? prev : index));
   }, [controller, lines]);
+
+  // Đồng bộ nhanh: bấm dòng đang được hát → độ lệch = thời gian video hiện tại − mốc gốc của dòng đó.
+  const syncToLine = useCallback((index: number) => {
+    const original = analysis.lines[index];
+    if (!controller || !original) return;
+    setOffset(offsetFromLineClick(controller.getCurrentTime(), original.start));
+    setQuickSync(false);
+  }, [controller, analysis.lines, setOffset]);
 
   const togglePlay = useCallback(() => {
     if (!controller) return;
@@ -106,6 +121,7 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
 
   return (
     <>
+      <h1 className="sr-only">Nghe: {analysis.track?.title ?? song.title}</h1>
       <ListenTopBar
         title={title} artist={artist} backHref={`/learn/${analysis.videoId}`}
         showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
@@ -129,6 +145,7 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
           />
+          <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
           {completed && (
             <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary-container/50 p-space-md">
               <p className="text-body-md text-on-secondary-container">Bạn đã nghe tới cuối bài.</p>
@@ -139,7 +156,7 @@ export function ListenScreen({ analysis, song }: ListenScreenProps) {
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
-            onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={seekToLine} onWord={setWord}
+            onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={setWord}
           />
         </div>
         <div className="lg:sticky lg:top-24 lg:col-span-5">

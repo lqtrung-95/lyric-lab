@@ -133,6 +133,16 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
     expect((await service.from("review_logs").select("id").eq("user_id", aId)).data).toHaveLength(1);
   });
 
+  it("độ lệch lời: chủ sở hữu ghi/đọc được, giá trị ngoài ±60 bị từ chối, người khác không đọc được", async () => {
+    const ok = await a.from("user_song_progress").upsert({ user_id: aId, video_id: SONG, lyric_offset_sec: 1.5 });
+    expect(ok.error).toBeNull();
+    const { data } = await a.from("user_song_progress").select("lyric_offset_sec,last_position_sec").eq("video_id", SONG).single();
+    expect(data).toEqual({ lyric_offset_sec: 1.5, last_position_sec: 12 }); // tiến độ nghe cũ được giữ nguyên
+    expect((await a.from("user_song_progress").upsert({ user_id: aId, video_id: SONG, lyric_offset_sec: 99 })).error).not.toBeNull();
+    expect((await b.from("user_song_progress").select("lyric_offset_sec").eq("video_id", SONG)).data).toEqual([]);
+    await a.from("user_song_progress").upsert({ user_id: aId, video_id: SONG, lyric_offset_sec: 0 });
+  });
+
   it("merge_user_data: luật gộp (thẻ nhiều lượt ôn thắng, cài đặt đích thắng, từ đã biết hợp lại)", async () => {
     // A (ẩn danh) → B (đã đăng nhập). Chuẩn bị B: hồ sơ riêng, thẻ trùng ít lượt ôn hơn, thẻ riêng, từ đã biết riêng.
     const setup = [];

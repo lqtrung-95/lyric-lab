@@ -5,6 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import type { Grade } from "ts-fsrs";
 import { Icon } from "@/components/ui/icon";
 import { SnippetPlayer, type SnippetRequest } from "@/components/player/snippet-player";
+import { shiftLines } from "@/lib/listen/lyric-offset";
+import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { snippetRange } from "@/lib/preview/preview-format";
 import { previewIntervals } from "@/lib/srs/fsrs-scheduler";
 import { FlashCard } from "./flash-card";
@@ -19,6 +21,7 @@ export function ReviewScreen() {
   const [snippet, setSnippet] = useState<SnippetRequest | null>(null);
   const card = s.current;
   const line = card?.line_index != null ? s.context?.lines[card.line_index] ?? null : null;
+  const { offset } = useLyricOffset(card?.video_id);
   const intervals = useMemo(() => (card && flipped ? previewIntervals(card, new Date()) : null), [card, flipped]);
 
   const grade = (rating: Grade) => {
@@ -28,7 +31,7 @@ export function ReviewScreen() {
   };
   const replay = () => {
     if (!line || !card) return;
-    setSnippet((prev) => ({ nonce: (prev?.nonce ?? 0) + 1, label: card.term, ...snippetRange(line) }));
+    setSnippet((prev) => ({ nonce: (prev?.nonce ?? 0) + 1, label: card.term, ...snippetRange(shiftLines([line], offset)[0]) }));
   };
 
   useEffect(() => {
