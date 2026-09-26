@@ -25,6 +25,8 @@ export function pickChineseVoice<T extends VoiceLike>(voices: T[], preferredName
 export const speechSupported = () => typeof window !== "undefined" && Boolean(window.speechSynthesis) && typeof SpeechSynthesisUtterance !== "undefined";
 
 export const VOICE_KEY = "lyric-lab-tts-voice";
+/** Giá trị lưu khi người dùng chọn giọng AI trên server thay vì một giọng hệ thống. */
+export const CLOUD_VOICE = "cloud";
 export function readPreferredVoice(): string | null {
   try {
     return localStorage.getItem(VOICE_KEY);

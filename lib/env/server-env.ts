@@ -8,6 +8,9 @@ const serverEnvSchema = z.object({
   GROQ_API_KEY: z.string().min(1),
   FALLBACK_LLM_API_KEY: z.string().min(1).optional(),
   YOUTUBE_DATA_API_KEY: z.string().min(1),
+  // Giọng đọc thần kinh (Azure Speech). Bỏ trống thì /api/tts trả 503 và nút loa dùng giọng hệ thống.
+  AZURE_SPEECH_KEY: z.string().min(1).optional(),
+  AZURE_SPEECH_REGION: z.string().min(1).optional(),
   CAPTION_PROBE_SECRET: z.string().min(16).optional(),
 });
 
