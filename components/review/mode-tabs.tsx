@@ -8,6 +8,7 @@ const MODES = [
   { href: "/review/pinyin", label: "Gõ pinyin" },
   { href: "/review/cloze", label: "Điền lời" },
   { href: "/review/match", label: "Ghép cặp" },
+  { href: "/review/listen", label: "Nghe và chọn" },
 ];
 
 /** Thanh chuyển chế độ ôn tập: ôn thẻ chuẩn (theo lịch FSRS) và ba chế độ luyện dạng game. */
