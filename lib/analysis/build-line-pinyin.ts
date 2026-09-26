@@ -5,6 +5,21 @@ type Dictionary = ReadonlyMap<string, DictWordRow[]>;
 const HAN = /\p{Script=Han}/u;
 const MAX_PART = 4;
 
+// Trợ từ cuối câu/hậu tố hay đứng một mình trong lời hát: từ điển liệt kê cả âm gốc (吗 má "cái gì") lẫn âm nhẹ,
+// nhưng trong câu hát gần như luôn đọc âm nhẹ.
+const PARTICLES = new Set([..."吗吧呢啊了的着过么嘛呀啦哦呢"]);
+const isNeutral = (pinyin: string) => /^[a-züv]+$/i.test(pinyin.replace(/\s+/g, ""));
+
+/** Mục chính của một đoạn con; trợ từ thì ưu tiên mục có âm nhẹ nếu từ điển có. */
+function primaryEntry(part: string, dictionary: Dictionary) {
+  const entries = dictionary.get(part) ?? [];
+  if (PARTICLES.has(part)) {
+    const neutral = entries.find((e) => isNeutral(e.pinyin));
+    if (neutral) return neutral;
+  }
+  return pickPrimaryEntry(entries);
+}
+
 /** Các đoạn con (1–4 chữ) của một từ, dùng để tra khi cả từ không có trong từ điển. */
 export function subwordsOf(word: string): string[] {
   const chars = [...word];
@@ -24,7 +39,7 @@ export const wordsMissingFrom = (words: Iterable<string>, dictionary: Dictionary
  * thì ghép từ các đoạn con dài nhất tìm được. Chữ nào cũng không có thì giữ nguyên chữ đó.
  */
 export function pinyinForToken(simplified: string, dictionary: Dictionary): string {
-  const whole = pickPrimaryEntry(dictionary.get(simplified) ?? []);
+  const whole = primaryEntry(simplified, dictionary);
   if (whole) return whole.pinyin;
   const chars = [...simplified];
   const out: string[] = [];
@@ -32,7 +47,7 @@ export function pinyinForToken(simplified: string, dictionary: Dictionary): stri
     let matched = false;
     for (let len = Math.min(MAX_PART, chars.length - i); len >= 1; len--) {
       const part = chars.slice(i, i + len).join("");
-      const entry = HAN.test(part) ? pickPrimaryEntry(dictionary.get(part) ?? []) : null;
+      const entry = HAN.test(part) ? primaryEntry(part, dictionary) : null;
       if (entry) {
         out.push(entry.pinyin);
         i += len;

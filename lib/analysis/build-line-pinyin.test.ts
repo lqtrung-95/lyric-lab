@@ -8,7 +8,7 @@ const dict = new Map([
   ["好了", [row("好了", "hǎo le")]],
   ["好", [row("好", "hǎo")]],
   ["了", [row("了", "le")]],
-  ["吗", [row("吗", "ma")]],
+  ["吗", [row("吗", "má"), row("吗", "ma")]],
 ]);
 
 describe("pinyinForToken", () => {
@@ -22,6 +22,12 @@ describe("pinyinForToken", () => {
 
   it("chữ nào cũng không tra được thì giữ nguyên chữ đó", () => {
     expect(pinyinForToken("好囧", dict)).toBe("hǎo 囧");
+  });
+});
+
+describe("trợ từ", () => {
+  it("ưu tiên âm nhẹ cho trợ từ cuối câu dù từ điển liệt kê âm có dấu trước", () => {
+    expect(pinyinForToken("吗", dict)).toBe("ma");
   });
 });
 
