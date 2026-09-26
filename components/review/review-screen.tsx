@@ -102,7 +102,7 @@ export function ReviewScreen() {
 
 function UndoButton({ onClick }: { onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="mx-auto mt-space-sm inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">
+    <button type="button" onClick={onClick} className="mx-auto mt-space-sm flex min-h-11 w-fit items-center gap-2 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">
       <Icon name="undo" size={18} />
       Hoàn tác lần chấm vừa rồi
     </button>

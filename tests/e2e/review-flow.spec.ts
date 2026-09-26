@@ -56,3 +56,32 @@ test("chưa có thẻ nào: hướng dẫn cách lưu từ", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Chưa có thẻ nào để ôn" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
+
+test("nút 'Hoàn tác' căn giữa ở màn kết thúc buổi ôn", async ({ page }) => {
+  const sb = serviceClientForTests();
+  let userId = "";
+  try {
+    await page.goto("/dev/preview-fixture");
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    const card = page.getByRole("article").filter({ has: page.getByRole("heading", { name: "离开", exact: true }) });
+    await card.getByRole("button", { name: "Lưu" }).click();
+    await expect.poll(async () => {
+      const { data } = await sb.from("user_cards").select("user_id").eq("item_key", "vocab:离开").order("created_at", { ascending: false }).limit(1);
+      userId = data?.[0]?.user_id ?? "";
+      return userId;
+    }, { timeout: 15_000 }).not.toBe("");
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/review");
+    await expect(page.getByRole("heading", { name: "离开", exact: true })).toBeVisible(); // đợi thẻ tải xong rồi mới bấm phím
+    await page.keyboard.press("Space");
+    await page.keyboard.press("3");
+    await expect(page.getByRole("heading", { name: "Xong buổi ôn hôm nay" })).toBeVisible();
+    const undo = await page.getByRole("button", { name: /Hoàn tác/ }).boundingBox();
+    const message = await page.getByRole("heading", { name: "Xong buổi ôn hôm nay" }).boundingBox();
+    const centerX = (b: { x: number; width: number }) => b.x + b.width / 2;
+    expect(Math.abs(centerX(undo!) - centerX(message!))).toBeLessThanOrEqual(2);
+  } finally {
+    if (userId) await sb.auth.admin.deleteUser(userId);
+  }
+});

@@ -19,7 +19,7 @@ export interface ReviewSession {
 
 const DEFAULT_NEW_PER_DAY = 15;
 const DEFAULT_TIMEZONE = "Asia/Ho_Chi_Minh";
-const CARD_COLUMNS =
+export const CARD_COLUMNS =
   "item_key,kind,term,pinyin,han_viet,hsk_level,meaning,video_id,line_index,created_at,due,stability,difficulty,elapsed_days,scheduled_days,learning_steps,reps,lapses,state,last_review";
 
 /** Tải hàng đợi ôn hôm nay: thẻ đến hạn + thẻ mới trong phần hạn mức còn lại (đếm từ nhật ký ôn theo múi giờ người dùng). */

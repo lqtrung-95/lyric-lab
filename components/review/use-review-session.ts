@@ -4,16 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Grade } from "ts-fsrs";
 import { fetchReviewContext } from "@/lib/review/review-context-client";
 import type { ReviewContext } from "@/lib/review/review-context-types";
-import { gradeCard, type SrsFields } from "@/lib/srs/fsrs-scheduler";
+import { gradeCard } from "@/lib/srs/fsrs-scheduler";
+import { srsFieldsOf } from "@/lib/srs/card-fields";
 import { requeueAfterGrade } from "@/lib/srs/review-queue";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { loadReviewSession, saveGrade, undoGrade, type ReviewCard } from "@/lib/user-data/review-repo";
 import { notifyDueCountChanged } from "@/lib/review/due-count-event";
-
-const srsFieldsOf = (c: ReviewCard): SrsFields => ({
-  due: c.due, stability: c.stability, difficulty: c.difficulty, elapsed_days: c.elapsed_days, scheduled_days: c.scheduled_days,
-  learning_steps: c.learning_steps, reps: c.reps, lapses: c.lapses, state: c.state, last_review: c.last_review,
-});
 
 interface LastGrade {
   before: ReviewCard;
