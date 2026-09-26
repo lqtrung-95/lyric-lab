@@ -1,5 +1,6 @@
 "use client";
 
+import { submitRoundScore } from "@/lib/practice/submit-score";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { shortMeaning } from "@/lib/practice/match-round";
 import { MatchGame } from "./match-game";
@@ -20,7 +21,7 @@ export function MatchPractice() {
         intro="Nối chữ Hán với nghĩa của nó càng nhanh càng tốt. Chế độ này chỉ để luyện thêm, không đổi lịch ôn."
         blocked={eligible.length < MIN_CARDS ? `Cần ít nhất ${MIN_CARDS} từ vựng đã lưu để ghép cặp (bạn có ${eligible.length}). Lưu thêm từ khi xem trước một bài hát nhé.` : null}
       >
-        <MatchGame cards={eligible} />
+        <MatchGame cards={eligible} onRoundEnd={(r) => void submitRoundScore("match", r)} />
       </PracticeFrame>
     </>
   );

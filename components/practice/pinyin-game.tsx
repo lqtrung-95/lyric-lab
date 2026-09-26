@@ -15,6 +15,8 @@ const LIVES = 3;
 interface Props {
   cards: ReviewCard[];
   grade: (card: ReviewCard, outcome: PracticeOutcome) => boolean;
+  /** Gọi khi kết thúc lượt để ghi điểm (bảng xếp hạng). */
+  onRoundEnd?: (result: { points: number; correct: number; total: number; durationSec: number }) => void;
 }
 
 const FEEDBACK: Record<PinyinResult, string> = {
@@ -26,7 +28,7 @@ const FEEDBACK: Record<PinyinResult, string> = {
 const noteState = (r: PinyinResult): NoteState => (r === "exact" ? "correct" : r === "wrong" ? "wrong" : "partial");
 
 /** Gõ pinyin: mỗi từ là một nốt trượt vào khuông; gõ đúng để "vang" lên. Nhẹ nhàng mặc định, có chế độ thử thách 3 mạng. */
-export function PinyinGame({ cards, grade }: Props) {
+export function PinyinGame({ cards, grade, onRoundEnd }: Props) {
   const [round, setRound] = useState(0);
   const deck = useMemo(() => pickPracticeCards(cards, ROUND, new Date()), [cards, round]); // eslint-disable-line react-hooks/exhaustive-deps
   const [index, setIndex] = useState(0);
@@ -44,6 +46,8 @@ export function PinyinGame({ cards, grade }: Props) {
   const [hideMeaning, setHideMeaning] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
+  const startedAt = useRef(0);
+  useEffect(() => { startedAt.current = Date.now(); }, [round]);
 
   const card = deck[index];
   const finished = index >= deck.length || (challenge && lives <= 0);
@@ -73,6 +77,9 @@ export function PinyinGame({ cards, grade }: Props) {
   }
 
   function next() {
+    if (index + 1 >= deck.length || (challenge && lives <= 0)) {
+      onRoundEnd?.({ points: score, correct, total: deck.length, durationSec: Math.round((Date.now() - startedAt.current) / 1000) });
+    }
     setFeedback(null);
     setInput("");
     setHints(0);

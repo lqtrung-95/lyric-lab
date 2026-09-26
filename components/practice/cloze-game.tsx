@@ -7,6 +7,7 @@ import { shiftLines } from "@/lib/listen/lyric-offset";
 import { buildChoices, buildCloze } from "@/lib/practice/cloze";
 import { pickPracticeCards } from "@/lib/practice/pick-practice-cards";
 import type { PracticeOutcome } from "@/lib/practice/practice-grade";
+import { answerPoints } from "@/lib/practice/scoring";
 import { snippetRange } from "@/lib/preview/preview-format";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
@@ -21,10 +22,12 @@ interface Props {
   /** Mọi từ của người dùng, làm nguồn đáp án nhiễu. */
   poolTerms: string[];
   grade: (card: ReviewCard, outcome: PracticeOutcome) => boolean;
+  /** Gọi khi kết thúc lượt để ghi điểm (bảng xếp hạng). */
+  onRoundEnd?: (result: { points: number; correct: number; total: number; durationSec: number }) => void;
 }
 
 /** Điền lời: câu hát bị đục lỗ đúng từ đã lưu, chọn 1 trong 4 từ (phím 1–4). Nghe lại được đúng câu hát đó. */
-export function ClozeGame({ candidates, poolTerms, grade }: Props) {
+export function ClozeGame({ candidates, poolTerms, grade, onRoundEnd }: Props) {
   const [round, setRound] = useState(0);
   const questions = useMemo(() => {
     const byKey = new Map(candidates.map((c) => [c.card.item_key, c]));
@@ -36,6 +39,10 @@ export function ClozeGame({ candidates, poolTerms, grade }: Props) {
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [correct, setCorrect] = useState(0);
+  const [combo, setCombo] = useState(0);
+  const [score, setScore] = useState(0);
+  const startedAt = useRef(0);
+  useEffect(() => { startedAt.current = Date.now(); }, [round]);
   const [scheduled, setScheduled] = useState(0);
   const [missed, setMissed] = useState<ReviewCard[]>([]);
   const [snippet, setSnippet] = useState<SnippetRequest | null>(null);
@@ -60,6 +67,8 @@ export function ClozeGame({ candidates, poolTerms, grade }: Props) {
     if (!q || picked) return;
     const ok = term === q.card.term;
     if (grade(q.card, ok ? "correct" : "wrong")) setScheduled((n) => n + 1);
+    setScore((sc) => sc + answerPoints(ok ? "correct" : "wrong", combo));
+    setCombo(ok ? combo + 1 : 0);
     if (ok) setCorrect((n) => n + 1);
     else setMissed((m) => [...m, q.card]);
     setPicked(term);
@@ -73,10 +82,10 @@ export function ClozeGame({ candidates, poolTerms, grade }: Props) {
     return (
       <PracticeSummary
         title="Xong lượt điền lời"
-        stats={[{ label: "Đúng", value: `${correct}/${questions.length}` }, { label: "Câu đã chơi", value: String(questions.length) }]}
+        stats={[{ label: "Điểm", value: String(score) }, { label: "Đúng", value: `${correct}/${questions.length}` }]}
         missed={missed.map((c) => ({ key: c.item_key, term: c.term, pinyin: c.pinyin, meaning: c.meaning }))}
         scheduled={scheduled}
-        onAgain={() => { setRound((r) => r + 1); setIndex(0); setPicked(null); setCorrect(0); setScheduled(0); setMissed([]); setSnippet(null); }}
+        onAgain={() => { setRound((r) => r + 1); setIndex(0); setPicked(null); setCorrect(0); setCombo(0); setScore(0); setScheduled(0); setMissed([]); setSnippet(null); }}
       />
     );
   }
@@ -116,7 +125,10 @@ export function ClozeGame({ candidates, poolTerms, grade }: Props) {
             {q.card.han_viet && <span className="text-hanviet-reading uppercase tracking-wider text-secondary">{q.card.han_viet}</span>}
             <PronounceButton text={q.card.term} />
           </p>
-          <button ref={nextRef} type="button" onClick={() => { setPicked(null); setSnippet(null); setIndex((i) => i + 1); }}
+          <button ref={nextRef} type="button" onClick={() => {
+            if (index + 1 >= questions.length) onRoundEnd?.({ points: score, correct, total: questions.length, durationSec: Math.round((Date.now() - startedAt.current) / 1000) });
+            setPicked(null); setSnippet(null); setIndex((i) => i + 1);
+          }}
             className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">{index + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp theo"}</button>
         </div>
       )}

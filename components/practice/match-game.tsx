@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { buildMatchRound, type MatchCard } from "@/lib/practice/match-round";
 import { pickPracticeCards } from "@/lib/practice/pick-practice-cards";
+import { matchPoints } from "@/lib/practice/scoring";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 
 const PAIRS = 6;
@@ -23,7 +24,7 @@ function readBest(): number | null {
  * Ghép cặp: nối chữ Hán với nghĩa, 6 cặp mỗi vòng, có đồng hồ đếm lên và kỷ lục cá nhân. Chỉ là luyện thêm nên
  * không thay đổi lịch ôn. Chọn một ô ở cột trái rồi một ô ở cột phải (thứ tự nào cũng được).
  */
-export function MatchGame({ cards }: { cards: ReviewCard[] }) {
+export function MatchGame({ cards, onRoundEnd }: { cards: ReviewCard[]; onRoundEnd?: (result: { points: number; correct: number; total: number; durationSec: number }) => void }) {
   const [roundNo, setRoundNo] = useState(0);
   const round = useMemo(() => buildMatchRound(pickPracticeCards(cards, 30, new Date()) as MatchCard[], PAIRS), [cards, roundNo]); // eslint-disable-line react-hooks/exhaustive-deps
   const [left, setLeft] = useState<string | null>(null);
@@ -44,7 +45,8 @@ export function MatchGame({ cards }: { cards: ReviewCard[] }) {
     return () => clearInterval(t);
   }, [done, roundNo]);
   /** Kết thúc vòng: cập nhật kỷ lục cá nhân nếu nhanh hơn. Gọi từ thao tác của người dùng, không phải từ effect. */
-  function finishRound(elapsed: number) {
+  function finishRound(elapsed: number, mistakeCount: number) {
+    onRoundEnd?.({ points: matchPoints(elapsed, mistakeCount), correct: total, total, durationSec: elapsed });
     const previous = readBest();
     if (previous !== null && elapsed >= previous) return;
     try { localStorage.setItem(BEST_KEY, String(elapsed)); } catch { /* không lưu được: bỏ qua */ }
@@ -56,7 +58,7 @@ export function MatchGame({ cards }: { cards: ReviewCard[] }) {
     if (l === r) {
       const next = new Set(matched).add(l);
       setMatched(next);
-      if (next.size === total) finishRound(seconds);
+      if (next.size === total) finishRound(seconds, mistakes);
     } else {
       setMistakes((n) => n + 1);
       setWrongPair([l, r]);

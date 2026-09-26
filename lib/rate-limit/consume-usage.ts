@@ -1,7 +1,7 @@
 import "server-only";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
-import { USAGE_WINDOW_HOURS, usageLimit, type UsageKind } from "./usage-limit-config";
+import { usageLimit, usageWindowHours, type UsageKind } from "./usage-limit-config";
 
 /**
  * Ghi nhận một lượt dùng của tài khoản; false nếu đã hết hạn mức 24 giờ gần nhất.
@@ -13,7 +13,7 @@ export async function consumeUsage(user: CurrentUser, kind: UsageKind): Promise<
     p_user: user.id,
     p_kind: kind,
     p_limit: usageLimit(kind, user.isAnonymous),
-    p_window_hours: USAGE_WINDOW_HOURS,
+    p_window_hours: usageWindowHours(kind),
   });
   if (error) throw new Error(`consume_usage: ${error.message}`);
   return data === true;

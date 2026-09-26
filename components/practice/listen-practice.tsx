@@ -1,5 +1,6 @@
 "use client";
 
+import { submitRoundScore } from "@/lib/practice/submit-score";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { shortMeaning } from "@/lib/practice/match-round";
 import { ListenGame } from "./listen-game";
@@ -20,7 +21,7 @@ export function ListenPractice() {
         intro="Nghe giọng đọc rồi chọn chữ Hán hoặc nghĩa đúng. Đúng thẻ đến hạn thì lịch ôn của thẻ được cập nhật (tối đa mức “Được”)."
         blocked={eligible.length < MIN_CARDS ? `Cần ít nhất ${MIN_CARDS} từ vựng đã lưu (bạn có ${eligible.length}). Lưu thêm từ khi xem trước một bài hát nhé.` : null}
       >
-        <ListenGame cards={eligible} grade={grade} />
+        <ListenGame cards={eligible} grade={grade} onRoundEnd={(r) => void submitRoundScore("listen", r)} />
       </PracticeFrame>
     </>
   );

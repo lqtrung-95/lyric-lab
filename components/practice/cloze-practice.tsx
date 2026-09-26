@@ -1,5 +1,6 @@
 "use client";
 
+import { submitRoundScore } from "@/lib/practice/submit-score";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { ClozeGame } from "./cloze-game";
 import { useClozeCandidates } from "./cloze-questions";
@@ -22,7 +23,7 @@ export function ClozePractice() {
         intro="Điền từ còn thiếu vào câu hát. Đúng thẻ đến hạn thì lịch ôn của thẻ được cập nhật (tối đa mức “Được”)."
         blocked={status === "ready" && cards.length === 0 ? "Bạn chưa có thẻ nào. Lưu vài từ khi xem trước một bài hát để bắt đầu luyện." : blocked}
       >
-        {candidates && <ClozeGame candidates={candidates} poolTerms={cards.filter((c) => c.kind === "vocab").map((c) => c.term)} grade={grade} />}
+        {candidates && <ClozeGame candidates={candidates} poolTerms={cards.filter((c) => c.kind === "vocab").map((c) => c.term)} grade={grade} onRoundEnd={(r) => void submitRoundScore("cloze", r)} />}
       </PracticeFrame>
     </>
   );

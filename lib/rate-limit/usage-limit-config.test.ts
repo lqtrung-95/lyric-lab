@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { usageLimit } from "./usage-limit-config";
+import { usageLimit, usageWindowHours } from "./usage-limit-config";
 
 describe("usageLimit", () => {
   it("phân tích bài mới: 10 cho ẩn danh, 30 cho đã đăng nhập (PRD §7)", () => {
@@ -11,5 +11,11 @@ describe("usageLimit", () => {
     for (const kind of ["analyze", "explain"] as const) {
       expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
     }
+  });
+
+  it("điểm luyện tập: 40 lượt mỗi giờ, cửa sổ đếm 1 giờ; các loại khác 24 giờ", () => {
+    expect(usageLimit("score", true)).toBe(40);
+    expect(usageWindowHours("score")).toBe(1);
+    expect(usageWindowHours("analyze")).toBe(24);
   });
 });

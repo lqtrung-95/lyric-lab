@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { submitRoundScore } from "@/lib/practice/submit-score";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { karaokeSongs, planKaraoke, type KaraokeCandidate } from "@/lib/practice/karaoke-plan";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
@@ -39,7 +40,7 @@ export function KaraokePractice() {
         intro="Nghe bài hát và điền từ còn thiếu vào đúng câu hát. Chỉ hiện các câu có từ bạn đã lưu. Đúng thẻ đến hạn thì lịch ôn được cập nhật (tối đa mức “Được”)."
       >
         {song ? (
-          <KaraokeGame key={`${song.videoId}-${live}`} videoId={song.videoId} title={song.title} steps={steps} poolTerms={poolTerms} live={live} grade={grade} onExit={() => setSongId(null)} />
+          <KaraokeGame key={`${song.videoId}-${live}`} videoId={song.videoId} title={song.title} steps={steps} poolTerms={poolTerms} live={live} grade={grade} onExit={() => setSongId(null)} onRoundEnd={(r) => void submitRoundScore("karaoke", r)} />
         ) : (
           <div>
             <label className="inline-flex min-h-11 items-center gap-2 text-label-md text-on-surface-variant">
