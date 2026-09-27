@@ -13,7 +13,7 @@ import { ProblemSolution } from "@/components/landing/problem-solution";
 import { landingJsonLd } from "@/lib/seo/landing-json-ld";
 
 const TITLE = "Lyric Lab: học tiếng Trung qua bài hát, dành cho người Việt";
-const DESCRIPTION = "Dán link YouTube, Lyric Lab chọn từ vựng và ngữ pháp đáng học kèm pinyin, âm Hán Việt và nghĩa theo câu hát. Nghe với lời chạy theo nhạc, ôn bằng flashcard FSRS. Miễn phí, chữ giản thể.";
+const DESCRIPTION = "Dán link YouTube hoặc gõ tên bài hát, Lyric Lab chọn từ vựng và ngữ pháp đáng học kèm pinyin, âm Hán Việt và nghĩa theo câu hát. Nghe với lời chạy theo nhạc, ôn bằng flashcard FSRS và trò chơi luyện tập. Miễn phí, chữ giản thể.";
 
 // Trang giới thiệu là trang duy nhất cho công cụ tìm kiếm lập chỉ mục; mọi trang học đều noindex.
 export const metadata: Metadata = {

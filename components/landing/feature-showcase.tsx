@@ -38,20 +38,36 @@ const ROWS: Row[] = [
   },
   {
     icon: "style", eyebrow: "Ôn tập", title: "Nhớ lâu nhờ ôn đúng lúc",
-    points: ["Lưu từ thành flashcard chỉ với một cú bấm", "FSRS xếp lịch riêng cho từng thẻ, thẻ mới theo hạn mức bạn đặt", "Ôn xong, nghe lại đúng câu hát chứa từ đó"],
+    points: ["Lưu từ thành flashcard chỉ với một cú bấm", "FSRS xếp lịch riêng cho từng thẻ, thẻ mới theo hạn mức mỗi ngày bạn đặt", "Ôn xong, nghe lại đúng câu hát chứa từ đó"],
     visual: (
       <div className="rounded-3xl bg-surface-container-lowest p-5 text-center shadow-[0_8px_30px_rgba(32,27,21,0.08)]">
         <p lang="zh" className="font-serif text-[60px] leading-none text-on-surface">离开</p>
         <p className="mt-2 text-pinyin-reading text-primary">lí kāi <span className="text-secondary">· LY KHAI</span></p>
         <div className="mt-4 grid grid-cols-4 gap-2 text-label-md font-semibold">
-          {[["Quên", "10 phút"], ["Khó", "1 ngày"], ["Được", "3 ngày"], ["Dễ", "7 ngày"]].map(([l, t]) => (<span key={l} className="rounded-xl bg-surface-container-high px-1 py-2 text-on-surface">{l}<br /><span className="font-normal text-on-surface-variant">{t}</span></span>))}
+          {[["Quên", "1 ngày"], ["Khó", "2 ngày"], ["Được", "5 ngày"], ["Dễ", "10 ngày"]].map(([l, t]) => (<span key={l} className="rounded-xl bg-surface-container-high px-1 py-2 text-on-surface">{l}<br /><span className="font-normal text-on-surface-variant">{t}</span></span>))}
         </div>
+      </div>
+    ),
+  },
+  {
+    icon: "quiz", eyebrow: "Luyện tập", title: "Biến từ đã lưu thành phản xạ",
+    points: ["Năm trò chơi ngắn: gõ pinyin, điền lời, ghép cặp, nghe và chọn, karaoke điền lời", "Chơi theo nhịp của bạn, không đồng hồ đếm ngược, không mất mạng", "Chuỗi ngày học và mục tiêu tuần giữ bạn đều đặn", "Muốn thi đua? Vào bảng xếp hạng tuần bằng biệt danh tự đặt, không lộ email"],
+    visual: (
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">{["Gõ pinyin", "Điền lời", "Ghép cặp", "Nghe và chọn", "Karaoke"].map((m) => <span key={m} className={chip}>{m}</span>)}</div>
+        <div className="rounded-2xl bg-surface-container-lowest p-4 shadow-sm">
+          <p className="text-label-sm uppercase tracking-wider text-on-surface-variant">Xếp hạng tuần này</p>
+          {[["1", "MeoCon", "4.820"], ["2", "Bạn", "4.310"], ["3", "TrangTM", "3.990"]].map(([r, n, p]) => (
+            <p key={r} className={`mt-2 flex items-center gap-3 rounded-xl px-2 py-1.5 text-body-md ${n === "Bạn" ? "bg-secondary-container/50 font-semibold" : ""}`}><span className="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container-high text-label-md">{r}</span><span className="flex-1 text-on-surface">{n}</span><span className="font-serif text-primary">{p}</span></p>
+          ))}
+        </div>
+        <p className="inline-flex items-center gap-2 rounded-full bg-tertiary-fixed px-3 py-1.5 text-label-md font-medium text-on-tertiary-fixed"><Icon name="local_fire_department" size={16} filled />5 ngày liên tiếp</p>
       </div>
     ),
   },
 ];
 
-/** Ba tính năng chính, mỗi tính năng một hàng xen kẽ chữ và hình minh họa (dữ liệu hư cấu 夜车). */
+/** Các tính năng chính, mỗi tính năng một hàng xen kẽ chữ và hình minh họa (dữ liệu hư cấu 夜车). */
 export function FeatureShowcase() {
   return (
     <section aria-label="Các bước học chi tiết" className="mt-24 space-y-24">

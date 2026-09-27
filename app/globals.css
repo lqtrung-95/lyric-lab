@@ -226,6 +226,11 @@ html {
   scroll-padding-bottom: 6rem;
 }
 
+/* Bấm liên kết neo ("Tính năng", "Hỏi đáp"…) thì cuộn mượt; người bật giảm chuyển động được cuộn tức thì (xem khối reduced-motion bên dưới). */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
 body {
   background: var(--background);
   color: var(--on-surface);
