@@ -57,7 +57,8 @@ const analysisCache = unstable_cache(
     if (!analysis) throw new NotFoundInCache();
     return analysis;
   },
-  ["song-analysis", PROMPT_VERSION],
+  // Số cuối tăng khi sửa dữ liệu phân tích trực tiếp trong DB (vd. bù bản dịch) để bỏ bản cache cũ ngay thay vì đợi hết 1 giờ.
+  ["song-analysis", PROMPT_VERSION, "rev2"],
   { revalidate: 3600, tags: ["song-analysis"] },
 );
 
