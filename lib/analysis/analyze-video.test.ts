@@ -49,9 +49,12 @@ describe("analyzeVideo", () => {
     expect(store.songs).toBe(1);
     expect(store.analyses).toHaveLength(1);
 
+    const callsAfterFirst = calls.n; // phân tích chính + lượt bù bản dịch (LLM giả không trả bản dịch nào)
+    expect(callsAfterFirst).toBeGreaterThanOrEqual(1);
+
     const second = await analyzeVideo(video, deps(db, calls));
     expect(second.fromCache).toBe(true);
-    expect(calls.n).toBe(1);
+    expect(calls.n).toBe(callsAfterFirst);
   });
 
   it("báo tiến trình theo thứ tự khi chạy pipeline, không báo khi dùng cache", async () => {

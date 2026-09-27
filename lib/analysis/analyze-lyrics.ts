@@ -3,13 +3,15 @@ import type { LyricsSourceLabel, SongAnalysis, TokenizedLine, VocabCandidate } f
 import { assembleSongAnalysis } from "./assemble-song-analysis";
 import { SYSTEM_PROMPT, buildAnalysisPrompt } from "./build-analysis-prompt";
 import type { ChatFn } from "./groq-chat";
+import { fillMissingTranslations } from "./fill-translations";
 import { llmOutputSchema } from "./llm-output-schema";
 import { validateLlmOutput, type Dropped } from "./validate-llm-output";
 
 // Model chính, rồi model dự phòng khi lỗi hoặc kết quả quá nghèo (PRD §7: tự chuyển model khi nhà cung cấp lỗi).
 // qwen/qwen3.8-27b bị loại: hạn mức đầu ra 1.000 token/phút không đủ cho một phân tích.
-// Hai model cuối chạy qua OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY): gemini-2.5-flash-lite nhanh và rẻ nhất, gpt-oss-120b là lưới an toàn cuối.
-export const DEFAULT_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "openrouter:google/gemini-2.5-flash-lite", "openrouter:openai/gpt-oss-120b"];
+// Hai model cuối chạy qua OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY, tức khi Groq lỗi hoặc hết hạn mức): gemini-2.5-flash cân bằng
+// chất lượng/giá, claude-haiku-4.5 là lưới an toàn có văn phong tiếng Việt và độ tuân thủ JSON tốt nhất trong các model đã thử.
+export const DEFAULT_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "openrouter:google/gemini-2.5-flash", "openrouter:anthropic/claude-haiku-4.5"];
 const MIN_VOCAB_ITEMS = 6;
 
 export interface AnalyzeInput {
@@ -57,7 +59,10 @@ export async function analyzeLyrics(input: AnalyzeInput): Promise<{ analysis: So
         throw new Error(`Chỉ ${validated.vocab.length} từ hợp lệ (cần ≥ ${MIN_VOCAB_ITEMS})`);
       }
       attempts.push({ model, ok: true, latencyMs: Date.now() - t0, dropped: validated.dropped });
-      return { analysis: assembleSongAnalysis({ ...input, llm: parsed, validated, model }), attempts };
+      const assembled = assembleSongAnalysis({ ...input, llm: parsed, validated, model });
+      // Bài dài: LLM hay dịch dở dang. Bù các dòng còn thiếu bằng lượt dịch riêng theo đoạn ngắn.
+      const lines = await fillMissingTranslations(assembled.lines, input.chat, input.models ?? DEFAULT_MODELS);
+      return { analysis: { ...assembled, lines }, attempts };
     } catch (e) {
       attempts.push({ model, ok: false, latencyMs: Date.now() - t0, error: errMsg(e).slice(0, 300) });
     }
