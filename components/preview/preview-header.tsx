@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { SongAnalysis } from "@/lib/analysis/analysis-types";
+import { ReportSongButton } from "./report-song-button";
 import { Icon } from "@/components/ui/icon";
 import { formatTimestamp, levelRangeLabel } from "@/lib/preview/preview-format";
 import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
@@ -57,6 +58,7 @@ export function PreviewHeader({ analysis, song, listenHref }: PreviewHeaderProps
                 <Icon name="chevron_right" size={16} />
               </Link>
             </div>
+            <ReportSongButton videoId={analysis.videoId} />
           </div>
         </div>
       </div>
