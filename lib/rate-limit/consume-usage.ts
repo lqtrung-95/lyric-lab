@@ -1,6 +1,7 @@
 import "server-only";
 import type { CurrentUser } from "@/lib/auth/current-user";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
+import { isUnlimitedAccount } from "./unlimited-accounts";
 import { usageLimit, usageWindowHours, type UsageKind } from "./usage-limit-config";
 
 /**
@@ -9,6 +10,7 @@ import { usageLimit, usageWindowHours, type UsageKind } from "./usage-limit-conf
  * Lỗi DB thì ném ra (không cho qua) để hạn mức không bị vô hiệu khi hệ thống trục trặc.
  */
 export async function consumeUsage(user: CurrentUser, kind: UsageKind): Promise<boolean> {
+  if (isUnlimitedAccount(user.email)) return true;
   const { data, error } = await createSupabaseServiceClient().rpc("consume_usage", {
     p_user: user.id,
     p_kind: kind,
