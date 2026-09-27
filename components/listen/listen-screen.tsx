@@ -12,6 +12,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { MiniTransportBar, useIsInView } from "./mini-transport-bar";
+import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
@@ -156,6 +157,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
+          <ReportSongButton videoId={analysis.videoId} />
           {completed && (
             <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary-container/50 p-space-md">
               <p className="text-body-md text-on-secondary-container">Bạn đã nghe tới cuối bài.</p>
