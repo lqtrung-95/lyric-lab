@@ -1,7 +1,7 @@
 import "server-only";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { PROMPT_VERSION } from "@/lib/analysis/build-analysis-prompt";
-import { createGroqChat } from "@/lib/analysis/groq-chat";
+import { createChat } from "@/lib/analysis/server-deps";
 import { EXPLAIN_LANG } from "@/lib/analysis/analyze-video";
 import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
@@ -43,7 +43,7 @@ export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>
       if (error) throw new Error(error.message);
     },
     dictionaryMeanings: async (term) => (await lookupTermEntry(term))?.meanings ?? [],
-    chat: createGroqChat(getServerEnv().GROQ_API_KEY),
+    chat: createChat(getServerEnv()),
     allowLlmCall,
   };
 }

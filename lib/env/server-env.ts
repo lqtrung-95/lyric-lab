@@ -6,7 +6,8 @@ import { z } from "zod";
 const serverEnvSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   GROQ_API_KEY: z.string().min(1),
-  FALLBACK_LLM_API_KEY: z.string().min(1).optional(),
+  // Dự phòng khi Groq hết hạn mức: model có tiền tố "openrouter:" trong DEFAULT_MODELS.
+  OPENROUTER_API_KEY: z.string().min(1).optional(),
   YOUTUBE_DATA_API_KEY: z.string().min(1),
   // Giọng đọc thần kinh (Azure Speech). Bỏ trống thì /api/tts trả 503 và nút loa dùng giọng hệ thống.
   AZURE_SPEECH_KEY: z.string().min(1).optional(),

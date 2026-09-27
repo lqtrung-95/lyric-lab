@@ -141,6 +141,14 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
         <div className="flex flex-col gap-6 lg:col-span-7">
           <div data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
             <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
+            <div className="lg:hidden">
+              <MiniTransportBar
+                inline visible ready={!!controller} playing={playing} onTogglePlay={togglePlay}
+                onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
+                looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
+                offset={offset} onOffsetChange={setOffset}
+              />
+            </div>
             {failed && (
               <p role="alert" className="mt-2 rounded-xl bg-error-container p-3 text-label-md text-on-error-container">
                 Không phát được video này (có thể chủ video tắt nhúng).{" "}
@@ -148,7 +156,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
               </p>
             )}
           </div>
-          <div ref={controlsRef}>
+          <div ref={controlsRef} className="hidden lg:block">
           <TransportControls
             ready={!!controller} playing={playing} onTogglePlay={togglePlay}
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
@@ -157,7 +165,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
-          <ReportSongButton videoId={analysis.videoId} />
+          <ReportSongButton videoId={analysis.videoId} prominent />
           {completed && (
             <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary-container/50 p-space-md">
               <p className="text-body-md text-on-secondary-container">Bạn đã nghe tới cuối bài.</p>

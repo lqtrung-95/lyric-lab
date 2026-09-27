@@ -8,7 +8,8 @@ import { validateLlmOutput, type Dropped } from "./validate-llm-output";
 
 // Model chính, rồi model dự phòng khi lỗi hoặc kết quả quá nghèo (PRD §7: tự chuyển model khi nhà cung cấp lỗi).
 // qwen/qwen3.8-27b bị loại: hạn mức đầu ra 1.000 token/phút không đủ cho một phân tích.
-export const DEFAULT_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"];
+// Hai model cuối chạy qua OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY): gemini-2.5-flash-lite nhanh và rẻ nhất, gpt-oss-120b là lưới an toàn cuối.
+export const DEFAULT_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "openrouter:google/gemini-2.5-flash-lite", "openrouter:openai/gpt-oss-120b"];
 const MIN_VOCAB_ITEMS = 6;
 
 export interface AnalyzeInput {

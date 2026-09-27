@@ -8,20 +8,29 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
 import { createGroqChat } from "./groq-chat";
+import { createChatRouter, createOpenRouterChat } from "./openrouter-chat";
 import { buildLinePinyin, withSubwordEntries } from "./build-line-pinyin";
 import { simplifyDeep } from "./simplify-analysis";
 import { getCachedAnalysis } from "./song-analysis-cache";
 import { createSupabaseCacheDb } from "./supabase-cache-db";
 import type { SongAnalysis } from "./analysis-types";
 
+/** Groq là chính; có khóa OpenRouter thì Groq chỉ chờ ngắn khi hết hạn mức (để chuyển dự phòng kịp trong thời gian tối đa của route). */
+export function createChat(env: { GROQ_API_KEY: string; OPENROUTER_API_KEY?: string }) {
+  const fallback = env.OPENROUTER_API_KEY ? createOpenRouterChat(env.OPENROUTER_API_KEY) : undefined;
+  const groq = createGroqChat(env.GROQ_API_KEY, fetch, undefined, fallback ? { maxRetries: 1, maxWaitSec: 8 } : {});
+  return createChatRouter(groq, fallback);
+}
+
 /** Ghép mọi phụ thuộc thật (Supabase service role, Groq, YouTube, LRCLIB) cho pipeline. Chỉ dùng ở server. */
 export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): AnalyzeVideoDeps {
   const sb = createSupabaseServiceClient();
+  const env = getServerEnv();
   return {
     captions: new YoutubeInnertubeCaptionProvider(),
     lrclib: new LrclibProvider(),
     cache: createSupabaseCacheDb(sb),
-    chat: createGroqChat(getServerEnv().GROQ_API_KEY),
+    chat: createChat(env),
     lookupDictionary: (terms) => lookupWords(sb as never, terms),
     lookupSinoViet: async (chars) => {
       const { data } = await sb.from("dict_hanzi_sino_viet").select("hanzi,readings").in("hanzi", chars);

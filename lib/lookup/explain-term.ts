@@ -4,7 +4,8 @@ import { EXPLAIN_SYSTEM_PROMPT, buildExplainPrompt } from "./build-explain-promp
 import { explainOutputSchema, type ExplainRequest, type TermExplanation } from "./explain-schema";
 
 // Model nhỏ trước cho nhanh (LS-06: ≤ 1,5 giây), model lớn làm dự phòng.
-export const EXPLAIN_MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b"];
+// Cuối danh sách là model OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY) khi Groq hết hạn mức.
+export const EXPLAIN_MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "openrouter:google/gemini-2.5-flash-lite"];
 const MAX_EXPLAIN_TOKENS = 400;
 
 export type ExplainErrorCode = "term_not_in_line" | "explain_failed" | "rate_limited";

@@ -13,7 +13,8 @@ export const llmGrammarSchema = z.object({
   explanation: z.string().min(1),
   example: z.object({ zh: z.string().min(1), vi: z.string().min(1) }),
   commonMistake: z.string().optional(),
-  level: z.number().int().min(1).max(7).optional(),
+  // Cấp ngoài 1–7 (vd. 0 từ một số model) coi như không có, không làm hỏng cả bản phân tích.
+  level: z.number().int().min(1).max(7).optional().catch(undefined),
   lineIndexes: z.array(z.number().int().min(0)).min(1),
   priority: z.number().min(0).max(100),
 });
