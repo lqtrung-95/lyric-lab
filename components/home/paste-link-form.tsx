@@ -4,17 +4,32 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
+import { SongSearchResults } from "./song-search-results";
+import { useSongSearch } from "./use-song-search";
 import { parseVideoId } from "@/lib/youtube/parse-video-id";
 
-/** Ô dán link YouTube. Link sai định dạng báo lỗi ngay, không gọi server (IN-01). */
+/** Chữ trông như một liên kết (không phải tên bài hát để tìm kiếm). */
+const looksLikeLink = (text: string) => /^(https?:\/\/|www\.)|youtu\.?be/i.test(text.trim());
+
+/**
+ * Ô nhập bài hát: dán link YouTube (link sai định dạng báo lỗi ngay, không gọi server, IN-01)
+ * hoặc gõ tên bài/nghệ sĩ để tìm và chọn từ danh sách gợi ý.
+ */
 export function PasteLinkForm() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [text, setText] = useState("");
+  const search = useSongSearch(looksLikeLink(text) || parseVideoId(text) ? "" : text);
 
   function submit(value: string) {
     const videoId = parseVideoId(value);
+    // Chữ thường (không giống link): kết quả tìm đang hiện ngay bên dưới, không báo lỗi định dạng link.
+    if (!videoId && !looksLikeLink(value)) {
+      inputRef.current?.focus();
+      return;
+    }
     if (!videoId) {
       setError("Link chưa đúng. Hãy dán link video YouTube, ví dụ https://www.youtube.com/watch?v=…");
       inputRef.current?.focus();
@@ -28,8 +43,10 @@ export function PasteLinkForm() {
   async function pasteFromClipboard() {
     try {
       const text = await navigator.clipboard.readText();
-      if (inputRef.current) inputRef.current.value = text;
-      if (text.trim()) submit(text);
+      const clip = text;
+      if (inputRef.current) inputRef.current.value = clip;
+      setText(clip);
+      if (clip.trim()) submit(clip);
     } catch {
       // Trình duyệt từ chối quyền clipboard: để người dùng dán tay vào ô.
       inputRef.current?.focus();
@@ -47,7 +64,7 @@ export function PasteLinkForm() {
     >
       <label htmlFor="video-link" className="flex items-center gap-2 text-label-md text-on-surface">
         <Icon name="smart_display" size={18} className="text-primary" />
-        Dán link YouTube của bài hát
+        Dán link YouTube hoặc gõ tên bài hát / nghệ sĩ
       </label>
       <div className="mt-space-sm flex flex-col gap-space-sm md:flex-row">
         <div
@@ -60,12 +77,11 @@ export function PasteLinkForm() {
             ref={inputRef}
             id="video-link"
             type="text"
-            inputMode="url"
             autoComplete="off"
-            placeholder="Dán link YouTube của bài hát…"
+            placeholder="Dán link, hoặc gõ tên bài hát / nghệ sĩ…"
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? "video-link-error" : undefined}
-            onChange={() => error && setError(null)}
+            onChange={(e) => { setText(e.target.value); if (error) setError(null); }}
             className="min-h-11 flex-1 bg-transparent text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/70"
           />
           <button
@@ -87,6 +103,7 @@ export function PasteLinkForm() {
           {pending ? <Spinner size={16} /> : <Icon name="arrow_forward" size={18} />}
         </button>
       </div>
+      <SongSearchResults state={search} onPick={() => setPending(true)} />
       {error && (
         <p id="video-link-error" role="alert" className="mt-space-sm text-label-md text-error">
           {error}

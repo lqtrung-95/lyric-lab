@@ -18,7 +18,7 @@ Từ cần giải nghĩa: ${term}
 Nghĩa tiếng Anh trong từ điển: ${dictionary}
 
 Trả về JSON: {"meaningInContext": "...", "note": "..."}
-- meaningInContext: nghĩa của từ trong ĐÚNG câu hát này, tiếng Việt, tối đa 2 câu ngắn. Bám vào nghĩa từ điển ở trên; không trích nguyên câu hát.
+- meaningInContext: nghĩa của từ trong ĐÚNG câu hát này, tiếng Việt, tối đa 2 câu ngắn. Bám vào nghĩa từ điển ở trên; không trích nguyên câu hát. TUYỆT ĐỐI KHÔNG nhắc lại từ gốc (chữ Hán) trong nội dung này vì nó được dùng làm gợi ý cho bài tập; mở đầu thẳng bằng nghĩa, ví dụ: "Ở câu này mang nghĩa là “đã mất” hoặc “không còn có”. Trong ngữ cảnh, nó diễn tả…".
 - note: ghi chú ngữ pháp hoặc cách dùng ngắn gọn bằng tiếng Việt (không bắt buộc, bỏ trống nếu không cần).
 - KHÔNG ghi pinyin, cấp HSK hay âm Hán Việt (hệ thống tự tra từ điển).`;
 }

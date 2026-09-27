@@ -31,7 +31,7 @@ export function StreakCard() {
   }
 
   return (
-    <section aria-label="Chuỗi ngày học" className="mt-space-md flex flex-col gap-2 rounded-2xl bg-surface-container-low px-space-md py-3 md:flex-row md:items-center md:gap-space-lg">
+    <section aria-label="Chuỗi ngày học" className="mt-space-md flex flex-col gap-2 rounded-2xl bg-surface-container-low px-space-md py-3 md:grid md:grid-cols-[auto_1fr_auto] md:items-center md:gap-space-lg">
       <div className="flex items-center gap-3">
         <span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${streak.current > 0 ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container-high text-on-surface-variant"}`}>
           <Icon name="local_fire_department" filled />
@@ -47,11 +47,11 @@ export function StreakCard() {
         <ShareButton onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0} className="md:hidden" />
       </div>
 
-      <div className="min-w-0 md:flex-1">
+      <div className="min-w-0 md:justify-self-center">
         <ol aria-label={`Tuần này: học ${streak.weekCount} trên ${WEEKLY_GOAL_DAYS} ngày mục tiêu`} className="flex justify-between gap-1 md:justify-start md:gap-3">
           {streak.week.map((d, i) => (
-            <li key={d.day} className="flex flex-col items-center gap-0.5">
-              <span className={`flex h-8 w-8 items-center justify-center rounded-full text-label-sm ${d.studied ? "bg-secondary text-on-secondary" : "bg-surface-container-high text-on-surface-variant"} ${d.isToday ? "ring-2 ring-primary ring-offset-2 ring-offset-surface-container-low" : ""}`}>
+            <li key={d.day} className="flex flex-col items-center gap-1.5">
+              <span className={`flex h-8 w-8 items-center justify-center rounded-full text-label-sm ${d.studied ? "bg-secondary text-on-secondary" : "bg-surface-container-high text-on-surface-variant"} ${d.isToday ? "ring-2 ring-primary ring-offset-1 ring-offset-surface-container-low" : ""}`}>
                 {d.studied ? <Icon name="check" size={18} /> : <span aria-hidden="true">·</span>}
                 <span className="sr-only">{d.studied ? "Đã học" : "Chưa học"}</span>
               </span>

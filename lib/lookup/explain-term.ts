@@ -1,6 +1,7 @@
 import type { ChatFn } from "@/lib/analysis/groq-chat";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { EXPLAIN_SYSTEM_PROMPT, buildExplainPrompt } from "./build-explain-prompt";
+import { stripTermFromMeaning } from "./strip-term-from-meaning";
 import { explainOutputSchema, type ExplainRequest, type TermExplanation } from "./explain-schema";
 
 // Model nhỏ trước cho nhanh (LS-06: ≤ 1,5 giây), model lớn làm dự phòng.
@@ -47,7 +48,8 @@ export async function explainTerm(lines: AnalyzedLine[], req: ExplainRequest, de
   }
 
   const cached = await deps.readCache(req);
-  if (cached) return { ...cached, fromCache: true };
+  // Kể cả bản đã lưu từ trước cũng bỏ chữ Hán: nghĩa này hiện làm gợi ý trong bài tập.
+  if (cached) return { ...cached, meaningInContext: stripTermFromMeaning(cached.meaningInContext, req.term), fromCache: true };
 
   if (deps.allowLlmCall && !(await deps.allowLlmCall())) throw new ExplainError("rate_limited", "Vượt giới hạn giải nghĩa");
 
@@ -59,7 +61,7 @@ export async function explainTerm(lines: AnalyzedLine[], req: ExplainRequest, de
     try {
       const raw = await deps.chat({ model, system: EXPLAIN_SYSTEM_PROMPT, user: prompt, maxTokens: MAX_EXPLAIN_TOKENS });
       const parsed = explainOutputSchema.parse(JSON.parse(raw));
-      const value: CachedExplanation = { meaningInContext: parsed.meaningInContext, note: parsed.note || undefined, model };
+      const value: CachedExplanation = { meaningInContext: stripTermFromMeaning(parsed.meaningInContext, req.term), note: parsed.note || undefined, model };
       await deps.writeCache(req, value).catch(() => {}); // ghi cache lỗi không được làm hỏng câu trả lời
       return { ...value, fromCache: false };
     } catch (e) {

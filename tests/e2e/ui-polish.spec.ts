@@ -27,7 +27,7 @@ test("thẻ bài hát ở thư viện và trang chủ cao bằng nhau dù tiêu 
 test("dán link đúng: nút chuyển sang trạng thái đang mở và bị khóa", async ({ page }) => {
   await page.route("**/api/analyze/**", () => new Promise(() => {})); // giữ trang bài học ở trạng thái chờ
   await page.goto("/");
-  await page.getByLabel("Dán link YouTube của bài hát").fill("https://youtu.be/dQw4w9WgXcQ");
+  await page.getByLabel(/Dán link YouTube hoặc gõ tên/).fill("https://youtu.be/dQw4w9WgXcQ");
   const submit = page.getByRole("button", { name: /Phân tích bài hát|Đang mở bài hát/ });
   await submit.click();
   await expect(page.getByRole("button", { name: "Đang mở bài hát…" })).toBeDisabled();

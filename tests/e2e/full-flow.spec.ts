@@ -16,7 +16,7 @@ test("dán link → xem trước → nghe, và bài xuất hiện ở 'Bài hát
   await page.evaluate(() => localStorage.clear());
   await page.reload();
 
-  await page.getByLabel("Dán link YouTube của bài hát").fill(`https://youtu.be/${E2E_VIDEO_ID}`);
+  await page.getByLabel(/Dán link YouTube hoặc gõ tên/).fill(`https://youtu.be/${E2E_VIDEO_ID}`);
   await page.getByRole("button", { name: "Phân tích bài hát" }).click();
 
   // Bản xem trước (bài đã có trong cache nên không cần phân tích).

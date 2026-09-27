@@ -17,7 +17,7 @@ test("dán link chỉ bằng bàn phím: Tab tới ô nhập, gõ, Enter", async
   await page.route("**/api/analyze/**", (r) => r.fulfill({ contentType: "text/event-stream", body: 'event: error\ndata: {"code":"no_lyrics"}\n\n' }));
   await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
   await page.goto("/");
-  await page.getByLabel("Dán link YouTube của bài hát").focus();
+  await page.getByLabel(/Dán link YouTube hoặc gõ tên/).focus();
   await page.keyboard.type("https://youtu.be/dQw4w9WgXcQ");
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/learn\/dQw4w9WgXcQ$/);
