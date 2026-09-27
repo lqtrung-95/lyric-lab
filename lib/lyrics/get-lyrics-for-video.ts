@@ -39,10 +39,10 @@ async function tryCaption(video: VideoMeta, captions: CaptionProvider, attempts:
       return null;
     }
     const lines = cleanCaptionLines(await captions.fetchLines(video.videoId, track));
-    const quality = assessLyricQuality(lines);
+    const quality = assessLyricQuality(lines, video.durationSec);
     const coverage = video.durationSec > 0 ? quality.coverageSec / video.durationSec : 1;
     if (quality.verdict !== "ok" || coverage < MIN_CAPTION_COVERAGE) {
-      attempts.push({ source, outcome: "low_quality", detail: `han=${quality.hanLineRatio.toFixed(2)} coverage=${coverage.toFixed(2)}` });
+      attempts.push({ source, outcome: "low_quality", detail: `han=${quality.hanLineRatio.toFixed(2)} coverage=${coverage.toFixed(2)} timing=${quality.timingIssue ?? "-"}` });
       return null;
     }
     attempts.push({ source, outcome: "used", detail: `${track.lang}/${track.kind}` });
@@ -77,9 +77,9 @@ async function tryLrclib(video: VideoMeta, lrclib: LrclibSearch, attempts: Lyric
     return null;
   }
   const lines = parseLrc(picked.item.syncedLyrics!);
-  const quality = assessLyricQuality(lines);
+  const quality = assessLyricQuality(lines, video.durationSec);
   if (quality.verdict !== "ok") {
-    attempts.push({ source, outcome: "low_quality", detail: `han=${quality.hanLineRatio.toFixed(2)}` });
+    attempts.push({ source, outcome: "low_quality", detail: `han=${quality.hanLineRatio.toFixed(2)} timing=${quality.timingIssue ?? "-"}` });
     return null;
   }
   attempts.push({ source, outcome: "used", detail: `id=${picked.item.id} gap=${picked.gapSec.toFixed(1)}s` });

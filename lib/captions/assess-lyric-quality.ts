@@ -2,6 +2,8 @@ import type { CaptionLine } from "./caption-provider-types";
 
 export type ChineseScript = "simplified" | "traditional" | "mixed" | "unknown";
 
+export type TimingIssue = "ends_past_video" | null;
+
 export interface LyricQuality {
   lineCount: number;
   /** Tỉ lệ dòng có phần lớn là chữ Hán (tiêu chí IN-03). */
@@ -14,11 +16,16 @@ export interface LyricQuality {
   /** Số dòng vừa có chữ Hán vừa có ≥ 3 chữ Latin (song ngữ / pinyin). */
   bilingualLineCount: number;
   script: ChineseScript;
+  /** Dòng cuối kết thúc quá xa sau khi video đã hết: dấu hiệu lời thuộc một bản khác (dài hơn). */
+  timingIssue: TimingIssue;
   verdict: "ok" | "unsupported";
 }
 
 // Dưới ngưỡng này thì báo "Bài này chưa hỗ trợ" (IN-03).
 export const MIN_HAN_LINE_RATIO = 0.6;
+// Dòng cuối kết thúc trễ hơn video quá ngưỡng này (giây) coi là lời thuộc bản khác (live dài hơn, bản đầy đủ của bản rút gọn…).
+// Cho biên độ vì mốc thời gian caption/LRCLIB có thể lệch vài giây so với contentDetails.duration của YouTube.
+export const MAX_TIMING_OVERRUN_SEC = 15;
 
 const HAN = /\p{Script=Han}/gu;
 const LATIN = /[A-Za-z]/g;
@@ -48,7 +55,8 @@ function median(values: number[]): number {
   return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
 }
 
-export function assessLyricQuality(lines: CaptionLine[]): LyricQuality {
+/** `videoDurationSec` không bắt buộc (không phải mọi nơi gọi đều biết trước độ dài video). */
+export function assessLyricQuality(lines: CaptionLine[], videoDurationSec?: number): LyricQuality {
   let hanLines = 0;
   let bilingual = 0;
   let han = 0;
@@ -63,6 +71,9 @@ export function assessLyricQuality(lines: CaptionLine[]): LyricQuality {
   }
   const hanLineRatio = lines.length ? hanLines / lines.length : 0;
   const durations = lines.map((l) => Math.max(0, l.end - l.start));
+  const lastEnd = lines.reduce((max, l) => Math.max(max, l.end), 0);
+  const timingIssue: TimingIssue =
+    videoDurationSec !== undefined && lastEnd > videoDurationSec + MAX_TIMING_OVERRUN_SEC ? "ends_past_video" : null;
   return {
     lineCount: lines.length,
     hanLineRatio,
@@ -71,6 +82,7 @@ export function assessLyricQuality(lines: CaptionLine[]): LyricQuality {
     medianLineSec: median(durations),
     bilingualLineCount: bilingual,
     script: detectScript(lines.map((l) => l.text).join("")),
-    verdict: hanLineRatio >= MIN_HAN_LINE_RATIO ? "ok" : "unsupported",
+    timingIssue,
+    verdict: hanLineRatio >= MIN_HAN_LINE_RATIO && !timingIssue ? "ok" : "unsupported",
   };
 }

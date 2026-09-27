@@ -38,3 +38,13 @@ describe("pickLrclibVersion", () => {
     expect(pickLrclibVersion([item({})], { ...video, durationSec: 0 })).toBeNull();
   });
 });
+
+describe("pickLrclibVersion — bắt buộc khớp nghệ sĩ trừ khi độ dài gần như trùng", () => {
+  it("không khớp nghệ sĩ, độ dài lệch vừa phải (trong MAX nhưng ngoài ARTIST_OPTIONAL) → null", () => {
+    expect(pickLrclibVersion([item({ artistName: "Ca sĩ khác", duration: 196 })], video)).toBeNull(); // gap = 8
+  });
+  it("không khớp nghệ sĩ nhưng độ dài gần như trùng khớp (≤ ARTIST_OPTIONAL_GAP_SEC) → vẫn chọn", () => {
+    const picked = pickLrclibVersion([item({ id: 9, artistName: "Ca sĩ khác", duration: 203 })], video); // gap = 1
+    expect(picked?.item.id).toBe(9);
+  });
+});

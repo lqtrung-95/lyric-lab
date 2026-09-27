@@ -4,7 +4,7 @@ import { decideUsable } from "./caption-spike-row";
 
 const q = (verdict: "ok" | "unsupported"): LyricQuality => ({
   lineCount: 30, hanLineRatio: verdict === "ok" ? 1 : 0, hanCharRatio: 1, coverageSec: 100,
-  medianLineSec: 4, bilingualLineCount: 0, script: "simplified", verdict,
+  medianLineSec: 4, bilingualLineCount: 0, script: "simplified", timingIssue: null, verdict,
 });
 
 describe("decideUsable", () => {

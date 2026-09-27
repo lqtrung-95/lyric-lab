@@ -20,6 +20,24 @@ const setTime = (page: Page, t: number) => page.evaluate((v) => { (window as unk
 const calls = (page: Page) => page.evaluate(() => (window as unknown as { __yt: string[] }).__yt);
 const line = (page: Page, n: number) => page.locator(`[data-line-index="${n - 1}"]`);
 
+/**
+ * Cuộn xuống đáy và đợi vị trí ổn định: `document.body.scrollHeight` đo ngay sau đổi cỡ cửa sổ có thể
+ * chưa tính layout mới (font, sticky player) nên một lần `scrollTo` có khi dừng giữa chừng. Cuộn lại tới
+ * khi vị trí không đổi nữa mới coi là đã tới đáy thật.
+ */
+async function scrollToBottom(page: Page) {
+  await page.waitForFunction(
+    () => {
+      const before = window.scrollY;
+      window.scrollTo(0, document.documentElement.scrollHeight);
+      const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 1;
+      return atBottom && window.scrollY === before;
+    },
+    null,
+    { polling: 100, timeout: 10_000 },
+  );
+}
+
 test.beforeEach(async ({ page }) => {
   await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.goto("/dev/listen-fixture");
@@ -165,7 +183,7 @@ test.describe("thanh điều khiển nhanh khi cuộn xuống", () => {
     const mini = page.getByRole("group", { name: "Điều khiển nhanh" });
     await expect(mini).toHaveCount(0); // thanh chính đang thấy: chưa cần thanh thu gọn
     await page.setViewportSize({ width: 1280, height: 520 });
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await scrollToBottom(page);
     await expect(mini).toBeVisible();
 
     await mini.getByRole("button", { name: /Tạm dừng|Phát/ }).click();

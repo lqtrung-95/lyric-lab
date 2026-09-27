@@ -43,3 +43,21 @@ describe("assessLyricQuality", () => {
     expect(q.medianLineSec).toBe(0);
   });
 });
+
+describe("assessLyricQuality — timingIssue (lời thuộc bản khác dài hơn video)", () => {
+  it("dòng cuối kết thúc quá xa sau khi video hết → ends_past_video, verdict unsupported", () => {
+    const q = assessLyricQuality([L("窗外的城市慢慢睡了", 0, 5), L("我从来没想过会离开", 300, 320)], 200);
+    expect(q.timingIssue).toBe("ends_past_video");
+    expect(q.verdict).toBe("unsupported");
+  });
+  it("lệch trong biên độ cho phép (đo thời gian không tuyệt đối chính xác) → không bị coi là lỗi", () => {
+    const q = assessLyricQuality([L("窗外的城市慢慢睡了", 0, 5), L("我从来没想过会离开", 190, 210)], 200);
+    expect(q.timingIssue).toBeNull();
+    expect(q.verdict).toBe("ok");
+  });
+  it("không truyền độ dài video → bỏ qua kiểm tra này (hành vi cũ)", () => {
+    const q = assessLyricQuality([L("窗外的城市慢慢睡了", 0, 5), L("我从来没想过会离开", 300, 320)]);
+    expect(q.timingIssue).toBeNull();
+    expect(q.verdict).toBe("ok");
+  });
+});
