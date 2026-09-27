@@ -41,3 +41,13 @@ describe("createGroqChat", () => {
     expect(calls).toBe(1);
   });
 });
+
+describe("stripCodeFence", () => {
+  it("gỡ khối ```json và ``` trơn, giữ nguyên JSON thường", async () => {
+    const { stripCodeFence } = await import("./groq-chat");
+    expect(stripCodeFence('```json\n{"a":1}\n```')).toBe('{"a":1}');
+    expect(stripCodeFence('```\n{"a":1}\n```')).toBe('{"a":1}');
+    expect(stripCodeFence('  ```json {"a":1}```  ')).toBe('{"a":1}');
+    expect(stripCodeFence('{"a":"```"}')).toBe('{"a":"```"}');
+  });
+});

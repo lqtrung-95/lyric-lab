@@ -31,42 +31,51 @@ export function StreakCard() {
   }
 
   return (
-    <section aria-label="Chuỗi ngày học" className="mt-space-md flex flex-wrap items-center gap-x-space-lg gap-y-space-sm rounded-2xl bg-surface-container-low p-space-md">
+    <section aria-label="Chuỗi ngày học" className="mt-space-md flex flex-col gap-2 rounded-2xl bg-surface-container-low px-space-md py-3 md:flex-row md:items-center md:gap-space-lg">
       <div className="flex items-center gap-3">
-        <span aria-hidden="true" className={`flex h-14 w-14 items-center justify-center rounded-full ${streak.current > 0 ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container-high text-on-surface-variant"}`}>
+        <span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${streak.current > 0 ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container-high text-on-surface-variant"}`}>
           <Icon name="local_fire_department" filled />
         </span>
-        <div>
-          <p className="font-serif text-headline-md text-on-surface">{streak.current} <span className="text-body-md text-on-surface-variant">ngày liên tiếp</span></p>
+        <div className="min-w-0 flex-1">
+          <p className="font-serif text-headline-md leading-tight text-on-surface">{streak.current} <span className="font-sans text-body-md text-on-surface-variant">ngày liên tiếp</span></p>
           <p className="text-label-md text-on-surface-variant">
             {streak.studiedToday ? "Hôm nay bạn đã học rồi" : streak.current > 0 ? "Học hôm nay để giữ chuỗi" : "Học một chút hôm nay để bắt đầu chuỗi"}
             {streak.longest > streak.current && ` · kỷ lục ${streak.longest}`}
           </p>
         </div>
+        {/* Điện thoại: nút chia sẻ nằm cùng hàng với số chuỗi (chỉ icon) để thẻ không dài ra. */}
+        <ShareButton onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0} className="md:hidden" />
       </div>
 
-      <div className="min-w-0 flex-1">
-        <ol aria-label={`Tuần này: học ${streak.weekCount} trên ${WEEKLY_GOAL_DAYS} ngày mục tiêu`} className="flex justify-between gap-1 sm:justify-start sm:gap-3">
+      <div className="min-w-0 md:flex-1">
+        <ol aria-label={`Tuần này: học ${streak.weekCount} trên ${WEEKLY_GOAL_DAYS} ngày mục tiêu`} className="flex justify-between gap-1 md:justify-start md:gap-3">
           {streak.week.map((d, i) => (
-            <li key={d.day} className="flex flex-col items-center gap-1">
-              <span className={`flex h-9 w-9 items-center justify-center rounded-full text-label-sm ${d.studied ? "bg-secondary text-on-secondary" : "bg-surface-container-high text-on-surface-variant"} ${d.isToday ? "ring-2 ring-primary ring-offset-2 ring-offset-surface-container-low" : ""}`}>
-                {d.studied ? <Icon name="check" /> : <span aria-hidden="true">·</span>}
+            <li key={d.day} className="flex flex-col items-center gap-0.5">
+              <span className={`flex h-8 w-8 items-center justify-center rounded-full text-label-sm ${d.studied ? "bg-secondary text-on-secondary" : "bg-surface-container-high text-on-surface-variant"} ${d.isToday ? "ring-2 ring-primary ring-offset-2 ring-offset-surface-container-low" : ""}`}>
+                {d.studied ? <Icon name="check" size={18} /> : <span aria-hidden="true">·</span>}
                 <span className="sr-only">{d.studied ? "Đã học" : "Chưa học"}</span>
               </span>
-              <span className="text-label-sm text-on-surface-variant">{DAY_LABELS[i]}</span>
+              <span className="text-[11px] leading-none text-on-surface-variant">{DAY_LABELS[i]}</span>
             </li>
           ))}
         </ol>
-        <p className="mt-1 text-label-md text-on-surface-variant">{goalDone ? "Đã đạt mục tiêu tuần!" : `Mục tiêu tuần: ${streak.weekCount}/${WEEKLY_GOAL_DAYS} ngày`}</p>
+        <p className="mt-1.5 text-label-sm text-on-surface-variant">{goalDone ? "Đã đạt mục tiêu tuần!" : `Mục tiêu tuần: ${streak.weekCount}/${WEEKLY_GOAL_DAYS} ngày`}</p>
       </div>
 
-      <div className="flex flex-col items-start">
-        <button type="button" onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-label-md font-medium text-primary hover:bg-surface-container disabled:opacity-50">
-          <Icon name="share" /> Chia sẻ
-        </button>
+      <div className="hidden md:block">
+        <ShareButton onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0} withLabel />
         {note && <p role="status" className="text-label-sm text-on-surface-variant">{note}</p>}
       </div>
+      {note && <p role="status" className="text-label-sm text-on-surface-variant md:hidden">{note}</p>}
     </section>
+  );
+}
+
+function ShareButton({ onClick, disabled, withLabel = false, className = "" }: { onClick: () => void; disabled: boolean; withLabel?: boolean; className?: string }) {
+  return (
+    <button type="button" onClick={onClick} disabled={disabled} aria-label="Chia sẻ"
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-full text-label-md font-medium text-primary hover:bg-surface-container disabled:opacity-50 ${withLabel ? "px-4" : "min-w-11"} ${className}`}>
+      <Icon name="share" />{withLabel && "Chia sẻ"}
+    </button>
   );
 }

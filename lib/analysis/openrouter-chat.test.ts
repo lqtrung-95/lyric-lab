@@ -11,6 +11,7 @@ describe("createChatRouter", () => {
     expect(await chat(req("openai/gpt-oss-120b"))).toBe("g");
     expect(await chat(req("openrouter:qwen/qwen3.7-flash"))).toBe("o");
     expect(or).toHaveBeenCalledWith(expect.objectContaining({ model: "qwen/qwen3.7-flash" }));
+    expect(or).toHaveBeenCalledWith(expect.objectContaining({ maxTokens: 9000 }));
     expect(groq).toHaveBeenCalledTimes(1);
   });
   it("thiếu khóa OpenRouter thì báo lỗi để pipeline thử model kế tiếp", async () => {

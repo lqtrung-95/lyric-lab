@@ -45,6 +45,12 @@ export interface CompatChatOptions {
   sleep?: (ms: number) => Promise<void>;
 }
 
+/** Gỡ khối mã markdown (```json ... ```) mà một số model (vd. Claude) bọc quanh JSON dù đã yêu cầu chỉ trả JSON. */
+export function stripCodeFence(content: string): string {
+  const m = content.trim().match(/^```[a-zA-Z]*\s*\n?([\s\S]*?)\n?```$/);
+  return m ? m[1].trim() : content;
+}
+
 /** Client chat cho API tương thích OpenAI (Groq, OpenRouter): tự chờ và thử lại khi bị giới hạn 429. */
 export function createCompatChat(opts: CompatChatOptions): ChatFn {
   const { endpoint, label, apiKey, maxRetries = MAX_RATE_LIMIT_RETRIES, maxWaitSec = MAX_WAIT_SEC, params = modelParams, fetchFn = fetch, sleep = (ms) => new Promise<void>((r) => setTimeout(r, ms)) } = opts;
@@ -70,7 +76,7 @@ export function createCompatChat(opts: CompatChatOptions): ChatFn {
       if (!res.ok) throw new Error(`${label} ${model} lỗi HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
       const content = (await res.json()).choices?.[0]?.message?.content;
       if (typeof content !== "string" || !content) throw new Error(`${label} ${model} trả nội dung rỗng`);
-      return content;
+      return stripCodeFence(content);
     }
   };
 }

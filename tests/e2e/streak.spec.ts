@@ -27,6 +27,17 @@ test("thẻ chuỗi ngày học: đếm hoạt động luyện tập, hiện tu�
     await card.getByRole("button", { name: "Chia sẻ" }).click();
     expect((await download).suggestedFilename()).toBe("lyric-lab-streak.png");
 
+    // Gọn ở cả hai cỡ màn hình: không tràn ngang, không quá cao, nút chia sẻ vẫn bấm được.
+    const heights: Record<string, number> = {};
+    for (const [name, size] of [["mobile", { width: 390, height: 800 }], ["desktop", { width: 1280, height: 800 }]] as const) {
+      await page.setViewportSize(size);
+      heights[name] = (await card.boundingBox())!.height;
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+      await expect(card.getByRole("button", { name: "Chia sẻ" })).toBeVisible();
+    }
+    expect(heights.mobile).toBeLessThan(175);
+    expect(heights.desktop).toBeLessThan(100);
+
     const axe = await new AxeBuilder({ page }).analyze();
     expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
   } finally {
