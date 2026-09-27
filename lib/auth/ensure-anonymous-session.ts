@@ -1,3 +1,4 @@
+import { getTurnstileToken } from "./turnstile-token";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 
 let pending: Promise<boolean> | null = null;
@@ -19,7 +20,8 @@ async function start(): Promise<boolean> {
     const supabase = createSupabaseBrowserClient();
     const { data } = await supabase.auth.getSession();
     if (data.session) return true;
-    const { error } = await supabase.auth.signInAnonymously();
+    const captchaToken = await getTurnstileToken();
+    const { error } = await supabase.auth.signInAnonymously(captchaToken ? { options: { captchaToken } } : undefined);
     return !error;
   } catch {
     return false;
