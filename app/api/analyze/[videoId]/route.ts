@@ -46,6 +46,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ videoId:
         // Hai việc độc lập (hỏi YouTube và đọc cache): chạy song song để bài đã phân tích mở nhanh hơn.
         const [video, cached] = await Promise.all([fetchVideoMeta(videoId), readCachedAnalysis(videoId)]);
         if (!video) return fail("video_not_found");
+        // Video không nhúng được thì học không có nhạc: chặn ngay, chưa tốn lượt phân tích hay Groq.
+        if (video.embeddable === false) return fail("video_not_embeddable");
         send("meta", { title: video.title, channelTitle: video.channelTitle, durationSec: video.durationSec });
 
         if (cached) return send("done", { fromCache: true });

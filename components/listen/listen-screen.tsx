@@ -172,6 +172,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             visible={!controlsInView} ready={!!controller} playing={playing} onTogglePlay={togglePlay}
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
             looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
+            offset={offset} onOffsetChange={setOffset}
           />
         </div>
         <div className="lg:sticky lg:top-24 lg:col-span-5">

@@ -159,7 +159,7 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, grade, onE
             })}
           </div>
           {phase === "answered" && (
-            <div role="status" className="mt-space-md rounded-2xl bg-surface-container-low p-space-md">
+            <div role="status" className="sticky bottom-3 z-10 mt-space-md rounded-2xl bg-surface-container-low p-space-md shadow-lg ring-1 ring-outline-variant">
               <p className="text-body-lg font-semibold text-on-surface">{picked === step.card.term ? "Chính xác!" : picked === "" ? "Hụt rồi, câu hát đã qua." : "Chưa đúng."}</p>
               <p className="mt-1 flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant">
                 <span lang="zh" className="font-serif text-headline-md text-on-surface">{step.card.term}</span>

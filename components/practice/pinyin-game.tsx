@@ -142,7 +142,7 @@ export function PinyinGame({ cards, grade, onRoundEnd }: Props) {
       </form>
 
       {feedback && (
-        <div role="status" className="mt-space-md rounded-2xl bg-surface-container-low p-space-md">
+        <div role="status" className="sticky bottom-3 z-10 mt-space-md rounded-2xl bg-surface-container-low p-space-md shadow-lg ring-1 ring-outline-variant">
           <p className="text-body-lg font-semibold text-on-surface">{FEEDBACK[feedback.result]}{feedback.points > 0 && <span className="ml-2 text-secondary">+{feedback.points}</span>}</p>
           <p className="mt-1 text-body-md text-on-surface-variant">Đáp án: <span className="font-semibold text-primary">{card.pinyin}</span>{card.han_viet && <> · <span className="uppercase tracking-wider text-secondary">{card.han_viet}</span></>}</p>
           <button ref={nextRef} type="button" onClick={next} className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">{index + 1 >= deck.length || (challenge && lives <= 0) ? "Xem kết quả" : "Từ tiếp theo"}</button>

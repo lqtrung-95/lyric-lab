@@ -24,6 +24,12 @@ const COPY: Record<AnalysisErrorCode, ErrorCopy> = {
     body: "Video có thể đã bị xóa hoặc để chế độ riêng tư. Hãy kiểm tra lại link.",
     retry: false,
   },
+  video_not_embeddable: {
+    icon: "warning",
+    title: "Video này không phát được trong app",
+    body: "Chủ video đã tắt cho phép nhúng nên Lyric Lab không thể phát nhạc. Hãy thử một phiên bản khác của bài hát (bản lyric, bản audio) trên YouTube.",
+    retry: false,
+  },
   invalid_video: { icon: "warning", title: "Link chưa đúng", body: "Hãy dán link video YouTube.", retry: false },
   rate_limited: {
     icon: "hourglass_top",

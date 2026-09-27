@@ -2,6 +2,7 @@
 export type AnalysisErrorCode =
   | "invalid_video"
   | "video_not_found"
+  | "video_not_embeddable"
   | "no_lyrics"
   | "rate_limited"
   | "auth_required"

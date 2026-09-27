@@ -8,6 +8,8 @@ export interface VideoMeta {
   title: string;
   channelTitle: string;
   durationSec: number;
+  /** false = chủ video tắt nhúng nên không phát được trong app. */
+  embeddable?: boolean;
 }
 
 /** Một bước thử lấy lời, để log và thống kê tỉ lệ thành công theo nguồn. */

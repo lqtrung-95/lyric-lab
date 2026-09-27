@@ -174,8 +174,19 @@ test.describe("thanh điều khiển nhanh khi cuộn xuống", () => {
     expect((await calls(page)).some((c) => c.startsWith("seek:"))).toBe(true);
     await mini.getByRole("button", { name: /^Tốc độ 1x/ }).click();
     expect((await calls(page)).includes("rate:0.5")).toBe(true);
+    // Chỉnh lời lệch ngay trên thanh: mở bảng nhỏ, +0,5 giây thì hiện +0,5s và nút "tune" báo đang lệch.
+    await mini.getByRole("button", { name: /^Chỉnh lời lệch/ }).click();
+    await mini.getByRole("button", { name: "Lời muộn hơn 0,5 giây" }).click();
+    await expect(mini.getByRole("group", { name: "Chỉnh lời lệch" }).locator("output")).toHaveText("+0.5s");
+    await mini.getByRole("button", { name: "Lời sớm hơn 0,5 giây" }).click();
     // Chỉ kiểm tra thanh thu gọn (các dòng lời mờ dần là thiết kế có sẵn, đã được kiểm tra riêng ở accessibility.spec).
     expect((await new AxeBuilder({ page }).include('[aria-label="Điều khiển nhanh"]').analyze()).violations).toEqual([]);
+
+    // Điện thoại: thanh ghim sát đáy màn hình, không nằm giữa lời.
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+    const box = await page.getByRole("group", { name: "Điều khiển nhanh" }).locator("> div").first().boundingBox();
+    expect(box!.y + box!.height).toBeGreaterThan(800 - 24);
 
     // Cuộn lên đầu: khi cửa sổ đủ cao để thấy thanh chính thì thanh thu gọn ẩn lại.
     await page.setViewportSize({ width: 1280, height: 900 });
