@@ -41,6 +41,22 @@ describe("validateLlmOutput", () => {
     expect(v.dropped.map((d) => d.reason)).toEqual(["không có trong danh sách ứng viên", "trùng"]);
   });
 
+  it("loại từ có nghĩa cụt (chỉ cụm dẫn nhập, không có nội dung theo sau)", () => {
+    const v = validateLlmOutput({ ...base, vocab: [
+      { term: "城市", meaningInContext: "Ở câu này", priority: 80 },
+      { term: "离开", meaningInContext: "Trong câu này.", priority: 70 },
+    ] }, lines, candidates);
+    expect(v.vocab).toEqual([]);
+    expect(v.dropped.map((d) => d.reason)).toEqual(["nghĩa cụt, chỉ có cụm dẫn nhập", "nghĩa cụt, chỉ có cụm dẫn nhập"]);
+  });
+
+  it("giữ nghĩa hợp lệ dù bắt đầu bằng cụm dẫn nhập, miễn có nội dung theo sau", () => {
+    const v = validateLlmOutput({ ...base, vocab: [
+      { term: "城市", meaningInContext: "Ở câu này mang nghĩa là nơi đông người sinh sống.", priority: 80 },
+    ] }, lines, candidates);
+    expect(v.vocab).toHaveLength(1);
+  });
+
   it("ngữ pháp: chỉ giữ dòng khớp, loại mục không khớp dòng nào", () => {
     const v = validateLlmOutput({ ...base, grammar: [
       { pattern: "从来没 + V + 过", explanation: "e", example: { zh: "z", vi: "v" }, lineIndexes: [0, 1, 99], priority: 70 },

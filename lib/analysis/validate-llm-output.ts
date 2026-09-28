@@ -30,6 +30,11 @@ export interface ValidatedOutput {
 
 import { grammarCharRanges } from "./grammar-ranges";
 
+// Model đôi khi chỉ trả về đúng cụm dẫn nhập ("Ở câu này", "Trong câu này"...) mà cụt luôn không có nội dung nghĩa
+// thật theo sau — chuỗi không rỗng nên qua được schema, nhưng vô nghĩa với người học. Loại các mục như vậy.
+const INCOMPLETE_MEANING = /^(ở|trong)\s+(câu|ngữ cảnh)\s*này\s*[.,:;]?$/iu;
+const isIncompleteMeaning = (s: string): boolean => INCOMPLETE_MEANING.test(s.trim());
+
 /** Mọi cụm chữ Hán trong công thức phải xuất hiện theo thứ tự trong dòng (bỏ qua A, B, V, O, dấu +). */
 export const patternMatchesLine = (pattern: string, lineSimplified: string): boolean => grammarCharRanges(pattern, lineSimplified).length > 0;
 
@@ -51,6 +56,7 @@ export function validateLlmOutput(out: LlmOutput, lines: TokenizedLine[], candid
     const candidate = byTerm.get(v.term);
     if (!candidate) dropped.push({ kind: "vocab", ref: v.term, reason: "không có trong danh sách ứng viên" });
     else if (seen.has(candidate.term)) dropped.push({ kind: "vocab", ref: v.term, reason: "trùng" });
+    else if (isIncompleteMeaning(v.meaningInContext)) dropped.push({ kind: "vocab", ref: v.term, reason: "nghĩa cụt, chỉ có cụm dẫn nhập" });
     else {
       seen.add(candidate.term);
       vocab.push({ candidate, meaningInContext: v.meaningInContext, contextNote: v.contextNote, priority: v.priority });
@@ -67,6 +73,10 @@ export function validateLlmOutput(out: LlmOutput, lines: TokenizedLine[], candid
       .filter((m) => m.ranges.length > 0);
     if (matched.length === 0) {
       dropped.push({ kind: "grammar", ref: g.pattern, reason: "công thức không khớp dòng lời nào được nêu" });
+      continue;
+    }
+    if (isIncompleteMeaning(g.explanation)) {
+      dropped.push({ kind: "grammar", ref: g.pattern, reason: "giải thích cụt, chỉ có cụm dẫn nhập" });
       continue;
     }
     grammar.push({
