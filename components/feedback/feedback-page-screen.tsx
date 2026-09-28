@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { SelectField } from "@/components/ui/select-field";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Toast } from "@/components/ui/toast";
 import { FEEDBACK_CATEGORIES, FEEDBACK_CATEGORY_LABELS, type FeedbackCategory } from "@/lib/feedback/feedback-schema";
 import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
 
@@ -16,8 +17,9 @@ const fmtDate = (iso: string) => new Date(iso).toLocaleDateString("vi-VN");
 export function FeedbackPageScreen() {
   const [category, setCategory] = useState<FeedbackCategory>("bug");
   const [message, setMessage] = useState("");
-  const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [sendStatus, setSendStatus] = useState<"idle" | "sending" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState(false);
   const [mine, setMine] = useState<MineItem[] | null>(null);
   const [community, setCommunity] = useState<PublicItem[] | null>(null);
 
@@ -45,9 +47,9 @@ export function FeedbackPageScreen() {
         return;
       }
       setMessage("");
-      setSendStatus("sent");
+      setSendStatus("idle");
+      setToast(true);
       loadMine();
-      setTimeout(() => setSendStatus("idle"), 2500);
     } catch {
       setError("Chưa gửi được, thử lại sau nhé.");
       setSendStatus("error");
@@ -83,8 +85,8 @@ export function FeedbackPageScreen() {
             </button>
           </div>
         </div>
-        {sendStatus === "sent" && <p role="status" className="mt-2 text-label-md text-secondary">Cảm ơn bạn đã góp ý! Mình sẽ xem sớm.</p>}
       </form>
+      {toast && <Toast message="Cảm ơn bạn đã góp ý! Mình sẽ xem sớm." onDismiss={() => setToast(false)} />}
 
       <div className="grid grid-cols-1 gap-space-md md:grid-cols-2">
         <section aria-labelledby="mine-heading">
