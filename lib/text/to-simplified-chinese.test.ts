@@ -8,4 +8,7 @@ describe("toSimplifiedChinese", () => {
   it("giữ nguyên giản thể, chữ Latin và số", () => {
     expect(toSimplifiedChinese("窗外的城市 abc 123")).toBe("窗外的城市 abc 123");
   });
+  it("đổi 妳 thành 你: OpenCC coi hợp lệ ở cả hai thể nên không tự đổi, nhưng từ điển chỉ có mục theo 你", () => {
+    expect(toSimplifiedChinese("妳爱我")).toBe("你爱我");
+  });
 });
