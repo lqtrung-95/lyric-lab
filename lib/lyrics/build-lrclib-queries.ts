@@ -6,7 +6,8 @@ const NOISE =
 // Câu trích lời trong 『』「」 (có chữ Hán) là lời bài hát, không dùng để tìm.
 const QUOTED_LYRIC = /[『「][^』」]*\p{Script=Han}[^』」]*[』」]/gu;
 const BRACKETED = /[【\[《](.+?)[】\]》]/g;
-const HAN_RUN = /\p{Script=Han}{2,}/gu;
+// Số xen giữa chữ Hán vẫn thuộc tên bài (vd. "第57次取消發送"), nên gộp luôn số vào cụm; lọc lại để loại cụm toàn số.
+const HAN_RUN = /[\p{Script=Han}0-9]{2,}/gu;
 const MAX_QUERIES = 5;
 
 const tidy = (s: string) => s.replace(/[(（]\s*[)）]/g, " ").replace(/[-–—|｜·•『』「」]+/g, " ").replace(/\s+/g, " ").trim();
@@ -21,7 +22,10 @@ const clean = (s: string) => tidy(s.replace(NOISE, " "));
 export function buildLrclibQueries(title: string): string[] {
   const noQuotedLyrics = title.replace(QUOTED_LYRIC, " ");
   const withoutNoise = noQuotedLyrics.replace(NOISE, " ");
-  const hanRuns = [...withoutNoise.matchAll(HAN_RUN)].map((m) => toSimplifiedChinese(m[0]));
+  const hanRuns = [...withoutNoise.matchAll(HAN_RUN)]
+    .map((m) => m[0])
+    .filter((s) => /\p{Script=Han}/u.test(s)) // bỏ cụm toàn số lọt qua (vd. năm tháng còn sót sau khi lọc NOISE)
+    .map(toSimplifiedChinese);
   const bracketed = [...noQuotedLyrics.matchAll(BRACKETED)]
     .map((m) => clean(m[1]))
     .filter((s) => /\p{Script=Han}/u.test(s));

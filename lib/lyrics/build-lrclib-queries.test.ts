@@ -27,6 +27,12 @@ describe("buildLrclibQueries", () => {
     expect(q[0]).toBe("歌手甲 夜车");
   });
 
+  it("giữ số xen giữa chữ Hán trong tên bài (vd. thứ tự trong tên bài)", () => {
+    const q = buildLrclibQueries("歌手甲 - 第57次取消發送「trích lời」(可轉伴奏)");
+    expect(q).toContain("第57次取消发送"); // không rớt mất số 57
+    expect(q).not.toContain("次取消发送"); // không có bản thiếu số làm truy vấn riêng
+  });
+
   it("tối đa 5 truy vấn, không trùng (kể cả phồn/giản)", () => {
     const q = buildLrclibQueries("夜車【夜车】【夜車】");
     expect(q.length).toBeLessThanOrEqual(5);
