@@ -53,8 +53,10 @@ export function LeaderboardScreen() {
 
   const joined = data?.profile?.optedIn === true;
   const shown = data?.entries ?? [];
-  const podium = shown.slice(0, 3);
-  const rest = shown.slice(3);
+  // Bục chỉ đẹp khi có ít nhất 2 người để so sánh; 1 người thì hiện dạng danh sách thường như bình thường.
+  const useTop3Podium = shown.length >= 2;
+  const podium = useTop3Podium ? shown.slice(0, 3) : [];
+  const rest = useTop3Podium ? shown.slice(3) : shown;
   const meOutside = data?.me && !shown.some((e) => e.isMe);
 
   return (
