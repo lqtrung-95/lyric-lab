@@ -34,7 +34,11 @@ export function SongLikeButton({ videoId, liked, onChange }: SongLikeButtonProps
     <button
       type="button" onClick={toggle} disabled={pending} aria-pressed={shown}
       aria-label={shown ? "Bỏ thích bài này" : "Thích bài này"}
-      className="flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 disabled:opacity-70"
+      // Đã thích thì luôn hiện (để thấy ngay bài mình thích); chưa thích thì chỉ hiện khi chạm/di chuột qua thẻ trên desktop,
+      // đỡ rợp mắt vì mọi thẻ đều có icon tim thường trực.
+      className={`flex h-9 w-9 items-center justify-center rounded-full bg-black/55 text-white opacity-90 backdrop-blur-sm transition-opacity hover:bg-black/75 focus-visible:opacity-100 disabled:opacity-70 ${
+        shown ? "" : "md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+      }`}
     >
       <Icon name={shown ? "favorite" : "favorite_border"} filled={shown} size={18} className={shown ? "text-error" : undefined} />
     </button>

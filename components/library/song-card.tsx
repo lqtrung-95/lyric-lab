@@ -12,11 +12,12 @@ interface SongCardProps {
   sizes: string;
   /** Nhãn nhỏ dưới tên kênh (vd. cấp HSK trung bình, số người đã học ở tab Khám phá). */
   meta?: string;
-  /** Có thì hiện nút xóa bài khỏi danh sách (nút nằm ngoài liên kết, không lồng trong thẻ <a>). */
+  /** Có thì hiện nút xóa bài khỏi danh sách, ở góc trên-phải ảnh (nút nằm ngoài liên kết, không lồng trong thẻ <a>). */
   onRemove?: () => void;
-  /** Nút riêng cho quản trị viên (ẩn/xóa bài khỏi Khám phá), đặt ở góc trái để không đè lên onRemove. */
+  /** Nút riêng cho quản trị viên (ẩn/xóa bài khỏi Khám phá), đặt ở góc trên-trái ảnh. */
   adminActions?: React.ReactNode;
-  /** Nút tim yêu thích, đặt cùng hàng với onRemove ở góc phải. */
+  /** Nút tim yêu thích, đặt ở góc dưới-trái ảnh: góc duy nhất luôn rảnh (trên-trái là admin, trên-phải là xóa,
+   * dưới-phải là icon phát khi thẻ không có thanh tiến độ). */
   likeButton?: React.ReactNode;
 }
 
@@ -56,20 +57,20 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, 
         )}
       </div>
       </Link>
-      {adminActions && <div className="absolute left-2 top-2 flex gap-1">{adminActions}</div>}
-      {(likeButton || onRemove) && (
-        <div className="absolute right-2 top-2 flex items-center gap-1">
-          {likeButton}
-          {onRemove && (
-            <button
-              type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white opacity-90 backdrop-blur-sm transition-opacity hover:bg-black/75 focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-            >
-              <Icon name="close" size={20} />
-            </button>
-          )}
-        </div>
-      )}
+      {/* Vùng nút nổi trên ảnh: box này khớp đúng kích thước ảnh (cùng aspect-video) dù thẻ rộng bao nhiêu, nhờ vậy các
+          nút nằm đúng 4 góc ảnh dù đặt ngoài <Link> (không lồng phần tử bấm được vào trong thẻ <a>, theo quy tắc a11y). */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 aspect-video">
+        {adminActions && <div className="pointer-events-auto absolute left-2 top-2 flex gap-1">{adminActions}</div>}
+        {likeButton && <div className="pointer-events-auto absolute bottom-2 left-2">{likeButton}</div>}
+        {onRemove && (
+          <button
+            type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}
+            className="pointer-events-auto absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white opacity-90 backdrop-blur-sm transition-opacity hover:bg-black/75 focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+          >
+            <Icon name="close" size={20} />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
