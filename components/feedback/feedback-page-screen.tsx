@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { SelectField } from "@/components/ui/select-field";
+import { Skeleton } from "@/components/ui/skeleton";
 import { FEEDBACK_CATEGORIES, FEEDBACK_CATEGORY_LABELS, type FeedbackCategory } from "@/lib/feedback/feedback-schema";
 import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
 
@@ -90,7 +91,7 @@ export function FeedbackPageScreen() {
           <h2 id="mine-heading" className="font-serif text-headline-md text-on-surface">Góp ý của bạn</h2>
           <div className="mt-space-sm flex flex-col gap-space-sm">
             {mine === null ? (
-              <p className="text-body-md text-on-surface-variant">Đang tải…</p>
+              <FeedbackCardSkeletons />
             ) : mine.length === 0 ? (
               <p className="rounded-2xl bg-surface-container-low p-space-md text-body-md text-on-surface-variant">Bạn chưa gửi góp ý nào.</p>
             ) : (
@@ -112,7 +113,7 @@ export function FeedbackPageScreen() {
           <h2 id="community-heading" className="font-serif text-headline-md text-on-surface">Góp ý từ cộng đồng</h2>
           <div className="mt-space-sm flex flex-col gap-space-sm">
             {community === null ? (
-              <p className="text-body-md text-on-surface-variant">Đang tải…</p>
+              <FeedbackCardSkeletons />
             ) : community.length === 0 ? (
               <p className="rounded-2xl bg-surface-container-low p-space-md text-body-md text-on-surface-variant">Chưa có góp ý nào được duyệt.</p>
             ) : (
@@ -132,6 +133,23 @@ export function FeedbackPageScreen() {
           </div>
         </section>
       </div>
+    </div>
+  );
+}
+
+function FeedbackCardSkeletons() {
+  return (
+    <div role="status" aria-label="Đang tải" className="flex flex-col gap-space-sm">
+      <span className="sr-only">Đang tải…</span>
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="flex gap-3 rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm">
+          <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

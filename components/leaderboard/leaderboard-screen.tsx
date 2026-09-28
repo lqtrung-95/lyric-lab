@@ -6,6 +6,7 @@ import { track } from "@/lib/analytics/track";
 import { Icon } from "@/components/ui/icon";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { formatTimeLeft } from "@/lib/leaderboard/week";
+import { Skeleton } from "@/components/ui/skeleton";
 import { AvatarCircle } from "./avatar-circle";
 import { AvatarUploader } from "./avatar-uploader";
 import { NicknameForm } from "./nickname-form";
@@ -68,7 +69,16 @@ export function LeaderboardScreen() {
 
         <section aria-label="Tham gia bảng xếp hạng" className="mt-space-md rounded-2xl bg-surface-container-low p-space-md">
           {data === null ? (
-            <p className="text-body-md text-on-surface-variant">Đang tải…</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-16 w-16 rounded-full" />
+                <Skeleton className="h-5 w-48" />
+              </div>
+              <div className="flex gap-1">
+                <Skeleton className="h-11 w-32 rounded-full" />
+                <Skeleton className="h-11 w-36 rounded-full" />
+              </div>
+            </div>
           ) : joined && !editing ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -102,7 +112,23 @@ export function LeaderboardScreen() {
         {failed ? (
           <p role="alert" className="mt-space-md text-body-md text-error">Chưa tải được bảng xếp hạng. Thử lại sau nhé.</p>
         ) : data === null ? (
-          <p role="status" className="mt-space-md text-body-md text-on-surface-variant">Đang tải bảng xếp hạng…</p>
+          <div role="status" aria-label="Đang tải bảng xếp hạng">
+            <span className="sr-only">Đang tải bảng xếp hạng…</span>
+            <div className="mt-space-md grid grid-cols-3 items-end gap-2 sm:gap-3">
+              <Skeleton className="h-40 rounded-2xl" />
+              <Skeleton className="h-48 rounded-2xl" />
+              <Skeleton className="h-36 rounded-2xl" />
+            </div>
+            <div className="mt-space-md flex flex-col gap-2 rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex items-center gap-3 px-2 py-1.5">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-4 flex-1" />
+                  <Skeleton className="h-6 w-14" />
+                </div>
+              ))}
+            </div>
+          </div>
         ) : shown.length === 0 ? (
           <p className="mt-space-md rounded-2xl bg-surface-container-low p-space-lg text-body-md text-on-surface-variant">Chưa có ai trên bảng {scope === "week" ? "tuần này" : ""}. Chơi một lượt luyện tập và tham gia để dẫn đầu!</p>
         ) : (
