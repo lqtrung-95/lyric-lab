@@ -168,6 +168,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
           <ReportSongButton videoId={analysis.videoId} prominent />
           <LyricList
+            videoId={analysis.videoId} promptVersion={analysis.promptVersion}
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}

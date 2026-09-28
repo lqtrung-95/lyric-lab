@@ -10,6 +10,8 @@ import { ViewToggles } from "./view-toggles";
 const MANUAL_SCROLL_PAUSE_MS = 4000;
 
 interface LyricListProps {
+  videoId: string;
+  promptVersion: string;
   lines: AnalyzedLine[];
   currentIndex: number;
   vocab: PreviewItem[];
@@ -23,7 +25,7 @@ interface LyricListProps {
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, onSeek, onWord }: LyricListProps) {
+export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, onSeek, onWord }: LyricListProps) {
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
@@ -92,6 +94,8 @@ export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, sho
           return (
             <LyricLineRow
               key={line.index}
+              videoId={videoId}
+              promptVersion={promptVersion}
               line={line}
               state={state}
               showPinyin={showPinyin}

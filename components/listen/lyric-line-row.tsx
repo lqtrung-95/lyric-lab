@@ -3,6 +3,7 @@
 import { memo } from "react";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { buildLineSegments, type HighlightSets } from "@/lib/listen/line-segments";
+import { TranslationSuggestionButton } from "./translation-suggestion-button";
 
 export type LineState = "past" | "active" | "upcoming";
 
@@ -14,6 +15,8 @@ export interface WordSelection {
 }
 
 interface LyricLineRowProps {
+  videoId: string;
+  promptVersion: string;
   line: AnalyzedLine;
   state: LineState;
   showPinyin: boolean;
@@ -27,7 +30,7 @@ interface LyricLineRowProps {
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights, onSeek, onWord }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
 
@@ -36,7 +39,7 @@ function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights
       data-line-index={line.index}
       aria-current={active ? "true" : undefined}
       onClick={() => onSeek(line.index)}
-      className={`relative flex cursor-pointer items-start gap-3 rounded-xl p-3.5 transition-colors ${
+      className={`group/line relative flex cursor-pointer items-start gap-3 rounded-xl p-3.5 transition-colors ${
         active ? "bg-surface-container p-5 shadow-md" : state === "past" ? "opacity-60 hover:bg-surface-container-low/50" : "hover:bg-surface-container-low/50"
       }`}
     >
@@ -79,7 +82,10 @@ function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights
           })}
         </p>
         {showTranslation && line.translation && (
-          <p className={active ? "text-body-lg font-medium text-primary" : "text-body-md italic text-on-surface-variant/80"}>{line.translation}</p>
+          <div className="flex items-start gap-1">
+            <p className={active ? "text-body-lg font-medium text-primary" : "text-body-md italic text-on-surface-variant/80"}>{line.translation}</p>
+            <TranslationSuggestionButton videoId={videoId} promptVersion={promptVersion} lineIndex={line.index} currentTranslation={line.translation} />
+          </div>
         )}
       </div>
     </li>

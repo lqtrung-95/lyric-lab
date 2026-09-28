@@ -1,0 +1,70 @@
+"use client";
+
+import { useState } from "react";
+import { Icon } from "@/components/ui/icon";
+
+interface TranslationSuggestionButtonProps {
+  videoId: string;
+  promptVersion: string;
+  lineIndex: number;
+  currentTranslation: string;
+}
+
+/** Nút bút chì nhỏ cạnh bản dịch một câu: mở form góp ý bản dịch tự nhiên hơn, gửi cho admin duyệt. */
+export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex, currentTranslation }: TranslationSuggestionButtonProps) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(currentTranslation);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setStatus("sending");
+    try {
+      const res = await fetch("/api/translation-suggestions", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoId, promptVersion, lineIndex, currentTranslation, suggestedTranslation: value }),
+      });
+      setStatus(res.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button" onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+        aria-label="Góp ý bản dịch câu này"
+        title="Góp ý bản dịch"
+        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 opacity-0 transition-opacity hover:bg-surface-container-high hover:text-on-surface group-hover/line:opacity-100 focus-visible:opacity-100"
+      >
+        <Icon name="edit" size={15} />
+      </button>
+    );
+  }
+
+  return (
+    <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="mt-1 flex flex-col gap-1.5 rounded-xl bg-surface-container-low p-2.5">
+      {status === "sent" ? (
+        <p role="status" className="text-label-md text-on-surface-variant">Cảm ơn góp ý! Mình sẽ xem lại câu này.</p>
+      ) : (
+        <>
+          <label htmlFor={`translation-suggest-${videoId}-${lineIndex}`} className="text-label-sm text-on-surface-variant">Bản dịch tự nhiên hơn cho câu này:</label>
+          <textarea
+            id={`translation-suggest-${videoId}-${lineIndex}`} value={value} onChange={(e) => setValue(e.target.value)}
+            required minLength={3} maxLength={500} rows={2}
+            className="rounded-lg bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface outline-none ring-2 ring-transparent focus:ring-secondary"
+          />
+          <div className="flex items-center gap-2">
+            <button type="submit" disabled={status === "sending"} className="min-h-9 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary disabled:opacity-60">
+              {status === "sending" ? "Đang gửi…" : "Gửi góp ý"}
+            </button>
+            <button type="button" onClick={() => setOpen(false)} className="min-h-9 rounded-full px-4 text-label-md text-on-surface-variant hover:bg-surface-container-high">Hủy</button>
+            {status === "error" && <p role="alert" className="text-label-sm text-error">Chưa gửi được, thử lại nhé.</p>}
+          </div>
+        </>
+      )}
+    </form>
+  );
+}
