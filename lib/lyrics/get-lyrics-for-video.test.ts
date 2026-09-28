@@ -20,6 +20,9 @@ const captions = (o: Partial<CaptionProvider> = {}): CaptionProvider => ({
 const lrclib = (items: LrclibItem[] | Error): LrclibSearch => ({
   search: async () => { if (items instanceof Error) throw items; return items; },
 });
+const netease = (items: LrclibItem[] | Error): LrclibSearch => ({
+  search: async () => { if (items instanceof Error) throw items; return items; },
+});
 
 describe("getLyricsForVideo", () => {
   it("ưu tiên caption YouTube khi đạt chất lượng, không gọi LRCLIB", async () => {
@@ -63,6 +66,22 @@ describe("getLyricsForVideo", () => {
       captions: captions({ listTracks: async () => { throw new Error("mạng"); } }),
       lrclib: lrclib(new Error("HTTP 500")),
     });
+    await expect(promise).rejects.toBeInstanceOf(NoLyricsError);
+  });
+
+  it("LRCLIB không khớp → dùng NetEase (nguồn dự phòng thứ hai)", async () => {
+    const r = await getLyricsForVideo(video, {
+      captions: captions({ listTracks: async () => [] }),
+      lrclib: lrclib([]),
+      netease: netease([lrclibItem]),
+    });
+    expect(r.source).toBe("netease");
+    expect(r.track).toEqual({ title: "夜车", artist: "歌手甲" });
+    expect(r.attempts.map((a) => `${a.source}:${a.outcome}`)).toEqual(["youtube_caption:no_data", "lrclib:no_data", "netease:used"]);
+  });
+
+  it("không truyền netease (deps.netease undefined) → bỏ qua bước đó, vẫn NoLyricsError như trước", async () => {
+    const promise = getLyricsForVideo(video, { captions: captions({ listTracks: async () => [] }), lrclib: lrclib([]) });
     await expect(promise).rejects.toBeInstanceOf(NoLyricsError);
   });
 });

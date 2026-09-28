@@ -1,7 +1,7 @@
 import type { CaptionLine } from "@/lib/captions/caption-provider-types";
 import type { ChineseScript } from "@/lib/captions/assess-lyric-quality";
 
-export type LyricsSource = "youtube_caption" | "lrclib";
+export type LyricsSource = "youtube_caption" | "lrclib" | "netease";
 
 export interface VideoMeta {
   videoId: string;

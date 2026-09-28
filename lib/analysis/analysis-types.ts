@@ -30,7 +30,7 @@ export interface VocabCandidate {
   occurrences: VocabOccurrence[];
 }
 
-export type LyricsSourceLabel = "youtube_caption" | "lrclib";
+export type LyricsSourceLabel = "youtube_caption" | "lrclib" | "netease";
 
 /**
  * Mục xem trước (PRD §8.2). `level` là cấp HSK 3.0 lấy từ từ điển (1–6, 7 = nhóm 7–9); từ ngoài HSK là null.

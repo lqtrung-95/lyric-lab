@@ -4,6 +4,7 @@ import { YoutubeInnertubeCaptionProvider } from "@/lib/captions/youtube-innertub
 import { getServerEnv } from "@/lib/env/server-env";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { LrclibProvider } from "@/lib/lyrics/lrclib-provider";
+import { NeteaseProvider } from "@/lib/lyrics/netease-provider";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
@@ -35,6 +36,7 @@ export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): Ana
   return {
     captions: new YoutubeInnertubeCaptionProvider(),
     lrclib: new LrclibProvider(),
+    netease: new NeteaseProvider(),
     cache: createSupabaseCacheDb(sb),
     chat: createChat(env),
     lookupDictionary: (terms) => lookupWords(sb as never, terms),
