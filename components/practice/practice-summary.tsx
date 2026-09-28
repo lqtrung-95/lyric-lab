@@ -23,9 +23,11 @@ export function PracticeSummary({ title, stats, missed, scheduled, onAgain }: Pr
     <section aria-labelledby="summary-heading" className="rounded-3xl bg-surface-container-lowest p-space-lg text-center shadow-[0_1px_10px_rgba(30,26,22,0.08)]">
       <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container"><Icon name="check_circle" filled size={30} /></span>
       <h2 id="summary-heading" className="mt-space-sm font-serif text-headline-md">{title}</h2>
-      <dl className="mt-space-md grid grid-cols-2 gap-space-sm sm:grid-cols-4">
+      {/* flex-wrap + justify-center thay vì grid-cols cố định: 2 hay 4 mục đều tự dồn về giữa hàng,
+          không để lại khoảng trống một bên như grid khi số ô ít hơn số cột. */}
+      <dl className="mt-space-md flex flex-wrap justify-center gap-space-sm">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl bg-surface-container-low p-space-sm text-center">
+          <div key={s.label} className="w-28 shrink-0 rounded-2xl bg-surface-container-low p-space-sm text-center sm:w-32">
             <dt className="text-label-md text-on-surface-variant">{s.label}</dt>
             <dd className="font-serif text-headline-md text-on-surface">{s.value}</dd>
           </div>
