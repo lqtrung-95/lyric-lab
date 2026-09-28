@@ -13,4 +13,12 @@ describe("progressReducer", () => {
     expect(activeStepIndex(s.step)).toBe(3);
     expect(progressReducer(s, { type: "error", code: "no_lyrics" }).error).toBe("no_lyrics");
   });
+
+  it("bấm thử lại (action step) xóa lỗi cũ để quay lại giao diện tiến trình", () => {
+    const withError = progressReducer(initialProgress, { type: "error", code: "server_error" });
+    expect(withError.error).toBe("server_error");
+    const retried = progressReducer(withError, { type: "step", step: "lyrics" });
+    expect(retried.error).toBeNull();
+    expect(activeStepIndex(retried.step)).toBe(0);
+  });
 });

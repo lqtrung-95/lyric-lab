@@ -29,7 +29,9 @@ export function progressReducer(state: ProgressState, action: ProgressAction): P
     case "meta":
       return { ...state, meta: { title: action.title, channelTitle: action.channelTitle } };
     case "step":
-      return { ...state, step: action.step };
+      // Bấm "Thử lại" cũng phát action này (chuyển về bước "lyrics"): phải xóa lỗi cũ để quay lại giao diện tiến trình,
+      // không thì AnalysisErrorView cứ hiện mãi dù SSE đã mở lại và đang chạy.
+      return { ...state, step: action.step, error: null };
     case "done":
       return { ...state, step: "done" };
     case "error":

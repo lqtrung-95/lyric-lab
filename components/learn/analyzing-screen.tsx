@@ -87,7 +87,7 @@ export function AnalyzingScreen({ videoId }: { videoId: string }) {
               const current = active === i;
               return (
                 <li key={label} className="flex items-center gap-3 rounded-xl bg-surface-container-low px-4 py-3">
-                  <span className={done ? "text-secondary" : current ? "text-primary" : "text-outline"}>
+                  <span className={`${done ? "text-secondary" : current ? "text-primary" : "text-outline"} ${current ? "animate-pulse" : ""}`}>
                     <Icon name={done ? "check_circle" : "hourglass_top"} filled={done} size={22} />
                   </span>
                   <span className={`text-body-md ${current || done ? "text-on-surface" : "text-on-surface-variant"}`}>{label}</span>
@@ -99,7 +99,7 @@ export function AnalyzingScreen({ videoId }: { videoId: string }) {
           <button
             type="button"
             onClick={() => router.push("/app")}
-            className="mt-space-lg min-h-11 rounded-full px-6 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high"
+            className="mt-space-lg min-h-11 cursor-pointer rounded-full px-6 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high"
           >
             Hủy
           </button>
