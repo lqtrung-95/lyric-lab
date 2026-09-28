@@ -31,40 +31,46 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
     }
   }
 
-  if (!open) {
-    return (
+  return (
+    // `relative` để form (absolute) nổi ra ngoài dòng flex chứa bản dịch, không bị bóp hẹp cùng hàng với đoạn văn.
+    <div className="relative shrink-0">
       <button
-        type="button" onClick={(e) => { e.stopPropagation(); setOpen(true); }}
+        type="button" onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        aria-expanded={open}
         aria-label="Góp ý bản dịch câu này"
         title="Góp ý bản dịch"
-        className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 opacity-0 transition-opacity hover:bg-surface-container-high hover:text-on-surface group-hover/line:opacity-100 focus-visible:opacity-100"
+        className={`mt-0.5 flex h-7 w-7 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
+          open ? "bg-surface-container-high opacity-100" : "opacity-0 group-hover/line:opacity-100"
+        }`}
       >
         <Icon name="edit" size={15} />
       </button>
-    );
-  }
-
-  return (
-    <form onClick={(e) => e.stopPropagation()} onSubmit={submit} className="mt-1 flex flex-col gap-1.5 rounded-xl bg-surface-container-low p-2.5">
-      {status === "sent" ? (
-        <p role="status" className="text-label-md text-on-surface-variant">Cảm ơn góp ý! Mình sẽ xem lại câu này.</p>
-      ) : (
-        <>
-          <label htmlFor={`translation-suggest-${videoId}-${lineIndex}`} className="text-label-sm text-on-surface-variant">Bản dịch tự nhiên hơn cho câu này:</label>
-          <textarea
-            id={`translation-suggest-${videoId}-${lineIndex}`} value={value} onChange={(e) => setValue(e.target.value)}
-            required minLength={3} maxLength={500} rows={2}
-            className="rounded-lg bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface outline-none ring-2 ring-transparent focus:ring-secondary"
-          />
-          <div className="flex items-center gap-2">
-            <button type="submit" disabled={status === "sending"} className="min-h-9 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary disabled:opacity-60">
-              {status === "sending" ? "Đang gửi…" : "Gửi góp ý"}
-            </button>
-            <button type="button" onClick={() => setOpen(false)} className="min-h-9 rounded-full px-4 text-label-md text-on-surface-variant hover:bg-surface-container-high">Hủy</button>
-            {status === "error" && <p role="alert" className="text-label-sm text-error">Chưa gửi được, thử lại nhé.</p>}
-          </div>
-        </>
+      {open && (
+        <form
+          onClick={(e) => e.stopPropagation()} onSubmit={submit}
+          className="absolute left-0 top-full z-20 mt-1 flex w-72 max-w-[calc(100vw-2rem)] flex-col gap-1.5 rounded-xl bg-surface-container-lowest p-2.5 shadow-lg ring-1 ring-outline-variant"
+        >
+          {status === "sent" ? (
+            <p role="status" className="text-label-md text-on-surface-variant">Cảm ơn góp ý! Mình sẽ xem lại câu này.</p>
+          ) : (
+            <>
+              <label htmlFor={`translation-suggest-${videoId}-${lineIndex}`} className="text-label-sm text-on-surface-variant">Bản dịch tự nhiên hơn cho câu này:</label>
+              <textarea
+                id={`translation-suggest-${videoId}-${lineIndex}`} value={value} onChange={(e) => setValue(e.target.value)}
+                required minLength={3} maxLength={500} rows={3} autoFocus
+                className="rounded-lg bg-surface-container px-3 py-2 text-body-md text-on-surface outline-none ring-2 ring-transparent focus:ring-secondary"
+              />
+              <div className="flex flex-wrap items-center gap-2">
+                <button type="submit" disabled={status === "sending"} className="min-h-9 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary disabled:opacity-60">
+                  {status === "sending" ? "Đang gửi…" : "Gửi góp ý"}
+                </button>
+                <button type="button" onClick={() => setOpen(false)} className="min-h-9 rounded-full px-4 text-label-md text-on-surface-variant hover:bg-surface-container-high">Hủy</button>
+              </div>
+              {status === "error" && <p role="alert" className="text-label-sm text-error">Chưa gửi được, thử lại nhé.</p>}
+            </>
+          )}
+        </form>
       )}
-    </form>
+    </div>
   );
 }
