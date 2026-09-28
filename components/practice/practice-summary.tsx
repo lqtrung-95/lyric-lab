@@ -25,7 +25,7 @@ export function PracticeSummary({ title, stats, missed, scheduled, onAgain }: Pr
       <h2 id="summary-heading" className="mt-space-sm font-serif text-headline-md">{title}</h2>
       <dl className="mt-space-md grid grid-cols-2 gap-space-sm sm:grid-cols-4">
         {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl bg-surface-container-low p-space-sm">
+          <div key={s.label} className="rounded-2xl bg-surface-container-low p-space-sm text-center">
             <dt className="text-label-md text-on-surface-variant">{s.label}</dt>
             <dd className="font-serif text-headline-md text-on-surface">{s.value}</dd>
           </div>
