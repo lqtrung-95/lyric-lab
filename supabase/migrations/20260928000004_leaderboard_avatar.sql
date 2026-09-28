@@ -5,7 +5,9 @@ insert into storage.buckets (id, name, public) values ('avatars', 'avatars', tru
 alter table public.leaderboard_profiles add column avatar_url text;
 
 -- Trả kèm avatar_url trong bảng xếp hạng (ảnh đại diện công khai, không lộ thêm gì so với biệt danh đã công khai).
-create or replace function public.leaderboard_top(p_scope text, p_limit integer default 50)
+-- Đổi kiểu trả về (thêm cột) nên phải xóa hàm cũ trước, "create or replace" không cho đổi kiểu OUT parameters.
+drop function if exists public.leaderboard_top(text, integer);
+create function public.leaderboard_top(p_scope text, p_limit integer default 50)
 returns table (rank bigint, user_id uuid, nickname text, points bigint, avatar_url text)
 language sql
 security definer
