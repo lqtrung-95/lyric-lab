@@ -5,8 +5,10 @@ import { Rating } from "ts-fsrs";
 import { gradeCard, newCardFields } from "@/lib/srs/fsrs-scheduler";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-// Test tích hợp trên Supabase thật (cần đã chạy migration user_accounts và bật Anonymous sign-ins).
-// Tự bỏ qua khi thiếu biến môi trường. Dùng hai tài khoản ẩn danh tạm và xóa sạch sau khi chạy.
+// Test tích hợp trên Supabase thật (cần đã chạy migration user_accounts).
+// Tự bỏ qua khi thiếu biến môi trường. Dùng hai tài khoản tạm (tạo qua admin, không qua signInAnonymously vì
+// dự án đã bật captcha cho đăng nhập ẩn danh — admin.createUser + signInWithPassword không bị chặn) và xóa sạch sau khi chạy.
+// RLS không phân biệt ẩn danh hay đã đăng nhập (đều role "authenticated"), nên vẫn kiểm được đúng hành vi.
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -27,10 +29,13 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
   let aId = "";
   let bId = "";
 
+  // Dùng khóa service role để đăng nhập ẩn danh (dự án đã bật captcha cho luồng công khai; khóa service role không bị chặn),
+  // rồi nạp phiên đó vào một client dùng anon key để request thật sự chịu RLS như người dùng thường.
   async function signInAnon(): Promise<{ client: SupabaseClient; id: string }> {
+    const { data, error } = await service.auth.signInAnonymously();
+    if (error || !data.user || !data.session) throw new Error(`signInAnonymously: ${error?.message}`);
     const client = createClient(url!, anonKey!, clientOptions);
-    const { data, error } = await client.auth.signInAnonymously();
-    if (error || !data.user) throw new Error(`signInAnonymously: ${error?.message}`);
+    await client.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
     return { client, id: data.user.id };
   }
 

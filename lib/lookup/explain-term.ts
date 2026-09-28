@@ -3,10 +3,12 @@ import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { EXPLAIN_SYSTEM_PROMPT, buildExplainPrompt } from "./build-explain-prompt";
 import { stripTermFromMeaning } from "./strip-term-from-meaning";
 import { explainOutputSchema, type ExplainRequest, type TermExplanation } from "./explain-schema";
+import { withGroqFallback } from "@/lib/analysis/openrouter-chat";
 
-// Model nhỏ trước cho nhanh (LS-06: ≤ 1,5 giây), model lớn làm dự phòng.
-// Cuối danh sách là model OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY) khi Groq hết hạn mức.
-export const EXPLAIN_MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "openrouter:google/gemini-2.5-flash"];
+// Model nhỏ trước cho nhanh (LS-06: ≤ 1,5 giây), model lớn làm dự phòng, rồi cùng hai model đó bằng khóa Groq thứ hai
+// (FALLBACK_LLM_API_KEY). Cuối danh sách là model OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY) khi cả hai khóa Groq đều hết hạn mức.
+const EXPLAIN_GROQ_MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b"];
+export const EXPLAIN_MODELS = [...EXPLAIN_GROQ_MODELS, ...withGroqFallback(EXPLAIN_GROQ_MODELS), "openrouter:google/gemini-2.5-flash"];
 const MAX_EXPLAIN_TOKENS = 400;
 
 export type ExplainErrorCode = "term_not_in_line" | "explain_failed" | "rate_limited";

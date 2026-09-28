@@ -21,9 +21,12 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
 
   beforeAll(async () => {
     service = createClient(url!, serviceKey!, opts);
+    // Khóa service role không bị chặn bởi captcha (dự án đã bật cho luồng công khai); nạp phiên vào client anon key
+    // để request thật sự chịu RLS, đồng thời giữ đúng is_anonymous:true mà luồng gộp tài khoản cần.
+    const { data, error } = await service.auth.signInAnonymously();
+    if (error || !data.user || !data.session) throw new Error(`signInAnonymously: ${error?.message}`);
     const anon = createClient(url!, anonKey!, opts);
-    const { data, error } = await anon.auth.signInAnonymously();
-    if (error || !data.user) throw new Error(`signInAnonymously: ${error?.message}`);
+    await anon.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
     anonId = data.user.id;
     const member = await service.auth.admin.createUser({ email: `merge-test-${Date.now()}@example.test`, email_confirm: true });
     memberId = member.data.user!.id;
