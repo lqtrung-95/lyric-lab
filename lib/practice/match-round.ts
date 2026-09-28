@@ -17,9 +17,15 @@ const MAX_MEANING = 38;
 const CLEAN_MEANING = 30;
 const isClean = (meaning: string, term: string) => meaning.length <= CLEAN_MEANING && !meaning.includes(term) && !/["“”]/.test(meaning);
 
-/** Nghĩa ngắn gọn để hiện trên ô ghép: lấy phần đầu (trước dấu ; hoặc ,) và cắt cho vừa ô. */
+// Nghĩa tra từ (bấm từ trong lời để tra) hay mở đầu bằng cụm dẫn nhập kiểu "Ở câu này, …" (để không lộ đáp án khi
+// hiện làm gợi ý ở màn Nghe). Cắt theo dấu phẩy đầu tiên bên dưới mà không bỏ cụm này trước thì chỉ còn lại đúng
+// cụm dẫn nhập, mất hết nội dung thật.
+const LEAD_IN = /^(ở|trong)\s+(câu này|đây|ngữ cảnh này)\s*[,:]\s*/iu;
+
+/** Nghĩa ngắn gọn để hiện trên ô ghép: bỏ cụm dẫn nhập nếu có, lấy phần đầu (trước dấu ; hoặc ,) và cắt cho vừa ô. */
 export function shortMeaning(meaning: string): string {
-  const first = meaning.split(/[;,；，]/)[0].trim() || meaning.trim();
+  const withoutLeadIn = meaning.replace(LEAD_IN, "");
+  const first = withoutLeadIn.split(/[;,；，]/)[0].trim() || withoutLeadIn.trim();
   return first.length > MAX_MEANING ? `${first.slice(0, MAX_MEANING - 1)}…` : first;
 }
 
