@@ -41,6 +41,9 @@ export function SiteHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-1">
+          <Link href="/feedback" aria-label="Góp ý cho Lyric Lab" title="Góp ý" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+            <Icon name="feedback" size={20} />
+          </Link>
           <ThemeToggle />
           <Link href="/settings" aria-label="Cài đặt và tài khoản" className="flex h-11 w-11 items-center justify-center">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
