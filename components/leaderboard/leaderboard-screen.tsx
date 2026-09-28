@@ -135,14 +135,14 @@ export function LeaderboardScreen() {
           <>
             {podium.length > 0 && <Podium entries={podium} />}
             {rest.length > 0 && (
-              <ol aria-label="Xếp hạng từ #4" className="mt-space-md divide-y divide-surface-container-high rounded-2xl bg-surface-container-lowest shadow-sm">
+              <ol aria-label="Xếp hạng từ #4" className="mt-space-md divide-y divide-surface-container-high overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm">
                 {rest.map((e) => <Row key={e.rank} entry={e} />)}
               </ol>
             )}
             {meOutside && (
               <>
                 <p className="mt-space-md text-center text-label-sm uppercase tracking-wider text-on-surface-variant">Vị trí của bạn</p>
-                <ol aria-label="Vị trí của bạn" className="mt-1 rounded-2xl bg-surface-container-lowest shadow-sm">
+                <ol aria-label="Vị trí của bạn" className="mt-1 overflow-hidden rounded-2xl bg-surface-container-lowest shadow-sm">
                   <Row entry={{ rank: data!.me!.rank, nickname: data!.profile?.nickname ?? "Bạn", points: data!.me!.points, avatarUrl: data!.profile?.avatarUrl ?? null, isMe: true }} />
                 </ol>
               </>
