@@ -18,20 +18,20 @@ export async function GET(req: Request) {
 
   const [top, profile, rank] = await Promise.all([
     sb.rpc("leaderboard_top", { p_scope: scope, p_limit: TOP }),
-    user ? sb.from("leaderboard_profiles").select("nickname,opted_in").eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null }),
+    user ? sb.from("leaderboard_profiles").select("nickname,opted_in,avatar_url").eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null }),
     user ? sb.rpc("leaderboard_rank", { p_user: user.id, p_scope: scope }) : Promise.resolve({ data: null }),
   ]);
   if (top.error) return Response.json({ error: "server_error" }, { status: 500 });
 
-  const entries = (top.data ?? []).map((r: { rank: number; user_id: string; nickname: string; points: number }) => ({
-    rank: Number(r.rank), nickname: r.nickname, points: Number(r.points), isMe: r.user_id === user?.id,
+  const entries = (top.data ?? []).map((r: { rank: number; user_id: string; nickname: string; points: number; avatar_url: string | null }) => ({
+    rank: Number(r.rank), nickname: r.nickname, points: Number(r.points), avatarUrl: r.avatar_url, isMe: r.user_id === user?.id,
   }));
   const mine = (rank.data as { rank: number; points: number }[] | null)?.[0];
   return Response.json(
     {
       scope, entries,
       me: mine ? { rank: Number(mine.rank), points: Number(mine.points) } : null,
-      profile: profile.data ? { nickname: profile.data.nickname, optedIn: profile.data.opted_in } : null,
+      profile: profile.data ? { nickname: profile.data.nickname, optedIn: profile.data.opted_in, avatarUrl: profile.data.avatar_url } : null,
       weekEndsAt: weekEnd(new Date()).toISOString(),
     },
     { headers: { "Cache-Control": "private, no-store" } },

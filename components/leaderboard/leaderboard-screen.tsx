@@ -3,16 +3,19 @@
 import { useEffect, useState } from "react";
 import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { track } from "@/lib/analytics/track";
+import { Icon } from "@/components/ui/icon";
 import { ModeTabs } from "@/components/review/mode-tabs";
 import { formatTimeLeft } from "@/lib/leaderboard/week";
+import { AvatarCircle } from "./avatar-circle";
+import { AvatarUploader } from "./avatar-uploader";
 import { NicknameForm } from "./nickname-form";
 
 type Scope = "week" | "all";
-interface Entry { rank: number; nickname: string; points: number; isMe: boolean }
+interface Entry { rank: number; nickname: string; points: number; avatarUrl: string | null; isMe: boolean }
 interface Data {
   entries: Entry[];
   me: { rank: number; points: number } | null;
-  profile: { nickname: string; optedIn: boolean } | null;
+  profile: { nickname: string; optedIn: boolean; avatarUrl: string | null } | null;
   weekEndsAt: string;
   loadedAt: number;
 }
@@ -20,13 +23,12 @@ interface Data {
 const TABS: { id: Scope; label: string }[] = [{ id: "week", label: "Tuần này" }, { id: "all", label: "Mọi thời gian" }];
 const fmt = (n: number) => n.toLocaleString("vi-VN");
 
-/** Bảng xếp hạng luyện tập (tuần này / mọi thời gian). Chỉ hiện biệt danh và điểm của người đã tự nguyện tham gia. */
+/** Bảng xếp hạng luyện tập (tuần này / mọi thời gian): bục 3 hạng đầu, rồi danh sách. Chỉ hiện biệt danh, ảnh đại diện và điểm của người tự nguyện tham gia. */
 export function LeaderboardScreen() {
   const [scope, setScope] = useState<Scope>("week");
   const [data, setData] = useState<Data | null>(null);
   const [failed, setFailed] = useState(false);
   const [editing, setEditing] = useState(false);
-
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
@@ -51,6 +53,8 @@ export function LeaderboardScreen() {
 
   const joined = data?.profile?.optedIn === true;
   const shown = data?.entries ?? [];
+  const podium = shown.slice(0, 3);
+  const rest = shown.slice(3);
   const meOutside = data?.me && !shown.some((e) => e.isMe);
 
   return (
@@ -58,14 +62,20 @@ export function LeaderboardScreen() {
       <ModeTabs />
       <div className="mx-auto max-w-3xl">
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Bảng xếp hạng</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">Tổng điểm từ các chế độ luyện tập. Chỉ biệt danh và điểm của người tự nguyện tham gia được hiển thị.</p>
+        <p className="mt-1 text-body-md text-on-surface-variant">Tổng điểm từ các chế độ luyện tập. Chỉ biệt danh, ảnh đại diện và điểm của người tự nguyện tham gia được hiển thị.</p>
 
         <section aria-label="Tham gia bảng xếp hạng" className="mt-space-md rounded-2xl bg-surface-container-low p-space-md">
           {data === null ? (
             <p className="text-body-md text-on-surface-variant">Đang tải…</p>
           ) : joined && !editing ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-body-md text-on-surface">Bạn đang tham gia với biệt danh <strong>{data.profile!.nickname}</strong>.</p>
+              <div className="flex items-center gap-3">
+                <AvatarUploader
+                  nickname={data.profile!.nickname} avatarUrl={data.profile!.avatarUrl}
+                  onUploaded={() => setReload((n) => n + 1)}
+                />
+                <p className="text-body-md text-on-surface">Bạn đang tham gia với biệt danh <strong>{data.profile!.nickname}</strong>.</p>
+              </div>
               <div className="flex gap-1">
                 <button type="button" onClick={() => setEditing(true)} className="min-h-11 rounded-full px-4 text-label-md font-medium text-primary hover:bg-surface-container">Đổi biệt danh</button>
                 <button type="button" onClick={() => void saveProfile({ optedIn: false })} className="min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container">Rời bảng xếp hạng</button>
@@ -94,26 +104,60 @@ export function LeaderboardScreen() {
         ) : shown.length === 0 ? (
           <p className="mt-space-md rounded-2xl bg-surface-container-low p-space-lg text-body-md text-on-surface-variant">Chưa có ai trên bảng {scope === "week" ? "tuần này" : ""}. Chơi một lượt luyện tập và tham gia để dẫn đầu!</p>
         ) : (
-          <ol aria-label="Xếp hạng" className="mt-space-md divide-y divide-surface-container-high rounded-2xl bg-surface-container-lowest shadow-sm">
-            {shown.map((e) => <Row key={`${e.rank}-${e.nickname}`} entry={e} />)}
+          <>
+            {podium.length > 0 && <Podium entries={podium} />}
+            {rest.length > 0 && (
+              <ol aria-label="Xếp hạng từ #4" className="mt-space-md divide-y divide-surface-container-high rounded-2xl bg-surface-container-lowest shadow-sm">
+                {rest.map((e) => <Row key={e.rank} entry={e} />)}
+              </ol>
+            )}
             {meOutside && (
               <>
-                <li aria-hidden="true" className="px-4 py-1 text-center text-on-surface-variant">⋯</li>
-                <Row entry={{ rank: data!.me!.rank, nickname: data!.profile?.nickname ?? "Bạn", points: data!.me!.points, isMe: true }} />
+                <p className="mt-space-md text-center text-label-sm uppercase tracking-wider text-on-surface-variant">Vị trí của bạn</p>
+                <ol aria-label="Vị trí của bạn" className="mt-1 rounded-2xl bg-surface-container-lowest shadow-sm">
+                  <Row entry={{ rank: data!.me!.rank, nickname: data!.profile?.nickname ?? "Bạn", points: data!.me!.points, avatarUrl: data!.profile?.avatarUrl ?? null, isMe: true }} />
+                </ol>
               </>
             )}
-          </ol>
+          </>
         )}
       </div>
     </>
   );
 }
 
+function Podium({ entries }: { entries: Entry[] }) {
+  // Thứ tự trưng bày trái→phải: hạng 2, hạng 1 (giữa, nhô cao), hạng 3 — không phải thứ tự hạng.
+  const display = [entries[1], entries[0], entries[2]].filter((e): e is Entry => e !== undefined);
+  return (
+    <div className="mt-space-md grid grid-cols-3 items-end gap-2 sm:gap-3">
+      {display.map((e) => {
+        const first = e.rank === 1;
+        return (
+          <div
+            key={e.rank}
+            className={`flex flex-col items-center gap-2 rounded-2xl p-space-sm text-center shadow-sm ${
+              first ? "bg-primary-container pb-space-md pt-space-md" : "bg-surface-container-low pb-space-sm pt-space-sm"
+            }`}
+          >
+            <Icon name={first ? "star" : "verified"} filled size={first ? 26 : 20} className={first ? "text-primary" : "text-on-surface-variant"} />
+            <AvatarCircle nickname={e.nickname} avatarUrl={e.avatarUrl} size={first ? 72 : 56} />
+            <p className={`line-clamp-1 max-w-full text-label-md font-semibold ${first ? "text-on-primary-container" : "text-on-surface"}`}>{e.nickname}</p>
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-label-sm font-semibold ${first ? "bg-surface-container-lowest text-primary" : "bg-surface-container-high text-on-surface-variant"}`}>
+              {fmt(e.points)}<span className="sr-only"> điểm</span>
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Row({ entry }: { entry: Entry }) {
-  const medal = entry.rank <= 3 ? ["bg-tertiary-fixed text-on-tertiary-fixed", "bg-surface-container-highest text-on-surface", "bg-primary-fixed text-on-primary-fixed"][entry.rank - 1] : "bg-surface-container text-on-surface-variant";
   return (
     <li aria-current={entry.isMe ? "true" : undefined} className={`flex items-center gap-3 px-4 py-3 ${entry.isMe ? "bg-secondary-container/40" : ""}`}>
-      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-mono text-label-md font-semibold ${medal}`}><span className="sr-only">Hạng </span>{entry.rank}</span>
+      <span className="w-9 shrink-0 text-center font-mono text-label-md font-semibold text-on-surface-variant"><span className="sr-only">Hạng </span>{entry.rank}</span>
+      <AvatarCircle nickname={entry.nickname} avatarUrl={entry.avatarUrl} size={36} />
       <span className="min-w-0 flex-1 truncate text-body-md font-medium text-on-surface">{entry.nickname}{entry.isMe && <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-label-sm text-on-secondary">Bạn</span>}</span>
       <span className="shrink-0 font-serif text-headline-md text-primary">{fmt(entry.points)}<span className="sr-only"> điểm</span></span>
     </li>
