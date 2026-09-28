@@ -14,10 +14,9 @@ interface SongCardProps {
   meta?: string;
   /** Có thì hiện nút xóa bài khỏi danh sách, ở góc trên-phải ảnh (nút nằm ngoài liên kết, không lồng trong thẻ <a>). */
   onRemove?: () => void;
-  /** Nút riêng cho quản trị viên (ẩn/xóa bài khỏi Khám phá), đặt ở góc trên-trái ảnh. */
+  /** Nút riêng cho quản trị viên (ẩn/xóa bài khỏi Khám phá), đặt ở góc trên-trái ảnh, cùng hàng với likeButton. */
   adminActions?: React.ReactNode;
-  /** Nút tim yêu thích, đặt ở góc dưới-trái ảnh: góc duy nhất luôn rảnh (trên-trái là admin, trên-phải là xóa,
-   * dưới-phải là icon phát khi thẻ không có thanh tiến độ). */
+  /** Nút tim yêu thích, đặt ở góc trên-trái ảnh (trước adminActions nếu có). */
   likeButton?: React.ReactNode;
 }
 
@@ -60,8 +59,12 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, 
       {/* Vùng nút nổi trên ảnh: box này khớp đúng kích thước ảnh (cùng aspect-video) dù thẻ rộng bao nhiêu, nhờ vậy các
           nút nằm đúng 4 góc ảnh dù đặt ngoài <Link> (không lồng phần tử bấm được vào trong thẻ <a>, theo quy tắc a11y). */}
       <div className="pointer-events-none absolute inset-x-0 top-0 aspect-video">
-        {adminActions && <div className="pointer-events-auto absolute left-2 top-2 flex gap-1">{adminActions}</div>}
-        {likeButton && <div className="pointer-events-auto absolute bottom-2 left-2">{likeButton}</div>}
+        {(likeButton || adminActions) && (
+          <div className="pointer-events-auto absolute left-2 top-2 flex gap-1">
+            {likeButton}
+            {adminActions}
+          </div>
+        )}
         {onRemove && (
           <button
             type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}
