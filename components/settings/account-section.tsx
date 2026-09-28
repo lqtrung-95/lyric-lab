@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { linkGoogle, signInGoogleForMerge, signOutAndReset } from "@/lib/auth/account-client";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAccount } from "./use-account";
 
 const btn = "min-h-11 rounded-full px-5 text-label-md font-medium";
@@ -24,7 +25,11 @@ export function AccountSection() {
     <section aria-labelledby="account-heading" className="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">
       <h2 id="account-heading" className="font-serif text-headline-md text-on-surface">Tài khoản</h2>
       {account === undefined ? (
-        <p className="mt-2 text-body-md text-on-surface-variant">Đang tải…</p>
+        <div role="status" aria-label="Đang tải" className="mt-2 flex flex-col gap-2">
+          <span className="sr-only">Đang tải…</span>
+          <Skeleton className="h-5 w-full max-w-md" />
+          <Skeleton className="mt-space-sm h-11 w-40" />
+        </div>
       ) : account && !account.isAnonymous ? (
         <div className="mt-2">
           <p className="text-body-md text-on-surface">Đã đăng nhập bằng Google{account.email ? `: ${account.email}` : ""}. Thẻ ôn của bạn được lưu theo tài khoản này trên mọi thiết bị.</p>
