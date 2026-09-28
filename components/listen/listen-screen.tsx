@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CompletedToast } from "./completed-toast";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
@@ -38,6 +39,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
   const [quickSync, setQuickSync] = useState(false);
+  const [toastDismissed, setToastDismissed] = useState(false);
   // Thanh điều khiển đầy đủ cuộn khuất thì hiện thanh thu gọn nổi để vẫn điều khiển được khi đọc lời.
   const controlsRef = useRef<HTMLDivElement>(null);
   const controlsInView = useIsInView(controlsRef);
@@ -184,6 +186,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
             offset={offset} onOffsetChange={setOffset}
           />
+          {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
         </div>
         <div className="lg:sticky lg:top-24 lg:col-span-5">
           <SingingPanel line={lines[currentIndex] ?? null} items={currentItems} savedKeys={savedKeys} onToggleSave={saveFromPanel} />

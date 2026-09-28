@@ -27,7 +27,6 @@ export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, sho
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
-  const sinoVietById = useMemo(() => new Map(vocab.filter((v) => v.sinoViet).map((v) => [v.id, v.sinoViet!])), [vocab]);
   const vocabIds = useMemo(() => new Set(vocab.map((v) => v.id)), [vocab]);
   // Ngữ pháp của từng dòng (id + vị trí ký tự), tính một lần thay vì mỗi lần vẽ.
   const grammarByLine = useMemo(() => {
@@ -48,11 +47,16 @@ export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, sho
 
   useEffect(() => {
     const mark = () => { lastManualScroll.current = Date.now(); };
+    const el = listRef.current;
     window.addEventListener("wheel", mark, { passive: true });
     window.addEventListener("touchmove", mark, { passive: true });
+    // Bấm một câu/từ cũng là tương tác thủ công: nếu không tính, bài đang phát có thể kích hoạt tự cuộn
+    // về câu đang hát ngay sau cú bấm, làm màn hình giật ngay khi người dùng đang tra một câu đã qua.
+    el?.addEventListener("pointerdown", mark, { passive: true });
     return () => {
       window.removeEventListener("wheel", mark);
       window.removeEventListener("touchmove", mark);
+      el?.removeEventListener("pointerdown", mark);
     };
   }, []);
 
@@ -93,7 +97,6 @@ export function LyricList({ lines, currentIndex, vocab, grammar, showPinyin, sho
               showPinyin={showPinyin}
               showTranslation={showTranslation}
               highlights={highlightsByLine.get(line.index)!}
-              sinoVietById={sinoVietById}
               onSeek={onSeek}
               onWord={onWord}
             />

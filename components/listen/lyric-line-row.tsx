@@ -19,7 +19,6 @@ interface LyricLineRowProps {
   showPinyin: boolean;
   showTranslation: boolean;
   highlights: HighlightSets;
-  sinoVietById: ReadonlyMap<string, string>;
   onSeek: (index: number) => void;
   onWord: (word: WordSelection) => void;
 }
@@ -28,7 +27,7 @@ interface LyricLineRowProps {
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights, sinoVietById, onSeek, onWord }: LyricLineRowProps) {
+function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights, onSeek, onWord }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
 
@@ -46,7 +45,7 @@ function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights
         type="button"
         aria-label={`Phát từ câu ${line.index + 1}`}
         onClick={(e) => { e.stopPropagation(); onSeek(line.index); }}
-        className={`mt-0.5 min-h-11 w-11 shrink-0 text-left text-label-sm ${active ? "font-bold text-primary" : "text-on-surface-variant"}`}
+        className={`mt-0.5 min-h-11 w-11 shrink-0 cursor-pointer text-left text-label-sm ${active ? "font-bold text-primary" : "text-on-surface-variant"}`}
       >
         {String(line.index + 1).padStart(2, "0")}
       </button>
@@ -60,7 +59,6 @@ function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights
                 : <span key={i}>{part.text}</span>,
             );
             if (!g.isHan) return <span key={g.tokenIndex}>{content}</span>;
-            const sinoViet = g.vocabId ? sinoVietById.get(g.vocabId) : undefined;
             return (
               <button
                 key={g.tokenIndex}
@@ -70,13 +68,12 @@ function LyricLineRowImpl({ line, state, showPinyin, showTranslation, highlights
                 onClick={(e) => { e.stopPropagation(); onWord({ lineIndex: line.index, term: g.text, itemId: g.vocabId }); }}
                 className={
                   g.vocabId
-                    ? "mx-0.5 inline-flex items-center gap-1.5 rounded-md bg-primary/15 px-2 py-0.5 font-bold text-primary ring-2 ring-primary/20"
-                    : "rounded px-0.5 hover:bg-primary/10 hover:text-primary"
+                    ? "mx-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary/15 px-2 py-0.5 font-bold text-primary ring-2 ring-primary/20"
+                    : "cursor-pointer rounded px-0.5 hover:bg-primary/10 hover:text-primary"
                 }
               >
                 {g.vocabId && <span className="sr-only">Từ vựng: </span>}
                 {content}
-                {active && sinoViet && <span className="text-[11px] font-semibold uppercase text-primary">[{sinoViet}]</span>}
               </button>
             );
           })}

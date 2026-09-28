@@ -15,6 +15,11 @@ const TIMEOUT_MS = 20_000;
 
 export const turnstileSiteKey = (): string | undefined => process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || undefined;
 
+// Widget Turnstile chỉ khai báo domain production trên Cloudflare; gọi trên localhost sẽ lỗi (domain không hợp lệ)
+// và chặn luôn đăng nhập ẩn danh khi chạy dev cục bộ. Bỏ qua captcha cho các host phát triển.
+const DEV_HOSTNAMES = new Set(["localhost", "127.0.0.1", "[::1]", "0.0.0.0"]);
+const isDevHost = (): boolean => typeof window !== "undefined" && DEV_HOSTNAMES.has(window.location.hostname);
+
 let scriptPromise: Promise<void> | null = null;
 function loadScript(): Promise<void> {
   scriptPromise ??= new Promise<void>((resolve, reject) => {
@@ -34,7 +39,7 @@ function loadScript(): Promise<void> {
  */
 export async function getTurnstileToken(): Promise<string | undefined> {
   const sitekey = turnstileSiteKey();
-  if (!sitekey) return undefined;
+  if (!sitekey || isDevHost()) return undefined;
   await loadScript();
 
   const host = document.createElement("div");

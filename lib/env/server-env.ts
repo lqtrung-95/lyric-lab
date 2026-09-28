@@ -19,6 +19,12 @@ const serverEnvSchema = z.object({
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
 
+// Nhiều công cụ (dotenv, Vercel) để một biến chưa điền dưới dạng chuỗi rỗng thay vì bỏ hẳn key.
+// Coi chuỗi rỗng như "chưa đặt" để các biến optional không bị lỗi min(1)/min(16) chỉ vì trống.
+function dropEmptyValues(env: NodeJS.ProcessEnv): Record<string, string> {
+  return Object.fromEntries(Object.entries(env).filter(([, v]) => v !== undefined && v !== "")) as Record<string, string>;
+}
+
 export function getServerEnv(): ServerEnv {
-  return serverEnvSchema.parse(process.env);
+  return serverEnvSchema.parse(dropEmptyValues(process.env));
 }
