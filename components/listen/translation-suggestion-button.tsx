@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Icon } from "@/components/ui/icon";
 
 interface TranslationSuggestionButtonProps {
@@ -13,8 +14,30 @@ interface TranslationSuggestionButtonProps {
 /** Nút bút chì nhỏ cạnh bản dịch một câu: mở form góp ý bản dịch tự nhiên hơn, gửi cho admin duyệt. */
 export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex, currentTranslation }: TranslationSuggestionButtonProps) {
   const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [value, setValue] = useState(currentTranslation);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Dòng lời đã nghe qua bị làm mờ bằng CSS opacity, mà opacity < 1 tự tạo stacking context riêng nên "nhốt" luôn
+  // z-index của popover bên trong — dòng kế tiếp (opacity đầy đủ) vẫn vẽ đè lên. Thoát hẳn bằng cổng React (render
+  // thẳng vào <body>, định vị theo tọa độ nút bấm) là cách chắc chắn tránh mọi kiểu nhốt stacking context như vậy.
+  function toggle(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!open && buttonRef.current) {
+      const r = buttonRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + 4, left: r.left });
+    }
+    setOpen((o) => !o);
+  }
+
+  // Cuộn trang thì tọa độ đã tính không còn đúng nữa: đóng popover cho đơn giản, thay vì phải tính lại liên tục.
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    window.addEventListener("scroll", close, { capture: true, passive: true });
+    return () => window.removeEventListener("scroll", close, { capture: true });
+  }, [open]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -32,23 +55,24 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
   }
 
   return (
-    // `relative` để form (absolute) nổi ra ngoài dòng flex chứa bản dịch, không bị bóp hẹp cùng hàng với đoạn văn.
-    <div className="relative shrink-0">
+    <>
       <button
-        type="button" onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        ref={buttonRef}
+        type="button" onClick={toggle}
         aria-expanded={open}
         aria-label="Góp ý bản dịch câu này"
         title="Góp ý bản dịch"
-        className={`mt-0.5 flex h-7 w-7 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
+        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
           open ? "bg-surface-container-high opacity-100" : "opacity-0 group-hover/line:opacity-100"
         }`}
       >
         <Icon name="edit" size={15} />
       </button>
-      {open && (
+      {open && pos && createPortal(
         <form
           onClick={(e) => e.stopPropagation()} onSubmit={submit}
-          className="absolute left-0 top-full z-20 mt-1 flex w-72 max-w-[calc(100vw-2rem)] flex-col gap-1.5 rounded-xl bg-surface-container-lowest p-2.5 shadow-lg ring-1 ring-outline-variant"
+          style={{ top: pos.top, left: pos.left }}
+          className="fixed z-[100] flex w-72 max-w-[calc(100vw-2rem)] flex-col gap-1.5 rounded-xl bg-surface-container-lowest p-2.5 shadow-lg ring-1 ring-outline-variant"
         >
           {status === "sent" ? (
             <p role="status" className="text-label-md text-on-surface-variant">Cảm ơn góp ý! Mình sẽ xem lại câu này.</p>
@@ -69,8 +93,9 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
               {status === "error" && <p role="alert" className="text-label-sm text-error">Chưa gửi được, thử lại nhé.</p>}
             </>
           )}
-        </form>
+        </form>,
+        document.body,
       )}
-    </div>
+    </>
   );
 }
