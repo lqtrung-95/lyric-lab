@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLikedSongs } from "@/components/library/use-liked-songs";
 import { CompletedToast } from "./completed-toast";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
@@ -45,6 +46,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const { containerRef, controller, failed } = useYouTubePlayer(analysis.videoId);
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
+  const { liked, setLiked } = useLikedSongs();
   const [loopIndex, setLoopIndex] = useState<number | null>(null);
   const [word, setWord] = useState<WordSelection | null>(null);
   const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex);
@@ -133,10 +135,11 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     <>
       <h1 className="sr-only">Nghe: {analysis.track?.title ?? song.title}</h1>
       <ListenTopBar
-        title={title} artist={artist} backHref={`/learn/${analysis.videoId}`}
+        videoId={analysis.videoId} title={title} artist={artist} backHref={`/learn/${analysis.videoId}`}
         showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
         onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
         onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
+        liked={liked.has(analysis.videoId)} onToggleLike={(v) => setLiked(analysis.videoId, v)}
       />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
         <div className="flex flex-col gap-6 lg:col-span-7">

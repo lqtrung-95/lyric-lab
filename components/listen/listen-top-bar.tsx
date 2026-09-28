@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
+import { ListenLikeButton } from "./listen-like-button";
 import { ViewToggles } from "./view-toggles";
 
 interface ListenTopBarProps {
+  videoId: string;
   title: string;
   artist: string;
   backHref: string;
@@ -12,10 +14,12 @@ interface ListenTopBarProps {
   showTranslation: boolean;
   onTogglePinyin: () => void;
   onToggleTranslation: () => void;
+  liked: boolean;
+  onToggleLike: (liked: boolean) => void;
 }
 
-/** Thanh phụ màn Nghe: quay lại xem trước, tên bài; trên desktop có cả nút bật/tắt pinyin và bản dịch. */
-export function ListenTopBar({ title, artist, backHref, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation }: ListenTopBarProps) {
+/** Thanh phụ màn Nghe: quay lại xem trước, tên bài, nút thích; trên desktop có cả nút bật/tắt pinyin và bản dịch. */
+export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, liked, onToggleLike }: ListenTopBarProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
       <div className="flex min-w-0 items-center gap-3">
@@ -27,11 +31,14 @@ export function ListenTopBar({ title, artist, backHref, showPinyin, showTranslat
           <p className="truncate text-label-sm text-on-surface-variant">{artist}</p>
         </div>
       </div>
-      <ViewToggles
-        className="hidden md:flex"
-        showPinyin={showPinyin} showTranslation={showTranslation}
-        onTogglePinyin={onTogglePinyin} onToggleTranslation={onToggleTranslation}
-      />
+      <div className="flex items-center gap-1">
+        <ListenLikeButton videoId={videoId} liked={liked} onChange={onToggleLike} />
+        <ViewToggles
+          className="hidden md:flex"
+          showPinyin={showPinyin} showTranslation={showTranslation}
+          onTogglePinyin={onTogglePinyin} onToggleTranslation={onToggleTranslation}
+        />
+      </div>
     </div>
   );
 }
