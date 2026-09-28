@@ -30,7 +30,7 @@ export function DeleteDataSection() {
       </p>
       {!confirming ? (
         <button type="button" onClick={() => setConfirming(true)}
-          className="mt-space-md min-h-11 rounded-full px-5 text-label-md font-medium text-error hover:bg-error-container/40">
+          className="mt-space-md min-h-11 rounded-full border-2 border-error px-5 text-label-md font-semibold text-error hover:bg-error hover:text-on-error">
           Xóa toàn bộ dữ liệu của tôi
         </button>
       ) : (

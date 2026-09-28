@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { AccountSection } from "@/components/settings/account-section";
 import { DeleteDataSection } from "@/components/settings/delete-data-section";
+import { FeedbackSection } from "@/components/settings/feedback-section";
 import { VoiceSection } from "@/components/settings/voice-section";
 import { LearningSection } from "@/components/settings/learning-section";
 
@@ -16,6 +17,7 @@ export default function SettingsPage() {
       <Suspense>
         <AccountSection />
       </Suspense>
+      <FeedbackSection />
       <DeleteDataSection />
     </div>
   );

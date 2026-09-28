@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CompletedToast } from "./completed-toast";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
@@ -168,12 +167,6 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
           <ReportSongButton videoId={analysis.videoId} prominent />
-          {completed && (
-            <div role="status" className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-secondary-container/50 p-space-md">
-              <p className="text-body-md text-on-secondary-container">Bạn đã nghe tới cuối bài.</p>
-              <Link href={`/learn/${analysis.videoId}/summary`} className="inline-flex min-h-11 items-center rounded-full bg-secondary px-5 text-label-md font-medium text-on-secondary">Xem tổng kết</Link>
-            </div>
-          )}
           <LyricList
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}

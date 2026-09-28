@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import { SelectField } from "@/components/ui/select-field";
 import { Spinner } from "@/components/ui/spinner";
 import type { DiscoverSong } from "@/lib/discover/discover-query";
+import { AdminSongActions } from "./admin-song-actions";
 import { SongCard } from "./song-card";
+import { useIsAdmin } from "./use-is-admin";
 
 const BANDS = [
   { value: "", label: "Mọi trình độ" },
@@ -21,6 +23,7 @@ const metaOf = (s: DiscoverSong) =>
 
 /** Tab "Khám phá": bài hát đã được phân tích (nên mở tức thì), lọc theo trình độ, mới nhất/phổ biến và tìm theo tên. */
 export function DiscoverTab() {
+  const isAdmin = useIsAdmin();
   const [sort, setSort] = useState<"new" | "popular">("new");
   const [band, setBand] = useState("");
   const [query, setQuery] = useState("");
@@ -103,7 +106,12 @@ export function DiscoverTab() {
         <>
           <ul className="mt-space-md grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-3">
             {songs.map((s) => (
-              <li key={s.videoId}><SongCard videoId={s.videoId} title={s.title} channelTitle={s.channelTitle} meta={metaOf(s)} sizes="(min-width:1024px) 33vw, 50vw" /></li>
+              <li key={s.videoId}>
+                <SongCard
+                  videoId={s.videoId} title={s.title} channelTitle={s.channelTitle} meta={metaOf(s)} sizes="(min-width:1024px) 33vw, 50vw"
+                  adminActions={isAdmin ? <AdminSongActions videoId={s.videoId} onDone={() => setSongs((prev) => prev.filter((p) => p.videoId !== s.videoId))} /> : undefined}
+                />
+              </li>
             ))}
           </ul>
           {hasMore && (

@@ -14,13 +14,15 @@ interface SongCardProps {
   meta?: string;
   /** Có thì hiện nút xóa bài khỏi danh sách (nút nằm ngoài liên kết, không lồng trong thẻ <a>). */
   onRemove?: () => void;
+  /** Nút riêng cho quản trị viên (ẩn/xóa bài khỏi Khám phá), đặt ở góc trái để không đè lên onRemove. */
+  adminActions?: React.ReactNode;
 }
 
 /**
  * Thẻ bài hát dùng chung cho trang chủ và thư viện. Thẻ luôn cao bằng nhau trong một hàng: tiêu đề chiếm chỗ 2 dòng
  * và phần chân (kênh, tiến độ) dính đáy, nên bài có tiêu đề ngắn hay dài đều thẳng hàng.
  */
-export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, onRemove }: SongCardProps) {
+export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, onRemove, adminActions }: SongCardProps) {
   return (
     <div className="group relative h-full">
       <Link
@@ -52,6 +54,7 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, 
         )}
       </div>
       </Link>
+      {adminActions && <div className="absolute left-2 top-2 flex gap-1">{adminActions}</div>}
       {onRemove && (
         <button
           type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}

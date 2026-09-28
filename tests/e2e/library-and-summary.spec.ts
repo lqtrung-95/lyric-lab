@@ -64,9 +64,9 @@ test.describe("thư viện", () => {
 test("nghe tới câu cuối: mời xem tổng kết", async ({ page }) => {
   await page.route("https://www.youtube.com/iframe_api", (r) => r.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.goto("/dev/listen-fixture");
-  await expect(page.getByText("Bạn đã nghe tới cuối bài.")).toHaveCount(0);
+  await expect(page.getByText("Bạn đã nghe xong bài")).toHaveCount(0);
   await page.evaluate(() => { (window as unknown as { __t: number }).__t = 27; });
-  await expect(page.getByText("Bạn đã nghe tới cuối bài.")).toBeVisible();
+  await expect(page.getByText("Bạn đã nghe xong bài")).toBeVisible();
   await expect(page.getByRole("link", { name: "Xem tổng kết" })).toHaveAttribute("href", /\/summary$/);
 });
 
