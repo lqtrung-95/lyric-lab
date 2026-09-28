@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
-import { useIsAdmin } from "@/components/library/use-is-admin";
 
 interface Suggestion {
   id: number;
@@ -17,7 +16,6 @@ interface Suggestion {
 
 /** Chỉ quản trị viên thấy được gì (whoami server xác thực thật; client chỉ ẩn/hiện giao diện). */
 export function TranslationSuggestionsAdminScreen() {
-  const isAdmin = useIsAdmin();
   const [items, setItems] = useState<Suggestion[] | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +27,7 @@ export function TranslationSuggestionsAdminScreen() {
       .catch(() => setItems([]));
   }, []);
 
-  useEffect(() => { if (isAdmin) load(); }, [isAdmin, load]);
+  useEffect(() => { load(); }, [load]);
 
   async function review(id: number, action: "apply" | "dismiss") {
     setBusyId(id);
@@ -46,8 +44,6 @@ export function TranslationSuggestionsAdminScreen() {
       setBusyId(null);
     }
   }
-
-  if (!isAdmin) return <p className="text-body-md text-on-surface-variant">Trang này chỉ dành cho quản trị viên.</p>;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-space-md">

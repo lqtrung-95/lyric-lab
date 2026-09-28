@@ -3,14 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
-import { useIsAdmin } from "@/components/library/use-is-admin";
 import { FEEDBACK_CATEGORY_LABELS, type FeedbackCategory } from "@/lib/feedback/feedback-schema";
 
 interface FeedbackItem { id: number; category: FeedbackCategory; message: string; pageUrl: string | null; createdAt: string }
 
-/** Duyệt góp ý để hiện ở trang /feedback công khai. Chỉ quản trị viên thấy được gì (whoami server xác thực thật). */
+/** Duyệt góp ý để hiện ở trang /feedback công khai. Chỉ quản trị viên thấy được gì (bọc ngoài bằng AdminGate). */
 export function FeedbackAdminScreen() {
-  const isAdmin = useIsAdmin();
   const [items, setItems] = useState<FeedbackItem[] | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +20,7 @@ export function FeedbackAdminScreen() {
       .catch(() => setItems([]));
   }, []);
 
-  useEffect(() => { if (isAdmin) load(); }, [isAdmin, load]);
+  useEffect(() => { load(); }, [load]);
 
   async function review(id: number, action: "approve" | "reject") {
     setBusyId(id);
@@ -39,8 +37,6 @@ export function FeedbackAdminScreen() {
       setBusyId(null);
     }
   }
-
-  if (!isAdmin) return <p className="text-body-md text-on-surface-variant">Trang này chỉ dành cho quản trị viên.</p>;
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-space-md">

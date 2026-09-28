@@ -95,14 +95,14 @@ export function FeedbackPageScreen() {
             ) : mine.length === 0 ? (
               <p className="rounded-2xl bg-surface-container-low p-space-md text-body-md text-on-surface-variant">Bạn chưa gửi góp ý nào.</p>
             ) : (
+              // Cùng số dòng nội dung với thẻ cộng đồng bên cạnh (dòng meta + dòng nội dung) để 2 cột cao đều nhau khi số lượng khớp.
               mine.map((f) => (
                 <article key={f.id} className="rounded-2xl bg-surface-container-lowest p-space-sm shadow-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-label-sm font-medium text-secondary">{FEEDBACK_CATEGORY_LABELS[f.category]}</span>
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-2">
+                    <span className="text-label-sm font-medium text-secondary">{FEEDBACK_CATEGORY_LABELS[f.category]} · {fmtDate(f.createdAt)}</span>
                     <span className={`text-label-sm ${f.status === "approved" ? "text-secondary" : f.status === "rejected" ? "text-on-surface-variant" : "text-primary"}`}>{STATUS_LABEL[f.status]}</span>
                   </div>
-                  <p className="mt-1 text-body-md text-on-surface">{f.message}</p>
-                  <p className="mt-1 text-label-sm text-on-surface-variant">{fmtDate(f.createdAt)}</p>
+                  <p className="mt-0.5 text-body-md text-on-surface">{f.message}</p>
                 </article>
               ))
             )}
