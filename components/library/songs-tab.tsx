@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { SelectField } from "@/components/ui/select-field";
 import { SongCard } from "./song-card";
+import { SongLikeButton } from "./song-like-button";
+import { useLikedSongs } from "./use-liked-songs";
 import { useSongRemoval } from "./use-song-removal";
 import { mergeLibrarySongs, type LibrarySong, type RemoteSongProgress } from "@/lib/library/merge-library-songs";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
@@ -17,10 +19,11 @@ const readRecent = () => {
   }
 };
 
-type StatusFilter = "all" | "in_progress" | "completed" | "not_started";
+type StatusFilter = "all" | "in_progress" | "completed" | "not_started" | "liked";
 
-const matchesStatus = (song: LibrarySong, status: StatusFilter): boolean => {
+const matchesStatus = (song: LibrarySong, status: StatusFilter, liked: Set<string>): boolean => {
   if (status === "all") return true;
+  if (status === "liked") return liked.has(song.videoId);
   if (status === "completed") return song.completed;
   if (status === "not_started") return !song.completed && song.progress === 0;
   return !song.completed && song.progress > 0;
@@ -32,6 +35,7 @@ export function SongsTab() {
   const recentRaw = useSyncExternalStore(noop, readRecent, () => null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
+  const { liked, setLiked } = useLikedSongs();
 
   const load = useCallback(() => {
     fetch("/api/library/songs").then((r) => r.json()).then((d) => setRemote(d.songs ?? []), () => setRemote([]));
@@ -42,8 +46,8 @@ export function SongsTab() {
   const allSongs = useMemo(() => mergeLibrarySongs(remote ?? [], parseRecentSongs(recentRaw)), [remote, recentRaw]);
   const q = query.trim().toLowerCase();
   const songs = useMemo(
-    () => allSongs.filter((s) => matchesStatus(s, status) && (!q || s.title.toLowerCase().includes(q) || s.channelTitle.toLowerCase().includes(q))),
-    [allSongs, status, q],
+    () => allSongs.filter((s) => matchesStatus(s, status, liked) && (!q || s.title.toLowerCase().includes(q) || s.channelTitle.toLowerCase().includes(q))),
+    [allSongs, status, q, liked],
   );
 
   if (remote === null && allSongs.length === 0) return <p role="status" className="py-space-lg text-body-md text-on-surface-variant">Đang tải…</p>;
@@ -69,6 +73,7 @@ export function SongsTab() {
           <option value="in_progress">Đang nghe dở</option>
           <option value="completed">Đã nghe hết</option>
           <option value="not_started">Chưa nghe</option>
+          <option value="liked">Đã thích</option>
         </SelectField>
       </label>
     </div>
@@ -81,6 +86,7 @@ export function SongsTab() {
           <SongCard
             videoId={song.videoId} title={song.title} channelTitle={song.channelTitle} sizes="(min-width:1024px) 33vw, 50vw"
             onRemove={() => remove(song.videoId, song.title)}
+            likeButton={<SongLikeButton videoId={song.videoId} liked={liked.has(song.videoId)} onChange={(v) => setLiked(song.videoId, v)} />}
             progress={{ fraction: song.progress, label: song.completed ? "Đã nghe hết" : song.progress > 0 ? `${Math.round(song.progress * 100)}%` : "Chưa nghe" }}
           />
         </li>

@@ -6,7 +6,9 @@ import { Spinner } from "@/components/ui/spinner";
 import type { DiscoverSong } from "@/lib/discover/discover-query";
 import { AdminSongActions } from "./admin-song-actions";
 import { SongCard } from "./song-card";
+import { SongLikeButton } from "./song-like-button";
 import { useIsAdmin } from "./use-is-admin";
+import { useLikedSongs } from "./use-liked-songs";
 
 const BANDS = [
   { value: "", label: "Mọi trình độ" },
@@ -19,11 +21,16 @@ const BANDS = [
 interface Page { songs: DiscoverSong[]; hasMore: boolean }
 
 const metaOf = (s: DiscoverSong) =>
-  [s.levelAvg !== null ? `HSK ~${s.levelAvg.toFixed(1)}` : null, s.listeners > 0 ? `${s.listeners} người đã nghe` : null].filter(Boolean).join(" · ");
+  [
+    s.levelAvg !== null ? `HSK ~${s.levelAvg.toFixed(1)}` : null,
+    s.listeners > 0 ? `${s.listeners} người đã nghe` : null,
+    s.likes > 0 ? `${s.likes} lượt thích` : null,
+  ].filter(Boolean).join(" · ");
 
 /** Tab "Khám phá": bài hát đã được phân tích (nên mở tức thì), lọc theo trình độ, mới nhất/phổ biến và tìm theo tên. */
 export function DiscoverTab() {
   const isAdmin = useIsAdmin();
+  const { liked, setLiked } = useLikedSongs();
   const [sort, setSort] = useState<"new" | "popular">("new");
   const [band, setBand] = useState("");
   const [query, setQuery] = useState("");
@@ -110,6 +117,7 @@ export function DiscoverTab() {
                 <SongCard
                   videoId={s.videoId} title={s.title} channelTitle={s.channelTitle} meta={metaOf(s)} sizes="(min-width:1024px) 33vw, 50vw"
                   adminActions={isAdmin ? <AdminSongActions videoId={s.videoId} onDone={() => setSongs((prev) => prev.filter((p) => p.videoId !== s.videoId))} /> : undefined}
+                  likeButton={<SongLikeButton videoId={s.videoId} liked={liked.has(s.videoId)} onChange={(v) => setLiked(s.videoId, v)} />}
                 />
               </li>
             ))}

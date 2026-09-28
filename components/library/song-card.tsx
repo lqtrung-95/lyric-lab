@@ -16,13 +16,15 @@ interface SongCardProps {
   onRemove?: () => void;
   /** Nút riêng cho quản trị viên (ẩn/xóa bài khỏi Khám phá), đặt ở góc trái để không đè lên onRemove. */
   adminActions?: React.ReactNode;
+  /** Nút tim yêu thích, đặt cùng hàng với onRemove ở góc phải. */
+  likeButton?: React.ReactNode;
 }
 
 /**
  * Thẻ bài hát dùng chung cho trang chủ và thư viện. Thẻ luôn cao bằng nhau trong một hàng: tiêu đề chiếm chỗ 2 dòng
  * và phần chân (kênh, tiến độ) dính đáy, nên bài có tiêu đề ngắn hay dài đều thẳng hàng.
  */
-export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, onRemove, adminActions }: SongCardProps) {
+export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, onRemove, adminActions, likeButton }: SongCardProps) {
   return (
     <div className="group relative h-full">
       <Link
@@ -55,13 +57,18 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, 
       </div>
       </Link>
       {adminActions && <div className="absolute left-2 top-2 flex gap-1">{adminActions}</div>}
-      {onRemove && (
-        <button
-          type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}
-          className="absolute right-2 top-2 flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white opacity-90 backdrop-blur-sm transition-opacity hover:bg-black/75 focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
-        >
-          <Icon name="close" size={20} />
-        </button>
+      {(likeButton || onRemove) && (
+        <div className="absolute right-2 top-2 flex items-center gap-1">
+          {likeButton}
+          {onRemove && (
+            <button
+              type="button" onClick={onRemove} aria-label={`Bỏ “${title}” khỏi danh sách`}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-black/55 text-white opacity-90 backdrop-blur-sm transition-opacity hover:bg-black/75 focus-visible:opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+            >
+              <Icon name="close" size={20} />
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

@@ -26,4 +26,5 @@ export interface DiscoverSong {
   channelTitle: string;
   levelAvg: number | null;
   listeners: number;
+  likes: number;
 }
