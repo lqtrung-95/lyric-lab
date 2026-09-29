@@ -53,14 +53,22 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
         {String(line.index + 1).padStart(2, "0")}
       </button>
       <div className="flex min-w-0 flex-col gap-1">
-        {showPinyin && <p className={`text-pinyin-reading tracking-wide ${active ? "text-on-surface" : "text-on-surface-variant"}`}>{line.pinyin}</p>}
-        <p className={`flex flex-wrap items-baseline gap-x-0.5 font-serif ${active ? "text-headline-lg-mobile leading-tight md:text-headline-lg" : "text-hanzi-body"} text-on-surface`}>
+        <p className={`flex flex-wrap items-end gap-x-0.5 font-serif ${active ? "text-headline-lg-mobile leading-tight md:text-headline-lg" : "text-hanzi-body"} text-on-surface`}>
           {groups.map((g) => {
-            const content = g.parts.map((part, i) =>
-              part.grammarId
-                ? <span key={i} className="border-b-2 border-secondary font-semibold text-secondary">{part.text}</span>
-                : <span key={i}>{part.text}</span>,
-            );
+            const pinyinClass = `text-pinyin-reading font-sans ${active ? "text-on-surface" : "text-on-surface-variant"}`;
+            const content = g.parts.map((part, i) => {
+              const chars = showPinyin && part.pinyinChars
+                ? [...part.text].map((ch, k) => (
+                    <ruby key={k}>
+                      {ch}
+                      <rt className={pinyinClass}>{part.pinyinChars![k] ?? ""}</rt>
+                    </ruby>
+                  ))
+                : part.text;
+              return part.grammarId
+                ? <span key={i} className="border-b-2 border-secondary font-semibold text-secondary">{chars}</span>
+                : <span key={i}>{chars}</span>;
+            });
             if (!g.isHan) return <span key={g.tokenIndex}>{content}</span>;
             return (
               <button
