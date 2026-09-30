@@ -18,7 +18,7 @@ const BANDS = [
   { value: "7", label: "HSK 7–9" },
 ];
 
-interface Page { songs: DiscoverSong[]; hasMore: boolean }
+interface Page { songs: DiscoverSong[]; hasMore: boolean; total: number }
 
 const metaOf = (s: DiscoverSong) =>
   [
@@ -37,6 +37,7 @@ export function DiscoverTab() {
   const [debounced, setDebounced] = useState("");
   const [songs, setSongs] = useState<DiscoverSong[]>([]);
   const [hasMore, setHasMore] = useState(false);
+  const [total, setTotal] = useState<number | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "error">("loading");
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -64,6 +65,7 @@ export function DiscoverTab() {
       if (!page) return setState("error");
       setSongs(page.songs);
       setHasMore(page.hasMore);
+      setTotal(page.total);
       setState("ready");
     });
     return () => { cancelled = true; };
@@ -101,7 +103,9 @@ export function DiscoverTab() {
           </SelectField>
         </label>
       </div>
-      <p className="mt-space-sm text-label-md text-on-surface-variant">Bài hát đã được người dùng khác phân tích: mở là học được ngay, không phải chờ.</p>
+      <p className="mt-space-sm text-label-md text-on-surface-variant">
+        {total !== null && total > 0 ? `${total.toLocaleString("vi-VN")} bài đã được phân tích` : "Bài hát đã được người dùng khác phân tích"}: mở là học được ngay, không phải chờ.
+      </p>
 
       {state === "loading" ? (
         <p role="status" className="mt-space-lg flex items-center gap-2 text-body-md text-on-surface-variant"><Spinner size={18} />Đang tải…</p>

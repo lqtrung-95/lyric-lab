@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     listeners: Number(r.listeners), likes: Number(r.likes),
   }));
   return Response.json(
-    { songs, hasMore: params.offset + songs.length < (count ?? 0) },
+    { songs, hasMore: params.offset + songs.length < (count ?? 0), total: count ?? 0 },
     { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } },
   );
 }
