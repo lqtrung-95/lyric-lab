@@ -55,6 +55,15 @@ test("axe: popover tra từ đang mở", async ({ page }) => {
   await audit(page, "popover");
 });
 
+test("axe: bảng giải thích cả câu đang mở", async ({ page }) => {
+  await stubYouTube(page);
+  await page.route("**/api/explain-line", (r) => r.fulfill({ json: { meaning: "Thành phố ngoài cửa sổ dần chìm vào giấc ngủ.", grammarNote: "Ghi chú ngữ pháp.", model: "t", fromCache: false } }));
+  await page.goto("/dev/listen-fixture");
+  await page.getByRole("button", { name: "Giải thích câu đang hát bằng AI" }).first().click();
+  await expect(page.getByRole("dialog")).toContainText("dần chìm vào giấc ngủ");
+  await audit(page, "bảng giải thích");
+});
+
 test("axe: màn lỗi 'không có lời'", async ({ page }) => {
   await page.route("**/api/analyze/**", (r) =>
     r.fulfill({ contentType: "text/event-stream", body: 'event: meta\ndata: {"title":"Bài mẫu","channelTitle":"Kênh","durationSec":30}\n\nevent: error\ndata: {"code":"no_lyrics"}\n\n' }));

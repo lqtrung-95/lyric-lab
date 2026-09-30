@@ -13,6 +13,7 @@ import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/lea
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
+import { LineExplainSheet } from "./line-explain-sheet";
 import { MiniTransportBar } from "./mini-transport-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
@@ -21,6 +22,7 @@ import { LyricList } from "./lyric-list";
 import type { WordSelection } from "./lyric-line-row";
 import { SingingPanel } from "./singing-panel";
 import { TransportControls } from "./transport-controls";
+import { useLineExplain } from "./use-line-explain";
 import { usePlaybackSync } from "./use-playback-sync";
 import { useSongProgress } from "./use-song-progress";
 import { useTermLookup } from "./use-term-lookup";
@@ -75,8 +77,10 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const [loopIndex, setLoopIndex] = useState<number | null>(null);
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig>(defaultRepeatConfig);
   const [word, setWord] = useState<WordSelection | null>(null);
+  const [explainOpen, setExplainOpen] = useState(false);
   const onRepeatsExhausted = useCallback(() => setLoopIndex(null), []);
   const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
+  const { result: explainResult, explain, reset: resetExplain } = useLineExplain(analysis.videoId);
   const { completed } = useSongProgress(analysis.videoId, lines, currentIndex);
   const lookup = useTermLookup(analysis.videoId, word);
   const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
@@ -121,6 +125,12 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const toggleLoop = useCallback(() => {
     setLoopIndex((prev) => (prev !== null ? null : currentIndex >= 0 ? currentIndex : 0));
   }, [currentIndex]);
+
+  const openExplain = useCallback(() => {
+    if (currentIndex < 0) return;
+    setExplainOpen(true);
+    void explain(currentIndex);
+  }, [currentIndex, explain]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -180,6 +190,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
                 offset={offset} onOffsetChange={setOffset}
                 autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
                 repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
+                onExplain={openExplain} explainDisabled={currentIndex < 0}
               />
             </div>
             {failed && (
@@ -197,6 +208,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             rate={prefs.rate} onRate={(rate) => update({ rate })}
             autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
+            onExplain={openExplain} explainDisabled={currentIndex < 0}
           />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
@@ -215,6 +227,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             offset={offset} onOffsetChange={setOffset}
             autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
+            onExplain={openExplain} explainDisabled={currentIndex < 0}
           />
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
         </div>
@@ -227,6 +240,12 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           word={word} item={wordItem} lookup={lookup}
           saved={savedKeys.has(itemKey({ type: "vocab", term: wordItem?.term ?? (lookup.entry?.ok && lookup.entry.value ? lookup.entry.value.term : word.term) }))}
           onClose={() => setWord(null)} onPlayLine={() => seekToLine(word.lineIndex)} onToggleSave={saveWord}
+        />
+      )}
+      {explainOpen && currentIndex >= 0 && (
+        <LineExplainSheet
+          lineText={lines[currentIndex].text} result={explainResult}
+          onClose={() => { setExplainOpen(false); resetExplain(); }}
         />
       )}
     </>

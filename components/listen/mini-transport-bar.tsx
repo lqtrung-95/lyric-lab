@@ -24,6 +24,9 @@ interface MiniTransportBarProps {
   onToggleAutoScroll: () => void;
   repeatConfig: RepeatConfig;
   onRepeatConfigChange: (v: RepeatConfig) => void;
+  /** Giải thích câu đang hát bằng AI (nghĩa tự nhiên hơn bản dịch máy, kèm ghi chú ngữ pháp). */
+  onExplain: () => void;
+  explainDisabled: boolean;
 }
 
 const round = "flex h-11 w-11 items-center justify-center rounded-full text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/15 disabled:opacity-50";
@@ -37,7 +40,7 @@ const caption = "text-[11px] font-medium leading-none text-on-surface-variant";
  * Cả hai có nút chỉnh thời gian hiện lời để canh lời ngay khi đang nghe. Bản viên nổi (máy tính) có thêm bảng cấu
  * hình lặp câu; bản inline (điện thoại) giữ lặp câu là nút bật/tắt đơn giản cho đỡ chật hàng nút.
  */
-export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
+export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
   const [openPanel, setOpenPanel] = useState<"sync" | "repeat" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -69,6 +72,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
         <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={tile}><span className="font-semibold">{label(rate)}</span><span aria-hidden="true" className={caption}>Tốc độ</span></button>
         <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel} className={`${tile} ${openPanel === "sync" || offset !== 0 ? "bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={24} /><span aria-hidden="true" className={caption}>Chỉnh lời</span></button>
         <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={24} /><span aria-hidden="true" className={caption}>Ghim</span></button>
+        <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={24} /><span aria-hidden="true" className={caption}>Giải thích</span></button>
         {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-1 top-full z-40 mt-1" />}
       </div>
     );
@@ -96,6 +100,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
           className={`${round} ${openPanel === "sync" || offset !== 0 ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="tune" size={22} /></button>
         <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel}
           className={`${round} ${pinned ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="push_pin" size={22} /></button>
+        <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" title="Giải thích câu đang hát" className={round}><Icon name="auto_awesome" size={22} /></button>
       </div>
     </div>
   );

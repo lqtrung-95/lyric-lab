@@ -8,6 +8,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { toSimplifiedChinese } from "@/lib/text/to-simplified-chinese";
 import { buildTermEntry, type TermEntry } from "./build-term-entry";
 import type { ExplainDeps } from "./explain-term";
+import type { ExplainLineDeps } from "./explain-line";
 
 /** Tra một từ (dạng phồn hoặc giản) trong từ điển: pinyin, Hán Việt, cấp HSK, nghĩa tiếng Anh. */
 export async function lookupTermEntry(term: string): Promise<TermEntry | null> {
@@ -43,6 +44,32 @@ export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>
       if (error) throw new Error(error.message);
     },
     dictionaryMeanings: async (term) => (await lookupTermEntry(term))?.meanings ?? [],
+    chat: createChat(getServerEnv()),
+    allowLlmCall,
+  };
+}
+
+/** Phụ thuộc thật cho `explainLine`: cache `line_explanations`, Groq. */
+export function createExplainLineDeps(allowLlmCall: () => boolean | Promise<boolean>): ExplainLineDeps {
+  const sb = createSupabaseServiceClient();
+  const key = (r: { videoId: string; lineIndex: number }) => ({
+    video_id: r.videoId, line_index: r.lineIndex, explain_lang: EXPLAIN_LANG, prompt_version: PROMPT_VERSION,
+  });
+  return {
+    readCache: async (req) => {
+      const k = key(req);
+      const { data } = await sb.from("line_explanations").select("meaning,grammar_note,model")
+        .eq("video_id", k.video_id).eq("line_index", k.line_index)
+        .eq("explain_lang", k.explain_lang).eq("prompt_version", k.prompt_version).maybeSingle();
+      return data ? { meaning: data.meaning, grammarNote: data.grammar_note ?? undefined, model: data.model } : null;
+    },
+    writeCache: async (req, v) => {
+      const { error } = await sb.from("line_explanations").upsert(
+        { ...key(req), meaning: v.meaning, grammar_note: v.grammarNote ?? null, model: v.model },
+        { onConflict: "video_id,line_index,explain_lang,prompt_version" },
+      );
+      if (error) throw new Error(error.message);
+    },
     chat: createChat(getServerEnv()),
     allowLlmCall,
   };
