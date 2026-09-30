@@ -61,7 +61,9 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 ? [...part.text].map((ch, k) => (
                     <ruby key={k}>
                       {ch}
-                      <rt className={pinyinClass}>{part.pinyinChars![k] ?? ""}</rt>
+                      {/* aria-hidden: pinyin chỉ là chú thích thị giác — nếu không ẩn, trình đọc màn hình và tên truy cập
+                          của nút (vd. Playwright getByRole name) sẽ lẫn cả pinyin vào chữ Hán ("慢慢" thành "慢 màn 慢 màn"). */}
+                      <rt aria-hidden="true" className={pinyinClass}>{part.pinyinChars![k] ?? ""}</rt>
                     </ruby>
                   ))
                 : part.text;

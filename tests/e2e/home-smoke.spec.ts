@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("trang chủ hiển thị tiêu đề và điều hướng chính", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("nhớ cả trăm chữ Hán");
-  await expect(page.getByRole("link", { name: "Lyric Lab" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "SongHanzi" })).toBeVisible();
 });
 
 test("giao diện tối bật được và được nhớ sau khi tải lại", async ({ page }) => {
@@ -33,7 +33,7 @@ test("trang giới thiệu: có demo, thanh điều hướng riêng và nút và
 test("trang giới thiệu chỉ mục được, trang app thì noindex", async ({ page, request }) => {
   await page.goto("/");
   await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
-  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /Lyric Lab/);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", /SongHanzi/);
   await expect(page.locator('script[type="application/ld+json"]')).toHaveCount(1);
   const image = new URL((await page.locator('meta[property="og:image"]').getAttribute("content"))!);
   const og = await request.get(image.pathname + image.search);

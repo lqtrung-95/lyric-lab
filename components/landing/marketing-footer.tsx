@@ -24,7 +24,7 @@ export function MarketingFooter() {
       </p>
       <p className="mx-auto max-w-7xl px-gutter pb-10 text-label-md text-on-surface-variant md:px-6 lg:px-12">
         Chủ sở hữu quyền tác giả muốn yêu cầu gỡ nội dung: gửi qua trang{" "}
-        <Link href="/feedback" className="text-primary hover:underline">Góp ý</Link>, chọn mục &quot;Yêu cầu gỡ nội dung (bản quyền)&quot;. Chúng tôi phản hồi trong 72 giờ.
+        <Link href="/feedback" className="text-primary underline underline-offset-2">Góp ý</Link>, chọn mục &quot;Yêu cầu gỡ nội dung (bản quyền)&quot;. Chúng tôi phản hồi trong 72 giờ.
       </p>
     </footer>
   );

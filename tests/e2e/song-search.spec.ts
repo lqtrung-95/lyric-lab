@@ -12,7 +12,7 @@ test("gõ tên: hiện nhóm 'Đã có' và 'Trên YouTube', bấm kết quả m
   await page.goto("/app");
   const input = page.getByLabel(/Dán link YouTube hoặc gõ tên/);
   await input.fill("周杰伦");
-  await expect(page.getByRole("region", { name: "Đã có trong Lyric Lab" })).toContainText("歌曲 1");
+  await expect(page.getByRole("region", { name: "Đã có trong SongHanzi" })).toContainText("歌曲 1");
   await expect(page.getByRole("region", { name: "Trên YouTube" })).toContainText("歌曲 3");
   expect(urls.at(-1)).toContain(encodeURIComponent("周杰伦"));
   expect((await new AxeBuilder({ page }).analyze()).violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);
@@ -26,7 +26,7 @@ test("YouTube không tìm được: báo 'hãy dán link' và vẫn hiện bài 
   await page.route("**/api/search**", (r) => r.fulfill({ status: 503, json: { error: "search_unavailable", library: [song(1)], youtube: [] } }));
   await page.goto("/app");
   await page.getByLabel(/Dán link YouTube hoặc gõ tên/).fill("bài nào đó");
-  await expect(page.getByRole("region", { name: "Đã có trong Lyric Lab" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Đã có trong SongHanzi" })).toBeVisible();
   await expect(page.getByRole("alert").filter({ hasText: "hãy dán link" })).toBeVisible();
 });
 
