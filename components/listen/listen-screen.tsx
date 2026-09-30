@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLikedSongs } from "@/components/library/use-liked-songs";
 import { CompletedToast } from "./completed-toast";
+import { Toast } from "@/components/ui/toast";
 import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
@@ -43,6 +44,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
   const [quickSync, setQuickSync] = useState(false);
   const [toastDismissed, setToastDismissed] = useState(false);
+  const [pinToast, setPinToast] = useState<string | null>(null);
   // Thanh điều khiển đầy đủ cuộn khuất (hoặc bị video ghim ở trên đè lên) thì hiện thanh thu gọn nổi để vẫn điều
   // khiển được khi đọc lời. IntersectionObserver không đủ: nó coi thanh vẫn "trong màn hình" miễn còn giao với
   // viewport dù đã bị video đè kín phần trên, nên chỉ báo khuất khi thanh cuộn qua HẾT — trễ hơn nhiều so với lúc
@@ -126,6 +128,13 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     setLoopIndex((prev) => (prev !== null ? null : currentIndex >= 0 ? currentIndex : 0));
   }, [currentIndex]);
 
+  // Ghim/bỏ ghim không có phản hồi hiện lên ngay (chỉ đổi màu icon), dễ bị bỏ lỡ khi thao tác nhanh lúc đang nghe.
+  const toggleAutoScroll = useCallback(() => {
+    const nextAutoScroll = !prefs.autoScroll;
+    update({ autoScroll: nextAutoScroll });
+    setPinToast(nextAutoScroll ? "Đã bỏ ghim: lời tự cuộn theo câu đang hát" : "Đã ghim: lời sẽ không tự cuộn theo câu đang hát nữa");
+  }, [prefs.autoScroll, update]);
+
   const openExplain = useCallback(() => {
     if (currentIndex < 0) return;
     setExplainOpen(true);
@@ -188,7 +197,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
                 onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
                 looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
                 offset={offset} onOffsetChange={setOffset}
-                autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
+                autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
                 repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
                 onExplain={openExplain} explainDisabled={currentIndex < 0}
               />
@@ -206,7 +215,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
-            autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
+            autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
             onExplain={openExplain} explainDisabled={currentIndex < 0}
           />
@@ -225,11 +234,12 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
             looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
             offset={offset} onOffsetChange={setOffset}
-            autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
+            autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
             onExplain={openExplain} explainDisabled={currentIndex < 0}
           />
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
+          {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}
         </div>
         <div className="lg:sticky lg:top-24 lg:col-span-5">
           <SingingPanel line={lines[currentIndex] ?? null} items={currentItems} savedKeys={savedKeys} onToggleSave={saveFromPanel} />

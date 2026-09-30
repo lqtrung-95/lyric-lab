@@ -71,21 +71,23 @@ export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loop
             aria-pressed={looping}
             aria-label="Lặp câu đang hát"
             title="Lặp câu đang hát (L)"
-            className={`${roundBtn} rounded-r-none ${looping ? "!bg-primary/15 text-primary" : "text-on-surface-variant"}`}
+            className={`${roundBtn} ${looping ? "rounded-r-none !bg-primary/15 text-primary" : "text-on-surface-variant"}`}
           >
             <Icon name="repeat_one" size={20} />
           </button>
-          <button
-            type="button"
-            onClick={() => setSettingsOpen((o) => !o)}
-            aria-expanded={settingsOpen}
-            aria-label="Cấu hình lặp câu: số lần và khoảng nghỉ"
-            title="Cấu hình lặp câu"
-            className={`flex h-11 min-w-11 items-center justify-center rounded-r-full border-l border-outline-variant/40 bg-surface-container text-on-surface-variant hover:bg-surface-container-high ${looping ? "!bg-primary/15 text-primary" : ""}`}
-          >
-            <Icon name="expand_more" size={16} />
-          </button>
-          {settingsOpen && <RepeatSettingsPopover value={repeatConfig} onChange={onRepeatConfigChange} className="absolute left-0 top-full z-40 mt-1" />}
+          {looping && (
+            <button
+              type="button"
+              onClick={() => setSettingsOpen((o) => !o)}
+              aria-expanded={settingsOpen}
+              aria-label="Cấu hình lặp câu: số lần và khoảng nghỉ"
+              title="Cấu hình lặp câu"
+              className="flex h-11 min-w-11 items-center justify-center rounded-r-full border-l border-outline-variant/40 !bg-primary/15 text-primary hover:bg-primary/25"
+            >
+              <Icon name="expand_more" size={16} />
+            </button>
+          )}
+          {settingsOpen && looping && <RepeatSettingsPopover value={repeatConfig} onChange={onRepeatConfigChange} className="absolute left-0 top-full z-40 mt-1" />}
         </div>
         <button
           type="button"

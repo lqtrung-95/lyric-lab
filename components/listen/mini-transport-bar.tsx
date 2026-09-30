@@ -83,7 +83,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
     <div role="group" aria-label="Điều khiển nhanh" className="pointer-events-none sticky bottom-6 z-30 hidden justify-center px-2 lg:flex">
       <div ref={barRef} className="pointer-events-auto relative flex items-center gap-1 rounded-full bg-inverse-surface px-2 py-1.5 shadow-[0_8px_30px_rgba(20,10,5,0.35)]">
         {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
-        {openPanel === "repeat" && <RepeatSettingsPopover value={repeatConfig} onChange={onRepeatConfigChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
+        {openPanel === "repeat" && looping && <RepeatSettingsPopover value={repeatConfig} onChange={onRepeatConfigChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
         <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={round}><Icon name="replay_5" size={22} /></button>
         <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50">
@@ -92,8 +92,10 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
         <button type="button" disabled={!ready} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={round}><Icon name="forward_5" size={22} /></button>
         <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát"
           className={`${round} ${looping ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="repeat_one" size={22} /></button>
-        <button type="button" onClick={() => setOpenPanel((p) => (p === "repeat" ? null : "repeat"))} aria-expanded={openPanel === "repeat"} aria-label="Cấu hình lặp câu: số lần và khoảng nghỉ" title="Cấu hình lặp câu"
-          className="flex h-11 min-w-11 items-center justify-center rounded-full text-inverse-on-surface/70 hover:bg-inverse-on-surface/15"><Icon name="expand_more" size={14} /></button>
+        {looping && (
+          <button type="button" onClick={() => setOpenPanel((p) => (p === "repeat" ? null : "repeat"))} aria-expanded={openPanel === "repeat"} aria-label="Cấu hình lặp câu: số lần và khoảng nghỉ" title="Cấu hình lặp câu"
+            className="flex h-11 min-w-11 items-center justify-center rounded-full text-inverse-primary hover:bg-inverse-on-surface/15"><Icon name="expand_more" size={14} /></button>
+        )}
         <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel}
           className="min-h-11 min-w-12 rounded-full px-2 text-label-md font-semibold text-inverse-on-surface hover:bg-inverse-on-surface/15">{label(rate)}</button>
         <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel}
