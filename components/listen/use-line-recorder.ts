@@ -8,12 +8,16 @@ export type RecorderState = "idle" | "requesting" | "recording" | "recorded" | "
  * Ghi âm giọng hát theo câu, chỉ lưu tạm trong trình duyệt (không gửi lên server) để người học tự nghe lại so với
  * bản gốc — không chấm điểm tự động, bản tối giản để thử phản ứng người dùng trước khi đầu tư nhận diện giọng nói.
  */
-export function useLineRecorder() {
+export function useLineRecorder(onRecorded?: () => void) {
   const [state, setState] = useState<RecorderState>("idle");
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  // Ref để onstop (đăng ký một lần lúc start) luôn gọi callback mới nhất mà không phải liệt kê onRecorded
+  // vào dependency của start — tránh phải tạo lại MediaRecorder khi component cha truyền hàm mới mỗi lần vẽ.
+  const onRecordedRef = useRef(onRecorded);
+  useEffect(() => { onRecordedRef.current = onRecorded; }, [onRecorded]);
 
   const cleanupStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -39,6 +43,7 @@ export function useLineRecorder() {
         setAudioUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return URL.createObjectURL(blob); });
         setState("recorded");
         cleanupStream();
+        onRecordedRef.current?.();
       };
       mediaRecorderRef.current = recorder;
       recorder.start();

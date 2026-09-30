@@ -24,12 +24,15 @@ interface TransportControlsProps {
   /** Giải thích câu đang hát bằng AI (nghĩa tự nhiên hơn bản dịch máy, kèm ghi chú ngữ pháp). */
   onExplain: () => void;
   explainDisabled: boolean;
+  /** Mở popup luyện phát âm riêng cho câu đang hát (Nghe → Nghĩ → Hát → Nghe lại), giống nút của app Miraa. */
+  onPractice: () => void;
+  practiceDisabled: boolean;
 }
 
 const roundBtn = "flex h-11 w-11 items-center justify-center rounded-full bg-surface-container text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50";
 
 /** Thanh điều khiển: lùi/tới 5 giây, phát/dừng, lặp câu (LS-08, kèm cấu hình số lần/khoảng nghỉ), tốc độ 0,5x / 0,75x / 1x (LS-09), ghim tự cuộn. */
-export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled }: TransportControlsProps) {
+export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: TransportControlsProps) {
   const looping = loopIndex !== null;
   const pinned = !autoScroll;
 
@@ -82,6 +85,16 @@ export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loop
           className={roundBtn}
         >
           <Icon name="auto_awesome" size={20} />
+        </button>
+        <button
+          type="button"
+          disabled={practiceDisabled}
+          onClick={onPractice}
+          aria-label="Luyện phát âm câu đang hát"
+          title="Luyện phát âm"
+          className={roundBtn}
+        >
+          <Icon name="mic" size={20} />
         </button>
       </div>
 

@@ -5,7 +5,6 @@ import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
 import { levelLabel } from "@/lib/preview/preview-format";
 import { itemKey } from "@/lib/user-state/learner-state";
-import { LineRecorderCard } from "./line-recorder-card";
 
 interface SingingPanelProps {
   line: AnalyzedLine | null;
@@ -82,7 +81,6 @@ export function SingingPanel({ line, items, savedKeys, onToggleSave }: SingingPa
             {items.map((item) => <ItemCard key={item.id} item={item} saved={savedKeys.has(itemKey(item))} onToggleSave={onToggleSave} />)}
           </ul>
         )}
-        {line && <div className="mt-3"><LineRecorderCard lineIndex={line.index} /></div>}
       </div>
     </aside>
   );

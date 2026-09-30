@@ -27,6 +27,9 @@ interface MiniTransportBarProps {
   /** Giải thích câu đang hát bằng AI (nghĩa tự nhiên hơn bản dịch máy, kèm ghi chú ngữ pháp). */
   onExplain: () => void;
   explainDisabled: boolean;
+  /** Mở popup luyện phát âm riêng cho câu đang hát (Nghe → Nghĩ → Hát → Nghe lại), giống nút của app Miraa. */
+  onPractice: () => void;
+  practiceDisabled: boolean;
 }
 
 const round = "flex h-11 w-11 items-center justify-center rounded-full text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/15 disabled:opacity-50";
@@ -42,7 +45,7 @@ const tile = "flex h-11 w-11 items-center justify-center rounded-full text-on-su
  * (hàng riêng phía trên hàng nút) để không đè lên player; bản viên thuốc nổi (đã tách xa video khi cuộn) thì chip
  * nổi hẳn lên trên, giống thanh điều khiển nổi của ứng dụng tham khảo.
  */
-export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
+export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
   const [openPanel, setOpenPanel] = useState<"sync" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -81,6 +84,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
           <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel} className={`${tile} ${openPanel === "sync" || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={22} /></button>
           <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={22} /></button>
           <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={22} /></button>
+          <button type="button" disabled={practiceDisabled} onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={22} /></button>
           {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-1 top-full z-40 mt-1" />}
         </div>
       </div>
@@ -110,6 +114,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
         <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel}
           className={`${round} ${pinned ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="push_pin" size={22} /></button>
         <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" title="Giải thích câu đang hát" className={round}><Icon name="auto_awesome" size={22} /></button>
+        <button type="button" disabled={practiceDisabled} onClick={onPractice} aria-label="Luyện phát âm câu đang hát" title="Luyện phát âm" className={round}><Icon name="mic" size={22} /></button>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLikedSongs } from "@/components/library/use-liked-songs";
 import { CompletedToast } from "./completed-toast";
 import { Toast } from "@/components/ui/toast";
-import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
+import type { AnalyzedLine, PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
 import { estimateSyncRisk, offsetFromLineClick, shiftLines } from "@/lib/listen/lyric-offset";
@@ -15,6 +15,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { LineExplainSheet } from "./line-explain-sheet";
+import { LinePracticeSheet } from "./line-practice-sheet";
 import { MiniTransportBar } from "./mini-transport-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
@@ -24,6 +25,7 @@ import type { WordSelection } from "./lyric-line-row";
 import { SingingPanel } from "./singing-panel";
 import { TransportControls } from "./transport-controls";
 import { useLineExplain } from "./use-line-explain";
+import { useListenLineOnce } from "./use-listen-line-once";
 import { usePlaybackSync } from "./use-playback-sync";
 import { useSongProgress } from "./use-song-progress";
 import { useTermLookup } from "./use-term-lookup";
@@ -80,10 +82,18 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig>(defaultRepeatConfig);
   const [word, setWord] = useState<WordSelection | null>(null);
   const [explainOpen, setExplainOpen] = useState(false);
+  // Câu đang luyện phát âm: chụp lại lúc bấm mở, không đọc theo currentIndex sống nữa — nhạc chạy tiếp/đổi câu
+  // trong lúc popup mở sẽ không làm mất nội dung đang luyện (khác lúc trước gắn thẳng vào panel "Đang hát").
+  const [practiceLine, setPracticeLine] = useState<AnalyzedLine | null>(null);
   const onRepeatsExhausted = useCallback(() => setLoopIndex(null), []);
-  const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
+  const { currentIndex: liveIndex, playing } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
+  // Trong lúc popup luyện phát âm đang mở, giữ nguyên hiển thị (tô sáng lời, cuộn, panel "Đang hát") ở đúng câu
+  // đang luyện — không theo currentIndex sống nữa. Nghe 1 câu trong popup có thể khiến currentIndex thật sự đã lệch
+  // sang câu kế (mốc kết thúc câu này thường trùng luôn mốc bắt đầu câu sau), nếu cứ theo currentIndex thì lời phía
+  // sau sẽ tự nhảy câu ngay trong lúc người dùng còn đang xem popup của câu trước.
+  const currentIndex = practiceLine ? practiceLine.index : liveIndex;
   const { result: explainResult, explain, reset: resetExplain } = useLineExplain(analysis.videoId);
-  const { completed } = useSongProgress(analysis.videoId, lines, currentIndex);
+  const { completed } = useSongProgress(analysis.videoId, lines, liveIndex);
   const lookup = useTermLookup(analysis.videoId, word);
   const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
 
@@ -109,6 +119,8 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     controller.play();
     setLoopIndex((prev) => (prev === null ? prev : index));
   }, [controller, lines]);
+
+  const listenLineOnce = useListenLineOnce(controller, lines);
 
   // Đồng bộ nhanh: bấm dòng đang được hát → độ lệch = thời gian video hiện tại − mốc gốc của dòng đó.
   const syncToLine = useCallback((index: number) => {
@@ -144,6 +156,13 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     setExplainOpen(true);
     void explain(currentIndex);
   }, [currentIndex, explain, controller]);
+
+  // Mở popup luyện phát âm cho câu đang hát: tạm dừng nhạc nền và chụp lại câu tại thời điểm bấm.
+  const openPractice = useCallback(() => {
+    if (currentIndex < 0) return;
+    controller?.pause();
+    setPracticeLine(lines[currentIndex]);
+  }, [currentIndex, controller, lines]);
 
   // Bấm tra một từ trong lúc đang mở giải thích cả câu: đóng giải thích lại, ưu tiên tra từ (thao tác nhanh hơn).
   const selectWord = useCallback((selection: WordSelection) => {
@@ -210,6 +229,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
                 autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
                 repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
                 onExplain={openExplain} explainDisabled={currentIndex < 0}
+                onPractice={openPractice} practiceDisabled={currentIndex < 0}
               />
             </div>
             {failed && (
@@ -228,6 +248,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
             onExplain={openExplain} explainDisabled={currentIndex < 0}
+            onPractice={openPractice} practiceDisabled={currentIndex < 0}
           />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
@@ -247,6 +268,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
             onExplain={openExplain} explainDisabled={currentIndex < 0}
+            onPractice={openPractice} practiceDisabled={currentIndex < 0}
           />
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
           {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}
@@ -266,6 +288,14 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
         <LineExplainSheet
           lineText={lines[currentIndex].text} result={explainResult}
           onClose={() => { setExplainOpen(false); resetExplain(); }}
+        />
+      )}
+      {practiceLine && (
+        <LinePracticeSheet
+          line={practiceLine}
+          onListenLine={() => listenLineOnce(practiceLine.index)}
+          onPauseSong={() => controller?.pause()}
+          onClose={() => setPracticeLine(null)}
         />
       )}
     </>
