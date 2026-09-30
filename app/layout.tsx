@@ -28,11 +28,16 @@ export const viewport: Viewport = {
 // Áp dụng giao diện tối trước khi vẽ để không bị nháy sáng. Ưu tiên lựa chọn đã lưu, sau đó theo hệ thống.
 const THEME_INIT = `try{var t=localStorage.getItem('lyric-lab-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`;
 
+// Icon (font Material Symbols) ẩn tới khi font tải xong (xem .material-symbols-outlined trong globals.css) — báo
+// đúng lúc bằng Font Loading API thay vì chỉ dựa vào mốc dự phòng cố định, mờ dần cho êm thay vì hiện đột ngột.
+const ICONS_READY_INIT = `try{document.fonts.ready.then(function(){document.documentElement.classList.add('fonts-ready')})}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${sans.variable} ${serif.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
+        <script dangerouslySetInnerHTML={{ __html: ICONS_READY_INIT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href={googleFontsUrl()} />
