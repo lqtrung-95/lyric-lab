@@ -91,14 +91,15 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
     );
   }
 
-  // Máy tính: viên thuốc nổi. Khung ngoài không bắt chuột (không che lời phía sau), chỉ viên thuốc nhận thao tác.
-  // Đang lặp câu thì đẩy viên thuốc lên cao hơn bình thường, chừa chỗ cho 2 chip nhô phía trên khỏi đè lên dòng lời
-  // đang hát (dòng này thường cuộn tới gần đáy màn hình, sát ngay viên thuốc).
+  // Máy tính: viên thuốc nổi. Khung ngoài không bắt chuột (không che lời phía sau), chỉ viên thuốc/chip nhận thao
+  // tác. Viên thuốc luôn đứng yên ở `bottom-6` — 2 chip lặp câu xếp thành hàng riêng NGAY TRONG luồng bình thường
+  // phía trên nó (giống bản inline điện thoại), không đẩy cả khối lên bằng cách đổi bottom-offset như trước (làm
+  // viên thuốc nhảy vị trí mỗi lần bật/tắt lặp câu).
   return (
-    <div data-floating-controls role="group" aria-label="Điều khiển nhanh" className={`pointer-events-none sticky z-30 hidden justify-center px-2 lg:flex ${looping ? "bottom-16" : "bottom-6"}`}>
+    <div data-floating-controls role="group" aria-label="Điều khiển nhanh" className="pointer-events-none sticky bottom-6 z-30 hidden flex-col items-center gap-2 px-2 lg:flex">
+      {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="pointer-events-auto" />}
       <div ref={barRef} className="pointer-events-auto relative flex items-center gap-1 rounded-full bg-inverse-surface px-2 py-1.5 shadow-[0_8px_30px_rgba(20,10,5,0.35)]">
         {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
-        {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="absolute -top-3 right-2 z-10" />}
         <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={round}><Icon name="replay_5" size={22} /></button>
         <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50">
