@@ -247,9 +247,14 @@ body {
 
 /*
  * Icon Material Symbols (subset tải trong layout, display=block nên vô hình chứ không hiện chữ ligature thật lúc
- * đang tải — xem lib/ui/google-fonts-url.ts). "Vô hình rồi hiện" vẫn giật nhẹ nên mờ dần thay vì bật đột ngột:
- * ẩn hẳn tới khi <html> có lớp `fonts-ready` (gắn bằng script khi document.fonts.ready, xem layout.tsx), có mốc
- * thời gian dự phòng 1,2s phòng khi Font Loading API không chạy được (trình duyệt cũ, JS lỗi…).
+ * đang tải — xem lib/ui/google-fonts-url.ts). Nội dung span là TÊN icon thật (vd "music_note"), nên trước khi
+ * font tải xong, trình duyệt tính bề rộng khung theo chữ đó bằng font dự phòng — rộng hơn hẳn 1 icon vuông. Khi
+ * font tải xong, khung co lại đúng bề rộng icon → đẩy layout xung quanh (badge, nút…) giật theo, dù chữ đã ẩn.
+ * Khóa cứng width/height = 1em (đúng bằng font-size) + overflow hidden: khung luôn 1 kích thước ngay từ đầu,
+ * không phụ thuộc nội dung chữ bên trong hay font đã tải xong hay chưa — hết giật layout hẳn, không chỉ ẩn chữ.
+ * "Vô hình rồi hiện" vẫn giật nhẹ nên mờ dần thay vì bật đột ngột: ẩn hẳn tới khi <html> có lớp `fonts-ready`
+ * (gắn bằng script khi document.fonts.ready, xem layout.tsx), có mốc dự phòng 1,2s phòng khi Font Loading API
+ * không chạy được (trình duyệt cũ, JS lỗi…).
  */
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
@@ -264,6 +269,10 @@ body {
   font-feature-settings: "liga";
   -webkit-font-smoothing: antialiased;
   font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0; /* width cố định nên trong flex container chật (nút có chữ dài) dễ bị co nhỏ nếu không khóa */
+  overflow: hidden;
   opacity: 0;
   animation: icon-reveal-fallback 0s 1.2s forwards;
 }
