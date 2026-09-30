@@ -78,10 +78,11 @@ export function PasteLinkForm() {
             id="video-link"
             type="text"
             autoComplete="off"
+            placeholder="https://youtube.com/watch?v=…"
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? "video-link-error" : undefined}
             onChange={(e) => { setText(e.target.value); if (error) setError(null); }}
-            className="min-h-11 flex-1 bg-transparent text-body-md text-on-surface outline-none"
+            className="min-h-11 flex-1 bg-transparent text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/70"
           />
           <button
             type="button"
