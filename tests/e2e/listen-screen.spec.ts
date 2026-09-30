@@ -120,6 +120,18 @@ test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", asyn
   await page.getByRole("button", { name: "0,75x" }).click();
   await expect.poll(() => calls(page)).toContain("rate:0.75");
   await page.reload();
+  // Cùng hiện tượng trôi cuộn sau khi tải đã ghi chú ở beforeEach — reload giữa bài test cũng cần cuộn lại về đầu,
+  // không thì thanh chính bị coi là cuộn khuất, viên thuốc nổi hiện thêm và "0,75x" khớp 2 nút (strict mode). Trôi
+  // có thể xảy ra sau cả lần cuộn đầu nên cuộn liên tục tới khi đứng yên ở 0 (giống scrollToBottom ở trên).
+  await page.waitForFunction(
+    () => {
+      const before = window.scrollY;
+      window.scrollTo({ top: 0, behavior: "instant" });
+      return before === 0 && window.scrollY === 0;
+    },
+    null,
+    { polling: 100, timeout: 10_000 },
+  );
   await expect(page.getByRole("button", { name: "0,75x" })).toHaveAttribute("aria-pressed", "true");
   await expect.poll(() => calls(page)).toContain("rate:0.75");
 });
