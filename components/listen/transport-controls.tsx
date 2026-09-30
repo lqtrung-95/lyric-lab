@@ -34,7 +34,8 @@ export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loop
   const pinned = !autoScroll;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-surface-container-low p-4 shadow-sm">
+    <div className="relative flex flex-wrap items-center justify-between gap-4 rounded-xl bg-surface-container-low p-4 shadow-sm">
+      {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="absolute -top-3 right-3 z-10" />}
       <div className="flex items-center gap-3">
         <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} title="Lùi 5 giây" aria-label="Lùi 5 giây" className={roundBtn}>
           <Icon name="replay_5" size={20} />
@@ -85,10 +86,9 @@ export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loop
       </div>
 
       {looping && (
-        <div role="status" className="flex items-center gap-2 rounded-full bg-primary/10 py-1.5 pl-3 pr-1.5 text-label-sm font-semibold text-primary">
+        <div role="status" className="flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-label-sm font-semibold text-primary">
           <span aria-hidden="true" className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-primary" />
           <span className="whitespace-nowrap">Đang lặp câu {loopIndex + 1}{loopStart !== null && ` (${formatTimestamp(loopStart)})`}</span>
-          <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} />
         </div>
       )}
 

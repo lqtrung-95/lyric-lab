@@ -21,7 +21,7 @@ export function RepeatConfigChips({ value, onChange, className = "" }: RepeatCon
   const nextTimes = REPEAT_COUNT_OPTIONS[(countIndex + 1) % REPEAT_COUNT_OPTIONS.length];
 
   return (
-    <div className={`flex items-center gap-1.5 ${className}`}>
+    <div className={`anim-chip-in flex items-center gap-1.5 ${className}`}>
       <button
         type="button"
         onClick={() => onChange({ ...value, delaySec: nextDelay })}

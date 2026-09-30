@@ -57,7 +57,13 @@ test("axe: popover tra từ đang mở", async ({ page }) => {
 
 test("axe: bảng giải thích cả câu đang mở", async ({ page }) => {
   await stubYouTube(page);
-  await page.route("**/api/explain-line", (r) => r.fulfill({ json: { meaning: "Thành phố ngoài cửa sổ dần chìm vào giấc ngủ.", grammarNote: "Ghi chú ngữ pháp.", model: "t", fromCache: false } }));
+  await page.route("**/api/explain-line", (r) => r.fulfill({ json: {
+    translation: "Thành phố ngoài cửa sổ dần chìm vào giấc ngủ.",
+    vocabulary: [{ term: "城市", pinyin: "chéng shì", meaning: "thành phố" }],
+    grammarPoints: [{ title: "了 chỉ trạng thái mới", explanation: "Đánh dấu thành phố vừa chuyển sang trạng thái yên tĩnh." }],
+    notes: ["Hình ảnh nhân hóa: thành phố như đang chìm vào giấc ngủ."],
+    model: "t", fromCache: false,
+  } }));
   await page.goto("/dev/listen-fixture");
   await page.getByRole("button", { name: "Giải thích câu đang hát bằng AI" }).first().click();
   await expect(page.getByRole("dialog")).toContainText("dần chìm vào giấc ngủ");

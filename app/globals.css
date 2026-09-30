@@ -334,3 +334,13 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .anim-note-in, .anim-note-pop, .anim-note-shake { animation: none; }
 }
+
+/* Chip cấu hình lặp câu nhô nhẹ lên khi xuất hiện (xem repeat-config-chips.tsx). Tắt khi giảm chuyển động. */
+@keyframes chip-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+.anim-chip-in { animation: chip-in 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-chip-in { animation: none; }
+}

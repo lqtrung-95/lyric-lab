@@ -65,7 +65,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
     return (
       <div ref={barRef} className="bg-surface">
         {looping && (
-          <div className="flex justify-center border-b border-outline-variant/30 py-1.5">
+          <div className="flex justify-end border-b border-outline-variant/30 px-2 py-1.5">
             <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} />
           </div>
         )}
@@ -92,17 +92,15 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
     <div role="group" aria-label="Điều khiển nhanh" className="pointer-events-none sticky bottom-6 z-30 hidden justify-center px-2 lg:flex">
       <div ref={barRef} className="pointer-events-auto relative flex items-center gap-1 rounded-full bg-inverse-surface px-2 py-1.5 shadow-[0_8px_30px_rgba(20,10,5,0.35)]">
         {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
+        {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="absolute -top-3 right-2 z-10" />}
         <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={round}><Icon name="replay_5" size={22} /></button>
         <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50">
           <Icon name={playing ? "pause" : "play_arrow"} filled size={26} />
         </button>
         <button type="button" disabled={!ready} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={round}><Icon name="forward_5" size={22} /></button>
-        <div className="relative">
-          <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát"
-            className={`${round} ${looping ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="repeat_one" size={22} /></button>
-          {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="absolute bottom-full left-1/2 z-40 mb-2 -translate-x-1/2" />}
-        </div>
+        <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát"
+          className={`${round} ${looping ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="repeat_one" size={22} /></button>
         <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel}
           className="min-h-11 min-w-12 rounded-full px-2 text-label-md font-semibold text-inverse-on-surface hover:bg-inverse-on-surface/15">{label(rate)}</button>
         <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel}

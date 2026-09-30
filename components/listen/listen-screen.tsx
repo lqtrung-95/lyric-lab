@@ -135,11 +135,13 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     setPinToast(nextAutoScroll ? "Đã bỏ ghim: lời tự cuộn theo câu đang hát" : "Đã ghim: lời sẽ không tự cuộn theo câu đang hát nữa");
   }, [prefs.autoScroll, update]);
 
+  // Tạm dừng khi mở giải thích: đọc xong câu đang phát mà nhạc vẫn trôi tới câu khác thì nội dung không còn khớp.
   const openExplain = useCallback(() => {
     if (currentIndex < 0) return;
+    controller?.pause();
     setExplainOpen(true);
     void explain(currentIndex);
-  }, [currentIndex, explain]);
+  }, [currentIndex, explain, controller]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

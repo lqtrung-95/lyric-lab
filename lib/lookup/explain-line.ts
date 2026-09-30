@@ -1,10 +1,11 @@
 import type { ChatFn } from "@/lib/analysis/groq-chat";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { EXPLAIN_LINE_SYSTEM_PROMPT, buildExplainLinePrompt } from "./build-explain-line-prompt";
-import { explainLineOutputSchema, type ExplainLineRequest, type LineExplanation } from "./explain-line-schema";
+import { explainLineOutputSchema, type ExplainLineOutput, type ExplainLineRequest, type LineExplanation } from "./explain-line-schema";
 import { EXPLAIN_MODELS } from "./explain-term";
 
-const MAX_EXPLAIN_LINE_TOKENS = 500;
+// Cấu trúc đầy đủ (dịch + từ vựng + ngữ pháp + ghi chú) tốn nhiều token hơn giải nghĩa một câu đơn giản.
+const MAX_EXPLAIN_LINE_TOKENS = 1200;
 
 export type ExplainLineErrorCode = "line_not_found" | "explain_failed" | "rate_limited";
 
@@ -15,9 +16,7 @@ export class ExplainLineError extends Error {
   }
 }
 
-export interface CachedLineExplanation {
-  meaning: string;
-  grammarNote?: string;
+export interface CachedLineExplanation extends ExplainLineOutput {
   model: string;
 }
 
@@ -49,7 +48,7 @@ export async function explainLine(lines: AnalyzedLine[], req: ExplainLineRequest
     try {
       const raw = await deps.chat({ model, system: EXPLAIN_LINE_SYSTEM_PROMPT, user: prompt, maxTokens: MAX_EXPLAIN_LINE_TOKENS });
       const parsed = explainLineOutputSchema.parse(JSON.parse(raw));
-      const value: CachedLineExplanation = { meaning: parsed.meaning, grammarNote: parsed.grammarNote || undefined, model };
+      const value: CachedLineExplanation = { ...parsed, model };
       await deps.writeCache(req, value).catch(() => {}); // ghi cache lỗi không được làm hỏng câu trả lời
       return { ...value, fromCache: false };
     } catch (e) {

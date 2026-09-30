@@ -9,7 +9,9 @@ const FAIL_TEXT = {
   error: "Chưa giải thích được lúc này. Thử lại sau nhé.",
 } as const;
 
-/** Bottom sheet hiện kết quả giải thích cả câu đang hát (nghĩa tự nhiên hơn bản dịch máy, kèm ghi chú ngữ pháp). */
+const sectionTitle = "text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant";
+
+/** Bottom sheet hiện kết quả giải thích cả câu đang hát: dịch tự nhiên, từ vựng, điểm ngữ pháp, ghi chú khác. */
 export function LineExplainSheet({ lineText, result, onClose }: { lineText: string; result: LineExplainResult; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -25,36 +27,73 @@ export function LineExplainSheet({ lineText, result, onClose }: { lineText: stri
       aria-label={`Giải thích câu ${lineText}`}
       tabIndex={-1}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="fixed inset-x-0 bottom-0 z-50 max-h-[70vh] overflow-y-auto rounded-t-2xl bg-surface-container-lowest p-5 shadow-[0_-4px_24px_rgba(30,26,22,0.2)] outline-none md:inset-x-auto md:bottom-6 md:right-6 md:w-96 md:rounded-2xl"
+      className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl bg-surface-container-lowest p-5 shadow-[0_-4px_24px_rgba(30,26,22,0.2)] outline-none md:inset-x-auto md:bottom-6 md:right-6 md:w-[26rem] md:rounded-2xl"
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="sticky top-0 -mt-5 -mx-5 flex items-start justify-between gap-3 bg-surface-container-lowest px-5 pb-3 pt-5">
         <p lang="zh" className="font-serif text-hanzi-body text-on-surface">{lineText}</p>
         <button type="button" aria-label="Đóng" onClick={onClose} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high">
           <Icon name="close" size={20} />
         </button>
       </div>
 
-      <section aria-label="Giải thích" className="mt-3">
-        <h3 className="text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">Ý nghĩa câu này</h3>
-        {result.status === "ok" ? (
-          <>
-            <p className="mt-1 text-body-md font-medium text-on-surface">{result.value.meaning}</p>
-            {result.value.grammarNote && (
-              <>
-                <h3 className="mt-3 text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant">Ngữ pháp</h3>
-                <p className="mt-1 text-label-md text-on-surface-variant">{result.value.grammarNote}</p>
-              </>
-            )}
-          </>
-        ) : result.status === "error" ? (
-          <p role="status" className="mt-1 text-label-md text-on-surface-variant">{FAIL_TEXT[result.reason]}</p>
-        ) : (
-          <div role="status" aria-label="Đang giải thích" className="mt-2 space-y-2">
-            <div className="h-4 w-full animate-pulse rounded bg-surface-container-high" />
-            <div className="h-4 w-3/4 animate-pulse rounded bg-surface-container-high" />
-          </div>
-        )}
-      </section>
+      {result.status === "ok" ? (
+        <div className="space-y-4">
+          <section aria-label="Dịch">
+            <h3 className={sectionTitle}>Dịch</h3>
+            <p className="mt-1 text-body-md font-medium text-on-surface">{result.value.translation}</p>
+          </section>
+
+          {result.value.vocabulary.length > 0 && (
+            <section aria-label="Từ vựng">
+              <h3 className={sectionTitle}>Từ vựng</h3>
+              <ol className="mt-1 space-y-1.5">
+                {result.value.vocabulary.map((v, i) => (
+                  <li key={i} className="text-label-md text-on-surface">
+                    <span lang="zh" className="font-serif font-semibold">{v.term}</span>
+                    {v.pinyin && <span className="text-on-surface-variant"> ({v.pinyin})</span>}
+                    {": "}
+                    <span className="text-on-surface-variant">{v.meaning}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+
+          {result.value.grammarPoints.length > 0 && (
+            <section aria-label="Điểm ngữ pháp">
+              <h3 className={sectionTitle}>Điểm ngữ pháp</h3>
+              <ol className="mt-1 space-y-2">
+                {result.value.grammarPoints.map((g, i) => (
+                  <li key={i} className="text-label-md">
+                    <span className="font-semibold text-on-surface">{g.title}</span>
+                    {": "}
+                    <span className="text-on-surface-variant">{g.explanation}</span>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )}
+
+          {result.value.notes.length > 0 && (
+            <section aria-label="Các điểm đáng chú ý khác">
+              <h3 className={sectionTitle}>Các điểm đáng chú ý khác</h3>
+              <ul className="mt-1 list-disc space-y-1.5 pl-4">
+                {result.value.notes.map((n, i) => (
+                  <li key={i} className="text-label-md text-on-surface-variant">{n}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+      ) : result.status === "error" ? (
+        <p role="status" className="text-label-md text-on-surface-variant">{FAIL_TEXT[result.reason]}</p>
+      ) : (
+        <div role="status" aria-label="Đang giải thích" className="space-y-2">
+          <div className="h-4 w-full animate-pulse rounded bg-surface-container-high" />
+          <div className="h-4 w-3/4 animate-pulse rounded bg-surface-container-high" />
+          <div className="h-4 w-5/6 animate-pulse rounded bg-surface-container-high" />
+        </div>
+      )}
     </div>
   );
 }
