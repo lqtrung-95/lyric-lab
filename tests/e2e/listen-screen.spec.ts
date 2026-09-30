@@ -61,7 +61,8 @@ test("lời chạy theo thời gian phát và panel 'Đang hát' đổi theo câ
 test("từ vựng tô nền, ngữ pháp gạch chân: hai kiểu khác nhau", async ({ page }) => {
   await setTime(page, 6);
   const row = line(page, 2);
-  await expect(row.getByText("Từ vựng:").first()).toBeAttached(); // nhãn cho trình đọc màn hình
+  // Nhãn cho trình đọc màn hình giờ ở aria-label (không phải text hiển thị, để không lẫn vào tên nút).
+  await expect(row.locator('[aria-label^="Từ vựng:"]').first()).toBeAttached();
   await expect(row.locator(".ring-2").first()).toBeVisible(); // từ vựng: nền + viền
   await expect(row.locator(".border-b-2").first()).toBeVisible(); // ngữ pháp: gạch chân
 });
