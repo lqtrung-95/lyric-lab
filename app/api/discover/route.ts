@@ -27,6 +27,8 @@ export async function GET(req: Request) {
   }));
   return Response.json(
     { songs, hasMore: params.offset + songs.length < (count ?? 0), total: count ?? 0 },
-    { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } },
+    // 60s chứ không phải vài phút: admin ẩn/xóa bài (route /api/admin/songs) gọi revalidatePath ngay sau khi đổi,
+    // nhưng cache theo query string (sort/band/q/offset) nên vẫn giữ cửa sổ ngắn phòng khi revalidate không khớp hết biến thể.
+    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } },
   );
 }

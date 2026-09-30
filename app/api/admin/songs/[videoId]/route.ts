@@ -1,3 +1,4 @@
+import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
@@ -8,6 +9,7 @@ export const runtime = "nodejs";
 /**
  * PATCH { action: "hide" | "unhide" | "delete" } → quản trị viên ẩn/hiện lại bài ở Khám phá, hoặc xóa hẳn.
  * Xóa chỉ thực hiện khi không ai còn thẻ ôn hay tiến độ nghe từ bài đó; ngược lại tự chuyển thành ẩn để không mất dữ liệu người dùng.
+ * /api/discover cache theo Cache-Control 5 phút (CDN) nên phải revalidate ngay, không thì bài vừa ẩn/xóa vẫn hiện tới khi cache hết hạn.
  */
 export async function PATCH(req: Request, { params }: { params: Promise<{ videoId: string }> }) {
   const { videoId } = await params;
@@ -21,6 +23,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
   if (body?.action === "hide" || body?.action === "unhide") {
     const { error } = await sb.from("songs").update({ listed: body.action === "unhide" }).eq("video_id", videoId);
     if (error) return Response.json({ error: "server_error" }, { status: 500 });
+    revalidatePath("/api/discover");
     return Response.json({ done: body.action });
   }
 
@@ -29,10 +32,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
     const inUse = (await count("user_cards")) + (await count("user_song_progress")) > 0;
     if (inUse) {
       await sb.from("songs").update({ listed: false }).eq("video_id", videoId);
+      revalidatePath("/api/discover");
       return Response.json({ done: "hidden_instead", reason: "in_use" });
     }
     const { error } = await sb.from("songs").delete().eq("video_id", videoId);
     if (error) return Response.json({ error: "server_error" }, { status: 500 });
+    revalidatePath("/api/discover");
     return Response.json({ done: "deleted" });
   }
 
