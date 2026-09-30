@@ -20,6 +20,8 @@ interface Props {
   poolTerms: string[];
   /** Chạy liên tục: không tạm dừng ở chỗ trống, chưa trả lời kịp trước khi hết câu là hụt. */
   live: boolean;
+  /** Hiện pinyin và nghĩa cả câu ngay khi câu hiện ra, không cần chờ trả lời xong mới thấy. */
+  showHints: boolean;
   grade: (card: ReviewCard, outcome: PracticeOutcome) => boolean;
   onExit: () => void;
   onRoundEnd?: (result: { points: number; correct: number; total: number; durationSec: number }) => void;
@@ -30,7 +32,7 @@ interface Props {
  * Mặc định tạm dừng chờ trả lời rồi cho hát tiếp hết câu; chế độ chạy liên tục thì phải trả lời trước khi câu hát qua.
  * Chỉ hiện những câu có thẻ của người dùng, không hiện cả bài.
  */
-export function KaraokeGame({ videoId, title, steps, poolTerms, live, grade, onExit, onRoundEnd }: Props) {
+export function KaraokeGame({ videoId, title, steps, poolTerms, live, showHints, grade, onExit, onRoundEnd }: Props) {
   const { containerRef, controller, failed } = useYouTubePlayer(videoId);
   const [phase, setPhase] = useState<Phase>("idle");
   const [index, setIndex] = useState(0);
@@ -86,9 +88,14 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, grade, onE
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      const n = Number(e.key);
-      if (phase !== "asking" || e.ctrlKey || e.metaKey || e.altKey || !(n >= 1 && n <= choices.length)) return;
-      settle(choices[n - 1]);
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (phase === "asking") {
+        const n = Number(e.key);
+        if (n >= 1 && n <= choices.length) settle(choices[n - 1]);
+      } else if (phase === "answered" && (e.key === " " || e.key === "Enter")) {
+        e.preventDefault(); // Space không nên cuộn trang khi dùng để sang câu tiếp theo.
+        next();
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -143,8 +150,28 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, grade, onE
         <div className="mt-space-md">
           <section aria-label="Câu hát cần điền" className="rounded-3xl bg-surface-container-low p-space-lg">
             <ClozeLine before={cloze.before} after={cloze.after} answer={step.card.term} reveal={phase === "asking" ? null : picked === step.card.term ? "correct" : "wrong"} />
+            {showHints && (step.line.pinyin || step.line.translation) && (
+              <p className="mt-1 text-label-md text-on-surface-variant">{step.line.pinyin}{step.line.pinyin && step.line.translation ? " · " : ""}{step.line.translation}</p>
+            )}
             <p className="mt-2 text-body-md text-on-surface-variant">Gợi ý nghĩa của từ cần điền: <strong className="text-on-surface">{step.card.meaning}</strong></p>
           </section>
+
+          {/* Kết quả đặt ngay dưới câu hát (không sticky đè lên lựa chọn phía dưới) để thấy được luôn, không cần cuộn. */}
+          {phase === "answered" && (
+            <div role="status" className="mt-space-md rounded-2xl bg-surface-container-low p-space-md shadow-sm ring-1 ring-outline-variant">
+              <p className="text-body-lg font-semibold text-on-surface">{picked === step.card.term ? "Chính xác!" : picked === "" ? "Hụt rồi, câu hát đã qua." : "Chưa đúng."}</p>
+              <p className="mt-1 flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant">
+                <span lang="zh" className="font-serif text-headline-md text-on-surface">{step.card.term}</span>
+                {step.card.pinyin && <span className="text-pinyin-reading text-primary">{step.card.pinyin}</span>}
+                <PronounceButton text={step.card.term} />
+              </p>
+              <button type="button" onClick={next} className="mt-space-sm inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+                {index + 1 >= steps.length ? "Xem kết quả" : "Câu tiếp theo"}
+                <kbd aria-hidden="true" className="rounded bg-on-primary/20 px-1.5 font-mono text-[10px]">Space</kbd>
+              </button>
+            </div>
+          )}
+
           <div role="group" aria-label="Chọn từ điền vào chỗ trống" className="mt-space-md grid grid-cols-2 gap-space-sm">
             {choices.map((term, i) => {
               const state = phase === "asking" ? "" : term === step.card.term ? "ring-2 ring-secondary bg-secondary-container/60" : term === picked ? "ring-2 ring-error bg-error-container/50" : "opacity-60";
@@ -158,17 +185,6 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, grade, onE
               );
             })}
           </div>
-          {phase === "answered" && (
-            <div role="status" className="sticky bottom-3 z-10 mt-space-md rounded-2xl bg-surface-container-low p-space-md shadow-lg ring-1 ring-outline-variant">
-              <p className="text-body-lg font-semibold text-on-surface">{picked === step.card.term ? "Chính xác!" : picked === "" ? "Hụt rồi, câu hát đã qua." : "Chưa đúng."}</p>
-              <p className="mt-1 flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant">
-                <span lang="zh" className="font-serif text-headline-md text-on-surface">{step.card.term}</span>
-                {step.card.pinyin && <span className="text-pinyin-reading text-primary">{step.card.pinyin}</span>}
-                <PronounceButton text={step.card.term} />
-              </p>
-              <button type="button" onClick={next} className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">{index + 1 >= steps.length ? "Xem kết quả" : "Câu tiếp theo"}</button>
-            </div>
-          )}
         </div>
       )}
     </div>

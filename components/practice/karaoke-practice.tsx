@@ -17,6 +17,7 @@ export function KaraokePractice() {
   const candidates = useClozeCandidates(status === "ready" ? cards : []);
   const [songId, setSongId] = useState<string | null>(null);
   const [live, setLive] = useState(false);
+  const [showHints, setShowHints] = useState(false);
 
   const karaoke = useMemo<KaraokeCandidate<ReviewCard>[]>(
     () => (candidates ?? []).map((c) => ({ card: c.card, line: c.line, videoId: c.videoId, lineIndex: c.lineIndex })),
@@ -40,12 +41,16 @@ export function KaraokePractice() {
         intro="Nghe bài hát và điền từ còn thiếu vào đúng câu hát. Chỉ hiện các câu có từ bạn đã lưu. Đúng thẻ đến hạn thì lịch ôn được cập nhật (tối đa mức “Được”)."
       >
         {song ? (
-          <KaraokeGame key={`${song.videoId}-${live}`} videoId={song.videoId} title={song.title} steps={steps} poolTerms={poolTerms} live={live} grade={grade} onExit={() => setSongId(null)} onRoundEnd={(r) => void submitRoundScore("karaoke", r)} />
+          <KaraokeGame key={`${song.videoId}-${live}`} videoId={song.videoId} title={song.title} steps={steps} poolTerms={poolTerms} live={live} showHints={showHints} grade={grade} onExit={() => setSongId(null)} onRoundEnd={(r) => void submitRoundScore("karaoke", r)} />
         ) : (
           <div>
-            <label className="inline-flex min-h-11 items-center gap-2 text-label-md text-on-surface-variant">
+            <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface-variant">
               <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} className="h-5 w-5 accent-primary" />
               Chạy liên tục (không tạm dừng chờ, phải trả lời trước khi câu hát qua)
+            </label>
+            <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface-variant">
+              <input type="checkbox" checked={showHints} onChange={(e) => setShowHints(e.target.checked)} className="h-5 w-5 accent-primary" />
+              Hiện pinyin và nghĩa cả câu (đỡ khó hơn)
             </label>
             <ul aria-label="Chọn bài hát" className="mt-space-sm space-y-space-sm">
               {songs.map((s) => (

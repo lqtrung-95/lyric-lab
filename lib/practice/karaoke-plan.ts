@@ -7,6 +7,9 @@ export interface KaraokeLine {
   text: string;
   start: number;
   end: number;
+  /** Có sẵn từ ngữ cảnh câu (ReviewLine) — dùng để hiện gợi ý pinyin/nghĩa cả câu khi người chơi bật tùy chọn. */
+  pinyin?: string;
+  translation?: string;
 }
 
 export interface KaraokeCandidate<T> {
