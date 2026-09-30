@@ -24,16 +24,20 @@ export function parseHskVocabulary(raw: RawWord[]): HskWord[] {
       .filter((l) => l.startsWith("new-"))
       .map((l) => Number(l.slice(4)))
       .filter((n) => n >= 1 && n <= 7);
-    const form = w.forms[0];
-    if (levels.length === 0 || !form) continue;
-    words.push({
-      simplified: w.simplified,
-      traditional: form.traditional,
-      pinyin: form.transcriptions.pinyin,
-      meanings: form.meanings,
-      level: Math.min(...levels),
-      frequency: w.frequency ?? null,
-    });
+    if (levels.length === 0 || w.forms.length === 0) continue;
+    // Chữ nhiều âm (多音字, vd. 都/还/说/着): nguồn liệt kê MỖI cách đọc là một phần tử riêng trong `forms`, thường
+    // xếp cách đọc hiếm/họ người trước (vd. 都 → "Dū: surname Du" đứng trước "dōu: all"). Lấy hết mọi form thay vì
+    // chỉ forms[0], nếu không cấp HSK sẽ gắn nhầm vào cách đọc hiếm, khiến tra từ điển chọn sai âm phổ biến.
+    for (const form of w.forms) {
+      words.push({
+        simplified: w.simplified,
+        traditional: form.traditional,
+        pinyin: form.transcriptions.pinyin,
+        meanings: form.meanings,
+        level: Math.min(...levels),
+        frequency: w.frequency ?? null,
+      });
+    }
   }
   return words;
 }

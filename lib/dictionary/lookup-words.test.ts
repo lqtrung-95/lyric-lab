@@ -48,4 +48,12 @@ describe("pickPrimaryEntry", () => {
     expect(pickPrimaryEntry([row("a", "1"), row("a", "2")])?.pinyin).toBe("1");
     expect(pickPrimaryEntry([])).toBeNull();
   });
+  it("hạ ưu tiên mục họ người (pinyin viết hoa) dù cùng cấp HSK", () => {
+    expect(pickPrimaryEntry([row("都", "Dū", 1), row("都", "dōu", 1), row("都", "dū", 1)])?.pinyin).toBe("dōu");
+    // Toàn mục là họ người thì vẫn phải trả về một mục, không rỗng.
+    expect(pickPrimaryEntry([row("某", "Mǒu", 1)])?.pinyin).toBe("Mǒu");
+  });
+  it("ghi đè cách đọc thông dụng cho chữ đã xác nhận báo lỗi (说 → shuō, không phải shuì)", () => {
+    expect(pickPrimaryEntry([row("说", "shuì", 1), row("说", "shuō", 1)])?.pinyin).toBe("shuō");
+  });
 });
