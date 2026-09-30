@@ -136,12 +136,20 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   }, [prefs.autoScroll, update]);
 
   // Tạm dừng khi mở giải thích: đọc xong câu đang phát mà nhạc vẫn trôi tới câu khác thì nội dung không còn khớp.
+  // Đóng popover tra từ nếu đang mở — cả hai đều là bottom sheet chiếm cùng vị trí, mở cùng lúc sẽ đè lên nhau.
   const openExplain = useCallback(() => {
     if (currentIndex < 0) return;
     controller?.pause();
+    setWord(null);
     setExplainOpen(true);
     void explain(currentIndex);
   }, [currentIndex, explain, controller]);
+
+  // Bấm tra một từ trong lúc đang mở giải thích cả câu: đóng giải thích lại, ưu tiên tra từ (thao tác nhanh hơn).
+  const selectWord = useCallback((selection: WordSelection) => {
+    setExplainOpen(false);
+    setWord(selection);
+  }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -229,7 +237,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
-            onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={setWord}
+            onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={selectWord}
           />
           <MiniTransportBar
             visible={!controlsInView} ready={!!controller} playing={playing} onTogglePlay={togglePlay}

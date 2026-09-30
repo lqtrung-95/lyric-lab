@@ -236,12 +236,12 @@ test.describe("thanh điều khiển nhanh khi cuộn xuống", () => {
     // Chỉ kiểm tra thanh thu gọn (các dòng lời mờ dần là thiết kế có sẵn, đã được kiểm tra riêng ở accessibility.spec).
     expect((await new AxeBuilder({ page }).include('[aria-label="Điều khiển nhanh"]').analyze()).violations).toEqual([]);
 
-    // Điện thoại: hàng nút có chữ nằm ngay dưới video ghim ở đầu màn hình, luôn hiện dù cuộn ở đâu.
+    // Điện thoại: hàng nút chỉ icon nằm ngay dưới video ghim ở đầu màn hình, luôn hiện dù cuộn ở đâu.
     await page.setViewportSize({ width: 390, height: 800 });
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
     const inline = page.getByRole("group", { name: "Điều khiển nhanh" });
     await expect(inline).toBeVisible();
-    await expect(inline.getByText("Chỉnh lời", { exact: true })).toBeVisible();
+    await expect(inline.getByRole("button", { name: /^Chỉnh thời gian hiện lời/ })).toBeVisible();
     const player = await page.locator("[data-sticky-player]").boundingBox();
     const bar = await inline.boundingBox();
     expect(bar!.y).toBeGreaterThanOrEqual(player!.y + player!.height - bar!.height - 2);
