@@ -33,9 +33,10 @@ interface MiniTransportBarProps {
 }
 
 const round = "flex h-11 w-11 items-center justify-center rounded-full text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/15 disabled:opacity-50";
-// Kiểu "gắn dưới video" (điện thoại): chỉ icon, không chữ — 8 nút đủ chật nếu thêm caption nên bỏ, aria-label vẫn
-// đọc được tên nút cho trình đọc màn hình. Cùng cỡ nút tròn với thanh điều khiển đầy đủ (máy tính) cho nhất quán.
-const tile = "flex h-11 w-11 items-center justify-center rounded-full text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50";
+// Kiểu "gắn dưới video" (điện thoại): chỉ icon, không chữ, aria-label vẫn đọc được tên nút cho trình đọc màn hình.
+// Cùng cỡ nút tròn với thanh điều khiển đầy đủ (máy tính) cho nhất quán. `shrink-0` giữ đúng 44px tối thiểu —
+// nút nhiều hơn bề ngang màn hình nhỏ thì hàng cuộn ngang (`overflow-x-auto` ở nơi dùng) thay vì bị bóp nhỏ lại.
+const tile = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50";
 
 /**
  * Thanh điều khiển thu gọn. `inline`: hàng nút chỉ icon, gắn ngay dưới video ghim ở đầu màn hình (điện thoại), luôn hiện.
@@ -72,10 +73,10 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
             <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} />
           </div>
         )}
-        <div role="group" aria-label="Điều khiển nhanh" className="relative flex items-center justify-between px-2 py-2">
+        <div role="group" aria-label="Điều khiển nhanh" className="relative flex items-center justify-between gap-1 overflow-x-auto px-2 py-2">
           <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={tile}><Icon name="replay_5" size={22} /></button>
           <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50">
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50">
             <Icon name={playing ? "pause" : "play_arrow"} filled size={24} />
           </button>
           <button type="button" disabled={!ready} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={tile}><Icon name="forward_5" size={22} /></button>
