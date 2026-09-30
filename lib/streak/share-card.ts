@@ -32,7 +32,7 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
   c.textAlign = "left";
   c.fillStyle = "#1c1611";
   c.font = `600 44px ${serif}`;
-  c.fillText("Lyric Lab", 90, 150);
+  c.fillText("Songhanzi", 90, 150);
 
   c.fillStyle = "#5c5147";
   c.font = `400 42px ${sans}`;
@@ -65,10 +65,10 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
 
 /** Chia sẻ ảnh bằng Web Share API (mobile); không hỗ trợ thì tải ảnh về. Trả "shared" | "downloaded" | "cancelled". */
 export async function shareOrDownload(blob: Blob): Promise<"shared" | "downloaded" | "cancelled"> {
-  const file = new File([blob], "lyric-lab-streak.png", { type: "image/png" });
+  const file = new File([blob], "songhanzi-streak.png", { type: "image/png" });
   if (navigator.canShare?.({ files: [file] })) {
     try {
-      await navigator.share({ files: [file], title: "Lyric Lab" });
+      await navigator.share({ files: [file], title: "Songhanzi" });
       return "shared";
     } catch (e) {
       if ((e as Error).name === "AbortError") return "cancelled";

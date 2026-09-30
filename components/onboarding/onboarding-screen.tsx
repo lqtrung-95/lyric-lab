@@ -31,7 +31,7 @@ export function OnboardingScreen() {
   const choice = "flex min-h-11 items-center justify-between gap-3 rounded-xl px-4 py-3 text-left transition-colors has-[:checked]:bg-primary-container has-[:checked]:text-on-primary-container bg-surface-container-low hover:bg-surface-container";
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Chào mừng đến Lyric Lab</h1>
+      <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Chào mừng đến Songhanzi</h1>
       <p className="mt-space-sm text-body-lg text-on-surface-variant">Chọn level hiện tại để danh sách từ vựng vừa sức. Bạn đổi lại được bất cứ lúc nào.</p>
 
       <fieldset className="mt-space-lg">

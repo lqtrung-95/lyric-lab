@@ -1,4 +1,4 @@
-# Lyric Lab
+# Songhanzi
 
 Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựng và ngữ pháp → nghe với lời chạy theo nhạc → ôn bằng flashcard.
 

@@ -42,7 +42,7 @@ export function AccountSection() {
           </p>
           {link === "exists" && (
             <div role="status" className="mt-space-md rounded-xl bg-secondary-container/50 p-space-md">
-              <p className="text-body-md text-on-secondary-container">Tài khoản Google này đã có dữ liệu trên Lyric Lab. Bạn có thể đăng nhập vào tài khoản đó và gộp dữ liệu đang có ở đây vào.</p>
+              <p className="text-body-md text-on-secondary-container">Tài khoản Google này đã có dữ liệu trên Songhanzi. Bạn có thể đăng nhập vào tài khoản đó và gộp dữ liệu đang có ở đây vào.</p>
               <button type="button" disabled={busy} onClick={() => run(signInGoogleForMerge)} className={`${btn} mt-space-sm bg-primary text-on-primary hover:bg-primary-container disabled:opacity-60`}>
                 Đăng nhập và gộp dữ liệu
               </button>

@@ -34,7 +34,7 @@ function Group({ title, songs, onPick }: { title: string; songs: SearchSong[]; o
   );
 }
 
-/** Kết quả tìm bài: nhóm "Đã có trong Lyric Lab" (học ngay) và "Trên YouTube". Lỗi tìm YouTube → nhắc dán link. */
+/** Kết quả tìm bài: nhóm "Đã có trong Songhanzi" (học ngay) và "Trên YouTube". Lỗi tìm YouTube → nhắc dán link. */
 export function SongSearchResults({ state, onPick }: { state: SongSearchState; onPick: (videoId: string) => void }) {
   if (state.status === "idle") return null;
   const box = "mt-space-sm rounded-2xl bg-surface-container-low p-2";
@@ -44,7 +44,7 @@ export function SongSearchResults({ state, onPick }: { state: SongSearchState; o
   const empty = library.length === 0 && youtube.length === 0;
   return (
     <div className={box}>
-      <Group title="Đã có trong Lyric Lab" songs={library} onPick={onPick} />
+      <Group title="Đã có trong Songhanzi" songs={library} onPick={onPick} />
       <Group title="Trên YouTube" songs={youtube} onPick={onPick} />
       {state.status === "unavailable" && <p role="alert" className="px-3 py-2 text-label-md text-error">Chưa tìm được trên YouTube, hãy dán link YouTube của bài hát.</p>}
       {empty && state.status === "done" && <p role="status" className="px-3 py-3 text-label-md text-on-surface-variant">Không thấy bài nào khớp. Thử tên khác hoặc dán link YouTube.</p>}

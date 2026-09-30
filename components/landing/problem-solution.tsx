@@ -11,7 +11,7 @@ const GAIN = [
   "Ôn lại đúng lúc sắp quên, mỗi ngày vài phút là đủ",
 ];
 
-/** Đối chiếu "trước đây" và "với Lyric Lab", giọng văn gần gũi. */
+/** Đối chiếu "trước đây" và "với Songhanzi", giọng văn gần gũi. */
 export function ProblemSolution() {
   return (
     <section aria-labelledby="problem-heading" className="mt-24">
@@ -28,7 +28,7 @@ export function ProblemSolution() {
           </ul>
         </div>
         <div className="rounded-3xl bg-primary-container/25 p-space-lg ring-1 ring-primary/20">
-          <p className="text-label-md font-semibold uppercase tracking-widest text-primary">Với Lyric Lab</p>
+          <p className="text-label-md font-semibold uppercase tracking-widest text-primary">Với Songhanzi</p>
           <ul className="mt-space-md space-y-space-md">
             {GAIN.map((t) => (
               <li key={t} className="flex gap-3 text-body-lg text-on-surface"><Icon name="check_circle" size={22} filled className="mt-0.5 shrink-0 text-secondary" />{t}</li>

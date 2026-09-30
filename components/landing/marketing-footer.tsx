@@ -20,7 +20,7 @@ export function MarketingFooter() {
         </nav>
       </div>
       <p className="mx-auto max-w-7xl px-gutter pb-10 text-label-md text-on-surface-variant md:px-6 lg:px-12">
-        Lyric Lab không tải hay lưu nhạc. Video phát trực tiếp từ YouTube; lời bài hát thuộc về chủ sở hữu quyền tác giả và chỉ hiện cạnh video gốc để học tập.
+        Songhanzi không tải hay lưu nhạc. Video phát trực tiếp từ YouTube; lời bài hát thuộc về chủ sở hữu quyền tác giả và chỉ hiện cạnh video gốc để học tập.
       </p>
     </footer>
   );

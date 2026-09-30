@@ -8,7 +8,7 @@ const FEATURES: { icon: IconName; title: string; body: string; accent?: boolean 
   { icon: "repeat_one", title: "Nghe lại đúng câu", body: "Lặp một câu, nghe chậm 0.5x–0.75x. Ở màn ôn, nghe lại đúng đoạn hát chứa từ đó." },
   { icon: "verified", title: "Luôn là chữ giản thể", body: "Dù lời gốc là phồn thể, mọi thứ hiển thị bằng giản thể để bạn học một hệ chữ nhất quán.", accent: true },
   { icon: "schedule", title: "Ôn tập FSRS", body: "Thuật toán ghi nhớ hiện đại, khoảng ôn tính riêng cho từng thẻ. Dữ liệu của bạn có thể xóa bất cứ lúc nào." },
-  { icon: "link", title: "Tìm bài bằng tên hoặc nghệ sĩ", body: "Không nhớ bài? Gõ tên bài hát hay nghệ sĩ, Lyric Lab gợi ý các bản phù hợp, bỏ video không phát được." },
+  { icon: "link", title: "Tìm bài bằng tên hoặc nghệ sĩ", body: "Không nhớ bài? Gõ tên bài hát hay nghệ sĩ, Songhanzi gợi ý các bản phù hợp, bỏ video không phát được." },
   { icon: "library_music", title: "Khám phá bài đã có sẵn", body: "Chọn bài người khác đã phân tích theo level HSK: mở là học ngay, không phải chờ AI." },
   { icon: "local_fire_department", title: "Chuỗi ngày học và bảng xếp hạng", body: "Giữ nhịp học mỗi ngày, chia sẻ thành tích bằng một tấm ảnh, thi đua vui bằng biệt danh do bạn đặt.", accent: true },
 ];

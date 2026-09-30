@@ -1,13 +1,13 @@
-# Design Brief — Lyric Lab
+# Design Brief — Songhanzi
 
 Cập nhật: 2026-09-24 · Tác giả: Le Trung
 Bản gốc (Claude Docs): https://claude.ai/code/artifact/44714360-9f15-4784-84be-26d45b1aba34
 
-Tài liệu này dành cho designer (người hoặc AI) thiết kế giao diện Lyric Lab từ đầu. Mọi thông tin cần thiết đều nằm trong tài liệu, không cần tham khảo sản phẩm nào khác.
+Tài liệu này dành cho designer (người hoặc AI) thiết kế giao diện Songhanzi từ đầu. Mọi thông tin cần thiết đều nằm trong tài liệu, không cần tham khảo sản phẩm nào khác.
 
 ## 1. Sản phẩm và người dùng
 
-Lyric Lab là web app (ưu tiên mobile, dùng tốt trên desktop) giúp người Việt học tiếng Trung qua bài hát. Người dùng dán link YouTube của một bài hát bất kỳ. App phân tích lời, chọn ra từ vựng và ngữ pháp đáng học, rồi cho người dùng vừa nghe vừa học.
+Songhanzi là web app (ưu tiên mobile, dùng tốt trên desktop) giúp người Việt học tiếng Trung qua bài hát. Người dùng dán link YouTube của một bài hát bất kỳ. App phân tích lời, chọn ra từ vựng và ngữ pháp đáng học, rồi cho người dùng vừa nghe vừa học.
 
 **Ý tưởng cốt lõi:** học trước rồi mới nghe. Trước khi phát nhạc, người dùng xem 8–12 từ và 3–5 điểm ngữ pháp quan trọng nhất của bài. Khi nghe, những mục đó được tô sáng trong lời, nên người dùng nhận ra chúng ngay khi ca sĩ hát tới.
 
@@ -260,4 +260,4 @@ Dùng bài hát hư cấu dưới đây cho mọi màn hình. Lời do nhóm s�
 5. Prototype bấm được cho luồng: S1 dán link → S3 → S4 (lưu 1 từ, đánh dấu đã biết 1 từ) → S5 (bấm 1 từ được tô sáng, bật lặp câu) → S8 → S7.
 6. Ghi chú ngắn cho các quyết định thiết kế quan trọng, đặc biệt là cách panel "Đang hát" cập nhật và cách bottom sheet hoạt động trên mobile.
 
-**Ngoài phạm vi thiết kế lần này:** landing page marketing, trang cài đặt chi tiết, trang thanh toán, logo chính thức (dùng wordmark tạm "Lyric Lab").
+**Ngoài phạm vi thiết kế lần này:** landing page marketing, trang cài đặt chi tiết, trang thanh toán, logo chính thức (dùng wordmark tạm "Songhanzi").

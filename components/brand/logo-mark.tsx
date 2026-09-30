@@ -1,4 +1,4 @@
-// Biểu tượng Lyric Lab: nốt nhạc trắng có đuôi như nét bút lông trên nền ô vuông bo tròn màu son, kèm một chấm ngọc lam
+// Biểu tượng Songhanzi: nốt nhạc trắng có đuôi như nét bút lông trên nền ô vuông bo tròn màu son, kèm một chấm ngọc lam
 // (như chữ Hán được tô sáng trong lời hát). Mỗi phiên bản dùng id gradient riêng để nhúng nhiều lần trong trang không xung đột.
 export function LogoMark({ size = 32 }: { size?: number }) {
   return (

@@ -27,7 +27,7 @@ const COPY: Record<AnalysisErrorCode, ErrorCopy> = {
   video_not_embeddable: {
     icon: "warning",
     title: "Video này không phát được trong app",
-    body: "Chủ video đã tắt cho phép nhúng nên Lyric Lab không thể phát nhạc. Hãy thử một phiên bản khác của bài hát (bản lyric, bản audio) trên YouTube.",
+    body: "Chủ video đã tắt cho phép nhúng nên Songhanzi không thể phát nhạc. Hãy thử một phiên bản khác của bài hát (bản lyric, bản audio) trên YouTube.",
     retry: false,
   },
   invalid_video: { icon: "warning", title: "Link chưa đúng", body: "Hãy dán link video YouTube.", retry: false },

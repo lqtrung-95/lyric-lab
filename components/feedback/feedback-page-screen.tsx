@@ -60,7 +60,7 @@ export function FeedbackPageScreen() {
     <div className="mx-auto flex max-w-4xl flex-col gap-space-lg">
       <div>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Góp ý</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">Bạn muốn Lyric Lab thêm tính năng gì, hay chỗ nào chưa tiện? Mọi góp ý đều được đọc.</p>
+        <p className="mt-1 text-body-md text-on-surface-variant">Bạn muốn Songhanzi thêm tính năng gì, hay chỗ nào chưa tiện? Mọi góp ý đều được đọc.</p>
       </div>
 
       <form onSubmit={submit} className="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">

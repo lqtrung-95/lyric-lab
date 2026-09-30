@@ -2,7 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
-  { icon: "link", title: "Dán link hoặc gõ tên bài", body: "Dán link YouTube, hoặc chỉ cần gõ tên bài hát hay nghệ sĩ, Lyric Lab tìm giúp bạn. Bài tiếng Phổ thông có lời đồng bộ là dùng được." },
+  { icon: "link", title: "Dán link hoặc gõ tên bài", body: "Dán link YouTube, hoặc chỉ cần gõ tên bài hát hay nghệ sĩ, Songhanzi tìm giúp bạn. Bài tiếng Phổ thông có lời đồng bộ là dùng được." },
   { icon: "auto_awesome", title: "Xem trước điều đáng học", body: "AI chọn 8–12 từ vựng và vài mẫu ngữ pháp, lọc theo level HSK của bạn. Từ đã biết thì ẩn đi." },
   { icon: "headphones", title: "Nghe cùng lời chạy theo nhạc", body: "Chạm vào từ bất kỳ để xem nghĩa ngay trong câu hát. Lặp một câu, nghe chậm lại, xem pinyin khi cần." },
   { icon: "style", title: "Ôn và luyện mỗi ngày", body: "Từ bạn lưu thành flashcard, FSRS xếp lịch ôn riêng cho từng thẻ. Thêm vài phút chơi gõ pinyin, điền lời, ghép cặp để nhớ chắc hơn." },

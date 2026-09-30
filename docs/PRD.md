@@ -1,11 +1,11 @@
-# PRD — Lyric Lab: Học ngoại ngữ qua bài hát
+# PRD — Songhanzi: Học ngoại ngữ qua bài hát
 
 Cập nhật: 2026-09-24 · Tác giả: Le Trung · Trạng thái: Draft v1
 Bản gốc (Claude Docs): https://claude.ai/code/artifact/51cadc8e-fa2d-4628-81f9-822e610e9e07
 
 ## 1. Tổng quan
 
-Lyric Lab giúp người học biến bất kỳ bài hát YouTube nào thành một bài học: dán link, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc. Thị trường mục tiêu đầu tiên là người Việt học tiếng Trung qua C-pop.
+Songhanzi giúp người học biến bất kỳ bài hát YouTube nào thành một bài học: dán link, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc. Thị trường mục tiêu đầu tiên là người Việt học tiếng Trung qua C-pop.
 
 **Vấn đề.** Người học thích nghe nhạc ngoại ngữ nhưng hiếm khi học được gì từ đó. Lời bài hát nhanh, nhiều từ lạ, nhiều cấu trúc khó. Tra từng từ thì mất cảm hứng. Các công cụ hiện có chỉ giải được một phần:
 
@@ -334,6 +334,6 @@ MVP dự kiến mất khoảng 6 tuần cho một người làm bán thời gian
 - [x] Làm lại trên codebase AI-Lyric-Universe hay dựng mới? → **Dựng mới bằng Next.js** (repo này). Repo cũ chỉ để tham khảo.
 - [x] Tỉ lệ video C-pop có caption lời dùng được thực tế là bao nhiêu? → **24% số bài** (12/50), quá thấp. LRCLIB phủ 86%. Xem `plans/reports/m0-caption-and-lyrics-source-spike-260925-1030-results-report.md`
 - [ ] Level lấy theo HSK 2.0 (6 cấp) hay HSK 3.0 (9 cấp)?
-- [ ] Tên sản phẩm chính thức: giữ "Lyric Lab", dùng lại "AI Lyric Universe", hay tên khác?
+- [x] Tên sản phẩm chính thức: **Songhanzi** (domain `songhanzi.app`) — chốt 2026-09-30.
 - [ ] Mô hình thu phí sau này: freemium theo số bài mới/ngày, hay gói Pro mở khóa luyện tập và xuất Anki?
 - [ ] Có hiển thị bản dịch toàn bài mặc định không, hay ẩn đi để khuyến khích người học tự hiểu trước?

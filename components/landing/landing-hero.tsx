@@ -23,7 +23,7 @@ export function LandingHero() {
             <span className="text-primary">nhớ cả trăm chữ Hán.</span>
           </h1>
           <p className="mt-space-md max-w-xl text-body-lg text-on-surface-variant">
-            Dán link YouTube hoặc gõ tên bài hát, nghệ sĩ. Lyric Lab chọn ra từ vựng và ngữ pháp đáng học, kèm pinyin và âm Hán Việt. Bạn nghe từng câu với lời chạy theo nhạc, ôn đúng lúc sắp quên, rồi luyện thành phản xạ bằng các trò chơi ngắn.
+            Dán link YouTube hoặc gõ tên bài hát, nghệ sĩ. Songhanzi chọn ra từ vựng và ngữ pháp đáng học, kèm pinyin và âm Hán Việt. Bạn nghe từng câu với lời chạy theo nhạc, ôn đúng lúc sắp quên, rồi luyện thành phản xạ bằng các trò chơi ngắn.
           </p>
           <div id="paste" className="mt-space-lg max-w-xl scroll-mt-24">
             <PasteLinkForm />

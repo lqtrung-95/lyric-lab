@@ -21,7 +21,7 @@ export async function synthesizeWithAzure(text: string, key: string, region: str
         "Ocp-Apim-Subscription-Key": key,
         "Content-Type": "application/ssml+xml",
         "X-Microsoft-OutputFormat": OUTPUT_FORMAT,
-        "User-Agent": "lyric-lab",
+        "User-Agent": "songhanzi",
       },
       body: buildSsml(text),
       signal: AbortSignal.timeout(10_000),
