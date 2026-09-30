@@ -1,22 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { LyricOffsetPopover } from "./lyric-offset-popover";
 import { PLAYBACK_RATES } from "@/lib/user-state/listen-prefs";
-
-/** Phần tử có đang nằm trong màn hình không (mặc định true để không nháy khi mới tải). */
-export function useIsInView(ref: RefObject<HTMLElement | null>): boolean {
-  const [inView, setInView] = useState(true);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !("IntersectionObserver" in window)) return;
-    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [ref]);
-  return inView;
-}
 
 interface MiniTransportBarProps {
   ready: boolean;

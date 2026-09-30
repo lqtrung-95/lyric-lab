@@ -12,7 +12,7 @@ import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/lea
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
-import { MiniTransportBar, useIsInView } from "./mini-transport-bar";
+import { MiniTransportBar } from "./mini-transport-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
 import { ListenTopBar } from "./listen-top-bar";
@@ -40,9 +40,33 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
   const [quickSync, setQuickSync] = useState(false);
   const [toastDismissed, setToastDismissed] = useState(false);
-  // Thanh điều khiển đầy đủ cuộn khuất thì hiện thanh thu gọn nổi để vẫn điều khiển được khi đọc lời.
+  // Thanh điều khiển đầy đủ cuộn khuất (hoặc bị video ghim ở trên đè lên) thì hiện thanh thu gọn nổi để vẫn điều
+  // khiển được khi đọc lời. IntersectionObserver không đủ: nó coi thanh vẫn "trong màn hình" miễn còn giao với
+  // viewport dù đã bị video đè kín phần trên, nên chỉ báo khuất khi thanh cuộn qua HẾT — trễ hơn nhiều so với lúc
+  // mắt đã thấy nó bị che. So trực tiếp mép trên của thanh với mép dưới video ghim mới đúng thời điểm.
   const controlsRef = useRef<HTMLDivElement>(null);
-  const controlsInView = useIsInView(controlsRef);
+  const stickyPlayerRef = useRef<HTMLDivElement>(null);
+  const [controlsInView, setControlsInView] = useState(true);
+  useEffect(() => {
+    function check() {
+      const controls = controlsRef.current;
+      const sticky = stickyPlayerRef.current;
+      if (!controls || !sticky) return;
+      setControlsInView(controls.getBoundingClientRect().top >= sticky.getBoundingClientRect().bottom);
+    }
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    // Lúc mount, khung video (aspect-video) có thể chưa lên đúng kích thước cuối (font/ảnh vừa tải xong đổi layout)
+    // nên lần check() đầu có thể đọc sai — ResizeObserver tính lại ngay khi kích thước thật sự ổn định.
+    let ro: ResizeObserver | undefined;
+    if (controlsRef.current && stickyPlayerRef.current && "ResizeObserver" in window) {
+      ro = new ResizeObserver(check);
+      ro.observe(controlsRef.current);
+      ro.observe(stickyPlayerRef.current);
+    }
+    return () => { window.removeEventListener("scroll", check); window.removeEventListener("resize", check); ro?.disconnect(); };
+  }, []);
   const { containerRef, controller, failed } = useYouTubePlayer(analysis.videoId);
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
@@ -143,7 +167,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
       />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
         <div className="flex flex-col gap-6 lg:col-span-7">
-          <div data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
+          <div ref={stickyPlayerRef} data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
             <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
             <div className="lg:hidden">
               <MiniTransportBar

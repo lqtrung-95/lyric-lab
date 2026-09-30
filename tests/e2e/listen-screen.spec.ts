@@ -45,6 +45,10 @@ test.beforeEach(async ({ page }) => {
   await page.reload();
   // Stub YouTube nạp trễ và tự đặt lại thời gian về 0: chờ nó sẵn sàng trước khi test đổi thời gian.
   await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+  // Trang có thể tự trôi cuộn vài trăm px ngay sau khi tải trong môi trường Playwright (không tái hiện được khi
+  // thao tác tay trên trình duyệt thật — nghi do timing dựng trang dưới automation, chưa rõ nguồn cụ thể). Cuộn
+  // hẳn về đầu để mọi test trong file này xuất phát từ cùng một trạng thái cuộn, không phụ thuộc hiện tượng đó.
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
 });
 
 test("lời chạy theo thời gian phát và panel 'Đang hát' đổi theo câu", async ({ page }) => {
@@ -78,7 +82,9 @@ test("bấm câu để nhảy tới đầu câu", async ({ page }) => {
 test("lặp câu: phát tới hết câu thì quay về đầu câu, bấm lại để tắt", async ({ page }) => {
   await setTime(page, 6);
   await expect(line(page, 2)).toHaveAttribute("aria-current", "true");
-  const loop = page.getByRole("button", { name: "Lặp câu đang hát" });
+  // .first(): thanh điều khiển nổi (mini) có thể cùng hiện nếu thanh chính bị video ghim che — cùng aria-label,
+  // lấy đúng nút trên thanh chính (nằm trước trong DOM).
+  const loop = page.getByRole("button", { name: "Lặp câu đang hát" }).first();
   await loop.click();
   await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu 2" })).toBeVisible();
   await setTime(page, 9.98);
@@ -185,6 +191,8 @@ test.describe("chỉnh lời lệch nhạc", () => {
 test.describe("thanh điều khiển nhanh khi cuộn xuống", () => {
   test("hiện khi thanh chính cuộn khuất, điều khiển được và ẩn lại khi cuộn lên", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
+    // Đổi cỡ viewport cũng có thể gây trôi cuộn như ở beforeEach — cuộn lại về đầu cho chắc.
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
     const mini = page.getByRole("group", { name: "Điều khiển nhanh" });
     await expect(mini).toHaveCount(0); // thanh chính đang thấy: chưa cần thanh thu gọn
     await page.setViewportSize({ width: 1280, height: 520 });
