@@ -93,6 +93,26 @@ test("lặp câu: phát tới hết câu thì quay về đầu câu, bấm lại
   await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu" })).toHaveCount(0);
 });
 
+test("lặp câu: cấu hình đúng số lần, hết lượt thì tự tắt và không quay đầu câu nữa", async ({ page }) => {
+  await setTime(page, 6);
+  await expect(line(page, 2)).toHaveAttribute("aria-current", "true");
+  await page.getByRole("button", { name: "Cấu hình lặp câu: số lần và khoảng nghỉ" }).first().click();
+  await page.getByRole("button", { name: "2 lần" }).click();
+  const loop = page.getByRole("button", { name: "Lặp câu đang hát" }).first();
+  await loop.click();
+  await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu 2" })).toContainText("2 lần");
+
+  // Hết câu lần 1: còn 1 lượt lặp → quay lại đầu câu.
+  await setTime(page, 9.98);
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __t: number }).__t)).toBe(5);
+  expect((await calls(page)).filter((c) => c === "seek:5")).toHaveLength(1);
+
+  // Hết câu lần 2: hết lượt lặp → không quay đầu câu nữa, "Lặp câu" tự tắt.
+  await setTime(page, 9.98);
+  await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu" })).toHaveCount(0);
+  expect((await calls(page)).filter((c) => c === "seek:5")).toHaveLength(1);
+});
+
 test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", async ({ page }) => {
   await page.getByRole("button", { name: "0,75x" }).click();
   await expect.poll(() => calls(page)).toContain("rate:0.75");

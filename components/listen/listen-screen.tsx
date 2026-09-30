@@ -7,6 +7,7 @@ import type { PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
 import { estimateSyncRisk, offsetFromLineClick, shiftLines } from "@/lib/listen/lyric-offset";
+import { defaultRepeatConfig, type RepeatConfig } from "@/lib/listen/repeat-config";
 import { buildPreviewView } from "@/lib/preview/build-preview-view";
 import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
@@ -72,8 +73,10 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const learner = useLearnerState();
   const { liked, setLiked } = useLikedSongs();
   const [loopIndex, setLoopIndex] = useState<number | null>(null);
+  const [repeatConfig, setRepeatConfig] = useState<RepeatConfig>(defaultRepeatConfig);
   const [word, setWord] = useState<WordSelection | null>(null);
-  const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex);
+  const onRepeatsExhausted = useCallback(() => setLoopIndex(null), []);
+  const { currentIndex, playing } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
   const { completed } = useSongProgress(analysis.videoId, lines, currentIndex);
   const lookup = useTermLookup(analysis.videoId, word);
   const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
@@ -176,6 +179,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
                 looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
                 offset={offset} onOffsetChange={setOffset}
                 autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
+                repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
               />
             </div>
             {failed && (
@@ -192,6 +196,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
             autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
+            repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
           />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
@@ -209,6 +214,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
             offset={offset} onOffsetChange={setOffset}
             autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
+            repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
           />
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
         </div>
