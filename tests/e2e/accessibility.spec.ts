@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { stubAnonymousSession } from "./helpers/stub-anonymous-session";
 import { stubYouTube } from "./helpers/youtube-stub";
 
 // Kiểm tra tự động WCAG 2.2 AA (axe) trên các màn chính, cả giao diện sáng và tối, desktop và mobile.
@@ -71,6 +72,9 @@ test("axe: bảng giải thích cả câu đang mở", async ({ page }) => {
 });
 
 test("axe: màn lỗi 'không có lời'", async ({ page }) => {
+  // Màn này mở phiên ẩn danh thật trước khi mở luồng SSE (để server tính hạn mức) — site key Turnstile không khai
+  // domain localhost nên lúc nào cũng lỗi captcha khi chạy test cục bộ (xem stub-anonymous-session.ts).
+  await stubAnonymousSession(page);
   await page.route("**/api/analyze/**", (r) =>
     r.fulfill({ contentType: "text/event-stream", body: 'event: meta\ndata: {"title":"Bài mẫu","channelTitle":"Kênh","durationSec":30}\n\nevent: error\ndata: {"code":"no_lyrics"}\n\n' }));
   await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
