@@ -68,9 +68,15 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
     if (!autoScroll || currentIndex < 0 || Date.now() - lastManualScroll.current < MANUAL_SCROLL_PAUSE_MS) return;
     const el = listRef.current?.querySelector<HTMLElement>(`[data-line-index="${currentIndex}"]`);
     if (!el) return;
-    // Đưa câu về giữa phần màn hình còn trống bên dưới video dính (nếu không câu nằm dưới video bị che).
+    // Đưa câu về giữa phần màn hình còn trống: bên trên là video dính, bên dưới là viên thuốc nổi (máy tính) nếu
+    // đang hiện — không trừ khoảng của viên thuốc thì màn hình thấp (laptop, cửa sổ thu nhỏ) dễ khiến câu bị nó
+    // (và 2 chip cấu hình lặp câu nhô lên trên nó) đè lên, nhất là lúc đang lặp câu (viên thuốc đẩy cao hơn).
     const stickyBottom = document.querySelector("[data-sticky-player]")?.getBoundingClientRect().bottom ?? 64;
-    const target = stickyBottom + (window.innerHeight - stickyBottom) / 2;
+    // Viên thuốc nổi ẩn bằng `hidden lg:flex` (điện thoại) hoặc `visible=false` (chưa cuộn khuất thanh chính) đều
+    // cho rect rỗng (top=0) — chỉ trừ khoảng của nó khi thật sự đang hiện (có kích thước).
+    const floatingRect = document.querySelector("[data-floating-controls]")?.getBoundingClientRect();
+    const viewportBottom = floatingRect && floatingRect.height > 0 ? floatingRect.top : window.innerHeight;
+    const target = stickyBottom + (viewportBottom - stickyBottom) / 2;
     const rect = el.getBoundingClientRect();
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: rect.top + rect.height / 2 - target, behavior: reduce ? "auto" : "smooth" });

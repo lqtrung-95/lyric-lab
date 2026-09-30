@@ -91,7 +91,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
   // Đang lặp câu thì đẩy viên thuốc lên cao hơn bình thường, chừa chỗ cho 2 chip nhô phía trên khỏi đè lên dòng lời
   // đang hát (dòng này thường cuộn tới gần đáy màn hình, sát ngay viên thuốc).
   return (
-    <div role="group" aria-label="Điều khiển nhanh" className={`pointer-events-none sticky z-30 hidden justify-center px-2 lg:flex ${looping ? "bottom-16" : "bottom-6"}`}>
+    <div data-floating-controls role="group" aria-label="Điều khiển nhanh" className={`pointer-events-none sticky z-30 hidden justify-center px-2 lg:flex ${looping ? "bottom-16" : "bottom-6"}`}>
       <div ref={barRef} className="pointer-events-auto relative flex items-center gap-1 rounded-full bg-inverse-surface px-2 py-1.5 shadow-[0_8px_30px_rgba(20,10,5,0.35)]">
         {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
         {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="absolute -top-3 right-2 z-10" />}
