@@ -18,6 +18,8 @@ interface LyricListProps {
   grammar: PreviewItem[];
   showPinyin: boolean;
   showTranslation: boolean;
+  /** Tự cuộn theo câu đang hát. Tắt (ghim) khi người dùng muốn đọc chỗ khác mà không bị kéo về. */
+  autoScroll: boolean;
   onTogglePinyin: () => void;
   onToggleTranslation: () => void;
   onSeek: (index: number) => void;
@@ -25,7 +27,7 @@ interface LyricListProps {
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, onSeek, onWord }: LyricListProps) {
+export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, onTogglePinyin, onToggleTranslation, onSeek, onWord }: LyricListProps) {
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
@@ -63,7 +65,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
   }, []);
 
   useEffect(() => {
-    if (currentIndex < 0 || Date.now() - lastManualScroll.current < MANUAL_SCROLL_PAUSE_MS) return;
+    if (!autoScroll || currentIndex < 0 || Date.now() - lastManualScroll.current < MANUAL_SCROLL_PAUSE_MS) return;
     const el = listRef.current?.querySelector<HTMLElement>(`[data-line-index="${currentIndex}"]`);
     if (!el) return;
     // Đưa câu về giữa phần màn hình còn trống bên dưới video dính (nếu không câu nằm dưới video bị che).
@@ -72,7 +74,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
     const rect = el.getBoundingClientRect();
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     window.scrollBy({ top: rect.top + rect.height / 2 - target, behavior: reduce ? "auto" : "smooth" });
-  }, [currentIndex]);
+  }, [currentIndex, autoScroll]);
 
   return (
     <div className="flex flex-col gap-4 rounded-xl bg-surface-container-lowest p-4 shadow-sm md:p-6">

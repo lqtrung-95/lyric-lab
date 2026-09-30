@@ -175,6 +175,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
                 onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
                 looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
                 offset={offset} onOffsetChange={setOffset}
+                autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
               />
             </div>
             {failed && (
@@ -190,6 +191,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
+            autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
           />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
@@ -197,7 +199,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           <LyricList
             videoId={analysis.videoId} promptVersion={analysis.promptVersion}
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
-            showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
+            showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
             onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={setWord}
           />
@@ -206,6 +208,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
             looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
             offset={offset} onOffsetChange={setOffset}
+            autoScroll={prefs.autoScroll} onToggleAutoScroll={() => update({ autoScroll: !prefs.autoScroll })}
           />
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
         </div>

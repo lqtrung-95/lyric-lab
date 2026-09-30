@@ -17,6 +17,9 @@ interface MiniTransportBarProps {
   /** Độ lệch lời hiện tại (giây) và hàm chỉnh, để canh lời ngay trên thanh này. */
   offset: number;
   onOffsetChange: (offset: number) => void;
+  /** Ghim: tắt tự cuộn theo câu đang hát để đọc chỗ khác mà không bị kéo về. */
+  autoScroll: boolean;
+  onToggleAutoScroll: () => void;
 }
 
 const round = "flex h-11 w-11 items-center justify-center rounded-full text-inverse-on-surface transition-colors hover:bg-inverse-on-surface/15 disabled:opacity-50";
@@ -29,7 +32,7 @@ const caption = "text-[11px] font-medium leading-none text-on-surface-variant";
  * Mặc định: viên thuốc nổi ở đáy cột (máy tính), chỉ hiện khi thanh điều khiển đầy đủ đã cuộn khuất (`visible`).
  * Cả hai có nút chỉnh thời gian hiện lời để canh lời ngay khi đang nghe.
  */
-export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
+export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
   const [syncOpen, setSyncOpen] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -45,6 +48,8 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
   const label = (r: number) => (r === 1 ? "1x" : `${String(r).replace(".", ",")}x`);
   const rateLabel = `Tốc độ ${label(rate)}, bấm để đổi sang ${label(nextRate)}`;
   const offsetLabel = `Chỉnh thời gian hiện lời (đang lệch ${Number(offset.toFixed(2))} giây)`;
+  const pinned = !autoScroll;
+  const pinLabel = pinned ? "Bỏ ghim, tự cuộn theo câu đang hát" : "Ghim, không tự cuộn theo câu đang hát";
 
   if (inline) {
     return (
@@ -58,6 +63,7 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
         <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={24} /><span aria-hidden="true" className={caption}>Lặp câu</span></button>
         <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={tile}><span className="font-semibold">{label(rate)}</span><span aria-hidden="true" className={caption}>Tốc độ</span></button>
         <button type="button" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel} className={`${tile} ${syncOpen || offset !== 0 ? "bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={24} /><span aria-hidden="true" className={caption}>Chỉnh lời</span></button>
+        <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={24} /><span aria-hidden="true" className={caption}>Ghim</span></button>
         {syncOpen && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-1 top-full z-40 mt-1" />}
       </div>
     );
@@ -80,6 +86,8 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
           className="min-h-11 min-w-12 rounded-full px-2 text-label-md font-semibold text-inverse-on-surface hover:bg-inverse-on-surface/15">{label(rate)}</button>
         <button type="button" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel}
           className={`${round} ${syncOpen || offset !== 0 ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="tune" size={22} /></button>
+        <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel}
+          className={`${round} ${pinned ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="push_pin" size={22} /></button>
       </div>
     </div>
   );

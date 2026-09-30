@@ -14,13 +14,17 @@ interface TransportControlsProps {
   onToggleLoop: () => void;
   rate: number;
   onRate: (rate: number) => void;
+  /** Ghim: tắt tự cuộn theo câu đang hát để đọc chỗ khác mà không bị kéo về. */
+  autoScroll: boolean;
+  onToggleAutoScroll: () => void;
 }
 
 const roundBtn = "flex h-11 w-11 items-center justify-center rounded-full bg-surface-container text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50";
 
-/** Thanh điều khiển: lùi/tới 5 giây, phát/dừng, lặp câu (LS-08), tốc độ 0,5x / 0,75x / 1x (LS-09). */
-export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate }: TransportControlsProps) {
+/** Thanh điều khiển: lùi/tới 5 giây, phát/dừng, lặp câu (LS-08), tốc độ 0,5x / 0,75x / 1x (LS-09), ghim tự cuộn. */
+export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, autoScroll, onToggleAutoScroll }: TransportControlsProps) {
   const looping = loopIndex !== null;
+  const pinned = !autoScroll;
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-surface-container-low p-4 shadow-sm">
       <div className="flex items-center gap-3">
@@ -49,6 +53,16 @@ export function TransportControls({ ready, playing, onTogglePlay, onSeekBy, loop
           className={`${roundBtn} ${looping ? "!bg-primary/15 text-primary" : "text-on-surface-variant"}`}
         >
           <Icon name="repeat_one" size={20} />
+        </button>
+        <button
+          type="button"
+          onClick={onToggleAutoScroll}
+          aria-pressed={pinned}
+          aria-label={pinned ? "Bỏ ghim, tự cuộn theo câu đang hát" : "Ghim, không tự cuộn theo câu đang hát"}
+          title={pinned ? "Đã ghim: bỏ ghim để tự cuộn lại" : "Ghim để đọc câu khác mà không bị cuộn theo"}
+          className={`${roundBtn} ${pinned ? "!bg-primary/15 text-primary" : "text-on-surface-variant"}`}
+        >
+          <Icon name="push_pin" size={20} />
         </button>
       </div>
 
