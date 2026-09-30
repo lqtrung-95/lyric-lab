@@ -96,12 +96,14 @@ test("lặp câu: phát tới hết câu thì quay về đầu câu, bấm lại
 test("lặp câu: cấu hình đúng số lần, hết lượt thì tự tắt và không quay đầu câu nữa", async ({ page }) => {
   await setTime(page, 6);
   await expect(line(page, 2)).toHaveAttribute("aria-current", "true");
-  // Bảng cấu hình chỉ hiện sau khi đã bật lặp câu (nút mở bảng không nên chình ình lúc chưa dùng tới).
+  // Chip chỉnh số lần chỉ hiện sau khi đã bật lặp câu; bấm là chuyển sang giá trị tiếp theo (Vô hạn → 1 → 2 …).
   const loop = page.getByRole("button", { name: "Lặp câu đang hát" }).first();
   await loop.click();
-  await page.getByRole("button", { name: "Cấu hình lặp câu: số lần và khoảng nghỉ" }).first().click();
-  await page.getByRole("button", { name: "2 lần" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu 2" })).toContainText("2 lần");
+  const countChip = page.getByRole("button", { name: /Số lần lặp/ }).first();
+  await countChip.click();
+  await countChip.click();
+  await expect(countChip).toHaveAccessibleName(/Số lần lặp: 2 lần/);
+  await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu 2" })).toBeVisible();
 
   // Hết câu lần 1: còn 1 lượt lặp → quay lại đầu câu.
   await setTime(page, 9.98);

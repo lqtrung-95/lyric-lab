@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { RepeatConfig } from "@/lib/listen/repeat-config";
 import { LyricOffsetPopover } from "./lyric-offset-popover";
-import { RepeatSettingsPopover } from "./repeat-settings-popover";
+import { RepeatConfigChips } from "./repeat-config-chips";
 import { PLAYBACK_RATES } from "@/lib/user-state/listen-prefs";
 
 interface MiniTransportBarProps {
@@ -37,11 +37,13 @@ const caption = "text-[11px] font-medium leading-none text-on-surface-variant";
 /**
  * Thanh điều khiển thu gọn. `inline`: hàng nút có chữ, gắn ngay dưới video ghim ở đầu màn hình (điện thoại), luôn hiện.
  * Mặc định: viên thuốc nổi ở đáy cột (máy tính), chỉ hiện khi thanh điều khiển đầy đủ đã cuộn khuất (`visible`).
- * Cả hai có nút chỉnh thời gian hiện lời để canh lời ngay khi đang nghe. Bản viên nổi (máy tính) có thêm bảng cấu
- * hình lặp câu; bản inline (điện thoại) giữ lặp câu là nút bật/tắt đơn giản cho đỡ chật hàng nút.
+ * Cả hai có nút chỉnh thời gian hiện lời để canh lời ngay khi đang nghe, và 2 chip chỉnh nhanh số lần/khoảng nghỉ
+ * hiện khi đang lặp câu (không chiếm thêm chỗ trong hàng nút chính). Bản inline sát video nên chip nằm trong luồng
+ * (hàng riêng phía trên hàng nút) để không đè lên player; bản viên thuốc nổi (đã tách xa video khi cuộn) thì chip
+ * nổi hẳn lên trên, giống thanh điều khiển nổi của ứng dụng tham khảo.
  */
 export function MiniTransportBar({ visible, inline = false, ready, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled }: MiniTransportBarProps & { visible: boolean; inline?: boolean }) {
-  const [openPanel, setOpenPanel] = useState<"sync" | "repeat" | null>(null);
+  const [openPanel, setOpenPanel] = useState<"sync" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!openPanel) return;
@@ -61,19 +63,26 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
 
   if (inline) {
     return (
-      <div ref={barRef} role="group" aria-label="Điều khiển nhanh" className="relative flex items-stretch gap-0.5 bg-surface px-1 py-1">
-        <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={tile}><Icon name="replay_5" size={24} /><span aria-hidden="true" className={caption}>Lùi 5s</span></button>
-        <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"} className={tile}>
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-on-primary"><Icon name={playing ? "pause" : "play_arrow"} filled size={22} /></span>
-          <span aria-hidden="true" className={caption}>{playing ? "Dừng" : "Phát"}</span>
-        </button>
-        <button type="button" disabled={!ready} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={tile}><Icon name="forward_5" size={24} /><span aria-hidden="true" className={caption}>Tới 5s</span></button>
-        <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={24} /><span aria-hidden="true" className={caption}>Lặp câu</span></button>
-        <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={tile}><span className="font-semibold">{label(rate)}</span><span aria-hidden="true" className={caption}>Tốc độ</span></button>
-        <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel} className={`${tile} ${openPanel === "sync" || offset !== 0 ? "bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={24} /><span aria-hidden="true" className={caption}>Chỉnh lời</span></button>
-        <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={24} /><span aria-hidden="true" className={caption}>Ghim</span></button>
-        <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={24} /><span aria-hidden="true" className={caption}>Giải thích</span></button>
-        {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-1 top-full z-40 mt-1" />}
+      <div ref={barRef} className="bg-surface">
+        {looping && (
+          <div className="flex justify-center border-b border-outline-variant/30 py-1.5">
+            <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} />
+          </div>
+        )}
+        <div role="group" aria-label="Điều khiển nhanh" className="relative flex items-stretch gap-0.5 px-1 py-1">
+          <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={tile}><Icon name="replay_5" size={24} /><span aria-hidden="true" className={caption}>Lùi 5s</span></button>
+          <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"} className={tile}>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-on-primary"><Icon name={playing ? "pause" : "play_arrow"} filled size={22} /></span>
+            <span aria-hidden="true" className={caption}>{playing ? "Dừng" : "Phát"}</span>
+          </button>
+          <button type="button" disabled={!ready} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={tile}><Icon name="forward_5" size={24} /><span aria-hidden="true" className={caption}>Tới 5s</span></button>
+          <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={24} /><span aria-hidden="true" className={caption}>Lặp câu</span></button>
+          <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={tile}><span className="font-semibold">{label(rate)}</span><span aria-hidden="true" className={caption}>Tốc độ</span></button>
+          <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel} className={`${tile} ${openPanel === "sync" || offset !== 0 ? "bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={24} /><span aria-hidden="true" className={caption}>Chỉnh lời</span></button>
+          <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={24} /><span aria-hidden="true" className={caption}>Ghim</span></button>
+          <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={24} /><span aria-hidden="true" className={caption}>Giải thích</span></button>
+          {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-1 top-full z-40 mt-1" />}
+        </div>
       </div>
     );
   }
@@ -83,19 +92,17 @@ export function MiniTransportBar({ visible, inline = false, ready, playing, onTo
     <div role="group" aria-label="Điều khiển nhanh" className="pointer-events-none sticky bottom-6 z-30 hidden justify-center px-2 lg:flex">
       <div ref={barRef} className="pointer-events-auto relative flex items-center gap-1 rounded-full bg-inverse-surface px-2 py-1.5 shadow-[0_8px_30px_rgba(20,10,5,0.35)]">
         {openPanel === "sync" && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
-        {openPanel === "repeat" && looping && <RepeatSettingsPopover value={repeatConfig} onChange={onRepeatConfigChange} className="absolute bottom-full left-1/2 mb-2 -translate-x-1/2" />}
         <button type="button" disabled={!ready} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={round}><Icon name="replay_5" size={22} /></button>
         <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50">
           <Icon name={playing ? "pause" : "play_arrow"} filled size={26} />
         </button>
         <button type="button" disabled={!ready} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={round}><Icon name="forward_5" size={22} /></button>
-        <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát"
-          className={`${round} ${looping ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="repeat_one" size={22} /></button>
-        {looping && (
-          <button type="button" onClick={() => setOpenPanel((p) => (p === "repeat" ? null : "repeat"))} aria-expanded={openPanel === "repeat"} aria-label="Cấu hình lặp câu: số lần và khoảng nghỉ" title="Cấu hình lặp câu"
-            className="flex h-11 min-w-11 items-center justify-center rounded-full text-inverse-primary hover:bg-inverse-on-surface/15"><Icon name="expand_more" size={14} /></button>
-        )}
+        <div className="relative">
+          <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát"
+            className={`${round} ${looping ? "!bg-primary-container/40 text-inverse-primary" : ""}`}><Icon name="repeat_one" size={22} /></button>
+          {looping && <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} className="absolute bottom-full left-1/2 z-40 mb-2 -translate-x-1/2" />}
+        </div>
         <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel}
           className="min-h-11 min-w-12 rounded-full px-2 text-label-md font-semibold text-inverse-on-surface hover:bg-inverse-on-surface/15">{label(rate)}</button>
         <button type="button" onClick={() => setOpenPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={openPanel === "sync"} aria-label={offsetLabel}
