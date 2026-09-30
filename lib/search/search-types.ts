@@ -8,7 +8,7 @@ export interface SearchSong {
 }
 
 export interface SearchResponse {
-  /** Bài đã được phân tích trong Songhanzi: mở là học ngay. */
+  /** Bài đã được phân tích trong SongHanzi: mở là học ngay. */
   library: SearchSong[];
   /** Kết quả từ YouTube (đã lọc và xếp hạng). */
   youtube: SearchSong[];

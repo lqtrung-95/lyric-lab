@@ -1,11 +1,11 @@
 import { SITE_URL } from "./site-url";
 
-/** Dữ liệu có cấu trúc (schema.org) mô tả Songhanzi như một ứng dụng web giáo dục miễn phí. */
+/** Dữ liệu có cấu trúc (schema.org) mô tả SongHanzi như một ứng dụng web giáo dục miễn phí. */
 export function landingJsonLd(description: string) {
   return {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: "Songhanzi",
+    name: "SongHanzi",
     url: SITE_URL,
     description,
     applicationCategory: "EducationalApplication",

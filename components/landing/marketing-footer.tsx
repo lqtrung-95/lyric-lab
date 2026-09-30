@@ -9,7 +9,7 @@ export function MarketingFooter() {
         <div>
           <div className="flex items-center gap-2">
             <LogoMark size={28} />
-            <span className="font-serif text-headline-md font-semibold text-on-surface">Lyric <span className="text-primary">Lab</span></span>
+            <span className="font-serif text-headline-md font-semibold text-on-surface">Song<span className="text-primary">Hanzi</span></span>
           </div>
           <p className="mt-2 max-w-sm text-label-md text-on-surface-variant">Học tiếng Trung qua bài hát, dành cho người Việt.</p>
         </div>
@@ -20,7 +20,7 @@ export function MarketingFooter() {
         </nav>
       </div>
       <p className="mx-auto max-w-7xl px-gutter pb-10 text-label-md text-on-surface-variant md:px-6 lg:px-12">
-        Songhanzi không tải hay lưu nhạc. Video phát trực tiếp từ YouTube; lời bài hát thuộc về chủ sở hữu quyền tác giả và chỉ hiện cạnh video gốc để học tập.
+        SongHanzi không tải hay lưu nhạc. Video phát trực tiếp từ YouTube; lời bài hát thuộc về chủ sở hữu quyền tác giả và chỉ hiện cạnh video gốc để học tập.
       </p>
     </footer>
   );

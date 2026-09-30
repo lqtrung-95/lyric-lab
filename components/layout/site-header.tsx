@@ -17,7 +17,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-8">
           <Link href="/app" className="flex min-h-11 items-center gap-2 transition-opacity hover:opacity-90">
             <LogoMark size={32} />
-            <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Lyric <span className="text-primary">Lab</span></span>
+            <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Song<span className="text-primary">Hanzi</span></span>
           </Link>
           <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 rounded-full bg-surface-container-low/70 p-1 md:flex">
             {NAV_LINKS.map((link) => {
@@ -44,7 +44,7 @@ export function SiteHeader() {
           <Link href="/review/leaderboard" aria-label="Bảng xếp hạng" title="Bảng xếp hạng" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="leaderboard" size={20} />
           </Link>
-          <Link href="/feedback" aria-label="Góp ý cho Songhanzi" title="Góp ý" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+          <Link href="/feedback" aria-label="Góp ý cho SongHanzi" title="Góp ý" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="feedback" size={20} />
           </Link>
           <ThemeToggle />

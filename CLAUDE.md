@@ -1,4 +1,4 @@
-# Songhanzi
+# SongHanzi
 
 Web app giúp người Việt học tiếng Trung qua bài hát. Người dùng dán link YouTube, app lấy lời có timestamp, AI chọn từ vựng và ngữ pháp đáng học, người dùng **xem trước → nghe → luyện → ôn**.
 

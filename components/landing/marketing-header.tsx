@@ -15,7 +15,7 @@ export function MarketingHeader() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-gutter md:px-6 lg:px-12">
         <Link href="/" className="flex min-h-11 items-center gap-2">
           <LogoMark size={32} />
-          <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Lyric <span className="text-primary">Lab</span></span>
+          <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Song<span className="text-primary">Hanzi</span></span>
         </Link>
         <nav aria-label="Các phần của trang" className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (
