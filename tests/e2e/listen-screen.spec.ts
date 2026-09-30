@@ -67,7 +67,9 @@ test("từ vựng tô nền, ngữ pháp gạch chân: hai kiểu khác nhau", a
 });
 
 test("bấm câu để nhảy tới đầu câu", async ({ page }) => {
-  await line(page, 4).click();
+  // Bấm ở góc trên-trái (vùng đệm của dòng): pinyin ruby làm dòng cao hơn nên tâm dòng (điểm click mặc định)
+  // có thể trúng ngay nút tra từ (chặn nảy sự kiện) thay vì phần nền dòng.
+  await line(page, 4).click({ position: { x: 8, y: 8 } });
   expect(await calls(page)).toContain("seek:15");
   await expect(line(page, 4)).toHaveAttribute("aria-current", "true");
 });
@@ -93,13 +95,15 @@ test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", asyn
 });
 
 test("tắt pinyin và bản dịch, lựa chọn được nhớ", async ({ page }) => {
-  await expect(page.getByText("wǒ cónglái méi xiǎng guò huì líkāi")).toBeVisible();
+  // Pinyin giờ ghép theo từng chữ (ruby/rt trên đúng vị trí chữ Hán) thay vì một dòng riêng, nên kiểm bằng
+  // sự có mặt của <rt> thay vì tìm nguyên câu pinyin ghép chuỗi.
+  await expect(line(page, 1).locator("rt").first()).toBeVisible();
   await page.getByRole("button", { name: "Pinyin" }).first().click();
   await page.getByRole("button", { name: "Bản dịch" }).first().click();
-  await expect(page.getByText("wǒ cónglái méi xiǎng guò huì líkāi")).toHaveCount(0);
+  await expect(line(page, 1).locator("rt")).toHaveCount(0);
   await expect(page.getByText("Anh chưa từng nghĩ mình sẽ rời đi")).toHaveCount(0);
   await page.reload();
-  await expect(page.getByText("wǒ cónglái méi xiǎng guò huì líkāi")).toHaveCount(0);
+  await expect(line(page, 1).locator("rt")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Pinyin" }).first()).toHaveAttribute("aria-pressed", "false");
 });
 

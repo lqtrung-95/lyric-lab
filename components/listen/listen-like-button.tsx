@@ -27,7 +27,7 @@ export function ListenLikeButton({ videoId, liked, onChange }: ListenLikeButtonP
     <button
       type="button" onClick={() => void toggle()} disabled={pending} aria-pressed={liked}
       aria-label={liked ? "Bỏ thích bài này" : "Thích bài này"}
-      className={`inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-label-md transition-colors disabled:opacity-70 ${
+      className={`inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full px-3 text-label-md transition-colors disabled:opacity-70 ${
         liked ? "bg-surface-container-high text-error" : "text-on-surface-variant hover:bg-surface-container"
       }`}
     >

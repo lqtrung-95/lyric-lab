@@ -62,7 +62,7 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
         aria-expanded={open}
         aria-label="Góp ý bản dịch câu này"
         title="Góp ý bản dịch"
-        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
+        className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
           open ? "bg-surface-container-high opacity-100" : "opacity-0 group-hover/line:opacity-100"
         }`}
       >

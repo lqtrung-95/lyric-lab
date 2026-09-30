@@ -61,9 +61,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 ? [...part.text].map((ch, k) => (
                     <ruby key={k}>
                       {ch}
-                      {/* aria-hidden: pinyin chỉ là chú thích thị giác — nếu không ẩn, trình đọc màn hình và tên truy cập
-                          của nút (vd. Playwright getByRole name) sẽ lẫn cả pinyin vào chữ Hán ("慢慢" thành "慢 màn 慢 màn"). */}
-                      <rt aria-hidden="true" className={pinyinClass}>{part.pinyinChars![k] ?? ""}</rt>
+                      <rt className={pinyinClass}>{part.pinyinChars![k] ?? ""}</rt>
                     </ruby>
                   ))
                 : part.text;
@@ -78,6 +76,10 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 type="button"
                 lang="zh"
                 title="Bấm để tra từ"
+                // Đặt tên tường minh thay vì để trình duyệt tự tính từ nội dung: chữ Hán lồng trong <ruby>/<rt> khiến
+                // vài trình duyệt tính accessible-name-từ-nội-dung ra rỗng rồi rơi về title ("Bấm để tra từ" cho mọi
+                // nút), hoặc lẫn cả pinyin vào tên nếu không kiểm soát — đặt aria-label giữ tên nút luôn đúng = g.text.
+                aria-label={g.vocabId ? `Từ vựng: ${g.text}` : g.text}
                 onClick={(e) => { e.stopPropagation(); onWord({ lineIndex: line.index, term: g.text, itemId: g.vocabId }); }}
                 className={
                   g.vocabId
@@ -85,7 +87,6 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                     : "cursor-pointer rounded px-0.5 hover:bg-primary/10 hover:text-primary"
                 }
               >
-                {g.vocabId && <span className="sr-only">Từ vựng: </span>}
                 {content}
               </button>
             );

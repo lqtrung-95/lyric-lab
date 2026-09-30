@@ -28,8 +28,10 @@ for (const url of SCREENS) {
         for (const el of document.querySelectorAll("button, a[href], select, input, [role=menuitem]")) {
           const r = el.getBoundingClientRect();
           if (r.width === 0 || r.height === 0) continue;
-          // Từ trong lời hát là liên kết nằm giữa câu (ngoại lệ "inline" của WCAG 2.5.8).
+          // Từ trong lời hát, hoặc link nằm trong đoạn văn (vd. link "Góp ý" ở footer): ngoại lệ "inline" của WCAG 2.5.8
+          // — mục tiêu nằm trong câu/khối văn bản không bắt buộc kích thước tối thiểu.
           if (el.matches('[lang="zh"][title]')) continue;
+          if (el.tagName === "A" && el.closest("p")) continue;
           // Liên kết "Bỏ qua tới nội dung" chỉ hiện khi được focus (sr-only), kích thước lúc ẩn không tính.
           if (el.matches(".sr-only")) continue;
           if (r.width < 43.5 || r.height < 43.5) out.push(`${(el.getAttribute("aria-label") || el.textContent || el.tagName).trim().slice(0, 30)} ${Math.round(r.width)}x${Math.round(r.height)}`);
