@@ -1,11 +1,12 @@
 import { z } from "zod";
 
-export const FEEDBACK_CATEGORIES = ["bug", "feature", "other"] as const;
+export const FEEDBACK_CATEGORIES = ["bug", "feature", "copyright", "other"] as const;
 export type FeedbackCategory = (typeof FEEDBACK_CATEGORIES)[number];
 
 export const FEEDBACK_CATEGORY_LABELS: Record<FeedbackCategory, string> = {
   bug: "Báo lỗi",
   feature: "Đề xuất tính năng",
+  copyright: "Yêu cầu gỡ nội dung (bản quyền)",
   other: "Khác",
 };
 
