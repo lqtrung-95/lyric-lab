@@ -28,7 +28,7 @@ export function ProblemSolution() {
           </ul>
         </div>
         <div className="rounded-3xl bg-primary-container/25 p-space-lg ring-1 ring-primary/20">
-          <p className="text-label-md font-semibold uppercase tracking-widest text-primary">Với SongHanzi</p>
+          <p className="text-label-md font-semibold uppercase tracking-widest text-primary">Với Song Hanzi</p>
           <ul className="mt-space-md space-y-space-md">
             {GAIN.map((t) => (
               <li key={t} className="flex gap-3 text-body-lg text-on-surface"><Icon name="check_circle" size={22} filled className="mt-0.5 shrink-0 text-secondary" />{t}</li>
