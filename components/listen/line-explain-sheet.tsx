@@ -88,10 +88,23 @@ export function LineExplainSheet({ lineText, result, onClose }: { lineText: stri
       ) : result.status === "error" ? (
         <p role="status" className="text-label-md text-on-surface-variant">{FAIL_TEXT[result.reason]}</p>
       ) : (
-        <div role="status" aria-label="Đang giải thích" className="space-y-2">
-          <div className="h-4 w-full animate-pulse rounded bg-surface-container-high" />
-          <div className="h-4 w-3/4 animate-pulse rounded bg-surface-container-high" />
-          <div className="h-4 w-5/6 animate-pulse rounded bg-surface-container-high" />
+        // Mô phỏng đúng cỡ các mục thật (Dịch, Từ vựng, Điểm ngữ pháp) để khung popup không nhảy cỡ lúc dữ liệu về.
+        <div role="status" aria-label="Đang giải thích" className="space-y-4">
+          <div className="space-y-2">
+            <div className="h-3 w-16 animate-pulse rounded bg-surface-container-high" />
+            <div className="h-4 w-full animate-pulse rounded bg-surface-container-high" />
+            <div className="h-4 w-4/5 animate-pulse rounded bg-surface-container-high" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 w-14 animate-pulse rounded bg-surface-container-high" />
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="h-4 animate-pulse rounded bg-surface-container-high" style={{ width: `${85 - i * 6}%` }} />
+            ))}
+          </div>
+          <div className="space-y-2">
+            <div className="h-3 w-24 animate-pulse rounded bg-surface-container-high" />
+            <div className="h-4 w-full animate-pulse rounded bg-surface-container-high" />
+          </div>
         </div>
       )}
     </div>
