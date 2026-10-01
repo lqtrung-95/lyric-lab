@@ -9,7 +9,10 @@ export interface ChatRequest {
 export type ChatFn = (req: ChatRequest) => Promise<string>;
 
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
-const TIMEOUT_MS = 60_000;
+// Route /api/analyze có maxDuration 60s (trần của gói Vercel Hobby) và có thể thử tới 6 model tuần tự khi model
+// trước lỗi/nghèo kết quả (xem DEFAULT_MODELS) — timeout 1 lần gọi phải NHỎ hơn nhiều so với 60s, nếu không 1 model
+// chậm/treo là chiếm hết cả ngân sách, không còn thời gian rớt qua model dự phòng nào (từng xảy ra thật).
+const TIMEOUT_MS = 15_000;
 // Groq tính max_completion_tokens vào hạn mức token/phút (gói miễn phí: 8.000). Đặt vừa đủ cho một phân tích
 // (~3k token đầu ra) để một lần gọi không chiếm hết hạn mức.
 const MAX_COMPLETION_TOKENS = 4500;

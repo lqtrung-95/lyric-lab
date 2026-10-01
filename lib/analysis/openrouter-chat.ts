@@ -11,7 +11,8 @@ const ENDPOINT = "https://openrouter.ai/api/v1/chat/completions";
 /** Suy luận tối thiểu cho model có hỗ trợ (bỏ qua nếu model không có chế độ suy luận) để nhanh và rẻ. */
 const params = (model: string) => (model.startsWith("openai/gpt-oss") ? { reasoning: { effort: "low" } } : { reasoning: { enabled: false } });
 
-export const createOpenRouterChat = (apiKey: string): ChatFn => createCompatChat({ endpoint: ENDPOINT, label: "OpenRouter", apiKey, params });
+export const createOpenRouterChat = (apiKey: string, limits: { maxRetries?: number; maxWaitSec?: number } = {}): ChatFn =>
+  createCompatChat({ endpoint: ENDPOINT, label: "OpenRouter", apiKey, params, ...limits });
 
 /** Áp tiền tố "groq-fallback:" cho các model Groq, để thử lại bằng FALLBACK_LLM_API_KEY trước khi sang OpenRouter. */
 export const withGroqFallback = (models: string[]): string[] => models.map((m) => `${GROQ_FALLBACK_PREFIX}${m}`);

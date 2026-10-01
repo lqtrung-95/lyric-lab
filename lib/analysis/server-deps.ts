@@ -16,16 +16,20 @@ import { getCachedAnalysis } from "./song-analysis-cache";
 import { createSupabaseCacheDb } from "./supabase-cache-db";
 import type { SongAnalysis } from "./analysis-types";
 
+// Danh sách model (DEFAULT_MODELS) dùng OpenRouter làm cả bước đầu lẫn bước chót, chờ 429 chậm ở bước nào cũng
+// chiếm vào cùng ngân sách 60s của route — luôn chờ ngắn để kịp rớt qua model kế tiếp (hoặc báo lỗi sạch sớm hơn).
+const FAST_FAIL_LIMITS = { maxRetries: 1, maxWaitSec: 8 };
+
 /**
  * Thứ tự: GROQ_API_KEY → FALLBACK_LLM_API_KEY (khóa Groq thứ hai, cùng model) → OpenRouter.
  * Mỗi khóa Groq chỉ chờ ngắn khi hết hạn mức nếu còn bước sau để thử, cho kịp chuyển dự phòng trong thời gian tối đa của route.
  */
 export function createChat(env: { GROQ_API_KEY: string; FALLBACK_LLM_API_KEY?: string; OPENROUTER_API_KEY?: string }) {
-  const openrouter = env.OPENROUTER_API_KEY ? createOpenRouterChat(env.OPENROUTER_API_KEY) : undefined;
+  const openrouter = env.OPENROUTER_API_KEY ? createOpenRouterChat(env.OPENROUTER_API_KEY, FAST_FAIL_LIMITS) : undefined;
   const groqFallback = env.FALLBACK_LLM_API_KEY
-    ? createGroqChat(env.FALLBACK_LLM_API_KEY, fetch, undefined, openrouter ? { maxRetries: 1, maxWaitSec: 8 } : {})
+    ? createGroqChat(env.FALLBACK_LLM_API_KEY, fetch, undefined, openrouter ? FAST_FAIL_LIMITS : {})
     : undefined;
-  const groq = createGroqChat(env.GROQ_API_KEY, fetch, undefined, groqFallback || openrouter ? { maxRetries: 1, maxWaitSec: 8 } : {});
+  const groq = createGroqChat(env.GROQ_API_KEY, fetch, undefined, groqFallback || openrouter ? FAST_FAIL_LIMITS : {});
   return createChatRouter(groq, groqFallback, openrouter);
 }
 
