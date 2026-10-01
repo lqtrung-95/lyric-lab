@@ -57,49 +57,45 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
   c.fillText("歌", W + 40, H - 120);
 
   c.textAlign = "left";
-  c.fillStyle = PRIMARY;
-  c.beginPath();
-  c.arc(104, 128, 10, 0, Math.PI * 2);
-  c.fill();
   c.fillStyle = INK;
   c.font = `600 44px ${serif}`;
-  c.fillText("SongHanzi", 130, 142);
+  c.fillText("SongHanzi", 90, 150);
 
   c.fillStyle = MUTED;
   c.font = `400 42px ${sans}`;
-  c.fillText("Chuỗi ngày học tiếng Trung qua bài hát", 90, 420);
+  c.fillText("Chuỗi ngày học tiếng Trung qua bài hát", 90, 230);
 
   c.fillStyle = PRIMARY;
   c.font = `700 300px ${serif}`;
-  c.fillText(String(d.current), 90, 700);
+  c.fillText(String(d.current), 90, 560);
   c.fillStyle = INK;
   c.font = `600 64px ${sans}`;
-  c.fillText("ngày liên tiếp", 90, 790);
+  c.fillText("ngày liên tiếp", 90, 650);
 
   const stats: [string, number][] = [["từ đã ôn", d.learnedWords], ["ngày học tuần này", d.weekCount]];
   stats.forEach(([label, value], i) => {
     const x = 90 + i * 460;
-    roundRect(c, x - 32, 900, 400, 200, 28);
+    roundRect(c, x - 32, 760, 400, 200, 28);
     c.fillStyle = "rgba(28, 22, 17, 0.04)";
     c.fill();
     c.fillStyle = PRIMARY;
     c.font = `700 96px ${serif}`;
-    c.fillText(String(value), x, 1010);
+    c.fillText(String(value), x, 870);
     c.fillStyle = MUTED;
     c.font = `400 36px ${sans}`;
-    c.fillText(label, x, 1070);
+    c.fillText(label, x, 930);
   });
 
   c.strokeStyle = "rgba(28, 22, 17, 0.12)";
   c.lineWidth = 2;
   c.beginPath();
-  c.moveTo(90, 1190);
-  c.lineTo(W - 90, 1190);
+  c.moveTo(90, 1050);
+  c.lineTo(W - 90, 1050);
   c.stroke();
 
   c.fillStyle = MUTED;
   c.font = `400 34px ${sans}`;
-  c.fillText(SITE_URL.replace(/^https?:\/\//, ""), 90, 1250);
+  c.fillText(SITE_URL.replace(/^https?:\/\//, ""), 90, 1110);
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png"));
 }
