@@ -63,22 +63,19 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png"));
 }
 
-/** Chia sẻ ảnh bằng Web Share API (mobile); không hỗ trợ thì tải ảnh về. Trả "shared" | "downloaded" | "cancelled". */
-export async function shareOrDownload(blob: Blob): Promise<"shared" | "downloaded" | "cancelled"> {
-  const file = new File([blob], "songhanzi-streak.png", { type: "image/png" });
-  if (navigator.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: "SongHanzi" });
-      return "shared";
-    } catch (e) {
-      if ((e as Error).name === "AbortError") return "cancelled";
-    }
+// Mobile có share sheet thật của hệ điều hành (liệt kê Facebook/Zalo/Messenger... nếu máy có cài) — tốt hơn hẳn
+// 3 nút cố định trong popup tự dựng, nên ưu tiên dùng. Desktop không có share sheet nên mới cần popup riêng.
+const MOBILE_UA = /Android|iPhone|iPad|iPod/i;
+export const isMobileDevice = (): boolean => MOBILE_UA.test(navigator.userAgent);
+
+/** Chia sẻ link bằng share sheet của hệ điều hành (mobile). Trả "shared" | "cancelled" | "unsupported". */
+export async function shareLinkNative(url: string, title: string, text: string): Promise<"shared" | "cancelled" | "unsupported"> {
+  if (!navigator.share) return "unsupported";
+  try {
+    await navigator.share({ title, text, url });
+    return "shared";
+  } catch (e) {
+    if ((e as Error).name === "AbortError") return "cancelled";
+    throw e;
   }
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = file.name;
-  a.click();
-  URL.revokeObjectURL(url);
-  return "downloaded";
 }

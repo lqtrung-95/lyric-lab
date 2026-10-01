@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { track } from "@/lib/analytics/track";
-import { renderShareCard, shareOrDownload } from "@/lib/streak/share-card";
+import { isMobileDevice, shareLinkNative } from "@/lib/streak/share-card";
 import { WEEKLY_GOAL_DAYS } from "@/lib/streak/streak-logic";
+import { ShareDialog } from "./share-dialog";
 import { useStreak } from "./use-streak";
 
 const DAY_LABELS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -13,20 +14,31 @@ const DAY_LABELS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 export function StreakCard() {
   const streak = useStreak();
   const [note, setNote] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   if (streak === null) return null;
   if (streak === undefined) return <div aria-hidden="true" className="mt-space-md h-28 animate-pulse rounded-2xl bg-surface-container-high motion-reduce:animate-none" />;
 
   const goalDone = streak.weekCount >= WEEKLY_GOAL_DAYS;
 
+  // Mobile: share sheet thật của hệ điều hành (liệt kê app cài sẵn: Facebook, Zalo, Messages...) — cần tạo link
+  // trước để chia sẻ (share sheet chỉ nhận {title, text, url}, không nhận file ảnh kèm link cùng lúc).
+  // Desktop: không có share sheet nên mở popup riêng (ShareDialog) tự xem trước banner + nút từng mạng xã hội.
   async function share() {
     if (!streak) return;
     track("share_card");
+    if (!isMobileDevice()) {
+      setDialogOpen(true);
+      return;
+    }
     try {
-      const result = await shareOrDownload(await renderShareCard(streak));
-      setNote(result === "downloaded" ? "Đã tải ảnh về máy." : "");
+      const res = await fetch("/api/streak/share", { method: "POST" });
+      if (!res.ok) throw new Error("share_failed");
+      const { url } = (await res.json()) as { url: string };
+      const result = await shareLinkNative(url, "SongHanzi", `${streak.current} ngày liên tiếp học tiếng Trung qua bài hát!`);
+      if (result === "unsupported") setDialogOpen(true);
     } catch {
-      setNote("Chưa tạo được ảnh. Thử lại sau nhé.");
+      setNote("Chưa tạo được link chia sẻ. Thử lại sau nhé.");
     }
   }
 
@@ -67,6 +79,7 @@ export function StreakCard() {
         {note && <p role="status" className="text-label-sm text-on-surface-variant">{note}</p>}
       </div>
       {note && <p role="status" className="text-label-sm text-on-surface-variant md:hidden">{note}</p>}
+      {dialogOpen && <ShareDialog streak={streak} onClose={() => setDialogOpen(false)} />}
     </section>
   );
 }
