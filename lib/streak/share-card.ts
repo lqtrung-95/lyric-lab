@@ -1,7 +1,17 @@
+import { SITE_URL } from "@/lib/seo/site-url";
 import type { StreakData } from "./load-streak";
 
 const W = 1080;
 const H = 1350;
+const PRIMARY = "#b03a2e";
+const SECONDARY = "#2e6b5e";
+const INK = "#1c1611";
+const MUTED = "#5c5147";
+
+function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  c.beginPath();
+  c.roundRect(x, y, w, h, r);
+}
 
 /**
  * Vẽ thẻ chia sẻ (PNG) ngay trên trình duyệt để dùng đúng font của trang (có đủ dấu tiếng Việt).
@@ -16,49 +26,80 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
   const sans = "'Be Vietnam Pro', system-ui, sans-serif";
   const serif = "Lora, Georgia, serif";
 
+  // Khung bo góc cho cả thẻ, bên ngoài khung giữ trong suốt (đẹp hơn khi xem trước trong popup/khi tải về).
+  const radius = 48;
+  roundRect(c, 0, 0, W, H, radius);
+  c.clip();
+
   c.fillStyle = "#fff8f4";
   c.fillRect(0, 0, W, H);
-  const glow = c.createRadialGradient(W, 0, 0, W, 0, 900);
-  glow.addColorStop(0, "rgba(176, 58, 46, 0.18)");
-  glow.addColorStop(1, "rgba(176, 58, 46, 0)");
-  c.fillStyle = glow;
+  const glowTop = c.createRadialGradient(W, 0, 0, W, 0, 900);
+  glowTop.addColorStop(0, "rgba(176, 58, 46, 0.2)");
+  glowTop.addColorStop(1, "rgba(176, 58, 46, 0)");
+  c.fillStyle = glowTop;
+  c.fillRect(0, 0, W, H);
+  const glowBottom = c.createRadialGradient(0, H, 0, 0, H, 700);
+  glowBottom.addColorStop(0, "rgba(46, 107, 94, 0.12)");
+  glowBottom.addColorStop(1, "rgba(46, 107, 94, 0)");
+  c.fillStyle = glowBottom;
   c.fillRect(0, 0, W, H);
 
-  c.fillStyle = "rgba(176, 58, 46, 0.07)";
+  // Dải màu thương hiệu trên cùng, mỏng — tạo điểm nhấn thay vì nền phẳng toàn bộ.
+  const topBar = c.createLinearGradient(0, 0, W, 0);
+  topBar.addColorStop(0, PRIMARY);
+  topBar.addColorStop(1, SECONDARY);
+  c.fillStyle = topBar;
+  c.fillRect(0, 0, W, 14);
+
+  c.fillStyle = "rgba(176, 58, 46, 0.06)";
   c.font = `700 760px "Noto Serif SC", serif`;
   c.textAlign = "right";
   c.fillText("歌", W + 40, H - 120);
 
   c.textAlign = "left";
-  c.fillStyle = "#1c1611";
+  c.fillStyle = PRIMARY;
+  c.beginPath();
+  c.arc(104, 128, 10, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = INK;
   c.font = `600 44px ${serif}`;
-  c.fillText("SongHanzi", 90, 150);
+  c.fillText("SongHanzi", 130, 142);
 
-  c.fillStyle = "#5c5147";
+  c.fillStyle = MUTED;
   c.font = `400 42px ${sans}`;
   c.fillText("Chuỗi ngày học tiếng Trung qua bài hát", 90, 420);
 
-  c.fillStyle = "#b03a2e";
+  c.fillStyle = PRIMARY;
   c.font = `700 300px ${serif}`;
   c.fillText(String(d.current), 90, 700);
-  c.fillStyle = "#1c1611";
+  c.fillStyle = INK;
   c.font = `600 64px ${sans}`;
   c.fillText("ngày liên tiếp", 90, 790);
 
   const stats: [string, number][] = [["từ đã ôn", d.learnedWords], ["ngày học tuần này", d.weekCount]];
   stats.forEach(([label, value], i) => {
     const x = 90 + i * 460;
-    c.fillStyle = "#1c1611";
+    roundRect(c, x - 32, 900, 400, 200, 28);
+    c.fillStyle = "rgba(28, 22, 17, 0.04)";
+    c.fill();
+    c.fillStyle = PRIMARY;
     c.font = `700 96px ${serif}`;
     c.fillText(String(value), x, 1010);
-    c.fillStyle = "#5c5147";
+    c.fillStyle = MUTED;
     c.font = `400 36px ${sans}`;
     c.fillText(label, x, 1070);
   });
 
-  c.fillStyle = "#5c5147";
+  c.strokeStyle = "rgba(28, 22, 17, 0.12)";
+  c.lineWidth = 2;
+  c.beginPath();
+  c.moveTo(90, 1190);
+  c.lineTo(W - 90, 1190);
+  c.stroke();
+
+  c.fillStyle = MUTED;
   c.font = `400 34px ${sans}`;
-  c.fillText("lyric-lab-indol.vercel.app", 90, 1250);
+  c.fillText(SITE_URL.replace(/^https?:\/\//, ""), 90, 1250);
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png"));
 }

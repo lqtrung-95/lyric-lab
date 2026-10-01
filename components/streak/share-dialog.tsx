@@ -12,10 +12,14 @@ interface NetworkLink {
   label: string;
   href: (url: string) => string;
 }
+// Facebook: sharer.php đã bỏ tham số text/quote từ lâu, không nhận text tùy chỉnh được, chỉ nhận link.
+// Instagram/TikTok không có: không có link chia sẻ web công khai (chỉ nhận qua share sheet app di động thật).
 const NETWORKS: NetworkLink[] = [
   { label: "Facebook", href: (u) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}` },
   { label: "X", href: (u) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(u)}&text=${encodeURIComponent(SHARE_TEXT)}` },
   { label: "Zalo", href: (u) => `https://zalo.me/share?u=${encodeURIComponent(u)}&t=${encodeURIComponent(SHARE_TITLE)}` },
+  { label: "Telegram", href: (u) => `https://t.me/share/url?url=${encodeURIComponent(u)}&text=${encodeURIComponent(SHARE_TEXT)}` },
+  { label: "Threads", href: (u) => `https://www.threads.net/intent/post?text=${encodeURIComponent(`${SHARE_TEXT} ${u}`)}` },
 ];
 
 /**
@@ -90,12 +94,12 @@ export function ShareDialog({ streak, onClose }: { streak: Pick<StreakData, "cur
           <p role="alert" className="mt-3 text-label-md text-error">{error}</p>
         ) : (
           <>
-            <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="mt-3 flex flex-wrap gap-2">
               {NETWORKS.map((n) => (
                 <a
                   key={n.label} href={shareUrl ? n.href(shareUrl) : undefined} target="_blank" rel="noopener noreferrer"
                   aria-disabled={!shareUrl}
-                  className="flex min-h-11 items-center justify-center rounded-full bg-surface-container px-3 text-label-md font-medium text-on-surface hover:bg-surface-container-high aria-disabled:pointer-events-none aria-disabled:opacity-50"
+                  className="inline-flex min-h-11 flex-1 basis-[calc(33%-6px)] items-center justify-center rounded-full bg-surface-container px-3 text-label-md font-medium text-on-surface hover:bg-surface-container-high aria-disabled:pointer-events-none aria-disabled:opacity-50"
                 >
                   {n.label}
                 </a>
