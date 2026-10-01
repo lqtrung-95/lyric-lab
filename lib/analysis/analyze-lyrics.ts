@@ -10,13 +10,13 @@ import { validateLlmOutput, type Dropped } from "./validate-llm-output";
 
 // Model chính, rồi model dự phòng khi lỗi hoặc kết quả quá nghèo (PRD §7: tự chuyển model khi nhà cung cấp lỗi).
 // qwen/qwen3.8-27b bị loại: hạn mức đầu ra 1.000 token/phút không đủ cho một phân tích.
-// claude-haiku-4.5 đứng đầu: văn phong tiếng Việt tự nhiên nhất và độ tuân thủ JSON tốt nhất trong các model đã thử,
-// ưu tiên chất lượng phân tích hơn chi phí (tốn phí OpenRouter mỗi bài mới, chấp nhận đánh đổi). Sau đó mới tới:
-// 2 model Groq bằng GROQ_API_KEY → cùng 2 model đó bằng FALLBACK_LLM_API_KEY (khóa Groq thứ hai) → gemini-2.5-flash
-// (OpenRouter, cân bằng chất lượng/giá) làm lưới an toàn cuối.
+// deepseek-v3 đứng đầu: mạnh tiếng Trung, rẻ hơn nhiều so với claude-haiku-4.5 (model trước đây) mà vẫn tuân thủ
+// JSON tốt — ưu tiên chi phí để chịu được lượng người dùng tăng, chấp nhận đánh đổi nếu văn phong tiếng Việt kém tự
+// nhiên hơn. Sau đó mới tới: 2 model Groq bằng GROQ_API_KEY → cùng 2 model đó bằng FALLBACK_LLM_API_KEY (khóa Groq
+// thứ hai) → gemini-2.5-flash (OpenRouter, cân bằng chất lượng/giá) làm lưới an toàn cuối.
 const GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"];
 export const DEFAULT_MODELS = [
-  "openrouter:anthropic/claude-haiku-4.5",
+  "openrouter:deepseek/deepseek-chat-v3-0324",
   ...GROQ_MODELS,
   ...withGroqFallback(GROQ_MODELS),
   "openrouter:google/gemini-2.5-flash",
