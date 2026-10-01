@@ -6,6 +6,7 @@ import { COMMON_READING, lookupWords } from "@/lib/dictionary/lookup-words";
 import { LrclibProvider } from "@/lib/lyrics/lrclib-provider";
 import { NeteaseProvider } from "@/lib/lyrics/netease-provider";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
+import { MANUAL_VARIANTS } from "@/lib/text/to-simplified-chinese";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
 import { createGroqChat } from "./groq-chat";
@@ -70,7 +71,7 @@ const analysisCache = unstable_cache(
     return analysis;
   },
   // Số cuối tăng khi sửa dữ liệu phân tích trực tiếp trong DB (vd. bù bản dịch) để bỏ bản cache cũ ngay thay vì đợi hết 1 giờ.
-  ["song-analysis", PROMPT_VERSION, "rev6"],
+  ["song-analysis", PROMPT_VERSION, "rev7"],
   { revalidate: 3600, tags: ["song-analysis"] },
 );
 
@@ -85,16 +86,19 @@ export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis 
 }
 
 const HAN = /\p{Script=Han}/u;
-// Chữ từng bị chọn nhầm âm phổ biến (vd. 听 ra "yǐn" thay vì "tīng") trước khi có COMMON_READING — bài đã cache lúc
-// đó vẫn giữ pinyin sai. Dòng có chữ này cũng cần tính lại, không chỉ dòng còn sót chữ Hán trong pinyin.
-const OVERRIDE_CHARS = new Set(Object.keys(COMMON_READING));
+// Chữ từng khiến pinyin tính sai trước khi có bản sửa: (a) khoá của COMMON_READING — từ nhiều âm từng bị chọn nhầm
+// cách đọc hiếm (vd. 听 ra "yǐn" thay vì "tīng"); (b) giá trị của MANUAL_VARIANTS — chữ đích của một lượt chuẩn hoá
+// giản thể bổ sung sau (vd. 著 được đổi thành 着 nên dòng vốn tra theo 著 có thể đã ra sai cách đọc). `l.text` lúc
+// kiểm tra đã qua `simplifyDeep` (chạy trước hàm này) nên luôn là chữ ĐÍCH, không còn 著 gốc — so theo chữ đích đúng.
+const OVERRIDE_CHARS = new Set([...Object.keys(COMMON_READING), ...Object.values(MANUAL_VARIANTS)]);
 const needsPinyinRepair = (l: { text: string; pinyin: string }) => HAN.test(l.pinyin) || [...l.text].some((c) => OVERRIDE_CHARS.has(c));
 
 /**
- * Bài đã cache có thể còn pinyin sai do 2 lý do: (1) lúc đó chưa có cách ghép pinyin theo đoạn con nên còn sót chữ
- * Hán trong dòng pinyin (token như 好了吗 không có nguyên từ trong từ điển), hoặc (2) chữ nhiều âm từng bị chọn nhầm
- * cách đọc hiếm trước khi thêm vào COMMON_READING (vd. 听 → "yǐn" thay vì "tīng"). Tính lại pinyin cho đúng những
- * dòng đó từ token và từ điển, không gọi LLM — tự sửa khi ai đó mở lại bài, không cần chạy script riêng.
+ * Bài đã cache có thể còn pinyin sai do: (1) lúc đó chưa có cách ghép pinyin theo đoạn con nên còn sót chữ Hán
+ * trong dòng pinyin (token như 好了吗 không có nguyên từ trong từ điển), (2) chữ nhiều âm từng bị chọn nhầm cách đọc
+ * hiếm trước khi thêm vào COMMON_READING, hoặc (3) chữ phồn thể từng bị bỏ sót khi chuẩn hoá giản thể (MANUAL_VARIANTS,
+ * vd. 著 lẽ ra phải thành 着). Tính lại pinyin cho đúng những dòng đó từ token và từ điển, không gọi LLM — tự sửa khi
+ * ai đó mở lại bài, không cần chạy script riêng.
  */
 async function repairLinePinyin(analysis: SongAnalysis): Promise<SongAnalysis> {
   if (!analysis.lines.some(needsPinyinRepair)) return analysis;

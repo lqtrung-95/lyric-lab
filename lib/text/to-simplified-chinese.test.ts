@@ -11,4 +11,7 @@ describe("toSimplifiedChinese", () => {
   it("đổi 妳 thành 你: OpenCC coi hợp lệ ở cả hai thể nên không tự đổi, nhưng từ điển chỉ có mục theo 你", () => {
     expect(toSimplifiedChinese("妳爱我")).toBe("你爱我");
   });
+  it("đổi 著 thành 着: lời phồn thể hay viết trợ từ zhe bằng 著, không đổi thì tra ra nghĩa zhù (著tác) thay vì trợ từ", () => {
+    expect(toSimplifiedChinese("我想著你")).toBe("我想着你");
+  });
 });
