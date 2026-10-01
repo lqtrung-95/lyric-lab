@@ -56,4 +56,7 @@ describe("pickPrimaryEntry", () => {
   it("ghi đè cách đọc thông dụng cho chữ đã xác nhận báo lỗi (说 → shuō, không phải shuì)", () => {
     expect(pickPrimaryEntry([row("说", "shuì", 1), row("说", "shuō", 1)])?.pinyin).toBe("shuō");
   });
+  it("ghi đè cách đọc thông dụng cho 听 → tīng, không phải yǐn (nghĩa cổ, hiếm)", () => {
+    expect(pickPrimaryEntry([row("听", "yǐn", 1), row("听", "tīng", 1)])?.pinyin).toBe("tīng");
+  });
 });

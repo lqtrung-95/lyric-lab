@@ -38,6 +38,7 @@ const SURNAME_PINYIN = /^[A-ZÀ-Ỹ]/;
 // cách đọc thông dụng trong tiếng Trung hiện đại. Chỉ thêm khi đã xác nhận qua báo lỗi thực tế.
 const COMMON_READING: Record<string, string> = {
   说: "shuō",
+  听: "tīng",
 };
 const pinyinKey = (p: string) => p.replace(/\s+/g, "").toLowerCase();
 
