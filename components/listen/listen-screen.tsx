@@ -238,7 +238,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
       )}
       {explainOpen && currentIndex >= 0 && (
         <LineExplainSheet
-          lineText={lines[currentIndex].text} result={explainResult}
+          lineText={lines[currentIndex].text} linePinyin={lines[currentIndex].pinyin} result={explainResult}
           onClose={() => { setExplainOpen(false); resetExplain(); }}
         />
       )}

@@ -12,7 +12,7 @@ const FAIL_TEXT = {
 const sectionTitle = "text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant";
 
 /** Bottom sheet hiện kết quả giải thích cả câu đang hát: dịch tự nhiên, từ vựng, điểm ngữ pháp, ghi chú khác. */
-export function LineExplainSheet({ lineText, result, onClose }: { lineText: string; result: LineExplainResult; onClose: () => void }) {
+export function LineExplainSheet({ lineText, linePinyin, result, onClose }: { lineText: string; linePinyin?: string; result: LineExplainResult; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -30,7 +30,10 @@ export function LineExplainSheet({ lineText, result, onClose }: { lineText: stri
       className="fixed inset-x-0 bottom-0 z-50 max-h-[80vh] overflow-y-auto rounded-t-2xl bg-surface-container-lowest p-5 shadow-[0_-4px_24px_rgba(30,26,22,0.2)] outline-none md:inset-x-auto md:bottom-6 md:right-6 md:w-[26rem] md:rounded-2xl"
     >
       <div className="sticky top-0 -mt-5 -mx-5 flex items-start justify-between gap-3 bg-surface-container-lowest px-5 pb-3 pt-5">
-        <p lang="zh" className="font-serif text-hanzi-body text-on-surface">{lineText}</p>
+        <div>
+          <p lang="zh" className="font-serif text-hanzi-body text-on-surface">{lineText}</p>
+          {linePinyin && <p className="mt-1 text-pinyin-reading text-primary">{linePinyin}</p>}
+        </div>
         <button type="button" aria-label="Đóng" onClick={onClose} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high">
           <Icon name="close" size={20} />
         </button>
