@@ -17,8 +17,8 @@ const seekBtn = "flex h-11 w-11 shrink-0 items-center justify-center rounded-ful
 /**
  * Hàng hiển thị vị trí đang phát: mốc hiện tại, thanh kéo tới vị trí bất kỳ trong bài, tổng thời lượng, và 2 nút
  * lùi/tới nhanh 5 giây ngay cạnh hai mốc thời gian. Đọc `getCurrentTime()` định kỳ thay vì đăng ký sự kiện (YouTube
- * IFrame API không phát sự kiện tiến độ liên tục); khi người dùng đang kéo thì ưu tiên hiển thị giá trị đang kéo,
- * không để lần đọc định kỳ tiếp theo đè mất thao tác dở dang.
+ * IFrame API không phát sự kiện tiến độ liên tục); khi người dùng kéo/bấm thanh thì ưu tiên hiển thị giá trị vừa
+ * chọn (`dragTime`), không để lần đọc định kỳ tiếp theo đè mất thao tác dở dang.
  */
 export function PlaybackProgressBar({ controller, durationSec, onSeekBy }: PlaybackProgressBarProps) {
   const [time, setTime] = useState(0);
@@ -26,7 +26,14 @@ export function PlaybackProgressBar({ controller, durationSec, onSeekBy }: Playb
 
   useEffect(() => {
     if (!controller) return;
-    const id = setInterval(() => setTime(controller.getCurrentTime()), 250);
+    const id = setInterval(() => {
+      const t = controller.getCurrentTime();
+      setTime(t);
+      // `seekTo()` của YouTube không xong ngay: vài lần đọc định kỳ kế tiếp vẫn trả vị trí CŨ trước khi video thực
+      // sự nhảy tới. Xoá `dragTime` ngay khi nhả tay (thay vì chờ đọc được đúng vị trí) làm thanh nhảy về vị trí cũ
+      // rồi mới nhảy lại vị trí đã chọn — chỉ coi là xong và bỏ giá trị tạm khi đọc được vị trí thật sự khớp.
+      setDragTime((d) => (d !== null && Math.abs(t - d) < 0.75 ? null : d));
+    }, 250);
     return () => clearInterval(id);
   }, [controller]);
 
@@ -42,7 +49,6 @@ export function PlaybackProgressBar({ controller, durationSec, onSeekBy }: Playb
         type="range" aria-label="Vị trí phát" min={0} max={Math.max(durationSec, 0.1)} step={0.1}
         value={Math.min(shown, Math.max(durationSec, 0.1))} disabled={!controller || durationSec <= 0}
         onChange={(e) => { const v = Number(e.target.value); setDragTime(v); controller?.seekTo(v); }}
-        onPointerUp={() => setDragTime(null)}
         className="h-11 min-w-0 flex-1 accent-primary disabled:opacity-40"
       />
       <span className="w-9 shrink-0 text-label-sm tabular-nums text-on-surface-variant">{formatTimestamp(durationSec)}</span>
