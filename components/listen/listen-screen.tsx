@@ -17,6 +17,7 @@ import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { LineExplainSheet } from "./line-explain-sheet";
 import { LinePracticeSheet } from "./line-practice-sheet";
 import { MiniTransportBar } from "./mini-transport-bar";
+import { MobilePlaybackBar } from "./mobile-playback-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
 import { ListenTopBar } from "./listen-top-bar";
@@ -221,8 +222,8 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           <div ref={stickyPlayerRef} data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
             <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
             <div className="lg:hidden">
-              <MiniTransportBar
-                inline visible ready={!!controller} playing={playing} onTogglePlay={togglePlay}
+              <MobilePlaybackBar
+                controller={controller} durationSec={song.durationSec ?? 0} playing={playing} onTogglePlay={togglePlay}
                 onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
                 looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
                 offset={offset} onOffsetChange={setOffset}
