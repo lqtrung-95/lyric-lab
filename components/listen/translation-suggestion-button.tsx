@@ -22,21 +22,38 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
   // Dòng lời đã nghe qua bị làm mờ bằng CSS opacity, mà opacity < 1 tự tạo stacking context riêng nên "nhốt" luôn
   // z-index của popover bên trong — dòng kế tiếp (opacity đầy đủ) vẫn vẽ đè lên. Thoát hẳn bằng cổng React (render
   // thẳng vào <body>, định vị theo tọa độ nút bấm) là cách chắc chắn tránh mọi kiểu nhốt stacking context như vậy.
+  //
+  // Mặc định mở xuống dưới-trái nút, nhưng câu ở gần mép phải/mép dưới màn hình (nhất là màn hẹp) sẽ làm popover
+  // tràn ra ngoài — tự đổi hướng (lên/xuống, trái/phải) theo khoảng trống thật quanh nút trước khi mở. Kích thước
+  // popover chưa render ra nên dùng kích thước ước lượng (khớp w-72 và nội dung form) để tính, không cần đo 2 lượt.
   function toggle(e: React.MouseEvent) {
     e.stopPropagation();
     if (!open && buttonRef.current) {
       const r = buttonRef.current.getBoundingClientRect();
-      setPos({ top: r.bottom + 4, left: r.left });
+      const POPUP_WIDTH = 288;
+      const POPUP_HEIGHT_ESTIMATE = 190;
+      const MARGIN = 16;
+      const spaceBelow = window.innerHeight - r.bottom;
+      const spaceRight = window.innerWidth - r.left;
+      const flipUp = spaceBelow < POPUP_HEIGHT_ESTIMATE + MARGIN && r.top >= POPUP_HEIGHT_ESTIMATE + MARGIN;
+      const flipLeft = spaceRight < POPUP_WIDTH + MARGIN;
+      const top = flipUp ? r.top - POPUP_HEIGHT_ESTIMATE - 4 : r.bottom + 4;
+      const left = flipLeft ? r.right - POPUP_WIDTH : r.left;
+      setPos({ top: Math.max(MARGIN, top), left: Math.max(MARGIN, left) });
     }
     setOpen((o) => !o);
   }
 
-  // Cuộn trang thì tọa độ đã tính không còn đúng nữa: đóng popover cho đơn giản, thay vì phải tính lại liên tục.
+  // Cuộn hay đổi cỡ cửa sổ thì tọa độ đã tính không còn đúng nữa: đóng popover cho đơn giản, thay vì phải tính lại liên tục.
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
     window.addEventListener("scroll", close, { capture: true, passive: true });
-    return () => window.removeEventListener("scroll", close, { capture: true });
+    window.addEventListener("resize", close);
+    return () => {
+      window.removeEventListener("scroll", close, { capture: true });
+      window.removeEventListener("resize", close);
+    };
   }, [open]);
 
   async function submit(e: React.FormEvent) {
@@ -62,7 +79,7 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
         aria-expanded={open}
         aria-label="Góp ý bản dịch câu này"
         title="Góp ý bản dịch"
-        className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant/70 transition-opacity hover:bg-surface-container-high hover:text-on-surface focus-visible:opacity-100 ${
           open ? "bg-surface-container-high opacity-100" : "opacity-0 group-hover/line:opacity-100"
         }`}
       >

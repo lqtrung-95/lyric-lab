@@ -93,7 +93,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
           })}
         </p>
         {showTranslation && line.translation && (
-          <div className="flex items-start gap-1">
+          <div className="flex items-center gap-1">
             <p className={active ? "text-body-lg font-medium text-primary" : "text-body-md italic text-on-surface-variant/80"}>{line.translation}</p>
             <TranslationSuggestionButton videoId={videoId} promptVersion={promptVersion} lineIndex={line.index} currentTranslation={line.translation} />
           </div>
