@@ -16,15 +16,13 @@ import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { LineExplainSheet } from "./line-explain-sheet";
 import { LinePracticeSheet } from "./line-practice-sheet";
-import { MiniTransportBar } from "./mini-transport-bar";
-import { MobilePlaybackBar } from "./mobile-playback-bar";
+import { PlaybackBar } from "./playback-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
 import type { WordSelection } from "./lyric-line-row";
 import { SingingPanel } from "./singing-panel";
-import { TransportControls } from "./transport-controls";
 import { useLineExplain } from "./use-line-explain";
 import { useListenLineOnce } from "./use-listen-line-once";
 import { usePlaybackSync } from "./use-playback-sync";
@@ -48,33 +46,9 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const [quickSync, setQuickSync] = useState(false);
   const [toastDismissed, setToastDismissed] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
-  // Thanh điều khiển đầy đủ cuộn khuất (hoặc bị video ghim ở trên đè lên) thì hiện thanh thu gọn nổi để vẫn điều
-  // khiển được khi đọc lời. IntersectionObserver không đủ: nó coi thanh vẫn "trong màn hình" miễn còn giao với
-  // viewport dù đã bị video đè kín phần trên, nên chỉ báo khuất khi thanh cuộn qua HẾT — trễ hơn nhiều so với lúc
-  // mắt đã thấy nó bị che. So trực tiếp mép trên của thanh với mép dưới video ghim mới đúng thời điểm.
-  const controlsRef = useRef<HTMLDivElement>(null);
+  // Video + thanh điều khiển dính ở đầu màn hình khi cuộn xuống đọc lời (mọi cỡ màn hình) — `data-sticky-player`
+  // dùng để `LyricList` tính khoảng chừa phía trên khi tự cuộn theo câu đang hát.
   const stickyPlayerRef = useRef<HTMLDivElement>(null);
-  const [controlsInView, setControlsInView] = useState(true);
-  useEffect(() => {
-    function check() {
-      const controls = controlsRef.current;
-      const sticky = stickyPlayerRef.current;
-      if (!controls || !sticky) return;
-      setControlsInView(controls.getBoundingClientRect().top >= sticky.getBoundingClientRect().bottom);
-    }
-    check();
-    window.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("resize", check);
-    // Lúc mount, khung video (aspect-video) có thể chưa lên đúng kích thước cuối (font/ảnh vừa tải xong đổi layout)
-    // nên lần check() đầu có thể đọc sai — ResizeObserver tính lại ngay khi kích thước thật sự ổn định.
-    let ro: ResizeObserver | undefined;
-    if (controlsRef.current && stickyPlayerRef.current && "ResizeObserver" in window) {
-      ro = new ResizeObserver(check);
-      ro.observe(controlsRef.current);
-      ro.observe(stickyPlayerRef.current);
-    }
-    return () => { window.removeEventListener("scroll", check); window.removeEventListener("resize", check); ro?.disconnect(); };
-  }, []);
   const { containerRef, controller, failed } = useYouTubePlayer(analysis.videoId);
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
@@ -221,36 +195,23 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
         <div className="flex flex-col gap-6 lg:col-span-7">
           <div ref={stickyPlayerRef} data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
             <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
-            <div className="lg:hidden">
-              <MobilePlaybackBar
-                controller={controller} durationSec={song.durationSec ?? 0} playing={playing} onTogglePlay={togglePlay}
-                onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
-                looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
-                offset={offset} onOffsetChange={setOffset}
-                autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
-                repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
-                onExplain={openExplain} explainDisabled={currentIndex < 0}
-                onPractice={openPractice} practiceDisabled={currentIndex < 0}
-              />
-            </div>
+            <PlaybackBar
+              controller={controller} durationSec={song.durationSec ?? 0} playing={playing} onTogglePlay={togglePlay}
+              onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
+              loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
+              rate={prefs.rate} onRate={(rate) => update({ rate })}
+              offset={offset} onOffsetChange={setOffset}
+              autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
+              repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
+              onExplain={openExplain} explainDisabled={currentIndex < 0}
+              onPractice={openPractice} practiceDisabled={currentIndex < 0}
+            />
             {failed && (
               <p role="alert" className="mt-2 rounded-xl bg-error-container p-3 text-label-md text-on-error-container">
                 Không phát được video này (có thể chủ video tắt nhúng).{" "}
                 <a className="font-semibold underline" href={`https://www.youtube.com/watch?v=${analysis.videoId}`} target="_blank" rel="noopener noreferrer">Mở trên YouTube</a>
               </p>
             )}
-          </div>
-          <div ref={controlsRef} className="hidden lg:block">
-          <TransportControls
-            ready={!!controller} playing={playing} onTogglePlay={togglePlay}
-            onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
-            loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
-            rate={prefs.rate} onRate={(rate) => update({ rate })}
-            autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
-            repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
-            onExplain={openExplain} explainDisabled={currentIndex < 0}
-            onPractice={openPractice} practiceDisabled={currentIndex < 0}
-          />
           </div>
           <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
           <ReportSongButton videoId={analysis.videoId} prominent />
@@ -260,16 +221,6 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
             onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={selectWord}
-          />
-          <MiniTransportBar
-            visible={!controlsInView} ready={!!controller} playing={playing} onTogglePlay={togglePlay}
-            onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}
-            looping={loopIndex !== null} onToggleLoop={toggleLoop} rate={prefs.rate} onRate={(rate) => update({ rate })}
-            offset={offset} onOffsetChange={setOffset}
-            autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
-            repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
-            onExplain={openExplain} explainDisabled={currentIndex < 0}
-            onPractice={openPractice} practiceDisabled={currentIndex < 0}
           />
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
           {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}

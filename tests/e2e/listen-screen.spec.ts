@@ -38,6 +38,32 @@ async function scrollToBottom(page: Page) {
   );
 }
 
+/**
+ * Cuộn sao cho dòng lời nằm hẳn dưới video + thanh điều khiển dính ở đầu màn hình — cần cho các bài test bấm vào
+ * dòng, vì Playwright tự "cuộn vào tầm nhìn" trước khi bấm nhưng không biết phần dính che mất phần trên màn hình,
+ * nên có thể dừng cuộn ở vị trí dòng vẫn bị che. Đo lại và cuộn thêm liên tục (không cuộn 1 lần) vì khung video
+ * (aspect-video) có thể chưa lên đúng kích thước cuối ngay sau khi tải.
+ */
+async function scrollLineBelowSticky(page: Page, n: number) {
+  await page.waitForFunction(
+    (lineIndex) => {
+      const stickyBottom = document.querySelector("[data-sticky-player]")?.getBoundingClientRect().bottom ?? 0;
+      const el = document.querySelector(`[data-line-index="${lineIndex}"]`);
+      if (!el) return false;
+      const top = el.getBoundingClientRect().top;
+      const target = stickyBottom + 24;
+      // Dải dung sai quanh `target`: đích chính xác là ngay dưới mép dính, không phải "miễn là ở dưới mép dính" —
+      // dòng ở xa phía dưới (chưa cuộn tới, scrollY vẫn 0) cũng thoả "top >= stickyBottom" dù đang nằm ngoài màn
+      // hình hẳn, nên phải cuộn cả hai chiều để đưa đúng về sát mép dính, không chỉ kiểm tra một phía.
+      if (Math.abs(top - target) <= 8) return true;
+      window.scrollBy({ top: top - target, behavior: "instant" });
+      return false;
+    },
+    n - 1,
+    { polling: 50, timeout: 10_000 },
+  );
+}
+
 test.beforeEach(async ({ page }) => {
   await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.goto("/dev/listen-fixture");
@@ -72,9 +98,11 @@ test("từ vựng tô nền, ngữ pháp gạch chân: hai kiểu khác nhau", a
 });
 
 test("bấm câu để nhảy tới đầu câu", async ({ page }) => {
+  await scrollLineBelowSticky(page, 4);
   // Bấm ở góc trên-trái (vùng đệm của dòng): pinyin ruby làm dòng cao hơn nên tâm dòng (điểm click mặc định)
-  // có thể trúng ngay nút tra từ (chặn nảy sự kiện) thay vì phần nền dòng.
-  await line(page, 4).click({ position: { x: 8, y: 8 } });
+  // có thể trúng ngay nút tra từ (chặn nảy sự kiện) thay vì phần nền dòng. `force`: đã tự cuộn đúng vị trí ở trên,
+  // bỏ qua bước Playwright tự cuộn lại trước khi bấm (thuật toán của nó không biết phần dính che mất góc trên).
+  await line(page, 4).click({ position: { x: 8, y: 8 }, force: true });
   expect(await calls(page)).toContain("seek:15");
   await expect(line(page, 4)).toHaveAttribute("aria-current", "true");
 });
@@ -82,9 +110,7 @@ test("bấm câu để nhảy tới đầu câu", async ({ page }) => {
 test("lặp câu: phát tới hết câu thì quay về đầu câu, bấm lại để tắt", async ({ page }) => {
   await setTime(page, 6);
   await expect(line(page, 2)).toHaveAttribute("aria-current", "true");
-  // .first(): thanh điều khiển nổi (mini) có thể cùng hiện nếu thanh chính bị video ghim che — cùng aria-label,
-  // lấy đúng nút trên thanh chính (nằm trước trong DOM).
-  const loop = page.getByRole("button", { name: "Lặp câu đang hát" }).first();
+  const loop = page.getByRole("button", { name: "Lặp câu đang hát" });
   await loop.click();
   await expect(page.getByRole("status").filter({ hasText: "Đang lặp câu 2" })).toBeVisible();
   await setTime(page, 9.98);
@@ -97,9 +123,9 @@ test("lặp câu: cấu hình đúng số lần, hết lượt thì tự tắt v
   await setTime(page, 6);
   await expect(line(page, 2)).toHaveAttribute("aria-current", "true");
   // Chip chỉnh số lần chỉ hiện sau khi đã bật lặp câu; bấm là chuyển sang giá trị tiếp theo (Vô hạn → 1 → 2 …).
-  const loop = page.getByRole("button", { name: "Lặp câu đang hát" }).first();
+  const loop = page.getByRole("button", { name: "Lặp câu đang hát" });
   await loop.click();
-  const countChip = page.getByRole("button", { name: /Số lần lặp/ }).first();
+  const countChip = page.getByRole("button", { name: /Số lần lặp/ });
   await countChip.click();
   await countChip.click();
   await expect(countChip).toHaveAccessibleName(/Số lần lặp: 2 lần/);
@@ -117,22 +143,16 @@ test("lặp câu: cấu hình đúng số lần, hết lượt thì tự tắt v
 });
 
 test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", async ({ page }) => {
-  await page.getByRole("button", { name: "0,75x" }).click();
+  // Nút tốc độ là 1 nút xoay vòng (nhãn = tốc độ hiện tại), không phải 3 nút rời: [0.5, 0.75, 1] → bấm 2 lần từ
+  // mặc định 1x mới tới 0,75x.
+  const rateBtn = page.getByRole("button", { name: /^Tốc độ/ });
+  await rateBtn.click();
+  await rateBtn.click();
+  await expect(rateBtn).toHaveText("0,75x");
   await expect.poll(() => calls(page)).toContain("rate:0.75");
   await page.reload();
-  // Cùng hiện tượng trôi cuộn sau khi tải đã ghi chú ở beforeEach — reload giữa bài test cũng cần cuộn lại về đầu,
-  // không thì thanh chính bị coi là cuộn khuất, viên thuốc nổi hiện thêm và "0,75x" khớp 2 nút (strict mode). Trôi
-  // có thể xảy ra sau cả lần cuộn đầu nên cuộn liên tục tới khi đứng yên ở 0 (giống scrollToBottom ở trên).
-  await page.waitForFunction(
-    () => {
-      const before = window.scrollY;
-      window.scrollTo({ top: 0, behavior: "instant" });
-      return before === 0 && window.scrollY === 0;
-    },
-    null,
-    { polling: 100, timeout: 10_000 },
-  );
-  await expect(page.getByRole("button", { name: "0,75x" })).toHaveAttribute("aria-pressed", "true");
+  await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+  await expect(page.getByRole("button", { name: /^Tốc độ/ })).toHaveText("0,75x");
   await expect.poll(() => calls(page)).toContain("rate:0.75");
 });
 
@@ -223,44 +243,39 @@ test.describe("chỉnh lời lệch nhạc", () => {
   });
 });
 
-test.describe("thanh điều khiển nhanh khi cuộn xuống", () => {
-  test("hiện khi thanh chính cuộn khuất, điều khiển được và ẩn lại khi cuộn lên", async ({ page }) => {
+test.describe("thanh điều khiển dính theo video khi cuộn", () => {
+  test("luôn thấy và điều khiển được dù cuộn tới đâu, mọi cỡ màn hình", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     // Đổi cỡ viewport cũng có thể gây trôi cuộn như ở beforeEach — cuộn lại về đầu cho chắc.
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
-    const mini = page.getByRole("group", { name: "Điều khiển nhanh" });
-    await expect(mini).toHaveCount(0); // thanh chính đang thấy: chưa cần thanh thu gọn
-    await page.setViewportSize({ width: 1280, height: 520 });
+    const bar = page.getByRole("group", { name: "Điều khiển nhanh" });
+    await expect(bar).toBeVisible();
     await scrollToBottom(page);
-    await expect(mini).toBeVisible();
+    await expect(bar).toBeVisible(); // video + thanh điều khiển dính ở đầu màn hình, không cuộn khuất
 
-    await mini.getByRole("button", { name: /Tạm dừng|Phát/ }).click();
+    await bar.getByRole("button", { name: /Tạm dừng|Phát/ }).click();
     expect((await calls(page)).some((c) => c === "pause" || c === "play")).toBe(true);
-    await mini.getByRole("button", { name: "Tới 5 giây" }).click();
+    // "Tới 5 giây"/"Lùi 5 giây" nằm ở hàng vị trí phát, ngoài group "Điều khiển nhanh" (nhóm chỉ bọc hàng nút dưới).
+    await page.getByRole("button", { name: "Tới 5 giây" }).click();
     expect((await calls(page)).some((c) => c.startsWith("seek:"))).toBe(true);
-    await mini.getByRole("button", { name: /^Tốc độ 1x/ }).click();
+    await bar.getByRole("button", { name: /^Tốc độ 1x/ }).click();
     expect((await calls(page)).includes("rate:0.5")).toBe(true);
-    // Chỉnh lời lệch ngay trên thanh: mở bảng nhỏ, "Muộn hơn 0,5s" thì hiện +0,5s.
-    await mini.getByRole("button", { name: /^Chỉnh thời gian hiện lời/ }).click();
-    await mini.getByRole("button", { name: "Muộn hơn 0,5 giây" }).click();
-    await expect(mini.getByRole("group", { name: "Chỉnh lời lệch" }).locator("output")).toHaveText("+0,5s");
-    await mini.getByRole("button", { name: "Đặt lại" }).click();
-    // Chỉ kiểm tra thanh thu gọn (các dòng lời mờ dần là thiết kế có sẵn, đã được kiểm tra riêng ở accessibility.spec).
+    // Chỉnh lời lệch ngay trên thanh: mở bảng nhỏ, "Muộn hơn 0,5s" thì hiện +0,5s. Bảng này định vị tuyệt đối ra
+    // ngoài group "Điều khiển nhanh" (neo theo cả thanh, không theo hàng nút) nên dò bằng `page`, không qua `bar`.
+    await bar.getByRole("button", { name: /^Canh lời lệch/ }).click();
+    await page.getByRole("button", { name: "Muộn hơn 0,5 giây" }).click();
+    await expect(page.getByRole("group", { name: "Chỉnh lời lệch" }).locator("output")).toHaveText("+0,5s");
+    await page.getByRole("button", { name: "Đặt lại" }).click();
     expect((await new AxeBuilder({ page }).include('[aria-label="Điều khiển nhanh"]').analyze()).violations).toEqual([]);
 
-    // Điện thoại: hàng nút chỉ icon nằm ngay dưới video ghim ở đầu màn hình, luôn hiện dù cuộn ở đâu.
+    // Điện thoại: cùng một thanh, vẫn dính ngay dưới video dù cuộn ở đâu.
     await page.setViewportSize({ width: 390, height: 800 });
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
-    const inline = page.getByRole("group", { name: "Điều khiển nhanh" });
-    await expect(inline).toBeVisible();
-    await expect(inline.getByRole("button", { name: /^Chỉnh thời gian hiện lời/ })).toBeVisible();
+    await expect(bar).toBeVisible();
     const player = await page.locator("[data-sticky-player]").boundingBox();
-    const bar = await inline.boundingBox();
-    expect(bar!.y).toBeGreaterThanOrEqual(player!.y + player!.height - bar!.height - 2);
-
-    // Cuộn lên đầu: khi cửa sổ đủ cao để thấy thanh chính thì thanh thu gọn ẩn lại.
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await expect(mini).toHaveCount(0);
+    const barBox = await bar.boundingBox();
+    // group "Điều khiển nhanh" nằm trong khung có đệm dưới (py-2 ≈ 8px) trước khi tới mép thanh, nên không sát
+    // hẳn mép dưới của `data-sticky-player` — chỉ cần gần đó (không lệch hẳn lên trên vùng video) là đủ.
+    expect(barBox!.y).toBeGreaterThanOrEqual(player!.y + player!.height - barBox!.height - 12);
   });
 });

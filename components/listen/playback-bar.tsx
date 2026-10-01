@@ -4,18 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { PlayerController } from "@/components/player/use-youtube-player";
 import type { RepeatConfig } from "@/lib/listen/repeat-config";
+import { formatTimestamp } from "@/lib/preview/preview-format";
 import { PLAYBACK_RATES } from "@/lib/user-state/listen-prefs";
 import { LyricOffsetPopover } from "./lyric-offset-popover";
 import { PlaybackProgressBar } from "./playback-progress-bar";
 import { RepeatConfigChips } from "./repeat-config-chips";
 
-interface MobilePlaybackBarProps {
+interface PlaybackBarProps {
   controller: PlayerController | null;
   durationSec: number;
   playing: boolean;
   onTogglePlay: () => void;
   onSeekBy: (deltaSec: number) => void;
-  looping: boolean;
+  loopIndex: number | null;
+  loopStart: number | null;
   onToggleLoop: () => void;
   rate: number;
   onRate: (rate: number) => void;
@@ -38,11 +40,12 @@ interface MobilePlaybackBarProps {
 const tile = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50";
 
 /**
- * Thanh điều khiển điện thoại, gắn ngay dưới video. 2 hàng: hàng trên là vị trí phát (kéo tới đâu tuỳ ý, kèm ±5s
- * cạnh hai mốc thời gian — xem `PlaybackProgressBar`), hàng dưới là các nút bấm nhanh: tốc độ, phát/dừng, lặp câu,
- * ghim, giải thích AI, luyện phát âm, canh lời lệch.
+ * Thanh điều khiển, gắn ngay dưới video (dính theo video khi cuộn, cùng một bố cục cho mọi cỡ màn hình — điện
+ * thoại, tablet, máy tính). 2 hàng: hàng trên là vị trí phát (kéo tới đâu tuỳ ý, kèm ±5s cạnh hai mốc thời gian —
+ * xem `PlaybackProgressBar`), hàng dưới là các nút bấm nhanh: tốc độ, phát/dừng, lặp câu, ghim, giải thích AI,
+ * luyện phát âm, canh lời lệch.
  */
-export function MobilePlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, looping, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: MobilePlaybackBarProps) {
+export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: PlaybackBarProps) {
   const [syncOpen, setSyncOpen] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -55,6 +58,7 @@ export function MobilePlaybackBar({ controller, durationSec, playing, onTogglePl
   }, [syncOpen]);
 
   const ready = !!controller;
+  const looping = loopIndex !== null;
   const nextRate = PLAYBACK_RATES[(PLAYBACK_RATES.indexOf(rate as never) + 1) % PLAYBACK_RATES.length];
   const label = (r: number) => (r === 1 ? "1x" : `${String(r).replace(".", ",")}x`);
   const rateLabel = `Tốc độ ${label(rate)}, bấm để đổi sang ${label(nextRate)}`;
@@ -63,11 +67,15 @@ export function MobilePlaybackBar({ controller, durationSec, playing, onTogglePl
   const offsetLabel = `Canh lời lệch (đang lệch ${Number(offset.toFixed(2))} giây)`;
 
   return (
-    // `relative` ở khung ngoài cùng (trọn bề rộng thanh, kể cả nút Luyện) để popup canh lời neo theo mép phải màn
-    // hình thật — neo theo khung hẹp hơn (chỉ cột trái) sẽ bị đẩy lệch trái, tràn ra ngoài màn hình hẹp.
+    // `relative` ở khung ngoài cùng (trọn bề rộng thanh) để popup canh lời neo theo mép phải thật — neo theo khung
+    // hẹp hơn sẽ bị đẩy lệch trái, tràn ra ngoài màn hình hẹp.
     <div ref={barRef} className="relative bg-surface">
       {looping && (
-        <div className="flex justify-end border-b border-outline-variant/30 px-2 py-1.5">
+        <div className="flex items-center justify-between gap-2 border-b border-outline-variant/30 px-2 py-1.5">
+          <p role="status" className="flex items-center gap-1.5 text-label-sm font-semibold text-primary">
+            <span aria-hidden="true" className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-primary" />
+            <span className="whitespace-nowrap">Đang lặp câu {loopIndex + 1}{loopStart !== null && ` (${formatTimestamp(loopStart)})`}</span>
+          </p>
           <RepeatConfigChips value={repeatConfig} onChange={onRepeatConfigChange} />
         </div>
       )}

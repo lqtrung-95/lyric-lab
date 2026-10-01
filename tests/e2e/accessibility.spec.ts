@@ -10,6 +10,11 @@ test.use({ reducedMotion: "reduce" });
 const TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
 async function audit(page: Page, label: string) {
+  // Trang có thể tự trôi cuộn vài trăm px ngay sau khi tải trong môi trường Playwright (không tái hiện được khi
+  // thao tác tay trên trình duyệt thật — nghi do timing dựng trang dưới automation). Ở vị trí cuộn dở dang đó,
+  // video + thanh điều khiển dính ở đầu màn hình có thể tạm che một phần nút ngay bên dưới nó, bị axe tính nhầm
+  // thành vùng bấm quá nhỏ — không phải lỗi thật, chỉ xảy ra ở đúng vị trí cuộn dở dang này. Cuộn về đầu cho chắc.
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
   const summary = results.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length} phần tử, vd. ${v.nodes[0]?.target.join(" ")}`);
   expect(summary, `${label}: vi phạm truy cập`).toEqual([]);
