@@ -12,7 +12,7 @@ interface PlaybackProgressBarProps {
   onSeekBy: (deltaSec: number) => void;
 }
 
-const seekBtn = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-high";
+const seekBtn = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container-high lg:h-14 lg:w-14";
 
 /**
  * Hàng hiển thị vị trí đang phát: mốc hiện tại, thanh kéo tới vị trí bất kỳ trong bài, tổng thời lượng, và 2 nút
@@ -42,18 +42,18 @@ export function PlaybackProgressBar({ controller, durationSec, onSeekBy }: Playb
   return (
     <div className="flex items-center gap-1">
       <button type="button" disabled={!controller} onClick={() => onSeekBy(-5)} aria-label="Lùi 5 giây" className={seekBtn}>
-        <Icon name="replay_5" size={20} />
+        <Icon name="replay_5" size={null} className="text-[20px] lg:text-[26px]" />
       </button>
-      <span className="w-9 shrink-0 text-right text-label-sm tabular-nums text-on-surface-variant">{formatTimestamp(shown)}</span>
+      <span className="w-9 shrink-0 text-right text-label-sm tabular-nums text-on-surface-variant lg:w-11 lg:text-[15px]">{formatTimestamp(shown)}</span>
       <input
         type="range" aria-label="Vị trí phát" min={0} max={Math.max(durationSec, 0.1)} step={0.1}
         value={Math.min(shown, Math.max(durationSec, 0.1))} disabled={!controller || durationSec <= 0}
         onChange={(e) => { const v = Number(e.target.value); setDragTime(v); controller?.seekTo(v); }}
-        className="h-11 min-w-0 flex-1 accent-primary disabled:opacity-40"
+        className="h-11 min-w-0 flex-1 accent-primary disabled:opacity-40 lg:h-14"
       />
-      <span className="w-9 shrink-0 text-label-sm tabular-nums text-on-surface-variant">{formatTimestamp(durationSec)}</span>
+      <span className="w-9 shrink-0 text-label-sm tabular-nums text-on-surface-variant lg:w-11 lg:text-[15px]">{formatTimestamp(durationSec)}</span>
       <button type="button" disabled={!controller} onClick={() => onSeekBy(5)} aria-label="Tới 5 giây" className={seekBtn}>
-        <Icon name="forward_5" size={20} />
+        <Icon name="forward_5" size={null} className="text-[20px] lg:text-[26px]" />
       </button>
     </div>
   );
