@@ -36,7 +36,9 @@ const SURNAME_PINYIN = /^[A-ZÀ-Ỹ]/;
 // Vài chữ nhiều âm mà mọi mục cùng được gắn chung một cấp HSK (dữ liệu nguồn không phân biệt được cách đọc phổ
 // biến hơn — vd. 说 cả "shuō: nói" lẫn "shuì: thuyết phục" (cổ, hiếm) cùng cấp 1) nên phải ghi đè thủ công theo
 // cách đọc thông dụng trong tiếng Trung hiện đại. Chỉ thêm khi đã xác nhận qua báo lỗi thực tế.
-const COMMON_READING: Record<string, string> = {
+// Export để nơi đọc cache phân tích cũ (server-deps.ts) biết những chữ nào từng bị chọn nhầm âm, tính lại pinyin
+// đúng cho các dòng có chữ này mà không phải chờ sửa thủ công từng bài hay gọi lại LLM.
+export const COMMON_READING: Record<string, string> = {
   说: "shuō",
   听: "tīng",
 };

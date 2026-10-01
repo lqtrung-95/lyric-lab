@@ -2,7 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { YoutubeInnertubeCaptionProvider } from "@/lib/captions/youtube-innertube-caption-provider";
 import { getServerEnv } from "@/lib/env/server-env";
-import { lookupWords } from "@/lib/dictionary/lookup-words";
+import { COMMON_READING, lookupWords } from "@/lib/dictionary/lookup-words";
 import { LrclibProvider } from "@/lib/lyrics/lrclib-provider";
 import { NeteaseProvider } from "@/lib/lyrics/netease-provider";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
@@ -70,7 +70,7 @@ const analysisCache = unstable_cache(
     return analysis;
   },
   // Số cuối tăng khi sửa dữ liệu phân tích trực tiếp trong DB (vd. bù bản dịch) để bỏ bản cache cũ ngay thay vì đợi hết 1 giờ.
-  ["song-analysis", PROMPT_VERSION, "rev5"],
+  ["song-analysis", PROMPT_VERSION, "rev6"],
   { revalidate: 3600, tags: ["song-analysis"] },
 );
 
@@ -85,21 +85,27 @@ export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis 
 }
 
 const HAN = /\p{Script=Han}/u;
+// Chữ từng bị chọn nhầm âm phổ biến (vd. 听 ra "yǐn" thay vì "tīng") trước khi có COMMON_READING — bài đã cache lúc
+// đó vẫn giữ pinyin sai. Dòng có chữ này cũng cần tính lại, không chỉ dòng còn sót chữ Hán trong pinyin.
+const OVERRIDE_CHARS = new Set(Object.keys(COMMON_READING));
+const needsPinyinRepair = (l: { text: string; pinyin: string }) => HAN.test(l.pinyin) || [...l.text].some((c) => OVERRIDE_CHARS.has(c));
 
 /**
- * Bài đã cache trước khi có cách ghép pinyin theo đoạn con có thể còn chữ Hán lẫn trong dòng pinyin (token như 好了吗
- * không có nguyên từ trong từ điển). Tính lại pinyin cho đúng những dòng đó từ token và từ điển, không gọi LLM.
+ * Bài đã cache có thể còn pinyin sai do 2 lý do: (1) lúc đó chưa có cách ghép pinyin theo đoạn con nên còn sót chữ
+ * Hán trong dòng pinyin (token như 好了吗 không có nguyên từ trong từ điển), hoặc (2) chữ nhiều âm từng bị chọn nhầm
+ * cách đọc hiếm trước khi thêm vào COMMON_READING (vd. 听 → "yǐn" thay vì "tīng"). Tính lại pinyin cho đúng những
+ * dòng đó từ token và từ điển, không gọi LLM — tự sửa khi ai đó mở lại bài, không cần chạy script riêng.
  */
 async function repairLinePinyin(analysis: SongAnalysis): Promise<SongAnalysis> {
-  if (!analysis.lines.some((l) => HAN.test(l.pinyin))) return analysis;
+  if (!analysis.lines.some(needsPinyinRepair)) return analysis;
   const sb = createSupabaseServiceClient();
   const lookup = (terms: string[]) => lookupWords(sb as never, terms);
-  const words = analysis.lines.filter((l) => HAN.test(l.pinyin)).flatMap((l) => l.tokens.map((t) => t.text)).filter((w) => HAN.test(w));
+  const words = analysis.lines.filter(needsPinyinRepair).flatMap((l) => l.tokens.map((t) => t.text)).filter((w) => HAN.test(w));
   const dictionary = await withSubwordEntries(lookup, await lookup(words), words);
   return {
     ...analysis,
     lines: analysis.lines.map((l) =>
-      HAN.test(l.pinyin) ? { ...l, pinyin: buildLinePinyin(l.tokens.map((t) => ({ text: t.text, simplified: t.text })), dictionary) } : l,
+      needsPinyinRepair(l) ? { ...l, pinyin: buildLinePinyin(l.tokens.map((t) => ({ text: t.text, simplified: t.text })), dictionary) } : l,
     ),
   };
 }
