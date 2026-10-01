@@ -7,9 +7,10 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 export const runtime = "nodejs";
 
 /**
- * PATCH { action: "apply" | "dismiss" } → duyệt góp ý dịch một câu.
+ * PATCH { action: "apply" | "dismiss", applyToMatchingLines?: boolean } → duyệt góp ý dịch một câu.
  * "apply" ghi thẳng vào `song_analyses.analysis.lines[lineIndex].translation` (bản dịch không có bảng riêng, nằm
- * trong JSON phân tích) rồi bung cache Next để hiện ngay, không cần đợi hết hạn.
+ * trong JSON phân tích) rồi bung cache Next để hiện ngay, không cần đợi hết hạn. `applyToMatchingLines` áp dụng
+ * cùng bản dịch cho mọi câu khác trong bài có nguyên văn Hán tự giống hệt (điệp khúc lặp lại).
  */
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -19,7 +20,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const user = await getCurrentUser();
   if (!isAdminAccount(user?.email ?? null)) return Response.json({ error: "forbidden" }, { status: 403 });
 
-  const body = (await req.json().catch(() => null)) as { action?: string } | null;
+  const body = (await req.json().catch(() => null)) as { action?: string; applyToMatchingLines?: boolean } | null;
   if (body?.action !== "apply" && body?.action !== "dismiss") return Response.json({ error: "invalid_action" }, { status: 400 });
 
   const sb = createSupabaseServiceClient();
@@ -41,7 +42,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const analysis = row.analysis as SongAnalysis;
     const line = analysis.lines[suggestion.line_index];
     if (!line) return Response.json({ error: "line_not_found" }, { status: 404 });
-    const updated: SongAnalysis = { ...analysis, lines: analysis.lines.map((l, i) => (i === suggestion.line_index ? { ...l, translation: suggestion.suggested_translation } : l)) };
+    const updated: SongAnalysis = {
+      ...analysis,
+      lines: analysis.lines.map((l, i) => {
+        const isTarget = i === suggestion.line_index || (body.applyToMatchingLines && l.text === line.text);
+        return isTarget ? { ...l, translation: suggestion.suggested_translation } : l;
+      }),
+    };
 
     const { error: writeError } = await sb
       .from("song_analyses").update({ analysis: updated })

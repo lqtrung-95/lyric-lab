@@ -12,6 +12,8 @@ interface Suggestion {
   currentTranslation: string;
   suggestedTranslation: string;
   createdAt: string;
+  /** Số câu khác trong cùng bài có nguyên văn Hán tự giống hệt câu này (điệp khúc lặp lại). */
+  matchingLineCount: number;
 }
 
 /** Chỉ quản trị viên thấy được gì (whoami server xác thực thật; client chỉ ẩn/hiện giao diện). */
@@ -19,6 +21,7 @@ export function TranslationSuggestionsAdminScreen() {
   const [items, setItems] = useState<Suggestion[] | null>(null);
   const [busyId, setBusyId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [applyAllIds, setApplyAllIds] = useState<Set<number>>(new Set());
 
   const load = useCallback(() => {
     fetch("/api/admin/translation-suggestions")
@@ -34,7 +37,8 @@ export function TranslationSuggestionsAdminScreen() {
     setError(null);
     try {
       const res = await fetch(`/api/admin/translation-suggestions/${id}`, {
-        method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }),
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, applyToMatchingLines: action === "apply" && applyAllIds.has(id) }),
       });
       if (!res.ok) { setError("Chưa xử lý được, thử lại nhé."); return; }
       setItems((prev) => (prev ?? []).filter((i) => i.id !== id));
@@ -63,6 +67,20 @@ export function TranslationSuggestionsAdminScreen() {
               <p className="text-label-sm text-on-surface-variant">{s.songTitle} · câu {s.lineIndex + 1}</p>
               <p className="mt-2 text-body-md text-on-surface-variant line-through decoration-error/60">{s.currentTranslation}</p>
               <p className="mt-1 text-body-md font-medium text-on-surface">{s.suggestedTranslation}</p>
+              {s.matchingLineCount > 0 && (
+                <label className="mt-space-sm flex min-h-11 w-fit cursor-pointer items-center gap-2 text-label-md text-on-surface-variant">
+                  <input
+                    type="checkbox" checked={applyAllIds.has(s.id)}
+                    onChange={(e) => setApplyAllIds((prev) => {
+                      const next = new Set(prev);
+                      if (e.target.checked) next.add(s.id); else next.delete(s.id);
+                      return next;
+                    })}
+                    className="h-5 w-5 rounded"
+                  />
+                  Áp dụng cho {s.matchingLineCount} câu giống hệt khác trong bài
+                </label>
+              )}
               <div className="mt-space-sm flex items-center gap-2">
                 <button
                   type="button" disabled={busyId === s.id} onClick={() => void review(s.id, "apply")}
