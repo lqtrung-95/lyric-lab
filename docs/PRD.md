@@ -333,6 +333,7 @@ MVP dự kiến mất khoảng 6 tuần cho một người làm bán thời gian
 
 - [x] Làm lại trên codebase AI-Lyric-Universe hay dựng mới? → **Dựng mới bằng Next.js** (repo này). Repo cũ chỉ để tham khảo.
 - [x] Tỉ lệ video C-pop có caption lời dùng được thực tế là bao nhiêu? → **24% số bài** (12/50), quá thấp. LRCLIB phủ 86%. Xem `plans/reports/m0-caption-and-lyrics-source-spike-260925-1030-results-report.md`
+- [x] Production có lấy được caption YouTube thật không? → **Không.** IP cloud (Vercel) bị YouTube chặn `LOGIN_REQUIRED` ngay bước liệt kê track qua InnerTube, kể cả video có caption dùng được từ máy nhà (verify lại 2026-10-01 với video thật). Caption chỉ hoạt động khi chạy local (IP dân cư). Production thực tế dựa vào LRCLIB + NetEase là chính; nguồn caption vẫn giữ trong code (rẻ, chạy được ở môi trường khác) nhưng gần như luôn rơi xuống bước sau trên production. Các hướng từng cân nhắc để khắc phục: proxy dân cư trả phí (IPRoyal ~$2–7/GB), PO Token/BotGuard (miễn phí nhưng phức tạp, không chắc sửa đúng chỗ bị chặn), tự host relay tại nhà qua Cloudflare Tunnel (miễn phí, chắc chạy được vì dùng lại đúng luồng local, nhưng phụ thuộc thiết bị/mạng nhà luôn online) — **chưa triển khai hướng nào**, chấp nhận giới hạn này cho tới khi cần.
 - [ ] Level lấy theo HSK 2.0 (6 cấp) hay HSK 3.0 (9 cấp)?
 - [x] Tên sản phẩm chính thức: **SongHanzi** (domain `songhanzi.app`) — chốt 2026-09-30.
 - [ ] Mô hình thu phí sau này: freemium theo số bài mới/ngày, hay gói Pro mở khóa luyện tập và xuất Anki?
