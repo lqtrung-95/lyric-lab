@@ -47,7 +47,7 @@ describe("analyzeLyrics", () => {
     expect(analysis.lines[0].translation).toBe("dịch 0");
     expect(analysis.lines[0].tokens.find((t) => t.text === "城市")?.itemId).toBe("vocab:城市");
     expect(analysis.lines[0].pinyin).toContain("pin-城市");
-    expect(analysis.promptVersion).toBe("v4");
+    expect(analysis.promptVersion).toBe("v5");
     expect(analysis.model).toBe("m1");
   });
 
