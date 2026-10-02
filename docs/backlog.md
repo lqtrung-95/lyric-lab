@@ -18,6 +18,7 @@ Các tính năng đã cân nhắc và **chủ động hoãn** (không thuộc MV
 Luyện điền từ khi nghe (RV-04), shadowing (RV-05), speech-to-text qua extension (IN-06), karaoke theo từng từ (LS-11), tiếng Hàn/Nhật/Anh, PWA cài được.
 
 ## Kỹ thuật
+- [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.
 - Tra từng chữ thành phần khi cụm nhiều chữ không có trong từ điển (popover tra từ).
 - Dịch tên bài sang tiếng Việt (cần đổi prompt → bump `PROMPT_VERSION`).
