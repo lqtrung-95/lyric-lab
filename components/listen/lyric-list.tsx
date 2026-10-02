@@ -52,14 +52,15 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
   useEffect(() => {
     const mark = () => { lastManualScroll.current = Date.now(); };
     const el = listRef.current;
-    window.addEventListener("wheel", mark, { passive: true });
-    window.addEventListener("touchmove", mark, { passive: true });
-    // Bấm một câu/từ cũng là tương tác thủ công: nếu không tính, bài đang phát có thể kích hoạt tự cuộn
-    // về câu đang hát ngay sau cú bấm, làm màn hình giật ngay khi người dùng đang tra một câu đã qua.
+    // Gắn vào khu vực danh sách lời (không phải window): cuộn/chạm ở nơi khác trên trang (vd. khung từ vựng
+    // bên cạnh) không được tính là "người dùng tự cuộn lời" — trước đây gắn vào window nên việc đó vô tình
+    // tắt tự cuộn 4 giây, gây cảm giác tự cuộn "lúc có lúc không".
+    el?.addEventListener("wheel", mark, { passive: true });
+    el?.addEventListener("touchmove", mark, { passive: true });
     el?.addEventListener("pointerdown", mark, { passive: true });
     return () => {
-      window.removeEventListener("wheel", mark);
-      window.removeEventListener("touchmove", mark);
+      el?.removeEventListener("wheel", mark);
+      el?.removeEventListener("touchmove", mark);
       el?.removeEventListener("pointerdown", mark);
     };
   }, []);
