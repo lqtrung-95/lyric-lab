@@ -11,7 +11,9 @@ export type ChatFn = (req: ChatRequest) => Promise<string>;
 const ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
 // Route /api/analyze có maxDuration 60s (trần của gói Vercel Hobby) và có thể thử tới 6 model tuần tự khi model
 // trước lỗi/nghèo kết quả (xem DEFAULT_MODELS) — timeout 1 lần gọi phải NHỎ hơn nhiều so với 60s, nếu không 1 model
-// chậm/treo là chiếm hết cả ngân sách, không còn thời gian rớt qua model dự phòng nào (từng xảy ra thật).
+// chậm/treo là chiếm hết cả ngân sách, không còn thời gian rớt qua model dự phòng nào (từng xảy ra thật). Dùng
+// chung cho cả Groq và OpenRouter (openrouter-chat.ts) — deepseek qua OpenRouter đo thực tế dao động/chậm thất
+// thường (có lần >30s), nới timeout riêng cho nó không giúp gì, chỉ trễ lúc rớt qua model dự phòng.
 const TIMEOUT_MS = 15_000;
 // Groq tính max_completion_tokens vào hạn mức token/phút (gói miễn phí: 8.000). Đặt vừa đủ cho một phân tích
 // (~3k token đầu ra) để một lần gọi không chiếm hết hạn mức.
@@ -44,6 +46,8 @@ export interface CompatChatOptions {
   /** Số lần thử lại khi 429 và thời gian chờ tối đa mỗi lần; đặt thấp khi có nhà cung cấp dự phòng để chuyển sang sớm. */
   maxRetries?: number;
   maxWaitSec?: number;
+  /** Trần thời gian 1 lần gọi; mặc định TIMEOUT_MS (xem ghi chú ở hằng số). */
+  timeoutMs?: number;
   fetchFn?: typeof fetch;
   sleep?: (ms: number) => Promise<void>;
 }
@@ -56,7 +60,7 @@ export function stripCodeFence(content: string): string {
 
 /** Client chat cho API tương thích OpenAI (Groq, OpenRouter): tự chờ và thử lại khi bị giới hạn 429. */
 export function createCompatChat(opts: CompatChatOptions): ChatFn {
-  const { endpoint, label, apiKey, maxRetries = MAX_RATE_LIMIT_RETRIES, maxWaitSec = MAX_WAIT_SEC, params = modelParams, fetchFn = fetch, sleep = (ms) => new Promise<void>((r) => setTimeout(r, ms)) } = opts;
+  const { endpoint, label, apiKey, maxRetries = MAX_RATE_LIMIT_RETRIES, maxWaitSec = MAX_WAIT_SEC, timeoutMs = TIMEOUT_MS, params = modelParams, fetchFn = fetch, sleep = (ms) => new Promise<void>((r) => setTimeout(r, ms)) } = opts;
   return async ({ model, system, user, maxTokens = MAX_COMPLETION_TOKENS }) => {
     for (let attempt = 0; ; attempt++) {
       const res = await fetchFn(endpoint, {
@@ -70,7 +74,7 @@ export function createCompatChat(opts: CompatChatOptions): ChatFn {
           response_format: { type: "json_object" },
           ...params(model),
         }),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
+        signal: AbortSignal.timeout(timeoutMs),
       });
       if (res.status === 429 && attempt < maxRetries) {
         await sleep(rateLimitWaitSeconds(res.headers, await res.text(), maxWaitSec) * 1000);

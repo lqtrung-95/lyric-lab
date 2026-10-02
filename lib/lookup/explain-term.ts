@@ -6,12 +6,15 @@ import { explainOutputSchema, type ExplainRequest, type TermExplanation } from "
 import { withGroqFallback } from "@/lib/analysis/openrouter-chat";
 
 // Model nhỏ trước cho nhanh (LS-06: ≤ 1,5 giây), model lớn làm dự phòng, rồi cùng hai model đó bằng khóa Groq thứ hai
-// (FALLBACK_LLM_API_KEY). Khi cả hai khóa Groq đều hết hạn mức mới sang OpenRouter (chỉ dùng khi có
-// OPENROUTER_API_KEY): gemini-2.5-flash-lite trước (rẻ, đủ cho tác vụ ngắn) rồi mới tới gemini-2.5-flash.
+// (FALLBACK_LLM_API_KEY). Kế đó BytePlus ModelArk (nếu có đủ BYTE_PLUS_API_KEY + BYTE_PLUS_MODEL_ID) — thêm nhà
+// cung cấp khác để đỡ phụ thuộc hạn mức ngày của Groq (từng cạn khi chạy backfill, xem lịch sử). Khi cả hai khóa
+// Groq VÀ BytePlus đều không dùng được mới sang OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY): gemini-2.5-flash-
+// lite trước (rẻ, đủ cho tác vụ ngắn) rồi mới tới gemini-2.5-flash.
 const EXPLAIN_GROQ_MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b"];
 export const EXPLAIN_MODELS = [
   ...EXPLAIN_GROQ_MODELS,
   ...withGroqFallback(EXPLAIN_GROQ_MODELS),
+  "byteplus:doubao",
   "openrouter:google/gemini-2.5-flash-lite",
   "openrouter:google/gemini-2.5-flash",
 ];

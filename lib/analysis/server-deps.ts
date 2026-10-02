@@ -8,7 +8,9 @@ import { NeteaseProvider } from "@/lib/lyrics/netease-provider";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { MANUAL_VARIANTS } from "@/lib/text/to-simplified-chinese";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
+import { createByteplusChat } from "./byteplus-chat";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
+import { createDeepSeekChat } from "./deepseek-chat";
 import { createGroqChat } from "./groq-chat";
 import { createChatRouter, createOpenRouterChat } from "./openrouter-chat";
 import { buildLinePinyin, withSubwordEntries } from "./build-line-pinyin";
@@ -22,16 +24,25 @@ import type { SongAnalysis } from "./analysis-types";
 const FAST_FAIL_LIMITS = { maxRetries: 1, maxWaitSec: 8 };
 
 /**
- * Thứ tự: GROQ_API_KEY → FALLBACK_LLM_API_KEY (khóa Groq thứ hai, cùng model) → OpenRouter.
- * Mỗi khóa Groq chỉ chờ ngắn khi hết hạn mức nếu còn bước sau để thử, cho kịp chuyển dự phòng trong thời gian tối đa của route.
+ * Thứ tự: DeepSeek (gọi thẳng, model chính trong DEFAULT_MODELS) → GROQ_API_KEY → FALLBACK_LLM_API_KEY (khóa Groq
+ * thứ hai, cùng model) → OpenRouter. BytePlus (nếu có đủ BYTE_PLUS_API_KEY + BYTE_PLUS_MODEL_ID) không nằm trong
+ * DEFAULT_MODELS của pipeline phân tích bài hát — chỉ dùng cho giải nghĩa từ/câu khi bấm (EXPLAIN_MODELS). Mỗi khóa
+ * chỉ chờ ngắn khi hết hạn mức nếu còn bước sau để thử, cho kịp chuyển dự phòng trong thời gian tối đa của route.
  */
-export function createChat(env: { GROQ_API_KEY: string; FALLBACK_LLM_API_KEY?: string; OPENROUTER_API_KEY?: string }) {
+export function createChat(env: {
+  GROQ_API_KEY: string; FALLBACK_LLM_API_KEY?: string; OPENROUTER_API_KEY?: string; DEEPSEEK_API_KEY?: string;
+  BYTE_PLUS_API_KEY?: string; BYTE_PLUS_MODEL_ID?: string;
+}) {
+  const deepseek = env.DEEPSEEK_API_KEY ? createDeepSeekChat(env.DEEPSEEK_API_KEY, FAST_FAIL_LIMITS) : undefined;
   const openrouter = env.OPENROUTER_API_KEY ? createOpenRouterChat(env.OPENROUTER_API_KEY, FAST_FAIL_LIMITS) : undefined;
+  const byteplus = env.BYTE_PLUS_API_KEY && env.BYTE_PLUS_MODEL_ID
+    ? createByteplusChat(env.BYTE_PLUS_API_KEY, env.BYTE_PLUS_MODEL_ID, FAST_FAIL_LIMITS)
+    : undefined;
   const groqFallback = env.FALLBACK_LLM_API_KEY
     ? createGroqChat(env.FALLBACK_LLM_API_KEY, fetch, undefined, openrouter ? FAST_FAIL_LIMITS : {})
     : undefined;
   const groq = createGroqChat(env.GROQ_API_KEY, fetch, undefined, groqFallback || openrouter ? FAST_FAIL_LIMITS : {});
-  return createChatRouter(groq, groqFallback, openrouter);
+  return createChatRouter(groq, groqFallback, openrouter, deepseek, byteplus);
 }
 
 /** Ghép mọi phụ thuộc thật (Supabase service role, Groq, YouTube, LRCLIB) cho pipeline. Chỉ dùng ở server. */

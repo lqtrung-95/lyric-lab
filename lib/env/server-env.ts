@@ -10,6 +10,15 @@ const serverEnvSchema = z.object({
   FALLBACK_LLM_API_KEY: z.string().min(1).optional(),
   // Dự phòng cuối khi cả hai khóa Groq hết hạn mức: model có tiền tố "openrouter:" trong DEFAULT_MODELS.
   OPENROUTER_API_KEY: z.string().min(1).optional(),
+  // DeepSeek gọi thẳng API của họ (không qua OpenRouter): đo thực tế nhanh (~1-2s), ổn định hơn hẳn deepseek qua
+  // OpenRouter (dao động, có lúc >30s/treo — xem lịch sử) nên để model chính nếu có khóa.
+  DEEPSEEK_API_KEY: z.string().min(1).optional(),
+  // BytePlus ModelArk, dùng cho giải nghĩa từ/câu khi người dùng bấm (EXPLAIN_MODELS trong lib/lookup/explain-term.ts),
+  // không dùng cho pipeline phân tích bài hát. BYTE_PLUS_MODEL_ID là model/endpoint ID thật từ console BytePlus
+  // (vd. "doubao-seed-1-6-flash" hoặc "ep-xxxxxxxx") — gắn với tài khoản nên không hardcode được, thiếu 1 trong 2
+  // biến này thì tính năng vẫn chạy bình thường (bỏ qua BytePlus, dùng các model khác).
+  BYTE_PLUS_API_KEY: z.string().min(1).optional(),
+  BYTE_PLUS_MODEL_ID: z.string().min(1).optional(),
   YOUTUBE_DATA_API_KEY: z.string().min(1),
   // Giọng đọc thần kinh (Azure Speech). Bỏ trống thì /api/tts trả 503 và nút loa dùng giọng hệ thống.
   AZURE_SPEECH_KEY: z.string().min(1).optional(),
