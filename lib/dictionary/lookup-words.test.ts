@@ -59,4 +59,7 @@ describe("pickPrimaryEntry", () => {
   it("ghi đè cách đọc thông dụng cho 听 → tīng, không phải yǐn (nghĩa cổ, hiếm)", () => {
     expect(pickPrimaryEntry([row("听", "yǐn", 1), row("听", "tīng", 1)])?.pinyin).toBe("tīng");
   });
+  it("ghi đè cách đọc thông dụng cho 读 → dú, không phải dòu (dấu ngắt câu cổ, hiếm)", () => {
+    expect(pickPrimaryEntry([row("读", "dòu", 1), row("读", "dú", 1)])?.pinyin).toBe("dú");
+  });
 });

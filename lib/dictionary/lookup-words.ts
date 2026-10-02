@@ -41,6 +41,7 @@ const SURNAME_PINYIN = /^[A-ZÀ-Ỹ]/;
 export const COMMON_READING: Record<string, string> = {
   说: "shuō",
   听: "tīng",
+  读: "dú",
 };
 const pinyinKey = (p: string) => p.replace(/\s+/g, "").toLowerCase();
 
