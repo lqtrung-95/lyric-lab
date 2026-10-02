@@ -56,7 +56,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ videoId:
         if (!running) {
           const user = await getCurrentUser();
           if (!user) return fail("auth_required");
-          if (!ipLimiter.tryConsume(ip) || !(await consumeUsage(user, "analyze"))) return fail("rate_limited");
+          // Bỏ hạn mức khi chạy local (next dev): test nhiều bài liên tục không bị chặn. NODE_ENV=production
+          // trên Vercel nên không ảnh hưởng người dùng thật.
+          const skipLimit = process.env.NODE_ENV === "development";
+          if (!skipLimit && (!ipLimiter.tryConsume(ip) || !(await consumeUsage(user, "analyze")))) return fail("rate_limited");
         }
 
         const job = running ?? analyzeVideo(video, createAnalyzeDeps((step) => send("step", { step })));
