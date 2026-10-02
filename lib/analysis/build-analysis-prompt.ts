@@ -1,7 +1,7 @@
 import type { TokenizedLine, VocabCandidate } from "./analysis-types";
 
 // Tăng khi đổi prompt hoặc schema để tạo cache mới (PRD §8.3).
-export const PROMPT_VERSION = "v3";
+export const PROMPT_VERSION = "v4";
 
 export const SYSTEM_PROMPT =
   "Bạn là giáo viên tiếng Trung kiêm dịch giả lời bài hát cho người Việt. Chỉ trả về MỘT đối tượng JSON hợp lệ, không thêm chữ nào ngoài JSON. " +
@@ -33,5 +33,6 @@ Quy tắc:
 - vocab: chọn 20–25 từ đáng học nhất, "term" chép NGUYÊN VĂN từ danh sách ứng viên. Ưu tiên từ cấp trung và cao, từ mang hình ảnh hoặc cảm xúc của bài; bỏ từ quá cơ bản.
 - grammar: 3–5 cấu trúc THẬT SỰ xuất hiện trong lời. "pattern" viết bằng chữ Hán cố định và ký hiệu A, B, V, O, adj (ví dụ "从来没 + V + 过"); "lineIndexes" là các dòng chứa cấu trúc. "example" là câu mới do bạn đặt, không lấy từ lời bài hát.
 - translations: dịch mọi dòng, giữ đúng chỉ số. Dịch THOÁT Ý như dịch lời bài hát/thơ, KHÔNG dịch word-by-word theo đúng trật tự chữ Hán — ưu tiên câu văn tiếng Việt mượt, có hình ảnh và cảm xúc, giữ đúng nghĩa và sắc thái gốc chứ không bịa thêm nội dung. Đảo trật tự từ, dùng từ ngữ văn chương khi hợp lý để câu nghe tự nhiên như lời bài hát tiếng Việt thật, không phải bản dịch máy móc.
+- Xưng hô (我/你 dịch thành gì): chọn ĐÚNG MỘT cặp xưng hô phù hợp giọng điệu và bối cảnh bài hát ngay từ đầu rồi DÙNG THỐNG NHẤT CHO MỌI DÒNG, không đổi qua lại giữa các cặp (vd. không vừa dùng "tớ/cậu" vừa "tôi/cậu" vừa "mình" trong cùng một bài). Chọn theo cảm giác: tình yêu tuổi học trò/trẻ trung → "tớ - cậu" hoặc "mình - cậu"; tình yêu người lớn, lãng mạn → "anh - em" hoặc "em - anh" (theo giới tính người hát nếu biết); bạn bè thân → "tớ - cậu" hoặc "mình - bạn". Có thể để trống đại từ khi câu không nói thẳng ai với ai.
 - KHÔNG ghi pinyin, cấp HSK hay âm Hán Việt cho từ vựng (hệ thống tự tra từ điển).`;
 }
