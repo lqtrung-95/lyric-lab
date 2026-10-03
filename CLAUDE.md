@@ -57,6 +57,12 @@ docs/                # PRD, design brief
 - Commit nhỏ, message dạng Conventional Commits (`feat:`, `fix:`, `chore:`…).
 - Viết test cho tokenizer, bộ lọc level, validate vị trí, FSRS. E2E cho luồng dán link → xem trước → nghe.
 - Khi thêm yêu cầu mới, ghi ID tương ứng trong PRD vào PR/commit.
+- **Sau mỗi lần cập nhật (tính năng, sửa lỗi, đổi prompt/model/cấu hình, thêm biến môi trường, script, quyết định kỹ thuật), phải rà và cập nhật 4 tài liệu bàn giao nếu cần**, trong cùng commit/PR với thay đổi:
+  - `docs/handoff-and-status.md`: tình trạng, việc dở, quyết định đã chốt, bẫy mới gặp.
+  - `docs/system-architecture.md`: pipeline, chuỗi model, cache, data model, hạn mức.
+  - `docs/operations-runbook.md`: biến môi trường, deploy, script, quy trình bump `PROMPT_VERSION`/`revN`.
+  - `docs/code-standards.md`: quy ước và quy tắc code mới.
+  Không cần sửa thì thôi, nhưng phải chủ động kiểm tra trước khi kết thúc việc. Không ghi khoá API hay giá trị bí mật vào docs.
 
 ## Lệnh
 
