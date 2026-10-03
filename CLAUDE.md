@@ -5,6 +5,7 @@ Web app giúp người Việt học tiếng Trung qua bài hát. Người dùng 
 ## Đọc trước khi code
 
 - `docs/PRD.md`: yêu cầu sản phẩm, ID yêu cầu (IN-, PV-, LS-, RV-, AC-), acceptance criteria, kiến trúc, data model, roadmap.
+- `docs/handoff-and-status.md`, `docs/system-architecture.md`, `docs/operations-runbook.md`, `docs/code-standards.md`: tình trạng hiện tại, kiến trúc hiện hành, vận hành, quy ước code. Đọc trước khi sửa pipeline phân tích hoặc chạy script ghi DB.
 - `docs/design-brief.md`: màn hình S1–S10, component, trạng thái, dữ liệu mẫu.
 - `design/`: file export từ Google Stitch (HTML + ảnh). **UI phải khớp design ở đây.** Nếu design và PRD mâu thuẫn, hỏi lại trước khi code.
 
@@ -13,7 +14,7 @@ Web app giúp người Việt học tiếng Trung qua bài hát. Người dùng 
 - Next.js (App Router) + React + TypeScript (strict) + Tailwind CSS
 - Supabase: Postgres, Auth (anonymous + Google OAuth), Row Level Security
 - YouTube IFrame Player API cho player, đồng bộ lời bằng `getCurrentTime()`
-- LLM qua server (Groq trước, có model dự phòng). Output JSON validate bằng Zod
+- LLM qua server (DeepSeek gọi thẳng làm chính, rồi Groq/OpenRouter dự phòng; BytePlus cho giải nghĩa khi bấm). Output JSON validate bằng Zod
 - Tách từ tiếng Trung: jieba / nodejieba. Từ điển: CC-CEDICT, danh sách HSK, bảng âm Hán Việt
 - Job nhiều bước: Inngest hoặc Trigger.dev. Stream kết quả về client bằng SSE
 - Test: Vitest cho logic, Playwright cho E2E

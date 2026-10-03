@@ -2,7 +2,11 @@
 
 Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựng và ngữ pháp → nghe với lời chạy theo nhạc → ôn bằng flashcard.
 
-- Yêu cầu sản phẩm: [`docs/PRD.md`](docs/PRD.md)
+- **Mới tiếp quản? Đọc trước**: [`docs/handoff-and-status.md`](docs/handoff-and-status.md) (tình trạng, quyết định, bẫy đã gặp)
+- Kiến trúc hiện hành: [`docs/system-architecture.md`](docs/system-architecture.md)
+- Vận hành (biến môi trường, deploy, backfill): [`docs/operations-runbook.md`](docs/operations-runbook.md)
+- Quy ước code: [`docs/code-standards.md`](docs/code-standards.md)
+- Yêu cầu sản phẩm: [`docs/PRD.md`](docs/PRD.md); việc đã hoãn: [`docs/backlog.md`](docs/backlog.md)
 - Thiết kế: [`docs/design-brief.md`](docs/design-brief.md), file design trong [`design/`](design/)
 - Hướng dẫn cho Claude Code: [`CLAUDE.md`](CLAUDE.md)
 
@@ -14,12 +18,12 @@ Học tiếng Trung qua bài hát: dán link YouTube → xem trước từ vựn
 
 ## Trạng thái
 
-- M0 (spike nguồn lời), M1 (pipeline phân tích), M2 (giao diện Xem trước + Nghe + tra từ): **xong**. M3 (flashcard FSRS, tài khoản ẩn danh + Google, thư viện, tổng kết bài, hạn mức theo tài khoản): **code xong**; còn chờ thử tay đăng nhập Google, bật captcha Turnstile trước khi công khai.
+- M0–M3 đã xong và đã deploy (Vercel + Supabase), thêm nhiều tính năng sau M3 (khám phá, bảng xếp hạng, mini-game, streak…). Còn chờ thử tay đăng nhập Google và bật captcha Turnstile trước khi công khai rộng. Chi tiết: [`docs/handoff-and-status.md`](docs/handoff-and-status.md).
 - Kế hoạch và kết quả từng mốc: [`plans/`](plans/) (M0: `260924-1827-…`, M1: `260925-1030-…`, M2: `260925-1401-…`, M3: `260925-1540-…`); báo cáo M0: `plans/reports/`.
 
 ## Chạy thử
 
-Cần Node ≥ 20.9 (khuyến nghị 22). Tạo `.env.local` từ `.env.example` và điền khóa (Supabase, Groq, YouTube Data API); không commit file này.
+Cần Node ≥ 20.9 (khuyến nghị 22). Tạo `.env.local` từ `.env.example` và điền khóa (Supabase, Groq, DeepSeek, YouTube Data API… xem bảng ở `docs/operations-runbook.md`); không commit file này.
 
 ```
 npm install
