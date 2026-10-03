@@ -100,7 +100,6 @@ flowchart LR
   C -- Không có caption --> X[Báo lỗi + gợi ý<br/>video khác]
   D -- Bắt đầu nghe --> E[Nghe]
   A -. Bài đã học .-> E
-  D -- Bỏ qua --> E
   E --> F[Luyện điền từ]
   E --> G[Ôn flashcard]
   F --> G
@@ -112,7 +111,7 @@ Link đã cache vào thẳng Xem trước. Bài đã học trước đó vào th
 
 1. **Onboarding (lần đầu):** chọn ngôn ngữ đang học và level (HSK1–6, hoặc làm bài test 10 câu). Không bắt đăng ký.
 2. **Dán link:** ô nhập ở trang chủ, nhận mọi dạng link YouTube (`watch?v=`, `youtu.be`, Shorts, Music). Hiển thị tiến trình: Lấy lời → Phân tích → Xong.
-3. **Xem trước:** tóm tắt bài, từ vựng, ngữ pháp. Nút chính "Bắt đầu nghe", link phụ "Bỏ qua, nghe luôn".
+3. **Xem trước:** tóm tắt bài, từ vựng, ngữ pháp. Nút chính "Bắt đầu nghe".
 4. **Nghe:** video nhúng, lời chạy theo nhạc, panel "Đang hát", các điều khiển lặp câu, tốc độ, bản dịch.
 5. **Kết thúc bài:** tóm tắt "Bạn đã học 6 từ, 2 cấu trúc" và hai nút: "Ôn ngay" hoặc "Nghe lại".
 6. **Ôn:** hàng đợi flashcard theo lịch SRS, gộp từ mọi bài đã học.
