@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { findCurrentLineIndex, shouldLoopBack } from "@/lib/listen/find-current-line";
 import { defaultRepeatConfig, type RepeatConfig } from "@/lib/listen/repeat-config";
@@ -27,6 +27,9 @@ export function usePlaybackSync(
   const repeatsLeftRef = useRef(repeat.times);
   // Mốc thời gian (ms, Date.now()) để tiếp tục phát sau khoảng nghỉ giữa hai lần lặp; null = không đang nghỉ.
   const resumeAtRef = useRef<number | null>(null);
+  const cancelPendingResume = useCallback(() => {
+    resumeAtRef.current = null;
+  }, []);
 
   // Đổi câu đang lặp hay đổi số lần lặp (mở bảng cấu hình mới) thì tính lại từ đầu.
   useEffect(() => {
@@ -72,5 +75,5 @@ export function usePlaybackSync(
     return () => clearInterval(timer);
   }, [controller, lines, loopIndex, repeat.delaySec, onRepeatsExhausted]);
 
-  return { currentIndex, playing };
+  return { currentIndex, playing, cancelPendingResume };
 }

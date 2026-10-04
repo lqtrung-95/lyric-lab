@@ -53,10 +53,6 @@ export function PreviewHeader({ analysis, song, listenHref }: PreviewHeaderProps
                 <Icon name="play_arrow" filled size={18} />
                 Bắt đầu nghe nhạc ({analysis.lines.length} câu)
               </Link>
-              <Link href={listenHref} className="ml-auto inline-flex min-h-11 items-center gap-1 text-label-md text-on-surface-variant underline decoration-outline-variant underline-offset-4 hover:text-on-surface">
-                Bỏ qua, nghe luôn
-                <Icon name="chevron_right" size={16} />
-              </Link>
             </div>
             <ReportSongButton videoId={analysis.videoId} />
           </div>

@@ -115,7 +115,7 @@ Thanh điều hướng chính có 3 mục: **Trang chủ**, **Ôn tập** (kèm 
 Màn quan trọng nhất. Thứ tự từ trên xuống:
 
 1. **Header bài hát:** ảnh bìa, tên bài (chữ Hán + pinyin + tên tiếng Việt), tóm tắt 2–3 câu, 2–3 tag cảm xúc, thời lượng.
-2. **Nút chính "Bắt đầu nghe"** và link phụ "Bỏ qua, nghe luôn". Trên mobile, nút chính dính cố định ở đáy màn hình.
+2. **Nút chính "Bắt đầu nghe"**. Trên mobile, nút chính dính cố định ở đáy màn hình.
 3. **Thanh lọc:** chọn level (HSK3 / HSK4 / HSK5…), dòng chú thích "Đã ẩn 3 mục dưới level của bạn", số mục đã biết kèm "Hoàn tác".
 4. **Nhóm Từ vựng (8–12 thẻ):** desktop lưới 2 cột, mobile 1 cột. Chi tiết thẻ ở mục 5.
 5. **Nhóm Ngữ pháp (3–5 thẻ):** desktop cột bên phải, mobile nằm dưới từ vựng (hoặc tab "Từ vựng / Ngữ pháp", designer chọn).
