@@ -40,9 +40,8 @@ interface ListenScreenProps {
 
 /** Màn Nghe (S5): video nhúng + lời chạy theo nhạc + panel "Đang hát". Mọi tô sáng dùng cùng bộ lọc level/"Đã biết" với màn xem trước. */
 export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
-  const { offset, setOffset } = useLyricOffset(analysis.videoId);
-  const resetOffset = useCallback(() => setOffset(0), [setOffset]);
-  const publishOffset = usePublishDefaultOffset(analysis.videoId, offset, resetOffset);
+  const { offset, setOffset } = useLyricOffset(analysis.videoId, analysis.lyricOffsetSec);
+  const publishOffset = usePublishDefaultOffset(analysis.videoId, offset);
   // Mọi thứ trong màn Nghe (đồng bộ, tô sáng, tua, lặp câu, tiến độ) dùng mốc đã cộng độ lệch người dùng chỉnh.
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);

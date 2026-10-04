@@ -9,7 +9,8 @@ export const runtime = "nodejs";
 
 /**
  * PATCH { action: "hide" | "unhide" | "delete" } → quản trị viên ẩn/hiện lại bài ở Khám phá, hoặc xóa hẳn.
- * PATCH { action: "shift_lyrics", deltaSec } → cộng `deltaSec` vào độ lệch lời mặc định của bài (áp cho mọi người dùng).
+ * PATCH { action: "shift_lyrics", deltaSec } → cộng `deltaSec` vào độ lệch lời mặc định của bài (áp cho mọi người dùng) và
+ * đưa độ lệch cá nhân của mọi người cho bài đó về 0 (bản admin lưu là bản chuẩn).
  * Xóa chỉ thực hiện khi không ai còn thẻ ôn hay tiến độ nghe từ bài đó; ngược lại tự chuyển thành ẩn để không mất dữ liệu người dùng.
  * /api/discover cache theo Cache-Control 5 phút (CDN) nên phải revalidate ngay, không thì bài vừa ẩn/xóa vẫn hiện tới khi cache hết hạn.
  */
@@ -29,6 +30,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
     const offsetSec = addToDefaultOffset(song.lyric_offset_sec, body.deltaSec);
     const { error } = await sb.from("songs").update({ lyric_offset_sec: offsetSec }).eq("video_id", videoId);
     if (error) return Response.json({ error: "server_error" }, { status: 500 });
+    // Độ lệch cá nhân đã lưu trên tài khoản mọi người là so với mức mặc định cũ: đưa về 0 để theo bản admin vừa lưu
+    // (bản trên trình duyệt từng máy tự bị bỏ khi nhận mức mặc định mới, xem `resolveOffset`). Không đổi updated_at để khỏi xáo "Bài hát gần đây".
+    await sb.from("user_song_progress").update({ lyric_offset_sec: 0 }).eq("video_id", videoId).neq("lyric_offset_sec", 0);
     // Không cần bung cache: độ lệch mặc định được đọc riêng ở mỗi lần mở bài (readCachedAnalysis), không nằm trong cache phân tích.
     return Response.json({ done: "shifted", offsetSec });
   }

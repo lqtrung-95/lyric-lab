@@ -42,7 +42,7 @@ export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
   const listenHref = `/learn/${analysis.videoId}/listen`;
   const vocabShown = showAllVocab ? view.vocab : view.vocab.slice(0, DEFAULT_VOCAB_SHOWN);
 
-  const { offset } = useLyricOffset(analysis.videoId);
+  const { offset } = useLyricOffset(analysis.videoId, analysis.lyricOffsetSec);
   const play = (item: PreviewItem, line: AnalyzedLine) => {
     // Đoạn nghe thử cũng theo độ lệch lời người dùng đã chỉnh ở màn Nghe.
     const { start, end } = snippetRange(shiftLines([line], offset)[0]);

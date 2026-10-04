@@ -102,7 +102,7 @@ export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis 
   try {
     // Hai việc độc lập nên chạy song song: bản phân tích (cache) và độ lệch mặc định (truy vấn nhỏ theo khoá chính).
     const [analysis, offset] = await Promise.all([analysisCache(videoId), readDefaultOffset(videoId)]);
-    return { ...analysis, lines: shiftLines(analysis.lines, offset) };
+    return { ...analysis, lines: shiftLines(analysis.lines, offset), lyricOffsetSec: offset };
   } catch (error) {
     if (error instanceof NotFoundInCache) return null;
     throw error;

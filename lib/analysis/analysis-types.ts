@@ -72,4 +72,6 @@ export interface SongAnalysis {
   items: PreviewItem[];
   promptVersion: string;
   model: string;
+  /** Độ lệch lời mặc định của bài do admin đặt (giây), đã cộng sẵn vào `start`/`end` của `lines`. Chỉ có khi đọc qua `readCachedAnalysis`. */
+  lyricOffsetSec?: number;
 }

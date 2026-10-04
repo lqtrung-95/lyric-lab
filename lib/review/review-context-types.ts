@@ -11,6 +11,8 @@ export interface ReviewContext {
   videoId: string;
   title: string;
   artist: string;
+  /** Độ lệch lời mặc định của bài (admin đặt), đã cộng sẵn vào `start`/`end` của `lines`. */
+  lyricOffsetSec: number;
   /** Khóa là chỉ số dòng; chỉ gồm các dòng mà người dùng có thẻ tham chiếu. */
   lines: Record<number, ReviewLine>;
 }

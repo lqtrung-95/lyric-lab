@@ -41,6 +41,45 @@ export function estimateSyncRisk(lines: Pick<AnalyzedLine, "end">[], videoDurati
   return lastEnd > videoDurationSec + 2 || videoDurationSec - lastEnd > 45 ? "likely_off" : "none";
 }
 
+/**
+ * Độ lệch cá nhân đã lưu cục bộ cho một bài: `o` là độ lệch (cộng lên trên mức mặc định của bài) và `base` là mức mặc định
+ * của bài LÚC người dùng chỉnh. Hai giá trị này cho biết bản chỉnh còn hợp lệ không khi admin đổi mức mặc định sau đó.
+ */
+export interface OffsetEntry {
+  o: number;
+  base: number;
+}
+
+/** Bảng độ lệch cá nhân lưu cục bộ. Chấp nhận cả dạng cũ (chỉ một số = chỉnh khi bài chưa có mức mặc định, `base` 0). Bỏ mục sai kiểu. */
+export function parseOffsetEntries(raw: string | null): Record<string, OffsetEntry> {
+  if (!raw) return {};
+  try {
+    const data: unknown = JSON.parse(raw);
+    if (!data || typeof data !== "object" || Array.isArray(data)) return {};
+    const out: Record<string, OffsetEntry> = {};
+    for (const [id, v] of Object.entries(data)) {
+      if (typeof v === "number" && Number.isFinite(v)) out[id] = { o: normalizeOffset(v), base: 0 };
+      else if (v && typeof v === "object" && Number.isFinite((v as OffsetEntry).o) && Number.isFinite((v as OffsetEntry).base)) {
+        out[id] = { o: normalizeOffset((v as OffsetEntry).o), base: normalizeOffset((v as OffsetEntry).base) };
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Độ lệch cá nhân đang có hiệu lực. `undefined` = người dùng chưa chỉnh bài này ở máy này. Khi admin đã đổi mức mặc định
+ * sau lúc người dùng chỉnh (`entry.base` khác `knownDefault`), bản chỉnh cũ bị bỏ (về 0) để không cộng đôi với mức mới.
+ * Chưa biết mức mặc định hiện tại (`knownDefault` undefined) thì tin bản đang lưu.
+ */
+export function resolveOffset(entry: OffsetEntry | undefined, knownDefault: number | undefined): number | undefined {
+  if (!entry) return undefined;
+  if (knownDefault !== undefined && entry.base !== knownDefault) return 0;
+  return entry.o;
+}
+
 /** Bảng độ lệch lưu cục bộ: videoId → giây. Bỏ mục sai kiểu. */
 export function parseOffsets(raw: string | null): Record<string, number> {
   if (!raw) return {};

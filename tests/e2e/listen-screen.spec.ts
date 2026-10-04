@@ -211,6 +211,23 @@ test.describe("chỉnh lời lệch nhạc", () => {
     await expect(line(page, 3)).toHaveAttribute("aria-current", "true");
   });
 
+  test("admin đổi mức mặc định của bài sau khi người dùng đã chỉnh: bản chỉnh cũ bị bỏ, không cộng đôi", async ({ page }) => {
+    const id = "dQw4w9WgXcQ"; // videoId của bài mẫu hư cấu (lib/preview/fixtures/ye-che-analysis.ts)
+    // Người dùng chỉnh +2s lúc bài chưa có mức mặc định (base 0); sau đó admin đặt mặc định 5s: bản +2s không còn đúng.
+    await page.evaluate((v) => {
+      localStorage.setItem("lyric-lab-lyric-offsets", JSON.stringify({ [v]: { o: 2, base: 0 } }));
+      localStorage.setItem("lyric-lab-default-offsets", JSON.stringify({ [v]: 5 }));
+    }, id);
+    await page.reload();
+    await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+    await expect(page.getByText(/Đang lệch/)).toHaveCount(0);
+    // Cùng bản chỉnh nhưng mức mặc định không đổi (base khớp) thì vẫn còn hiệu lực.
+    await page.evaluate((v) => localStorage.setItem("lyric-lab-default-offsets", JSON.stringify({ [v]: 0 })), id);
+    await page.reload();
+    await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+    await expect(page.getByText("Đang lệch +2 giây")).toBeVisible();
+  });
+
   test("đồng bộ nhanh: bấm dòng đang được hát đặt độ lệch, có bù phản xạ 0,25s", async ({ page }) => {
     await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
     await page.getByRole("button", { name: "Đồng bộ nhanh" }).click();

@@ -35,6 +35,7 @@ export async function GET(req: Request) {
     videoId, lines,
     title: analysis.track?.title ?? song?.title ?? "",
     artist: analysis.track?.artist ?? song?.channelTitle ?? "",
+    lyricOffsetSec: analysis.lyricOffsetSec ?? 0,
   };
   return Response.json(body, { headers: { "Cache-Control": "private, no-store" } });
 }

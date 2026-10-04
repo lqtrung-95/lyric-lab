@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addToDefaultOffset, estimateSyncRisk, normalizeOffset, offsetFromLineClick, parseOffsets, shiftLines } from "./lyric-offset";
+import { addToDefaultOffset, estimateSyncRisk, normalizeOffset, parseOffsetEntries, resolveOffset, offsetFromLineClick, parseOffsets, shiftLines } from "./lyric-offset";
 
 const line = (start: number, end: number) => ({ start, end });
 
@@ -67,5 +67,33 @@ describe("addToDefaultOffset", () => {
     expect(addToDefaultOffset(59, 5)).toBe(60);
     expect(addToDefaultOffset(-59, -5)).toBe(-60);
     expect(addToDefaultOffset(2, NaN)).toBe(0);
+  });
+});
+
+describe("parseOffsetEntries", () => {
+  it("đọc dạng cũ (một số) với base 0 và dạng mới {o, base}", () => {
+    expect(parseOffsetEntries(JSON.stringify({ a: 1.2, b: { o: 0.5, base: 23 } }))).toEqual({ a: { o: 1.2, base: 0 }, b: { o: 0.5, base: 23 } });
+  });
+  it("bỏ mục sai kiểu và dữ liệu hỏng", () => {
+    expect(parseOffsetEntries(JSON.stringify({ a: "x", b: { o: 1 }, c: null }))).toEqual({});
+    expect(parseOffsetEntries("không phải json")).toEqual({});
+    expect(parseOffsetEntries(null)).toEqual({});
+  });
+});
+
+describe("resolveOffset", () => {
+  it("chưa chỉnh → undefined", () => {
+    expect(resolveOffset(undefined, 23)).toBeUndefined();
+  });
+  it("bản chỉnh còn hợp lệ khi mức mặc định không đổi kể từ lúc chỉnh", () => {
+    expect(resolveOffset({ o: 2, base: 0 }, 0)).toBe(2);
+    expect(resolveOffset({ o: -1.5, base: 23 }, 23)).toBe(-1.5);
+  });
+  it("admin đổi mức mặc định sau lúc người dùng chỉnh → bản chỉnh cũ bị bỏ (về 0), không cộng đôi", () => {
+    expect(resolveOffset({ o: 23, base: 0 }, 23)).toBe(0);
+    expect(resolveOffset({ o: 2, base: 10 }, 0)).toBe(0);
+  });
+  it("chưa biết mức mặc định hiện tại → tin bản đang lưu", () => {
+    expect(resolveOffset({ o: 4, base: 0 }, undefined)).toBe(4);
   });
 });

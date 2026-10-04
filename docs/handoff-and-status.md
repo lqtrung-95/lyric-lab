@@ -22,7 +22,7 @@ Chưa làm trước khi công khai rộng (từ README cũ): thử tay đăng nh
 
 ## Việc dở / quyết định đang treo
 
-- **Độ lệch lời mặc định (admin)**: đã có (`songs.lyric_offset_sec`, nút ở bảng chỉnh lời). Chưa có công cụ dọn độ lệch cá nhân của người dùng khác cho các bài admin đã chỉnh; làm khi có nhiều người dùng.
+- **Độ lệch lời mặc định (admin)**: đã có (`songs.lyric_offset_sec`, nút ở bảng chỉnh lời). Admin lưu thì mọi chỉnh cá nhân trước đó của bài bị bỏ (DB về 0, bản trên trình duyệt tự cũ theo `base`).
 
 - **Quét bài có quá ít từ vựng**: sau khi nâng prompt lên 20–25 từ, một số bài vẫn ra ít (đã sửa tay `aaM7qG2ycjk`, `p6jOf_uDeH8`, `QQucPUfXUQQ`). Chưa quét toàn bộ — chủ dự án chọn "tạm thời không cần". Tiêu chí gợi ý: bài có < ~15 mục vocab trong `song_analyses.items`.
 - **Tách phân tích LLM thành job nền** (Inngest/Trigger.dev) để thoát trần 60s của Vercel Hobby: đã ước effort, hoãn. Chi tiết: [`backlog.md`](backlog.md).
