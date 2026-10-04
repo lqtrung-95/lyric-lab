@@ -231,7 +231,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
           {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}
         </div>
-        <div className="lg:sticky lg:top-24 lg:col-span-5">
+        <div className="listen-panel-scroll lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain">
           <SingingPanel line={lines[currentIndex] ?? null} items={currentItems} savedKeys={savedKeys} onToggleSave={saveFromPanel} />
         </div>
       </div>

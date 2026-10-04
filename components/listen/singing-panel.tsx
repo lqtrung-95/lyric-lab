@@ -16,7 +16,7 @@ interface SingingPanelProps {
 function ItemCard({ item, saved, onToggleSave }: { item: PreviewItem; saved: boolean; onToggleSave: (i: PreviewItem) => void }) {
   const isVocab = item.type === "vocab";
   return (
-    <li className={`relative overflow-hidden rounded-xl bg-surface-container-lowest p-4 shadow-sm ${isVocab ? "" : "pl-5"}`}>
+    <li className={`relative shrink-0 overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest p-3 shadow-sm ${isVocab ? "" : "pl-5"}`}>
       {!isVocab && <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-secondary" />}
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -64,8 +64,8 @@ export function SingingPanel({ line, items, savedKeys, onToggleSave }: SingingPa
         <span className="text-label-md font-semibold text-on-surface">Đang hát · {title} · {items.length} mục</span>
         <Icon name={open ? "expand_more" : "expand_less"} size={22} />
       </button>
-      <div className={`${open ? "block" : "hidden"} max-h-[55vh] overflow-y-auto px-4 pb-4 lg:block lg:max-h-none lg:overflow-visible lg:p-0`}>
-        <div className="mb-3 hidden items-center justify-between lg:flex">
+      <div className={`${open ? "block" : "hidden"} max-h-[55vh] overflow-y-auto px-4 pb-4 lg:block lg:max-h-none lg:overflow-visible lg:px-0 lg:pt-4 lg:pb-6`}>
+        <div className="sticky top-0 z-10 mb-3 hidden items-center justify-between gap-2 border-b border-outline-variant/40 bg-surface py-2 lg:flex">
           <h2 className="flex items-center gap-2 font-serif text-headline-md text-on-surface">
             <Icon name="menu_book" size={20} className="text-secondary" />
             Từ & Ngữ pháp trong bài
@@ -77,7 +77,7 @@ export function SingingPanel({ line, items, savedKeys, onToggleSave }: SingingPa
             {line ? "Câu này chưa có từ hay mẫu nổi bật. Cứ nghe tiếp nhé." : "Bấm phát để bắt đầu. Từ và ngữ pháp của câu đang hát sẽ hiện ở đây."}
           </p>
         ) : (
-          <ul className="flex flex-col gap-3">
+          <ul className="flex flex-col gap-2.5">
             {items.map((item) => <ItemCard key={item.id} item={item} saved={savedKeys.has(itemKey(item))} onToggleSave={onToggleSave} />)}
           </ul>
         )}
