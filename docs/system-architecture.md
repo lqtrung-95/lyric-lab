@@ -95,6 +95,10 @@ Hai lớp, cộng dồn: (1) **mặc định của bài** `songs.lyric_offset_se
 
 Admin bấm "Lưu làm mặc định cho mọi người" ở bảng chỉnh lời (`SyncPanel`) → `PATCH /api/admin/songs/[videoId]` `{action:"shift_lyrics", deltaSec}`: cộng delta vào mặc định, đưa `user_song_progress.lyric_offset_sec` của mọi người cho bài đó về 0 (cho thiết bị chưa có bản cục bộ), rồi client tải lại dữ liệu bài. Ý nghĩa: bản admin lưu là bản chuẩn, ghi đè mọi chỉnh cá nhân trước đó của bài.
 
+## Cỡ khung video (màn Nghe)
+
+Người dùng chọn Lớn/Vừa/Nhỏ cho khung video (`playerSize` trong `lyric-lab-listen-prefs`, chọn ở trang Cài đặt, mục "Màn Nghe", `components/settings/listen-section.tsx`; có tác dụng từ breakpoint `md`). "Nhỏ" = 356px rộng (200px cao ở 16:9), là mức nhỏ nhất ta cho phép; điện thoại đã ở mức này nên không đổi. **Không có chế độ ẩn hẳn video**: theo điều khoản YouTube IFrame API (theo ghi nhớ, cần tra lại bản hiện hành trước khi đổi), player nhúng phải còn nhìn thấy, không nhỏ hơn khoảng 200×200 và không được tách riêng âm thanh.
+
 ## Hạn mức và bảo vệ
 
 Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản (ẩn danh / đã đăng nhập): phân tích 10/30, giải nghĩa 60/200, TTS 80/250; điểm game 40/giờ. Thêm lớp theo IP (30 phân tích/24h, bộ nhớ trong tiến trình). Bài đã cache không tốn hạn mức. Chạy `next dev` (`NODE_ENV=development`) bỏ qua hạn mức phân tích. Email trong `UNLIMITED_USAGE_EMAILS` không bị giới hạn; `ADMIN_EMAILS` vào được trang admin. Captcha Turnstile (tùy chọn) ở `lib/auth/turnstile-token.ts`.

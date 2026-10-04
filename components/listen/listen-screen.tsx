@@ -14,6 +14,7 @@ import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/lea
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
+import type { PlayerSize } from "@/lib/user-state/listen-prefs";
 import { LineExplainSheet } from "./line-explain-sheet";
 import { LinePracticeSheet } from "./line-practice-sheet";
 import { PlaybackBar } from "./playback-bar";
@@ -37,6 +38,10 @@ interface ListenScreenProps {
   /** Giây để tua tới khi player sẵn sàng (tiếp tục bài nghe dở). */
   startAt?: number;
 }
+
+// Cỡ khung video từ md trở lên (điện thoại luôn là cỡ nhỏ nhất cho phép). "Nhỏ" = 356px rộng, tức 200px cao ở tỉ lệ 16:9, là
+// mức nhỏ nhất ta cho phép vì player nhúng của YouTube không được nhỏ hơn khoảng 200x200 (xem docs/system-architecture.md).
+const PLAYER_SIZE_CLASS: Record<PlayerSize, string> = { large: "", medium: "md:max-w-[560px]", small: "md:max-w-[356px]" };
 
 /** Màn Nghe (S5): video nhúng + lời chạy theo nhạc + panel "Đang hát". Mọi tô sáng dùng cùng bộ lọc level/"Đã biết" với màn xem trước. */
 export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
@@ -201,7 +206,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
         <div className="flex flex-col gap-6 lg:col-span-7">
           <div ref={stickyPlayerRef} data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
-            <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
+            <div ref={containerRef} className={`mx-auto aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full ${PLAYER_SIZE_CLASS[prefs.playerSize]}`} />
             <PlaybackBar
               controller={controller} durationSec={song.durationSec ?? 0} playing={playing} onTogglePlay={togglePlay}
               onSeekBy={(d) => controller?.seekTo(Math.max(0, controller.getCurrentTime() + d))}

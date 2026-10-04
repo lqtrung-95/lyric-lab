@@ -193,6 +193,29 @@ test("mobile: panel 'Đang hát' thu gọn mặc định, mở ra thấy thẻ c
   await expect(page.getByRole("complementary").getByText("rời đi, rời khỏi")).toBeVisible();
 });
 
+test.describe("cỡ khung video", () => {
+  const videoWidth = (page: import("@playwright/test").Page) =>
+    page.evaluate(() => document.querySelector("[data-sticky-player] > div")?.getBoundingClientRect().width ?? 0);
+
+  test("chọn cỡ ở Cài đặt đổi bề rộng video màn Nghe, được nhớ, video luôn hiển thị", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    expect(await videoWidth(page)).toBeGreaterThan(560); // mặc định Lớn
+    await page.goto("/settings");
+    const select = page.getByLabel("Cỡ video");
+    await select.selectOption("small");
+    await page.goto("/dev/listen-fixture");
+    await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+    await expect.poll(() => videoWidth(page)).toBeLessThanOrEqual(356);
+    expect(await videoWidth(page)).toBeGreaterThanOrEqual(200);
+    await page.goto("/settings");
+    await page.getByLabel("Cỡ video").selectOption("medium");
+    await page.goto("/dev/listen-fixture");
+    await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
+    await expect.poll(() => videoWidth(page)).toBeLessThanOrEqual(560);
+    expect(await videoWidth(page)).toBeGreaterThan(356);
+  });
+});
+
 test.describe("chỉnh lời lệch nhạc", () => {
   test("nút ±0,5s dịch mốc lời, được nhớ sau khi tải lại và đặt lại được", async ({ page }) => {
     await setTime(page, 10.5); // câu 3 bắt đầu ở 10s
