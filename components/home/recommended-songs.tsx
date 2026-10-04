@@ -1,26 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo } from "react";
 import { SongCard } from "@/components/library/song-card";
-import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { useRecentSongs } from "./use-recent-songs";
 import { useRecommendedSongs } from "./use-home-data";
-
-const noop = () => () => {};
-const readRecent = () => {
-  try {
-    return localStorage.getItem(RECENT_SONGS_KEY);
-  } catch {
-    return null;
-  }
-};
 
 /** Hàng "Gợi ý cho bạn": bài đã được phân tích sẵn, chọn theo level của người dùng (mở là học được ngay). Ẩn khi không có bài nào. */
 export function RecommendedSongs() {
   const { state } = useLearnerState();
-  const recentRaw = useSyncExternalStore(noop, readRecent, () => null);
-  const openedIds = useMemo(() => parseRecentSongs(recentRaw).map((s) => s.videoId), [recentRaw]);
+  const { songs: recent } = useRecentSongs();
+  const openedIds = useMemo(() => (recent ?? []).map((s) => s.videoId), [recent]);
   const songs = useRecommendedSongs(state.level, openedIds);
 
   if (songs !== undefined && songs.length === 0) return null;

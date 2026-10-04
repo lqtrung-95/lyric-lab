@@ -35,11 +35,13 @@ test("đang nghe dở: hiện 'Tiếp tục nghe' dẫn tới đúng vị trí; 
   await page.addInitScript(() => localStorage.setItem("lyric-lab-recent-songs", JSON.stringify([{ videoId: "rec00000001", title: "Đã mở rồi", channelTitle: "K", openedAt: 1 }])));
   await mock(page, { songs: [progress()], discover: [rec(1), rec(2), rec(3), rec(4), rec(5)] });
   await page.goto("/app");
-  await expect(page.getByText("Bài đang nghe dở")).toBeVisible();
+  await expect(page.getByText("Bài đang nghe dở").first()).toBeVisible();
   await expect(page.getByText("Dừng ở 1:24")).toBeVisible();
   await expect(page.getByRole("link", { name: "Tiếp tục nghe" })).toHaveAttribute("href", "/learn/cont0000001/listen?t=84");
   await expect(page.getByRole("heading", { name: "Bắt đầu chỉ với ba bước" })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Bài hát gần đây" })).toBeVisible();
+  // Bài đã nghe lưu trên tài khoản (không có trong localStorage của trình duyệt này) vẫn hiện ở "Bài hát gần đây".
+  await expect(page.getByRole("link", { name: /Bài đang nghe dở/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Bài gợi ý 1/ })).toHaveCount(0); // rec00000001 đã mở nên bị loại
   await expect(page.getByRole("link", { name: /Bài gợi ý 2/ })).toBeVisible();
 });

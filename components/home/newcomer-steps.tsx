@@ -1,9 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
-import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
+import { useRecentSongs } from "./use-recent-songs";
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
   { icon: "link", title: "Dán link YouTube", body: "Bài hát tiếng Phổ thông nào cũng được." },
@@ -11,19 +10,11 @@ const STEPS: { icon: IconName; title: string; body: string }[] = [
   { icon: "headphones", title: "Nghe cùng lời", body: "Lời chạy theo nhạc, chạm vào từ để biết nghĩa." },
 ];
 
-const noop = () => () => {};
-const isNewcomer = () => {
-  try {
-    return parseRecentSongs(localStorage.getItem(RECENT_SONGS_KEY)).length === 0;
-  } catch {
-    return false;
-  }
-};
-
-/** Ba bước làm quen, chỉ hiện khi người dùng chưa mở bài nào (thay cho phần "Bài hát gần đây" trống). */
+/** Ba bước làm quen, chỉ hiện khi người dùng chưa mở bài nào (ở trình duyệt này lẫn trên tài khoản) (thay cho phần "Bài hát gần đây" trống). */
 export function NewcomerSteps() {
-  const newcomer = useSyncExternalStore(noop, isNewcomer, () => false);
-  if (!newcomer) return null;
+  // Chờ biết cả bài trên tài khoản (songs === null) để người đã có bài ở thiết bị khác không thấy khối này nhấp nháy.
+  const { songs } = useRecentSongs();
+  if (songs === null || songs.length > 0) return null;
   return (
     <section aria-labelledby="steps-heading" className="mt-space-xl">
       <h2 id="steps-heading" className="font-serif text-headline-md text-on-surface">Bắt đầu chỉ với ba bước</h2>

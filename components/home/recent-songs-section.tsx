@@ -1,33 +1,16 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
 import { SongCard } from "@/components/library/song-card";
 import { SongLikeButton } from "@/components/library/song-like-button";
 import { useLikedSongs } from "@/components/library/use-liked-songs";
 import { useSongRemoval } from "@/components/library/use-song-removal";
-import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
+import { useRecentSongs } from "./use-recent-songs";
 
-function subscribe(onChange: () => void) {
-  window.addEventListener("storage", onChange);
-  window.addEventListener("lyric-lab-recent-songs", onChange);
-  return () => {
-    window.removeEventListener("storage", onChange);
-    window.removeEventListener("lyric-lab-recent-songs", onChange);
-  };
-}
-function readRaw() {
-  try {
-    return localStorage.getItem(RECENT_SONGS_KEY);
-  } catch {
-    return null;
-  }
-}
-
-/** Bài học gần đây (lưu trong trình duyệt). */
+/** Bài hát gần đây: bài đã nghe (theo tài khoản, đồng bộ mọi thiết bị) gộp với bài mới xem trước (trong trình duyệt). */
 export function RecentSongsSection() {
-  const raw = useSyncExternalStore(subscribe, readRaw, () => null);
-  const songs = useMemo(() => parseRecentSongs(raw).slice(0, 8), [raw]);
-  const { remove, toast, dialog } = useSongRemoval();
+  const { songs: all, reload } = useRecentSongs();
+  const songs = all?.slice(0, 8) ?? [];
+  const { remove, toast, dialog } = useSongRemoval(reload);
   const { liked, setLiked } = useLikedSongs();
 
   // Chưa mở bài nào thì bỏ phần này (NewcomerSteps và gợi ý đã đảm nhận), tránh một khối "trống".
