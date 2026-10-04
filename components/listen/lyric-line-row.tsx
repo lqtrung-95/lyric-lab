@@ -24,13 +24,14 @@ interface LyricLineRowProps {
   highlights: HighlightSets;
   onSeek: (index: number) => void;
   onWord: (word: WordSelection) => void;
+  onPauseSong: () => void;
 }
 
 /**
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
 
@@ -95,7 +96,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
         {showTranslation && line.translation && (
           <div className="flex items-center gap-1">
             <p className={active ? "text-body-lg font-medium text-primary" : "text-body-md italic text-on-surface-variant/80"}>{line.translation}</p>
-            <TranslationSuggestionButton videoId={videoId} promptVersion={promptVersion} lineIndex={line.index} currentTranslation={line.translation} />
+            <TranslationSuggestionButton videoId={videoId} promptVersion={promptVersion} lineIndex={line.index} currentTranslation={line.translation} onPauseSong={onPauseSong} />
           </div>
         )}
       </div>

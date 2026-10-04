@@ -24,10 +24,11 @@ interface LyricListProps {
   onToggleTranslation: () => void;
   onSeek: (index: number) => void;
   onWord: (word: WordSelection) => void;
+  onPauseSong: () => void;
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, onTogglePinyin, onToggleTranslation, onSeek, onWord }: LyricListProps) {
+export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong }: LyricListProps) {
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
@@ -106,6 +107,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               highlights={highlightsByLine.get(line.index)!}
               onSeek={onSeek}
               onWord={onWord}
+              onPauseSong={onPauseSong}
             />
           );
         })}

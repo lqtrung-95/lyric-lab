@@ -9,10 +9,11 @@ interface TranslationSuggestionButtonProps {
   promptVersion: string;
   lineIndex: number;
   currentTranslation: string;
+  onPauseSong: () => void;
 }
 
 /** Nút bút chì nhỏ cạnh bản dịch một câu: mở form góp ý bản dịch tự nhiên hơn, gửi cho admin duyệt. */
-export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex, currentTranslation }: TranslationSuggestionButtonProps) {
+export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex, currentTranslation, onPauseSong }: TranslationSuggestionButtonProps) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const [value, setValue] = useState(currentTranslation);
@@ -28,6 +29,9 @@ export function TranslationSuggestionButton({ videoId, promptVersion, lineIndex,
   // popover chưa render ra nên dùng kích thước ước lượng (khớp w-72 và nội dung form) để tính, không cần đo 2 lượt.
   function toggle(e: React.MouseEvent) {
     e.stopPropagation();
+    if (!open) {
+      onPauseSong();
+    }
     if (!open && buttonRef.current) {
       const r = buttonRef.current.getBoundingClientRect();
       const POPUP_WIDTH = 288;
