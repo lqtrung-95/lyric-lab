@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { SyncRisk } from "@/lib/listen/lyric-offset";
+import type { PublishState } from "./use-publish-default-offset";
 
 interface SyncPanelProps {
   offset: number;
@@ -11,6 +12,8 @@ interface SyncPanelProps {
   quickSync: boolean;
   onOffsetChange: (offset: number) => void;
   onToggleQuickSync: () => void;
+  /** Chỉ có với quản trị viên: lưu độ lệch đang chỉnh thành mặc định cho mọi người dùng. */
+  publish?: { state: PublishState; onPublish: () => void };
 }
 
 const fmt = (o: number) => `${o > 0 ? "+" : ""}${Number(o.toFixed(2))} giây`;
@@ -20,7 +23,7 @@ const step = "min-h-11 min-w-16 rounded-full bg-surface-container-high px-3 text
  * Chỉnh lệch lời so với video: nút ±0,1 s và ±0,5 s, "đồng bộ nhanh" bằng cách bấm dòng đang được hát, và đặt lại.
  * Khi lời có dấu hiệu lệch (độ dài không khớp video) hiện gợi ý mở bảng chỉnh.
  */
-export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQuickSync }: SyncPanelProps) {
+export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQuickSync, publish }: SyncPanelProps) {
   const [open, setOpen] = useState(false);
   const show = open || quickSync;
 
@@ -70,6 +73,20 @@ export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQui
             className="min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container disabled:opacity-50">
             Đặt lại (không lệch)
           </button>
+
+          {publish && (
+            <div>
+              <button type="button" disabled={offset === 0 || publish.state === "saving"} onClick={publish.onPublish}
+                className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+                {publish.state === "saving" ? "Đang lưu…" : "Lưu làm mặc định cho mọi người"}
+              </button>
+              <p role="status" className={`mt-1 text-label-sm ${publish.state === "error" ? "text-error" : "text-on-surface-variant"}`}>
+                {publish.state === "saved" ? "Đã lưu. Mọi người dùng sẽ thấy lời đã chỉnh."
+                  : publish.state === "error" ? "Chưa lưu được. Thử lại nhé."
+                  : "Dành cho quản trị viên: người dùng khác không phải tự chỉnh bài này nữa."}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </section>

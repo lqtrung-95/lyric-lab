@@ -19,6 +19,7 @@ import { LinePracticeSheet } from "./line-practice-sheet";
 import { PlaybackBar } from "./playback-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
+import { usePublishDefaultOffset } from "./use-publish-default-offset";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
 import type { WordSelection } from "./lyric-line-row";
@@ -40,6 +41,8 @@ interface ListenScreenProps {
 /** Màn Nghe (S5): video nhúng + lời chạy theo nhạc + panel "Đang hát". Mọi tô sáng dùng cùng bộ lọc level/"Đã biết" với màn xem trước. */
 export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const { offset, setOffset } = useLyricOffset(analysis.videoId);
+  const resetOffset = useCallback(() => setOffset(0), [setOffset]);
+  const publishOffset = usePublishDefaultOffset(analysis.videoId, offset, resetOffset);
   // Mọi thứ trong màn Nghe (đồng bộ, tô sáng, tua, lặp câu, tiến độ) dùng mốc đã cộng độ lệch người dùng chỉnh.
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
@@ -215,7 +218,8 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
               </p>
             )}
           </div>
-          <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)} />
+          <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)}
+            publish={publishOffset.canPublish ? { state: publishOffset.state, onPublish: publishOffset.publish } : undefined} />
           <ReportSongButton videoId={analysis.videoId} prominent />
           <LyricList
             videoId={analysis.videoId} promptVersion={analysis.promptVersion}

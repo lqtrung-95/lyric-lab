@@ -89,6 +89,10 @@ Người dùng mới là phiên **ẩn danh** (Supabase Anonymous). Bấm "Đăn
 
 "Bài hát gần đây" (trang chủ, hook `components/home/use-recent-songs.ts`) và tab "Bài hát của tôi" gộp hai nguồn bằng `mergeLibrarySongs`: **tiến độ nghe trên tài khoản** (`user_song_progress` qua `/api/library/songs`, đồng bộ mọi thiết bị) và **bài mới mở xem trước lưu trong `localStorage`** của trình duyệt (`lyric-lab-recent-songs`, chỉ ở máy đó). Bài chỉ mở xem trước mà chưa nghe thì chưa có hàng trong DB nên không sang thiết bị khác.
 
+## Độ lệch lời (mặc định của bài + chỉnh cá nhân)
+
+Hai lớp, cộng dồn: (1) **mặc định của bài** `songs.lyric_offset_sec`, do admin đặt và áp cho mọi người; server cộng nó vào mốc `start`/`end` của các dòng ngay khi đọc phân tích (`loadAnalysis` trong `lib/analysis/server-deps.ts`, bằng `shiftLines`), nên mọi màn hình nhận lời đã chỉnh mà không phải sửa từng nơi, và bản chỉnh không mất khi phân tích lại bài. (2) **Chỉnh cá nhân** (`localStorage` + `user_song_progress.lyric_offset_sec`, hook `useLyricOffset`) là phần cộng thêm lên trên mặc định; "Đặt lại" nghĩa là về mặc định của bài. Admin bấm "Lưu làm mặc định cho mọi người" ở bảng chỉnh lời (`SyncPanel`) → `PATCH /api/admin/songs/[videoId]` `{action:"shift_lyrics", deltaSec}` cộng delta vào mặc định, xoá cache phân tích (`revalidateTag("song-analysis")`), rồi client tải lại dữ liệu và đưa độ lệch cá nhân của admin về 0 (tránh cộng đôi). Người khác đã tự chỉnh bài đó trước đó sẽ lệch thêm đúng bằng giá trị admin lưu (chấp nhận được khi ít người dùng).
+
 ## Hạn mức và bảo vệ
 
 Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản (ẩn danh / đã đăng nhập): phân tích 10/30, giải nghĩa 60/200, TTS 80/250; điểm game 40/giờ. Thêm lớp theo IP (30 phân tích/24h, bộ nhớ trong tiến trình). Bài đã cache không tốn hạn mức. Chạy `next dev` (`NODE_ENV=development`) bỏ qua hạn mức phân tích. Email trong `UNLIMITED_USAGE_EMAILS` không bị giới hạn; `ADMIN_EMAILS` vào được trang admin. Captcha Turnstile (tùy chọn) ở `lib/auth/turnstile-token.ts`.

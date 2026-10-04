@@ -6,6 +6,7 @@ import { COMMON_READING, lookupWords } from "@/lib/dictionary/lookup-words";
 import { LrclibProvider } from "@/lib/lyrics/lrclib-provider";
 import { NeteaseProvider } from "@/lib/lyrics/netease-provider";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
+import { shiftLines } from "@/lib/listen/lyric-offset";
 import { MANUAL_VARIANTS } from "@/lib/text/to-simplified-chinese";
 import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } from "./analyze-video";
 import { createByteplusChat } from "./byteplus-chat";
@@ -69,7 +70,18 @@ class NotFoundInCache extends Error {}
 async function loadAnalysis(videoId: string): Promise<SongAnalysis | null> {
   const cache = createSupabaseCacheDb(createSupabaseServiceClient());
   const analysis = await getCachedAnalysis(cache, { videoId, learnLang: LEARN_LANG, explainLang: EXPLAIN_LANG, promptVersion: PROMPT_VERSION });
-  return analysis ? repairLinePinyin(simplifyDeep(analysis)) : null;
+  if (!analysis) return null;
+  const repaired = await repairLinePinyin(simplifyDeep(analysis));
+  return { ...repaired, lines: shiftLines(repaired.lines, await readDefaultOffset(videoId)) };
+}
+
+/**
+ * Độ lệch lời mặc định của bài do quản trị viên đặt (songs.lyric_offset_sec), áp lên mốc thời gian ngay khi đọc để mọi
+ * màn hình nhận lời đã chỉnh, và để bản chỉnh không mất khi bài được phân tích lại (hàng song_analyses mới vẫn mang mốc gốc).
+ */
+async function readDefaultOffset(videoId: string): Promise<number> {
+  const { data } = await createSupabaseServiceClient().from("songs").select("lyric_offset_sec").eq("video_id", videoId).maybeSingle();
+  return data?.lyric_offset_sec ?? 0;
 }
 
 // Phân tích của một bài gần như bất biến (khóa theo promptVersion) nên giữ trong cache của Next 1 giờ để mở lại bài không phải

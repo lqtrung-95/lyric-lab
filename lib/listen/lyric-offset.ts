@@ -12,6 +12,9 @@ export function normalizeOffset(value: number): number {
   return Math.max(-MAX_OFFSET_SEC, Math.min(MAX_OFFSET_SEC, Math.round(rounded * 100) / 100));
 }
 
+/** Độ lệch mặc định mới của bài khi quản trị viên lưu thêm `delta` lên trên mức mặc định hiện có (làm tròn, kẹp ±60 giây). */
+export const addToDefaultOffset = (current: number, delta: number): number => normalizeOffset(current + delta);
+
 /** Dịch mốc thời gian các dòng lời theo độ lệch. Dòng không bao giờ bắt đầu trước 0. */
 export function shiftLines<T extends Pick<AnalyzedLine, "start" | "end">>(lines: T[], offset: number): T[] {
   if (offset === 0) return lines;

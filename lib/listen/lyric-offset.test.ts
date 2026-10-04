@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { estimateSyncRisk, normalizeOffset, offsetFromLineClick, parseOffsets, shiftLines } from "./lyric-offset";
+import { addToDefaultOffset, estimateSyncRisk, normalizeOffset, offsetFromLineClick, parseOffsets, shiftLines } from "./lyric-offset";
 
 const line = (start: number, end: number) => ({ start, end });
 
@@ -54,5 +54,18 @@ describe("parseOffsets", () => {
     expect(parseOffsets("không phải json")).toEqual({});
     expect(parseOffsets(null)).toEqual({});
     expect(parseOffsets("[1,2]")).toEqual({});
+  });
+});
+
+describe("addToDefaultOffset", () => {
+  it("cộng độ lệch admin chỉnh thêm lên mặc định hiện có, làm tròn 0,05", () => {
+    expect(addToDefaultOffset(0, 1.2)).toBe(1.2);
+    expect(addToDefaultOffset(1.5, -0.4)).toBe(1.1);
+    expect(addToDefaultOffset(0.3, 0.12)).toBe(0.4);
+  });
+  it("kẹp trong ±60 giây và coi giá trị không hợp lệ như 0", () => {
+    expect(addToDefaultOffset(59, 5)).toBe(60);
+    expect(addToDefaultOffset(-59, -5)).toBe(-60);
+    expect(addToDefaultOffset(2, NaN)).toBe(0);
   });
 });

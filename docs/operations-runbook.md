@@ -59,6 +59,8 @@ npx tsx --env-file=.env.local scripts/dictionary/import-dictionary.mts
 
 Migration gần nhất `20261004000001_merge_user_data_all_user_tables.sql` mở rộng hàm gộp tài khoản (bài thích, điểm luyện tập, hồ sơ bảng xếp hạng, báo sai bài). Phải chạy trên Supabase SQL Editor trước/cùng lúc deploy bản code dùng luồng đăng nhập một đường, nếu không người dùng đăng nhập Google sẽ mất các dữ liệu đó. Test tích hợp `tests/integration/account-merge.test.ts` kiểm tra điều này (chạy trên DB thật, tự dọn).
 
+Migration `20261004000002_song_default_lyric_offset.sql` thêm cột `songs.lyric_offset_sec` (độ lệch lời mặc định do admin đặt). Chưa chạy thì code vẫn chạy (đọc lỗi → coi như 0) nhưng nút "Lưu làm mặc định cho mọi người" sẽ báo lỗi.
+
 Vì local và production **dùng chung DB**, mọi script bên dưới ảnh hưởng dữ liệu thật.
 
 ## 4. Deploy (Vercel)
