@@ -61,7 +61,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   // trong lúc popup mở sẽ không làm mất nội dung đang luyện (khác lúc trước gắn thẳng vào panel "Đang hát").
   const [practiceLine, setPracticeLine] = useState<AnalyzedLine | null>(null);
   const onRepeatsExhausted = useCallback(() => setLoopIndex(null), []);
-  const { currentIndex: liveIndex, playing } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
+  const { currentIndex: liveIndex, playing, cancelPendingResume } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
   // Trong lúc popup luyện phát âm đang mở, giữ nguyên hiển thị (tô sáng lời, cuộn, panel "Đang hát") ở đúng câu
   // đang luyện — không theo currentIndex sống nữa. Nghe 1 câu trong popup có thể khiến currentIndex thật sự đã lệch
   // sang câu kế (mốc kết thúc câu này thường trùng luôn mốc bắt đầu câu sau), nếu cứ theo currentIndex thì lời phía
@@ -141,9 +141,11 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
 
   // Bấm tra một từ trong lúc đang mở giải thích cả câu: đóng giải thích lại, ưu tiên tra từ (thao tác nhanh hơn).
   const selectWord = useCallback((selection: WordSelection) => {
+    cancelPendingResume();
+    controller?.pause();
     setExplainOpen(false);
     setWord(selection);
-  }, []);
+  }, [cancelPendingResume, controller]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
