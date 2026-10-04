@@ -25,8 +25,9 @@ function readRaw(): string | null {
 function writeLocal(videoId: string, offset: number) {
   try {
     const table = parseOffsets(readRaw());
-    if (offset === 0) delete table[videoId];
-    else table[videoId] = offset;
+    // Lưu cả giá trị 0 (không xóa khóa): "chưa có bản cục bộ" mới đi hỏi tài khoản, còn "đã đặt về 0" thì không. Nếu xóa khóa,
+    // lúc vừa đặt về 0 máy sẽ hỏi lại tài khoản trước khi bản 0 kịp ghi lên đó và nhận về độ lệch cũ.
+    table[videoId] = offset;
     localStorage.setItem(KEY, JSON.stringify(table));
   } catch {
     // localStorage bị chặn: độ lệch chỉ có hiệu lực tới khi tải lại trang.

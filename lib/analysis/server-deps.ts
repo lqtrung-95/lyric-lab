@@ -70,14 +70,13 @@ class NotFoundInCache extends Error {}
 async function loadAnalysis(videoId: string): Promise<SongAnalysis | null> {
   const cache = createSupabaseCacheDb(createSupabaseServiceClient());
   const analysis = await getCachedAnalysis(cache, { videoId, learnLang: LEARN_LANG, explainLang: EXPLAIN_LANG, promptVersion: PROMPT_VERSION });
-  if (!analysis) return null;
-  const repaired = await repairLinePinyin(simplifyDeep(analysis));
-  return { ...repaired, lines: shiftLines(repaired.lines, await readDefaultOffset(videoId)) };
+  return analysis ? repairLinePinyin(simplifyDeep(analysis)) : null;
 }
 
 /**
- * Độ lệch lời mặc định của bài do quản trị viên đặt (songs.lyric_offset_sec), áp lên mốc thời gian ngay khi đọc để mọi
- * màn hình nhận lời đã chỉnh, và để bản chỉnh không mất khi bài được phân tích lại (hàng song_analyses mới vẫn mang mốc gốc).
+ * Độ lệch lời mặc định của bài do quản trị viên đặt (songs.lyric_offset_sec). Đọc MỖI LẦN (không qua cache 1 giờ của phân
+ * tích) để bản admin vừa lưu có hiệu lực ngay, và để bản chỉnh không mất khi bài được phân tích lại (hàng song_analyses mới
+ * vẫn mang mốc gốc).
  */
 async function readDefaultOffset(videoId: string): Promise<number> {
   const { data } = await createSupabaseServiceClient().from("songs").select("lyric_offset_sec").eq("video_id", videoId).maybeSingle();
@@ -93,15 +92,17 @@ const analysisCache = unstable_cache(
     if (!analysis) throw new NotFoundInCache();
     return analysis;
   },
-  // Số cuối tăng khi sửa dữ liệu phân tích trực tiếp trong DB (vd. bù bản dịch) để bỏ bản cache cũ ngay thay vì đợi hết 1 giờ.
-  ["song-analysis", PROMPT_VERSION, "rev11"],
+  // Số cuối tăng khi sửa dữ liệu phân tích trực tiếp trong DB (vd. bù bản dịch) hoặc đổi nội dung được cache, để bỏ bản cache cũ ngay thay vì đợi hết 1 giờ.
+  ["song-analysis", PROMPT_VERSION, "rev12"],
   { revalidate: 3600, tags: ["song-analysis"] },
 );
 
-/** Đọc phân tích đã cache (khóa theo quy tắc 8), luôn ở dạng giản thể (xem `simplifyDeep`) và có pinyin không lẫn chữ Hán. */
+/** Đọc phân tích đã cache (khóa theo quy tắc 8), luôn ở dạng giản thể (xem `simplifyDeep`), có pinyin không lẫn chữ Hán và mốc thời gian đã cộng độ lệch mặc định của bài. */
 export async function readCachedAnalysis(videoId: string): Promise<SongAnalysis | null> {
   try {
-    return await analysisCache(videoId);
+    // Hai việc độc lập nên chạy song song: bản phân tích (cache) và độ lệch mặc định (truy vấn nhỏ theo khoá chính).
+    const [analysis, offset] = await Promise.all([analysisCache(videoId), readDefaultOffset(videoId)]);
+    return { ...analysis, lines: shiftLines(analysis.lines, offset) };
   } catch (error) {
     if (error instanceof NotFoundInCache) return null;
     throw error;

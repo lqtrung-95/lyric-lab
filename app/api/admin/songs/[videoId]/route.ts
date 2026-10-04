@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { addToDefaultOffset } from "@/lib/listen/lyric-offset";
@@ -29,8 +29,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
     const offsetSec = addToDefaultOffset(song.lyric_offset_sec, body.deltaSec);
     const { error } = await sb.from("songs").update({ lyric_offset_sec: offsetSec }).eq("video_id", videoId);
     if (error) return Response.json({ error: "server_error" }, { status: 500 });
-    // Bỏ cache phân tích ngay (không đợi hết 1 giờ) để người dùng nhận mốc thời gian mới ở lần mở kế tiếp.
-    revalidateTag("song-analysis", { expire: 0 });
+    // Không cần bung cache: độ lệch mặc định được đọc riêng ở mỗi lần mở bài (readCachedAnalysis), không nằm trong cache phân tích.
     return Response.json({ done: "shifted", offsetSec });
   }
 
