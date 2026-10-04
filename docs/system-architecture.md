@@ -81,6 +81,10 @@ Prompt: `lib/analysis/build-analysis-prompt.ts`, hằng `PROMPT_VERSION`. LLM ch
 | Chống lạm dụng | `usage_events` (hạn mức 24h/1h theo tài khoản) |
 | Phản hồi | `feedback`, `item_reports`, `song_reports`, `translation_suggestions` |
 
+## Đăng nhập Google và gộp tài khoản
+
+Người dùng mới là phiên **ẩn danh** (Supabase Anonymous). Bấm "Đăng nhập bằng Google" (`signInGoogle` trong `lib/auth/account-client.ts`) luôn đi một đường: xin mã gộp một lần (`/api/account/merge-token`), cất vào `localStorage`, qua Google đúng một lần, rồi về `/settings/merge`. Trang này gọi `/api/account/merge`: `autoMerge = true` (tài khoản Google còn trống hoặc phía ẩn danh không có dữ liệu học) thì gộp luôn; ngược lại hỏi xác nhận kèm số thẻ/từ/lượt ôn sẽ gộp. Hàm SQL `merge_user_data` chuyển hồ sơ, từ đã biết, thẻ ôn, nhật ký ôn, lượt dùng, tiến độ nghe, bài đã thích, điểm luyện tập, hồ sơ bảng xếp hạng, báo sai bài; xong thì xoá tài khoản ẩn danh. **Thêm bảng mới có `user_id` → phải thêm vào `merge_user_data` bằng migration mới**, nếu không dữ liệu bị xoá cascade khi người dùng đăng nhập.
+
 ## Hạn mức và bảo vệ
 
 Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản (ẩn danh / đã đăng nhập): phân tích 10/30, giải nghĩa 60/200, TTS 80/250; điểm game 40/giờ. Thêm lớp theo IP (30 phân tích/24h, bộ nhớ trong tiến trình). Bài đã cache không tốn hạn mức. Chạy `next dev` (`NODE_ENV=development`) bỏ qua hạn mức phân tích. Email trong `UNLIMITED_USAGE_EMAILS` không bị giới hạn; `ADMIN_EMAILS` vào được trang admin. Captcha Turnstile (tùy chọn) ở `lib/auth/turnstile-token.ts`.

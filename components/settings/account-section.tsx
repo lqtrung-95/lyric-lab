@@ -2,13 +2,13 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { linkGoogle, signInGoogleForMerge, signOutAndReset } from "@/lib/auth/account-client";
+import { signInGoogle, signOutAndReset } from "@/lib/auth/account-client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAccount } from "./use-account";
 
 const btn = "min-h-11 rounded-full px-5 text-label-md font-medium";
 
-/** Tài khoản: ẩn danh (nhắc đăng nhập Google để giữ thẻ) hoặc đã đăng nhập Google. Xử lý cả trường hợp Google đã có tài khoản. */
+/** Tài khoản: ẩn danh (nhắc đăng nhập Google để giữ thẻ) hoặc đã đăng nhập Google. Dữ liệu ẩn danh được gộp vào tài khoản Google ở trang gộp. */
 export function AccountSection() {
   const account = useAccount();
   const link = useSearchParams().get("link");
@@ -40,16 +40,8 @@ export function AccountSection() {
           <p className="text-body-md text-on-surface-variant">
             Bạn đang dùng không cần tài khoản. Nếu xóa dữ liệu trình duyệt hoặc đổi thiết bị, thẻ ôn sẽ mất. Đăng nhập Google để giữ thẻ và dùng trên mọi thiết bị.
           </p>
-          {link === "exists" && (
-            <div role="status" className="mt-space-md rounded-xl bg-secondary-container/50 p-space-md">
-              <p className="text-body-md text-on-secondary-container">Tài khoản Google này đã có dữ liệu trên SongHanzi. Bạn có thể đăng nhập vào tài khoản đó và gộp dữ liệu đang có ở đây vào.</p>
-              <button type="button" disabled={busy} onClick={() => run(signInGoogleForMerge)} className={`${btn} mt-space-sm bg-primary text-on-primary hover:bg-primary-container disabled:opacity-60`}>
-                Đăng nhập và gộp dữ liệu
-              </button>
-            </div>
-          )}
           {link === "error" && <p role="alert" className="mt-space-sm text-label-md text-error">Đăng nhập Google chưa thành công. Thử lại nhé.</p>}
-          <button type="button" disabled={busy} onClick={() => run(linkGoogle)} className={`${btn} mt-space-md bg-primary text-on-primary hover:bg-primary-container disabled:opacity-60`}>
+          <button type="button" disabled={busy} onClick={() => run(signInGoogle)} className={`${btn} mt-space-md bg-primary text-on-primary hover:bg-primary-container disabled:opacity-60`}>
             Đăng nhập bằng Google
           </button>
         </div>

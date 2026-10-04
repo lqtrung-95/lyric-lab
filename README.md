@@ -35,7 +35,7 @@ npm run test:e2e             # Playwright, cổng 3100
 
 ### Cơ sở dữ liệu (Supabase)
 
-Chạy lần lượt các file trong `supabase/migrations/` bằng Supabase SQL Editor (dictionary → cache phân tích → báo sai → giải nghĩa từ → dữ liệu người dùng → mã gộp tài khoản). Cần bật Anonymous sign-ins và Manual linking trong Supabase; test tích hợp chạy với `NODE_OPTIONS=--experimental-websocket` trên Node 20. Sau đó nạp từ điển:
+Chạy lần lượt các file trong `supabase/migrations/` bằng Supabase SQL Editor (dictionary → cache phân tích → báo sai → giải nghĩa từ → dữ liệu người dùng → mã gộp tài khoản → mở rộng gộp tài khoản). Cần bật Anonymous sign-ins và Manual linking trong Supabase; test tích hợp chạy với `NODE_OPTIONS=--experimental-websocket` trên Node 20. Sau đó nạp từ điển:
 
 ```
 # tải CC-CEDICT, HSK 3.0, Unihan vào data-cache/ (xem plans/260925-1030-m1-analysis-pipeline/plan.md), rồi:

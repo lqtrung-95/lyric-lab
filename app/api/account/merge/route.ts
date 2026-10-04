@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { MergeError, executeMerge, previewMerge } from "@/lib/account/merge-account";
+import { MergeError, executeMerge, isAccountEmpty, previewMerge } from "@/lib/account/merge-account";
 import { isMergeTokenFormat } from "@/lib/account/merge-token";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 
@@ -19,7 +19,11 @@ function errorResponse(error: unknown) {
   return Response.json({ error: "server_error" }, { status: 500 });
 }
 
-/** POST {token, confirm?} : không có `confirm` thì trả số dữ liệu sẽ gộp; `confirm: true` thì thực hiện gộp. Cần đã đăng nhập Google. */
+/**
+ * POST {token, confirm?} : không có `confirm` thì trả số dữ liệu sẽ gộp kèm `autoMerge` (true khi không có gì để đè lên:
+ * tài khoản đích còn trống hoặc phía ẩn danh không có dữ liệu học, client gộp luôn không cần hỏi); `confirm: true` thì
+ * thực hiện gộp. Cần đã đăng nhập Google.
+ */
 export async function POST(req: Request) {
   const body = (await req.json().catch(() => ({}))) as { token?: unknown; confirm?: unknown };
   const user = await authorize(body.token);
@@ -30,7 +34,9 @@ export async function POST(req: Request) {
       await executeMerge(sb, body.token as string, user.id);
       return Response.json({ merged: true });
     }
-    return Response.json(await previewMerge(sb, body.token as string));
+    const preview = await previewMerge(sb, body.token as string);
+    const nothingToMerge = preview.knownTerms + preview.cards + preview.reviews === 0;
+    return Response.json({ ...preview, autoMerge: nothingToMerge || (await isAccountEmpty(sb, user.id)) });
   } catch (error) {
     return errorResponse(error);
   }

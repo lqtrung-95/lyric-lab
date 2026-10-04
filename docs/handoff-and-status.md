@@ -42,6 +42,8 @@ Chưa làm trước khi công khai rộng (từ README cũ): thử tay đăng nh
 |---|---|---|
 | Bài lạ hoắc / lời sai hoàn toàn | LRCLIB có nhiều bản cùng tên bài + nghệ sĩ nhưng lời khác nhau; khớp theo thời lượng có thể chọn nhầm (ca `pbSji_3prUc`) | Ép đúng id LRCLIB rồi chạy lại phân tích |
 | Lời bài `7I1SPKwTXJ0` bị lặp dồn giữa các câu | Caption của riêng video này chứa các cue nối tiếp lặp phần lời trước | Đã sửa dữ liệu của bài này; không tự động áp dụng cách cắt phần lặp cho bài khác |
+| Đăng nhập Google xong vẫn ẩn danh, phải đăng nhập lần 2 (đã sửa) | Trước đây luôn thử `linkIdentity` trước; Google đã có tài khoản thì bị từ chối, chưa có phiên nào, phải đăng nhập lại để gộp | Nay mọi trường hợp đi một đường qua `signInGoogle` + trang gộp (tự gộp khi không có gì bị đè). Cần migration `20261004000001` đã chạy |
+| Gộp tài khoản làm mất bài thích/điểm game/hồ sơ xếp hạng | `merge_user_data` cũ không chuyển các bảng thêm sau; tài khoản ẩn danh bị xoá cascade | Migration `20261004000001`; bảng mới có `user_id` phải thêm vào hàm này |
 | Sửa DB trực tiếp mà UI vẫn hiện bản cũ | `unstable_cache` trong `lib/analysis/server-deps.ts` giữ 1 giờ | Tăng hậu tố `revN` trong key cache |
 | Vào bài nào cũng phải phân tích lại | Vừa bump `PROMPT_VERSION` → cache key đổi → mọi bài thành "chưa phân tích" | Chạy backfill `reanalyze-songs.mts`, hoặc chấp nhận phân tích lười khi mở bài |
 | Script `tsx` lỗi `server-only` | `import "server-only"` ném lỗi ngoài Next | Script tự dựng phụ thuộc, không import `server-deps.ts` (xem `scripts/reanalyze-songs.mts`) |

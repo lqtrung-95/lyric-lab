@@ -35,6 +35,12 @@ async function findFromUser(sb: SupabaseClient, token: string, now: Date): Promi
 const count = async (sb: SupabaseClient, table: string, userId: string) =>
   (await sb.from(table).select("*", { count: "exact", head: true }).eq("user_id", userId)).count ?? 0;
 
+/** Tài khoản chưa có dữ liệu học nào (thẻ, từ đã biết, lượt ôn): gộp vào đây không đè lên gì nên không cần hỏi xác nhận. */
+export async function isAccountEmpty(sb: SupabaseClient, userId: string): Promise<boolean> {
+  const counts = await Promise.all([count(sb, "user_known_terms", userId), count(sb, "user_cards", userId), count(sb, "review_logs", userId)]);
+  return counts.every((n) => n === 0);
+}
+
 /** Số dữ liệu sẽ được gộp, để hiện ở màn xác nhận. */
 export async function previewMerge(sb: SupabaseClient, token: string, now = new Date()): Promise<MergePreview> {
   const from = await findFromUser(sb, token, now);

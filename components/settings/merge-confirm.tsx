@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { MERGE_TOKEN_KEY } from "@/lib/auth/account-client";
 
-interface Preview { knownTerms: number; cards: number; reviews: number }
+interface Preview { knownTerms: number; cards: number; reviews: number; autoMerge: boolean }
 type Fetched = { kind: "ready"; preview: Preview } | { kind: "none" } | { kind: "error" } | { kind: "merging" };
 
 const post = (body: object) => fetch("/api/account/merge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -18,30 +18,40 @@ function readToken(): string | null {
   }
 }
 
-/** Màn xác nhận gộp dữ liệu ẩn danh vào tài khoản Google đã có, sau khi đăng nhập Google xong. */
+/**
+ * Sau khi đăng nhập Google: gộp dữ liệu ẩn danh vào tài khoản Google. Tự gộp khi không có gì bị đè; chỉ hỏi xác nhận khi
+ * tài khoản Google đã có dữ liệu học riêng.
+ */
 export function MergeConfirm() {
   // undefined khi render trên server: chưa biết có mã hay không.
   const token = useSyncExternalStore(noop, readToken, () => undefined);
   const [fetched, setFetched] = useState<Fetched | null>(null);
   const state: { kind: "loading" } | Fetched = token === null ? { kind: "none" } : (fetched ?? { kind: "loading" });
 
-  useEffect(() => {
-    if (!token) return;
-    post({ token }).then(async (res) => {
-      if (res.ok) return setFetched({ kind: "ready", preview: await res.json() });
-      setFetched({ kind: res.status === 400 || res.status === 409 ? "none" : "error" });
-    }, () => setFetched({ kind: "error" }));
-  }, [token]);
+  // Mã chỉ dùng được một lần: chặn chạy hai lần (React StrictMode ở dev) để lần gộp thứ hai không bị từ chối.
+  const started = useRef(false);
 
-  async function confirm() {
+  async function merge(tokenValue: string) {
     setFetched({ kind: "merging" });
-    const res = await post({ token, confirm: true }).catch(() => null);
+    const res = await post({ token: tokenValue, confirm: true }).catch(() => null);
     if (!res?.ok) return setFetched({ kind: "error" });
     localStorage.removeItem(MERGE_TOKEN_KEY);
     // Tải lại toàn trang để trạng thái học được nạp lại từ tài khoản đã gộp.
     // eslint-disable-next-line @next/next/no-location-assign-relative-destination
     window.location.assign("/settings");
   }
+
+  useEffect(() => {
+    if (!token || started.current) return;
+    started.current = true;
+    post({ token }).then(async (res) => {
+      if (!res.ok) return setFetched({ kind: res.status === 400 || res.status === 409 ? "none" : "error" });
+      const preview: Preview = await res.json();
+      // Không có gì để đè lên (tài khoản Google mới, hoặc phía ẩn danh trống): gộp luôn, người dùng khỏi phải hiểu thêm bước nào.
+      if (preview.autoMerge) return merge(token);
+      setFetched({ kind: "ready", preview });
+    }, () => setFetched({ kind: "error" }));
+  }, [token]);
 
   const wrap = "mx-auto mt-space-lg max-w-xl rounded-2xl bg-surface-container-low p-space-lg text-center";
   if (state.kind === "loading" || state.kind === "merging") {
@@ -67,7 +77,7 @@ export function MergeConfirm() {
         Thẻ trùng giữ bản bạn đã ôn nhiều hơn; thiết lập của tài khoản Google được giữ nguyên.
       </p>
       <div className="mt-space-md flex flex-wrap justify-center gap-space-sm">
-        <button type="button" onClick={confirm} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Gộp dữ liệu</button>
+        <button type="button" onClick={() => merge(token!)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Gộp dữ liệu</button>
         <Link href="/app" className="inline-flex min-h-11 items-center rounded-full px-6 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Bỏ qua</Link>
       </div>
     </div>

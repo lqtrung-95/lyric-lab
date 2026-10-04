@@ -17,18 +17,13 @@ export async function fetchAccountInfo(): Promise<AccountInfo | null> {
 
 const callbackUrl = (next: string) => `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
 
-/** Nâng tài khoản ẩn danh lên tài khoản Google (giữ nguyên dữ liệu). Chuyển hướng sang Google; lỗi thì trả thông báo. */
-export async function linkGoogle(): Promise<string | null> {
-  if (!(await ensureAnonymousSession())) return "Chưa mở được phiên. Kiểm tra kết nối rồi thử lại.";
-  const { error } = await createSupabaseBrowserClient().auth.linkIdentity({ provider: "google", options: { redirectTo: callbackUrl("/settings") } });
-  return error ? error.message : null;
-}
-
 /**
- * Google này đã có tài khoản: xin mã một lần cho dữ liệu ẩn danh đang có, cất lại, rồi đăng nhập Google.
- * Sau khi quay về, trang gộp dùng mã này để chứng minh dữ liệu ẩn danh là của người đang thao tác.
+ * Đăng nhập Google, mang theo dữ liệu đang có của phiên ẩn danh: xin mã một lần cho phiên này, cất lại, rồi chuyển sang
+ * Google. Quay về trang gộp dùng mã để chứng minh dữ liệu ẩn danh là của người đang thao tác, rồi gộp vào tài khoản
+ * Google (tài khoản mới hay đã có đều đi chung một đường, chỉ qua Google đúng một lần).
  */
-export async function signInGoogleForMerge(): Promise<string | null> {
+export async function signInGoogle(): Promise<string | null> {
+  if (!(await ensureAnonymousSession())) return "Chưa mở được phiên. Kiểm tra kết nối rồi thử lại.";
   const res = await fetch("/api/account/merge-token", { method: "POST" });
   if (res.ok) {
     try {

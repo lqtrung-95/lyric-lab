@@ -17,13 +17,18 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
   let service: SupabaseClient;
   let anonId = "";
   let memberId = "";
+  let videoId = "";
+  const nickname = `mt${Date.now()}`.slice(0, 20);
   const created: string[] = [];
 
   beforeAll(async () => {
     service = createClient(url!, serviceKey!, opts);
     // Khóa service role không bị chặn bởi captcha (dự án đã bật cho luồng công khai); nạp phiên vào client anon key
     // để request thật sự chịu RLS, đồng thời giữ đúng is_anonymous:true mà luồng gộp tài khoản cần.
-    const { data, error } = await service.auth.signInAnonymously();
+    // Đăng nhập ẩn danh bằng client RIÊNG: supabase-js gắn phiên vừa tạo vào client gọi nó, nên nếu dùng `service` thì
+    // mọi request sau đó chạy với quyền của người ẩn danh thay vì service role.
+    const signer = createClient(url!, serviceKey!, opts);
+    const { data, error } = await signer.auth.signInAnonymously();
     if (error || !data.user || !data.session) throw new Error(`signInAnonymously: ${error?.message}`);
     const anon = createClient(url!, anonKey!, opts);
     await anon.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
@@ -33,6 +38,12 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
     created.push(anonId, memberId);
     await service.from("user_cards").insert({ user_id: anonId, item_key: "vocab:词", kind: "vocab", term: "词", meaning: "từ", reps: 3 });
     await service.from("user_known_terms").insert({ user_id: anonId, item_key: "vocab:好" });
+    // Các bảng thêm sau này (bài thích, điểm luyện tập, hồ sơ bảng xếp hạng) phải đi theo khi gộp, không bị xóa cascade.
+    const { data: song } = await service.from("songs").select("video_id").limit(1).single();
+    videoId = song!.video_id;
+    await service.from("user_song_likes").insert({ user_id: anonId, video_id: videoId });
+    await service.from("practice_scores").insert({ user_id: anonId, mode: "cloze", points: 120, correct: 4, total: 5, duration_sec: 60 });
+    await service.from("leaderboard_profiles").insert({ user_id: anonId, nickname });
   });
 
   afterAll(async () => {
@@ -57,9 +68,15 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
   });
 
   it("gộp: dữ liệu sang tài khoản đích, tài khoản ẩn danh bị xóa, mã dùng một lần", async () => {
-    const { createMergeToken, executeMerge } = await import("@/lib/account/merge-account");
+    const { createMergeToken, executeMerge, isAccountEmpty } = await import("@/lib/account/merge-account");
     const token = await createMergeToken(service, anonId);
+    expect(await isAccountEmpty(service, memberId)).toBe(true);
+    expect(await isAccountEmpty(service, anonId)).toBe(false);
     await executeMerge(service, token, memberId);
+    expect(await isAccountEmpty(service, memberId)).toBe(false);
+    expect((await service.from("user_song_likes").select("video_id").eq("user_id", memberId)).data).toEqual([{ video_id: videoId }]);
+    expect((await service.from("practice_scores").select("points").eq("user_id", memberId)).data).toEqual([{ points: 120 }]);
+    expect((await service.from("leaderboard_profiles").select("nickname").eq("user_id", memberId)).data).toEqual([{ nickname }]);
     expect((await service.from("user_cards").select("reps").eq("user_id", memberId)).data).toEqual([{ reps: 3 }]);
     expect((await service.from("user_known_terms").select("item_key").eq("user_id", memberId)).data).toEqual([{ item_key: "vocab:好" }]);
     expect((await service.auth.admin.getUserById(anonId)).data.user).toBeNull();
