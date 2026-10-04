@@ -32,7 +32,10 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
   // Dùng khóa service role để đăng nhập ẩn danh (dự án đã bật captcha cho luồng công khai; khóa service role không bị chặn),
   // rồi nạp phiên đó vào một client dùng anon key để request thật sự chịu RLS như người dùng thường.
   async function signInAnon(): Promise<{ client: SupabaseClient; id: string }> {
-    const { data, error } = await service.auth.signInAnonymously();
+    // Client riêng: supabase-js gắn phiên vừa tạo vào client gọi signInAnonymously, nên dùng `service` sẽ làm mọi request
+    // sau đó của nó chạy với quyền người ẩn danh thay vì service role (RLS chặn, rpc service_role bị từ chối).
+    const signer = createClient(url!, serviceKey!, clientOptions);
+    const { data, error } = await signer.auth.signInAnonymously();
     if (error || !data.user || !data.session) throw new Error(`signInAnonymously: ${error?.message}`);
     const client = createClient(url!, anonKey!, clientOptions);
     await client.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
