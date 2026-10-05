@@ -61,6 +61,8 @@ Migration gần nhất `20261004000001_merge_user_data_all_user_tables.sql` mở
 
 Migration `20261004000002_song_default_lyric_offset.sql` thêm cột `songs.lyric_offset_sec` (độ lệch lời mặc định do admin đặt). Chưa chạy thì code vẫn chạy (đọc lỗi → coi như 0) nhưng nút "Lưu làm mặc định cho mọi người" sẽ báo lỗi.
 
+Migration `20261005000001_practice_rooms.sql` tạo bảng phòng thi đấu (`rooms`, `room_players`), các hàm SQL của vòng đời phòng, RLS và mở rộng `usage_events_kind_check` (thêm `room`, `room_join`). Cần chạy trước khi dùng API `/api/rooms/*`. Test tích hợp: `tests/integration/rooms.test.ts`. Chưa mở rộng `merge_user_data` cho `room_players`: việc đó ở giai đoạn 5 của kế hoạch phòng thi đấu, và phải làm trước khi mở tính năng cho người dùng (nếu không lịch sử phòng mất khi đăng nhập Google).
+
 Vì local và production **dùng chung DB**, mọi script bên dưới ảnh hưởng dữ liệu thật.
 
 ## 4. Deploy (Vercel)

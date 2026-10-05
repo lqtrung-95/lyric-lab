@@ -99,6 +99,10 @@ Admin bấm "Lưu làm mặc định cho mọi người" ở bảng chỉnh lờ
 
 Người dùng chọn Lớn/Vừa/Nhỏ cho khung video (`playerSize` trong `lyric-lab-listen-prefs`, chọn ở trang Cài đặt, mục "Màn Nghe", `components/settings/listen-section.tsx`; có tác dụng từ breakpoint `md`). "Nhỏ" = 356px rộng (200px cao ở 16:9), là mức nhỏ nhất ta cho phép; điện thoại đã ở mức này nên không đổi. **Không có chế độ ẩn hẳn video**: theo điều khoản YouTube IFrame API (theo ghi nhớ, cần tra lại bản hiện hành trước khi đổi), player nhúng phải còn nhìn thấy, không nhỏ hơn khoảng 200×200 và không được tách riêng âm thanh.
 
+## Phòng thi đấu 1v1 (đang xây, kế hoạch ở `plans/261005-1700-realtime-practice-rooms/`)
+
+Giai đoạn 1 (vòng đời phòng) đã có: bảng `rooms`, `room_players` (migration `20261005000001_practice_rooms.sql`), các hàm SQL nguyên tử `create_room`, `join_room`, `leave_room`, `leave_active_rooms`, `set_room_ready`, `start_room` (khóa dòng phòng để hai người vào chỗ cuối không lọt cả hai; chỉ service role gọi được), RLS cho thành viên đọc (hàm `is_room_member` chạy quyền chủ hàm để policy không lặp vô hạn), và API `app/api/rooms/*` (tạo `POST /api/rooms`, xem `GET /api/rooms/[code]`, `join`, `ready`, `leave`, `start`). Mã phòng 6 số (`lib/rooms/room-code.ts`), duy nhất trong các phòng còn hiệu lực; phòng chờ sống 10 phút, phòng đang chơi 2 giờ. Một người chỉ ở một phòng còn hiệu lực. Hạn mức dùng `usage_events`: `room` (tạo phòng, 10/30 mỗi 24 giờ) và `room_join` (số lần thử vào phòng, 30/60 mỗi giờ, chống đoán mã). Client không nhận id tài khoản của người khác, chỉ tên hiển thị. Câu hỏi, chấm điểm, Realtime và giao diện thuộc các giai đoạn sau.
+
 ## Hạn mức và bảo vệ
 
 Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản (ẩn danh / đã đăng nhập): phân tích 10/30, giải nghĩa 60/200, TTS 80/250; điểm game 40/giờ. Thêm lớp theo IP (30 phân tích/24h, bộ nhớ trong tiến trình). Bài đã cache không tốn hạn mức. Chạy `next dev` (`NODE_ENV=development`) bỏ qua hạn mức phân tích. Email trong `UNLIMITED_USAGE_EMAILS` không bị giới hạn; `ADMIN_EMAILS` vào được trang admin. Captcha Turnstile (tùy chọn) ở `lib/auth/turnstile-token.ts`.

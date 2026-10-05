@@ -36,11 +36,11 @@
 6. Test đơn vị cho mã phòng và hạn mức; test tích hợp cho API trên DB thật (client riêng cho đăng nhập ẩn danh, bài học từ test gộp tài khoản).
 
 ## Danh sách việc
-- [ ] Migration + RLS + kind
-- [ ] `room-code` + test
-- [ ] API tạo/vào/sẵn sàng/rời/bắt đầu
-- [ ] Hạn mức `room`
-- [ ] Test tích hợp
+- [x] Migration + RLS + kind (`20261005000001_practice_rooms.sql`, chờ chạy trên Supabase)
+- [x] `room-code` + test
+- [x] API tạo/vào/sẵn sàng/rời/bắt đầu
+- [x] Hạn mức `room` và `room_join`
+- [x] Test tích hợp viết xong (`tests/integration/rooms.test.ts`); [ ] chạy sau khi migration được áp dụng
 
 ## Tiêu chí hoàn thành
 Hai tài khoản ẩn danh tạo phòng, vào bằng mã, thấy nhau, cùng sẵn sàng và chủ phòng bắt đầu được; đoán mã bừa bị chặn; test qua.

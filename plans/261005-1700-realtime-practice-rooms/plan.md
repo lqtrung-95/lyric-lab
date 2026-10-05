@@ -28,7 +28,7 @@ Trạng thái: **kế hoạch đã chốt các quyết định về thiết kế
 
 | # | File | Nội dung | Ước lượng | Trạng thái |
 |---|---|---|---|---|
-| 1 | [phase-01-database-and-room-lifecycle.md](phase-01-database-and-room-lifecycle.md) | Schema, RLS, tạo/vào/rời phòng, mã 6 số, hạn mức | 0,5–1 ngày | Chưa làm |
+| 1 | [phase-01-database-and-room-lifecycle.md](phase-01-database-and-room-lifecycle.md) | Schema, RLS, tạo/vào/rời phòng, mã 6 số, hạn mức | 0,5–1 ngày | Code xong; chờ chạy migration và test tích hợp |
 | 2 | [phase-02-question-engine-and-scoring.md](phase-02-question-engine-and-scoring.md) | Sinh bộ câu hỏi chung từ phân tích bài, chấm ở server, tính điểm | 1 ngày | Chưa làm |
 | 3 | [phase-03-realtime-game-state-machine.md](phase-03-realtime-game-state-machine.md) | Máy trạng thái ván chơi, kênh thời gian thực, rớt mạng | 1–1,5 ngày | Chưa làm |
 | 4 | [phase-04-room-ui.md](phase-04-room-ui.md) | Màn Thi đấu, phòng chờ, màn chơi, kết quả | 1–1,5 ngày | Chưa làm |

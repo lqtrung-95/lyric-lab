@@ -18,4 +18,12 @@ describe("usageLimit", () => {
     expect(usageWindowHours("score")).toBe(1);
     expect(usageWindowHours("analyze")).toBe(24);
   });
+
+  it("phòng thi đấu: tạo phòng theo 24 giờ, thử vào phòng theo 1 giờ; đã đăng nhập luôn nhiều hơn ẩn danh", () => {
+    expect(usageLimit("room", true)).toBe(10);
+    expect(usageWindowHours("room")).toBe(24);
+    expect(usageLimit("room_join", true)).toBe(30);
+    expect(usageWindowHours("room_join")).toBe(1);
+    for (const kind of ["room", "room_join"] as const) expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
+  });
 });
