@@ -28,6 +28,7 @@ async function call(path: string, body?: unknown): Promise<{ ok: boolean; status
 export function useRoom(code: string) {
   const [view, setView] = useState<RoomView | null>(null);
   const [error, setError] = useState<RoomLoadError | null>(null);
+  const [offsetMs, setOffsetMs] = useState(0);
   const offsetRef = useRef(0);
   const advancedKeyRef = useRef<string | null>(null);
 
@@ -39,6 +40,7 @@ export function useRoom(code: string) {
       if (!res.ok) return setError("network");
       const next = (await res.json()) as RoomView;
       offsetRef.current = serverOffsetMs(next.serverNow, Date.now());
+      setOffsetMs(offsetRef.current);
       setView(next);
       setError(null);
     } catch {
@@ -117,14 +119,17 @@ export function useRoom(code: string) {
   return {
     view,
     error,
-    /** Giờ server hiện tại (ms), từ giờ máy cộng độ lệch của lần tải gần nhất. */
+    refresh,
+    /** Độ lệch đồng hồ (giờ server = giờ máy + độ lệch), để tính trong lúc render cùng `useNow`. */
+    offsetMs,
+    /** Giờ server hiện tại (ms); chỉ gọi trong trình xử lý sự kiện (không gọi lúc render). */
     serverNow: () => Date.now() + offsetRef.current,
     setReady: (ready: boolean) => act("ready", { ready }),
     start: () => act("start"),
     leave: () => act("leave"),
-    answer: async (index: number, choice: number): Promise<AnswerFeedback | null> => {
+    answer: async (index: number, choice: number): Promise<{ feedback: AnswerFeedback | null; error: string | null }> => {
       const result = await act("answer", { index, choice });
-      return result.ok ? (result.data as unknown as AnswerFeedback) : null;
+      return result.ok ? { feedback: result.data as unknown as AnswerFeedback, error: null } : { feedback: null, error: typeof result.data.error === "string" ? result.data.error : "server_error" };
     },
   };
 }

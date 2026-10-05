@@ -49,11 +49,11 @@
 5. Responsive (điện thoại là ưu tiên), trạng thái lỗi/hết hạn/phòng đầy, kiểm tra axe và vùng bấm.
 
 ## Danh sách việc
-- [ ] Hub + tạo/nhập mã
-- [ ] Phòng chờ
-- [ ] Màn chơi
-- [ ] Kết quả + Chơi lại
-- [ ] Responsive + axe + trạng thái lỗi
+- [x] Hub + tạo/nhập mã
+- [x] Phòng chờ
+- [x] Màn chơi
+- [x] Kết quả + Chơi lại
+- [x] Responsive + axe + trạng thái lỗi
 
 ## Tiêu chí hoàn thành
 Hai người trên hai thiết bị đi hết luồng từ tạo phòng đến kết quả mà không cần hướng dẫn; đạt kiểm tra axe; dùng được trên điện thoại.

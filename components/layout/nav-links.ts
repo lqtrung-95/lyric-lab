@@ -6,9 +6,10 @@ export interface NavLink {
   icon: IconName;
 }
 
-// Ba mục điều hướng chính (design-brief §3). Thư viện và Ôn tập hoàn thiện ở các mốc sau.
+// Các mục điều hướng chính (design-brief §3), thêm "Thi đấu" (phòng luyện tập 1v1).
 export const NAV_LINKS: NavLink[] = [
   { href: "/app", label: "Trang chủ", icon: "home" },
+  { href: "/room", label: "Thi đấu", icon: "group" },
   { href: "/review", label: "Ôn tập", icon: "style" },
   { href: "/library", label: "Thư viện", icon: "library_music" },
 ];

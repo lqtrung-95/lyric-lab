@@ -34,3 +34,10 @@ Ghép ngẫu nhiên (hàng đợi + "bóng ma"); Lời mời đang chờ (Chấp
 1. **Quy tắc thắng:** số câu đúng trước, điểm (có thưởng tốc độ) sau. Đồng ý.
 2. **Nghe đoạn trong câu hỏi:** đưa vào **giai đoạn 1**, với khung video **luôn hiển thị** theo điều khoản YouTube (dùng `SnippetPlayer`, khung nhỏ nổi ở góc/đáy, không phải thanh chỉ có âm thanh). Màn chơi vì vậy có khung video nhỏ mà bản vẽ không có. Mỗi câu nghe tối đa 2 lần (nhãn "Còn N lượt nghe"). Mỗi người nghe trên máy của mình nên không cần đồng bộ giữa hai máy.
 3. **Hán-Việt và ghi chú ngữ pháp:** giữ cả hai ở giai đoạn 1 (ghi chú ngữ pháp chỉ hiện khi dòng có mục ngữ pháp trong phân tích).
+
+## Khác thiết kế khi dựng (giai đoạn 4)
+- **Nút "Đổi bài" ở phòng chờ chưa làm**: bài chọn lúc tạo phòng; muốn đổi bài thì rời phòng và tạo phòng mới (sẽ cần API đổi bài nếu sau này muốn).
+- **Khung video nghe đoạn nằm ngay trong thẻ câu hỏi** (356px, luôn hiển thị) thay vì chỉ có nút phát như bản vẽ, theo điều khoản YouTube.
+- **Điểm hai bên chỉ cập nhật khi câu đóng**, không cập nhật ngay lúc trả lời, để Realtime không lộ đúng/sai của đối thủ; thiết kế vẽ điểm cập nhật liền.
+- **Ghi chú ngữ pháp chỉ hiện sau khi đã trả lời hoặc câu đóng** (an toàn hơn so với hiện sẵn).
+- Mục menu tên "Thi đấu" (thiết kế ghi "Luyện tập 1v1") cho vừa thanh tab điện thoại.
