@@ -5,7 +5,9 @@ import { shuffle } from "@/lib/practice/random";
 import { generateRoomCode } from "./room-code";
 import { canPlayRoomSong, deleteRoomQuestions, prepareRoomQuestions, saveRoomQuestions } from "./room-question-store";
 import type { RoomQuestionSet } from "./room-question-types";
-import type { AnswerFailure, AnswerFeedback, JoinRoomResult, RoomStatus, RoomView, StartRoomResult } from "./room-types";
+import { buildRoomView } from "./build-room-view";
+import type { RoomQuestionPublic } from "./room-question-types";
+import type { AdvanceResult, AnswerFailure, AnswerFeedback, JoinRoomResult, RoomStatus, RoomView, StartRoomResult } from "./room-types";
 
 export type RoomErrorCode = "invalid_song" | "code_unavailable";
 
@@ -25,9 +27,12 @@ interface RoomRow {
   question_count: number;
   seed: number;
   expires_at: string;
+  current_question: number | null;
+  winner_id: string | null;
+  forfeit: boolean;
 }
 
-const ROOM_COLUMNS = "id, code, status, host_id, video_id, question_count, seed, expires_at";
+const ROOM_COLUMNS = "id, code, status, host_id, video_id, question_count, seed, expires_at, current_question, winner_id, forfeit";
 const DEFAULT_QUESTION_COUNT = 10;
 const RANDOM_SONG_POOL = 100;
 const RANDOM_SONG_TRIES = 10;
@@ -133,31 +138,69 @@ export async function submitAnswer(
   return { ok: true, feedback: { correct: r.correct!, points: r.points!, elapsedMs: r.elapsed_ms!, correctIndex: r.correct_index! } };
 }
 
+/** Tiến câu (mọi thành viên gọi được, idempotent): chuyển sang câu kế hoặc kết thúc ván khi câu hiện tại đã đóng; chưa đóng thì `not_ready`. */
+export async function advanceRoom(userId: string, code: string): Promise<AdvanceResult | "not_in_room"> {
+  const room = await findMemberRoom(userId, code);
+  if (!room) return "not_in_room";
+  const { data, error } = await createSupabaseServiceClient().rpc("advance_room", { p_room: room.id });
+  if (error) throw new Error(`advance_room: ${error.message}`);
+  return (data as { result: AdvanceResult }).result;
+}
+
+interface AnswerDbRow {
+  idx: number;
+  user_id: string;
+  choice: number;
+  correct: boolean;
+  points: number;
+  elapsed_ms: number;
+}
+
+/** Tổng kết từng câu của ván đã kết thúc: câu hỏi, đáp án đúng và các câu trả lời. */
+async function loadRounds(roomId: string) {
+  const sb = createSupabaseServiceClient();
+  const [{ data: questions }, { data: keys }, { data: answers }] = await Promise.all([
+    sb.from("room_questions").select("idx, payload").eq("room_id", roomId).order("idx"),
+    sb.from("room_question_keys").select("idx, correct_term").eq("room_id", roomId),
+    sb.from("room_answers").select("idx, user_id, choice, correct, points, elapsed_ms").eq("room_id", roomId),
+  ]);
+  const termByIdx = new Map((keys ?? []).map((k) => [k.idx as number, k.correct_term as string]));
+  const answersByIdx = new Map<number, AnswerDbRow[]>();
+  for (const a of (answers ?? []) as AnswerDbRow[]) answersByIdx.set(a.idx, [...(answersByIdx.get(a.idx) ?? []), a]);
+  return (questions ?? []).map((q) => ({
+    idx: q.idx as number,
+    correct_term: termByIdx.get(q.idx as number) ?? "",
+    translation: (q.payload as RoomQuestionPublic).translation,
+    answers: answersByIdx.get(q.idx as number) ?? [],
+  }));
+}
+
 /** Trạng thái phòng cho một thành viên; null nếu phòng không tồn tại hoặc người này không ở trong phòng (không lộ phòng của người khác). */
 export async function getRoomView(userId: string, code: string): Promise<RoomView | null> {
   const room = await findMemberRoom(userId, code);
   if (!room) return null;
   const sb = createSupabaseServiceClient();
-  const [{ data: players }, { data: song }] = await Promise.all([
-    sb.from("room_players").select("user_id, display_name, ready, left_at").eq("room_id", room.id).order("joined_at"),
+  const cur = room.current_question;
+  const [{ data: players }, { data: song }, { data: question }, { data: key }, { data: mine }] = await Promise.all([
+    sb.from("room_players").select("user_id, display_name, ready, left_at, score, correct, answered_idx, last_answer_ms").eq("room_id", room.id).order("joined_at"),
     room.video_id
       ? sb.from("songs").select("video_id, title, channel_title").eq("video_id", room.video_id).maybeSingle()
       : Promise.resolve({ data: null }),
+    cur === null ? Promise.resolve({ data: null }) : sb.from("room_questions").select("idx, payload, opens_at, deadline_at").eq("room_id", room.id).eq("idx", cur).maybeSingle(),
+    cur === null ? Promise.resolve({ data: null }) : sb.from("room_question_keys").select("correct_index").eq("room_id", room.id).eq("idx", cur).maybeSingle(),
+    cur === null ? Promise.resolve({ data: null }) : sb.from("room_answers").select("idx, user_id, choice, correct, points, elapsed_ms").eq("room_id", room.id).eq("idx", cur).eq("user_id", userId).maybeSingle(),
   ]);
-  // Phòng chờ quá hạn nhưng chưa ai chạm vào để đánh dấu: báo hết hạn cho người xem.
-  const status: RoomStatus = room.status === "waiting" && Date.parse(room.expires_at) < Date.now() ? "expired" : room.status;
-  return {
-    code: room.code,
-    status,
+  const rounds = room.status === "finished" ? await loadRounds(room.id) : null;
+  return buildRoomView({
+    room,
+    players: players ?? [],
+    me: userId,
+    now: new Date(),
     song: song ? simplifyDeep({ videoId: song.video_id, title: song.title, channelTitle: song.channel_title }) : null,
-    questionCount: room.question_count,
-    expiresAt: room.expires_at,
-    players: (players ?? []).map((p) => ({
-      displayName: p.display_name,
-      ready: p.ready,
-      isHost: p.user_id === room.host_id,
-      isMe: p.user_id === userId,
-      left: p.left_at !== null,
-    })),
-  };
+    question: question && question.opens_at && key
+      ? { idx: question.idx as number, payload: question.payload as RoomQuestionPublic, opens_at: question.opens_at, deadline_at: question.deadline_at, correct_index: key.correct_index as number }
+      : null,
+    myAnswer: mine ?? null,
+    rounds,
+  });
 }

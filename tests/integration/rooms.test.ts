@@ -15,7 +15,7 @@ const opts = { auth: { persistSession: false }, realtime: { transport: ws as nev
 
 describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
   let service: SupabaseClient;
-  const users: { id: string; client: SupabaseClient }[] = [];
+  const users: { id: string; client: SupabaseClient; token: string }[] = [];
   const codes: string[] = [];
   let videoId = "";
   let seq = 0;
@@ -43,7 +43,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     if (error || !data.user || !data.session) throw new Error(`signInAnonymously: ${error?.message}`);
     const client = createClient(url!, anonKey!, opts);
     await client.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
-    users.push({ id: data.user.id, client });
+    users.push({ id: data.user.id, client, token: data.session.access_token });
   }
 
   beforeAll(async () => {
@@ -95,7 +95,15 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect((await roomRow(id)).status).toBe("expired");
   });
 
-  it("bắt đầu: cần đủ hai người và cả hai sẵn sàng, chỉ chủ phòng bắt đầu được, bài được điền khi chưa có", async () => {
+  // Bộ câu hỏi nhỏ cho test: câu i có đáp án đúng ở chỉ số (2 nếu i chẵn, ngược lại 0), 4 lựa chọn a–d.
+  async function addQuestions(roomId: string, count = 2) {
+    const payload = (n: number) => ({ videoId, lineIndex: n, before: "我", after: "你", choices: ["a", "b", "c", "d"].map((term) => ({ term, reading: null, sinoViet: null, meaning: "" })) });
+    const rows = Array.from({ length: count }, (_, i) => ({ room_id: roomId, idx: i, payload: payload(i) }));
+    await service.from("room_questions").insert(rows);
+    await service.from("room_question_keys").insert(rows.map((r) => ({ room_id: roomId, idx: r.idx, correct_index: r.idx % 2 === 0 ? 2 : 0, correct_term: r.idx % 2 === 0 ? "c" : "a" })));
+  }
+
+  it("bắt đầu: cần đủ hai người, cả hai sẵn sàng và đã có bộ câu hỏi; chỉ chủ phòng bắt đầu; lên lịch mở câu đầu sau 3 giây", async () => {
     const code = newCode();
     const id = await createRoom(0, code);
     const start = (user: number) => rpc<string>("start_room", { p_room: id, p_host: users[user].id, p_video: videoId });
@@ -104,8 +112,13 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect(await start(0)).toBe("not_ready");
     expect(await rpc<boolean>("set_room_ready", { p_room: id, p_user: users[1].id, p_ready: true })).toBe(true);
     expect(await start(1)).toBe("not_host");
+    expect(await start(0)).toBe("no_questions");
+    await addQuestions(id);
     expect(await start(0)).toBe("ok");
-    expect(await roomRow(id)).toMatchObject({ status: "playing", video_id: videoId });
+    expect(await roomRow(id)).toMatchObject({ status: "playing", video_id: videoId, current_question: 0 });
+    const { data: q0 } = await service.from("room_questions").select("opens_at, deadline_at").eq("room_id", id).eq("idx", 0).single();
+    expect(Date.parse(q0!.opens_at) - Date.now()).toBeGreaterThan(1000); // mở sau ~3 giây
+    expect(Date.parse(q0!.deadline_at) - Date.parse(q0!.opens_at)).toBe(15_000);
     expect(await start(0)).toBe("not_waiting");
     // Đang chơi thì không đổi sẵn sàng được nữa.
     expect(await rpc<boolean>("set_room_ready", { p_room: id, p_user: users[1].id, p_ready: false })).toBe(false);
@@ -140,19 +153,14 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect((await other.from("rooms").insert({ code: newCode(), host_id: users[2].id })).error).not.toBeNull();
   });
 
-  // Phòng đang chơi với hai người và bộ câu hỏi nhỏ: câu 0 đáp án đúng ở chỉ số 2, câu 1 đáp án đúng ở chỉ số 0.
-  async function playingRoom() {
+  // Phòng đang chơi với hai người (host = users[0], khách = users[1]) và bộ câu hỏi nhỏ.
+  async function playingRoom(questionCount = 2) {
     const code = newCode();
     const id = await createRoom(0, code);
     await join(1, code);
     await rpc("set_room_ready", { p_room: id, p_user: users[1].id, p_ready: true });
+    await addQuestions(id, questionCount);
     expect(await rpc<string>("start_room", { p_room: id, p_host: users[0].id, p_video: videoId })).toBe("ok");
-    const payload = (n: number) => ({ videoId, lineIndex: n, before: "我", after: "你", choices: ["a", "b", "c", "d"].map((term) => ({ term, reading: null, sinoViet: null, meaning: "" })) });
-    await service.from("room_questions").insert([{ room_id: id, idx: 0, payload: payload(0) }, { room_id: id, idx: 1, payload: payload(1) }]);
-    await service.from("room_question_keys").insert([
-      { room_id: id, idx: 0, correct_index: 2, correct_term: "c" },
-      { room_id: id, idx: 1, correct_index: 0, correct_term: "a" },
-    ]);
     return { code, id };
   }
   const openQuestion = (id: string, idx: number, opensInMs = -200, lastsMs = 15_000) =>
@@ -167,7 +175,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
 
   it("trả lời: chưa mở thì từ chối; đúng được 100–130 điểm và cộng vào người chơi; trả lời lần hai bị từ chối", async () => {
     const { id } = await playingRoom();
-    expect((await answer(id, 1, 0, 2)).result).toBe("not_open"); // opens_at còn null
+    expect((await answer(id, 1, 0, 2)).result).toBe("not_open"); // câu 0 mở sau 3 giây kể từ lúc bắt đầu
     await openQuestion(id, 0, -300);
     const ok = await answer(id, 1, 0, 2);
     expect(ok).toMatchObject({ result: "ok", correct: true, correct_index: 2 });
@@ -175,9 +183,12 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect(ok.points).toBeLessThanOrEqual(130);
     expect(ok.elapsed_ms).toBeGreaterThanOrEqual(300);
     expect((await answer(id, 1, 0, 2)).result).toBe("already_answered");
-    const { data: me } = await service.from("room_players").select("score, correct, total_ms").eq("room_id", id).eq("user_id", users[1].id).single();
-    expect(me).toMatchObject({ score: ok.points, correct: 1 });
-    expect(me!.total_ms).toBe(ok.elapsed_ms);
+    const me = () => service.from("room_players").select("score, correct, total_ms, answered_idx, last_answer_ms").eq("room_id", id).eq("user_id", users[1].id).single();
+    // Điểm hiển thị CHƯA đổi lúc trả lời (nếu đổi thì Realtime báo cho đối thủ biết người này vừa đúng); chỉ đánh dấu đã trả lời.
+    expect((await me()).data).toEqual({ score: 0, correct: 0, total_ms: 0, answered_idx: 0, last_answer_ms: ok.elapsed_ms });
+    await service.from("room_questions").update({ deadline_at: new Date(Date.now() - 5000).toISOString() }).eq("room_id", id).eq("idx", 0); // hết hạn
+    expect(await rpc<{ result: string }>("advance_room", { p_room: id })).toMatchObject({ result: "advanced" });
+    expect((await me()).data).toMatchObject({ score: ok.points, correct: 1, total_ms: ok.elapsed_ms }); // câu đóng thì điểm mới được công bố
   });
 
   it("trả lời sai: 0 điểm nhưng vẫn ghi nhận và hiện đáp án đúng; người khác trả lời độc lập", async () => {
@@ -209,8 +220,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     const { id } = await playingRoom();
     const member = users[1].client;
     const other = users[2].client;
-    expect((await member.from("room_questions").select("idx").eq("room_id", id)).data).toEqual([]); // chưa câu nào có lịch mở
-    await openQuestion(id, 0, 2000); // lên lịch mở sau 2 giây
+    // Chỉ câu đã được lên lịch mở (câu 0, lúc bắt đầu) đọc được; câu 1 chưa có lịch nên không lộ trước.
     expect((await member.from("room_questions").select("idx").eq("room_id", id)).data).toEqual([{ idx: 0 }]);
     expect((await other.from("room_questions").select("idx").eq("room_id", id)).data).toEqual([]);
     await openQuestion(id, 0, -100);
@@ -221,6 +231,118 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect((await users[0].client.from("room_answers").select("choice").eq("room_id", id)).data).toEqual([]);
     expect((await member.rpc("submit_room_answer", { p_room: id, p_user: users[1].id, p_idx: 0, p_choice: 2 })).error).not.toBeNull();
   });
+
+  const advance = (id: string) => rpc<{ result: string; current_question?: number }>("advance_room", { p_room: id });
+  const closeByDeadline = (id: string, idx: number) =>
+    service.from("room_questions").update({ deadline_at: new Date(Date.now() - 5000).toISOString() }).eq("room_id", id).eq("idx", idx);
+
+  it("tiến câu: chưa mở/chưa trả lời hết thì not_ready, đủ người trả lời thì sang câu kế (mở sau 3 giây), gọi thừa vô hại", async () => {
+    const { id } = await playingRoom(2);
+    expect((await advance(id)).result).toBe("not_ready"); // câu 0 chưa mở
+    await openQuestion(id, 0, -300);
+    expect((await advance(id)).result).toBe("not_ready"); // đã mở, chưa ai trả lời
+    await answer(id, 0, 0, 2);
+    expect((await advance(id)).result).toBe("not_ready"); // mới một người trả lời
+    await answer(id, 1, 0, 1);
+    expect(await advance(id)).toMatchObject({ result: "advanced", current_question: 1 });
+    expect((await roomRow(id)).current_question).toBe(1);
+    const { data: q1 } = await service.from("room_questions").select("opens_at, deadline_at").eq("room_id", id).eq("idx", 1).single();
+    expect(Date.parse(q1!.opens_at)).toBeGreaterThan(Date.now()); // câu kế mở sau 3 giây để người chơi kịp xem kết quả câu vừa rồi
+    expect((await advance(id)).result).toBe("not_ready"); // gọi lại không nhảy thêm câu
+    expect((await roomRow(id)).current_question).toBe(1);
+    const { data: players } = await service.from("room_players").select("user_id, score, correct").eq("room_id", id);
+    expect(players!.find((p) => p.user_id === users[0].id)).toMatchObject({ correct: 1 });
+    expect(players!.find((p) => p.user_id === users[1].id)).toMatchObject({ score: 0, correct: 0 });
+  });
+
+  it("quá hạn mà người kia chưa trả lời vẫn tiến được (người chưa trả lời bị tính sai)", async () => {
+    const { id } = await playingRoom(2);
+    await openQuestion(id, 0, -300);
+    await answer(id, 0, 0, 2);
+    await closeByDeadline(id, 0);
+    expect(await advance(id)).toMatchObject({ result: "advanced", current_question: 1 });
+  });
+
+  it("hết câu: ván kết thúc, người nhiều câu đúng hơn thắng; sau đó không tiến được nữa", async () => {
+    const { id } = await playingRoom(2);
+    for (const idx of [0, 1]) {
+      await openQuestion(id, idx, -300);
+      await answer(id, 0, idx, idx % 2 === 0 ? 2 : 0); // chủ phòng đúng cả hai câu
+      await answer(id, 1, idx, 1); // khách sai cả hai
+      const res = await advance(id);
+      expect(res.result).toBe(idx === 1 ? "finished" : "advanced");
+    }
+    expect(await roomRow(id)).toMatchObject({ status: "finished", winner_id: users[0].id, forfeit: false });
+    expect((await roomRow(id)).finished_at).not.toBeNull();
+    expect((await advance(id)).result).toBe("not_playing");
+    const { data: host } = await service.from("room_players").select("correct, score").eq("room_id", id).eq("user_id", users[0].id).single();
+    expect(host!.correct).toBe(2);
+    expect(host!.score).toBeGreaterThanOrEqual(200);
+  });
+
+  it("hòa số câu đúng thì so tổng điểm; hòa cả hai thì không có người thắng", async () => {
+    const { id } = await playingRoom(2);
+    for (const idx of [0, 1]) {
+      await openQuestion(id, idx, -300);
+      await answer(id, 0, idx, 1); // cả hai cùng sai cả hai câu: 0 câu đúng, 0 điểm
+      await answer(id, 1, idx, 1);
+      await advance(id);
+    }
+    expect(await roomRow(id)).toMatchObject({ status: "finished", winner_id: null, forfeit: false });
+  });
+
+  it("rời phòng giữa ván: ván kết thúc xử người còn lại thắng", async () => {
+    const { id } = await playingRoom(2);
+    await rpc("leave_room", { p_room: id, p_user: users[1].id });
+    expect(await roomRow(id)).toMatchObject({ status: "finished", winner_id: users[0].id, forfeit: true });
+  });
+
+  it("vắng 3 câu liền (rớt mạng, đóng tab) thì bị coi là đã rời và ván kết thúc xử người còn lại thắng", async () => {
+    const { id } = await playingRoom(4);
+    for (const idx of [0, 1, 2]) {
+      await openQuestion(id, idx, -300);
+      await answer(id, 0, idx, 1); // chỉ chủ phòng trả lời
+      await closeByDeadline(id, idx);
+      const res = await advance(id);
+      expect(res.result).toBe(idx === 2 ? "finished" : "advanced");
+    }
+    const { data: guest } = await service.from("room_players").select("left_at").eq("room_id", id).eq("user_id", users[1].id).single();
+    expect(guest!.left_at).not.toBeNull();
+    expect(await roomRow(id)).toMatchObject({ status: "finished", winner_id: users[0].id, forfeit: true });
+  });
+
+  // Realtime: chỉ thành viên nhận được thay đổi của phòng (RLS), người ngoài không nhận gì.
+  // `setAuth` truyền token người dùng cho Realtime (client Node không tự làm); thiếu thì kênh chạy với vai trò anon và RLS chặn hết sự kiện.
+  function listen(user: { client: SupabaseClient; token: string }, roomId: string, events: string[]) {
+    const client = user.client;
+    client.realtime.setAuth(user.token);
+    return new Promise<() => Promise<unknown>>((resolve, reject) => {
+      const channel = client.channel(`test-${roomId}-${Math.random()}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "room_players", filter: `room_id=eq.${roomId}` }, (p) => events.push(p.eventType))
+        .subscribe((status) => {
+          if (status === "SUBSCRIBED") resolve(() => client.removeChannel(channel));
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") reject(new Error(`realtime ${status}`));
+        });
+    });
+  }
+
+  it("Realtime: thành viên nhận thay đổi người chơi của phòng mình, người ngoài không nhận gì", async () => {
+    const { id } = await playingRoom(2);
+    const memberEvents: string[] = [];
+    const outsiderEvents: string[] = [];
+    const stopMember = await listen(users[1], id, memberEvents);
+    const stopOutsider = await listen(users[2], id, outsiderEvents);
+    await new Promise((r) => setTimeout(r, 1500)); // chờ đăng ký có hiệu lực ở phía server
+    await openQuestion(id, 0, -300);
+    await answer(id, 0, 0, 2); // cập nhật room_players.answered_idx
+    const deadline = Date.now() + 10_000;
+    while (memberEvents.length === 0 && Date.now() < deadline) await new Promise((r) => setTimeout(r, 200));
+    await new Promise((r) => setTimeout(r, 1500));
+    await stopMember();
+    await stopOutsider();
+    expect(memberEvents).toContain("UPDATE");
+    expect(outsiderEvents).toEqual([]);
+  }, 30_000);
 
   it("công thức điểm ở SQL (room_answer_points) trùng bản TypeScript", async () => {
     for (const correct of [true, false]) {

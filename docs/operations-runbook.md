@@ -65,6 +65,8 @@ Migration `20261005000001_practice_rooms.sql` tạo bảng phòng thi đấu (`r
 
 Migration `20261005000002_room_questions.sql` thêm `room_questions`, `room_question_keys`, `room_answers`, hàm `room_answer_points` và `submit_room_answer` (phải chạy sau migration phòng thi đấu thứ nhất). `start` phòng cần migration này (lưu bộ câu hỏi). Migration `20261005000003_room_answer_points_integer_math.sql` sửa `room_answer_points` sang phép tính số nguyên (làm tròn nửa lên) để khớp bản TypeScript ở mọi mốc; chạy sau migration thứ hai.
 
+Migration `20261005000004_room_game_state_machine.sql` thêm cột trạng thái ván (`rooms.current_question`, `winner_id`…, `room_players.answered_idx`…), các hàm `advance_room`, `finish_room`, `recompute_room_scores`, thay `start_room`, `leave_room`, `submit_room_answer`, và thêm `rooms`, `room_players` vào publication `supabase_realtime` (Realtime của dự án phải đang bật). Chạy được một lần (có `alter table add column` và `alter publication add table`). Gói Supabase Free giới hạn 200 kết nối Realtime đồng thời và 2 triệu tin nhắn/tháng; client chỉ mở kết nối khi đang ở trong phòng.
+
 Vì local và production **dùng chung DB**, mọi script bên dưới ảnh hưởng dữ liệu thật.
 
 ## 4. Deploy (Vercel)

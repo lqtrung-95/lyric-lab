@@ -30,7 +30,7 @@ Trạng thái: **kế hoạch đã chốt các quyết định về thiết kế
 |---|---|---|---|---|
 | 1 | [phase-01-database-and-room-lifecycle.md](phase-01-database-and-room-lifecycle.md) | Schema, RLS, tạo/vào/rời phòng, mã 6 số, hạn mức | 0,5–1 ngày | Xong (2026-10-05) |
 | 2 | [phase-02-question-engine-and-scoring.md](phase-02-question-engine-and-scoring.md) | Sinh bộ câu hỏi chung từ phân tích bài, chấm ở server, tính điểm | 1 ngày | Xong (2026-10-05) |
-| 3 | [phase-03-realtime-game-state-machine.md](phase-03-realtime-game-state-machine.md) | Máy trạng thái ván chơi, kênh thời gian thực, rớt mạng | 1–1,5 ngày | Chưa làm |
+| 3 | [phase-03-realtime-game-state-machine.md](phase-03-realtime-game-state-machine.md) | Máy trạng thái ván chơi, kênh thời gian thực, rớt mạng | 1–1,5 ngày | Xong (2026-10-05); còn thử tay hai trình duyệt khi có giao diện ở giai đoạn 4 |
 | 4 | [phase-04-room-ui.md](phase-04-room-ui.md) | Màn Thi đấu, phòng chờ, màn chơi, kết quả | 1–1,5 ngày | Chưa làm |
 | 5 | [phase-05-account-merge-security-docs.md](phase-05-account-merge-security-docs.md) | Gộp tài khoản, chống lạm dụng, kiểm thử tích hợp/e2e, cập nhật docs | 0,5–1 ngày | Chưa làm |
 

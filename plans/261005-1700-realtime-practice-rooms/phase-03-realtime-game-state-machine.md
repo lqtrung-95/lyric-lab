@@ -43,11 +43,11 @@
 5. Thử với hai trình duyệt thật ở hai tài khoản ẩn danh, cố ý ngắt mạng một bên.
 
 ## Danh sách việc
-- [ ] `room-state` + test
-- [ ] API `advance` idempotent
-- [ ] Bật Realtime + kiểm RLS
-- [ ] `useRoom` + presence
-- [ ] Thử thủ công hai trình duyệt, rớt mạng
+- [x] Máy trạng thái trong SQL (`advance_room`, `finish_room`) + `room-clock` và `build-room-view` (hàm thuần) + test
+- [x] API `advance` idempotent
+- [x] Bật Realtime + kiểm RLS
+- [x] `useRoom` (Realtime làm tín hiệu + thăm dò 4 giây; presence thay bằng quy tắc vắng 3 câu liền)
+- [ ] Thử thủ công hai trình duyệt, rớt mạng (làm khi có giao diện, giai đoạn 4)
 
 ## Tiêu chí hoàn thành
 Hai người chơi trọn 10 câu, cùng thấy câu và đồng hồ; một bên rớt mạng thì ván kết thúc đúng quy tắc; hai máy cùng gọi "tiến câu" không làm nhảy câu.

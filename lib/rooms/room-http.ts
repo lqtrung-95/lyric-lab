@@ -11,6 +11,7 @@ const JOIN_ERRORS: Record<Exclude<JoinRoomResult, "ok">, [number, string]> = {
 const START_ERRORS: Record<Exclude<StartRoomResult, "ok">, [number, string]> = {
   no_song: [409, "no_song"],
   song_unusable: [409, "song_unusable"],
+  no_questions: [500, "no_questions"],
   not_found: [404, "room_not_found"],
   not_host: [403, "not_host"],
   not_waiting: [409, "room_started"],
