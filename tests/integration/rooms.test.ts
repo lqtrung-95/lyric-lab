@@ -264,7 +264,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect(await advance(id)).toMatchObject({ result: "advanced", current_question: 1 });
   });
 
-  it("hết câu: ván kết thúc, người nhiều câu đúng hơn thắng; sau đó không tiến được nữa", async () => {
+  it("hết câu: ván kết thúc, người nhiều điểm hơn thắng; sau đó không tiến được nữa", async () => {
     const { id } = await playingRoom(2);
     for (const idx of [0, 1]) {
       await openQuestion(id, idx, -300);
@@ -281,7 +281,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect(host!.score).toBeGreaterThanOrEqual(200);
   });
 
-  it("hòa số câu đúng thì so tổng điểm; hòa cả hai thì không có người thắng", async () => {
+  it("bằng điểm thì không có người thắng", async () => {
     const { id } = await playingRoom(2);
     for (const idx of [0, 1]) {
       await openQuestion(id, idx, -300);

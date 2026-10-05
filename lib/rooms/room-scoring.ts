@@ -19,11 +19,10 @@ export interface PlayerTotals {
 }
 
 /**
- * Người thắng ván: nhiều câu đúng hơn thắng; bằng số câu đúng thì so tổng điểm (thưởng tốc độ chỉ có tác dụng ở đây);
- * vẫn bằng thì hòa. Không so thẳng tổng điểm vì 9 câu đúng cộng thưởng tối đa vẫn hơn 10 câu đúng không có thưởng.
+ * Người thắng ván: tổng điểm cao hơn thắng, bằng điểm thì hòa. Thưởng tốc độ tính vào điểm nên trả lời nhanh có thể bù một câu sai
+ * (chủ dự án chọn luật này thay cho "nhiều câu đúng hơn thắng").
  */
 export function decideWinner(a: PlayerTotals, b: PlayerTotals): "a" | "b" | "draw" {
-  if (a.correct !== b.correct) return a.correct > b.correct ? "a" : "b";
   if (a.points !== b.points) return a.points > b.points ? "a" : "b";
   return "draw";
 }

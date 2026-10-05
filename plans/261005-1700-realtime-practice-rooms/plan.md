@@ -9,7 +9,7 @@ Trạng thái: **giai đoạn 1 của dự án (mời bạn, ván 1v1) đã xong
 | Mục | Quyết định |
 |---|---|
 | Đối thủ | Cả mời bạn (mã 6 số + link) và ghép ngẫu nhiên |
-| Điểm | Đúng là chính, tốc độ chỉ phụ. Người thắng = **nhiều câu đúng hơn**; hòa số câu đúng thì so tổng điểm (có thưởng tốc độ). Mỗi câu đúng 100 điểm + thưởng tốc độ 0–30 (xem phase-02) |
+| Điểm | Người thắng = **tổng điểm cao hơn** (đã đổi từ "nhiều câu đúng hơn" theo ý chủ dự án 2026-10-06); bằng điểm thì hòa. Mỗi câu đúng 100 điểm + thưởng tốc độ 0–30 (xem phase-02) |
 | Kiểu chơi | Thời gian thực, trong phòng |
 | Chọn bài | Chủ phòng chọn từ bài đã phân tích, hoặc "Ngẫu nhiên" (hệ thống chọn bài phổ biến hợp trình độ) |
 | Danh tính | Ẩn danh vẫn chơi được. "Bạn luyện cùng gần đây" chỉ hiện với người đã đăng nhập Google, kể cả khi đối thủ cũ là ẩn danh (ghi "Chơi 5/10"); lời mời hết hạn sau ~10 phút |

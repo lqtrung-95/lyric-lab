@@ -24,12 +24,12 @@ describe("roomAnswerPoints", () => {
 });
 
 describe("decideWinner", () => {
-  it("nhiều câu đúng hơn thắng dù ít điểm hơn (thưởng tốc độ không bù được một câu sai)", () => {
-    expect(decideWinner({ correct: 9, points: 1170 }, { correct: 10, points: 1000 })).toBe("b");
-    expect(decideWinner({ correct: 10, points: 1000 }, { correct: 9, points: 1170 })).toBe("a");
+  it("điểm cao hơn thắng, kể cả khi ít câu đúng hơn (thưởng tốc độ tính vào điểm)", () => {
+    expect(decideWinner({ correct: 9, points: 1170 }, { correct: 10, points: 1000 })).toBe("a");
+    expect(decideWinner({ correct: 10, points: 1000 }, { correct: 9, points: 1170 })).toBe("b");
   });
-  it("bằng số câu đúng thì so tổng điểm, bằng cả hai thì hòa", () => {
-    expect(decideWinner({ correct: 8, points: 900 }, { correct: 8, points: 980 })).toBe("b");
+  it("bằng điểm thì hòa, bất kể số câu đúng", () => {
     expect(decideWinner({ correct: 8, points: 980 }, { correct: 8, points: 980 })).toBe("draw");
+    expect(decideWinner({ correct: 8, points: 900 }, { correct: 9, points: 900 })).toBe("draw");
   });
 });

@@ -69,9 +69,9 @@ export function RoomHub() {
 
       <section aria-labelledby="rules-heading" className="rounded-2xl bg-surface-container-low p-space-md">
         <h2 id="rules-heading" className="font-serif text-headline-md text-on-surface">Quy tắc tính điểm</h2>
-        <p className="mt-1 max-w-3xl text-body-md text-on-surface-variant">
-          <strong className="text-on-surface">Đúng là tiên quyết:</strong> mỗi câu đúng được 100 điểm, thêm tối đa 30 điểm thưởng phản xạ nếu trả lời nhanh. Người thắng là người
-          có <strong className="text-on-surface">nhiều câu đúng hơn</strong>; hòa số câu đúng thì so tổng điểm. Mỗi ván 10 câu điền từ vào chỗ trống, đáp án chỉ hiện sau khi bạn trả lời.
+        <p className="mt-1 text-body-md text-on-surface-variant">
+          Mỗi câu đúng được <strong className="text-on-surface">100 điểm</strong>, thêm tối đa 30 điểm thưởng phản xạ nếu trả lời nhanh. Người thắng là người có
+          <strong className="text-on-surface"> tổng điểm cao hơn</strong>; bằng điểm thì hòa. Mỗi ván 10 câu điền từ vào chỗ trống, đáp án chỉ hiện sau khi bạn trả lời.
         </p>
       </section>
 

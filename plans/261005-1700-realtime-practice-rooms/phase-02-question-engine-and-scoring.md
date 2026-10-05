@@ -18,7 +18,7 @@
 
 ## Tính điểm (đúng là chính, tốc độ là phụ; khớp thiết kế)
 - Đúng: 100 điểm cố định + **thưởng tốc độ 0–30** giảm tuyến tính trong 15 giây (ví dụ trả lời sau 1,8 giây được khoảng +26, thiết kế minh họa +25), tính từ lúc server mở câu tới lúc server nhận đáp án. Sai hoặc hết giờ: 0.
-- **Người thắng là người có nhiều câu đúng hơn.** Cùng số câu đúng thì so tổng điểm (thưởng tốc độ chỉ có tác dụng ở đây); vẫn bằng thì hòa. Lý do: nếu so thẳng tổng điểm thì 9 câu đúng với thưởng tối đa (1170) vẫn thắng 10 câu đúng không có thưởng (1000), trái với "đúng là tiên quyết" mà thiết kế ghi.
+- **Người thắng là người có tổng điểm cao hơn**, bằng điểm thì hòa (cập nhật 2026-10-06 theo ý chủ dự án; trước đó là "nhiều câu đúng hơn, hòa thì so điểm"). Hệ quả: trả lời rất nhanh có thể bù một câu sai.
 - Số điểm vẫn hiện trực tiếp cho cả hai bên trong lúc chơi (thiết kế có thanh so sánh tỉ lệ), nhưng kết quả thắng thua theo quy tắc trên.
 
 ## Nội dung mỗi câu (theo thiết kế)
