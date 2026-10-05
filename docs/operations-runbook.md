@@ -67,6 +67,8 @@ Migration `20261005000002_room_questions.sql` thêm `room_questions`, `room_ques
 
 Migration `20261005000004_room_game_state_machine.sql` thêm cột trạng thái ván (`rooms.current_question`, `winner_id`…, `room_players.answered_idx`…), các hàm `advance_room`, `finish_room`, `recompute_room_scores`, thay `start_room`, `leave_room`, `submit_room_answer`, và thêm `rooms`, `room_players` vào publication `supabase_realtime` (Realtime của dự án phải đang bật). Chạy được một lần (có `alter table add column` và `alter publication add table`). Gói Supabase Free giới hạn 200 kết nối Realtime đồng thời và 2 triệu tin nhắn/tháng; client chỉ mở kết nối khi đang ở trong phòng.
 
+Migration `20261005000005_merge_user_data_rooms.sql` mở rộng `merge_user_data` cho dữ liệu phòng thi đấu và thêm hàm `tables_referencing_users()` (chỉ cho test). **Chạy trước khi mở tính năng thi đấu cho nhiều người**, nếu không người ẩn danh đăng nhập Google sẽ mất lịch sử phòng. Mỗi khi thêm bảng có `user_id` hoặc khóa ngoại tới `auth.users`: thêm vào `merge_user_data` bằng migration `create or replace` mới và cập nhật danh sách phân loại trong `tests/integration/rooms.test.ts`.
+
 Vì local và production **dùng chung DB**, mọi script bên dưới ảnh hưởng dữ liệu thật.
 
 ## 4. Deploy (Vercel)

@@ -24,12 +24,12 @@ async function newPlayer(context: BrowserContext): Promise<Page> {
 
 const noViolations = async (page: Page) => expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
-let code = "";
+const codes: string[] = [];
 
 test.afterAll(async () => {
-  if (!code) return;
+  if (codes.length === 0) return;
   const sb = serviceClientForTests();
-  const { data: rooms } = await sb.from("rooms").select("id").eq("code", code);
+  const { data: rooms } = await sb.from("rooms").select("id").in("code", codes);
   for (const room of rooms ?? []) {
     const { data: players } = await sb.from("room_players").select("user_id").eq("room_id", room.id);
     await sb.from("rooms").delete().eq("id", room.id);
@@ -49,7 +49,8 @@ test("hai người chơi trọn một ván: mời bằng link, sẵn sàng, 10 c
   await host.getByRole("dialog").getByLabel("Tên hiển thị trong phòng").fill("Chủ phòng");
   await host.getByRole("dialog").getByRole("button", { name: "Tạo phòng" }).click();
   await host.waitForURL(/\/room\/\d{6}$/, { timeout: 30_000 });
-  code = host.url().match(/(\d{6})$/)![1];
+  const code = host.url().match(/(\d{6})$/)![1];
+  codes.push(code);
   await expect(host.getByRole("heading", { name: new RegExp(`Phòng chờ #${code}`) })).toBeVisible();
   await noViolations(host); // phòng chờ
 
@@ -88,6 +89,40 @@ test("hai người chơi trọn một ván: mời bằng link, sẵn sàng, 10 c
   const [h, g] = [await hostBanner.innerText(), await guestBanner.innerText()];
   const mirror: Record<string, string> = { "Bạn thắng!": "Đối thủ thắng ván này", "Đối thủ thắng ván này": "Bạn thắng!", "Hòa nhau!": "Hòa nhau!" };
   expect(mirror[h]).toBe(g);
+
+  await host.context().close();
+  await guest.context().close();
+});
+
+test("bỏ cuộc giữa ván: người còn lại thắng và thấy ván kết thúc vì có người rời", async ({ browser }) => {
+  test.setTimeout(120_000);
+  const host = await newPlayer(await browser.newContext());
+  const guest = await newPlayer(await browser.newContext());
+
+  await host.goto("/room");
+  await host.getByRole("button", { name: "Tạo phòng" }).first().click();
+  await host.getByRole("dialog").getByLabel("Tên hiển thị trong phòng").fill("Chủ phòng");
+  await host.getByRole("dialog").getByRole("button", { name: "Tạo phòng" }).click();
+  await host.waitForURL(/\/room\/\d{6}$/, { timeout: 30_000 });
+  const code = host.url().match(/(\d{6})$/)![1];
+  codes.push(code);
+
+  await guest.goto(`/room/${code}`);
+  await guest.getByLabel("Tên hiển thị trong phòng").fill("Bạn chơi");
+  await guest.getByRole("button", { name: "Vào phòng" }).click();
+  await expect(host.getByText("Bạn chơi")).toBeVisible({ timeout: 20_000 });
+  await guest.getByRole("button", { name: "Sẵn sàng" }).click();
+  await expect(host.getByRole("button", { name: "Bắt đầu thi đấu" })).toBeEnabled({ timeout: 20_000 });
+  await host.getByRole("button", { name: "Bắt đầu thi đấu" }).click();
+
+  // Giữa câu 1, khách bỏ cuộc (có hộp xác nhận).
+  await expect(guest.getByText("Câu 1 / 10")).toBeVisible({ timeout: 30_000 });
+  await guest.getByRole("button", { name: "Bỏ cuộc" }).click();
+  await guest.getByRole("dialog").getByRole("button", { name: "Bỏ cuộc" }).click();
+  await guest.waitForURL(/\/room$/, { timeout: 20_000 });
+
+  await expect(host.getByRole("heading", { level: 1 })).toHaveText("Bạn thắng!", { timeout: 30_000 });
+  await expect(host.getByText("Ván kết thúc vì có người rời ván.")).toBeVisible();
 
   await host.context().close();
   await guest.context().close();

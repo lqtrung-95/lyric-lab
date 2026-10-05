@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { normalizeRoomCode } from "@/lib/rooms/room-code";
-import { authRequired, badRequest, serverError } from "@/lib/rooms/room-http";
+import { allowRoomRequest } from "@/lib/rooms/room-rate-limit";
+import { authRequired, badRequest, serverError, rateLimited } from "@/lib/rooms/room-http";
 import { setReady } from "@/lib/rooms/room-repo";
 
 export const runtime = "nodejs";
@@ -9,6 +10,7 @@ export const runtime = "nodejs";
 export async function POST(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const user = await getCurrentUser();
   if (!user) return authRequired();
+  if (!allowRoomRequest(user.id)) return rateLimited();
   const code = normalizeRoomCode((await params).code);
   const body = (await req.json().catch(() => null)) as { ready?: unknown } | null;
   if (!code || typeof body?.ready !== "boolean") return badRequest("invalid_request");

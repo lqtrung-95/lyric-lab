@@ -1,12 +1,13 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { existsSync } from "node:fs";
 import ws from "ws";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { roomAnswerPoints } from "@/lib/rooms/room-scoring";
 
 // Vòng đời phòng thi đấu và RLS trên Supabase thật. Cần đã chạy migration practice_rooms và bật Anonymous sign-ins.
 // Tự bỏ qua khi thiếu biến môi trường; xóa sạch phòng và tài khoản tạm sau khi chạy.
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
+vi.mock("server-only", () => ({}));
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -351,6 +352,78 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
         expect(sql, `correct=${correct} elapsed=${elapsed}`).toBe(roomAnswerPoints(correct, elapsed));
       }
     }
+  });
+
+  // Chơi trọn một ván 1 câu giữa hai người (chủ phòng đúng, khách sai) để có đủ lịch sử: người chơi, câu trả lời, người thắng.
+  async function finishedGame(host: number, guest: number) {
+    const code = newCode();
+    const id = await createRoom(host, code);
+    await join(guest, code);
+    await rpc("set_room_ready", { p_room: id, p_user: users[guest].id, p_ready: true });
+    await addQuestions(id, 1);
+    expect(await rpc<string>("start_room", { p_room: id, p_host: users[host].id, p_video: videoId })).toBe("ok");
+    await openQuestion(id, 0, -300);
+    await answer(id, host, 0, 2);
+    await answer(id, guest, 0, 1);
+    expect((await advance(id)).result).toBe("finished");
+    return id;
+  }
+
+  it("gộp tài khoản: lịch sử phòng (người chơi, câu trả lời, chủ phòng, người thắng) đi theo tài khoản đích", async () => {
+    const { createMergeToken, executeMerge } = await import("@/lib/account/merge-account");
+    await signInAnon();
+    await signInAnon();
+    const [from, to, opponent] = [users.length - 2, users.length - 1, 1];
+    const roomId = await finishedGame(from, opponent); // `from` là chủ phòng và người thắng
+    expect(await roomRow(roomId)).toMatchObject({ host_id: users[from].id, winner_id: users[from].id });
+
+    await executeMerge(service, await createMergeToken(service, users[from].id), users[to].id);
+
+    expect(await roomRow(roomId)).toMatchObject({ host_id: users[to].id, winner_id: users[to].id, status: "finished" });
+    const { data: players } = await service.from("room_players").select("user_id, display_name, correct").eq("room_id", roomId).order("joined_at");
+    expect(players!.map((p) => p.user_id)).toEqual([users[to].id, users[opponent].id]);
+    expect(players![0]).toMatchObject({ display_name: `Host${from}`, correct: 1 });
+    const { data: answers } = await service.from("room_answers").select("user_id, correct").eq("room_id", roomId);
+    expect(answers!.find((a) => a.user_id === users[to].id)).toMatchObject({ correct: true });
+    expect(await service.from("room_players").select("user_id").eq("user_id", users[from].id).then((r) => r.data)).toEqual([]);
+  });
+
+  it("gộp tài khoản khi hai tài khoản từng đấu với nhau: giữ hàng và câu trả lời của tài khoản đích, không lỗi khóa trùng", async () => {
+    const { createMergeToken, executeMerge } = await import("@/lib/account/merge-account");
+    await signInAnon();
+    await signInAnon();
+    const [from, to] = [users.length - 2, users.length - 1];
+    const roomId = await finishedGame(from, to); // from thắng, to thua; gộp from vào to
+    await executeMerge(service, await createMergeToken(service, users[from].id), users[to].id);
+
+    const { data: players } = await service.from("room_players").select("user_id, correct").eq("room_id", roomId);
+    expect(players).toEqual([{ user_id: users[to].id, correct: 0 }]); // hàng của đích (đã thua) còn, hàng nguồn bỏ
+    const { data: answers } = await service.from("room_answers").select("user_id, correct").eq("room_id", roomId);
+    expect(answers).toEqual([{ user_id: users[to].id, correct: false }]);
+    expect(await roomRow(roomId)).toMatchObject({ host_id: users[to].id, winner_id: users[to].id });
+  });
+
+  // Mọi bảng có khóa ngoại tới auth.users phải được phân loại: hoặc nằm trong merge_user_data (người dùng không được mất dữ liệu khi
+  // đăng nhập Google), hoặc cố ý bỏ qua kèm lý do. Thêm bảng mới mà chưa phân loại thì test này đỏ, nhắc cập nhật hàm gộp.
+  it("mọi bảng có user_id đều đã được phân loại cho việc gộp tài khoản", async () => {
+    const merged = new Set([
+      "user_profiles.user_id", "user_known_terms.user_id", "user_cards.user_id", "review_logs.user_id", "usage_events.user_id",
+      "user_song_progress.user_id", "user_song_likes.user_id", "practice_scores.user_id", "leaderboard_profiles.user_id",
+      "song_reports.user_id", "room_players.user_id", "room_answers.user_id", "rooms.host_id", "rooms.winner_id",
+    ]);
+    const ignored = new Set([
+      "account_merge_tokens.from_user", // mã gộp của chính tài khoản nguồn, xóa theo tài khoản
+      "feedback.user_id", // on delete set null: góp ý giữ lại, chỉ mất liên kết người gửi
+      "translation_suggestions.user_id", // on delete set null: như trên
+    ]);
+    const { data, error } = await service.rpc("tables_referencing_users");
+    expect(error).toBeNull();
+    const found = (data as { table_name: string; column_name: string }[]).map((r) => `${r.table_name}.${r.column_name}`);
+    const unclassified = found.filter((f) => !merged.has(f) && !ignored.has(f));
+    expect(unclassified, `Bảng chưa phân loại cho gộp tài khoản: ${unclassified.join(", ")}`).toEqual([]);
+    // Danh sách khai báo cũng không được chứa bảng không còn tồn tại (tránh phân loại cũ lỗi thời).
+    const stale = [...merged, ...ignored].filter((f) => !found.includes(f));
+    expect(stale, `Phân loại cũ không còn bảng tương ứng: ${stale.join(", ")}`).toEqual([]);
   });
 
   it("các hàm phòng không gọi được bằng khóa anon/người dùng (chỉ service role)", async () => {

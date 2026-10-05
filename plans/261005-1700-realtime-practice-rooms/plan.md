@@ -2,7 +2,7 @@
 
 Hai người vào cùng một phòng, cùng thấy một bộ câu hỏi về một bài hát và trả lời cùng lúc; ai đúng nhiều hơn thắng. Tham khảo luồng của một app khác: thẻ "Tìm bạn luyện cùng" (ghép ngẫu nhiên) và "Mời bạn" (mã 6 số hoặc link), mục Lời mời và Bạn luyện cùng gần đây.
 
-Trạng thái: **kế hoạch đã chốt các quyết định về thiết kế, chờ duyệt để bắt đầu code** (2026-10-05). Chưa có code.
+Trạng thái: **giai đoạn 1 của dự án (mời bạn, ván 1v1) đã xong** (2026-10-05); phần ghép ngẫu nhiên, lời mời, bạn luyện cùng gần đây còn trong `docs/backlog.md`.
 
 ## Quyết định đã chốt với chủ dự án
 
@@ -32,7 +32,7 @@ Trạng thái: **kế hoạch đã chốt các quyết định về thiết kế
 | 2 | [phase-02-question-engine-and-scoring.md](phase-02-question-engine-and-scoring.md) | Sinh bộ câu hỏi chung từ phân tích bài, chấm ở server, tính điểm | 1 ngày | Xong (2026-10-05) |
 | 3 | [phase-03-realtime-game-state-machine.md](phase-03-realtime-game-state-machine.md) | Máy trạng thái ván chơi, kênh thời gian thực, rớt mạng | 1–1,5 ngày | Xong (2026-10-05); còn thử tay hai trình duyệt khi có giao diện ở giai đoạn 4 |
 | 4 | [phase-04-room-ui.md](phase-04-room-ui.md) | Màn Thi đấu, phòng chờ, màn chơi, kết quả | 1–1,5 ngày | Xong (2026-10-05); e2e hai trình duyệt qua |
-| 5 | [phase-05-account-merge-security-docs.md](phase-05-account-merge-security-docs.md) | Gộp tài khoản, chống lạm dụng, kiểm thử tích hợp/e2e, cập nhật docs | 0,5–1 ngày | Chưa làm |
+| 5 | [phase-05-account-merge-security-docs.md](phase-05-account-merge-security-docs.md) | Gộp tài khoản, chống lạm dụng, kiểm thử tích hợp/e2e, cập nhật docs | 0,5–1 ngày | Xong (2026-10-05) |
 
 Tổng ước lượng 4–6 ngày (ước lượng thô, chưa tính thử nghiệm với hai trình duyệt thật).
 

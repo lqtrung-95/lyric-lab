@@ -35,6 +35,15 @@ Xếp theo tỉ lệ hiệu quả/công sức. Chưa quyết định làm; mục
 | Xuất Anki | Đã nêu ở trên | Nhỏ | |
 | Danh sách bài theo chủ đề, lớp học cùng nhau, PWA, giải thích tiếng Anh | Xem các mục liên quan ở trên và phần Kỹ thuật | Vừa-lớn | |
 
+## Phòng thi đấu 1v1: giai đoạn 2 của dự án (2026-10-05)
+Giai đoạn 1–5 (mời bạn bằng mã/link, ván 10 câu Điền lời, kết quả) đã xong. Còn hoãn:
+- Ghép ngẫu nhiên (hàng đợi theo trình độ + "bóng ma" là bản ghi lượt chơi khi không có ai online, vì hiện số người dùng quá ít để hàng đợi có người).
+- Lời mời đang chờ (Chấp nhận/Từ chối, hết hạn ~10 phút), "Bạn luyện cùng gần đây" (suy ra từ `room_players`, chỉ hiện với người đã đăng nhập Google), thành tích đối đầu và "Mời tái đấu".
+- Thêm chế độ chơi (Nghe và chọn, Ghép cặp, Gõ pinyin), phản ứng emoji sau ván, nút "Đổi bài" ở phòng chờ.
+- An toàn khi chơi với người lạ: báo cáo/chặn người chơi, lọc từ tục ở tên hiển thị.
+- Dọn phòng cũ (`rooms` đã kết thúc tích lũy theo thời gian).
+- Chọn bài ngẫu nhiên theo trình độ của cả hai người (hiện chọn trong bài Khám phá dựng được đủ câu).
+
 ## Kỹ thuật
 - [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.

@@ -59,6 +59,10 @@ Bổ sung cho [`CLAUDE.md`](../CLAUDE.md) (quy tắc bắt buộc) và `~/.claud
 - Commit nhỏ, tập trung. **Không commit bí mật** (`.env*`, khoá API); kiểm tra `git diff --cached` trước khi commit.
 - Khi dùng git worktree: stash dùng chung giữa các worktree — tránh `git stash` trần; dùng commit WIP.
 
+## Bảng mới có `user_id`
+
+Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi người ẩn danh đăng nhập Google: thêm vào hàm SQL `merge_user_data` (migration `create or replace` mới, nhớ sao chép đủ thân hàm hiện có) hoặc cố ý bỏ qua kèm lý do. Test tích hợp `mọi bảng có user_id đều đã được phân loại` (trong `tests/integration/rooms.test.ts`) sẽ đỏ nếu quên. Dữ liệu người chơi mà đối thủ có thể đọc qua Realtime hoặc RLS không được lộ đúng/sai hay lựa chọn trước khi chính họ trả lời (xem phòng thi đấu).
+
 ## Nhắc về dữ liệu
 
 - Local và production chung một DB Supabase: ghi từ máy local là ghi vào dữ liệu thật. Phần lớn script ghi DB mặc định dry-run (trừ `reanalyze-reuse-old-lyrics.mts`) — đọc đầu file script trước khi chạy.

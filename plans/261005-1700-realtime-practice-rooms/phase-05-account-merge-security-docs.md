@@ -32,11 +32,11 @@
 5. Chạy toàn bộ: `npx tsc --noEmit`, `npm run lint`, `npm run test`, test tích hợp, e2e liên quan.
 
 ## Danh sách việc
-- [ ] Migration gộp tài khoản + test
-- [ ] Giới hạn đoán mã, hạn mức
-- [ ] E2E hai người
-- [ ] Cập nhật bốn tài liệu bàn giao
-- [ ] Chạy toàn bộ kiểm thử
+- [x] Migration gộp tài khoản + test
+- [x] Giới hạn đoán mã, hạn mức
+- [x] E2E hai người
+- [x] Cập nhật bốn tài liệu bàn giao
+- [x] Chạy toàn bộ kiểm thử
 
 ## Tiêu chí hoàn thành
 Người ẩn danh chơi vài ván rồi đăng nhập Google thì lịch sử phòng còn nguyên; đoán mã bừa bị chặn; mọi test qua; docs cập nhật.
