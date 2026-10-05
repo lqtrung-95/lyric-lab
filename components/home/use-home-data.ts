@@ -48,13 +48,14 @@ async function collectUnseen(params: Record<string, string>, skip: Set<string>, 
 
 /**
  * Bài gợi ý theo level của người dùng: ưu tiên bài phổ biến trong dải trình độ, thiếu thì bù bằng bài phổ biến chung.
- * Bỏ các bài người dùng đã mở gần đây. undefined = đang tải.
+ * Bỏ các bài người dùng đã mở gần đây. undefined = đang tải; `excludeIds` null = danh sách bài đã mở chưa có, chưa gọi gì.
  */
-export function useRecommendedSongs(level: number, excludeIds: string[]): DiscoverSong[] | undefined {
+export function useRecommendedSongs(level: number, excludeIds: string[] | null): DiscoverSong[] | undefined {
   const [songs, setSongs] = useState<DiscoverSong[] | undefined>(undefined);
-  const excludeKey = excludeIds.join(",");
+  const excludeKey = excludeIds?.join(",") ?? null;
 
   useEffect(() => {
+    if (excludeKey === null) return;
     let cancelled = false;
     (async () => {
       // `skip` gồm bài đã mở và dồn thêm các bài đã chọn, để nguồn bù không lặp lại bài của dải trình độ.

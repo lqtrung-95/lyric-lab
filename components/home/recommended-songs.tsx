@@ -11,7 +11,8 @@ import { useRecommendedSongs } from "./use-home-data";
 export function RecommendedSongs() {
   const { state } = useLearnerState();
   const { songs: recent } = useRecentSongs();
-  const openedIds = useMemo(() => (recent ?? []).map((s) => s.videoId), [recent]);
+  // null = bài đã mở chưa tải xong: hook gợi ý chờ, để không chọn bài khi chưa biết cần loại bài nào.
+  const openedIds = useMemo(() => (recent === null ? null : recent.map((s) => s.videoId)), [recent]);
   const songs = useRecommendedSongs(state.level, openedIds);
 
   if (songs !== undefined && songs.length === 0) return null;
