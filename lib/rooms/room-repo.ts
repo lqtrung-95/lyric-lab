@@ -190,10 +190,16 @@ export async function getRoomView(userId: string, code: string): Promise<RoomVie
     cur === null ? Promise.resolve({ data: null }) : sb.from("room_question_keys").select("correct_index").eq("room_id", room.id).eq("idx", cur).maybeSingle(),
     cur === null ? Promise.resolve({ data: null }) : sb.from("room_answers").select("idx, user_id, choice, correct, points, elapsed_ms").eq("room_id", room.id).eq("idx", cur).eq("user_id", userId).maybeSingle(),
   ]);
+  const playerIds = (players ?? []).map((p) => p.user_id);
+  const { data: profiles } = playerIds.length
+    ? await sb.from("leaderboard_profiles").select("user_id, avatar_url").in("user_id", playerIds)
+    : { data: [] };
+  const avatars = Object.fromEntries((profiles ?? []).map((p) => [p.user_id as string, p.avatar_url as string | null]));
   const rounds = room.status === "finished" ? await loadRounds(room.id) : null;
   return buildRoomView({
     room,
     players: players ?? [],
+    avatars,
     me: userId,
     now: new Date(),
     song: song ? simplifyDeep({ videoId: song.video_id, title: song.title, channelTitle: song.channel_title }) : null,

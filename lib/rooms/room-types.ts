@@ -5,6 +5,8 @@ export type RoomStatus = "waiting" | "playing" | "finished" | "expired";
 /** Một người trong phòng, đúng những gì client được biết về họ (không có id tài khoản). */
 export interface RoomPlayerView {
   displayName: string;
+  /** Ảnh đại diện của tài khoản (cùng ảnh ở Cài đặt và bảng xếp hạng); null = dùng chữ cái đầu. */
+  avatarUrl: string | null;
   ready: boolean;
   isHost: boolean;
   isMe: boolean;

@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
-import { AvatarCircle } from "./avatar-circle";
+import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
 
 interface AvatarUploaderProps {
   nickname: string;
@@ -10,7 +10,7 @@ interface AvatarUploaderProps {
   onUploaded: (avatarUrl: string) => void;
 }
 
-/** Ảnh đại diện của bạn trong hồ sơ bảng xếp hạng, bấm để đổi (JPG/PNG/WebP, tối đa 2MB). */
+/** Ảnh đại diện của tài khoản (dùng chung ở phòng thi đấu và bảng xếp hạng), bấm để đổi (JPG/PNG/WebP, tối đa 2MB). */
 export function AvatarUploader({ nickname, avatarUrl, onUploaded }: AvatarUploaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);

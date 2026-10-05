@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { track } from "@/lib/analytics/track";
@@ -8,7 +9,6 @@ import { ModeTabs } from "@/components/review/mode-tabs";
 import { formatTimeLeft } from "@/lib/leaderboard/week";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AvatarCircle } from "./avatar-circle";
-import { AvatarUploader } from "./avatar-uploader";
 import { NicknameForm } from "./nickname-form";
 
 type Scope = "week" | "all";
@@ -83,11 +83,11 @@ export function LeaderboardScreen() {
           ) : joined && !editing ? (
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <AvatarUploader
-                  nickname={data.profile!.nickname} avatarUrl={data.profile!.avatarUrl}
-                  onUploaded={() => setReload((n) => n + 1)}
-                />
-                <p className="text-body-md text-on-surface">Bạn đang tham gia với biệt danh <strong>{data.profile!.nickname}</strong>.</p>
+                <AvatarCircle nickname={data.profile!.nickname} avatarUrl={data.profile!.avatarUrl} size={64} />
+                <p className="text-body-md text-on-surface">
+                  Bạn đang tham gia với biệt danh <strong>{data.profile!.nickname}</strong>.{" "}
+                  <Link href="/settings" className="text-primary underline underline-offset-2">Đổi ảnh đại diện ở Cài đặt</Link>
+                </p>
               </div>
               <div className="flex gap-1">
                 <button type="button" onClick={() => setEditing(true)} className="min-h-11 rounded-full px-4 text-label-md font-medium text-primary hover:bg-surface-container">Đổi biệt danh</button>

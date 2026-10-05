@@ -44,7 +44,11 @@ describe("buildRoomView: không lộ đáp án", () => {
     const v = buildRoomView(input({ players }));
     const opponent = v.players.find((p) => !p.isMe)!;
     expect(opponent).toMatchObject({ answered: true, lastAnswerMs: 2400, score: 0, correct: 0 });
-    expect(Object.keys(opponent).sort()).toEqual(["answered", "correct", "displayName", "isHost", "isMe", "lastAnswerMs", "left", "ready", "score"].sort());
+    expect(Object.keys(opponent).sort()).toEqual(["answered", "avatarUrl", "correct", "displayName", "isHost", "isMe", "lastAnswerMs", "left", "ready", "score"].sort());
+  });
+  it("gắn ảnh đại diện theo tài khoản, thiếu thì null", () => {
+    const v = buildRoomView(input({ avatars: { u1: "https://x/a.png" } }));
+    expect(v.players.map((p) => p.avatarUrl)).toEqual(["https://x/a.png", null]);
   });
   it("người đã rời không tính vào việc 'mọi người đã trả lời'", () => {
     const players = input().players.map((p) => (p.user_id === "u2" ? { ...p, left_at: "2026-10-05T10:00:08Z" } : { ...p, answered_idx: 0 }));

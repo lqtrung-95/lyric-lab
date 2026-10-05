@@ -21,6 +21,8 @@ export interface RoomViewInput {
     user_id: string; display_name: string; ready: boolean; left_at: string | null;
     score: number; correct: number; answered_idx: number; last_answer_ms: number | null;
   }[];
+  /** Ảnh đại diện theo id tài khoản (thiếu = chưa đặt). */
+  avatars?: Record<string, string | null>;
   me: string;
   now: Date;
   song: RoomSongView | null;
@@ -42,7 +44,7 @@ const toMine = (a: AnswerRow | null | undefined): MyAnswerView | null =>
  * trước khi ván kết thúc, và khi đó chỉ gồm đúng/sai, điểm, thời gian.
  */
 export function buildRoomView(input: RoomViewInput): RoomView {
-  const { room, players, me, now, song, question, myAnswer, rounds } = input;
+  const { room, players, avatars, me, now, song, question, myAnswer, rounds } = input;
   // Phòng chờ quá hạn nhưng chưa ai chạm vào để đánh dấu: báo hết hạn cho người xem.
   const status: RoomStatus = room.status === "waiting" && Date.parse(room.expires_at) < now.getTime() ? "expired" : room.status;
 
@@ -75,6 +77,7 @@ export function buildRoomView(input: RoomViewInput): RoomView {
     serverNow: now.toISOString(),
     players: players.map((p) => ({
       displayName: p.display_name,
+      avatarUrl: avatars?.[p.user_id] ?? null,
       ready: p.ready,
       isHost: p.user_id === room.host_id,
       isMe: p.user_id === me,

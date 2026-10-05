@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
 import { Icon } from "@/components/ui/icon";
 import { Toast } from "@/components/ui/toast";
 import { buildRoomLink } from "@/lib/rooms/room-code-format";
@@ -25,9 +26,7 @@ function PlayerSlot({ player }: { player: RoomPlayerView | undefined }) {
   }
   return (
     <div className="flex flex-col items-center rounded-2xl bg-surface-container-low p-space-md text-center">
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-        <Icon name="person" filled size={26} />
-      </span>
+      <AvatarCircle nickname={player.displayName} avatarUrl={player.avatarUrl} size={48} />
       <p className="mt-2 max-w-full truncate text-body-md font-semibold text-on-surface">{player.displayName}{player.isMe && " (Bạn)"}</p>
       {player.isHost && <span className="mt-1 rounded-full bg-primary px-2 py-0.5 text-label-sm font-semibold text-on-primary">Chủ phòng</span>}
       <p className={`mt-1 inline-flex items-center gap-1 rounded-full px-3 py-1 text-label-sm font-medium ${player.ready ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-high text-on-surface-variant"}`}>

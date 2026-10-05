@@ -1,3 +1,4 @@
+import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
 import { Icon } from "@/components/ui/icon";
 import type { RoomPlayerView } from "@/lib/rooms/room-types";
 
@@ -9,7 +10,8 @@ function Side({ player, align }: { player: RoomPlayerView | undefined; align: "l
   const status = player.left ? "Đã rời ván" : player.answered ? `Đã trả lời${player.lastAnswerMs !== null ? ` sau ${seconds(player.lastAnswerMs)}s` : ""}` : "Đang suy nghĩ…";
   return (
     <div className={`flex min-w-0 flex-1 flex-col ${right ? "items-end text-right" : "items-start text-left"}`}>
-      <p className="max-w-full truncate text-body-md font-semibold text-on-surface">{player.displayName}{player.isMe && <span className="ml-1 rounded-full bg-primary/10 px-2 text-label-sm text-primary">Bạn</span>}</p>
+      <AvatarCircle nickname={player.displayName} avatarUrl={player.avatarUrl} size={40} />
+      <p className="mt-1 max-w-full truncate text-body-md font-semibold text-on-surface">{player.displayName}{player.isMe && <span className="ml-1 rounded-full bg-primary/10 px-2 text-label-sm text-primary">Bạn</span>}</p>
       <p className="font-serif text-headline-lg-mobile font-semibold text-primary md:text-headline-lg">{player.score}<span className="ml-1 text-label-md font-normal text-on-surface-variant">điểm</span></p>
       <p className="text-label-sm text-on-surface-variant">{player.correct} câu đúng</p>
       <p role="status" className={`mt-1 inline-flex items-center gap-1 text-label-sm ${player.answered && !player.left ? "text-secondary" : "text-on-surface-variant"}`}>
