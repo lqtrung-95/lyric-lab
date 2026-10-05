@@ -50,7 +50,8 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
       <div className="space-y-space-md p-space-lg">
         <h2 id="create-room-title" className="font-serif text-headline-md">Tạo phòng thi đấu</h2>
         <NicknameGate state={nick} />
-        <fieldset>
+        {/* `min-w-0`: <fieldset> mặc định rộng ít nhất bằng nội dung, nên một tên bài dài sẽ kéo rộng cả hộp thoại thay vì được cắt bớt. */}
+        <fieldset className="min-w-0">
           <legend className="text-label-md font-medium text-on-surface">Bài hát</legend>
           <div className="mt-1 flex gap-2">
             <label className={radio(!pick)}>
