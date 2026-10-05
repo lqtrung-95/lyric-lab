@@ -22,6 +22,7 @@ Chưa làm trước khi công khai rộng (từ README cũ): thử tay đăng nh
 
 ## Việc dở / quyết định đang treo
 
+- **Biệt danh**: một biệt danh dùng chung cho phòng thi đấu và bảng xếp hạng (xem `docs/system-architecture.md` mục "Biệt danh dùng chung"); đặt tên không tự công khai điểm.
 - **Phòng thi đấu 1v1** (kế hoạch `plans/261005-1700-realtime-practice-rooms/`): giai đoạn 1–5 xong (server, ván chơi thời gian thực, giao diện, gộp tài khoản, chống lạm dụng, e2e hai trình duyệt). **Giai đoạn 2 của dự án chưa làm**: ghép ngẫu nhiên (hàng đợi + "bóng ma"), lời mời, bạn luyện cùng gần đây, thêm chế độ chơi, emoji sau ván, nút "Đổi bài" ở phòng chờ, báo cáo/chặn người chơi, lọc từ tục ở tên hiển thị. Xem `docs/backlog.md`.
 - **Độ lệch lời mặc định (admin)**: đã có (`songs.lyric_offset_sec`, nút ở bảng chỉnh lời). Admin lưu thì mọi chỉnh cá nhân trước đó của bài bị bỏ (DB về 0, bản trên trình duyệt tự cũ theo `base`).
 

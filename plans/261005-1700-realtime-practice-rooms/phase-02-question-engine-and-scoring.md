@@ -22,7 +22,7 @@
 - Số điểm vẫn hiện trực tiếp cho cả hai bên trong lúc chơi (thiết kế có thanh so sánh tỉ lệ), nhưng kết quả thắng thua theo quy tắc trên.
 
 ## Nội dung mỗi câu (theo thiết kế)
-- Dòng lời có ô trống (chữ Hán + pinyin có ô trống), nghĩa tiếng Việt của dòng, gợi ý Hán-Việt của dòng (suy ra từ từ điển, ẩn phần ô trống) nếu có.
+- Dòng lời có ô trống (chữ Hán + pinyin có ô trống) và nghĩa tiếng Việt của dòng (đã bỏ gợi ý Hán-Việt cả dòng theo ý chủ dự án).
 - Bốn đáp án, mỗi đáp án hiện chữ Hán, pinyin, âm Hán-Việt và nghĩa; lấy từ các từ vựng khác của chính bài (đã có sẵn `reading`, `sinoViet`, `meaningInContext`).
 - Đoạn nghe của dòng đó: `room_questions` lưu `videoId`, `clipStart`, `clipEnd` (mốc của dòng, đã cộng độ lệch lời mặc định của bài; không cộng độ lệch cá nhân vì phòng dùng chung). Tối đa 2 lượt nghe mỗi câu, giới hạn ở phía client (không phải điểm gian lận cần chặn). Khung video hiển thị theo phase-04.
 - Ghi chú ngữ pháp của dòng (nếu dòng có mục ngữ pháp trong phân tích), hiện kèm câu.

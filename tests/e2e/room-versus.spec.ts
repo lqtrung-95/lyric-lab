@@ -25,6 +25,7 @@ async function newPlayer(context: BrowserContext): Promise<Page> {
 const noViolations = async (page: Page) => expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
 const codes: string[] = [];
+const tag = () => String(Date.now() % 100_000) + Math.floor(Math.random() * 10);
 
 test.afterAll(async () => {
   if (codes.length === 0) return;
@@ -46,7 +47,10 @@ test("hai người chơi trọn một ván: mời bằng link, sẵn sàng, 10 c
   await host.goto("/room");
   await noViolations(host); // sảnh Thi đấu
   await host.getByRole("button", { name: "Tạo phòng" }).first().click();
-  await host.getByRole("dialog").getByLabel("Tên hiển thị trong phòng").fill("Chủ phòng");
+  // Chưa có biệt danh: đặt ngay trong hộp thoại (một biệt danh dùng chung cho phòng và bảng xếp hạng), rồi tạo phòng.
+  const hostName = `Chu${tag()}`;
+  await host.getByRole("dialog").getByLabel(/Biệt danh hiển thị/).fill(hostName);
+  await host.getByRole("dialog").getByRole("button", { name: "Lưu biệt danh" }).click();
   await host.getByRole("dialog").getByRole("button", { name: "Tạo phòng" }).click();
   await host.waitForURL(/\/room\/\d{6}$/, { timeout: 30_000 });
   const code = host.url().match(/(\d{6})$/)![1];
@@ -56,12 +60,14 @@ test("hai người chơi trọn một ván: mời bằng link, sẵn sàng, 10 c
 
   // Khách mở link mời (chưa có phiên): nhập tên rồi vào phòng.
   await guest.goto(`/room/${code}`);
-  await guest.getByLabel("Tên hiển thị trong phòng").fill("Bạn chơi");
+  const guestName = `Khach${tag()}`;
+  await guest.getByLabel(/Biệt danh hiển thị/).fill(guestName);
+  await guest.getByRole("button", { name: "Lưu biệt danh" }).click();
   await guest.getByRole("button", { name: "Vào phòng" }).click();
   await expect(guest.getByRole("heading", { name: new RegExp(`Phòng chờ #${code}`) })).toBeVisible({ timeout: 20_000 });
 
   // Hai bên thấy nhau (Realtime hoặc thăm dò), khách sẵn sàng thì chủ phòng bắt đầu được.
-  await expect(host.getByText("Bạn chơi")).toBeVisible({ timeout: 20_000 });
+  await expect(host.getByText(guestName)).toBeVisible({ timeout: 20_000 });
   await expect(host.getByRole("button", { name: /Bắt đầu thi đấu/ })).toBeDisabled();
   await guest.getByRole("button", { name: "Sẵn sàng" }).click();
   await expect(host.getByRole("button", { name: "Bắt đầu thi đấu" })).toBeEnabled({ timeout: 20_000 });
@@ -101,16 +107,21 @@ test("bỏ cuộc giữa ván: người còn lại thắng và thấy ván kết
 
   await host.goto("/room");
   await host.getByRole("button", { name: "Tạo phòng" }).first().click();
-  await host.getByRole("dialog").getByLabel("Tên hiển thị trong phòng").fill("Chủ phòng");
+  // Chưa có biệt danh: đặt ngay trong hộp thoại (một biệt danh dùng chung cho phòng và bảng xếp hạng), rồi tạo phòng.
+  const hostName = `Chu${tag()}`;
+  await host.getByRole("dialog").getByLabel(/Biệt danh hiển thị/).fill(hostName);
+  await host.getByRole("dialog").getByRole("button", { name: "Lưu biệt danh" }).click();
   await host.getByRole("dialog").getByRole("button", { name: "Tạo phòng" }).click();
   await host.waitForURL(/\/room\/\d{6}$/, { timeout: 30_000 });
   const code = host.url().match(/(\d{6})$/)![1];
   codes.push(code);
 
   await guest.goto(`/room/${code}`);
-  await guest.getByLabel("Tên hiển thị trong phòng").fill("Bạn chơi");
+  const guestName = `Khach${tag()}`;
+  await guest.getByLabel(/Biệt danh hiển thị/).fill(guestName);
+  await guest.getByRole("button", { name: "Lưu biệt danh" }).click();
   await guest.getByRole("button", { name: "Vào phòng" }).click();
-  await expect(host.getByText("Bạn chơi")).toBeVisible({ timeout: 20_000 });
+  await expect(host.getByText(guestName)).toBeVisible({ timeout: 20_000 });
   await guest.getByRole("button", { name: "Sẵn sàng" }).click();
   await expect(host.getByRole("button", { name: "Bắt đầu thi đấu" })).toBeEnabled({ timeout: 20_000 });
   await host.getByRole("button", { name: "Bắt đầu thi đấu" }).click();

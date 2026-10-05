@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { answerFailure, joinFailure, startFailure } from "./room-http";
+import { answerFailure, joinFailure, nicknameRequired, startFailure } from "./room-http";
 
 const read = async (r: Response) => [r.status, (await r.json()).error];
 
@@ -22,5 +22,8 @@ describe("room-http", () => {
     expect(await read(answerFailure("already_answered"))).toEqual([409, "already_answered"]);
     expect(await read(answerFailure("not_in_room"))).toEqual([403, "not_in_room"]);
     expect(await read(startFailure("song_unusable"))).toEqual([409, "song_unusable"]);
+  });
+  it("chưa có biệt danh: 409 nickname_required", async () => {
+    expect(await read(nicknameRequired())).toEqual([409, "nickname_required"]);
   });
 });

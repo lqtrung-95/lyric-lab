@@ -34,6 +34,7 @@ const failure = ([status, error]: [number, string]) => Response.json({ error }, 
 export const joinFailure = (result: Exclude<JoinRoomResult, "ok">) => failure(JOIN_ERRORS[result]);
 export const startFailure = (result: Exclude<StartRoomResult, "ok">) => failure(START_ERRORS[result]);
 export const answerFailure = (result: AnswerFailure) => failure(ANSWER_ERRORS[result]);
+export const nicknameRequired = () => Response.json({ error: "nickname_required" }, { status: 409 });
 export const authRequired = () => Response.json({ error: "auth_required" }, { status: 401 });
 export const rateLimited = () => Response.json({ error: "rate_limited" }, { status: 429 });
 export const badRequest = (error: string) => Response.json({ error }, { status: 400 });

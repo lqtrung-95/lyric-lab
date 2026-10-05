@@ -1,19 +1,19 @@
 "use client";
 
 import { useId, useState } from "react";
+import { NicknameGate } from "@/components/profile/nickname-gate";
+import { useNickname } from "@/components/profile/use-nickname";
 import { normalizeRoomCode } from "@/lib/rooms/room-code-format";
 import { roomErrorMessage } from "@/lib/rooms/room-messages";
-import { DisplayNameField } from "./display-name-field";
 import { joinRoomRequest } from "./room-requests";
-import { useDisplayName } from "./use-display-name";
 
 /**
- * Vào phòng bằng mã hoặc link. `fixedCode` có giá trị khi người dùng mở thẳng link mời (không cần nhập mã, chỉ cần tên).
- * `onJoined` được gọi với mã phòng khi vào thành công.
+ * Vào phòng bằng mã hoặc link, với biệt danh của tài khoản (chưa có thì đặt ngay tại đây). `fixedCode` có giá trị khi người dùng mở
+ * thẳng link mời (không cần nhập mã). `onJoined` được gọi với mã phòng khi vào thành công.
  */
 export function JoinRoomForm({ fixedCode, onJoined }: { fixedCode?: string; onJoined: (code: string) => void }) {
   const codeId = useId();
-  const display = useDisplayName();
+  const nick = useNickname();
   const [codeInput, setCodeInput] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -22,33 +22,38 @@ export function JoinRoomForm({ fixedCode, onJoined }: { fixedCode?: string; onJo
 
   async function join() {
     setSubmitted(true);
-    if (!code || display.valid === null) return;
+    if (!code) return;
     setBusy(true);
     setError(null);
-    const result = await joinRoomRequest(code, display.valid);
+    const result = await joinRoomRequest(code);
     if (result.ok) return onJoined(result.data.code);
     setError(roomErrorMessage(result.error));
     setBusy(false);
   }
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void join(); }} className="space-y-space-sm">
-      {!fixedCode && (
-        <div>
-          <label htmlFor={codeId} className="text-label-md font-medium text-on-surface">Mã 6 số hoặc link mời</label>
-          <input
-            id={codeId} value={codeInput} onChange={(e) => setCodeInput(e.target.value)} inputMode="numeric" autoComplete="off"
-            aria-invalid={submitted && !code} placeholder="842 915"
-            className="mt-1 min-h-11 w-full rounded-xl bg-surface-container-high px-4 font-mono text-body-lg tracking-widest text-on-surface placeholder:text-on-surface-variant/70"
-          />
-          {submitted && !code && <p role="alert" className="mt-1 text-label-md text-error">{roomErrorMessage("invalid_code")}</p>}
-        </div>
-      )}
-      <DisplayNameField {...display} showError={submitted} />
-      {error && <p role="alert" className="text-label-md text-error">{error}</p>}
-      <button type="submit" disabled={busy} className="min-h-11 w-full rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
-        {busy ? "Đang vào…" : "Vào phòng"}
-      </button>
-    </form>
+    <div className="space-y-space-sm">
+      <NicknameGate state={nick}>
+        {() => (
+          <form onSubmit={(e) => { e.preventDefault(); void join(); }} className="space-y-space-sm">
+            {!fixedCode && (
+              <div>
+                <label htmlFor={codeId} className="text-label-md font-medium text-on-surface">Mã 6 số hoặc link mời</label>
+                <input
+                  id={codeId} value={codeInput} onChange={(e) => setCodeInput(e.target.value)} inputMode="numeric" autoComplete="off"
+                  aria-invalid={submitted && !code} placeholder="842 915"
+                  className="mt-1 min-h-11 w-full rounded-xl bg-surface-container-high px-4 font-mono text-body-lg tracking-widest text-on-surface placeholder:text-on-surface-variant/70"
+                />
+                {submitted && !code && <p role="alert" className="mt-1 text-label-md text-error">{roomErrorMessage("invalid_code")}</p>}
+              </div>
+            )}
+            {error && <p role="alert" className="text-label-md text-error">{error}</p>}
+            <button type="submit" disabled={busy} className="min-h-11 w-full rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+              {busy ? "Đang vào…" : "Vào phòng"}
+            </button>
+          </form>
+        )}
+      </NicknameGate>
+    </div>
   );
 }

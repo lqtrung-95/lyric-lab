@@ -1,6 +1,6 @@
 /** Thông báo tiếng Việt cho các mã lỗi của API phòng thi đấu. */
 const MESSAGES: Record<string, string> = {
-  invalid_name: "Tên hiển thị cần 3–20 ký tự (chữ, số, dấu cách, chấm, gạch).",
+  nickname_required: "Hãy đặt biệt danh trước khi chơi.",
   invalid_code: "Mã phòng gồm 6 chữ số.",
   invalid_video: "Bài hát không hợp lệ.",
   song_unavailable: "Bài này chưa đủ dữ liệu cho phòng thi đấu. Hãy chọn bài khác.",

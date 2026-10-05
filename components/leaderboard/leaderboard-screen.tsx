@@ -53,6 +53,7 @@ export function LeaderboardScreen() {
   }
 
   const joined = data?.profile?.optedIn === true;
+  const hasProfile = data?.profile != null;
   const shown = data?.entries ?? [];
   // Bục chỉ đẹp khi có ít nhất 2 người để so sánh; 1 người thì hiện dạng danh sách thường như bình thường.
   const useTop3Podium = shown.length >= 2;
@@ -93,10 +94,22 @@ export function LeaderboardScreen() {
                 <button type="button" onClick={() => void saveProfile({ optedIn: false })} className="min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container">Rời bảng xếp hạng</button>
               </div>
             </div>
+          ) : hasProfile && !joined && !editing ? (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-body-md text-on-surface">Biệt danh của bạn là <strong>{data.profile!.nickname}</strong>. Tham gia để điểm của bạn hiện trên bảng; bạn rời đi bất cứ lúc nào.</p>
+              <div className="flex gap-1">
+                <button type="button" onClick={() => void saveProfile({ optedIn: true })} className="min-h-11 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container">Tham gia bảng xếp hạng</button>
+                <button type="button" onClick={() => setEditing(true)} className="min-h-11 rounded-full px-4 text-label-md font-medium text-primary hover:bg-surface-container">Đổi biệt danh</button>
+              </div>
+            </div>
           ) : (
             <>
-              <p className="text-body-md text-on-surface">{joined ? "Đổi biệt danh của bạn." : "Bạn chưa tham gia. Đặt biệt danh để điểm của bạn xuất hiện trên bảng; bạn rời đi bất cứ lúc nào."}</p>
-              <NicknameForm initial={data.profile?.nickname ?? ""} submitLabel={joined ? "Lưu biệt danh" : "Tham gia"} onSubmit={(nickname) => saveProfile({ optedIn: true, nickname })} onCancel={joined ? () => setEditing(false) : undefined} />
+              <p className="text-body-md text-on-surface">{hasProfile ? "Đổi biệt danh của bạn (dùng chung ở phòng thi đấu)." : "Bạn chưa tham gia. Đặt biệt danh để điểm của bạn xuất hiện trên bảng; bạn rời đi bất cứ lúc nào."}</p>
+              <NicknameForm
+                initial={data.profile?.nickname ?? ""} submitLabel={hasProfile ? "Lưu biệt danh" : "Tham gia"}
+                onSubmit={(nickname) => saveProfile(joined || !hasProfile ? { optedIn: true, nickname } : { nickname })}
+                onCancel={hasProfile ? () => setEditing(false) : undefined}
+              />
             </>
           )}
         </section>

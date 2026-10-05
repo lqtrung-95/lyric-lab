@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { NICKNAME_MAX, NICKNAME_MESSAGES, validateNickname } from "@/lib/leaderboard/nickname";
 
 /**
@@ -13,6 +13,7 @@ export function NicknameForm({ initial = "", submitLabel, onSubmit, onCancel }: 
   onSubmit: (nickname: string) => Promise<string | null>;
   onCancel?: () => void;
 }) {
+  const id = useId();
   const [value, setValue] = useState(initial);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -29,15 +30,15 @@ export function NicknameForm({ initial = "", submitLabel, onSubmit, onCancel }: 
 
   return (
     <form onSubmit={submit} noValidate className="mt-space-sm">
-      <label htmlFor="nickname" className="text-label-md font-medium text-on-surface">Biệt danh hiển thị (không dùng email hay tên Google)</label>
+      <label htmlFor={id} className="text-label-md font-medium text-on-surface">Biệt danh hiển thị (không dùng email hay tên Google)</label>
       <div className="mt-1 flex flex-wrap gap-2">
-        <input id="nickname" value={value} onChange={(e) => { setValue(e.target.value); setError(null); }} maxLength={NICKNAME_MAX + 5} autoComplete="off"
-          aria-invalid={error ? true : undefined} aria-describedby={error ? "nickname-error" : undefined}
+        <input id={id} value={value} onChange={(e) => { setValue(e.target.value); setError(null); }} maxLength={NICKNAME_MAX + 5} autoComplete="off"
+          aria-invalid={error ? true : undefined} aria-describedby={error ? `${id}-error` : undefined}
           className="min-h-12 min-w-0 flex-1 rounded-2xl bg-surface-container px-4 text-body-lg text-on-surface outline-none ring-2 ring-transparent focus:ring-secondary aria-[invalid=true]:ring-error" />
         <button type="submit" disabled={busy} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">{busy ? "Đang lưu…" : submitLabel}</button>
         {onCancel && <button type="button" onClick={onCancel} className="min-h-12 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Hủy</button>}
       </div>
-      {error && <p id="nickname-error" role="alert" className="mt-1 text-label-md text-error">{error}</p>}
+      {error && <p id={`${id}-error`} role="alert" className="mt-1 text-label-md text-error">{error}</p>}
     </form>
   );
 }

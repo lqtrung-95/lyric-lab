@@ -41,3 +41,5 @@ Ghép ngẫu nhiên (hàng đợi + "bóng ma"); Lời mời đang chờ (Chấp
 - **Điểm hai bên chỉ cập nhật khi câu đóng**, không cập nhật ngay lúc trả lời, để Realtime không lộ đúng/sai của đối thủ; thiết kế vẽ điểm cập nhật liền.
 - **Ghi chú ngữ pháp chỉ hiện sau khi đã trả lời hoặc câu đóng** (an toàn hơn so với hiện sẵn).
 - Mục menu tên "Thi đấu" (thiết kế ghi "Luyện tập 1v1") cho vừa thanh tab điện thoại.
+- **Bỏ dòng Hán-Việt của cả dòng lời** ở câu hỏi (chủ dự án thấy không cần thiết); mỗi đáp án vẫn hiện âm Hán-Việt của chính nó.
+- **Tên hiển thị trong phòng = biệt danh của tài khoản** (một biệt danh dùng chung với bảng xếp hạng, đặt ở Cài đặt hoặc ngay khi cần), không còn ô nhập tên riêng cho từng phòng.

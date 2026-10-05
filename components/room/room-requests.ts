@@ -14,8 +14,7 @@ async function post<T>(path: string, body: unknown, retried = false): Promise<Re
   }
 }
 
-export const createRoomRequest = (displayName: string, videoId: string | null) =>
-  post<{ code: string }>("/api/rooms", { displayName, videoId });
+/** Tên hiển thị trong phòng lấy từ biệt danh của tài khoản ở phía server, nên không gửi tên lên đây. */
+export const createRoomRequest = (videoId: string | null) => post<{ code: string }>("/api/rooms", { videoId });
 
-export const joinRoomRequest = (code: string, displayName: string) =>
-  post<{ code: string }>(`/api/rooms/${code}/join`, { displayName });
+export const joinRoomRequest = (code: string) => post<{ code: string }>(`/api/rooms/${code}/join`, {});

@@ -1,7 +1,7 @@
 import type { RoomQuestionPublic } from "@/lib/rooms/room-question-types";
 import { Icon } from "@/components/ui/icon";
 
-/** Dòng lời có ô trống (hoặc điền sẵn đáp án khi `fill` có giá trị), kèm pinyin, gợi ý Hán-Việt và nghĩa dòng. */
+/** Dòng lời có ô trống (hoặc điền sẵn đáp án khi `fill` có giá trị), kèm pinyin và nghĩa dòng. */
 export function RoomQuestionLine({ q, fill }: { q: RoomQuestionPublic; fill?: string }) {
   const hasPinyin = q.pinyinBefore !== null && q.pinyinAfter !== null;
   return (
@@ -16,7 +16,6 @@ export function RoomQuestionLine({ q, fill }: { q: RoomQuestionPublic; fill?: st
         <span className={`mx-1 inline-block min-w-12 rounded-lg px-2 ${fill ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-highest text-primary"}`}>{fill ?? "?"}</span>
         {q.after}
       </p>
-      {q.sinoVietHint && <p className="mt-2 text-label-md text-on-surface-variant">Hán-Việt: {q.sinoVietHint}</p>}
       {q.translation && <p className="mt-1 text-body-md italic text-on-surface-variant">&ldquo;{q.translation}&rdquo;</p>}
     </div>
   );

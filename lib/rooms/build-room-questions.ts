@@ -60,7 +60,6 @@ function clipRange(line: AnalyzedLine): { clipStart: number; clipEnd: number } {
  * Dựng bộ câu Điền lời cho một phòng từ phân tích của bài. Cùng `seed` ra cùng bộ; mỗi dòng và mỗi từ chỉ ra một lần; bốn đáp án
  * gồm từ đúng và ba từ nhiễu lấy từ các từ vựng khác của chính bài (nhiễu không nằm trong dòng nên không thể là đáp án thứ hai).
  * Trả null khi bài không đủ dữ liệu cho `count` câu (bài đó không chọn được cho phòng).
- * `sinoVietHint` để null ở đây (cần tra bảng Hán-Việt, làm ở bước ghép dữ liệu phía server).
  */
 export function buildRoomQuestions(song: RoomSongInput, seed: number, count: number): RoomQuestionSet | null {
   const rng = seededRng(seed);
@@ -95,7 +94,6 @@ export function buildRoomQuestions(song: RoomSongInput, seed: number, count: num
       pinyinBefore: pinyin?.before ?? null,
       pinyinAfter: pinyin?.after ?? null,
       translation: line.translation ?? null,
-      sinoVietHint: null,
       choices,
       ...clipRange(line),
       grammarNote: safeGrammarNote(song.items, line.index, item.term),

@@ -8,7 +8,7 @@ export interface RoomChoice {
 
 /**
  * Câu hỏi Điền lời gửi cho client: KHÔNG chứa đáp án đúng (đáp án nằm ở bảng riêng `room_question_keys`).
- * Mọi trường dẫn xuất từ dòng lời đều đã bỏ phần ô trống (pinyin, Hán-Việt, ghi chú ngữ pháp).
+ * Mọi trường dẫn xuất từ dòng lời đều đã bỏ phần ô trống (pinyin, ghi chú ngữ pháp).
  */
 export interface RoomQuestionPublic {
   videoId: string;
@@ -21,8 +21,6 @@ export interface RoomQuestionPublic {
   pinyinAfter: string | null;
   /** Nghĩa tiếng Việt của cả dòng. */
   translation: string | null;
-  /** Âm Hán-Việt của dòng (ô trống hiện "[…]"); null khi thiếu chữ trong bảng. */
-  sinoVietHint: string | null;
   /** Bốn đáp án đã xáo. */
   choices: RoomChoice[];
   /** Mốc đoạn nghe của dòng (giây). */

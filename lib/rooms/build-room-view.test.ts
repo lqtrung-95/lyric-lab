@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildRoomView, type RoomViewInput } from "./build-room-view";
 
 const NOW = new Date("2026-10-05T10:00:10.000Z");
-const payload = { videoId: "abcdefghijk", lineIndex: 0, before: "a", after: "b", pinyinBefore: null, pinyinAfter: null, translation: null, sinoVietHint: null, choices: [], clipStart: 0, clipEnd: 3, grammarNote: null };
+const payload = { videoId: "abcdefghijk", lineIndex: 0, before: "a", after: "b", pinyinBefore: null, pinyinAfter: null, translation: null, choices: [], clipStart: 0, clipEnd: 3, grammarNote: null };
 
 function input(over: Partial<RoomViewInput> = {}): RoomViewInput {
   return {

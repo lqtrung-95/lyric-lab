@@ -29,7 +29,7 @@ export function RoomResult({ room }: { room: ReturnType<typeof useRoom> }) {
     if (!me) return;
     setBusy(true);
     setError(null);
-    const result = await createRoomRequest(me.displayName, view.song?.videoId ?? null);
+    const result = await createRoomRequest(view.song?.videoId ?? null);
     if (result.ok) return router.push(`/room/${result.data.code}`);
     setError(roomErrorMessage(result.error));
     setBusy(false);

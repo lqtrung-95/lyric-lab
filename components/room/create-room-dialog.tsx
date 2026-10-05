@@ -3,16 +3,16 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { roomErrorMessage } from "@/lib/rooms/room-messages";
-import { DisplayNameField } from "./display-name-field";
+import { NicknameGate } from "@/components/profile/nickname-gate";
+import { useNickname } from "@/components/profile/use-nickname";
 import { createRoomRequest } from "./room-requests";
 import { SongPicker } from "./song-picker";
-import { useDisplayName } from "./use-display-name";
 
-/** Hộp thoại tạo phòng: tên hiển thị, chọn bài (ngẫu nhiên hoặc tự chọn), rồi vào phòng chờ với mã 6 số. */
+/** Hộp thoại tạo phòng: biệt danh (đặt ngay nếu chưa có), chọn bài (ngẫu nhiên hoặc tự chọn), rồi vào phòng chờ với mã 6 số. */
 export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter();
   const ref = useRef<HTMLDialogElement>(null);
-  const display = useDisplayName();
+  const nick = useNickname();
   const [pick, setPick] = useState(false);
   const [videoId, setVideoId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -28,10 +28,10 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
 
   async function create() {
     setSubmitted(true);
-    if (display.valid === null || (pick && !videoId)) return;
+    if (pick && !videoId) return;
     setBusy(true);
     setError(null);
-    const result = await createRoomRequest(display.valid, pick ? videoId : null);
+    const result = await createRoomRequest(pick ? videoId : null);
     if (result.ok) return router.push(`/room/${result.data.code}`);
     setError(roomErrorMessage(result.error));
     setBusy(false);
@@ -49,7 +49,7 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
     >
       <div className="space-y-space-md p-space-lg">
         <h2 id="create-room-title" className="font-serif text-headline-md">Tạo phòng thi đấu</h2>
-        <DisplayNameField {...display} showError={submitted} />
+        <NicknameGate state={nick} />
         <fieldset>
           <legend className="text-label-md font-medium text-on-surface">Bài hát</legend>
           <div className="mt-1 flex gap-2">
@@ -74,7 +74,7 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
         {error && <p role="alert" className="text-label-md text-error">{error}</p>}
         <div className="flex flex-col-reverse gap-space-sm sm:flex-row sm:justify-end">
           <button type="button" onClick={onClose} className="min-h-11 rounded-full px-5 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Hủy</button>
-          <button type="button" onClick={create} disabled={busy} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+          <button type="button" onClick={create} disabled={busy || !nick.nickname} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
             {busy ? "Đang tạo…" : "Tạo phòng"}
           </button>
         </div>

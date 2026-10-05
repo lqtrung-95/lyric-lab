@@ -24,7 +24,7 @@ export function RoomHub() {
       </section>
 
       <div className="grid gap-space-md lg:grid-cols-2">
-        <section aria-labelledby="invite-heading" className={card}>
+        <section aria-labelledby="invite-heading" className={`${card} flex flex-col`}>
           <div className="flex items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary-container text-on-primary-container"><Icon name="person_add" size={22} /></span>
             <div>
@@ -32,6 +32,11 @@ export function RoomHub() {
               <p className="text-label-md text-on-surface-variant">Tạo phòng riêng và gửi mã hoặc link cho bạn bè.</p>
             </div>
           </div>
+          <ul className="mt-space-md flex-1 space-y-2 text-body-md text-on-surface-variant">
+            {["Chọn bài ngẫu nhiên hoặc tự chọn bài bạn thích", "Gửi mã 6 số hoặc link, bạn bè vào là chơi", "10 câu điền từ, hai người trả lời cùng lúc"].map((line) => (
+              <li key={line} className="flex items-start gap-2"><Icon name="check_circle" filled size={18} className="mt-0.5 shrink-0 text-secondary" />{line}</li>
+            ))}
+          </ul>
           <button type="button" onClick={() => setCreating(true)} className="mt-space-md min-h-11 w-full rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">
             Tạo phòng
           </button>

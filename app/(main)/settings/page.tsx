@@ -4,6 +4,7 @@ import { AccountSection } from "@/components/settings/account-section";
 import { AdminEntry } from "@/components/settings/admin-entry";
 import { DeleteDataSection } from "@/components/settings/delete-data-section";
 import { ListenSection } from "@/components/settings/listen-section";
+import { NicknameSection } from "@/components/settings/nickname-section";
 import { VoiceSection } from "@/components/settings/voice-section";
 import { LearningSection } from "@/components/settings/learning-section";
 
@@ -14,6 +15,7 @@ export default function SettingsPage() {
     <div className="mx-auto flex max-w-2xl flex-col gap-space-md">
       <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Cài đặt</h1>
       <LearningSection />
+      <NicknameSection />
       <ListenSection />
       <VoiceSection />
       <Suspense>
