@@ -1,5 +1,6 @@
 import type { AnalyzedLine, PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { buildChoices, buildCloze } from "@/lib/practice/cloze";
+import { isCreditLine } from "./credit-line";
 import { seededRng, shuffle } from "@/lib/practice/random";
 import type { RoomChoice, RoomQuestionPublic, RoomQuestionSet } from "./room-question-types";
 import { splitPinyinAroundTerm } from "./split-pinyin";
@@ -63,8 +64,12 @@ function clipRange(line: AnalyzedLine): { clipStart: number; clipEnd: number } {
  */
 export function buildRoomQuestions(song: RoomSongInput, seed: number, count: number): RoomQuestionSet | null {
   const rng = seededRng(seed);
-  const vocab = song.items.filter((i) => i.type === "vocab");
-  const lineByIndex = new Map(song.lines.map((l) => [l.index, l]));
+  // Bỏ dòng ghi công đầu bài (作词, 混音母带, 企划, OP…): không phải lời hát nên không ra câu hỏi, và từ chỉ xuất hiện ở các dòng đó
+  // (vd. 企划) cũng không được dùng làm đáp án nhiễu.
+  const lyricLines = song.lines.filter((l) => !isCreditLine(l.text));
+  const lyricLineIndexes = new Set(lyricLines.map((l) => l.index));
+  const vocab = song.items.filter((i) => i.type === "vocab" && i.occurrences.some((o) => lyricLineIndexes.has(o.lineIndex)));
+  const lineByIndex = new Map(lyricLines.map((l) => [l.index, l]));
   const byTerm = new Map(vocab.map((i) => [i.term, i]));
   const pool = vocab.map((i) => i.term);
 

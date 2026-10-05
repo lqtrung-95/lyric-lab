@@ -104,4 +104,18 @@ describe("buildRoomQuestions", () => {
     expect(q4.grammarNote).toEqual({ pattern: "我看见……", explanation: "Thấy một điều gì đó" });
     expect(q5.grammarNote).toBeNull(); // lời giải thích chứa từ đáp án
   });
+
+  it("bỏ dòng ghi công đầu bài: không ra câu hỏi từ dòng đó, và từ chỉ có ở dòng ghi công không làm đáp án nhiễu", () => {
+    const song = makeSong();
+    // Dòng 0 trở thành dòng ghi công chứa từ 企划 (chỉ xuất hiện ở đó); thêm vào kho từ vựng như bài thật.
+    song.lines[0] = { ...song.lines[0], text: "企划 : 李孟言/钱娇" };
+    song.items[0] = { ...song.items[0], term: "企划", occurrences: [{ lineIndex: 0, start: 0 }] };
+    const set = buildRoomQuestions(song, 4, WORDS.length - 1)!;
+    expect(set).not.toBeNull();
+    expect(set.questions.map((q) => q.lineIndex)).not.toContain(0);
+    expect(set.correctTerms).not.toContain("企划");
+    for (const q of set.questions) expect(q.choices.map((c) => c.term)).not.toContain("企划");
+    // Đủ 14 dòng thì chỉ còn 13 dòng lời: yêu cầu 14 câu không đủ dữ liệu.
+    expect(buildRoomQuestions(song, 4, WORDS.length)).toBeNull();
+  });
 });
