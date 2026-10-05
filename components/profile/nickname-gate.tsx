@@ -9,11 +9,12 @@ import type { NicknameState } from "./use-nickname";
 /**
  * Cần biệt danh mới đi tiếp (vào phòng thi đấu): chưa có thì hiện form đặt ngay tại chỗ (lưu vào hồ sơ dùng chung, không tự công khai điểm
  * trên bảng xếp hạng), có rồi thì hiện dòng "Bạn chơi với tên … (đổi ở Cài đặt)" và các phần con. `state` từ `useNickname()` do nơi dùng giữ
- * để biết lúc nào đã có biệt danh (bật/tắt nút) và dùng chung một lần tải.
+ * để biết lúc nào đã có biệt danh (bật/tắt nút) và dùng chung một lần tải. `loading` là khung chờ cùng kích thước nội dung thật của nơi dùng
+ * để bố cục không nhảy khi tải xong.
  */
-export function NicknameGate({ state, children }: { state: NicknameState; children?: (nickname: string) => ReactNode }) {
+export function NicknameGate({ state, loading, children }: { state: NicknameState; loading?: ReactNode; children?: (nickname: string) => ReactNode }) {
   const { nickname, save } = state;
-  if (nickname === undefined) return <Skeleton className="h-12 w-full" />;
+  if (nickname === undefined) return <>{loading ?? <Skeleton className="h-12 w-full" />}</>;
   if (nickname === null) {
     return (
       <div>

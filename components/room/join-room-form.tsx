@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { NicknameGate } from "@/components/profile/nickname-gate";
 import { useNickname } from "@/components/profile/use-nickname";
+import { Skeleton } from "@/components/ui/skeleton";
 import { normalizeRoomCode } from "@/lib/rooms/room-code-format";
 import { roomErrorMessage } from "@/lib/rooms/room-messages";
 import { joinRoomRequest } from "./room-requests";
@@ -33,7 +34,7 @@ export function JoinRoomForm({ fixedCode, onJoined }: { fixedCode?: string; onJo
 
   return (
     <div className="space-y-space-sm">
-      <NicknameGate state={nick}>
+      <NicknameGate state={nick} loading={<JoinFormSkeleton fixedCode={fixedCode !== undefined} />}>
         {() => (
           <form onSubmit={(e) => { e.preventDefault(); void join(); }} className="space-y-space-sm">
             {!fixedCode && (
@@ -54,6 +55,22 @@ export function JoinRoomForm({ fixedCode, onJoined }: { fixedCode?: string; onJo
           </form>
         )}
       </NicknameGate>
+    </div>
+  );
+}
+
+/** Khung chờ cùng cỡ với nội dung thật (dòng "Bạn chơi với tên", ô nhập mã, nút) để thẻ không đổi chiều cao khi hồ sơ tải xong. */
+function JoinFormSkeleton({ fixedCode }: { fixedCode: boolean }) {
+  return (
+    <div role="status" aria-label="Đang tải" className="space-y-space-sm">
+      <Skeleton className="h-5 w-56" />
+      {!fixedCode && (
+        <div className="space-y-1">
+          <Skeleton className="h-4 w-40" />
+          <Skeleton className="h-11 w-full rounded-xl" />
+        </div>
+      )}
+      <Skeleton className="h-11 w-full rounded-full" />
     </div>
   );
 }
