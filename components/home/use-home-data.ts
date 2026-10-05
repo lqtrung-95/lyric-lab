@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { DiscoverSong } from "@/lib/discover/discover-query";
+import { DISCOVER_PAGE_SIZE, type DiscoverSong } from "@/lib/discover/discover-query";
 import { levelToBand, pickContinueSong, type ContinueSong } from "@/lib/home/home-logic";
 import type { RemoteSongProgress } from "@/lib/library/merge-library-songs";
 
@@ -21,13 +21,29 @@ export function useContinueSong(): ContinueSong | null | undefined {
 
 const MAX_RECOMMENDED = 4;
 
-async function fetchDiscover(params: Record<string, string>): Promise<DiscoverSong[]> {
+interface DiscoverPage { songs: DiscoverSong[]; hasMore: boolean }
+
+async function fetchDiscover(params: Record<string, string>): Promise<DiscoverPage> {
   try {
     const res = await fetch(`/api/discover?${new URLSearchParams(params)}`);
-    return res.ok ? ((await res.json()) as { songs: DiscoverSong[] }).songs : [];
+    return res.ok ? ((await res.json()) as DiscoverPage) : { songs: [], hasMore: false };
   } catch {
-    return [];
+    return { songs: [], hasMore: false };
   }
+}
+
+/** Số trang Khám phá tối đa đọc cho mỗi nguồn (24 bài/trang): đủ vượt qua cả thư viện mà không gọi vô hạn. */
+const MAX_PAGES = 6;
+
+/** Đọc từng trang (đã xếp theo độ phổ biến) cho đến khi gom đủ `need` bài chưa bị loại hoặc hết trang. */
+async function collectUnseen(params: Record<string, string>, skip: Set<string>, need: number): Promise<DiscoverSong[]> {
+  const found: DiscoverSong[] = [];
+  for (let page = 0; page < MAX_PAGES && found.length < need; page++) {
+    const { songs, hasMore } = await fetchDiscover({ ...params, offset: String(page * DISCOVER_PAGE_SIZE) });
+    for (const s of songs) if (!skip.has(s.videoId)) { skip.add(s.videoId); found.push(s); }
+    if (!hasMore) break;
+  }
+  return found;
 }
 
 /**
@@ -41,13 +57,10 @@ export function useRecommendedSongs(level: number, excludeIds: string[]): Discov
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // `skip` gồm bài đã mở và dồn thêm các bài đã chọn, để nguồn bù không lặp lại bài của dải trình độ.
       const skip = new Set(excludeKey ? excludeKey.split(",") : []);
-      const pick = (list: DiscoverSong[]) => list.filter((s) => !skip.has(s.videoId));
-      let result = pick(await fetchDiscover({ sort: "popular", band: levelToBand(level) }));
-      if (result.length < MAX_RECOMMENDED) {
-        const more = pick(await fetchDiscover({ sort: "popular" })).filter((s) => !result.some((r) => r.videoId === s.videoId));
-        result = [...result, ...more];
-      }
+      const inBand = await collectUnseen({ sort: "popular", band: levelToBand(level) }, skip, MAX_RECOMMENDED);
+      const result = inBand.length >= MAX_RECOMMENDED ? inBand : [...inBand, ...(await collectUnseen({ sort: "popular" }, skip, MAX_RECOMMENDED - inBand.length))];
       if (!cancelled) setSongs(result.slice(0, MAX_RECOMMENDED));
     })();
     return () => { cancelled = true; };
