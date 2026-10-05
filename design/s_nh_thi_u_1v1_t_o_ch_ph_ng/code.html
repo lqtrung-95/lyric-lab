@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="vi"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Noto+Serif:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface-container": "#f7ece3", "on-surface-variant": "#58413d", "on-secondary-fixed": "#002020", "secondary-fixed": "#b4edec", "on-error": "#ffffff", "inverse-surface": "#352f29", "primary-container": "#b23a26", "error": "#ba1a1a", "surface": "#fff8f4", "primary-fixed-dim": "#ffb4a6", "on-primary-fixed": "#3f0300", "surface-container-low": "#fdf2e8", "on-background": "#201b15", "tertiary-fixed-dim": "#ffb4a6", "on-tertiary-container": "#ffd9d2", "primary": "#912211", "surface-container-high": "#f1e6dd", "surface-tint": "#ab3521", "inverse-primary": "#ffb4a6", "on-tertiary-fixed-variant": "#8c1708", "on-surface": "#201b15", "secondary-fixed-dim": "#99d1d0", "on-secondary": "#ffffff", "on-tertiary-fixed": "#3f0300", "tertiary": "#941d0d", "on-primary-fixed-variant": "#891d0c", "tertiary-fixed": "#ffdad4", "primary-fixed": "#ffdad3", "secondary-container": "#b4edec", "surface-container-lowest": "#ffffff", "outline": "#8c716c", "surface-container-highest": "#ebe1d7", "on-secondary-container": "#366d6d", "tertiary-container": "#b63623", "surface-bright": "#fff8f4", "secondary": "#2f6767", "on-tertiary": "#ffffff", "on-primary": "#ffffff", "inverse-on-surface": "#faefe5", "on-error-container": "#93000a", "on-primary-container": "#ffd8d1", "error-container": "#ffdad6", "surface-variant": "#ebe1d7", "surface-dim": "#e3d8cf", "background": "#fff8f4", "on-secondary-fixed-variant": "#114f4f", "outline-variant": "#e0bfb9" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-desktop": "1.5rem", "space-xl": "2.5rem", "space-md": "1rem", "gutter": "1rem", "margin": "1.25rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "margin-desktop": "3rem", "space-sm": "0.5rem" }, "fontFamily": { "hanzi-display": ["Noto Serif"], "headline-xl": ["Noto Serif"], "label-sm": ["Be Vietnam Pro"], "body-lg": ["Be Vietnam Pro"], "label-md": ["Be Vietnam Pro"], "body-md": ["Be Vietnam Pro"], "hanzi-body": ["Noto Serif"], "headline-xl-mobile": ["Noto Serif"], "headline-lg": ["Noto Serif"], "hanviet-reading": ["Be Vietnam Pro"], "pinyin-reading": ["Be Vietnam Pro"], "headline-md": ["Noto Serif"], "headline-lg-mobile": ["Noto Serif"] }, "fontSize": { "hanzi-display": ["36px", { "lineHeight": "48px", "fontWeight": "500" }], "headline-xl": ["40px", { "lineHeight": "52px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }], "body-lg": ["17px", { "lineHeight": "28px", "fontWeight": "400" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "500" }], "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], "hanzi-body": ["22px", { "lineHeight": "36px", "fontWeight": "400" }], "headline-xl-mobile": ["30px", { "lineHeight": "40px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "42px", "fontWeight": "500" }], "hanviet-reading": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "pinyin-reading": ["13px", { "lineHeight": "18px", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "30px", "fontWeight": "500" }], "headline-lg-mobile": ["24px", { "lineHeight": "34px", "fontWeight": "500" }] } } } }</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs"><button aria-label="Quay lại" class="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-on-surface hover:text-primary transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-headline-md text-headline-md text-on-surface tracking-tight truncate">Luyện Tập 1V1</h1></div><div class="flex items-center gap-space-xs"><div aria-label="Hồ sơ người dùng" class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface px-margin pb-safe"><div class="flex flex-col w-full pb-8 space-y-5">
+<!-- Subtitle Intro (App shell handles H1 page title) -->
+<div class="flex items-center justify-between px-1">
+<div>
+<p class="font-body-md text-body-md text-on-surface-variant font-medium">Đối ẩm thi ca · Học cùng bạn bè qua giai điệu</p>
+</div>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+      Phòng trực tiếp
+    </span>
+</div>
+<!-- Segmented Tabs -->
+<div class="grid grid-cols-2 p-1 rounded-full bg-surface-container-high">
+<button class="py-2 rounded-full font-label-md text-label-md bg-surface-container-lowest text-primary shadow-sm font-semibold transition-all" type="button">
+      Tạo phòng mới
+    </button>
+<button class="py-2 rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface transition-all" type="button">
+      Vào bằng mã
+    </button>
+</div>
+<!-- Main Lobby Card -->
+<div class="rounded-xl bg-surface-container-lowest p-5 shadow-sm space-y-5">
+<!-- Header of the Room -->
+<div class="flex items-center justify-between pb-1">
+<div class="space-y-0.5">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Phòng đấu riêng</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Phòng chờ #842915</h2>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[15px] text-primary">hourglass_top</span>
+<span id="lobbyCountdown">09:54</span>
+</div>
+</div>
+<!-- Room Code Badge Banner -->
+<div class="rounded-xl bg-surface-container-low p-4 flex flex-col items-center justify-center space-y-3">
+<span class="font-label-sm text-label-sm text-on-surface-variant">MÃ PHÒNG GẶP MẶT</span>
+<div class="flex items-center gap-2 tracking-[0.25em] font-hanzi-display text-headline-xl-mobile text-primary font-semibold select-all" id="roomCodeText">
+<span>8</span><span>4</span><span>2</span><span>9</span><span>1</span><span>5</span>
+</div>
+<div class="grid grid-cols-2 gap-2 w-full pt-1">
+<button class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-surface-container-highest text-on-surface font-label-md text-label-md active:scale-95 transition-transform" id="copyCodeBtn" onclick="copyCode()" type="button">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+<span id="copyBtnText">Sao chép mã</span>
+</button>
+<button class="flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-full bg-secondary text-on-secondary font-label-md text-label-md active:scale-95 transition-transform" onclick="shareInvite()" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+<span>Gửi Zalo / Link</span>
+</button>
+</div>
+</div>
+<!-- Match Configuration Card -->
+<div class="rounded-xl bg-surface-container p-3.5 space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 bg-surface-container-highest relative">
+<img class="w-full h-full object-cover" data-alt="Vintage cassette tape and vinyl record sleeve on handcrafted textured tea paper, warm cinnabar red Chinese calligraphy seal, cinematic melancholic moody lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_9v2A5o72XEeaOamapeiL2p7QkxDcHLIjS1qX4P0qESffrrefuLaTCpzerSCeCyR4tFhynZa9jQ90y_unzzQIEqlQ2nUrBGF1SCNibF0q00WHMwwkXkQ8nMNEKNB3J-peftMPaAZGfvLptPY4pbkzKpNhk6-mRbwot0dORnOiNvAqDlNkzt7tXff37lXP1GbwjVOuL0_WjNLjq3t5II2NXIVooXOktCtnW1R1vtJ0gSuBHxzfdG9-1Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end justify-center pb-0.5">
+<span class="material-symbols-outlined text-white text-[14px]">music_note</span>
+</div>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="font-hanzi-body text-[16px] text-on-surface font-medium truncate">夜车</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Chuyến tàu đêm</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant truncate">Tăng Cật Duy (Sodagreen) · C-Pop Ballad</p>
+</div>
+</div>
+<button class="shrink-0 px-2.5 py-1.5 rounded-full bg-surface-container-lowest text-primary font-label-sm text-label-sm font-medium shadow-sm hover:bg-surface-container-high transition-colors" type="button">
+          Đổi bài
+        </button>
+</div>
+<div class="flex items-center justify-between pt-2 border-t-0 bg-surface-container-low rounded-lg px-3 py-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">stylus_note</span>
+<span class="font-label-md text-label-md text-on-surface">Điền từ vào chỗ trống (Cloze)</span>
+</div>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">10 câu</span>
+</div>
+</div>
+<!-- 1v1 Battle Arena Duet -->
+<div class="space-y-2">
+<div class="flex items-center justify-between px-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-medium">DANH SÁCH BÀN ĐẤU (1/2)</span>
+<span class="font-label-sm text-label-sm text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+          Đang đợi đối thủ
+        </span>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<!-- Player 1 (Host - You) -->
+<div class="rounded-xl bg-surface-container-low p-3.5 flex flex-col items-center text-center space-y-2 relative shadow-sm">
+<div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded-full bg-primary-container text-on-primary-container font-label-sm text-[10px] font-bold">
+            Chủ phòng
+          </div>
+<div class="w-14 h-14 rounded-full overflow-hidden p-0.5 bg-surface-container-lowest shadow-sm mt-2">
+<img class="w-full h-full object-cover rounded-full" data-alt="Portrait of a young East Asian girl with short hair wearing cozy knitted sweater studying by a wooden table with ceramic cup, warm natural afternoon light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr0gt0wovvk7jrc_DDkvwEy2KOH8rLF91g8_BlMM_eJgmgStJnTDOw8GDqxG1_Ni13KrWjQYYtnQPuroogSC2KeKhmdsXgmXLdqe3dgawsfIY0dX3KbRRsw81g2L5jJ41CWUvyahEB_U2DHSVUyO9eH1Bpvl3AIDkktm9twguQF8hZbKPiW56rGbAZQxGO_fVzLtLkMMF5l2Pfg84J9dv7WdWGp3rKHWlVwPi4-P3xSA6M1GDYC9IG0Q"/>
+</div>
+<div class="space-y-0.5 w-full">
+<h3 class="font-body-md text-body-md text-on-surface font-semibold truncate">Linh (Bạn)</h3>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-[11px]">
+<span>HSK 3</span>
+<span>·</span>
+<span>1.420 đ</span>
+</div>
+</div>
+<span class="w-full py-1 rounded-full bg-secondary/15 text-secondary font-label-sm text-label-sm font-semibold flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+            Sẵn sàng
+          </span>
+</div>
+<!-- Player 2 (Empty Slot) -->
+<div class="rounded-xl bg-surface-container p-3.5 flex flex-col items-center justify-center text-center space-y-2 relative">
+<div class="w-14 h-14 rounded-full bg-surface-container-highest flex items-center justify-center relative mt-2 text-outline">
+<span class="material-symbols-outlined text-[28px] animate-pulse">person_add</span>
+<div class="absolute inset-0 rounded-full border border-dashed border-outline-variant animate-spin" style="animation-duration: 9s;"></div>
+</div>
+<div class="space-y-0.5">
+<h3 class="font-body-md text-body-md text-on-surface-variant font-medium">Chờ bạn bè...</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Quét mã hoặc vào link</p>
+</div>
+<button class="w-full py-1 rounded-full bg-surface-container-highest text-primary font-label-sm text-label-sm font-semibold hover:bg-surface-container-lowest transition-colors" onclick="shareInvite()" type="button">
+            + Mời nhanh
+          </button>
+</div>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="space-y-2 pt-1">
+<button class="w-full py-3.5 px-4 rounded-full bg-primary-container text-on-primary font-body-md text-body-md font-semibold tracking-wide shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="button">
+<span class="material-symbols-outlined text-[20px]">swords</span>
+<span>Bắt đầu thi đấu</span>
+</button>
+<button class="w-full py-3 px-4 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors flex items-center justify-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[18px]">shuffle</span>
+<span>Chuyển sang ghép ngẫu nhiên toàn quốc</span>
+</button>
+</div>
+</div>
+<!-- Recent Study Buddies Section -->
+<div class="space-y-3">
+<div class="flex items-center justify-between px-1">
+<h3 class="font-headline-md text-headline-md text-on-surface">Bạn cùng học gần đây</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lịch sử đấu</span>
+</div>
+<div class="space-y-2.5">
+<!-- Friend Item 1 -->
+<div class="rounded-xl bg-surface-container-lowest p-3.5 flex items-center justify-between shadow-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-11 h-11 rounded-full overflow-hidden bg-surface-container-high shrink-0">
+<img class="w-full h-full object-cover" data-alt="Portrait photo of a young Vietnamese student smiling warmly in university library wearing beige jacket, soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUIuvMhxTjK5rw59rhu4oNk21y0basv1QM3H_QNgYspW2_o9URHYoKg6n6-O-qWMJgv5Ke-aemWn9LnkSdEwmegU99qvrJorf9NY1o1p_tqpV8HuLkjhRYQTuoZroyoFmt2itGoU7w6ZEmZfaS_sZ-oFpykeNdIJc6AhJ5ocM3O0K9qtnrqvOdgJZ3VEOybJPTDrRg1xW9gA0EMMe4Pu7FZtgg15B1vNeI4VYevFBIiRUdwqL3cTZ2gw"/>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">Minh Hoàng</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high font-label-sm text-[10px] text-on-surface-variant">HSK 4</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span>Đấu hôm qua</span>
+<span>·</span>
+<span class="text-secondary font-medium">Bạn thắng 8-6</span>
+</div>
+</div>
+</div>
+<button class="px-3.5 py-1.5 rounded-full bg-primary text-on-primary font-label-md text-label-md font-medium active:scale-95 transition-transform shrink-0 flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">send</span>
+          Mời
+        </button>
+</div>
+<!-- Friend Item 2 -->
+<div class="rounded-xl bg-surface-container-lowest p-3.5 flex items-center justify-between shadow-sm opacity-90">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-11 h-11 rounded-full bg-surface-container-highest flex items-center justify-center shrink-0 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">person_outline</span>
+</div>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md text-on-surface font-semibold truncate">Học viên ẩn danh</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container-high font-label-sm text-[10px] text-on-surface-variant">HSK 3</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span>Chơi bài: 晴天</span>
+<span>·</span>
+<span>2 ngày trước</span>
+</div>
+</div>
+</div>
+<button class="px-3.5 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant font-label-md text-label-md font-medium active:scale-95 transition-transform shrink-0 flex items-center gap-1" type="button">
+<span class="material-symbols-outlined text-[16px]">add</span>
+          Mời
+        </button>
+</div>
+</div>
+</div>
+<!-- Literary Insight & Scoring Note -->
+<div class="rounded-xl bg-surface-container-low p-4 space-y-2 relative overflow-hidden">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">auto_stories</span>
+<div class="space-y-1">
+<h4 class="font-headline-md text-[15px] leading-5 text-on-surface font-semibold">Quy tắc nhịp điệu &amp; Chấm điểm</h4>
+<p class="font-body-md text-label-md text-on-surface-variant leading-relaxed">
+          Độ chuẩn xác ngữ nghĩa là tiên quyết (100đ/câu). Tốc độ gõ và nhận diện chữ Hán trong bài nhạc sẽ cộng điểm thưởng (+10 đến +30đ).
+        </p>
+</div>
+</div>
+<div class="pt-2 flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] text-secondary">verified_user</span>
+        Đồng bộ điểm HSK cá nhân
+      </span>
+<button class="text-primary font-medium underline underline-offset-2" type="button">
+        Đăng nhập Google
+      </button>
+</div>
+</div>
+</div>
+<script>
+  // Countdown Timer Simulation
+  (function initLobbyCountdown() {
+    let secondsLeft = 594; // 09:54
+    const timerEl = document.getElementById('lobbyCountdown');
+    if (!timerEl) return;
+    
+    const interval = setInterval(() => {
+      if (secondsLeft <= 0) {
+        clearInterval(interval);
+        timerEl.textContent = '00:00';
+        return;
+      }
+      secondsLeft--;
+      const mins = Math.floor(secondsLeft / 60);
+      const secs = secondsLeft % 60;
+      timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }, 1000);
+  })();
+
+  function copyCode() {
+    const code = '842915';
+    navigator.clipboard?.writeText(code).then(() => {
+      const btnText = document.getElementById('copyBtnText');
+      if (btnText) {
+        const prev = btnText.textContent;
+        btnText.textContent = 'Đã chép!';
+        setTimeout(() => { btnText.textContent = prev; }, 1800);
+      }
+    }).catch(() => {
+      alert('Mã phòng: 842915');
+    });
+  }
+
+  function shareInvite() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Thi đấu lời nhạc C-Pop cùng tôi!',
+        text: 'Vào phòng luyện thi đấu Lyric Lab #842915 qua bài hát 夜车 (Chuyến tàu đêm)',
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      copyCode();
+    }
+  }
+</script></main></body></html>
