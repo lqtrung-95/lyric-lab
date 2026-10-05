@@ -43,7 +43,7 @@ const iconSize = "text-[20px] lg:text-[26px]";
 /**
  * Thanh điều khiển, gắn ngay dưới video (dính theo video khi cuộn, cùng một bố cục cho mọi cỡ màn hình — điện
  * thoại, tablet, máy tính). 2 hàng: hàng trên là vị trí phát (kéo tới đâu tuỳ ý, kèm ±5s cạnh hai mốc thời gian —
- * xem `PlaybackProgressBar`), hàng dưới là các nút bấm nhanh: tốc độ, phát/dừng, lặp câu, ghim, giải thích AI,
+ * xem `PlaybackProgressBar`), hàng dưới là các nút bấm nhanh: tốc độ, lặp câu, ghim, phát/dừng, giải thích AI,
  * luyện phát âm, canh lời lệch.
  */
 export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: PlaybackBarProps) {
@@ -84,12 +84,12 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
         <PlaybackProgressBar controller={controller} durationSec={durationSec} onSeekBy={onSeekBy} />
         <div role="group" aria-label="Điều khiển nhanh" className="flex items-center justify-between gap-1">
           <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px]`}>{label(rate)}</button>
+          <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
+          <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>
           <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50 lg:h-14 lg:w-14">
             <Icon name={playing ? "pause" : "play_arrow"} filled size={null} className="text-[22px] lg:text-[28px]" />
           </button>
-          <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
-          <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>
           <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>
           <button type="button" disabled={practiceDisabled} onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>
           <button type="button" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel} className={`${tile} ${syncOpen || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>
