@@ -53,8 +53,9 @@
 Hai người chơi trọn 10 câu, cùng thấy câu và đồng hồ; một bên rớt mạng thì ván kết thúc đúng quy tắc; hai máy cùng gọi "tiến câu" không làm nhảy câu.
 
 ## Rủi ro
-- **Chưa kiểm chứng giới hạn Realtime của gói Supabase hiện dùng** (số kết nối đồng thời, số tin nhắn/giây). Cần xem trước khi cam kết số phòng đồng thời.
-- Độ trễ Postgres Changes có thể cao hơn Broadcast; nếu thấy lag thì chuyển sự kiện nóng sang Broadcast do server phát.
+- **Giới hạn Realtime của gói Free (đã đối chiếu với tài liệu Supabase, 2026-10-05):** 200 kết nối đồng thời, 100 tin nhắn/giây, 100 lượt vào kênh/giây, 100 kênh/kết nối, presence 20 tin/giây, quota 2 triệu tin nhắn/tháng (Free không tính thêm phí, vượt thì bị giới hạn). Ước lượng thô của tôi (chưa đo): một ván 1v1 mất khoảng 100–150 tin nhắn (Postgres Changes nhân theo số người nghe, cộng presence), tức khoảng 13.000+ ván/tháng; 200 kết nối ≈ **tối đa khoảng 100 ván cùng lúc** nếu mỗi người chỉ có một kết nối. Để giữ số này: chỉ mở kết nối Realtime khi đang ở trong phòng và đóng ngay khi rời, tránh để kết nối mở ở các trang khác.
+- Số phòng chơi cùng lúc thực tế của app hiện rất nhỏ nên giới hạn này không phải nút thắt; theo dõi trong Supabase Dashboard (Realtime) sau khi mở cho nhiều người.
+- Độ trễ Postgres Changes có thể cao hơn Broadcast (tài liệu Supabase cũng ghi Postgres Changes kém co giãn hơn Broadcast khi nhiều người nghe); nếu thấy lag thì chuyển sự kiện nóng sang Broadcast do server phát.
 - Lệch đồng hồ giữa hai máy làm đếm ngược không khớp: dùng thời điểm server trả về và hiển thị phần còn lại tính từ đó.
 
 ## Bảo mật

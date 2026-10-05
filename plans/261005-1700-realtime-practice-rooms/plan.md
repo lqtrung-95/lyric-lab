@@ -46,4 +46,4 @@ Tổng ước lượng 4–6 ngày (ước lượng thô, chưa tính thử nghi
 
 ## Câu hỏi còn mở
 
-Xem cuối từng file giai đoạn. Câu lớn nhất: giới hạn kết nối/tin nhắn Realtime của gói Supabase hiện dùng (chưa kiểm chứng), ảnh hưởng số phòng chơi đồng thời.
+Xem cuối từng file giai đoạn. Giới hạn Realtime của gói Free (200 kết nối, 100 tin nhắn/giây, 2 triệu tin nhắn/tháng) đã kiểm chứng và ghi ở phase-03: đủ cho khoảng 100 ván cùng lúc. Còn lại cần đo độ trễ Postgres Changes khi dựng thật.
