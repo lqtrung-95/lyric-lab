@@ -44,11 +44,11 @@
 5. Điều kiện đủ điều kiện của bài và hàm chọn bài ngẫu nhiên hợp trình độ (dựa trên `level_avg` của `songs` / `discover_songs`).
 
 ## Danh sách việc
-- [ ] `build-room-questions` + test
-- [ ] `room-scoring` + test
-- [ ] Migration các bảng câu hỏi/đáp án
-- [ ] API trả lời
-- [ ] Lọc bài đủ điều kiện + chọn ngẫu nhiên theo trình độ
+- [x] `build-room-questions` + test
+- [x] `room-scoring` + test
+- [x] Migration các bảng câu hỏi/đáp án
+- [x] API trả lời
+- [x] Lọc bài đủ điều kiện (dựng được đủ câu) + chọn ngẫu nhiên trong bài Khám phá (chưa lọc theo trình độ: để giai đoạn 2 của dự án)
 
 ## Tiêu chí hoàn thành
 Cùng `seed` ra đúng cùng bộ câu cho hai người; đáp án không lộ qua API/Realtime; điểm tính đúng theo quy tắc; test qua.

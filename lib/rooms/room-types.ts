@@ -30,4 +30,15 @@ export interface RoomView {
 /** Kết quả hàm SQL `join_room`. */
 export type JoinRoomResult = "ok" | "not_found" | "expired" | "full" | "not_waiting";
 /** Kết quả hàm SQL `start_room`. */
-export type StartRoomResult = "ok" | "no_song" | "not_found" | "not_host" | "not_waiting" | "expired" | "need_two" | "not_ready";
+export type StartRoomResult = "ok" | "no_song" | "song_unusable" | "not_found" | "not_host" | "not_waiting" | "expired" | "need_two" | "not_ready";
+
+/** Kết quả hàm SQL `submit_room_answer` (trường `result`). */
+export type AnswerFailure = "not_playing" | "not_in_room" | "no_question" | "not_open" | "closed" | "already_answered";
+
+export interface AnswerFeedback {
+  correct: boolean;
+  points: number;
+  elapsedMs: number;
+  /** Chỉ số đáp án đúng trong `choices` của câu, để hiện ngay sau khi người này đã trả lời. */
+  correctIndex: number;
+}
