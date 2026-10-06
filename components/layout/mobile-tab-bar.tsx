@@ -4,18 +4,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/ui/icon";
 import { DueBadge } from "@/components/review/due-badge";
-import { NAV_LINKS, isNavActive } from "./nav-links";
+import { isNavActive } from "./nav-links";
+import { useNavLinks } from "./use-nav-links";
 
 /** Tab bar dưới cùng cho mobile (ẩn từ md trở lên). */
 export function MobileTabBar() {
   const pathname = usePathname();
+  const navLinks = useNavLinks();
   return (
     <nav
       aria-label="Điều hướng chính"
       className="fixed inset-x-0 bottom-0 z-50 bg-surface/90 pb-safe shadow-[0_-2px_12px_rgba(30,26,22,0.04)] backdrop-blur-xl md:hidden"
     >
       <div className="flex h-16 items-center justify-around px-space-sm">
-        {NAV_LINKS.map((link) => {
+        {navLinks.map((link) => {
           const active = isNavActive(link.href, pathname);
           return (
             <Link

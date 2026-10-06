@@ -5,12 +5,14 @@ import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/brand/logo-mark";
 import { Icon } from "@/components/ui/icon";
 import { DueBadge } from "@/components/review/due-badge";
-import { NAV_LINKS, isNavActive } from "./nav-links";
+import { isNavActive } from "./nav-links";
+import { useNavLinks } from "./use-nav-links";
 import { ThemeToggle } from "./theme-toggle";
 
 /** Thanh trên cùng: desktop có 3 mục điều hướng dạng viên thuốc; mobile chỉ có logo (tab bar ở dưới). */
 export function SiteHeader() {
   const pathname = usePathname();
+  const navLinks = useNavLinks();
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-surface/90 pt-safe shadow-[0_1px_8px_rgba(30,26,22,0.04)] backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-gutter md:px-6 lg:px-12">
@@ -20,7 +22,7 @@ export function SiteHeader() {
             <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Song<span className="text-primary">Hanzi</span></span>
           </Link>
           <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 rounded-full bg-surface-container-low/70 p-1 md:flex">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = isNavActive(link.href, pathname);
               return (
                 <Link
