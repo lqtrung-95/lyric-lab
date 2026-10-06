@@ -111,6 +111,9 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
           </div>
         </div>
         <div className="flex items-center gap-1">
+          <Link href={`/video/${lesson.videoId}/shadowing`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-high px-4 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest">
+            <Icon name="mic" size={18} /> Luyện nói
+          </Link>
           <Link href={`/video/${lesson.videoId}/dictation`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container">
             <Icon name="edit" size={18} /> Chép chính tả
           </Link>

@@ -12,9 +12,10 @@ Chưa làm. Admin duyệt video `draft`, chuyển `listed`, ẩn hoặc xóa khi
 - Xóa video xóa cả dòng liên quan và làm mới cache danh sách.
 
 ## Todo
-- [ ] API admin
-- [ ] Trang admin
-- [ ] Cập nhật bốn tài liệu bàn giao
+- [x] API admin
+- [x] Trang admin (danh sách, rà bản dịch, duyệt/ẩn/xóa)
+- [x] Cập nhật bốn tài liệu bàn giao
+- [ ] Quản lý `video_sources` (ghi chú giấy phép): hoãn, script nạp tự tạo bản ghi nguồn
 
 ## Tiêu chí hoàn thành
 Admin duyệt và gỡ được video mà không cần SQL tay.

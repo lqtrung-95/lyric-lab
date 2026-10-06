@@ -12,9 +12,9 @@ Chưa làm. Lặp từng câu, ẩn chữ, người học nói theo rồi tự n
 - Chấm tự động bằng nhận dạng giọng nói: **ngoài phạm vi** (xem backlog); chỉ tự chấm.
 
 ## Todo
-- [ ] Tách kiểu dòng dùng chung
-- [ ] Màn shadowing cho video
-- [ ] E2E (micro giả của Playwright)
+- [x] Dùng chung `LinePracticeCard` (thêm `variant="speech"`); kiểu dòng dùng `AnalyzedLine` qua `lessonLinesToAnalyzed`
+- [x] Màn shadowing cho video
+- [x] E2E (micro giả bằng script khởi tạo)
 
 ## Tiêu chí hoàn thành
 Luyện được một video theo từng câu và nghe lại giọng mình; bài hát vẫn dùng được thẻ luyện như cũ.

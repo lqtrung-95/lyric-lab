@@ -8,6 +8,7 @@ export const metadata: Metadata = { title: "Quản trị", robots: { index: fals
 
 const LINKS: { href: string; label: string; description: string; icon: IconName }[] = [
   { href: "/admin/translations", label: "Duyệt bản dịch", description: "Góp ý bản dịch từng câu do người học gửi.", icon: "translate" },
+  { href: "/admin/videos", label: "Quản lý video", description: "Duyệt, ẩn, xóa video luyện nghe và sửa bản dịch từng câu.", icon: "smart_display" },
   { href: "/admin/feedback", label: "Duyệt góp ý", description: "Góp ý/báo lỗi chờ hiện công khai ở trang Góp ý.", icon: "feedback" },
 ];
 

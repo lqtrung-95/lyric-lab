@@ -26,8 +26,8 @@ Chức năng mới, **tách khỏi bài hát**: kho video tiếng Trung do admin
 | 1 | [Dữ liệu và script crawl](phase-01-data-and-ingest.md) | Code xong, chờ chạy migration và nạp |
 | 2 | [Duyệt, xem video, bấm từ lưu thẻ](phase-02-browse-watch-lookup.md) | Code xong (chờ có dữ liệu thật) |
 | 3 | [Chép chính tả](phase-03-dictation.md) | Code xong |
-| 4 | [Shadowing](phase-04-shadowing.md) | Chưa làm |
-| 5 | [Quản trị nguồn và dọn dẹp](phase-05-admin-curation.md) | Chưa làm |
+| 4 | [Shadowing](phase-04-shadowing.md) | Code xong |
+| 5 | [Quản trị nguồn và dọn dẹp](phase-05-admin-curation.md) | Code xong (chưa có UI quản lý nguồn) |
 
 ## Rủi ro chính và cách giảm
 - **Bản quyền/YouTube:** lưu bản chép của video bên thứ ba trong DB mà người dùng đọc được. Giảm: tuyển nguồn kỹ (ưu tiên video giấy phép Creative Commons hoặc xin phép kênh), chỉ nhúng player YouTube, trang `noindex`, có link về video gốc, admin ẩn/xóa video ngay khi có yêu cầu gỡ. Mức rủi ro còn lại do chủ dự án chấp nhận (không phải tư vấn pháp lý).

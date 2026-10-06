@@ -147,3 +147,98 @@ test("chép chính tả: chế độ chữ Hán chấm từng chữ và nhớ ch
   await page.reload();
   await expect(page.getByRole("radio", { name: "Gõ chữ Hán" })).toBeChecked();
 });
+
+// ---- Quản trị video (API giả lập) ----
+const adminSummary = { ...summary, status: "draft", translationSource: "youtube", translatedLineCount: 2, createdAt: "2026-10-06T10:00:00Z" };
+
+async function mockAdminApis(page: Page, patches: unknown[]) {
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route("**/api/admin/videos", (route) => route.fulfill({ json: { videos: [adminSummary] } }));
+  await page.route(`**/api/admin/videos/${VIDEO_ID}`, async (route) => {
+    if (route.request().method() === "PATCH") {
+      patches.push(route.request().postDataJSON());
+      return route.fulfill({ json: { done: "ok" } });
+    }
+    return route.fulfill({ json: { ...adminSummary, lines: [{ ...lesson.lines[0] }, { ...lesson.lines[1], translation: null }, { ...lesson.lines[2] }] } });
+  });
+}
+
+test("quản trị video: danh sách theo trạng thái, duyệt thành đang hiện, xóa cần xác nhận", async ({ page }) => {
+  const patches: unknown[] = [];
+  await mockAdminApis(page, patches);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/admin/videos");
+  await expect(page.getByRole("heading", { name: "Quản lý video" })).toBeVisible();
+  await expect(page.getByText("Nháp", { exact: true })).toBeVisible();
+  await expect(page.getByText(/3 dòng · dịch 2\/3/)).toBeVisible();
+  await noViolations(page);
+
+  await page.getByRole("button", { name: "Duyệt, hiện công khai" }).click();
+  await expect(page.getByText("Đang hiện", { exact: true })).toBeVisible();
+  expect(patches).toEqual([{ action: "list" }]);
+  await expect(page.getByRole("button", { name: "Ẩn" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Xóa", exact: true }).click();
+  await expect(page.getByRole("alertdialog", { name: "Xác nhận xóa video" })).toBeVisible();
+  await page.getByRole("button", { name: "Giữ lại" }).click();
+  await expect(page.getByRole("alertdialog")).toHaveCount(0);
+  expect(patches).toHaveLength(1); // chưa xóa
+  await page.getByRole("button", { name: "Xóa", exact: true }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Xóa", exact: true }).click();
+  await expect(page.getByText("Chưa có video nào")).toBeVisible();
+  expect(patches[1]).toEqual({ action: "delete" });
+});
+
+test("quản trị video: rà bản dịch từng dòng, lọc dòng thiếu dịch và lưu", async ({ page }) => {
+  const patches: unknown[] = [];
+  await mockAdminApis(page, patches);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/admin/videos/${VIDEO_ID}`);
+  await expect(page.getByText(/1 dòng thiếu bản dịch/)).toBeVisible();
+  await noViolations(page);
+  await page.getByLabel("Chỉ hiện dòng thiếu bản dịch").check();
+  await expect(page.getByLabel(/Bản dịch dòng/)).toHaveCount(1);
+  const box = page.getByLabel("Bản dịch dòng 2");
+  await box.fill("Hôm nay trời đẹp.");
+  await page.getByRole("button", { name: "Lưu bản dịch" }).click();
+  await expect.poll(() => patches).toEqual([{ action: "edit_translation", idx: 1, translation: "Hôm nay trời đẹp." }]);
+  await expect(page.getByText(/0 dòng thiếu bản dịch/)).toBeVisible();
+});
+
+// ---- Luyện nói theo (shadowing) ----
+const FAKE_MIC = `navigator.mediaDevices.getUserMedia = async function () { return { getTracks: function () { return [{ stop: function () {} }]; } }; };
+window.MediaRecorder = class { constructor() { this.mimeType = 'audio/webm'; }
+  start() {} stop() { this.ondataavailable({ data: new Blob(['x'], { type: 'audio/webm' }) }); this.onstop(); } };`;
+
+test("luyện nói: nghe, nhớ nghĩa, ghi âm rồi nghe lại; ẩn bớt chữ; sang câu khác đặt lại các bước", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.addInitScript(FAKE_MIC);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}/shadowing`);
+  await expect(page.getByText("Câu 1 / 3")).toBeVisible();
+  await expect(page.locator('section[aria-label="Câu đang luyện"] ruby').first()).toBeVisible();
+  await noViolations(page);
+
+  // Ẩn chữ Hán và pinyin: chỉ còn lời nhắc nghe.
+  await page.getByRole("button", { name: "Chữ Hán" }).click();
+  await page.getByRole("button", { name: "Pinyin", exact: true }).click();
+  await expect(page.getByText("Đã ẩn chữ, hãy nghe thật kỹ rồi nói theo.")).toBeVisible();
+  await page.getByRole("button", { name: "Chữ Hán" }).click();
+  await page.getByRole("button", { name: "Pinyin", exact: true }).click();
+
+  await page.getByRole("button", { name: "Nghe bản gốc" }).click();
+  expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:0");
+  await page.getByRole("tab", { name: "Nghĩ" }).click();
+  await expect(page.getByText("Xin chào, bạn bè.").last()).toBeVisible();
+  await page.getByRole("button", { name: "Đã nhớ nghĩa, nói thôi" }).click();
+  await page.getByRole("button", { name: "Bắt đầu ghi âm" }).click();
+  await page.getByRole("button", { name: "Dừng ghi âm" }).click();
+  await expect(page.locator("audio")).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("pause");
+
+  await page.getByRole("button", { name: "Câu sau" }).click();
+  await expect(page.getByText("Câu 2 / 3")).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Nghe", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("audio")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Câu trước" })).toBeEnabled();
+});
