@@ -44,6 +44,30 @@ Giai đoạn 1–5 (mời bạn bằng mã/link, ván 10 câu Điền lời, k�
 - Dọn phòng cũ (`rooms` đã kết thúc tích lũy theo thời gian).
 - Chọn bài ngẫu nhiên theo trình độ của cả hai người (hiện chọn trong bài Khám phá dựng được đủ câu).
 
+## Ý tưởng game đối kháng mới (brainstorm 2026-10-06)
+Khung phòng hiện có (máy trạng thái SQL, Realtime, chấm điểm ở server) dùng lại được; mỗi game chỉ thêm một dạng câu hỏi hoặc luật. Chưa quyết định làm; thứ tự đề xuất ở cuối mục.
+
+| Game | Cách chơi | Effort | Ghi chú |
+|---|---|---|---|
+| Nghe và chọn | Nghe đoạn 3–5 giây, chọn dòng lời hoặc nghĩa đúng | Nhỏ | Đã có video đoạn (`room-clip-player`) và 4 đáp án |
+| Hán-Việt đoán chữ | Hiện âm Hán-Việt, chọn chữ Hán đúng (vd. "ái tình" → 爱情) | Nhỏ | Hợp người Việt, ít app có; dữ liệu Hán-Việt đã có trong từ vựng |
+| Chọn thanh điệu | Hiện pinyin không dấu, chọn đúng thanh | Nhỏ | Thanh điệu là chỗ người Việt hay sai |
+| Đua ghép cặp | Cùng 6 cặp chữ Hán–nghĩa, ai ghép xong trước hoặc ít lỗi hơn thắng | Nhỏ-vừa | Tái dùng `lib/practice/match-round.ts` |
+| Đua gõ pinyin | Cùng một từ, ai gõ đúng nhanh hơn | Nhỏ-vừa | Tái dùng `lib/practice/pinyin-answer.ts` |
+| Sắp xếp lời | Dòng lời bị xáo từ, ai sắp lại đúng thứ tự nhanh hơn | Vừa | Luyện trật tự từ và ngữ pháp |
+| Sinh tồn 3 mạng | Sai là mất mạng, ai hết mạng trước thì thua | Vừa | Số câu không cố định, cần đổi điều kiện kết thúc ván |
+| Tam quốc (best-of-3) | Ba vòng, mỗi vòng một chế độ khác nhau, thắng 2 là thắng chung cuộc | Vừa | Làm sau khi có ít nhất 2–3 chế độ |
+| Rung chuông | Ai bấm trước giành quyền trả lời, sai bị trừ điểm | Vừa-lớn | Server phải phân xử độ trễ giữa hai máy |
+| Đua điền chữ khi nghe | Lời đang chạy, ai gõ đúng chữ tiếp theo trước thì ăn điểm | Lớn | Nối với RV-04 trong PRD |
+
+Hai hướng đổi cách chơi (không phải game mới):
+- **Thách đấu không cần cùng lúc (ưu tiên):** chơi một bộ câu cố định theo seed, gửi link, bạn chơi sau rồi so điểm. Giải quyết việc ít người online cùng lúc, và là nền cho "bóng ma" của ghép ngẫu nhiên (đã nêu ở mục phòng thi đấu).
+- **Phòng 3–8 người kiểu Kahoot:** hợp lớp học hoặc nhóm bạn; cần xem lại giới hạn Realtime của gói Free (200 kết nối, 100 tin/giây) và cách chia cặp, để sau.
+
+Thứ tự đề xuất: (1) Nghe và chọn, (2) Hán-Việt đoán chữ, (3) Thách đấu không cần cùng lúc, (4) Tam quốc khi đã có ≥ 3 chế độ.
+
+Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice_scores`/bảng xếp hạng (chủ động, vì hai người hẹn nhau đấu liên tục có thể cày điểm). Nếu cần, làm bảng riêng "Đấu trường" tính số trận thắng hoặc Elo, và tính ván thắng vào chuỗi ngày học.
+
 ## Kỹ thuật
 - [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.
