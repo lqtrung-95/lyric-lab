@@ -15,7 +15,8 @@ export interface ListenPrefs {
   playerSize: PlayerSize;
 }
 
-export const defaultListenPrefs: ListenPrefs = { showPinyin: true, showTranslation: true, rate: 1, autoScroll: true, playerSize: "large" };
+// Mặc định cỡ "vừa": video lớn đầy khung đẩy lời bài hát xuống thấp, người mới khó theo kịp; ai muốn lớn hơn thì đổi ở Cài đặt.
+export const defaultListenPrefs: ListenPrefs = { showPinyin: true, showTranslation: true, rate: 1, autoScroll: true, playerSize: "medium" };
 
 export function parseListenPrefs(raw: string | null): ListenPrefs {
   if (!raw) return defaultListenPrefs;

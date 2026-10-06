@@ -15,7 +15,7 @@ export function NicknameSection() {
     <section aria-labelledby="nickname-heading" className="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">
       <h2 id="nickname-heading" className="font-serif text-headline-md text-on-surface">Biệt danh và ảnh đại diện</h2>
       <p className="mt-1 text-body-md text-on-surface-variant">
-        Tên và ảnh hiển thị của bạn ở phòng thi đấu và bảng xếp hạng. {optedIn ? "Bạn đang tham gia bảng xếp hạng." : "Điểm của bạn chỉ hiện trên bảng xếp hạng khi bạn bật tham gia ở trang Bảng xếp hạng."}
+        Dùng chung cho phòng thi đấu và bảng xếp hạng. {optedIn ? "Bạn đang tham gia bảng xếp hạng." : "Điểm chỉ lên bảng xếp hạng khi bạn bật tham gia ở trang Bảng xếp hạng."}
       </p>
       {nickname === undefined ? (
         <Skeleton className="mt-space-sm h-12 w-full max-w-md" />

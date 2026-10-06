@@ -7,7 +7,7 @@ describe("parseListenPrefs", () => {
     expect(parseListenPrefs("{hỏng")).toEqual(defaultListenPrefs);
   });
   it("đọc giá trị hợp lệ, bỏ giá trị lạ", () => {
-    expect(parseListenPrefs('{"showPinyin":false,"showTranslation":true,"rate":0.75,"autoScroll":false}')).toEqual({ showPinyin: false, showTranslation: true, rate: 0.75, autoScroll: false, playerSize: "large" });
+    expect(parseListenPrefs('{"showPinyin":false,"showTranslation":true,"rate":0.75,"autoScroll":false}')).toEqual({ showPinyin: false, showTranslation: true, rate: 0.75, autoScroll: false, playerSize: "medium" });
     expect(parseListenPrefs('{"showPinyin":"x","rate":3,"autoScroll":"x","playerSize":"huge"}')).toEqual(defaultListenPrefs);
   });
   it("nhớ cỡ video hợp lệ", () => {
