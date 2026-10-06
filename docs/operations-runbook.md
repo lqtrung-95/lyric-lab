@@ -109,6 +109,14 @@ Tăng hậu tố `revN` trong `analysisCache` (`lib/analysis/server-deps.ts`) r�
 
 1. Xác định nguồn đúng (id LRCLIB hoặc caption). 2. Xoá/thay `song_analyses` hiện hành của bài. 3. Chạy lại phân tích (script hoặc mở bài). 4. Bump `revN`.
 
+### Nạp video luyện nghe (kho Video, tách khỏi bài hát)
+Migration `20261006000003_video_lessons.sql` (chạy tay, một lần) tạo `video_sources` và `video_lessons`. Script `scripts/ingest-video-source.mts` đưa video của một kênh vào kho ở trạng thái `draft`: chỉ nhận video **nhúng được** và có phụ đề tiếng Trung **do người làm** (bỏ phụ đề tự động); bản dịch lấy từ track tiếng Việt thủ công (không gọi LLM); chia từ bằng jieba, pinyin và level từ từ điển. Không tải audio/video và không in nội dung phụ đề.
+```
+NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow --owned          # xem thử (dry-run)
+NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow --owned --apply  # ghi DB
+```
+Tùy chọn: `--videos id1,id2` (chỉ định video thay cho cả kênh), `--limit N` (mặc định 40 video gần nhất), `--refresh` (làm mới dòng của video đã có, giữ nguyên trạng thái). Cần `YOUTUBE_DATA_API_KEY`. Chạy lại được: video đã có bị bỏ qua. Gỡ video theo yêu cầu: `delete from video_lessons where video_id = '...'`.
+
 ## 6. Khi LLM lỗi / hết hạn mức
 
 | Hiện tượng | Xử lý |

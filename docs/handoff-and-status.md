@@ -20,6 +20,10 @@ Thứ tự đọc cho người mới: file này → [`system-architecture.md`](s
 
 Chưa làm trước khi công khai rộng (từ README cũ): thử tay đăng nhập Google, bật captcha Turnstile (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`).
 
+## Đang làm: Video luyện nghe (chép chính tả, shadowing)
+
+Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. Quyết định: chức năng riêng khỏi bài hát, nguồn do admin tuyển chọn (người dùng không dán link), dùng phụ đề YouTube có sẵn, chỉ phân tích khi bấm từ. Nguồn đầu: kênh của chủ dự án @ChineseGlow (13 video có phụ đề tiếng Trung + Việt do người làm). DaihuaXiyou không dùng được (không có phụ đề tiếng Trung). Giai đoạn 1 (migration `20261006000003_video_lessons.sql` + script nạp) đã code; **việc tiếp theo cho người nhận**: chạy migration, chạy script với `--apply`, rồi làm giai đoạn 2 (trang `/video`).
+
 ## Việc dở / quyết định đang treo
 
 - **Biệt danh và ảnh đại diện**: một biệt danh và một ảnh đại diện dùng chung cho phòng thi đấu và bảng xếp hạng (xem `docs/system-architecture.md` mục "Biệt danh dùng chung"); đặt tên không tự công khai điểm.
