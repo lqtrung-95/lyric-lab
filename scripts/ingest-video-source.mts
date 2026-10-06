@@ -3,7 +3,7 @@
 // bản dịch lấy từ track tiếng Việt do người làm; chia từ bằng jieba, pinyin và level từ từ điển. Không in nội dung phụ đề.
 // Mặc định chỉ xem (dry-run), thêm --apply để ghi DB. Video đã có trong DB bị bỏ qua (--refresh để cập nhật dòng, giữ nguyên trạng thái).
 //   NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow [--owned] [--limit 40] [--apply]
-//   ... --videos id1,id2 (chỉ định thẳng vài video thay cho cả kênh)
+//   ... --videos id1,id2 (chỉ định thẳng vài video thay cho cả kênh); --delay 60000 (nghỉ 60 giây giữa các video, nên dùng khi bị chặn 429)
 import { createClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { withSubwordEntries } from "@/lib/analysis/build-line-pinyin";
@@ -19,7 +19,8 @@ const opt = (name: string) => { const i = args.indexOf(`--${name}`); return i >=
 const apply = flag("apply");
 const refresh = flag("refresh");
 const limit = Number(opt("limit") ?? 40);
-const DELAY_MS = 3000;
+// Nghỉ giữa các video: YouTube chặn (429) nếu tải phụ đề dồn dập (thường chỉ qua được vài video liền). `--delay 60000` cho kênh nhiều video.
+const DELAY_MS = Number(opt("delay") ?? 3000);
 // YouTube tạm chặn (429) khi tải phụ đề dồn dập: nghỉ rồi thử lại; nhiều video liên tiếp vẫn bị chặn thì dừng để chạy lại sau.
 const BACKOFF_MS = [30_000, 90_000, 180_000];
 const MAX_BLOCKED_IN_ROW = 2;
@@ -29,7 +30,8 @@ const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPAB
 const provider = new YoutubeInnertubeCaptionProvider();
 const lookup = (terms: string[]) => lookupWords(sb as never, terms);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-const isBlocked = (e: unknown) => /429/.test((e as Error)?.message ?? "");
+// Lỗi tạm: YouTube chặn (429) hoặc tải phụ đề thất bại do mạng/đứt kết nối (thường gặp khi tải liên tục); thử lại sau khi nghỉ.
+const isBlocked = (e: unknown) => /429|Tải caption thất bại/.test((e as Error)?.message ?? "");
 async function withBackoff<T>(label: string, fn: () => Promise<T>): Promise<T> {
   for (let attempt = 0; ; attempt++) {
     try {
