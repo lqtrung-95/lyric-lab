@@ -103,7 +103,7 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
       <section aria-label="Bài hát và chế độ chơi" className="rounded-2xl bg-surface-container-low p-space-md">
         <div className="flex items-center gap-3">
           {view.song ? (
-            <Image src={videoThumbnailUrl(view.song.videoId, "mqdefault")} alt="" width={96} height={54} className="h-14 w-24 shrink-0 rounded-lg object-cover" />
+            <Image src={videoThumbnailUrl(view.song.videoId, "mqdefault")} alt="" width={96} height={54} unoptimized className="h-14 w-24 shrink-0 rounded-lg object-cover" />
           ) : (
             <span className="flex h-14 w-24 shrink-0 items-center justify-center rounded-lg bg-surface-container-high text-on-surface-variant"><Icon name="shuffle" size={26} /></span>
           )}

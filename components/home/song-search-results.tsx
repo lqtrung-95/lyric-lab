@@ -13,7 +13,7 @@ function Row({ song, onPick }: { song: SearchSong; onPick: (videoId: string) => 
     <li>
       <Link href={`/learn/${song.videoId}`} onClick={() => onPick(song.videoId)} className="flex min-h-14 items-center gap-3 rounded-xl p-2 hover:bg-surface-container-high">
         <span className="relative h-11 w-20 shrink-0 overflow-hidden rounded-lg bg-surface-container-high">
-          <Image src={videoThumbnailUrl(song.videoId)} alt="" fill sizes="80px" className="object-cover" />
+          <Image src={videoThumbnailUrl(song.videoId, "mqdefault")} alt="" fill sizes="80px" unoptimized className="object-cover" />
         </span>
         <span className="min-w-0 flex-1">
           <span lang="zh" className="line-clamp-2 text-body-md font-medium text-on-surface">{song.title}</span>

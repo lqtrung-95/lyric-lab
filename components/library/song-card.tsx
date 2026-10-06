@@ -32,7 +32,7 @@ export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, 
       className="flex h-full flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_1px_8px_rgba(30,26,22,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(30,26,22,0.1)]"
     >
       <div className="relative aspect-video shrink-0 bg-surface-container-high">
-        <Image src={videoThumbnailUrl(videoId, "mqdefault")} alt="" fill sizes={sizes} className="object-cover" />
+        <Image src={videoThumbnailUrl(videoId, "mqdefault")} alt="" fill sizes={sizes} unoptimized className="object-cover" />
         {!progress && (
           <span className="absolute bottom-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
             <Icon name="play_arrow" filled size={20} />

@@ -37,6 +37,7 @@ Bổ sung cho [`CLAUDE.md`](../CLAUDE.md) (quy tắc bắt buộc) và `~/.claud
 - Route nặng: `runtime = "nodejs"`, `maxDuration = 60`, trả luồng SSE qua `lib/http/sse.ts`; client phải chịu được đóng kết nối giữa chừng (bọc `controller.enqueue` bằng try/catch).
 - Xử lý lỗi: try/catch ở biên (route, gọi mạng), ánh xạ sang mã lỗi ổn định (`AnalysisErrorCode`, `ExplainErrorCode`) thay vì ném message thô ra client.
 - Tailwind v4; dark mode bằng class `dark` trên `<html>`; logo đổi bằng `dark:hidden` / `hidden dark:block`.
+- Thumbnail YouTube (`videoThumbnailUrl`) hiển thị bằng `next/image` phải có `unoptimized`: qua trình tối ưu của Vercel, mỗi bài mới tốn một ảnh nguồn của hạn mức tháng (Hobby) và hết hạn mức thì ảnh vỡ (402 `OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED`). Chỉ ảnh tĩnh của app (logo) đi qua trình tối ưu.
 - Điều hướng trạng thái giao diện có ý nghĩa (tab thư viện) phải nằm trên URL (`?tab=`) để nút Back hoạt động.
 
 ## Làm việc với LLM

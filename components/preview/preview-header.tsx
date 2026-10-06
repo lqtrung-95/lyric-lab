@@ -37,7 +37,7 @@ export function PreviewHeader({ analysis, song, listenHref }: PreviewHeaderProps
 
         <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
           <div className="relative aspect-video w-full max-w-sm justify-self-center overflow-hidden rounded-xl bg-surface-container-high shadow-md lg:col-span-4 lg:justify-self-start">
-            <Image src={videoThumbnailUrl(analysis.videoId)} alt="" fill sizes="(min-width:1024px) 33vw, 384px" className="object-cover" priority />
+            <Image src={videoThumbnailUrl(analysis.videoId)} alt="" fill sizes="(min-width:1024px) 33vw, 384px" unoptimized className="object-cover" priority />
           </div>
           <div className="flex flex-col gap-4 lg:col-span-8">
             <ul aria-label="Cảm xúc của bài" className="flex flex-wrap items-center gap-2">

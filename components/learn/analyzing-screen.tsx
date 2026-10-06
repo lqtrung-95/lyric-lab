@@ -66,7 +66,7 @@ export function AnalyzingScreen({ videoId }: { videoId: string }) {
   return (
     <div className="mx-auto max-w-xl py-space-lg text-center">
       <div className="relative mx-auto aspect-video w-full max-w-sm overflow-hidden rounded-2xl bg-surface-container-high">
-        <Image src={videoThumbnailUrl(videoId)} alt="" fill sizes="384px" className="object-cover" priority />
+        <Image src={videoThumbnailUrl(videoId)} alt="" fill sizes="384px" unoptimized className="object-cover" priority />
       </div>
       <h1 className="mt-space-md font-serif text-headline-md text-on-surface">{state.meta?.title ?? "Đang mở bài hát…"}</h1>
       {state.meta && <p className="mt-1 text-label-md text-on-surface-variant">{state.meta.channelTitle}</p>}
