@@ -47,11 +47,24 @@ export interface CurrentQuestionView {
   correctIndex: number | null;
 }
 
+/** Thông tin để lưu từ của câu thành thẻ ôn (lấy từ đáp án đúng của câu, chỉ có khi ván đã kết thúc). */
+export interface RoundCard {
+  term: string;
+  reading: string | null;
+  sinoViet: string | null;
+  meaning: string;
+  videoId: string;
+  /** Dòng lời chứa từ và thời điểm bắt đầu dòng (giây), để thẻ nghe lại đúng đoạn. */
+  lineIndex: number;
+  start: number;
+}
+
 /** Tổng kết một câu, chỉ có khi ván đã kết thúc. */
 export interface RoundSummary {
   index: number;
   correctTerm: string;
   translation: string | null;
+  card: RoundCard | null;
   mine: MyAnswerView | null;
   theirs: { correct: boolean; points: number; elapsedMs: number } | null;
 }

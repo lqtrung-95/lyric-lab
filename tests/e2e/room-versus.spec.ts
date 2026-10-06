@@ -96,6 +96,20 @@ test("hai người chơi trọn một ván: mời bằng link, sẵn sàng, 10 c
   const mirror: Record<string, string> = { "Bạn thắng!": "Đối thủ thắng ván này", "Đối thủ thắng ván này": "Bạn thắng!", "Hòa nhau!": "Hòa nhau!" };
   expect(mirror[h]).toBe(g);
 
+  // Lưu từ từ màn kết quả: bật được nút lưu của một câu (cùng kho thẻ với màn Nghe).
+  await host.getByRole("button", { name: /^Lưu từ / }).first().click();
+  await expect(host.getByRole("button", { name: /^Bỏ lưu từ / })).toHaveCount(1);
+
+  // Lịch sử: ván vừa chơi hiện ở đầu danh sách, bấm vào xem lại được bảng "Từng câu".
+  await host.getByRole("link", { name: "Về sảnh Thi đấu" }).or(host.getByRole("button", { name: "Về sảnh Thi đấu" })).click();
+  await host.getByRole("link", { name: /Lịch sử thi đấu/ }).click();
+  const row = host.getByRole("link", { name: new RegExp(`vs ${guestName}`) });
+  await expect(row).toBeVisible({ timeout: 20_000 });
+  await noViolations(host); // màn lịch sử
+  await row.click();
+  await expect(host.getByRole("heading", { name: "Từng câu" })).toBeVisible({ timeout: 20_000 });
+  await expect(host.getByRole("button", { name: /^Bỏ lưu từ / })).toHaveCount(1); // từ đã lưu vẫn đánh dấu khi xem lại
+
   await host.context().close();
   await guest.context().close();
 });

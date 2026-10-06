@@ -1,5 +1,5 @@
 import type { RoomQuestionPublic } from "./room-question-types";
-import type { MyAnswerView, RoomSongView, RoomStatus, RoomView, RoundSummary } from "./room-types";
+import type { MyAnswerView, RoomSongView, RoomStatus, RoomView, RoundCard, RoundSummary } from "./room-types";
 
 /** Hạn ân hạn sau `deadline_at` (khớp hàm SQL), quá mốc này câu coi như đã đóng. */
 const GRACE_MS = 1000;
@@ -31,7 +31,17 @@ export interface RoomViewInput {
   /** Câu trả lời của chính người xem cho câu hiện tại. */
   myAnswer: AnswerRow | null;
   /** Tổng kết từng câu, chỉ truyền khi ván đã kết thúc. */
-  rounds: { idx: number; correct_term: string; translation: string | null; answers: AnswerRow[] }[] | null;
+  rounds: { idx: number; correct_term: string; payload: RoomQuestionPublic; answers: AnswerRow[] }[] | null;
+}
+
+/** Thẻ ôn của câu: đáp án đúng nằm trong 4 lựa chọn của câu (cùng chữ với từ đúng). Null nếu không tìm thấy. */
+function toCard(correctTerm: string, payload: RoomQuestionPublic): RoundCard | null {
+  const choice = payload.choices.find((c) => c.term === correctTerm);
+  if (!choice) return null;
+  return {
+    term: choice.term, reading: choice.reading, sinoViet: choice.sinoViet, meaning: choice.meaning,
+    videoId: payload.videoId, lineIndex: payload.lineIndex, start: payload.clipStart,
+  };
 }
 
 const toMine = (a: AnswerRow | null | undefined): MyAnswerView | null =>
@@ -60,7 +70,7 @@ export function buildRoomView(input: RoomViewInput): RoomView {
     ? rounds.map((r) => {
         const theirs = r.answers.find((a) => a.user_id !== me);
         return {
-          index: r.idx, correctTerm: r.correct_term, translation: r.translation,
+          index: r.idx, correctTerm: r.correct_term, translation: r.payload.translation, card: toCard(r.correct_term, r.payload),
           mine: toMine(r.answers.find((a) => a.user_id === me)),
           theirs: theirs ? { correct: theirs.correct, points: theirs.points, elapsedMs: theirs.elapsed_ms } : null,
         };

@@ -170,7 +170,7 @@ async function loadRounds(roomId: string) {
   return (questions ?? []).map((q) => ({
     idx: q.idx as number,
     correct_term: termByIdx.get(q.idx as number) ?? "",
-    translation: (q.payload as RoomQuestionPublic).translation,
+    payload: q.payload as RoomQuestionPublic,
     answers: answersByIdx.get(q.idx as number) ?? [],
   }));
 }
@@ -178,7 +178,20 @@ async function loadRounds(roomId: string) {
 /** Trạng thái phòng cho một thành viên; null nếu phòng không tồn tại hoặc người này không ở trong phòng (không lộ phòng của người khác). */
 export async function getRoomView(userId: string, code: string): Promise<RoomView | null> {
   const room = await findMemberRoom(userId, code);
-  if (!room) return null;
+  return room ? viewForRoom(userId, room) : null;
+}
+
+/** Xem lại một ván ĐÃ KẾT THÚC theo id phòng (lịch sử; mã phòng được dùng lại nên không tra theo mã). Null nếu không phải thành viên hoặc ván chưa xong. */
+export async function getFinishedRoomView(userId: string, roomId: string): Promise<RoomView | null> {
+  const { data, error } = await createSupabaseServiceClient().from("room_players")
+    .select(`rooms!inner(${ROOM_COLUMNS})`)
+    .eq("user_id", userId).eq("room_id", roomId).eq("rooms.status", "finished").limit(1);
+  if (error) throw new Error(`getFinishedRoomView: ${error.message}`);
+  const room = (data as unknown as { rooms: RoomRow }[] | null)?.[0]?.rooms;
+  return room ? viewForRoom(userId, room) : null;
+}
+
+async function viewForRoom(userId: string, room: RoomRow): Promise<RoomView> {
   const sb = createSupabaseServiceClient();
   const cur = room.current_question;
   const [{ data: players }, { data: song }, { data: question }, { data: key }, { data: mine }] = await Promise.all([

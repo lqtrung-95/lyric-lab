@@ -292,6 +292,28 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
     expect(await roomRow(id)).toMatchObject({ status: "finished", winner_id: null, forfeit: false });
   });
 
+  it("lịch sử: ván đã kết thúc hiện cho cả hai người với kết quả đúng góc nhìn; xem lại chỉ cho thành viên và chỉ khi đã xong", async () => {
+    const { listRoomHistory } = await import("@/lib/rooms/room-history-repo");
+    const { getFinishedRoomView } = await import("@/lib/rooms/room-repo");
+    const { id } = await playingRoom(2);
+    expect(await getFinishedRoomView(users[0].id, id)).toBeNull(); // ván đang chơi chưa xem lại được
+    for (const idx of [0, 1]) {
+      await openQuestion(id, idx, -300);
+      await answer(id, 0, idx, idx % 2 === 0 ? 2 : 0);
+      await answer(id, 1, idx, 1);
+      await advance(id);
+    }
+    const host = (await listRoomHistory(users[0].id)).find((e) => e.roomId === id);
+    expect(host).toMatchObject({ result: "win", forfeit: false, opponent: { name: expect.any(String) }, myCorrect: 2, theirCorrect: 0 });
+    expect(host!.myScore).toBeGreaterThanOrEqual(200);
+    expect((await listRoomHistory(users[1].id)).find((e) => e.roomId === id)).toMatchObject({ result: "loss", myScore: 0, theirScore: host!.myScore });
+
+    const view = await getFinishedRoomView(users[1].id, id);
+    expect(view).toMatchObject({ status: "finished", winner: "opponent" });
+    expect(view!.rounds).toHaveLength(2);
+    expect(await getFinishedRoomView(users[2].id, id)).toBeNull(); // người ngoài phòng không xem được
+  });
+
   it("rời phòng giữa ván: ván kết thúc xử người còn lại thắng", async () => {
     const { id } = await playingRoom(2);
     await rpc("leave_room", { p_room: id, p_user: users[1].id });

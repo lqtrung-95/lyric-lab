@@ -38,7 +38,7 @@ Xếp theo tỉ lệ hiệu quả/công sức. Chưa quyết định làm; mục
 ## Phòng thi đấu 1v1: giai đoạn 2 của dự án (2026-10-05)
 Giai đoạn 1–5 (mời bạn bằng mã/link, ván 10 câu Điền lời, kết quả) đã xong. Còn hoãn:
 - Ghép ngẫu nhiên (hàng đợi theo trình độ + "bóng ma" là bản ghi lượt chơi khi không có ai online, vì hiện số người dùng quá ít để hàng đợi có người).
-- Lời mời đang chờ (Chấp nhận/Từ chối, hết hạn ~10 phút), "Bạn luyện cùng gần đây" (suy ra từ `room_players`, chỉ hiện với người đã đăng nhập Google), thành tích đối đầu và "Mời tái đấu".
+- Lời mời đang chờ (Chấp nhận/Từ chối, hết hạn ~10 phút), "Bạn luyện cùng gần đây" (suy ra từ `room_players`, chỉ hiện với người đã đăng nhập Google), thành tích đối đầu theo từng đối thủ và "Mời tái đấu". (Lịch sử ván và thống kê thắng/thua tổng đã có ở `/room/history`; còn thiếu phân trang và quy tắc giữ ván cũ.)
 - Thêm chế độ chơi (Nghe và chọn, Ghép cặp, Gõ pinyin), phản ứng emoji sau ván, nút "Đổi bài" ở phòng chờ.
 - An toàn khi chơi với người lạ: báo cáo/chặn người chơi, lọc từ tục ở tên hiển thị.
 - Dọn phòng cũ (`rooms` đã kết thúc tích lũy theo thời gian).

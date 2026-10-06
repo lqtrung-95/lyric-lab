@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
@@ -21,6 +22,9 @@ export function RoomHub() {
         <p className="mt-space-sm max-w-xl text-body-lg text-on-surface-variant">
           So tài cảm thụ ca từ và phản xạ Hán ngữ cùng bạn bè, trả lời cùng lúc trong thời gian thực.
         </p>
+        <Link href="/room/history" className="mt-space-sm inline-flex min-h-11 items-center gap-1 rounded-full bg-surface-container-high px-4 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest">
+          <Icon name="history" size={18} /> Lịch sử thi đấu
+        </Link>
       </section>
 
       <div className="grid gap-space-md lg:grid-cols-2">

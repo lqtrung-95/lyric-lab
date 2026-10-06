@@ -67,7 +67,7 @@ describe("buildRoomView: kết thúc và hết hạn", () => {
   it("ván kết thúc: lộ đáp án câu cuối và dựng tổng kết từng câu (đối thủ chỉ có đúng/sai, điểm, thời gian)", () => {
     const v = buildRoomView(input({
       room: { ...input().room, status: "finished", winner_id: "u1" },
-      rounds: [{ idx: 0, correct_term: "远", translation: "xa", answers: [
+      rounds: [{ idx: 0, correct_term: "远", payload: { ...payload, translation: "xa", choices: [{ term: "近", reading: "jìn", sinoViet: "cận", meaning: "gần" }, { term: "远", reading: "yuǎn", sinoViet: "viễn", meaning: "xa" }], videoId: "abcdefghijk", lineIndex: 3, clipStart: 12.5 }, answers: [
         { user_id: "u1", choice: 2, correct: true, points: 126, elapsed_ms: 1800 },
         { user_id: "u2", choice: 0, correct: false, points: 0, elapsed_ms: 2400 },
       ] }],
@@ -75,6 +75,7 @@ describe("buildRoomView: kết thúc và hết hạn", () => {
     expect(v.currentQuestion?.correctIndex).toBe(2);
     expect(v.rounds).toEqual([{
       index: 0, correctTerm: "远", translation: "xa",
+      card: { term: "远", reading: "yuǎn", sinoViet: "viễn", meaning: "xa", videoId: "abcdefghijk", lineIndex: 3, start: 12.5 },
       mine: { choice: 2, correct: true, points: 126, elapsedMs: 1800 },
       theirs: { correct: false, points: 0, elapsedMs: 2400 },
     }]);
