@@ -19,13 +19,28 @@ const opt = (name: string) => { const i = args.indexOf(`--${name}`); return i >=
 const apply = flag("apply");
 const refresh = flag("refresh");
 const limit = Number(opt("limit") ?? 40);
-const DELAY_MS = 900;
+const DELAY_MS = 3000;
+// YouTube tạm chặn (429) khi tải phụ đề dồn dập: nghỉ rồi thử lại; nhiều video liên tiếp vẫn bị chặn thì dừng để chạy lại sau.
+const BACKOFF_MS = [30_000, 90_000, 180_000];
+const MAX_BLOCKED_IN_ROW = 2;
 
 const key = process.env.YOUTUBE_DATA_API_KEY!;
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false }, realtime: { transport: ws as never } });
 const provider = new YoutubeInnertubeCaptionProvider();
 const lookup = (terms: string[]) => lookupWords(sb as never, terms);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const isBlocked = (e: unknown) => /429/.test((e as Error)?.message ?? "");
+async function withBackoff<T>(label: string, fn: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (!isBlocked(e) || attempt >= BACKOFF_MS.length) throw e;
+      console.log(`${label}  YouTube đang chặn tạm (429), nghỉ ${BACKOFF_MS[attempt] / 1000}s rồi thử lại`);
+      await sleep(BACKOFF_MS[attempt]);
+    }
+  }
+}
 
 async function yt(path: string, q: Record<string, string>) {
   const u = new URL(`https://www.googleapis.com/youtube/v3/${path}`);
@@ -80,6 +95,7 @@ if (apply && channel) {
 // 3) Từng video.
 console.log(`${apply ? "GHI" : "XEM (dry-run)"}: ${ids.length} video${channel ? ` của ${channel.title}` : ""}\n`);
 let added = 0;
+let blockedInRow = 0;
 for (const id of ids) {
   const m = meta.get(id);
   const label = `${id} ${m ? `${Math.round(m.durationSec / 60)}p` : "?"}`;
@@ -87,11 +103,13 @@ for (const id of ids) {
   if (!m.embeddable) { console.log(`${label}  bỏ: không nhúng được`); continue; }
   if (have.has(id) && !refresh) { console.log(`${label}  bỏ: đã có`); continue; }
   try {
-    const tracks = await provider.listTracks(id);
+    const tracks = await withBackoff(label, () => provider.listTracks(id));
     const zhTrack = pickBestChineseTrack(tracks);
     if (!zhTrack || zhTrack.kind !== "manual") { console.log(`${label}  bỏ: không có phụ đề tiếng Trung do người làm`); await sleep(DELAY_MS); continue; }
     const viTrack = tracks.find((t) => t.lang.toLowerCase().startsWith("vi") && t.kind === "manual") ?? null;
-    const [zh, vi] = [await provider.fetchLines(id, zhTrack), viTrack ? await provider.fetchLines(id, viTrack) : null];
+    const zh = await withBackoff(label, () => provider.fetchLines(id, zhTrack));
+    const vi = viTrack ? await withBackoff(label, () => provider.fetchLines(id, viTrack)) : null;
+    blockedInRow = 0;
     const prepared = prepareLessonLines(zh, vi);
     if (prepared.length === 0) { console.log(`${label}  bỏ: không còn dòng nào sau khi làm sạch`); continue; }
     const terms = termsToLookUp(prepared);
@@ -113,6 +131,10 @@ for (const id of ids) {
     }
   } catch (e) {
     console.log(`${label}  lỗi: ${(e as Error).message}`);
+    if (isBlocked(e) && ++blockedInRow >= MAX_BLOCKED_IN_ROW) {
+      console.log("\nYouTube vẫn đang chặn: dừng. Chạy lại sau ít phút (video đã nạp sẽ được bỏ qua).");
+      break;
+    }
   }
   await sleep(DELAY_MS);
 }

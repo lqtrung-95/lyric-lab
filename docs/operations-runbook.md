@@ -115,7 +115,7 @@ Migration `20261006000003_video_lessons.sql` (chạy tay, một lần) tạo `vi
 NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow --owned          # xem thử (dry-run)
 NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow --owned --apply  # ghi DB
 ```
-Tùy chọn: `--videos id1,id2` (chỉ định video thay cho cả kênh), `--limit N` (mặc định 40 video gần nhất), `--refresh` (làm mới dòng của video đã có, giữ nguyên trạng thái). Cần `YOUTUBE_DATA_API_KEY`. Chạy lại được: video đã có bị bỏ qua. Gỡ video theo yêu cầu: `delete from video_lessons where video_id = '...'`.
+Tùy chọn: `--videos id1,id2` (chỉ định video thay cho cả kênh), `--limit N` (mặc định 40 video gần nhất), `--refresh` (làm mới dòng của video đã có, giữ nguyên trạng thái). Cần `YOUTUBE_DATA_API_KEY`. YouTube tạm chặn (429) khi tải phụ đề dồn dập từ một IP (dễ gặp sau nhiều lần chạy thử liên tiếp): script nghỉ 30s/90s/180s rồi thử lại, nhiều video liền vẫn bị chặn thì tự dừng; chờ khoảng một giờ rồi chạy lại. Chạy lại được: video đã có bị bỏ qua. Gỡ video theo yêu cầu: `delete from video_lessons where video_id = '...'`.
 
 ## 6. Khi LLM lỗi / hết hạn mức
 
