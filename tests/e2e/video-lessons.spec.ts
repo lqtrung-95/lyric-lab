@@ -242,3 +242,58 @@ test("luyện nói: nghe, nhớ nghĩa, ghi âm rồi nghe lại; ẩn bớt ch�
   await expect(page.locator("audio")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Câu trước" })).toBeEnabled();
 });
+
+// ---- Nạp video từ kênh (API giả lập) ----
+const planVideos = [
+  { videoId: "aaaaaaaaaa1", title: "Video có phụ đề", durationSec: 600, embeddable: true, exists: false },
+  { videoId: "aaaaaaaaaa2", title: "Video không có phụ đề", durationSec: 60, embeddable: true, exists: false },
+  { videoId: "aaaaaaaaaa3", title: "Video đã có", durationSec: 300, embeddable: true, exists: true },
+];
+
+test("nạp video từ kênh: tìm, nạp lần lượt, bỏ qua video không phụ đề, báo tiến độ", async ({ page }) => {
+  const ingested: unknown[] = [];
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route("**/api/admin/videos", (route) => route.fulfill({ json: { videos: [] } }));
+  await page.route("**/api/admin/videos/ingest/plan", (route) => route.fulfill({ json: { channel: { id: "UCx", title: "Kênh thử" }, videos: planVideos } }));
+  await page.route("**/api/admin/videos/ingest", (route) => {
+    const body = route.request().postDataJSON() as { videoId: string; owned: boolean };
+    ingested.push(body);
+    return route.fulfill({ json: body.videoId === "aaaaaaaaaa1" ? { kind: "ingested", lineCount: 120, translatedLineCount: 118, levelAvg: 2 } : { kind: "skipped", reason: "no_human_zh_captions" } });
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/admin/videos");
+  await page.getByLabel("Tên kênh YouTube").fill("https://www.youtube.com/@KenhThu");
+  await page.getByLabel("Đây là kênh của tôi").check();
+  await page.getByRole("button", { name: "Tìm video" }).click();
+  await expect(page.getByText(/3 video gần đây, 1 đã có, 2 có thể nạp/)).toBeVisible();
+  await noViolations(page);
+
+  await page.getByRole("button", { name: "Nạp 2 video" }).click();
+  await expect(page.getByText("120 dòng, dịch 118/120")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("Bỏ qua: Không có phụ đề tiếng Trung do người làm")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("status").filter({ hasText: "Xong 1 · bỏ qua 1 · lỗi 0 · còn 0" })).toBeVisible();
+  expect(ingested).toEqual([{ videoId: "aaaaaaaaaa1", owned: true }, { videoId: "aaaaaaaaaa2", owned: true }]);
+});
+
+test("nạp video từ kênh: YouTube chặn tạm thì báo lỗi, dừng sớm và cho thử lại video lỗi", async ({ page }) => {
+  let allow = false;
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route("**/api/admin/videos", (route) => route.fulfill({ json: { videos: [] } }));
+  await page.route("**/api/admin/videos/ingest/plan", (route) => route.fulfill({ json: { channel: { id: "UCx", title: "Kênh thử" }, videos: planVideos.slice(0, 2) } }));
+  await page.route("**/api/admin/videos/ingest", (route) =>
+    allow ? route.fulfill({ json: { kind: "ingested", lineCount: 10, translatedLineCount: 10, levelAvg: 1 } }) : route.fulfill({ status: 503, json: { error: "blocked" } }));
+  await page.clock.install();
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/admin/videos");
+  await page.getByLabel("Tên kênh YouTube").fill("KenhThu");
+  await page.getByRole("button", { name: "Tìm video" }).click();
+  await page.getByRole("button", { name: "Nạp 2 video" }).click();
+  // Nhanh tiến thời gian qua các lần nghỉ thử lại (20s, 60s) của hai video.
+  for (let i = 0; i < 8; i++) { await page.clock.fastForward(60_000); await page.waitForTimeout(150); }
+  await expect(page.getByText(/YouTube vẫn đang chặn tạm việc tải phụ đề nên đã dừng/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText("YouTube đang chặn tạm").first()).toBeVisible();
+  allow = true;
+  await page.getByRole("button", { name: "Thử lại video lỗi" }).click();
+  for (let i = 0; i < 4; i++) { await page.clock.fastForward(5_000); await page.waitForTimeout(150); }
+  await expect(page.getByRole("status").filter({ hasText: /Xong 2 · bỏ qua 0 · lỗi 0/ })).toBeVisible({ timeout: 15_000 });
+});

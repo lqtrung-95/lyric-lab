@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import type { AdminLessonSummary } from "@/lib/video/video-repo";
 import type { LessonStatus } from "@/lib/video/video-lesson-types";
 import { STATUS_LABEL } from "./video-admin-actions";
+import { VideoIngestPanel } from "./video-ingest-panel";
 import { VideoStatusButtons } from "./video-status-buttons";
 
 const BADGE: Record<LessonStatus, string> = {
@@ -18,6 +19,9 @@ const BADGE: Record<LessonStatus, string> = {
 export function VideosAdminScreen() {
   const [videos, setVideos] = useState<AdminLessonSummary[] | null | "error">(null);
 
+  const [reload, setReload] = useState(0);
+  const refresh = useCallback(() => setReload((n) => n + 1), []);
+
   useEffect(() => {
     let cancelled = false;
     fetch("/api/admin/videos", { cache: "no-store" })
@@ -25,7 +29,7 @@ export function VideosAdminScreen() {
       .then((v) => { if (!cancelled) setVideos(v); })
       .catch(() => { if (!cancelled) setVideos("error"); });
     return () => { cancelled = true; };
-  }, []);
+  }, [reload]);
 
   const setStatus = (id: string, status: LessonStatus) => setVideos((v) => (Array.isArray(v) ? v.map((x) => (x.videoId === id ? { ...x, status } : x)) : v));
   const remove = (id: string) => setVideos((v) => (Array.isArray(v) ? v.filter((x) => x.videoId !== id) : v));
@@ -33,7 +37,8 @@ export function VideosAdminScreen() {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-space-md">
       <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Quản lý video</h1>
-      <p className="text-body-md text-on-surface-variant">Video mới nạp ở trạng thái Nháp. Duyệt thì hiện ở trang Video cho người dùng; ẩn thì giữ dữ liệu nhưng không hiện. Nạp thêm video bằng script <code className="rounded bg-surface-container-high px-1">ingest-video-source</code> (xem runbook).</p>
+      <p className="text-body-md text-on-surface-variant">Video mới nạp ở trạng thái Nháp. Duyệt thì hiện ở trang Video cho người dùng; ẩn thì giữ dữ liệu nhưng không hiện. Nạp thêm video bằng ô bên dưới.</p>
+      <VideoIngestPanel onIngested={refresh} />
       {videos === null ? (
         <p role="status" className="flex items-center gap-2 text-body-md text-on-surface-variant"><Spinner size={18} />Đang tải…</p>
       ) : videos === "error" ? (
