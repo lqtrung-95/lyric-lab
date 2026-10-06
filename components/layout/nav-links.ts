@@ -4,7 +4,7 @@ export interface NavLink {
   href: string;
   label: string;
   icon: IconName;
-  /** Chỉ hiện với quản trị viên (và ở môi trường phát triển) cho tới khi mở công khai bằng `NEXT_PUBLIC_VIDEO_PUBLIC=1`. */
+  /** Chỉ hiện ở môi trường phát triển cho tới khi mở công khai bằng `NEXT_PUBLIC_VIDEO_PUBLIC=1`. */
   previewOnly?: boolean;
 }
 

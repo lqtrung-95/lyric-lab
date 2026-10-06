@@ -21,7 +21,7 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Tùy chọn | TTS thần kinh. Thiếu → `/api/tts` trả 503, nút loa dùng giọng hệ thống |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Tùy chọn | Captcha Turnstile (cần bật trước khi công khai rộng) |
 | `NEXT_PUBLIC_SENTRY_DSN` | Tùy chọn | Sentry |
-| `NEXT_PUBLIC_VIDEO_PUBLIC` | Tùy chọn | `1` = hiện mục "Video" trên menu cho mọi người. Không đặt: mục này chỉ hiện ở môi trường phát triển và với quản trị viên (đang thử nghiệm). Đặt xong cần deploy lại (biến `NEXT_PUBLIC_*` được nhúng lúc build). |
+| `NEXT_PUBLIC_VIDEO_PUBLIC` | Tùy chọn | `1` = hiện mục "Video" trên menu cho mọi người. Không đặt: mục này chỉ hiện ở môi trường phát triển, ẩn cả với admin ở production (admin vẫn vào thẳng `/video` và `/admin/videos` bằng đường dẫn để thử). Đặt xong cần deploy lại (biến `NEXT_PUBLIC_*` được nhúng lúc build). |
 | `NEXT_PUBLIC_SITE_URL` | Tùy chọn | URL gốc khi có tên miền riêng (OG image, sitemap) |
 | `ADMIN_EMAILS` | Tùy chọn | Danh sách email (phân tách dấu phẩy) vào được `/admin/*` |
 | `UNLIMITED_USAGE_EMAILS` | Tùy chọn | Email không bị hạn mức |
