@@ -13,6 +13,7 @@ import { useTermLookup } from "@/components/listen/use-term-lookup";
 import { usePlaybackSync } from "@/components/listen/use-playback-sync";
 import { ViewToggles } from "@/components/listen/view-toggles";
 import { WordPopover } from "@/components/listen/word-popover";
+import { VideoModeNav } from "./video-mode-nav";
 import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
 import { defaultRepeatConfig, type RepeatConfig } from "@/lib/listen/repeat-config";
 import { itemKey, type CardSnapshot } from "@/lib/user-state/learner-state";
@@ -110,13 +111,8 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
             <p className="truncate text-label-sm text-on-surface-variant">{lesson.channelTitle}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          <Link href={`/video/${lesson.videoId}/shadowing`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-high px-4 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest">
-            <Icon name="mic" size={18} /> Luyện nói
-          </Link>
-          <Link href={`/video/${lesson.videoId}/dictation`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container">
-            <Icon name="edit" size={18} /> Chép chính tả
-          </Link>
+        <div className="flex flex-wrap items-center gap-1">
+          <VideoModeNav videoId={lesson.videoId} current="watch" />
           <ViewToggles
           className="hidden md:flex" showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
           onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}

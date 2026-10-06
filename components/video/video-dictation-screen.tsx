@@ -12,6 +12,7 @@ import { dictationKey, emptyDictationProgress, firstUndone, parseDictationProgre
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { DictationFeedback } from "./dictation-feedback";
 import { DictationSummary } from "./dictation-summary";
+import { VideoModeNav } from "./video-mode-nav";
 import { useLineClip } from "./use-line-clip";
 
 const MODES: { id: DictationMode; label: string }[] = [{ id: "pinyin", label: "Gõ pinyin" }, { id: "hanzi", label: "Gõ chữ Hán" }];
@@ -110,14 +111,7 @@ export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
             <p className="truncate text-label-sm text-on-surface-variant">Chép chính tả · {stats.done}/{stats.total} câu</p>
           </div>
         </div>
-        <div role="radiogroup" aria-label="Chế độ gõ" className="flex gap-1">
-          {MODES.map((m) => (
-            <label key={m.id} className={`flex min-h-11 cursor-pointer items-center rounded-full px-4 text-label-md font-medium ${progress.mode === m.id ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"}`}>
-              <input type="radio" name="dictation-mode" checked={progress.mode === m.id} onChange={() => changeMode(m.id)} className="sr-only" />
-              {m.label}
-            </label>
-          ))}
-        </div>
+        <VideoModeNav videoId={lesson.videoId} current="dictation" />
       </div>
       <div className="mx-auto flex max-w-2xl flex-col gap-space-md px-gutter py-space-lg pb-32 md:px-6">
         <div className={`mx-auto w-full ${PLAYER_SIZE_CLASS[prefs.playerSize === "large" ? "medium" : prefs.playerSize]}`}>
@@ -134,6 +128,14 @@ export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
           <DictationSummary lesson={lesson} lines={lines} progress={progress} onRestart={restart} />
         ) : (
           <>
+            <div role="radiogroup" aria-label="Chế độ gõ" className="flex flex-wrap gap-1">
+              {MODES.map((m) => (
+                <label key={m.id} className={`flex min-h-11 cursor-pointer items-center rounded-full px-4 text-label-md font-medium ${progress.mode === m.id ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"}`}>
+                  <input type="radio" name="dictation-mode" checked={progress.mode === m.id} onChange={() => changeMode(m.id)} className="sr-only" />
+                  {m.label}
+                </label>
+              ))}
+            </div>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-label-md font-semibold text-on-surface-variant">Câu {position + 1} / {lines.length}</p>
               <div className="flex items-center gap-2">

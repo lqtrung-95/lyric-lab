@@ -12,6 +12,7 @@ import { dictationLines } from "@/lib/video/dictation";
 import { lessonLinesToAnalyzed } from "@/lib/video/lesson-to-lines";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { useLineClip } from "./use-line-clip";
+import { VideoModeNav } from "./video-mode-nav";
 
 const SLOW_RATE = 0.75;
 
@@ -53,6 +54,7 @@ export function VideoShadowingScreen({ lesson }: { lesson: LessonDetail }) {
             <p className="truncate text-label-sm text-on-surface-variant">Luyện nói theo</p>
           </div>
         </div>
+        <VideoModeNav videoId={lesson.videoId} current="shadowing" />
       </div>
       <div className="mx-auto flex max-w-2xl flex-col gap-space-md px-gutter py-space-lg pb-32 md:px-6">
         <div className={`mx-auto w-full ${PLAYER_SIZE_CLASS[prefs.playerSize === "large" ? "medium" : prefs.playerSize]}`}>
