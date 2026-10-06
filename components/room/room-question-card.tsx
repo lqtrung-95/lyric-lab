@@ -6,7 +6,7 @@ function Segment({ aligned }: { aligned: PinyinChar[] }) {
   return (
     <>
       {aligned.map((c, i) =>
-        c.py ? <ruby key={i}>{c.ch}<rt className="font-sans text-label-md font-normal tracking-wide text-on-surface-variant">{c.py}</rt></ruby> : <span key={i}>{c.ch}</span>,
+        c.py ? <ruby key={i} className="mx-0.5">{c.ch}<rt className="font-sans text-label-md font-normal tracking-wide text-on-surface-variant">{c.py}</rt></ruby> : <span key={i}>{c.ch}</span>,
       )}
     </>
   );
@@ -20,15 +20,16 @@ export function RoomQuestionLine({ q, fill }: { q: RoomQuestionPublic; fill?: st
   const before = alignPinyinToText(q.before, q.pinyinBefore);
   const after = alignPinyinToText(q.after, q.pinyinAfter);
   const blank = (
-    <span className={`mx-1 inline-block min-w-12 rounded-lg px-2 ${fill ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-highest text-primary"}`}>{fill ?? "?"}</span>
+    <span className={`mx-1 inline-block min-w-[1.6em] rounded-md px-2 py-0.5 text-[0.8em] leading-tight ${fill ? "bg-secondary-container text-on-secondary-container" : "bg-surface-container-highest text-primary"}`}>{fill ?? "?"}</span>
   );
-  const mark = fill ? "✓" : "[ ? ]";
+  // Ô trống không lộ cách đọc; "?" nhỏ phía trên giữ cho hàng pinyin đều, còn dấu ✓ báo đã điền.
+  const mark = fill ? "✓" : "?";
   return (
     <div className="rounded-2xl bg-surface-container-low px-space-md py-space-lg text-center">
       {before && after ? (
-        <p lang="zh" className="font-serif text-[1.75rem] leading-[1.9] text-on-surface md:text-[2.25rem] md:leading-[1.9]">
+        <p lang="zh" className="font-serif text-[1.75rem] leading-[2.1] text-on-surface md:text-[2.25rem] md:leading-[2.1]">
           <Segment aligned={before} />
-          <ruby>{blank}<rt className="font-sans text-label-md font-semibold tracking-wide text-primary">{mark}</rt></ruby>
+          <ruby className="mx-0.5">{blank}<rt className="font-sans text-label-md font-semibold text-primary">{mark}</rt></ruby>
           <Segment aligned={after} />
         </p>
       ) : (
