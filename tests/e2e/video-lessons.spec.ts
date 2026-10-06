@@ -92,3 +92,58 @@ test("video chưa duyệt hoặc không có: báo rõ và có đường về dan
   await expect(page.getByRole("heading", { name: "Không tìm thấy video này" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Về danh sách video" })).toBeVisible();
 });
+
+test("chép chính tả: nghe câu, gõ pinyin, kiểm tra từng âm tiết, lưu tiến độ, tổng kết và làm lại", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}/dictation`);
+  await expect(page.getByText("Câu 1 / 3")).toBeVisible();
+  await expect(page.getByLabel(/Gõ lại câu bạn nghe được \(4 âm tiết\)/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Nghe câu này" }).click();
+  expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:0");
+
+  // Câu 1: gõ không thanh vẫn đạt (nửa điểm cho thanh).
+  await page.getByLabel(/Gõ lại câu bạn nghe được/).fill("ni hao peng you");
+  await page.getByRole("button", { name: "Kiểm tra" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Đúng chữ, chú ý thanh điệu nhé" })).toBeVisible();
+  await expect(page.getByText("Xin chào, bạn bè.")).toBeVisible();
+  await noViolations(page);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}"))).toMatchObject({ mode: "pinyin", scores: { 0: 0.625 } });
+
+  // Câu 2: gõ sai.
+  await page.getByRole("button", { name: "Câu tiếp" }).click();
+  await expect(page.getByText("Câu 2 / 3")).toBeVisible();
+  await page.getByLabel(/Gõ lại câu bạn nghe được/).fill("xyz");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("status").filter({ hasText: "Chưa đúng" })).toBeVisible();
+
+  // Câu 3: bỏ qua rồi xem tổng kết.
+  await page.getByRole("button", { name: "Câu tiếp" }).click();
+  await page.getByRole("button", { name: "Bỏ qua câu" }).click();
+  await page.getByRole("button", { name: "Xem tổng kết" }).click();
+  await expect(page.getByRole("heading", { name: "Hoàn thành bài chép" })).toBeVisible();
+  await expect(page.getByText(/0\/3 câu chính xác hoàn toàn/)).toBeVisible();
+  await noViolations(page);
+  await expect(page.getByRole("link", { name: "Xem lại" }).first()).toHaveAttribute("href", new RegExp(`/video/${VIDEO_ID}\\?t=\\d+`));
+
+  // Tải lại: đã làm hết nên mở thẳng tổng kết; làm lại thì xóa điểm và về câu 1.
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Hoàn thành bài chép" })).toBeVisible();
+  await page.getByRole("button", { name: "Làm lại từ đầu" }).click();
+  await expect(page.getByText("Câu 1 / 3")).toBeVisible();
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}").scores)).toEqual({});
+});
+
+test("chép chính tả: chế độ chữ Hán chấm từng chữ và nhớ chế độ", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}/dictation`);
+  await page.getByRole("radio", { name: "Gõ chữ Hán" }).check({ force: true });
+  await expect(page.getByLabel(/\(4 chữ Hán\)/)).toBeVisible();
+  await page.getByLabel(/Gõ lại câu bạn nghe được/).fill("你好朋友");
+  await page.getByRole("button", { name: "Kiểm tra" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Chính xác!" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("radio", { name: "Gõ chữ Hán" })).toBeChecked();
+});

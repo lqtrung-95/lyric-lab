@@ -13,10 +13,10 @@ Chưa làm. Nghe một câu (lặp được), gõ lại, hệ thống so từng 
 - Tiến độ lưu trong trình duyệt (chưa có bảng người dùng).
 
 ## Todo
-- [ ] `compareDictation` + test
-- [ ] Màn chép chính tả
-- [ ] Tổng kết và lưu từ sai
-- [ ] E2E
+- [x] `compareDictation` + test
+- [x] Màn chép chính tả
+- [x] Tổng kết (câu nên xem lại); lưu hàng loạt từ sai **hoãn**: lưu từng từ ở màn xem là đủ cho bản đầu
+- [x] E2E
 
 ## Tiêu chí hoàn thành
 Chép được một video từ đầu tới cuối, thấy sai từng chữ, lưu được các từ sai.

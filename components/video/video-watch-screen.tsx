@@ -110,10 +110,15 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
             <p className="truncate text-label-sm text-on-surface-variant">{lesson.channelTitle}</p>
           </div>
         </div>
-        <ViewToggles
+        <div className="flex items-center gap-1">
+          <Link href={`/video/${lesson.videoId}/dictation`} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+            <Icon name="edit" size={18} /> Chép chính tả
+          </Link>
+          <ViewToggles
           className="hidden md:flex" showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
           onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
         />
+        </div>
       </div>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-gutter py-space-lg pb-32 md:px-6">
         <div data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">

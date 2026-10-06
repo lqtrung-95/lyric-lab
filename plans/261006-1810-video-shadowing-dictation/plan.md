@@ -25,7 +25,7 @@ Chức năng mới, **tách khỏi bài hát**: kho video tiếng Trung do admin
 |---|---|---|
 | 1 | [Dữ liệu và script crawl](phase-01-data-and-ingest.md) | Code xong, chờ chạy migration và nạp |
 | 2 | [Duyệt, xem video, bấm từ lưu thẻ](phase-02-browse-watch-lookup.md) | Code xong (chờ có dữ liệu thật) |
-| 3 | [Chép chính tả](phase-03-dictation.md) | Chưa làm |
+| 3 | [Chép chính tả](phase-03-dictation.md) | Code xong |
 | 4 | [Shadowing](phase-04-shadowing.md) | Chưa làm |
 | 5 | [Quản trị nguồn và dọn dẹp](phase-05-admin-curation.md) | Chưa làm |
 
