@@ -110,6 +110,7 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
           <div className="min-w-0">
             <p lang="zh" className="truncate text-body-md font-semibold text-on-surface">{view.song?.title ?? "Bài ngẫu nhiên"}</p>
             <p className="truncate text-label-md text-on-surface-variant">{view.song?.channelTitle ?? "Hệ thống chọn một bài khi bắt đầu ván"}</p>
+            <p className="truncate text-label-sm text-on-surface-variant">{view.showTranslation ? "Hiện nghĩa câu hát khi đang chơi" : "Nghĩa câu hát chỉ hiện sau khi trả lời"}</p>
           </div>
         </div>
         <p className="mt-space-sm inline-flex items-center gap-2 rounded-xl bg-surface-container-lowest px-3 py-2 text-label-md text-on-surface">

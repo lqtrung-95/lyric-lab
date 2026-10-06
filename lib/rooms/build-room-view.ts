@@ -15,7 +15,7 @@ interface AnswerRow {
 export interface RoomViewInput {
   room: {
     id: string; code: string; status: RoomStatus; host_id: string | null; question_count: number; expires_at: string;
-    current_question: number | null; winner_id: string | null; forfeit: boolean;
+    current_question: number | null; winner_id: string | null; forfeit: boolean; show_translation: boolean;
   };
   players: {
     user_id: string; display_name: string; ready: boolean; left_at: string | null;
@@ -85,6 +85,7 @@ export function buildRoomView(input: RoomViewInput): RoomView {
     questionCount: room.question_count,
     expiresAt: room.expires_at,
     serverNow: now.toISOString(),
+    showTranslation: room.show_translation,
     players: players.map((p) => ({
       displayName: p.display_name,
       avatarUrl: avatars?.[p.user_id] ?? null,
@@ -100,7 +101,8 @@ export function buildRoomView(input: RoomViewInput): RoomView {
     currentQuestion: question
       ? {
           index: question.idx,
-          payload: question.payload,
+          // Nghĩa dòng thường trùng nghĩa của một đáp án: phòng không bật hiện nghĩa thì giữ kín tới khi người xem trả lời hoặc câu đóng.
+          payload: myAnswer || closed || room.show_translation ? question.payload : { ...question.payload, translation: null },
           opensAt: question.opens_at,
           deadlineAt: question.deadline_at,
           myAnswer: toMine(myAnswer),

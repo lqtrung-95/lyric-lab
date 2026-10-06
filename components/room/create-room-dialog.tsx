@@ -15,6 +15,7 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
   const nick = useNickname();
   const [pick, setPick] = useState(false);
   const [videoId, setVideoId] = useState<string | null>(null);
+  const [showTranslation, setShowTranslation] = useState(false);
   const [busy, setBusy] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +32,7 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
     if (pick && !videoId) return;
     setBusy(true);
     setError(null);
-    const result = await createRoomRequest(pick ? videoId : null);
+    const result = await createRoomRequest(pick ? videoId : null, showTranslation);
     if (result.ok) return router.push(`/room/${result.data.code}`);
     setError(roomErrorMessage(result.error));
     setBusy(false);
@@ -72,6 +73,13 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
             <p className="mt-2 text-label-md text-on-surface-variant">Hệ thống chọn một bài phổ biến khi bắt đầu ván.</p>
           )}
         </fieldset>
+        <label className="flex min-h-11 cursor-pointer items-start gap-3">
+          <input type="checkbox" checked={showTranslation} onChange={(e) => setShowTranslation(e.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-primary" />
+          <span>
+            <span className="block text-label-md font-medium text-on-surface">Hiện nghĩa câu hát khi đang chơi</span>
+            <span className="block text-label-sm text-on-surface-variant">Tắt (mặc định): nghĩa chỉ hiện sau khi bạn trả lời, nên phải nghe và đọc để chọn đáp án. Bật: dễ hơn, dành cho người mới.</span>
+          </span>
+        </label>
         {error && <p role="alert" className="text-label-md text-error">{error}</p>}
         <div className="flex flex-col-reverse gap-space-sm sm:flex-row sm:justify-end">
           <button type="button" onClick={onClose} className="min-h-11 rounded-full px-5 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Hủy</button>

@@ -23,7 +23,7 @@ Chưa làm trước khi công khai rộng (từ README cũ): thử tay đăng nh
 ## Việc dở / quyết định đang treo
 
 - **Biệt danh và ảnh đại diện**: một biệt danh và một ảnh đại diện dùng chung cho phòng thi đấu và bảng xếp hạng (xem `docs/system-architecture.md` mục "Biệt danh dùng chung"); đặt tên không tự công khai điểm.
-- **Thi đấu: lưu từ và lịch sử**: màn kết quả có nút lưu từng từ và "Lưu các từ trả lời sai" (cùng kho thẻ với màn Nghe); lịch sử ở `/room/history` (50 ván gần nhất, bấm vào xem lại từng câu). Pinyin trong câu hỏi hiện ngay trên từng chữ Hán. Không cần migration. Chưa phân trang lịch sử, chưa dọn ván cũ.
+- **Thi đấu: lưu từ và lịch sử**: màn kết quả có nút lưu từng từ và "Lưu các từ trả lời sai" (cùng kho thẻ với màn Nghe); lịch sử ở `/room/history` (50 ván gần nhất, bấm vào xem lại từng câu). Pinyin trong câu hỏi hiện ngay trên từng chữ Hán. Nghĩa dòng lời ẩn tới khi trả lời (chủ phòng bật được lúc tạo phòng; cần migration `20261006000002_room_show_translation.sql`). Chưa phân trang lịch sử, chưa dọn ván cũ.
 - **Phòng thi đấu 1v1** (kế hoạch `plans/261005-1700-realtime-practice-rooms/`): giai đoạn 1–5 xong (server, ván chơi thời gian thực, giao diện, gộp tài khoản, chống lạm dụng, e2e hai trình duyệt). **Giai đoạn 2 của dự án chưa làm**: ghép ngẫu nhiên (hàng đợi + "bóng ma"), lời mời, bạn luyện cùng gần đây, thêm chế độ chơi, emoji sau ván, nút "Đổi bài" ở phòng chờ, báo cáo/chặn người chơi, lọc từ tục ở tên hiển thị. Xem `docs/backlog.md`.
 - **Độ lệch lời mặc định (admin)**: đã có (`songs.lyric_offset_sec`, nút ở bảng chỉnh lời). Admin lưu thì mọi chỉnh cá nhân trước đó của bài bị bỏ (DB về 0, bản trên trình duyệt tự cũ theo `base`).
 

@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { buildRoomView, type RoomViewInput } from "./build-room-view";
 
 const NOW = new Date("2026-10-05T10:00:10.000Z");
-const payload = { videoId: "abcdefghijk", lineIndex: 0, before: "a", after: "b", pinyinBefore: null, pinyinAfter: null, translation: null, choices: [], clipStart: 0, clipEnd: 3, grammarNote: null };
+const payload = { videoId: "abcdefghijk", lineIndex: 0, before: "a", after: "b", pinyinBefore: null, pinyinAfter: null, translation: "nghĩa dòng", choices: [], clipStart: 0, clipEnd: 3, grammarNote: null };
 
 function input(over: Partial<RoomViewInput> = {}): RoomViewInput {
   return {
-    room: { id: "r1", code: "123456", status: "playing", host_id: "u1", question_count: 10, expires_at: "2026-10-05T12:00:00Z", current_question: 0, winner_id: null, forfeit: false },
+    room: { id: "r1", code: "123456", status: "playing", host_id: "u1", question_count: 10, expires_at: "2026-10-05T12:00:00Z", current_question: 0, winner_id: null, forfeit: false, show_translation: false },
     players: [
       { user_id: "u1", display_name: "Linh", ready: true, left_at: null, score: 0, correct: 0, answered_idx: -1, last_answer_ms: null },
       { user_id: "u2", display_name: "Minh", ready: true, left_at: null, score: 0, correct: 0, answered_idx: -1, last_answer_ms: null },
@@ -45,6 +45,15 @@ describe("buildRoomView: không lộ đáp án", () => {
     const opponent = v.players.find((p) => !p.isMe)!;
     expect(opponent).toMatchObject({ answered: true, lastAnswerMs: 2400, score: 0, correct: 0 });
     expect(Object.keys(opponent).sort()).toEqual(["answered", "avatarUrl", "correct", "displayName", "isHost", "isMe", "lastAnswerMs", "left", "ready", "score"].sort());
+  });
+  it("nghĩa dòng giữ kín khi câu đang mở nếu phòng không bật hiện nghĩa; hiện sau khi trả lời, khi câu đóng, hoặc khi phòng bật", () => {
+    const answered = { user_id: "u1", choice: 0, correct: false, points: 0, elapsed_ms: 1000 };
+    const shown = (v: ReturnType<typeof buildRoomView>) => v.currentQuestion?.payload.translation;
+    expect(shown(buildRoomView(input()))).toBeNull();
+    expect(shown(buildRoomView(input({ myAnswer: answered })))).toBe("nghĩa dòng");
+    expect(shown(buildRoomView(input({ now: new Date("2026-10-05T10:00:25.000Z") })))).toBe("nghĩa dòng"); // quá hạn + ân hạn: câu đã đóng
+    expect(shown(buildRoomView(input({ room: { ...input().room, show_translation: true } })))).toBe("nghĩa dòng");
+    expect(buildRoomView(input()).showTranslation).toBe(false);
   });
   it("gắn ảnh đại diện theo tài khoản, thiếu thì null", () => {
     const v = buildRoomView(input({ avatars: { u1: "https://x/a.png" } }));

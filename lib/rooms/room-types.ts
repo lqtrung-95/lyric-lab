@@ -81,6 +81,8 @@ export interface RoomView {
   expiresAt: string;
   /** Giờ server lúc trả lời (ISO), để client tính độ lệch đồng hồ. */
   serverNow: string;
+  /** Phòng cho hiện nghĩa dòng lời ngay khi câu đang mở (mặc định ẩn cho tới khi trả lời). */
+  showTranslation: boolean;
   players: RoomPlayerView[];
   currentQuestion: CurrentQuestionView | null;
   /** Chỉ có khi ván đã kết thúc. */

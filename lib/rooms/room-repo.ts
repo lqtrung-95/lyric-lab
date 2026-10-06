@@ -30,9 +30,10 @@ interface RoomRow {
   current_question: number | null;
   winner_id: string | null;
   forfeit: boolean;
+  show_translation: boolean;
 }
 
-const ROOM_COLUMNS = "id, code, status, host_id, video_id, question_count, seed, expires_at, current_question, winner_id, forfeit";
+const ROOM_COLUMNS = "id, code, status, host_id, video_id, question_count, seed, expires_at, current_question, winner_id, forfeit, show_translation";
 const DEFAULT_QUESTION_COUNT = 10;
 const RANDOM_SONG_POOL = 100;
 const RANDOM_SONG_TRIES = 10;
@@ -59,13 +60,20 @@ async function chooseSongAndQuestions(room: RoomRow): Promise<{ videoId: string;
 }
 
 /** Tạo phòng và đưa chủ phòng vào. Trả mã phòng. Thử lại với mã khác khi trùng một phòng còn hiệu lực. */
-export async function createRoom(userId: string, displayName: string, videoId: string | null): Promise<string> {
+export async function createRoom(userId: string, displayName: string, videoId: string | null, showTranslation = false): Promise<string> {
   if (videoId && !(await canPlayRoomSong(videoId, DEFAULT_QUESTION_COUNT))) throw new RoomError("invalid_song");
   const sb = createSupabaseServiceClient();
   for (let attempt = 0; attempt < CODE_ATTEMPTS; attempt++) {
     const code = generateRoomCode();
-    const { error } = await sb.rpc("create_room", { p_host: userId, p_code: code, p_video: videoId, p_name: displayName });
-    if (!error) return code;
+    const { data: roomId, error } = await sb.rpc("create_room", { p_host: userId, p_code: code, p_video: videoId, p_name: displayName });
+    if (!error) {
+      // Tùy chọn của phòng đặt ngay sau khi tạo (phòng còn chờ nên chưa ai thấy); lỗi thì giữ mặc định (ẩn nghĩa), không làm hỏng việc tạo phòng.
+      if (showTranslation) {
+        const { error: optionError } = await sb.from("rooms").update({ show_translation: true }).eq("id", roomId as string);
+        if (optionError) console.error(JSON.stringify({ event: "room_option_error", message: optionError.message }));
+      }
+      return code;
+    }
     if (error.code !== UNIQUE_VIOLATION) throw new Error(`create_room: ${error.message}`);
   }
   throw new RoomError("code_unavailable");

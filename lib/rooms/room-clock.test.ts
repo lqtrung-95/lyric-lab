@@ -27,7 +27,7 @@ function view(over: { status?: "playing" | "waiting" | "finished"; answered?: [b
   const [a1, a2] = over.answered ?? [false, false];
   const [l1, l2] = over.left ?? [false, false];
   const input: RoomViewInput = {
-    room: { id: "r", code: "123456", status: over.status ?? "playing", host_id: "u1", question_count: 10, expires_at: "2099-01-01T00:00:00Z", current_question: 0, winner_id: null, forfeit: false },
+    room: { id: "r", code: "123456", status: over.status ?? "playing", host_id: "u1", question_count: 10, expires_at: "2099-01-01T00:00:00Z", current_question: 0, winner_id: null, forfeit: false, show_translation: false },
     players: [
       { user_id: "u1", display_name: "Linh", ready: true, left_at: l1 ? "x" : null, score: 0, correct: 0, answered_idx: a1 ? 0 : -1, last_answer_ms: null },
       { user_id: "u2", display_name: "Minh", ready: true, left_at: l2 ? "x" : null, score: 0, correct: 0, answered_idx: a2 ? 0 : -1, last_answer_ms: null },
