@@ -22,19 +22,19 @@ interface PlaybackBarProps {
   rate: number;
   onRate: (rate: number) => void;
   /** Độ lệch lời hiện tại (giây) và hàm chỉnh, để canh lời ngay trên thanh này. */
-  offset: number;
-  onOffsetChange: (offset: number) => void;
+  offset?: number;
+  onOffsetChange?: (offset: number) => void;
   /** Ghim: tắt tự cuộn theo câu đang hát để đọc chỗ khác mà không bị kéo về. */
   autoScroll: boolean;
   onToggleAutoScroll: () => void;
   repeatConfig: RepeatConfig;
   onRepeatConfigChange: (v: RepeatConfig) => void;
   /** Giải thích câu đang hát bằng AI (nghĩa tự nhiên hơn bản dịch máy, kèm ghi chú ngữ pháp). */
-  onExplain: () => void;
-  explainDisabled: boolean;
+  onExplain?: () => void;
+  explainDisabled?: boolean;
   /** Mở popup luyện phát âm riêng cho câu đang hát (Nghe → Nghĩ → Hát → Nghe lại), giống nút của app Miraa. */
-  onPractice: () => void;
-  practiceDisabled: boolean;
+  onPractice?: () => void;
+  practiceDisabled?: boolean;
 }
 
 const tile = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50 lg:h-14 lg:w-14";
@@ -46,7 +46,7 @@ const iconSize = "text-[20px] lg:text-[26px]";
  * xem `PlaybackProgressBar`), hàng dưới là các nút bấm nhanh: tốc độ, lặp câu, ghim, phát/dừng, giải thích AI,
  * luyện phát âm, canh lời lệch.
  */
-export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, offset, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: PlaybackBarProps) {
+export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, offset = 0, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: PlaybackBarProps) {
   const [syncOpen, setSyncOpen] = useState(false);
   const barRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -90,12 +90,12 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50 lg:h-14 lg:w-14">
             <Icon name={playing ? "pause" : "play_arrow"} filled size={null} className="text-[22px] lg:text-[28px]" />
           </button>
-          <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>
-          <button type="button" disabled={practiceDisabled} onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>
-          <button type="button" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel} className={`${tile} ${syncOpen || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>
+          {onExplain && <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>}
+          {onPractice && <button type="button" disabled={practiceDisabled} onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>}
+          {onOffsetChange && <button type="button" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel} className={`${tile} ${syncOpen || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>}
         </div>
       </div>
-      {syncOpen && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-2 bottom-full z-40 mb-1" />}
+      {syncOpen && onOffsetChange && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-2 bottom-full z-40 mb-1" />}
     </div>
   );
 }

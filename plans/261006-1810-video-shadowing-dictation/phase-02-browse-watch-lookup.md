@@ -16,11 +16,11 @@ Chưa làm. Trang danh sách video đã duyệt và trang xem video có bản ch
 Tạo: `app/(main)/video/page.tsx`, `app/(main)/video/[videoId]/page.tsx`, `app/api/videos/**`, `components/video/*`, `lib/video/*`. Sửa: điều hướng (`nav-links.ts`, tùy câu hỏi mở số 1), tài liệu kiến trúc.
 
 ## Todo
-- [ ] API đọc danh sách và chi tiết
-- [ ] Trang danh sách
-- [ ] Trang xem và bấm từ
-- [ ] Kiểm tra ôn thẻ từ video
-- [ ] E2E (fixture hư cấu) và kiểm tra trợ năng
+- [x] API đọc danh sách và chi tiết
+- [x] Trang danh sách (chưa có lọc theo level/kênh: ít video nên hoãn)
+- [x] Trang xem và bấm từ (giải nghĩa qua `/api/explain` mở rộng cho video, cache riêng)
+- [ ] Ôn thẻ từ video: màn Ôn tập vẫn phát được đoạn (chỉ cần videoId + mốc giờ); chưa kiểm tra tay với video thật
+- [x] E2E (API giả lập, dữ liệu hư cấu) và kiểm tra trợ năng
 
 ## Tiêu chí hoàn thành
 Từ video `listed`, người dùng xem, bấm từ, thấy nghĩa, lưu thẻ và ôn được ở màn Ôn tập.

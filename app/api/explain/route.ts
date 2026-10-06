@@ -4,6 +4,8 @@ import { ExplainError, explainTerm } from "@/lib/lookup/explain-term";
 import { explainRequestSchema } from "@/lib/lookup/explain-schema";
 import { createExplainDeps } from "@/lib/lookup/server-lookup";
 import { readCachedAnalysis } from "@/lib/analysis/server-deps";
+import { lessonLinesToAnalyzed } from "@/lib/video/lesson-to-lines";
+import { getLessonLinesForExplain } from "@/lib/video/video-repo";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
 
 export const runtime = "nodejs";
@@ -12,7 +14,7 @@ export const maxDuration = 30;
 // Mỗi lần gọi LLM tốn token: hạn mức chính theo tài khoản (DB); 300 lần/ngày/IP là lớp chặn thô phụ. Kết quả đã cache không tính.
 const ipLimiter = new InMemoryRateLimiter(300, 24 * 60 * 60 * 1000);
 
-/** POST /api/explain {videoId, lineIndex, term} → nghĩa của từ trong đúng câu hát, tiếng Việt (LS-06). */
+/** POST /api/explain {videoId, lineIndex, term} → nghĩa của từ trong đúng câu hát (hoặc câu nói của video luyện nghe), tiếng Việt (LS-06). */
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   let body: unknown;
@@ -27,11 +29,14 @@ export async function POST(req: Request) {
   if (!parsed.success) return Response.json({ error: "invalid_request" }, { status: 400 });
 
   try {
+    // Bài hát đã phân tích trước; không phải bài hát thì thử video luyện nghe (lời nói, cache riêng).
     const analysis = await readCachedAnalysis(parsed.data.videoId);
-    if (!analysis) return Response.json({ error: "analysis_not_found" }, { status: 404 });
+    const lessonLines = analysis ? null : await getLessonLinesForExplain(parsed.data.videoId);
+    if (!analysis && !lessonLines) return Response.json({ error: "analysis_not_found" }, { status: 404 });
+    const lines = analysis ? analysis.lines : lessonLinesToAnalyzed(lessonLines!);
 
     const started = Date.now();
-    const result = await explainTerm(analysis.lines, parsed.data, createExplainDeps(async () => ipLimiter.tryConsume(ip) && (await consumeUsage(user, "explain"))));
+    const result = await explainTerm(lines, parsed.data, createExplainDeps(async () => ipLimiter.tryConsume(ip) && (await consumeUsage(user, "explain")), analysis ? "song" : "video"));
     console.info(JSON.stringify({ event: "explain", videoId: parsed.data.videoId, fromCache: result.fromCache, model: result.model, ms: Date.now() - started }));
     return Response.json(result);
   } catch (error) {

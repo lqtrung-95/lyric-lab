@@ -14,7 +14,7 @@ import { itemKey, type CardSnapshot, type SavedItem } from "@/lib/user-state/lea
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
-import type { PlayerSize } from "@/lib/user-state/listen-prefs";
+import { PLAYER_SIZE_CLASS } from "./player-size-class";
 import { LineExplainSheet } from "./line-explain-sheet";
 import { LinePracticeSheet } from "./line-practice-sheet";
 import { PlaybackBar } from "./playback-bar";
@@ -38,10 +38,6 @@ interface ListenScreenProps {
   /** Giây để tua tới khi player sẵn sàng (tiếp tục bài nghe dở). */
   startAt?: number;
 }
-
-// Cỡ khung video từ md trở lên (điện thoại luôn là cỡ nhỏ nhất cho phép). "Nhỏ" = 356px rộng, tức 200px cao ở tỉ lệ 16:9, là
-// mức nhỏ nhất ta cho phép vì player nhúng của YouTube không được nhỏ hơn khoảng 200x200 (xem docs/system-architecture.md).
-const PLAYER_SIZE_CLASS: Record<PlayerSize, string> = { large: "", medium: "md:max-w-[560px]", small: "md:max-w-[356px]" };
 
 /** Màn Nghe (S5): video nhúng + lời chạy theo nhạc + panel "Đang hát". Mọi tô sáng dùng cùng bộ lọc level/"Đã biết" với màn xem trước. */
 export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {

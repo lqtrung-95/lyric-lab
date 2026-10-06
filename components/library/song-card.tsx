@@ -5,6 +5,8 @@ import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
 
 interface SongCardProps {
   videoId: string;
+  /** Mặc định mở trang xem trước bài hát; video luyện nghe truyền đường dẫn riêng. */
+  href?: string;
   title: string;
   channelTitle: string;
   /** Có thì hiện thanh tiến độ nghe (thư viện); không có thì hiện nút phát trên ảnh (trang chủ). */
@@ -24,11 +26,11 @@ interface SongCardProps {
  * Thẻ bài hát dùng chung cho trang chủ và thư viện. Thẻ luôn cao bằng nhau trong một hàng: tiêu đề chiếm chỗ 2 dòng
  * và phần chân (kênh, tiến độ) dính đáy, nên bài có tiêu đề ngắn hay dài đều thẳng hàng.
  */
-export function SongCard({ videoId, title, channelTitle, progress, sizes, meta, onRemove, adminActions, likeButton }: SongCardProps) {
+export function SongCard({ videoId, href, title, channelTitle, progress, sizes, meta, onRemove, adminActions, likeButton }: SongCardProps) {
   return (
     <div className="group relative h-full">
       <Link
-      href={`/learn/${videoId}`}
+      href={href ?? `/learn/${videoId}`}
       className="flex h-full flex-col overflow-hidden rounded-2xl bg-surface-container-lowest shadow-[0_1px_8px_rgba(30,26,22,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(30,26,22,0.1)]"
     >
       <div className="relative aspect-video shrink-0 bg-surface-container-high">

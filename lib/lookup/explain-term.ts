@@ -42,6 +42,8 @@ export interface ExplainDeps {
   dictionaryMeanings(term: string): Promise<string[]>;
   chat: ChatFn;
   models?: string[];
+  /** Loại câu: lời bài hát (mặc định) hoặc câu nói trong video, chỉ để gọi đúng tên trong prompt. */
+  lineKind?: "lyric" | "speech";
   /** Gọi trước khi tốn token LLM (để áp giới hạn tần suất). Trả false để từ chối. */
   allowLlmCall?: () => boolean | Promise<boolean>;
 }
@@ -65,7 +67,7 @@ export async function explainTerm(lines: AnalyzedLine[], req: ExplainRequest, de
   if (deps.allowLlmCall && !(await deps.allowLlmCall())) throw new ExplainError("rate_limited", "Vượt giới hạn giải nghĩa");
 
   const prompt = buildExplainPrompt({
-    term: req.term, line: line.text, lineTranslation: line.translation, dictionaryMeanings: await deps.dictionaryMeanings(req.term),
+    term: req.term, line: line.text, lineTranslation: line.translation, dictionaryMeanings: await deps.dictionaryMeanings(req.term), lineKind: deps.lineKind,
   });
   let lastError = "";
   for (const model of deps.models ?? EXPLAIN_MODELS) {

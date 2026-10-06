@@ -25,10 +25,12 @@ interface LyricListProps {
   onSeek: (index: number) => void;
   onWord: (word: WordSelection) => void;
   onPauseSong: () => void;
+  /** Mặc định bật; video luyện nghe tắt gợi ý sửa bản dịch và đổi tiêu đề/mô tả cho hợp lời nói. */
+  variant?: "lyrics" | "speech";
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong }: LyricListProps) {
+export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, variant = "lyrics" }: LyricListProps) {
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
@@ -83,7 +85,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-serif text-headline-md text-on-surface">
           <Icon name="format_quote" size={20} className="text-primary" />
-          Lời ca & nhịp điệu
+          {variant === "speech" ? "Bản chép" : "Lời ca & nhịp điệu"}
         </h2>
         <p className="text-label-sm text-on-surface-variant">Bấm câu để nhảy tới đó · bấm từ để tra</p>
         <ViewToggles
@@ -108,6 +110,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               onSeek={onSeek}
               onWord={onWord}
               onPauseSong={onPauseSong}
+              allowTranslationSuggestion={variant === "lyrics"}
             />
           );
         })}

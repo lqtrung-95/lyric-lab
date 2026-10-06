@@ -23,7 +23,9 @@ export async function lookupTermEntry(term: string): Promise<TermEntry | null> {
 }
 
 /** Phụ thuộc thật cho `explainTerm`: cache `term_explanations`, từ điển, Groq. */
-export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>): ExplainDeps {
+export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>, source: "song" | "video" = "song"): ExplainDeps {
+  // Video luyện nghe có bảng cache riêng (gắn với video_lessons, xóa video thì cache xóa theo).
+  const table = source === "video" ? "video_term_explanations" : "term_explanations";
   const sb = createSupabaseServiceClient();
   const key = (r: { videoId: string; lineIndex: number; term: string }) => ({
     video_id: r.videoId, line_index: r.lineIndex, term: r.term, explain_lang: EXPLAIN_LANG, prompt_version: PROMPT_VERSION,
@@ -31,13 +33,13 @@ export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>
   return {
     readCache: async (req) => {
       const k = key(req);
-      const { data } = await sb.from("term_explanations").select("meaning_in_context,note,model")
+      const { data } = await sb.from(table).select("meaning_in_context,note,model")
         .eq("video_id", k.video_id).eq("line_index", k.line_index).eq("term", k.term)
         .eq("explain_lang", k.explain_lang).eq("prompt_version", k.prompt_version).maybeSingle();
       return data ? { meaningInContext: data.meaning_in_context, note: data.note ?? undefined, model: data.model } : null;
     },
     writeCache: async (req, v) => {
-      const { error } = await sb.from("term_explanations").upsert(
+      const { error } = await sb.from(table).upsert(
         { ...key(req), meaning_in_context: v.meaningInContext, note: v.note ?? null, model: v.model },
         { onConflict: "video_id,line_index,term,explain_lang,prompt_version" },
       );
@@ -46,6 +48,7 @@ export function createExplainDeps(allowLlmCall: () => boolean | Promise<boolean>
     dictionaryMeanings: async (term) => (await lookupTermEntry(term))?.meanings ?? [],
     chat: createChat(getServerEnv()),
     allowLlmCall,
+    lineKind: source === "video" ? "speech" : "lyric",
   };
 }
 

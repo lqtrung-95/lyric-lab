@@ -22,7 +22,7 @@ export function MobileTabBar() {
               key={link.href}
               href={link.href}
               aria-current={active ? "page" : undefined}
-              className={`flex h-12 min-w-20 flex-col items-center justify-center transition-colors ${
+              className={`flex h-12 min-w-0 flex-1 flex-col items-center justify-center transition-colors ${
                 active ? "font-medium text-primary" : "text-on-surface-variant"
               }`}
             >
