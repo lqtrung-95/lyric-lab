@@ -144,7 +144,7 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
           <Icon name="logout" size={18} /> Rời phòng
         </button>
       </div>
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+      {toast && <Toast message={toast} onDismiss={() => setToast(null)} placement="top-right" />}
     </div>
   );
 }
