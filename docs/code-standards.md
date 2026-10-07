@@ -74,3 +74,5 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 - Ảnh `ImageResponse` (og:image): lấy font qua `lib/streak/og-fonts.ts` (Google Fonts với tham số `text` để có MỘT file đủ ký tự tiếng Việt). Đừng nạp từng khối unicode-range làm các font riêng cùng tên: satori chỉ dùng một khối nên cùng một từ bị trộn hai kiểu chữ. Font chưa có chữ Hán, nên không đưa tên bài hay lời vào ảnh og.
 
 - Trang Cài đặt: mỗi nhóm một tab (`SettingsTabs`), mọi bảng đều được dựng sẵn và chỉ ẩn bảng không chọn (các phần tự tải dữ liệu không mất trạng thái). Dòng cài đặt nào có thể tự ẩn (thông báo, email) thì thẻ chứa nó cần dòng chú thích `only:block` để không hiện thẻ trống.
+
+- Font: không thêm `<link rel="stylesheet">` font nặng vào `<head>` (chặn lần vẽ đầu). Font chữ Hán nạp qua `CjkFontLoader`; font Latin/Việt tự host bằng `next/font` chỉ với các biến thể đang dùng (mỗi kiểu × đậm × bộ ký tự là một file được preload). Ảnh `icon.png` giữ nhỏ (đang tải ở mọi trang); ảnh lớn cho manifest để ở `public/`.

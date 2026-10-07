@@ -3,14 +3,17 @@ import { Be_Vietnam_Pro, Lora } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { SITE_URL } from "@/lib/seo/site-url";
-import { googleFontsUrl, iconFontUrl } from "@/lib/ui/google-fonts-url";
+import { CjkFontLoader } from "@/components/layout/cjk-font-loader";
+import { iconFontUrl } from "@/lib/ui/google-fonts-url";
 import "./globals.css";
 
 // Font tự host (tải lúc build, phục vụ cùng domain): không phụ thuộc CDN lúc chạy và luôn có bộ glyph tiếng Việt.
 // Lora cho tiêu đề (dấu tiếng Việt vẽ chuẩn), Be Vietnam Pro cho nội dung. Chữ Hán (Noto Serif SC) nạp qua link Google Fonts:
 // next/font phải tải hàng trăm mảnh CJK lúc build nên làm hỏng build, còn Google tự cắt theo unicode-range.
-const sans = Be_Vietnam_Pro({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["300", "400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-be-vietnam-pro" });
-const serif = Lora({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-lora" });
+// Chỉ nạp (và preload) đúng các biến thể đang dùng: mỗi kiểu × đậm × bộ ký tự là một file ~5–40 KB được preload, nên thừa là chặn băng thông của tài nguyên quan trọng
+// hơn trên mạng chậm. Tiếng Việt chỉ cần latin + vietnamese (không cần latin-ext); không dùng chữ mảnh (300); Lora không có in nghiêng ở đâu trong app.
+const sans = Be_Vietnam_Pro({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-be-vietnam-pro" });
+const serif = Lora({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal"], display: "swap", variable: "--font-lora" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -40,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: ICONS_READY_INIT }} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href={googleFontsUrl()} />
         <link rel="stylesheet" href={iconFontUrl()} />
       </head>
       <body className="min-h-dvh">
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Bỏ qua tới nội dung chính
         </a>
         <NavigationProgress />
+        <CjkFontLoader />
         {children}
         <Analytics />
       </body>
