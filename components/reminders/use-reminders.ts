@@ -5,6 +5,23 @@ import { VAPID_PUBLIC_KEY } from "@/lib/push/push-config";
 
 export type ReminderStatus = "loading" | "unsupported" | "off" | "on" | "denied";
 
+/** Lý do không đăng ký được nhắc học, để hiện cho người dùng (và để chẩn đoán nhanh khi cấu hình sai). */
+export type ReminderError = "bad_key" | "push_service" | "server" | "network";
+
+export const REMINDER_ERROR_MESSAGES: Record<ReminderError, string> = {
+  bad_key: "Khóa thông báo của hệ thống bị lỗi định dạng. Hãy báo cho quản trị viên.",
+  push_service: "Trình duyệt không kết nối được dịch vụ thông báo. Với Brave, bật “Use Google services for push messaging” trong cài đặt; hoặc thử trình duyệt khác.",
+  server: "Máy chủ chưa lưu được đăng ký (có thể do chưa đăng nhập hoặc thiếu cấu hình). Thử tải lại trang rồi bật lại.",
+  network: "Chưa đăng ký được. Kiểm tra kết nối rồi thử lại.",
+};
+
+const classify = (e: unknown): ReminderError => {
+  const name = (e as { name?: string })?.name;
+  if (name === "InvalidCharacterError" || name === "InvalidAccessError") return "bad_key";
+  if (name === "AbortError" || name === "NotSupportedError") return "push_service";
+  return "network";
+};
+
 function base64ToBytes(base64: string): Uint8Array<ArrayBuffer> {
   const padded = (base64 + "=".repeat((4 - (base64.length % 4)) % 4)).replace(/-/g, "+").replace(/_/g, "/");
   const raw = atob(padded);
@@ -30,6 +47,7 @@ const post = (method: "POST" | "DELETE", body: unknown) =>
 export function useReminders() {
   const [status, setStatus] = useState<ReminderStatus>("loading");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<ReminderError | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -47,6 +65,7 @@ export function useReminders() {
   const enable = useCallback(async (): Promise<boolean> => {
     if (!supported()) return false;
     setBusy(true);
+    setError(null);
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") { setStatus(permission === "denied" ? "denied" : "off"); return false; }
@@ -54,10 +73,12 @@ export function useReminders() {
       await navigator.serviceWorker.ready;
       const sub = (await reg.pushManager.getSubscription()) ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: base64ToBytes(VAPID_PUBLIC_KEY) }));
       const res = await post("POST", sub.toJSON());
-      if (!res.ok) { await sub.unsubscribe().catch(() => {}); setStatus("off"); return false; }
+      if (!res.ok) { await sub.unsubscribe().catch(() => {}); setError("server"); setStatus("off"); return false; }
       setStatus("on");
       return true;
-    } catch {
+    } catch (e) {
+      console.error("reminder_subscribe_failed", e);
+      setError(classify(e));
       setStatus("off");
       return false;
     } finally {
@@ -79,5 +100,5 @@ export function useReminders() {
     }
   }, []);
 
-  return { status, busy, enable, disable };
+  return { status, busy, error, enable, disable };
 }

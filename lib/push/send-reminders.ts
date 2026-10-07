@@ -1,5 +1,6 @@
 import "server-only";
 import webpush from "web-push";
+import { VAPID_PUBLIC_KEY } from "./push-config";
 import { loadStreak } from "@/lib/streak/load-streak";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { deleteSubscriptionByEndpoint, listSubscriptionsToRemind, markSent } from "./push-subscriptions-repo";
@@ -29,7 +30,7 @@ async function dueCardCount(userId: string): Promise<number> {
  * Không in nội dung người dùng; chỉ trả số liệu tổng hợp.
  */
 export async function sendReminders(): Promise<ReminderRunResult> {
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT ?? "mailto:admin@example.com", process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!, process.env.VAPID_PRIVATE_KEY!);
+  webpush.setVapidDetails((process.env.VAPID_SUBJECT ?? "mailto:admin@example.com").trim(), VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY!.trim());
   const subs = await listSubscriptionsToRemind(MIN_HOURS_BETWEEN, MAX_PER_RUN);
   const result: ReminderRunResult = { considered: subs.length, sent: 0, skipped: 0, removed: 0, failed: 0 };
   // Một người có thể có nhiều thiết bị: tính trạng thái học một lần cho mỗi người.
