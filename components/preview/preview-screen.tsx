@@ -11,6 +11,7 @@ import { shiftLines } from "@/lib/listen/lyric-offset";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { SongReportBanner } from "@/components/admin/song-report-banner";
 import { ComprehensionBanner } from "./comprehension-banner";
 import { computeComprehension } from "@/lib/preview/comprehension";
 import type { WordStat } from "@/lib/preview/word-stats";
@@ -76,6 +77,7 @@ export function PreviewScreen({ analysis, song, wordStats }: PreviewScreenProps)
 
   return (
     <>
+      <SongReportBanner videoId={analysis.videoId} />
       <PreviewHeader analysis={analysis} song={song} listenHref={listenHref} />
 
       <div className="mx-auto max-w-7xl px-gutter py-space-lg md:px-6 lg:px-12">

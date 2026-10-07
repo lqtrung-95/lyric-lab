@@ -21,6 +21,7 @@ import { PlaybackBar } from "./playback-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
 import { usePublishDefaultOffset } from "./use-publish-default-offset";
+import { SongReportBanner } from "@/components/admin/song-report-banner";
 import { ListenTopBar } from "./listen-top-bar";
 import { LyricList } from "./lyric-list";
 import type { WordSelection } from "./lyric-line-row";
@@ -188,6 +189,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   return (
     <>
       <h1 className="sr-only">Nghe: {analysis.track?.title ?? song.title}</h1>
+      <SongReportBanner videoId={analysis.videoId} />
       <ListenTopBar
         videoId={analysis.videoId} title={title} artist={artist} backHref={`/learn/${analysis.videoId}`}
         showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}

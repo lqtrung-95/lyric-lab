@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AdminReportsBadge } from "@/components/admin/admin-reports-badge";
 import { AdminGate } from "@/components/admin/admin-gate";
 import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
@@ -7,6 +8,7 @@ import type { IconName } from "@/components/ui/icon-names";
 export const metadata: Metadata = { title: "Quản trị", robots: { index: false } };
 
 const LINKS: { href: string; label: string; description: string; icon: IconName }[] = [
+  { href: "/admin/reports", label: "Báo cáo bài hát", description: "Bài bị người học báo sai (lời không khớp, không phải tiếng Trung…): sửa lời, ẩn hoặc đánh dấu đã xử lý.", icon: "warning" },
   { href: "/admin/translations", label: "Duyệt bản dịch", description: "Góp ý bản dịch từng câu do người học gửi.", icon: "translate" },
   { href: "/admin/videos", label: "Quản lý video", description: "Duyệt, ẩn, xóa video luyện nghe và sửa bản dịch từng câu.", icon: "smart_display" },
   { href: "/admin/feedback", label: "Duyệt góp ý", description: "Góp ý/báo lỗi chờ hiện công khai ở trang Góp ý.", icon: "feedback" },
@@ -26,7 +28,7 @@ export default function AdminHomePage() {
                   <Icon name={l.icon} size={20} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block text-body-lg font-medium text-on-surface">{l.label}</span>
+                  <span className="flex items-center gap-2 text-body-lg font-medium text-on-surface">{l.label}{l.href === "/admin/reports" && <AdminReportsBadge />}</span>
                   <span className="block text-label-md text-on-surface-variant">{l.description}</span>
                 </span>
                 <Icon name="chevron_right" size={20} className="shrink-0 text-on-surface-variant" />
