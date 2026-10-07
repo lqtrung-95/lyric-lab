@@ -93,3 +93,5 @@ Người tiếp quản cần được cấp: repo GitHub, project Vercel, projec
 - Tên miền chính: `songhanzi.com` (Namecheap, gắn vào Vercel). Còn lại: đặt tên miền chính (không `www`) làm Production, `NEXT_PUBLIC_SITE_URL`, thêm tên miền vào Supabase Auth và Google OAuth, xác thực Resend. Chi tiết ở runbook mục "Tên miền songhanzi.com".
 
 - Trang Cài đặt chia bốn tab (`components/settings/settings-tabs.tsx`; tab đang mở nằm ở `?tab=account|learning|notifications|tips`): Tài khoản (đăng nhập, biệt danh, quản trị, xóa dữ liệu), Học tập, Thông báo (nhắc đẩy và email), Mẹo. Thêm tùy chọn mới thì đặt vào đúng tab trong `app/(main)/settings/page.tsx`. Test e2e dùng ô ở tab Học tập phải mở `/settings?tab=learning`.
+
+- Level mặc định HSK 3: trong app đã là `DEFAULT_LEVEL = 3` nhưng cột DB `user_profiles.level` mặc định 1 và đè lên khi hồ sơ được tạo mà chưa kèm level, nên tài khoản mới hiện HSK 1. Migration `20261007000004_user_profile_default_level.sql` đổi mặc định DB thành 3 (chạy tay; chỉ tác động hàng tạo sau đó).
