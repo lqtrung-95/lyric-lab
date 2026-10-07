@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ToggleSwitch } from "@/components/ui/toggle-switch";
 import { SettingRow } from "@/components/settings/settings-card";
 
 interface Prefs { weeklyEnabled: boolean; reminderEnabled: boolean }
@@ -24,12 +25,7 @@ export function EmailRows() {
     const res = await fetch("/api/email/prefs", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) }).catch(() => null);
     if (!res?.ok) setPrefs((p) => (p ? { ...p, ...Object.fromEntries(Object.entries(patch).map(([k, v]) => [k, !v])) } : p));
   }
-  const toggle = (label: string, on: boolean, onClick: () => void) => (
-    <button type="button" role="switch" aria-checked={on} aria-label={label} onClick={onClick}
-      className={`inline-flex min-h-11 min-w-20 items-center justify-center rounded-full px-4 text-label-md font-semibold transition-colors ${on ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"}`}>
-      {on ? "Đang bật" : "Bật"}
-    </button>
-  );
+  const toggle = (label: string, on: boolean, onClick: () => void) => <ToggleSwitch on={on} label={label} onChange={onClick} />;
   return (
     <>
       <SettingRow label="Email tổng kết tuần" hint="Mỗi sáng thứ Hai, chỉ khi tuần qua bạn có học.">{toggle("Email tổng kết tuần", prefs.weeklyEnabled, () => void change({ weeklyEnabled: !prefs.weeklyEnabled }))}</SettingRow>
