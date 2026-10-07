@@ -39,6 +39,6 @@ export default async function Image({ params }: { params: Promise<{ token: strin
         </div>
       </div>
     ),
-    { ...size, fonts: [{ name: "sans", data: fonts.sans, weight: 400 }, { name: "serif-bold", data: fonts.serifBold, weight: 700 }] },
+    { ...size, fonts },
   );
 }

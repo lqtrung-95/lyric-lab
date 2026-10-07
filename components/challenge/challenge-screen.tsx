@@ -92,7 +92,7 @@ export function ChallengeScreen({ code }: { code: string }) {
         </p>
 
         {finished ? (
-          <div className="mt-space-md"><ShareChallengeButton code={code} points={info.mine!.points} songTitle={info.songTitle} /></div>
+          <div className="mt-space-md"><ShareChallengeButton code={code} points={info.mine!.points} /></div>
         ) : info.expired && !info.mine ? (
           <p role="status" className="mt-space-md text-body-md text-on-surface-variant">Thử thách này đã hết hạn.</p>
         ) : (

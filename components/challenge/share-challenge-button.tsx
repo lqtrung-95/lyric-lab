@@ -6,9 +6,10 @@ import { isMobileDevice, shareLinkNative } from "@/lib/streak/share-card";
 import { ChallengeShareDialog } from "./challenge-share-dialog";
 
 /** Chia sẻ thử thách giống chia sẻ chuỗi ngày học: điện thoại mở share sheet của hệ điều hành, desktop mở popup có xem trước, nút từng mạng và sao chép link. */
-export function ShareChallengeButton({ code, points, songTitle }: { code: string; points: number; songTitle: string | null }) {
+export function ShareChallengeButton({ code, points }: { code: string; points: number }) {
   const [dialog, setDialog] = useState(false);
-  const text = `Mình được ${points} điểm ở thử thách điền lời${songTitle ? ` bài ${songTitle}` : ""} trên SongHanzi. Thử vượt mình nhé!`;
+  // Không đưa tên bài vào lời nhắn: tên video YouTube thường rất dài và làm lời nhắn rối.
+  const text = `Mình được ${points} điểm ở thử thách điền lời trên SongHanzi. Thử vượt mình nhé!`;
 
   async function share() {
     if (!isMobileDevice()) return setDialog(true);

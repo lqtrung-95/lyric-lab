@@ -39,7 +39,7 @@ export function ChallengeShareDialog({ code, text, onClose }: { code: string; te
           {/* eslint-disable-next-line @next/next/no-img-element -- ảnh og tạo động ở server, không phải asset tĩnh */}
           <img src={`/api/challenges/${code}/og`} alt="Xem trước thẻ thử thách" className="h-full w-full object-cover" />
         </div>
-        <p className="mt-3 text-label-md text-on-surface-variant">{text}</p>
+        <p className="mt-2 text-label-md text-on-surface-variant">{text}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {networks.map((n) => (
             <a key={n.label} href={n.href(url)} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 flex-1 basis-[calc(33%-6px)] items-center justify-center rounded-full bg-surface-container px-3 text-label-md font-medium text-on-surface hover:bg-surface-container-high">{n.label}</a>

@@ -70,3 +70,5 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 - Sửa dữ liệu phân tích trực tiếp trong DB phải kèm bump `revN` của `unstable_cache`.
 
 - Phím tắt màn Nghe và màn Xem video: hook chung `components/listen/use-listen-shortcuts.ts`, nút/hộp thoại `shortcuts-help-button.tsx`; thêm phím mới thì sửa `lib/listen/keyboard-shortcuts.ts` và danh sách trong hộp thoại.
+
+- Ảnh `ImageResponse` (og:image): lấy font qua `lib/streak/og-fonts.ts` (Google Fonts với tham số `text` để có MỘT file đủ ký tự tiếng Việt). Đừng nạp từng khối unicode-range làm các font riêng cùng tên: satori chỉ dùng một khối nên cùng một từ bị trộn hai kiểu chữ. Font chưa có chữ Hán, nên không đưa tên bài hay lời vào ảnh og.
