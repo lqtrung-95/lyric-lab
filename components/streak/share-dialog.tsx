@@ -2,25 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { socialNetworks } from "@/lib/share/social-networks";
 import { renderShareCard } from "@/lib/streak/share-card";
 import type { StreakData } from "@/lib/streak/load-streak";
 
 const SHARE_TITLE = "SongHanzi";
 const SHARE_TEXT = "Chuỗi ngày học tiếng Trung qua bài hát của tôi trên SongHanzi";
 
-interface NetworkLink {
-  label: string;
-  href: (url: string) => string;
-}
-// Facebook: sharer.php đã bỏ tham số text/quote từ lâu, không nhận text tùy chỉnh được, chỉ nhận link.
-// Instagram/TikTok không có: không có link chia sẻ web công khai (chỉ nhận qua share sheet app di động thật).
-const NETWORKS: NetworkLink[] = [
-  { label: "Facebook", href: (u) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}` },
-  { label: "X", href: (u) => `https://twitter.com/intent/tweet?url=${encodeURIComponent(u)}&text=${encodeURIComponent(SHARE_TEXT)}` },
-  { label: "Zalo", href: (u) => `https://zalo.me/share?u=${encodeURIComponent(u)}&t=${encodeURIComponent(SHARE_TITLE)}` },
-  { label: "Telegram", href: (u) => `https://t.me/share/url?url=${encodeURIComponent(u)}&text=${encodeURIComponent(SHARE_TEXT)}` },
-  { label: "Threads", href: (u) => `https://www.threads.net/intent/post?text=${encodeURIComponent(`${SHARE_TEXT} ${u}`)}` },
-];
+const NETWORKS = socialNetworks(SHARE_TITLE, SHARE_TEXT);
 
 /**
  * Popup chia sẻ cho desktop (không có share sheet của hệ điều hành như mobile): xem trước banner, nút mở trang chia

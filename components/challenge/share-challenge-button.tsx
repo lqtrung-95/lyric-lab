@@ -2,27 +2,26 @@
 
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { isMobileDevice, shareLinkNative } from "@/lib/streak/share-card";
+import { ChallengeShareDialog } from "./challenge-share-dialog";
 
-/** Chia sẻ link thử thách: share sheet của hệ điều hành nếu có, không thì sao chép link. */
+/** Chia sẻ thử thách giống chia sẻ chuỗi ngày học: điện thoại mở share sheet của hệ điều hành, desktop mở popup có xem trước, nút từng mạng và sao chép link. */
 export function ShareChallengeButton({ code, points, songTitle }: { code: string; points: number; songTitle: string | null }) {
-  const [copied, setCopied] = useState(false);
+  const [dialog, setDialog] = useState(false);
+  const text = `Mình được ${points} điểm ở thử thách điền lời${songTitle ? ` bài ${songTitle}` : ""} trên SongHanzi. Thử vượt mình nhé!`;
 
   async function share() {
-    const url = `${location.origin}/challenge/${code}`;
-    const text = `Mình được ${points} điểm ở thử thách bài ${songTitle ?? "hát"} trên SongHanzi. Thử vượt mình nhé!`;
-    if (typeof navigator.share === "function") {
-      try { await navigator.share({ title: "SongHanzi", text, url }); return; } catch (e) { if ((e as Error).name === "AbortError") return; }
-    }
-    try {
-      await navigator.clipboard.writeText(`${text} ${url}`);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2500);
-    } catch { /* clipboard bị chặn: người dùng tự sao chép link từ thanh địa chỉ */ }
+    if (!isMobileDevice()) return setDialog(true);
+    const result = await shareLinkNative(`${location.origin}/challenge/${code}`, "SongHanzi", text).catch(() => "unsupported" as const);
+    if (result === "unsupported") setDialog(true);
   }
 
   return (
-    <button type="button" onClick={() => void share()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">
-      <Icon name={copied ? "check" : "share"} size={20} />{copied ? "Đã sao chép link" : "Thách bạn bè"}
-    </button>
+    <>
+      <button type="button" onClick={() => void share()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+        <Icon name="share" size={20} />Thách bạn bè
+      </button>
+      {dialog && <ChallengeShareDialog code={code} text={text} onClose={() => setDialog(false)} />}
+    </>
   );
 }
