@@ -73,3 +73,5 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 ## Liên hệ / quyền truy cập cần có
 
 Người tiếp quản cần được cấp: repo GitHub, project Vercel, project Supabase, khóa API (Groq ×2, DeepSeek, BytePlus ModelArk, OpenRouter, YouTube Data API, Azure Speech tùy chọn), Sentry. Không có khóa nào được lưu trong repo; xem [`operations-runbook.md`](operations-runbook.md).
+
+- Video luyện nghe: đã nạp 9 video của @ChineseGlow (draft) từ SRT của công cụ podcast bằng `scripts/ingest-from-podcast-output.mts` (YouTube chặn tải phụ đề). Còn 2 tập chưa ghép được video (HSK2 ordering coffee, HSK4 vượt qua nỗi sợ thất bại: chưa đăng?). Việc của bạn: duyệt draft ở `/admin/videos`, rồi đặt `NEXT_PUBLIC_VIDEO_PUBLIC=1` để mở tab Video.
