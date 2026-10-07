@@ -11,6 +11,8 @@ import { shiftLines } from "@/lib/listen/lyric-offset";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { ComprehensionBanner } from "./comprehension-banner";
+import { computeComprehension } from "@/lib/preview/comprehension";
 import { GrammarCard } from "./grammar-card";
 import { LevelFilterBar } from "./level-filter-bar";
 import { PreviewHeader } from "./preview-header";
@@ -37,6 +39,10 @@ export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
   const view = useMemo(
     () => buildPreviewView(analysis.items, { userLevel: state.level, known, levelFilter, showEasy }),
     [analysis.items, state.level, known, levelFilter, showEasy],
+  );
+  const comprehension = useMemo(
+    () => computeComprehension(analysis.lines, analysis.items, { userLevel: state.level, known }),
+    [analysis.lines, analysis.items, state.level, known],
   );
   const activeFilter = view.chips.some((c) => c.key === levelFilter) ? levelFilter : "all";
   const listenHref = `/learn/${analysis.videoId}/listen`;
@@ -70,6 +76,7 @@ export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
       <PreviewHeader analysis={analysis} song={song} listenHref={listenHref} />
 
       <div className="mx-auto max-w-7xl px-gutter py-space-lg md:px-6 lg:px-12">
+        {comprehension && <ComprehensionBanner value={comprehension} />}
         <LevelFilterBar
           chips={view.chips} active={activeFilter} onChange={setLevelFilter} userLevel={state.level}
           hiddenBelowLevel={view.hiddenBelowLevel} showEasy={showEasy} onToggleEasy={() => setShowEasy((v) => !v)}

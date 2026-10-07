@@ -139,6 +139,7 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
           videoId={lesson.videoId} promptVersion="video" variant="speech"
           lines={lines} currentIndex={currentIndex} vocab={[]} grammar={[]}
           showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
+          shareContext={{ title: lesson.title, artist: lesson.channelTitle }}
           onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
           onSeek={seekToLine} onWord={selectWord} onPauseSong={pause}
         />

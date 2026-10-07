@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
 import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-row";
+import { LineShareDialog } from "@/components/share/line-share-dialog";
 import { ViewToggles } from "./view-toggles";
 
 // Sau khi người dùng tự cuộn, tạm ngừng tự cuộn theo lời để không giật màn hình.
@@ -20,6 +21,8 @@ interface LyricListProps {
   showTranslation: boolean;
   /** Tự cuộn theo câu đang hát. Tắt (ghim) khi người dùng muốn đọc chỗ khác mà không bị kéo về. */
   autoScroll: boolean;
+  /** Có thì mỗi dòng có nút chia sẻ thành ảnh, kèm tên bài/nghệ sĩ in trên thẻ. */
+  shareContext?: { title: string; artist?: string };
   onTogglePinyin: () => void;
   onToggleTranslation: () => void;
   onSeek: (index: number) => void;
@@ -30,7 +33,17 @@ interface LyricListProps {
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, variant = "lyrics" }: LyricListProps) {
+export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, shareContext, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, variant = "lyrics" }: LyricListProps) {
+  const [sharing, setSharing] = useState<number | null>(null);
+  const shareLine = useCallback((index: number) => setSharing(index), []);
+  const sharedLine = sharing !== null ? lines.find((l) => l.index === sharing) : undefined;
+  // Phụ thuộc vào chuỗi (không phải đối tượng `shareContext` mới mỗi lần vẽ) để thẻ không dựng lại ảnh mỗi 100 ms khi nhạc chạy.
+  const shareTitle = shareContext?.title;
+  const shareArtist = shareContext?.artist;
+  const shareCard = useMemo(
+    () => (sharedLine && shareTitle ? { han: sharedLine.text, pinyin: sharedLine.pinyin, translation: sharedLine.translation, title: shareTitle, artist: shareArtist } : null),
+    [sharedLine, shareTitle, shareArtist],
+  );
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
@@ -125,10 +138,12 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               onWord={onWord}
               onPauseSong={onPauseSong}
               allowTranslationSuggestion={variant === "lyrics"}
+              onShare={shareContext ? shareLine : undefined}
             />
           );
         })}
       </ol>
+      {shareCard && <LineShareDialog card={shareCard} onClose={() => setSharing(null)} />}
     </div>
   );
 }

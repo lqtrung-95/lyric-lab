@@ -224,6 +224,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
             videoId={analysis.videoId} promptVersion={analysis.promptVersion}
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}
             showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
+            shareContext={{ title, artist }}
             onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
             onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })} onSeek={quickSync ? syncToLine : seekToLine} onWord={selectWord} onPauseSong={pauseSong}
           />

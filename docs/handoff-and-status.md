@@ -83,3 +83,5 @@ Người tiếp quản cần được cấp: repo GitHub, project Vercel, projec
 - Hướng 3 tháng (chốt 2026-10-07): ưu tiên nhiều người dùng, kiếm tiền tính sau, app là sản phẩm độc lập. Kế hoạch 4 tuần ở `docs/backlog.md` mục "Kế hoạch tăng trưởng 3 tháng". Cảnh báo: Vercel Hobby cấm dùng thương mại, cần lên gói phù hợp trước khi đẩy mạnh.
 
 - Tuần 1 (tăng trưởng): nhắc học bằng web push đã xong ở code, **chưa chạy thử đầu-cuối trên thiết bị thật**. Việc của bạn: chạy migration `20261007000001_push_subscriptions.sql`, sinh khóa VAPID, đặt 4 biến (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`) trên Vercel rồi deploy lại. Hạn mức phân tích/ngày đã có sẵn từ trước.
+
+- Tuần 2 (tăng trưởng): "độ hiểu được của bài" ở màn xem trước và nút chia sẻ một câu thành ảnh (màn Nghe và màn Xem video) đã xong. Chưa xem được ảnh thẻ bằng mắt trong trình duyệt tích hợp (chỉ kiểm tra kích thước 1080×1350); nên mở thử một thẻ.

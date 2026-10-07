@@ -3,6 +3,7 @@
 import { memo } from "react";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { buildLineSegments, type HighlightSets } from "@/lib/listen/line-segments";
+import { Icon } from "@/components/ui/icon";
 import { TranslationSuggestionButton } from "./translation-suggestion-button";
 
 export type LineState = "past" | "active" | "upcoming";
@@ -27,13 +28,15 @@ interface LyricLineRowProps {
   onPauseSong: () => void;
   /** Cho gợi ý sửa bản dịch của cộng đồng (chỉ có ở bài hát; video luyện nghe không dùng). Mặc định bật. */
   allowTranslationSuggestion?: boolean;
+  /** Có thì hiện nút chia sẻ câu này dưới dạng ảnh. */
+  onShare?: (index: number) => void;
 }
 
 /**
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
 
@@ -102,6 +105,15 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
           </div>
         )}
       </div>
+      {onShare && (
+        <button
+          type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
+          onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
+          className="ml-auto mt-0.5 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-on-surface-variant opacity-0 transition-opacity hover:bg-surface-container-high focus-visible:opacity-100 group-hover/line:opacity-100 [@media(hover:none)]:opacity-60"
+        >
+          <Icon name="share" size={18} />
+        </button>
+      )}
     </li>
   );
 }
