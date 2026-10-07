@@ -23,9 +23,13 @@ test("thẻ chuỗi ngày học: đếm hoạt động luyện tập, hiện tu�
     await expect(card).toContainText("Hôm nay bạn đã học rồi");
     await expect(card.getByRole("list", { name: /Tuần này: học/ })).toBeVisible();
 
-    const download = page.waitForEvent("download");
+    // Desktop: nút Chia sẻ mở popup có xem trước ảnh, nút các mạng xã hội và sao chép link (điện thoại dùng share sheet của hệ điều hành).
     await card.getByRole("button", { name: "Chia sẻ" }).click();
-    expect((await download).suggestedFilename()).toBe("lyric-lab-streak.png");
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ chuỗi ngày học" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Sao chép link" })).toBeVisible();
+    await dialog.getByRole("button", { name: "Đóng" }).click();
+    await expect(dialog).toBeHidden();
 
     // Gọn ở cả hai cỡ màn hình: không tràn ngang, không quá cao, nút chia sẻ vẫn bấm được.
     const heights: Record<string, number> = {};

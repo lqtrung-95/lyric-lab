@@ -15,7 +15,7 @@ for (const song of songs) {
   let items: LrclibItem[] = [];
   try {
     const url = `https://lrclib.net/api/search?q=${encodeURIComponent(`${song.title} ${song.artist}`)}`;
-    const res = await fetch(url, { headers: { "User-Agent": "lyric-lab-spike (personal project)" }, signal: AbortSignal.timeout(20_000) });
+    const res = await fetch(url, { headers: { "User-Agent": "SongHanzi-spike (songhanzi.com; personal project)" }, signal: AbortSignal.timeout(20_000) });
     items = res.ok ? await res.json() : [];
   } catch { /* lỗi mạng: tính là không có kết quả */ }
 

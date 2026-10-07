@@ -15,7 +15,7 @@ export class LrclibProvider implements LrclibSearch {
     const url = new URL(BASE_URL);
     url.searchParams.set("q", query);
     const res = await this.fetchFn(url, {
-      headers: { "User-Agent": "lyric-lab (personal project)" },
+      headers: { "User-Agent": "SongHanzi (songhanzi.com; personal project)" },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!res.ok) throw new Error(`LRCLIB lỗi HTTP ${res.status}`);

@@ -28,7 +28,7 @@ for (let i = 0; i < todo.length; i += BATCH) {
   let json;
   for (let attempt = 0; attempt < 5 && !json; attempt++) {
     try {
-      const res = await fetch(url, { headers: { "User-Agent": "lyric-lab-dictionary-import (personal project)" }, signal: AbortSignal.timeout(60_000) });
+      const res = await fetch(url, { headers: { "User-Agent": "SongHanzi-dictionary-import (songhanzi.com; personal project)" }, signal: AbortSignal.timeout(60_000) });
       if (res.ok) json = await res.json();
       else { console.log(`HTTP ${res.status} ở lô ${i}, thử lại`); await new Promise((r) => setTimeout(r, 10_000 * (attempt + 1))); }
     } catch (e) { console.log(`Lỗi ${(e as Error).message} ở lô ${i}, thử lại`); await new Promise((r) => setTimeout(r, 10_000 * (attempt + 1))); }

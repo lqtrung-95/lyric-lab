@@ -45,3 +45,20 @@ export function loadOgFonts(): Promise<OgFont[]> {
   ]);
   return cached;
 }
+
+const cjkCache = new Map<string, Promise<OgFont>>();
+
+/** Font Noto Serif SC đậm chỉ chứa đúng các chữ Hán cho trước (dùng để vẽ chữ Hán trang trí trong ảnh og: tham số `text` giúp tải vài KB thay vì cả font). */
+export function loadCjkGlyphFont(chars: string): Promise<OgFont> {
+  let font = cjkCache.get(chars);
+  if (!font) {
+    font = (async () => {
+      const css = await fetch(`https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&text=${encodeURIComponent(chars)}`, { headers: { "User-Agent": OLD_UA } }).then((r) => r.text());
+      const url = css.match(/url\((https:\/\/[^)]+)\) format\('woff'\)/)?.[1];
+      if (!url) throw new Error("Không tìm thấy URL font chữ Hán");
+      return { name: "serif-cjk", weight: 700 as const, data: await fetch(url).then((r) => r.arrayBuffer()) };
+    })();
+    cjkCache.set(chars, font);
+  }
+  return font;
+}
