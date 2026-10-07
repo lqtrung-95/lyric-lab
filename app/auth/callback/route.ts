@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { sendWelcomeIfNeeded } from "@/lib/email/send-welcome";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
 
 export const runtime = "nodejs";
@@ -19,5 +20,11 @@ export async function GET(request: Request) {
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (!error) {
+    // Email chào mừng gửi sau khi đã trả phản hồi (không làm chậm đăng nhập, lỗi gửi mail không ảnh hưởng đăng nhập).
+    const { data } = await supabase.auth.getUser();
+    const user = data.user;
+    if (user) after(() => sendWelcomeIfNeeded({ id: user.id, email: user.email ?? null, isAnonymous: user.is_anonymous ?? false }));
+  }
   return NextResponse.redirect(new URL(error ? "/settings?link=error" : next, url.origin));
 }

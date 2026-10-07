@@ -6,6 +6,11 @@ const DEFAULT_TIMEZONE = "Asia/Ho_Chi_Minh";
 const LOOKBACK_DAYS = 400;
 const MAX_ROWS = 5000;
 
+export interface ActivityDays {
+  days: Set<string>;
+  timeZone: string;
+}
+
 export interface StreakData extends StreakSummary {
   /** Số thẻ đã ôn ít nhất một lần. */
   learnedWords: number;
@@ -15,7 +20,7 @@ export interface StreakData extends StreakSummary {
  * Ngày có hoạt động học = có lần chấm thẻ, lượt luyện tập hoặc tiến độ nghe bài trong ngày (múi giờ của người dùng).
  * Tính từ dữ liệu sẵn có nên hoàn tác một lần chấm cũng tự cập nhật, không cần bảng riêng.
  */
-export async function loadStreak(userId: string, now = new Date()): Promise<StreakData> {
+export async function loadActivityDays(userId: string, now = new Date()): Promise<ActivityDays & { learnedWords: number }> {
   const sb = createSupabaseServiceClient();
   const since = new Date(now.getTime() - LOOKBACK_DAYS * 86_400_000).toISOString();
   const [profile, logs, scores, songs, learned] = await Promise.all([
@@ -31,6 +36,11 @@ export async function loadStreak(userId: string, now = new Date()): Promise<Stre
     ...(scores.data ?? []).map((r) => r.played_at as string),
     ...(songs.data ?? []).map((r) => r.updated_at as string),
   ];
-  const days = new Set(stamps.map((s) => dayKey(new Date(s), tz)));
-  return { ...computeStreak(days, dayKey(now, tz)), learnedWords: learned.count ?? 0 };
+  return { days: new Set(stamps.map((s) => dayKey(new Date(s), tz))), timeZone: tz, learnedWords: learned.count ?? 0 };
+}
+
+/** Chuỗi ngày học của người dùng tính từ các ngày có hoạt động. */
+export async function loadStreak(userId: string, now = new Date()): Promise<StreakData> {
+  const { days, timeZone, learnedWords } = await loadActivityDays(userId, now);
+  return { ...computeStreak(days, dayKey(now, timeZone)), learnedWords };
 }

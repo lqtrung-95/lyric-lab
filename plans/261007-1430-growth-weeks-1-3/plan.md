@@ -11,3 +11,6 @@
 - Thiếu khóa VAPID/`CRON_SECRET` thì tính năng tự ẩn (không lỗi).
 - Thách đấu dùng lại `buildRoomQuestions`, `RoomQuestionLine`, `RoomChoiceList`, `roomAnswerPoints`. Tạo thử thách tính vào hạn mức `room` (không cần đổi ràng buộc `usage_events`).
 - Bảng mới có `user_id` mà không gộp được: ghi vào danh sách "ignored" của test gộp tài khoản kèm lý do.
+
+## Email (thêm 2026-10-07)
+Email chào mừng (lần đầu có email thật), email tổng kết tuần (thứ Hai, chỉ gửi khi tuần trước có học), email nhắc quay lại (3–30 ngày không học, tối đa 1 lần/7 ngày). Chỉ người đã đăng nhập Google (ẩn danh không có email). Có link hủy nhận (một chạm, kèm header List-Unsubscribe) và hai công tắc trong Cài đặt. Nhà cung cấp: Resend qua REST (`RESEND_API_KEY`, `EMAIL_FROM`); thiếu biến thì tự tắt. Cần tên miền riêng đã xác thực SPF/DKIM để gửi được tới người lạ.

@@ -24,6 +24,7 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `NEXT_PUBLIC_VIDEO_PUBLIC` | Tùy chọn | `1` = hiện mục "Video" trên menu cho mọi người. Không đặt: mục này chỉ hiện ở môi trường phát triển, ẩn cả với admin ở production (admin vẫn vào thẳng `/video` và `/admin/videos` bằng đường dẫn để thử). Đặt xong cần deploy lại (biến `NEXT_PUBLIC_*` được nhúng lúc build). |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Tùy chọn | Khóa thông báo đẩy cho nhắc học. Sinh bằng `npx tsx scripts/generate-vapid-keys.mts` (in ra màn hình, không ghi file). Thiếu thì mục "Nhắc học" tự ẩn. Biến `NEXT_PUBLIC_*` cần deploy lại. |
 | `CRON_SECRET` | Tùy chọn | Chuỗi ngẫu nhiên ≥ 16 ký tự; Vercel Cron gửi kèm `Authorization: Bearer` khi gọi `/api/cron/reminders`. Thiếu thì route từ chối (401). |
+| `RESEND_API_KEY`, `EMAIL_FROM` | Tùy chọn | Gửi email (chào mừng, tổng kết tuần, nhắc quay lại) qua Resend. `EMAIL_FROM` dạng `SongHanzi <no-reply@ten-mien.com>` và **tên miền phải được xác thực (SPF/DKIM) trong Resend**: không xác thực thì chỉ gửi được tới chính chủ tài khoản Resend. Thiếu một trong hai thì mọi tính năng email tự tắt. |
 | `NEXT_PUBLIC_SITE_URL` | Tùy chọn | URL gốc khi có tên miền riêng (OG image, sitemap) |
 | `ADMIN_EMAILS` | Tùy chọn | Danh sách email (phân tách dấu phẩy) vào được `/admin/*` |
 | `UNLIMITED_USAGE_EMAILS` | Tùy chọn | Email không bị hạn mức |
@@ -148,3 +149,11 @@ Migration `20261007000001_push_subscriptions.sql` (chạy tay) tạo `push_subsc
 - Vercel: gói Hobby cấm dùng thương mại, cần Pro trước khi kiếm tiền hoặc đẩy mạnh. Tối ưu ảnh đã từng cạn (thumbnail YouTube dùng `unoptimized`).
 - Phân tích bài mới tốn LLM: đã có hạn mức theo tài khoản (10 ẩn danh / 30 đã đăng nhập mỗi 24 giờ) và theo IP (30/24 giờ); bài đã cache không tốn. Theo dõi hạn mức Groq; khi cần nâng gói trả phí.
 - Supabase Free: Realtime tối đa 200 kết nối đồng thời và 100 tin/giây (ảnh hưởng phòng thi đấu khi đông); 500 MB cơ sở dữ liệu (cache phân tích và bài video chiếm dần).
+
+
+## Email
+Migration `20261007000003_email_prefs.sql` (chạy tay) tạo `email_prefs` và đánh dấu "đã chào mừng" cho mọi tài khoản Google có từ trước (họ không nhận email chào muộn nhưng vẫn nhận tổng kết tuần và nhắc theo mặc định, mỗi email có link hủy). Ba loại email, chỉ cho tài khoản có email thật (Google; ẩn danh không có):
+- **Chào mừng**: gửi một lần ở `/auth/callback` sau khi đăng nhập Google lần đầu (`after()`, không chậm đăng nhập; gửi lỗi thì trả quyền để lần đăng nhập sau thử lại).
+- **Tổng kết tuần**: cron `0 2 * * *` (09:00 giờ Việt Nam) gọi `/api/cron/emails`; chỉ thứ Hai, chỉ khi 7 ngày qua có học, cách lần trước ≥ 6 ngày.
+- **Nhắc quay lại**: cùng cron, mọi ngày; khi đã bỏ học 3–30 ngày, tối đa một lần mỗi 7 ngày. Một người nhận tối đa một email mỗi lần chạy.
+Mỗi email có link hủy nhận (`/unsubscribe/[token]`, nút bấm gọi `POST /api/email/unsubscribe`; header `List-Unsubscribe` + `List-Unsubscribe-Post` cho hủy một chạm trong ứng dụng thư) và người dùng bật/tắt từng loại ở Cài đặt. Chạy tay: `curl -H "Authorization: Bearer $CRON_SECRET" https://<tên miền>/api/cron/emails` (trả số liệu tổng hợp). Hạn mức Resend gói miễn phí (kiến thức cũ, xem lại trang giá): khoảng 3.000 email/tháng và 100 email/ngày; mỗi lượt cron tối đa 200 người. Vercel Hobby giới hạn số cron (hiện dùng 2: nhắc đẩy và email).

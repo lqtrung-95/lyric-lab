@@ -440,6 +440,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "challenges.creator_id", // on delete set null: thử thách giữ lại, chỉ mất liên kết người tạo
       "challenge_attempts.user_id", // on delete set null: như trên; mỗi người một lượt nên không gộp
       "player_reports.reporter_id", // on delete set null: báo cáo giữ lại cho quản trị
+      "email_prefs.user_id", // tùy chọn email gắn với tài khoản có email thật (Google); tài khoản ẩn danh không có hàng này nên không có gì để gộp
       "push_subscriptions.user_id", // đăng ký theo thiết bị: app đăng ký lại endpoint với tài khoản hiện tại mỗi lần mở, nên tự gắn lại sau khi gộp
     ]);
     const { data, error } = await service.rpc("tables_referencing_users");
