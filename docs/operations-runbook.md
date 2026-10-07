@@ -25,7 +25,7 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Tùy chọn | Khóa thông báo đẩy cho nhắc học. Sinh bằng `npx tsx scripts/generate-vapid-keys.mts` (in ra màn hình, không ghi file). Thiếu thì mục "Nhắc học" tự ẩn. Biến `NEXT_PUBLIC_*` cần deploy lại. |
 | `CRON_SECRET` | Tùy chọn | Chuỗi ngẫu nhiên ≥ 16 ký tự; Vercel Cron gửi kèm `Authorization: Bearer` khi gọi `/api/cron/reminders`. Thiếu thì route từ chối (401). |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Tùy chọn | Gửi email (chào mừng, tổng kết tuần, nhắc quay lại) qua Resend. `EMAIL_FROM` dạng `SongHanzi <no-reply@ten-mien.com>` và **tên miền phải được xác thực (SPF/DKIM) trong Resend**: không xác thực thì chỉ gửi được tới chính chủ tài khoản Resend. Thiếu một trong hai thì mọi tính năng email tự tắt. |
-| `NEXT_PUBLIC_SITE_URL` | Tùy chọn | URL gốc khi có tên miền riêng (OG image, sitemap) |
+| `NEXT_PUBLIC_SITE_URL` | Khuyến nghị | `https://songhanzi.com` (URL gốc, không có `/` cuối): dùng cho og:image, sitemap, link chia sẻ và link trong email. Mặc định trong code cũng là giá trị này. Đổi xong cần deploy lại. |
 | `ADMIN_EMAILS` | Tùy chọn | Danh sách email (phân tách dấu phẩy) vào được `/admin/*` |
 | `UNLIMITED_USAGE_EMAILS` | Tùy chọn | Email không bị hạn mức |
 | `CAPTION_PROBE_SECRET` (≥ 16 ký tự) | Tùy chọn | Bật route chẩn đoán `/api/debug/caption-probe`; client phải gửi đúng giá trị trong header. Chỉ để kiểm tra việc lấy caption trên Vercel; để trống = route tắt. Tạo bằng `openssl rand -hex 24` |
@@ -157,3 +157,19 @@ Migration `20261007000003_email_prefs.sql` (chạy tay) tạo `email_prefs` và 
 - **Tổng kết tuần**: cron `0 2 * * *` (09:00 giờ Việt Nam) gọi `/api/cron/emails`; chỉ thứ Hai, chỉ khi 7 ngày qua có học, cách lần trước ≥ 6 ngày.
 - **Nhắc quay lại**: cùng cron, mọi ngày; khi đã bỏ học 3–30 ngày, tối đa một lần mỗi 7 ngày. Một người nhận tối đa một email mỗi lần chạy.
 Mỗi email có link hủy nhận (`/unsubscribe/[token]`, nút bấm gọi `POST /api/email/unsubscribe`; header `List-Unsubscribe` + `List-Unsubscribe-Post` cho hủy một chạm trong ứng dụng thư) và người dùng bật/tắt từng loại ở Cài đặt. Chạy tay: `curl -H "Authorization: Bearer $CRON_SECRET" https://<tên miền>/api/cron/emails` (trả số liệu tổng hợp). Hạn mức Resend gói miễn phí (kiến thức cũ, xem lại trang giá): khoảng 3.000 email/tháng và 100 email/ngày; mỗi lượt cron tối đa 200 người. Vercel Hobby giới hạn số cron (hiện dùng 2: nhắc đẩy và email).
+
+
+## Tên miền `songhanzi.com` (mua ở Namecheap, 2026-10-07)
+- **Vercel:** project → Settings → Domains. Chọn `songhanzi.com` (không `www`) làm tên chính (Production) và cho `www.songhanzi.com` chuyển hướng 308 về nó, để địa chỉ ngắn và khớp `SITE_URL`. `lyric-lab-indol.vercel.app` vẫn dùng được. Chờ trạng thái "Generating SSL Certificate" chuyển xong.
+- **DNS:** nếu nameserver vẫn là của Namecheap thì thêm bản ghi ở Namecheap → Advanced DNS; nếu đã chuyển nameserver sang Vercel thì thêm ở Vercel → Domains → DNS Records. Không thêm bản ghi ở cả hai nơi.
+- **Tài khoản ẩn danh theo tên miền:** phiên ẩn danh và tiến độ lưu trong trình duyệt gắn với địa chỉ web. Ai đang dùng bằng `vercel.app` mà chuyển sang `songhanzi.com` sẽ thấy như người mới (dữ liệu cũ vẫn ở địa chỉ cũ). Người đã đăng nhập Google không mất gì. Vì vậy không ép chuyển hướng toàn bộ `vercel.app` sang tên miền mới.
+- **Đăng nhập Google:** thêm `https://songhanzi.com` vào Supabase → Authentication → URL Configuration (Site URL và Redirect URLs, gồm `https://songhanzi.com/auth/callback`) và vào Google Cloud Console → OAuth client → Authorized JavaScript origins. Quên bước này thì đăng nhập Google trên tên miền mới lỗi.
+
+### Resend (email)
+1. Resend → Domains → Add Domain → `songhanzi.com`, vùng gần Việt Nam nhất (Singapore nếu có).
+2. Resend hiện các bản ghi DNS (thường: TXT DKIM `resend._domainkey`, MX và TXT SPF ở subdomain `send`). Thêm đúng các bản ghi đó ở nơi quản lý DNS (xem mục DNS trên). Namecheap tự thêm tên miền vào cuối nên ô Host chỉ điền phần đầu (ví dụ `resend._domainkey`, `send`).
+3. Bấm Verify trong Resend. Có thể mất từ vài phút đến vài giờ. Nên thêm cả bản ghi DMARC: TXT tên `_dmarc`, giá trị `v=DMARC1; p=none;`.
+4. API Keys → Create API Key, quyền "Sending access", giới hạn theo domain `songhanzi.com`. Chép khóa ngay (chỉ hiện một lần) và dán thẳng vào Vercel, không gửi qua chat hay lưu vào git.
+5. Vercel → Settings → Environment Variables: `RESEND_API_KEY` = khóa vừa tạo; `EMAIL_FROM` = `SongHanzi <no-reply@songhanzi.com>`; `NEXT_PUBLIC_SITE_URL` = `https://songhanzi.com`. Deploy lại.
+6. Chạy migration `20261007000003_email_prefs.sql`.
+7. Thử: Supabase SQL Editor chạy `update email_prefs set welcome_sent_at = null where user_id = '<id của bạn>';` rồi đăng xuất và đăng nhập lại bằng Google: sẽ nhận email chào mừng. Thư không tới thì xem Resend → Logs.
