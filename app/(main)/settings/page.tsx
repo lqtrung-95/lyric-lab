@@ -6,6 +6,7 @@ import { DeleteDataSection } from "@/components/settings/delete-data-section";
 import { LearningRows } from "@/components/settings/learning-rows";
 import { ListenRows } from "@/components/settings/listen-rows";
 import { NicknameSection } from "@/components/settings/nickname-section";
+import { ReminderRow } from "@/components/reminders/reminder-row";
 import { QuickStartCard } from "@/components/settings/quick-start-card";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { VoiceRows } from "@/components/settings/voice-rows";
@@ -29,6 +30,7 @@ export default function SettingsPage() {
         <LearningRows />
         <ListenRows />
         <VoiceRows />
+        <ReminderRow />
       </SettingsCard>
       <QuickStartCard />
       <AdminEntry />

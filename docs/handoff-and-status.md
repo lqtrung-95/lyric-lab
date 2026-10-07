@@ -81,3 +81,5 @@ Người tiếp quản cần được cấp: repo GitHub, project Vercel, projec
 - Bật/tắt bản dịch hoặc pinyin trong danh sách lời: `LyricList` giữ câu đang hát ở giữa màn hình ngay sau khi bố cục đổi (`useLayoutEffect` theo `showPinyin|showTranslation`, cuộn tức thì), vì độ cao các dòng đổi làm câu bị đẩy đi.
 
 - Hướng 3 tháng (chốt 2026-10-07): ưu tiên nhiều người dùng, kiếm tiền tính sau, app là sản phẩm độc lập. Kế hoạch 4 tuần ở `docs/backlog.md` mục "Kế hoạch tăng trưởng 3 tháng". Cảnh báo: Vercel Hobby cấm dùng thương mại, cần lên gói phù hợp trước khi đẩy mạnh.
+
+- Tuần 1 (tăng trưởng): nhắc học bằng web push đã xong ở code, **chưa chạy thử đầu-cuối trên thiết bị thật**. Việc của bạn: chạy migration `20261007000001_push_subscriptions.sql`, sinh khóa VAPID, đặt 4 biến (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `CRON_SECRET`) trên Vercel rồi deploy lại. Hạn mức phân tích/ngày đã có sẵn từ trước.

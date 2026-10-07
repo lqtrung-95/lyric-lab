@@ -144,3 +144,6 @@ Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản
 
 
 **Lối vào nhanh (không dán link):** `app/watch/page.tsx` (`/watch?v=ID` → `/learn/ID`), `app/share-target/page.tsx` (nhận `title/text/url` từ Web Share Target, `findVideoIdInText`), `app/manifest.ts` (PWA + `share_target`). Cả hai trang là redirect phía server, `noindex`.
+
+
+**Nhắc học:** `lib/push/` (`reminder-message` thuần, `send-reminders` đọc streak + thẻ đến hạn rồi gửi bằng `web-push`, `push-subscriptions-repo`), API `POST/DELETE /api/push/subscribe` và cron `GET /api/cron/reminders`, service worker `public/sw.js` (chỉ nhận push, không cache), giao diện `components/reminders/`. Bảng `push_subscriptions` (khóa chính endpoint, RLS không policy) nằm trong danh sách "bỏ qua" của test gộp tài khoản vì thiết bị tự đăng ký lại mỗi lần mở app.

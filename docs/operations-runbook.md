@@ -22,6 +22,8 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Tùy chọn | Captcha Turnstile (cần bật trước khi công khai rộng) |
 | `NEXT_PUBLIC_SENTRY_DSN` | Tùy chọn | Sentry |
 | `NEXT_PUBLIC_VIDEO_PUBLIC` | Tùy chọn | `1` = hiện mục "Video" trên menu cho mọi người. Không đặt: mục này chỉ hiện ở môi trường phát triển, ẩn cả với admin ở production (admin vẫn vào thẳng `/video` và `/admin/videos` bằng đường dẫn để thử). Đặt xong cần deploy lại (biến `NEXT_PUBLIC_*` được nhúng lúc build). |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Tùy chọn | Khóa thông báo đẩy cho nhắc học. Sinh bằng `npx tsx scripts/generate-vapid-keys.mts` (in ra màn hình, không ghi file). Thiếu thì mục "Nhắc học" tự ẩn. Biến `NEXT_PUBLIC_*` cần deploy lại. |
+| `CRON_SECRET` | Tùy chọn | Chuỗi ngẫu nhiên ≥ 16 ký tự; Vercel Cron gửi kèm `Authorization: Bearer` khi gọi `/api/cron/reminders`. Thiếu thì route từ chối (401). |
 | `NEXT_PUBLIC_SITE_URL` | Tùy chọn | URL gốc khi có tên miền riêng (OG image, sitemap) |
 | `ADMIN_EMAILS` | Tùy chọn | Danh sách email (phân tách dấu phẩy) vào được `/admin/*` |
 | `UNLIMITED_USAGE_EMAILS` | Tùy chọn | Email không bị hạn mức |
@@ -137,3 +139,12 @@ Tùy chọn: `--delay 60000` (nghỉ 60 giây giữa các video, nên dùng khi 
 - Gỡ bài theo yêu cầu bản quyền: xoá hàng ở `songs` (cascade); cache Next hết hiệu lực trong ≤ 1 giờ (hoặc bump `revN`).
 - Góp ý/báo sai/gợi ý bản dịch xử lý ở `/admin/*` (cần email trong `ADMIN_EMAILS`).
 - `scripts/prune-songs.mts`: dọn bài phân tích nhiễu. Mặc định dry-run; `--hide` ẩn bài chất lượng thấp/bị báo sai khỏi Khám phá, `--delete` xoá bản phân tích nếu không ai còn dùng.
+
+
+## Nhắc học (thông báo đẩy)
+Migration `20261007000001_push_subscriptions.sql` (chạy tay) tạo `push_subscriptions`. `vercel.json` có cron `0 13 * * *` (UTC) = 20:00 giờ Việt Nam gọi `/api/cron/reminders`; gói Hobby chỉ cho cron mỗi ngày một lần nên không đặt tần suất cao hơn. Route chỉ gửi cho thiết bị chưa nhận nhắc trong 20 giờ và người dùng hôm nay (múi giờ của họ) chưa học; thiết bị trả 404/410 bị xóa. Người dùng bật ở Cài đặt → "Nhắc học mỗi ngày" hoặc thẻ gợi ý ở trang chủ. Thử tay: `curl -H "Authorization: Bearer $CRON_SECRET" https://<tên miền>/api/cron/reminders` (trả số liệu tổng hợp, không có nội dung người dùng). iOS chỉ nhận khi đã cài app vào màn hình chính.
+
+## Rà hạn mức hạ tầng trước khi mở rộng (2026-10-07)
+- Vercel: gói Hobby cấm dùng thương mại, cần Pro trước khi kiếm tiền hoặc đẩy mạnh. Tối ưu ảnh đã từng cạn (thumbnail YouTube dùng `unoptimized`).
+- Phân tích bài mới tốn LLM: đã có hạn mức theo tài khoản (10 ẩn danh / 30 đã đăng nhập mỗi 24 giờ) và theo IP (30/24 giờ); bài đã cache không tốn. Theo dõi hạn mức Groq; khi cần nâng gói trả phí.
+- Supabase Free: Realtime tối đa 200 kết nối đồng thời và 100 tin/giây (ảnh hưởng phòng thi đấu khi đông); 500 MB cơ sở dữ liệu (cache phân tích và bài video chiếm dần).
