@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { ReportPlayerButton } from "@/components/challenge/report-player-button";
 import { Icon } from "@/components/ui/icon";
 import { roomErrorMessage } from "@/lib/rooms/room-messages";
 import { createRoomRequest } from "./room-requests";
@@ -39,6 +40,7 @@ export function RoomResult({ room }: { room: ReturnType<typeof useRoom> }) {
   const router = useRouter();
   const view = room.view!;
   const me = view.players.find((p) => p.isMe);
+  const opponent = view.players.find((p) => !p.isMe);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,6 +59,7 @@ export function RoomResult({ room }: { room: ReturnType<typeof useRoom> }) {
       <RoomResultSummary view={view} />
 
       {error && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{error}</p>}
+      {opponent && <p className="flex items-center justify-center gap-1 text-label-md text-on-surface-variant">Có vấn đề với {opponent.displayName}? <ReportPlayerButton context="room" code={view.code} name={opponent.displayName} /></p>}
       <div className="flex flex-col gap-space-sm sm:flex-row sm:justify-center">
         <button type="button" onClick={again} disabled={busy} className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
           {busy ? "Đang tạo phòng…" : "Chơi lại cùng bài"}

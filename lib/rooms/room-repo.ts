@@ -41,7 +41,7 @@ const CODE_ATTEMPTS = 5;
 const UNIQUE_VIOLATION = "23505";
 
 /** Các bài đang hiện ở Khám phá (đã phân tích, chưa bị báo sai nhiều), thứ tự ngẫu nhiên. */
-async function randomListedSongs(): Promise<string[]> {
+export async function randomListedSongs(): Promise<string[]> {
   const { data } = await createSupabaseServiceClient().from("discover_songs").select("video_id").limit(RANDOM_SONG_POOL);
   return shuffle((data ?? []).map((r) => r.video_id as string));
 }

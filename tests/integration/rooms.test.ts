@@ -437,6 +437,9 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "account_merge_tokens.from_user", // mã gộp của chính tài khoản nguồn, xóa theo tài khoản
       "feedback.user_id", // on delete set null: góp ý giữ lại, chỉ mất liên kết người gửi
       "translation_suggestions.user_id", // on delete set null: như trên
+      "challenges.creator_id", // on delete set null: thử thách giữ lại, chỉ mất liên kết người tạo
+      "challenge_attempts.user_id", // on delete set null: như trên; mỗi người một lượt nên không gộp
+      "player_reports.reporter_id", // on delete set null: báo cáo giữ lại cho quản trị
       "push_subscriptions.user_id", // đăng ký theo thiết bị: app đăng ký lại endpoint với tài khoản hiện tại mỗi lần mở, nên tự gắn lại sau khi gộp
     ]);
     const { data, error } = await service.rpc("tables_referencing_users");

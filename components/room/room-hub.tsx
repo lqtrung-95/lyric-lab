@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { CreateChallengeDialog } from "./create-challenge-dialog";
 import { CreateRoomDialog } from "./create-room-dialog";
 import { JoinRoomForm } from "./join-room-form";
 
@@ -11,6 +12,7 @@ import { JoinRoomForm } from "./join-room-form";
 export function RoomHub() {
   const router = useRouter();
   const [creating, setCreating] = useState(false);
+  const [challenging, setChallenging] = useState(false);
   const card = "rounded-2xl bg-surface-container-lowest p-space-md shadow-sm";
 
   return (
@@ -59,6 +61,17 @@ export function RoomHub() {
           </div>
         </section>
 
+        <section aria-labelledby="challenge-heading" className={`${card} lg:col-span-2`}>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container"><Icon name="emoji_events" size={22} /></span>
+            <div className="min-w-0 flex-1">
+              <h2 id="challenge-heading" className="font-serif text-headline-md text-on-surface">Thử thách không cần cùng lúc</h2>
+              <p className="text-label-md text-on-surface-variant">Bạn chơi trước đặt điểm chuẩn, gửi link cho bạn bè. Họ chơi lúc nào cũng được rồi so điểm.</p>
+            </div>
+            <button type="button" onClick={() => setChallenging(true)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">Tạo thử thách</button>
+          </div>
+        </section>
+
         <section aria-labelledby="random-heading" className={`${card} opacity-80 lg:col-span-2`}>
           <div className="flex flex-wrap items-center gap-3">
             <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant"><Icon name="shuffle" size={22} /></span>
@@ -80,6 +93,7 @@ export function RoomHub() {
       </section>
 
       <CreateRoomDialog open={creating} onClose={() => setCreating(false)} />
+      <CreateChallengeDialog open={challenging} onClose={() => setChallenging(false)} />
     </div>
   );
 }
