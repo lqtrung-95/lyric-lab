@@ -4,6 +4,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
 import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-row";
+import { useIsAdmin } from "@/components/library/use-is-admin";
+import { LineEditDialog } from "./line-edit-dialog";
 import { LineShareDialog } from "@/components/share/line-share-dialog";
 import { ViewToggles } from "./view-toggles";
 
@@ -36,6 +38,11 @@ interface LyricListProps {
 export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, shareContext, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, variant = "lyrics" }: LyricListProps) {
   const [sharing, setSharing] = useState<number | null>(null);
   const shareLine = useCallback((index: number) => setSharing(index), []);
+  // Quản trị viên sửa lời ngay trên danh sách (chỉ bài hát, không phải video luyện nghe; video có trang quản trị riêng).
+  const isAdmin = useIsAdmin();
+  const [editing, setEditing] = useState<number | null>(null);
+  const editLine = useCallback((index: number) => setEditing(index), []);
+  const editedLine = editing !== null ? lines.find((l) => l.index === editing) : undefined;
   const sharedLine = sharing !== null ? lines.find((l) => l.index === sharing) : undefined;
   // Phụ thuộc vào chuỗi (không phải đối tượng `shareContext` mới mỗi lần vẽ) để thẻ không dựng lại ảnh mỗi 100 ms khi nhạc chạy.
   const shareTitle = shareContext?.title;
@@ -139,11 +146,13 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               onPauseSong={onPauseSong}
               allowTranslationSuggestion={variant === "lyrics"}
               onShare={shareContext ? shareLine : undefined}
+              onEdit={variant === "lyrics" && isAdmin === true ? editLine : undefined}
             />
           );
         })}
       </ol>
       {shareCard && <LineShareDialog card={shareCard} onClose={() => setSharing(null)} />}
+      {editedLine && <LineEditDialog videoId={videoId} line={editedLine} onClose={() => setEditing(null)} />}
     </div>
   );
 }

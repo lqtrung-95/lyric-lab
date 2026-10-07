@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
+import { MAX_LINE_PINYIN, MAX_LINE_TRANSLATION, editSongLine } from "@/lib/analysis/edit-song-line";
 import { addToDefaultOffset } from "@/lib/listen/lyric-offset";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
@@ -11,7 +12,8 @@ export const runtime = "nodejs";
  * PATCH { action: "hide" | "unhide" | "delete" } → quản trị viên ẩn/hiện lại bài ở Khám phá, hoặc xóa hẳn.
  * PATCH { action: "shift_lyrics", deltaSec } → cộng `deltaSec` vào độ lệch lời mặc định của bài (áp cho mọi người dùng) và
  * đưa độ lệch cá nhân của mọi người cho bài đó về 0 (bản admin lưu là bản chuẩn).
- * Xóa chỉ thực hiện khi không ai còn thẻ ôn hay tiến độ nghe từ bài đó; ngược lại tự chuyển thành ẩn để không mất dữ liệu người dùng.
+ * PATCH { action: "edit_line", lineIndex, text, pinyin?, translation? } → sửa lời tiếng Trung (và tùy chọn pinyin gõ tay, bản dịch) của một dòng; pinyin tự tính
+ * lại từ từ điển khi không gửi. Xóa chỉ thực hiện khi không ai còn thẻ ôn hay tiến độ nghe từ bài đó; ngược lại tự chuyển thành ẩn để không mất dữ liệu người dùng.
  * /api/discover cache theo Cache-Control 5 phút (CDN) nên phải revalidate ngay, không thì bài vừa ẩn/xóa vẫn hiện tới khi cache hết hạn.
  */
 export async function PATCH(req: Request, { params }: { params: Promise<{ videoId: string }> }) {
@@ -20,8 +22,26 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
   const user = await getCurrentUser();
   if (!isAdminAccount(user?.email ?? null)) return Response.json({ error: "forbidden" }, { status: 403 });
 
-  const body = (await req.json().catch(() => null)) as { action?: string; deltaSec?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as { action?: string; deltaSec?: unknown; lineIndex?: unknown; text?: unknown; pinyin?: unknown; translation?: unknown } | null;
   const sb = createSupabaseServiceClient();
+
+  if (body?.action === "edit_line") {
+    const optional = (v: unknown, max: number) => (v === undefined || v === null ? undefined : typeof v === "string" && v.length <= max ? v : false);
+    const pinyin = optional(body.pinyin, MAX_LINE_PINYIN);
+    const translation = optional(body.translation, MAX_LINE_TRANSLATION);
+    if (typeof body.lineIndex !== "number" || !Number.isInteger(body.lineIndex) || body.lineIndex < 0 || typeof body.text !== "string" || pinyin === false || translation === false) {
+      return Response.json({ error: "invalid_line" }, { status: 400 });
+    }
+    try {
+      const result = await editSongLine(videoId, { lineIndex: body.lineIndex, text: body.text, pinyin, translation });
+      if (result === "invalid_text") return Response.json({ error: "invalid_text" }, { status: 400 });
+      if (result !== "ok") return Response.json({ error: result }, { status: 404 });
+      return Response.json({ done: "line_edited" });
+    } catch (error) {
+      console.error(JSON.stringify({ event: "edit_line_error", message: (error as Error)?.message }));
+      return Response.json({ error: "server_error" }, { status: 500 });
+    }
+  }
 
   if (body?.action === "shift_lyrics") {
     if (typeof body.deltaSec !== "number" || !Number.isFinite(body.deltaSec)) return Response.json({ error: "invalid_delta" }, { status: 400 });

@@ -30,13 +30,15 @@ interface LyricLineRowProps {
   allowTranslationSuggestion?: boolean;
   /** Có thì hiện nút chia sẻ câu này dưới dạng ảnh. */
   onShare?: (index: number) => void;
+  /** Có thì hiện nút sửa lời (chỉ quản trị viên). */
+  onEdit?: (index: number) => void;
 }
 
 /**
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onEdit }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
 
@@ -105,14 +107,27 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
           </div>
         )}
       </div>
-      {onShare && (
-        <button
-          type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
-          onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
-          className="ml-auto mt-0.5 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full text-on-surface-variant opacity-0 transition-opacity hover:bg-surface-container-high focus-visible:opacity-100 group-hover/line:opacity-100 [@media(hover:none)]:opacity-60"
-        >
-          <Icon name="share" size={18} />
-        </button>
+      {(onShare || onEdit) && (
+        <div className="ml-auto mt-0.5 flex shrink-0 opacity-0 transition-opacity focus-within:opacity-100 group-hover/line:opacity-100 [@media(hover:none)]:opacity-60">
+          {onEdit && (
+            <button
+              type="button" aria-label={`Sửa lời câu ${line.index + 1} (quản trị)`} title="Sửa lời (quản trị)"
+              onClick={(e) => { e.stopPropagation(); onEdit(line.index); }}
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
+            >
+              <Icon name="edit" size={18} />
+            </button>
+          )}
+          {onShare && (
+            <button
+              type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
+              onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
+            >
+              <Icon name="share" size={18} />
+            </button>
+          )}
+        </div>
       )}
     </li>
   );
