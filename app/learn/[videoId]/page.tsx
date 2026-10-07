@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { AnalyzingScreen } from "@/components/learn/analyzing-screen";
 import { RememberSong } from "@/components/learn/remember-song";
 import { PreviewScreen } from "@/components/preview/preview-screen";
+import { loadWordStats } from "@/lib/preview/load-word-stats";
 import { readCachedAnalysis, readSongRow } from "@/lib/analysis/server-deps";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
@@ -14,6 +15,7 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
   // Hai truy vấn độc lập: chạy song song (bài chưa phân tích thì `song` bị bỏ qua bên dưới).
   const [analysis, songRow] = await Promise.all([readCachedAnalysis(videoId), readSongRow(videoId)]);
   const song = analysis ? songRow : null;
+  const wordStats = analysis ? await loadWordStats(analysis.lines) : null;
 
   return (
     <>
@@ -23,7 +25,7 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
         {analysis && song ? (
           <>
             <RememberSong videoId={videoId} title={song.title} channelTitle={song.channelTitle} />
-            <PreviewScreen analysis={analysis} song={song} />
+            <PreviewScreen analysis={analysis} song={song} wordStats={wordStats} />
           </>
         ) : (
           <div className="mx-auto max-w-7xl px-gutter pt-space-lg md:px-6 lg:px-12"><AnalyzingScreen videoId={videoId} /></div>

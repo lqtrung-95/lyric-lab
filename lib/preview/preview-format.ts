@@ -12,6 +12,14 @@ export function levelLabel(level: number | null): string {
   return level >= 7 ? "HSK 7–9" : `HSK ${level}`;
 }
 
+/**
+ * Nhãn của ô chọn level của người dùng. Level N nghĩa là đã biết HSK 1 đến N−1 và đang học từ HSK N (các mục dưới level bị ẩn ở màn xem trước),
+ * nên HSK 1 là "chưa biết gì": không ẩn mục nào.
+ */
+export function levelOptionLabel(level: number): string {
+  return level === 1 ? "Chưa biết gì (HSK 1)" : levelLabel(level);
+}
+
 /** Khoảng cấp của các mục, ví dụ "HSK 3–5"; rỗng nếu không mục nào có cấp. */
 export function levelRangeLabel(items: Pick<PreviewItem, "level">[]): string {
   const levels = items.map((i) => i.level).filter((l): l is number => l !== null);

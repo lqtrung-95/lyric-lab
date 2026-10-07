@@ -24,7 +24,7 @@ export function LearningRows() {
 
   return (
     <>
-      <SettingRow label="Level của bạn" hint="Danh sách từ ở bước xem trước lọc theo level này.">
+      <SettingRow label="Level của bạn" hint="HSK N nghĩa là bạn đã biết HSK 1 đến N−1. Từ dưới level bị ẩn khỏi danh sách xem trước; chọn “Chưa biết gì” nếu mới bắt đầu.">
         <LevelSelect showLabel={false} />
       </SettingRow>
       <SettingRow label="Thẻ mới mỗi ngày" hint="Thẻ cần ôn lại không bị giới hạn; chỉ thẻ mới theo hạn mức này.">

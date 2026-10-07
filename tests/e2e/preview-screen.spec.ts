@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Trang thử dùng dữ liệu mẫu hư cấu "夜车" (không gọi DB/AI). Level mặc định HSK 3.
+// Trang thử dùng dữ liệu mẫu hư cấu "夜车" (không gọi DB/AI). Trang thử đặt sẵn level HSK 3 (mặc định thật của app là HSK 1, xem SeedFixtureLevel).
 const URL = "/dev/preview-fixture";
 const card = (page: Page, term: string) => page.getByRole("article").filter({ has: page.getByRole("heading", { name: term, exact: true }) });
 

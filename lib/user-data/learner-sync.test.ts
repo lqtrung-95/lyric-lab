@@ -44,7 +44,7 @@ describe("card rows", () => {
   });
 
   it("stateFromRemote dùng cấp mặc định khi chưa có hồ sơ", () => {
-    expect(stateFromRemote({ level: null, known: [], cards: [] }).level).toBe(3);
+    expect(stateFromRemote({ level: null, known: [], cards: [] }).level).toBe(1);
     expect(stateFromRemote({ level: 6, known: ["vocab:a"], cards: [] })).toMatchObject({ level: 6, known: ["vocab:a"] });
   });
 });

@@ -2,8 +2,8 @@ import type { PreviewItem } from "@/lib/analysis/analysis-types";
 
 // Trạng thái học của người dùng: bản làm việc trong trình duyệt (đồng bộ lên Supabase ở `lib/user-data`). Toàn bộ hàm là thuần để test được.
 export const LEARNER_STATE_KEY = "lyric-lab-learner-state";
-// Phải khớp mặc định của cột `user_profiles.level` ở DB (migration 20261007000004): hàng hồ sơ mới tạo thiếu level sẽ nhận giá trị DB và đè lên mặc định này.
-export const DEFAULT_LEVEL = 3;
+// Tài khoản mới là "chưa biết gì" (HSK 1: không ẩn mục nào). Phải khớp mặc định của cột `user_profiles.level` ở DB: hàng hồ sơ tạo thiếu level nhận giá trị DB và đè lên mặc định này.
+export const DEFAULT_LEVEL = 1;
 export const MAX_LEVEL = 7; // 7 = nhóm 7–9 của HSK 3.0
 
 export interface SavedItem {

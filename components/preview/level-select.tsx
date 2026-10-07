@@ -2,7 +2,7 @@
 
 import { SelectField } from "@/components/ui/select-field";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
-import { levelLabel } from "@/lib/preview/preview-format";
+import { levelOptionLabel } from "@/lib/preview/preview-format";
 
 const LEVELS = [1, 2, 3, 4, 5, 6, 7];
 
@@ -18,7 +18,7 @@ export function LevelSelect({ className = "", showLabel = true }: { className?: 
       >
         {LEVELS.map((l) => (
           <option key={l} value={l}>
-            {levelLabel(l)}
+            {levelOptionLabel(l)}
           </option>
         ))}
       </SelectField>

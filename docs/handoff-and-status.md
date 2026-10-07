@@ -94,4 +94,6 @@ Người tiếp quản cần được cấp: repo GitHub, project Vercel, projec
 
 - Trang Cài đặt chia bốn tab (`components/settings/settings-tabs.tsx`; tab đang mở nằm ở `?tab=account|learning|notifications|tips`): Tài khoản (đăng nhập, biệt danh, quản trị, xóa dữ liệu), Học tập, Thông báo (nhắc đẩy và email), Mẹo. Thêm tùy chọn mới thì đặt vào đúng tab trong `app/(main)/settings/page.tsx`. Test e2e dùng ô ở tab Học tập phải mở `/settings?tab=learning`.
 
-- Level mặc định HSK 3: trong app đã là `DEFAULT_LEVEL = 3` nhưng cột DB `user_profiles.level` mặc định 1 và đè lên khi hồ sơ được tạo mà chưa kèm level, nên tài khoản mới hiện HSK 1. Migration `20261007000004_user_profile_default_level.sql` đổi mặc định DB thành 3 (chạy tay; chỉ tác động hàng tạo sau đó).
+- Level mặc định tài khoản mới là HSK 1 ("chưa biết gì": level N = đã biết HSK 1 đến N−1, mục dưới level bị ẩn; HSK 1 không ẩn gì). `DEFAULT_LEVEL = 1` khớp mặc định cột `user_profiles.level`; migration `20261007000004_user_profile_default_level.sql` đặt tường minh mặc định 1 (nếu đã chạy bản cũ đặt 3 thì chạy lại).
+
+- "Độ hiểu được" tính lại theo cấp HSK từng từ: `loadWordStats` (server, tra từ điển một lượt cho các từ của bài) → `computeComprehension` coi từ có cấp HSK < level là đã hiểu, cộng từ cốt lõi đã đánh dấu đã biết; người mới ở HSK 1 bắt đầu gần 0%. Từ ngoài HSK/không tra được tính là chưa hiểu; lời phồn thể có thể bị tra thiếu nên điểm thấp hơn thực tế.

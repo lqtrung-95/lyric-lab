@@ -13,6 +13,7 @@ import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { ComprehensionBanner } from "./comprehension-banner";
 import { computeComprehension } from "@/lib/preview/comprehension";
+import type { WordStat } from "@/lib/preview/word-stats";
 import { GrammarCard } from "./grammar-card";
 import { LevelFilterBar } from "./level-filter-bar";
 import { PreviewHeader } from "./preview-header";
@@ -23,10 +24,12 @@ const DEFAULT_VOCAB_SHOWN = 12;
 interface PreviewScreenProps {
   analysis: SongAnalysis;
   song: { title: string; channelTitle: string; durationSec: number };
+  /** Từ của bài kèm cấp HSK (tính ở server); null = không có (ẩn thanh độ hiểu). */
+  wordStats: WordStat[] | null;
 }
 
 /** Màn Xem trước (S4): mọi lọc/"Đã biết"/"Lưu" tính lại trên dữ liệu đã có, không gọi AI. */
-export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
+export function PreviewScreen({ analysis, song, wordStats }: PreviewScreenProps) {
   const { state, markKnown, unmarkKnown, toggleSaved } = useLearnerState();
   const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [showEasy, setShowEasy] = useState(false);
@@ -41,8 +44,8 @@ export function PreviewScreen({ analysis, song }: PreviewScreenProps) {
     [analysis.items, state.level, known, levelFilter, showEasy],
   );
   const comprehension = useMemo(
-    () => computeComprehension(analysis.lines, analysis.items, { userLevel: state.level, known }),
-    [analysis.lines, analysis.items, state.level, known],
+    () => (wordStats ? computeComprehension(wordStats, analysis.items, { userLevel: state.level, known }) : null),
+    [wordStats, analysis.items, state.level, known],
   );
   const activeFilter = view.chips.some((c) => c.key === levelFilter) ? levelFilter : "all";
   const listenHref = `/learn/${analysis.videoId}/listen`;
