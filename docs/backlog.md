@@ -68,6 +68,21 @@ Thứ tự đề xuất: (1) Nghe và chọn, (2) Hán-Việt đoán chữ, (3) 
 
 Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice_scores`/bảng xếp hạng (chủ động, vì hai người hẹn nhau đấu liên tục có thể cày điểm). Nếu cần, làm bảng riêng "Đấu trường" tính số trận thắng hoặc Elo, và tính ván thắng vào chuỗi ngày học.
 
+## Kế hoạch tăng trưởng 3 tháng (2026-10-07)
+**Mục tiêu đã chốt:** có nhiều người dùng trước, kiếm tiền tính sau. App là **sản phẩm độc lập** (kênh ChineseGlow chỉ là một kênh kéo người, không phải mục đích). Ngân sách Vercel Pro / Groq trả phí: sẵn sàng khi cần, chưa cam kết.
+**Chưa đại trà trước khi xong 3 thứ:** (1) nhắc học, (2) giới hạn chi phí LLM + gói hạ tầng đúng (Vercel Hobby cấm dùng thương mại), (3) báo cáo/chặn người chơi trong phòng thi đấu.
+
+| Tuần | Việc | Mục đích |
+|---|---|---|
+| 1 | Nhắc học (email hoặc web push); giới hạn số bài mới phân tích/người/ngày; rà hạn mức Vercel, Supabase, Groq | Giữ chân, an toàn chi phí |
+| 2 | "Độ hiểu được của bài" (X% bài, học N từ nữa để hiểu 80%); thẻ chia sẻ một câu hát (chỉ một dòng) | Động lực học, chất liệu để lan |
+| 3 | Thách đấu không cần cùng lúc (link + bộ câu cố định theo seed); báo cáo/chặn, lọc từ tục tên hiển thị | Viral, an toàn xã hội |
+| 4 | Mở cho ~100 người đầu (nhóm Facebook học tiếng Trung, người xem kênh), đo rồi sửa; duyệt video draft và mở tab Video | Kiểm chứng trước khi đẩy |
+
+**Số cần đo:** tỷ lệ quay lại sau 7 ngày; tỷ lệ hoàn thành bài nghe đầu tiên; số người mở link chia sẻ rồi học được một bài. Chỉ mở rộng khi hai số đầu đủ tốt.
+**Kênh:** nhóm Facebook học tiếng Trung và fan C-pop/C-drama (bài hữu ích thật, không quảng cáo trần); video ngắn quay màn hình học một bài hát nổi tiếng; kênh ChineseGlow (link trong mô tả); creator tiếng Trung nhỏ. Không mua traffic sớm, không làm trang công khai chứa lời để SEO (giữ `noindex`, một dòng lời cho thẻ chia sẻ).
+**Để sau:** bài kiểm tra level 2 phút, xuất Anki, ghép ngẫu nhiên thi đấu, extension trình duyệt, kiếm tiền.
+
 ## Kỹ thuật
 - [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.

@@ -79,3 +79,5 @@ Người tiếp quản cần được cấp: repo GitHub, project Vercel, projec
 - Vào bài không cần dán link: `/watch?v=ID` (đổi tên miền youtube.com → tên miền app) và `/share-target` (Web Share Target của PWA, Android: Chia sẻ từ app YouTube) chuyển thẳng tới `/learn/ID`; `app/manifest.ts` khai báo PWA + share target; bookmarklet và hướng dẫn ở thẻ "Học nhanh từ YouTube" trong Cài đặt. iOS chưa hỗ trợ share target. Trang chủ: hành động "Hôm nay" khi chưa có gì cần làm đề xuất sẵn một bài (nút "Học ngay"), và khi nghe hết bài có nút "Bài tiếp theo" (bài hợp level chưa nghe). Chưa làm extension trình duyệt (cân nhắc lại nếu nhiều người dùng máy tính đòi hỏi).
 
 - Bật/tắt bản dịch hoặc pinyin trong danh sách lời: `LyricList` giữ câu đang hát ở giữa màn hình ngay sau khi bố cục đổi (`useLayoutEffect` theo `showPinyin|showTranslation`, cuộn tức thì), vì độ cao các dòng đổi làm câu bị đẩy đi.
+
+- Hướng 3 tháng (chốt 2026-10-07): ưu tiên nhiều người dùng, kiếm tiền tính sau, app là sản phẩm độc lập. Kế hoạch 4 tuần ở `docs/backlog.md` mục "Kế hoạch tăng trưởng 3 tháng". Cảnh báo: Vercel Hobby cấm dùng thương mại, cần lên gói phù hợp trước khi đẩy mạnh.
