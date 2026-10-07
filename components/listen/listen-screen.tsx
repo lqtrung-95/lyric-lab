@@ -6,7 +6,7 @@ import { CompletedToast } from "./completed-toast";
 import { Toast } from "@/components/ui/toast";
 import type { AnalyzedLine, PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
-import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
+import { useListenShortcuts } from "@/components/listen/use-listen-shortcuts";
 import { estimateSyncRisk, offsetFromLineClick, shiftLines } from "@/lib/listen/lyric-offset";
 import { defaultRepeatConfig, type RepeatConfig } from "@/lib/listen/repeat-config";
 import { buildPreviewView } from "@/lib/preview/build-preview-view";
@@ -153,19 +153,15 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     setWord(selection);
   }, [pauseSong]);
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const action = resolveShortcut({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, target: e.target as HTMLElement | null });
-      if (!action) return;
-      e.preventDefault();
-      if (action === "togglePlay") togglePlay();
-      else if (action === "toggleLoop") toggleLoop();
-      else if (action === "prevLine") seekToLine(Math.max(0, currentIndex - 1));
-      else seekToLine(Math.min(lines.length - 1, currentIndex + 1));
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [togglePlay, toggleLoop, seekToLine, currentIndex, lines.length]);
+  const shortcuts = useMemo(() => ({
+    togglePlay, toggleLoop,
+    prevLine: () => seekToLine(Math.max(0, currentIndex - 1)),
+    nextLine: () => seekToLine(Math.min(lines.length - 1, currentIndex + 1)),
+    replayLine: () => { if (currentIndex >= 0) seekToLine(currentIndex); },
+    togglePinyin: () => update({ showPinyin: !prefs.showPinyin }),
+    toggleTranslation: () => update({ showTranslation: !prefs.showTranslation }),
+  }), [togglePlay, toggleLoop, seekToLine, currentIndex, lines.length, update, prefs.showPinyin, prefs.showTranslation]);
+  useListenShortcuts(shortcuts);
 
   const saveFromPanel = (item: PreviewItem) => {
     const occurrence = item.occurrences[0];

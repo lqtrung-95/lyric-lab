@@ -68,3 +68,5 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 
 - Local và production chung một DB Supabase: ghi từ máy local là ghi vào dữ liệu thật. Phần lớn script ghi DB mặc định dry-run (trừ `reanalyze-reuse-old-lyrics.mts`) — đọc đầu file script trước khi chạy.
 - Sửa dữ liệu phân tích trực tiếp trong DB phải kèm bump `revN` của `unstable_cache`.
+
+- Phím tắt màn Nghe và màn Xem video: hook chung `components/listen/use-listen-shortcuts.ts`, nút/hộp thoại `shortcuts-help-button.tsx`; thêm phím mới thì sửa `lib/listen/keyboard-shortcuts.ts` và danh sách trong hộp thoại.

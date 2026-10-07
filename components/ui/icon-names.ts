@@ -4,7 +4,7 @@ export const ICON_NAMES = [
   "add", "arrow_back", "arrow_forward", "auto_awesome", "auto_stories", "bookmark", "bookmark_add", "brush", "check",
   "check_circle", "chevron_right", "close", "content_copy", "content_paste", "dark_mode", "dictionary", "edit", "emoji_events", "expand_less", "expand_more",
   "favorite", "favorite_border", "feedback", "format_quote", "forward_5", "graphic_eq", "group", "headphones", "history", "history_edu", "home", "hourglass_top",
-  "laps", "leaderboard", "library_music", "light_mode", "lightbulb", "link", "list_alt", "local_fire_department", "logout", "menu_book", "mic", "more_horiz", "music_note",
+  "keyboard", "laps", "leaderboard", "library_music", "light_mode", "lightbulb", "link", "list_alt", "local_fire_department", "logout", "menu_book", "mic", "more_horiz", "music_note",
   "pause", "person", "person_add", "photo_camera", "play_arrow", "play_circle", "psychology", "push_pin", "quiz", "repeat_one", "replay_5", "schedule", "share", "shuffle",
   "skip_next", "smart_display", "star", "star_border", "style", "subtitles", "sync", "timer", "translate", "tune", "undo", "verified", "visibility",
   "visibility_off", "volume_up", "warning",

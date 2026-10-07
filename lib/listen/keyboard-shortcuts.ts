@@ -1,4 +1,4 @@
-export type ShortcutAction = "togglePlay" | "prevLine" | "nextLine" | "toggleLoop";
+export type ShortcutAction = "togglePlay" | "prevLine" | "nextLine" | "toggleLoop" | "replayLine" | "togglePinyin" | "toggleTranslation";
 
 interface KeyLike {
   key: string;
@@ -11,7 +11,7 @@ interface KeyLike {
 const TYPING_TAGS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
 /**
- * Phím tắt màn Nghe (LS-10): Space phát/dừng, ←/→ câu trước/sau, L lặp câu. Bỏ qua khi đang gõ trong ô nhập,
+ * Phím tắt màn Nghe (LS-10): Space phát/dừng, ←/→ câu trước/sau, L lặp câu, R nghe lại câu hiện tại, M/T bật tắt pinyin/bản dịch. Bỏ qua khi đang gõ trong ô nhập,
  * khi có phím bổ trợ (Ctrl/Cmd/Alt) và khi phím Space đang nằm trên một nút (để nút tự xử lý).
  */
 export function resolveShortcut(e: KeyLike): ShortcutAction | null {
@@ -28,6 +28,15 @@ export function resolveShortcut(e: KeyLike): ShortcutAction | null {
     case "l":
     case "L":
       return "toggleLoop";
+    case "r":
+    case "R":
+      return "replayLine";
+    case "m":
+    case "M":
+      return "togglePinyin";
+    case "t":
+    case "T":
+      return "toggleTranslation";
     default:
       return null;
   }

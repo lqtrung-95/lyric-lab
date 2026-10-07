@@ -160,7 +160,7 @@ Mức ưu tiên: **P0** = bắt buộc cho MVP, **P1** = nên có trong MVP, **P
 | LS-07 | Bấm câu để nhảy tới | P0 | Phát từ đầu câu đó |
 | LS-08 | Lặp câu | P0 | Lặp vô hạn câu hiện tại cho tới khi tắt |
 | LS-09 | Giảm tốc | P0 | 0,5x / 0,75x / 1x qua `setPlaybackRate` |
-| LS-10 | Phím tắt | P1 | Space phát/dừng, ←/→ câu trước/sau, L lặp câu. Chỉ hoạt động khi focus không nằm trong ô nhập |
+| LS-10 | Phím tắt | P1 | Space phát/dừng, ←/→ câu trước/sau, L lặp câu, R nghe lại câu, M/T bật tắt pinyin/bản dịch. Nút bàn phím ở thanh trên (từ md) mở hộp thoại liệt kê phím tắt, dùng cho cả màn Nghe bài hát và màn Xem video. Chỉ hoạt động khi focus không nằm trong ô nhập |
 | LS-11 | Tô sáng theo từng từ (karaoke) | P2 | Cần timestamp mức từ từ forced alignment |
 
 ### 6.4 Luyện và Ôn

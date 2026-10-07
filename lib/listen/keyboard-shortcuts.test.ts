@@ -11,6 +11,9 @@ describe("resolveShortcut", () => {
     expect(press("ArrowRight")).toBe("nextLine");
     expect(press("l")).toBe("toggleLoop");
     expect(press("L")).toBe("toggleLoop");
+    expect(press("R")).toBe("replayLine");
+    expect(press("m")).toBe("togglePinyin");
+    expect(press("T")).toBe("toggleTranslation");
     expect(press("x")).toBeNull();
   });
   it("bỏ qua khi đang gõ hoặc focus ở select", () => {

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
 import { ListenLikeButton } from "./listen-like-button";
+import { ShortcutsHelpButton } from "./shortcuts-help-button";
 import { ViewToggles } from "./view-toggles";
 
 interface ListenTopBarProps {
@@ -32,6 +33,7 @@ export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, sho
         </div>
       </div>
       <div className="flex items-center gap-1">
+        <ShortcutsHelpButton />
         <ListenLikeButton videoId={videoId} liked={liked} onChange={onToggleLike} />
         <ViewToggles
           className="hidden md:flex"

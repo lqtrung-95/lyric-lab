@@ -14,7 +14,8 @@ import { usePlaybackSync } from "@/components/listen/use-playback-sync";
 import { ViewToggles } from "@/components/listen/view-toggles";
 import { WordPopover } from "@/components/listen/word-popover";
 import { VideoModeNav } from "./video-mode-nav";
-import { resolveShortcut } from "@/lib/listen/keyboard-shortcuts";
+import { ShortcutsHelpButton } from "@/components/listen/shortcuts-help-button";
+import { useListenShortcuts } from "@/components/listen/use-listen-shortcuts";
 import { defaultRepeatConfig, type RepeatConfig } from "@/lib/listen/repeat-config";
 import { itemKey, type CardSnapshot } from "@/lib/user-state/learner-state";
 import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
@@ -84,19 +85,15 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
     });
   };
 
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      const action = resolveShortcut({ key: e.key, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, target: e.target as HTMLElement | null });
-      if (!action) return;
-      e.preventDefault();
-      if (action === "togglePlay") togglePlay();
-      else if (action === "toggleLoop") toggleLoop();
-      else if (action === "prevLine") seekToLine(Math.max(0, currentIndex - 1));
-      else seekToLine(Math.min(lines.length - 1, currentIndex + 1));
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [togglePlay, toggleLoop, seekToLine, currentIndex, lines.length]);
+  const shortcuts = useMemo(() => ({
+    togglePlay, toggleLoop,
+    prevLine: () => seekToLine(Math.max(0, currentIndex - 1)),
+    nextLine: () => seekToLine(Math.min(lines.length - 1, currentIndex + 1)),
+    replayLine: () => { if (currentIndex >= 0) seekToLine(currentIndex); },
+    togglePinyin: () => update({ showPinyin: !prefs.showPinyin }),
+    toggleTranslation: () => update({ showTranslation: !prefs.showTranslation }),
+  }), [togglePlay, toggleLoop, seekToLine, currentIndex, lines.length, update, prefs.showPinyin, prefs.showTranslation]);
+  useListenShortcuts(shortcuts);
 
   const savedTerm = word ? (lookup.entry?.ok && lookup.entry.value ? lookup.entry.value.term : word.term) : "";
 
@@ -112,6 +109,7 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-1">
+          <ShortcutsHelpButton />
           <VideoModeNav videoId={lesson.videoId} current="watch" />
           <ViewToggles
           className="hidden md:flex" showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
