@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseVideoId } from "./parse-video-id";
+import { findVideoIdInText, parseVideoId } from "./parse-video-id";
 
 const ID = "dQw4w9WgXcQ";
 
@@ -34,5 +34,16 @@ describe("parseVideoId", () => {
     [`https://www.youtube.com/watch?v=${ID}extra`],
   ])("từ chối %s", (input) => {
     expect(parseVideoId(input)).toBeNull();
+  });
+});
+
+describe("findVideoIdInText", () => {
+  it("lấy link trong đoạn chia sẻ từ app YouTube", () => {
+    expect(findVideoIdInText("Bài hay quá https://youtu.be/dQw4w9WgXcQ?si=abc")).toBe("dQw4w9WgXcQ");
+    expect(findVideoIdInText("https://www.youtube.com/watch?v=dQw4w9WgXcQ")).toBe("dQw4w9WgXcQ");
+  });
+  it("không có link YouTube thì null", () => {
+    expect(findVideoIdInText("xin chào https://example.com/a")).toBeNull();
+    expect(findVideoIdInText("")).toBeNull();
   });
 });

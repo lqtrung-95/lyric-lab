@@ -38,3 +38,12 @@ export function parseVideoId(input: string): string | null {
   }
   return candidate && isValidVideoId(candidate) ? candidate : null;
 }
+
+/** Tìm videoId trong một đoạn chữ được chia sẻ (ví dụ "Tên video https://youtu.be/xxx"): thử từng link trong đoạn, rồi cả đoạn. */
+export function findVideoIdInText(text: string): string | null {
+  for (const match of text.match(/https?:\/\/\S+/gi) ?? []) {
+    const id = parseVideoId(match);
+    if (id) return id;
+  }
+  return parseVideoId(text);
+}

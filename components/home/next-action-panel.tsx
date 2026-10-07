@@ -8,6 +8,7 @@ import { chooseNextAction, formatPosition } from "@/lib/home/home-logic";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { DailyGoalRing } from "./daily-goal-ring";
+import { DiscoverAction } from "./discover-action";
 import { useContinueSong } from "./use-home-data";
 
 const noop = () => () => {};
@@ -61,13 +62,7 @@ export function NextActionPanel() {
             </Link>
           </>
         )}
-        {ready && action.kind === "discover" && (
-          <>
-            <p className="mt-space-sm font-serif text-headline-md text-on-surface">Chưa biết học bài nào?</p>
-            <p className="mt-2 text-body-md text-on-surface-variant">Chọn một bài đã có sẵn, mở là học được ngay, hoặc dán link bài bạn thích ở bên cạnh.</p>
-            <Link href="/library?tab=discover" className={`${cta} bg-primary text-on-primary hover:bg-primary-container`}><Icon name="library_music" size={20} />Xem bài gợi ý</Link>
-          </>
-        )}
+        {ready && action.kind === "discover" && <DiscoverAction />}
       </div>
 
       <div className="mt-space-lg border-t border-outline-variant/40 pt-space-md">

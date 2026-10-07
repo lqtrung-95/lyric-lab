@@ -141,3 +141,6 @@ Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản
 - Không lưu audio/video YouTube; nghe lại bằng player nhúng tại timestamp.
 - Trang bài học `noindex`; không có trang công khai chứa lời bài hát.
 - InnerTube là endpoint không chính thức, có thể bị YouTube đổi/chặn — luôn giữ sau interface `CaptionProvider`.
+
+
+**Lối vào nhanh (không dán link):** `app/watch/page.tsx` (`/watch?v=ID` → `/learn/ID`), `app/share-target/page.tsx` (nhận `title/text/url` từ Web Share Target, `findVideoIdInText`), `app/manifest.ts` (PWA + `share_target`). Cả hai trang là redirect phía server, `noindex`.
