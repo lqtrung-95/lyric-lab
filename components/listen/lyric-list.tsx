@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
 import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-row";
@@ -68,17 +68,31 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
     };
   }, []);
 
-  useEffect(() => {
-    if (!autoScroll || currentIndex < 0 || Date.now() - lastManualScroll.current < MANUAL_SCROLL_PAUSE_MS) return;
-    const el = listRef.current?.querySelector<HTMLElement>(`[data-line-index="${currentIndex}"]`);
+  // Đưa câu đang hát về giữa phần màn hình còn trống bên dưới khối video + thanh điều khiển dính ở trên.
+  const centerLine = useCallback((index: number, smooth: boolean) => {
+    const el = listRef.current?.querySelector<HTMLElement>(`[data-line-index="${index}"]`);
     if (!el) return;
-    // Đưa câu về giữa phần màn hình còn trống bên dưới khối video + thanh điều khiển dính ở trên.
     const stickyBottom = document.querySelector("[data-sticky-player]")?.getBoundingClientRect().bottom ?? 64;
     const target = stickyBottom + (window.innerHeight - stickyBottom) / 2;
     const rect = el.getBoundingClientRect();
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollBy({ top: rect.top + rect.height / 2 - target, behavior: reduce ? "auto" : "smooth" });
-  }, [currentIndex, autoScroll]);
+    window.scrollBy({ top: rect.top + rect.height / 2 - target, behavior: smooth && !reduce ? "smooth" : "auto" });
+  }, []);
+
+  useEffect(() => {
+    if (!autoScroll || currentIndex < 0 || Date.now() - lastManualScroll.current < MANUAL_SCROLL_PAUSE_MS) return;
+    centerLine(currentIndex, true);
+  }, [currentIndex, autoScroll, centerLine]);
+
+  // Bật/tắt bản dịch hoặc pinyin làm các dòng cao thấp khác đi nên câu đang hát bị đẩy khỏi chỗ cũ: giữ nó ở giữa ngay sau khi bố cục đổi
+  // (không chờ tự cuộn, không tính là người dùng tự cuộn). Bỏ qua lần vẽ đầu.
+  const layoutKey = `${showPinyin}|${showTranslation}`;
+  const prevLayoutKey = useRef(layoutKey);
+  useLayoutEffect(() => {
+    if (prevLayoutKey.current === layoutKey) return;
+    prevLayoutKey.current = layoutKey;
+    if (currentIndex >= 0) centerLine(currentIndex, false);
+  }, [layoutKey, currentIndex, centerLine]);
 
   return (
     <div className="flex flex-col gap-4 rounded-xl bg-surface-container-lowest p-4 shadow-sm md:p-6">
