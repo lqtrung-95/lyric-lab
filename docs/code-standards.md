@@ -72,3 +72,5 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 - Phím tắt màn Nghe và màn Xem video: hook chung `components/listen/use-listen-shortcuts.ts`, nút/hộp thoại `shortcuts-help-button.tsx`; thêm phím mới thì sửa `lib/listen/keyboard-shortcuts.ts` và danh sách trong hộp thoại.
 
 - Ảnh `ImageResponse` (og:image): lấy font qua `lib/streak/og-fonts.ts` (Google Fonts với tham số `text` để có MỘT file đủ ký tự tiếng Việt). Đừng nạp từng khối unicode-range làm các font riêng cùng tên: satori chỉ dùng một khối nên cùng một từ bị trộn hai kiểu chữ. Font chưa có chữ Hán, nên không đưa tên bài hay lời vào ảnh og.
+
+- Trang Cài đặt: mỗi nhóm một tab (`SettingsTabs`), mọi bảng đều được dựng sẵn và chỉ ẩn bảng không chọn (các phần tự tải dữ liệu không mất trạng thái). Dòng cài đặt nào có thể tự ẩn (thông báo, email) thì thẻ chứa nó cần dòng chú thích `only:block` để không hiện thẻ trống.

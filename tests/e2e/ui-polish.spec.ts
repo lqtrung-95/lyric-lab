@@ -46,7 +46,7 @@ test("bấm liên kết sang trang server chậm: hiện thanh tiến trình r�
 });
 
 test("dropdown: mũi tên nằm trong ô, cách mép phải đủ xa", async ({ page }) => {
-  await page.goto("/settings");
+  await page.goto("/settings?tab=learning");
   const select = page.getByLabel("Thẻ mới mỗi ngày");
   const box = await select.boundingBox();
   const arrow = await select.locator("xpath=following-sibling::*[1]").boundingBox();

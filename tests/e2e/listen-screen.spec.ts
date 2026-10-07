@@ -200,19 +200,19 @@ test.describe("cỡ khung video", () => {
   test("chọn cỡ ở Cài đặt đổi bề rộng video màn Nghe, được nhớ, video luôn hiển thị", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     expect(await videoWidth(page)).toBeLessThanOrEqual(560); // mặc định Vừa
-    await page.goto("/settings");
+    await page.goto("/settings?tab=learning");
     const select = page.getByLabel("Cỡ video");
     await select.selectOption("large");
     await page.goto("/dev/listen-fixture");
     await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
     await expect.poll(() => videoWidth(page)).toBeGreaterThan(560);
-    await page.goto("/settings");
+    await page.goto("/settings?tab=learning");
     await select.selectOption("small");
     await page.goto("/dev/listen-fixture");
     await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
     await expect.poll(() => videoWidth(page)).toBeLessThanOrEqual(356);
     expect(await videoWidth(page)).toBeGreaterThanOrEqual(200);
-    await page.goto("/settings");
+    await page.goto("/settings?tab=learning");
     await page.getByLabel("Cỡ video").selectOption("medium");
     await page.goto("/dev/listen-fixture");
     await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");

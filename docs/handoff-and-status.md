@@ -91,3 +91,5 @@ Người tiếp quản cần được cấp: repo GitHub, project Vercel, projec
 - Email (chào mừng, tổng kết tuần, nhắc quay lại) đã xong ở code, tự tắt khi thiếu `RESEND_API_KEY`/`EMAIL_FROM`. **Cần tên miền riêng** (vercel.app không xác thực được) rồi xác thực SPF/DKIM trong Resend. Việc của bạn: mua tên miền, tạo tài khoản Resend, thêm tên miền, đặt hai biến, chạy migration `20261007000003_email_prefs.sql`, deploy. Test phân loại bảng gộp tài khoản đang đỏ cho tới khi chạy migration này.
 
 - Tên miền chính: `songhanzi.com` (Namecheap, gắn vào Vercel). Còn lại: đặt tên miền chính (không `www`) làm Production, `NEXT_PUBLIC_SITE_URL`, thêm tên miền vào Supabase Auth và Google OAuth, xác thực Resend. Chi tiết ở runbook mục "Tên miền songhanzi.com".
+
+- Trang Cài đặt chia bốn tab (`components/settings/settings-tabs.tsx`; tab đang mở nằm ở `?tab=account|learning|notifications|tips`): Tài khoản (đăng nhập, biệt danh, quản trị, xóa dữ liệu), Học tập, Thông báo (nhắc đẩy và email), Mẹo. Thêm tùy chọn mới thì đặt vào đúng tab trong `app/(main)/settings/page.tsx`. Test e2e dùng ô ở tab Học tập phải mở `/settings?tab=learning`.
