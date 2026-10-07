@@ -83,6 +83,13 @@ Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice
 **Kênh:** nhóm Facebook học tiếng Trung và fan C-pop/C-drama (bài hữu ích thật, không quảng cáo trần); video ngắn quay màn hình học một bài hát nổi tiếng; kênh ChineseGlow (link trong mô tả); creator tiếng Trung nhỏ. Không mua traffic sớm, không làm trang công khai chứa lời để SEO (giữ `noindex`, một dòng lời cho thẻ chia sẻ).
 **Để sau:** bài kiểm tra level 2 phút, xuất Anki, ghép ngẫu nhiên thi đấu, extension trình duyệt, kiếm tiền.
 
+## Đa ngôn ngữ (i18n) để nhắm người dùng quốc tế (2026-10-07)
+**Quyết định: hoãn.** Chưa làm cho tới khi có số liệu từ nhóm ~100 người dùng Việt đầu tiên (tỷ lệ quay lại sau 7 ngày, tỷ lệ hoàn thành bài đầu tiên).
+- **Lý do hoãn:** thế mạnh hiện tại là người Việt (âm Hán-Việt, giải nghĩa tiếng Việt, kênh Facebook/Zalo); sang thị trường tiếng Anh mất lợi thế Hán-Việt và đứng cạnh các sản phẩm đã có người dùng. Chi phí: app chưa có khung i18n (chữ tiếng Việt nằm rải ở component, lỗi, email, thẻ chia sẻ) và mỗi tính năng sau này phải duy trì hai ngôn ngữ; phân tích bài bằng LLM phải chạy lại cho mỗi ngôn ngữ giải nghĩa (cache đã khóa theo `explainLang`) nên tốn gần gấp đôi lượt gọi LLM và hạn mức Groq; cần kênh, trang giới thiệu, SEO và hỗ trợ bằng tiếng Anh.
+- **Khi nào xét lại:** tỷ lệ quay lại và hoàn thành bài ở người Việt đã tốt; hoặc có người nước ngoài tự tìm đến và dùng thật; hoặc thị trường người Việt đã chạm trần so với mục tiêu.
+- **Cách thử rẻ trước khi đầu tư (nếu muốn):** (1) trang giới thiệu tiếng Anh `/en` kèm form để lại email, quảng bá thử ở vài cộng đồng học tiếng Trung quốc tế rồi đếm đăng ký; (2) tùy chọn giải nghĩa tiếng Anh cho bài hát (giữ giao diện tiếng Việt), cần bản prompt tiếng Anh thay `EXPLAIN_LANG` cứng (xem mục Kỹ thuật).
+- **Nếu làm đầy đủ:** dùng khung có sẵn cho Next.js (ví dụ `next-intl`), dịch dần từng màn (trang giới thiệu và màn học chính trước), không dịch cả app một lúc.
+
 ## Kỹ thuật
 - [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.
