@@ -90,6 +90,16 @@ Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice
 - **Cách thử rẻ trước khi đầu tư (nếu muốn):** (1) trang giới thiệu tiếng Anh `/en` kèm form để lại email, quảng bá thử ở vài cộng đồng học tiếng Trung quốc tế rồi đếm đăng ký; (2) tùy chọn giải nghĩa tiếng Anh cho bài hát (giữ giao diện tiếng Việt), cần bản prompt tiếng Anh thay `EXPLAIN_LANG` cứng (xem mục Kỹ thuật).
 - **Nếu làm đầy đủ:** dùng khung có sẵn cho Next.js (ví dụ `next-intl`), dịch dần từng màn (trang giới thiệu và màn học chính trước), không dịch cả app một lúc.
 
+## Nội dung ngoài bài hát: dán link video YouTube có phụ đề (2026-10-08)
+**Quyết định: đang nghiên cứu, chưa làm.** Tín hiệu nhu cầu: một bình luận dưới bài quảng cáo Threads hỏi app có đọc được link nội dung khác ngoài bài hát không. Cần thêm số liệu (ai hỏi, muốn loại nội dung nào) trước khi đầu tư.
+- **Phạm vi chốt:** chỉ video YouTube có phụ đề (CC) tiếng Trung; không có thì báo rõ và chỉ sang mục Video luyện nghe.
+- **Vướng mắc:** phụ đề lấy ở server (`YoutubeInnertubeCaptionProvider`) bị YouTube chặn từ IP cloud (429 ở máy nhà, "Sign in to confirm you're not a bot" ở Vercel). Bài hát vượt được nhờ LRCLIB/NetEase; video thường không có đường dự phòng này.
+- **Cách các app khác làm:** LingQ và Language Reactor chạy extension ở trình duyệt người dùng (IP và phiên của họ, không bị chặn); Readlang cho dán transcript thủ công. Cách dùng proxy dân dụng hoặc dịch vụ transcript trả phí tốn tiền và mong manh, chưa cần.
+- **Hướng đề xuất:** bookmarklet (sau này extension) chạy trên trang youtube.com, đọc track CC tiếng Trung rồi gửi sang `/learn/ID`; server nhận phụ đề và chạy lại pipeline hiện có (làm sạch → tách từ → từ điển → LLM), lưu cache. Bookmarklet hiện chỉ chuyển hướng, chưa lấy phụ đề. Bản nhỏ hơn để kiểm chứng nhu cầu: cho dán phụ đề thủ công trên trang bài.
+- **Giới hạn:** chỉ máy tính (điện thoại không chạy bookmarklet, Android share target không đọc được trang); cần giới hạn số video mỗi người mỗi ngày (mỗi video tốn một lượt gọi LLM) và chặn nội dung không phù hợp trước khi phân tích.
+- **YouTube ToS:** chỉ lấy phụ đề của video người dùng đang xem, không lưu video/audio, player nhúng vẫn hiện; chưa đối chiếu lại điều khoản mới nhất trước khi làm.
+- **Trả lời công khai đã dùng:** app tập trung vào bài hát trước, đang nghiên cứu tính năng này, hỏi lại loại nội dung họ muốn học.
+
 ## Kỹ thuật
 - [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.
