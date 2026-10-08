@@ -17,38 +17,38 @@
       "action": "type-link",
       "hook": true,
       "caption": "🎧 Các vợ ơi, anh mới tìm ra cách **học tiếng Trung bằng bài hát** cực chill nè",
-      "voice": "Các vợ ơi, anh mới tìm ra một cách học tiếng Trung bằng bài hát cực chill nè.",
+      "voice": "Các vợ ơi... anh mới tìm ra một cách học tiếng Trung bằng bài hát cực chill nè.",
       "minSeconds": 4
     },
     {
       "action": "analyze",
-      "caption": "Chỉ cần **dán link YouTube** bài hát mình thích",
-      "voice": "Chỉ cần dán link YouTube bài hát mình thích.",
+      "caption": "Chỉ cần **dán link YouTube** bài hát mình thích. Dễ tới mức lười cũng làm được",
+      "voice": "Chỉ cần dán link YouTube bài hát mình thích. Dễ tới mức lười cũng làm được.",
       "minSeconds": 3
     },
     {
       "action": "preview-scroll",
-      "caption": "Nó tự chọn sẵn **từ vựng đáng học** cho mình luôn",
-      "voice": "Nó tự chọn sẵn từ vựng đáng học cho mình luôn.",
+      "caption": "Nó tự chọn sẵn **từ vựng đáng học** cho mình. Khỏi ngồi lọc từng chữ nữa",
+      "voice": "Nó tự chọn sẵn từ vựng đáng học cho mình luôn đó. Khỏi ngồi lọc từng chữ nữa.",
       "minSeconds": 6
     },
     {
       "action": "listen",
-      "caption": "Vừa nghe nhạc, **lời chạy theo** từng câu, có cả pinyin và nghĩa tiếng Việt",
-      "voice": "Vừa nghe nhạc, lời chạy theo từng câu, có cả pinyin với nghĩa tiếng Việt.",
+      "caption": "Vừa nghe nhạc, **lời chạy theo** từng câu, có pinyin và nghĩa tiếng Việt. Nghe tới đâu hiểu tới đó",
+      "voice": "Vừa nghe nhạc, lời chạy theo từng câu, có cả pinyin với nghĩa tiếng Việt. Nghe tới đâu hiểu tới đó.",
       "minSeconds": 4
     },
     {
       "action": "word-popup",
       "captionTop": true,
-      "caption": "Bấm vào từ nào cũng ra **nghĩa** và **âm Hán Việt**",
-      "voice": "Bấm vào từ nào cũng ra nghĩa với âm Hán Việt, nhớ lẹ cực.",
+      "caption": "Bấm vào từ nào cũng ra **nghĩa** và **âm Hán Việt**. Nhớ lẹ cực luôn!",
+      "voice": "Bấm vào từ nào cũng ra nghĩa với âm Hán Việt. Nhớ lẹ cực luôn!",
       "minSeconds": 4
     },
     {
       "action": "outro",
       "caption": "",
-      "voice": "Miễn phí nha, vào song han zi chấm com.",
+      "voice": "Miễn phí nha. Vào song han zi chấm com!",
       "minSeconds": 3
     }
   ]

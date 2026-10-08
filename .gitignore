@@ -33,3 +33,4 @@ spike-output/
 data-cache/
 eval-output/
 .env*.local
+scripts/pr-video/voice/

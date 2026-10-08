@@ -49,7 +49,7 @@ const fx = setupEffects(p);
 const id = cfg.videoId, listen = `${cfg.site}/learn/${id}/listen`;
 const actions = {
   "type-link": async () => { await sleep(900); await fx.tap(p.getByPlaceholder(/youtube\.com/).first()); await p.keyboard.type(`https://www.youtube.com/watch?v=${id}`, { delay: 40 }); },
-  analyze: async () => { await fx.tap(p.getByRole("button", { name: /Phân tích bài hát/ })); await p.waitForURL(new RegExp(id), { timeout: 20000 }); await p.waitForLoadState("networkidle"); },
+  analyze: async () => { await fx.tap(p.getByRole("button", { name: /Phân tích bài hát/ })); await p.waitForURL(new RegExp(id), { timeout: 20000 }); await p.waitForLoadState("networkidle"); await p.getByText(/Bắt đầu nghe/).first().waitFor({ timeout: 20000 }); },
   "preview-scroll": async () => { await sleep(600); for (let i = 0; i < 3; i++) { await p.mouse.wheel(0, 260); await sleep(450); } await p.goto(listen, { waitUntil: "networkidle" }); await p.locator("iframe").first().waitFor(); await sleep(1500); },
   listen: async () => { await fx.tap(p.getByRole("button", { name: /Bản dịch/ }).first()); await sleep(600); await p.mouse.wheel(0, 560); },
   "word-popup": async () => { await sleep(500); await fx.tap(p.getByRole("button", { name: /城/ }).first()); },
