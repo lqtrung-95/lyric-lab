@@ -173,3 +173,6 @@ Mỗi email có link hủy nhận (`/unsubscribe/[token]`, nút bấm gọi `POS
 5. Vercel → Settings → Environment Variables: `RESEND_API_KEY` = khóa vừa tạo; `EMAIL_FROM` = `SongHanzi <no-reply@songhanzi.com>`; `NEXT_PUBLIC_SITE_URL` = `https://songhanzi.com`. Deploy lại.
 6. Chạy migration `20261007000003_email_prefs.sql`.
 7. Thử: Supabase SQL Editor chạy `update email_prefs set welcome_sent_at = null where user_id = '<id của bạn>';` rồi đăng xuất và đăng nhập lại bằng Google: sẽ nhận email chào mừng. Thư không tới thì xem Resend → Logs.
+
+## Video PR cho TikTok/Reels (`scripts/pr-video`)
+Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư-mục-xuất]` (mặc định `~/Desktop/songhanzi-pr`). Cần Playwright (đã có), `ffmpeg` và, với giọng macOS, lệnh `say`. Kịch bản, phụ đề (`**cụm**` thành chữ vàng), bài hát quay (`videoId`) và thời lượng sửa ở `scripts/pr-video/config.json`. Giọng đọc ưu tiên: file của bạn `scripts/pr-video/voice/1.m4a`, `2.mp3`… (số = thứ tự cảnh) > ElevenLabs nếu đặt biến môi trường `ELEVENLABS_API_KEY` (voice theo tên, mặc định Adam; tiếng Việt cần model `eleven_flash_v2_5` hoặc `eleven_turbo_v2_5`) > `say` Linh. Khóa API chỉ để trong biến môi trường của shell, không ghi vào file. Quay bài thật có thể bị TikTok báo bản quyền (ảnh bìa MV, lời bài hát); muốn an toàn thì đổi `videoId`.

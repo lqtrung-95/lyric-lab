@@ -1,0 +1,55 @@
+{
+  "site": "https://songhanzi.com",
+  "videoId": "5gx4LiFCfUU",
+  "tts": {
+    "provider": "elevenlabs",
+    "voice": "Adam",
+    "model": "eleven_flash_v2_5",
+    "stability": 0.4,
+    "similarity": 0.8,
+    "say": {
+      "voice": "Linh",
+      "rate": 170
+    }
+  },
+  "scenes": [
+    {
+      "action": "type-link",
+      "hook": true,
+      "caption": "🎧 Cách dùng **chính bài hát yêu thích** để học tiếng Trung, **không cần giáo trình**",
+      "voice": "Cách dùng chính bài hát yêu thích để học tiếng Trung, không cần giáo trình.",
+      "minSeconds": 4
+    },
+    {
+      "action": "analyze",
+      "caption": "Bước 1: **dán link YouTube** bài hát bạn thích",
+      "voice": "Bước một: dán link YouTube bài hát bạn thích.",
+      "minSeconds": 3
+    },
+    {
+      "action": "preview-scroll",
+      "caption": "App tự chọn **từ vựng đáng học** theo trình độ của bạn",
+      "voice": "App tự chọn từ vựng đáng học theo trình độ của bạn.",
+      "minSeconds": 6
+    },
+    {
+      "action": "listen",
+      "caption": "Bước 2: nghe với **lời chạy theo nhạc**, có pinyin và nghĩa tiếng Việt",
+      "voice": "Bước hai: nghe với lời chạy theo nhạc, có pinyin và nghĩa tiếng Việt.",
+      "minSeconds": 4
+    },
+    {
+      "action": "word-popup",
+      "captionTop": true,
+      "caption": "Bấm vào từ nào cũng ra **nghĩa** và **âm Hán Việt**",
+      "voice": "Bấm vào từ nào cũng ra nghĩa và âm Hán Việt.",
+      "minSeconds": 4
+    },
+    {
+      "action": "outro",
+      "caption": "",
+      "voice": "Học miễn phí tại song han zi chấm com.",
+      "minSeconds": 3
+    }
+  ]
+}
