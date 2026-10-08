@@ -16,39 +16,39 @@
     {
       "action": "type-link",
       "hook": true,
-      "caption": "🎧 Cách dùng **chính bài hát yêu thích** để học tiếng Trung, **không cần giáo trình**",
-      "voice": "Cách dùng chính bài hát yêu thích để học tiếng Trung, không cần giáo trình.",
+      "caption": "🎧 Các vợ ơi, anh mới tìm ra cách **học tiếng Trung bằng bài hát** cực chill nè",
+      "voice": "Các vợ ơi, anh mới tìm ra một cách học tiếng Trung bằng bài hát cực chill nè.",
       "minSeconds": 4
     },
     {
       "action": "analyze",
-      "caption": "Bước 1: **dán link YouTube** bài hát bạn thích",
-      "voice": "Bước một: dán link YouTube bài hát bạn thích.",
+      "caption": "Chỉ cần **dán link YouTube** bài hát mình thích",
+      "voice": "Chỉ cần dán link YouTube bài hát mình thích.",
       "minSeconds": 3
     },
     {
       "action": "preview-scroll",
-      "caption": "App tự chọn **từ vựng đáng học** theo trình độ của bạn",
-      "voice": "App tự chọn từ vựng đáng học theo trình độ của bạn.",
+      "caption": "Nó tự chọn sẵn **từ vựng đáng học** cho mình luôn",
+      "voice": "Nó tự chọn sẵn từ vựng đáng học cho mình luôn.",
       "minSeconds": 6
     },
     {
       "action": "listen",
-      "caption": "Bước 2: nghe với **lời chạy theo nhạc**, có pinyin và nghĩa tiếng Việt",
-      "voice": "Bước hai: nghe với lời chạy theo nhạc, có pinyin và nghĩa tiếng Việt.",
+      "caption": "Vừa nghe nhạc, **lời chạy theo** từng câu, có cả pinyin và nghĩa tiếng Việt",
+      "voice": "Vừa nghe nhạc, lời chạy theo từng câu, có cả pinyin với nghĩa tiếng Việt.",
       "minSeconds": 4
     },
     {
       "action": "word-popup",
       "captionTop": true,
       "caption": "Bấm vào từ nào cũng ra **nghĩa** và **âm Hán Việt**",
-      "voice": "Bấm vào từ nào cũng ra nghĩa và âm Hán Việt.",
+      "voice": "Bấm vào từ nào cũng ra nghĩa với âm Hán Việt, nhớ lẹ cực.",
       "minSeconds": 4
     },
     {
       "action": "outro",
       "caption": "",
-      "voice": "Học miễn phí tại song han zi chấm com.",
+      "voice": "Miễn phí nha, vào song han zi chấm com.",
       "minSeconds": 3
     }
   ]
