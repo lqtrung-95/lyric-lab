@@ -5,7 +5,6 @@ import { RecentSongsSection } from "@/components/home/recent-songs-section";
 import { NewcomerSteps } from "@/components/home/newcomer-steps";
 import { NextActionPanel } from "@/components/home/next-action-panel";
 import { StreakCard } from "@/components/streak/streak-card";
-import { ReminderPrompt } from "@/components/reminders/reminder-prompt";
 import { RecommendedSongs } from "@/components/home/recommended-songs";
 
 // Trang làm việc của người dùng: không cần công cụ tìm kiếm lập chỉ mục (trang giới thiệu ở "/").
@@ -30,7 +29,6 @@ export default function AppHomePage() {
         <NextActionPanel />
       </div>
       <StreakCard />
-      <ReminderPrompt />
       <OnboardingBanner />
       <NewcomerSteps />
       <RecentSongsSection />

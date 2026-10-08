@@ -143,7 +143,7 @@ Tùy chọn: `--delay 60000` (nghỉ 60 giây giữa các video, nên dùng khi 
 
 
 ## Nhắc học (thông báo đẩy)
-Migration `20261007000001_push_subscriptions.sql` (chạy tay) tạo `push_subscriptions`. `vercel.json` có cron `0 13 * * *` (UTC) = 20:00 giờ Việt Nam gọi `/api/cron/reminders`; gói Hobby chỉ cho cron mỗi ngày một lần nên không đặt tần suất cao hơn. Route chỉ gửi cho thiết bị chưa nhận nhắc trong 20 giờ và người dùng hôm nay (múi giờ của họ) chưa học; thiết bị trả 404/410 bị xóa. Người dùng bật ở Cài đặt → "Nhắc học mỗi ngày" hoặc thẻ gợi ý ở trang chủ. Thử tay: `curl -H "Authorization: Bearer $CRON_SECRET" https://<tên miền>/api/cron/reminders` (trả số liệu tổng hợp, không có nội dung người dùng). iOS chỉ nhận khi đã cài app vào màn hình chính.
+Migration `20261007000001_push_subscriptions.sql` (chạy tay) tạo `push_subscriptions`. `vercel.json` có cron `0 13 * * *` (UTC) = 20:00 giờ Việt Nam gọi `/api/cron/reminders`; gói Hobby chỉ cho cron mỗi ngày một lần nên không đặt tần suất cao hơn. Route chỉ gửi cho thiết bị chưa nhận nhắc trong 20 giờ và người dùng hôm nay (múi giờ của họ) chưa học; thiết bị trả 404/410 bị xóa. Người dùng bật ở Cài đặt → "Nhắc học mỗi ngày" (đã bỏ thẻ gợi ý ở trang chủ, không tự mời bật). Thử tay: `curl -H "Authorization: Bearer $CRON_SECRET" https://<tên miền>/api/cron/reminders` (trả số liệu tổng hợp, không có nội dung người dùng). iOS chỉ nhận khi đã cài app vào màn hình chính.
 
 ## Rà hạn mức hạ tầng trước khi mở rộng (2026-10-07)
 - Vercel: gói Hobby cấm dùng thương mại, cần Pro trước khi kiếm tiền hoặc đẩy mạnh. Tối ưu ảnh đã từng cạn (thumbnail YouTube dùng `unoptimized`).
