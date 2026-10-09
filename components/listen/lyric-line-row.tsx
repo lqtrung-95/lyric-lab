@@ -64,8 +64,8 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
       >
         {String(line.index + 1).padStart(2, "0")}
       </button>
-      <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:gap-1">
-        <p className={`flex flex-wrap items-end gap-x-0.5 font-serif ${active ? "text-[22px] leading-[30px] md:text-headline-lg" : "text-[19px] leading-7 md:text-hanzi-body"} text-on-surface`}>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:gap-2">
+        <p className={`flex flex-wrap items-end gap-x-0.5 gap-y-2 font-serif md:gap-y-4 ${active ? "text-[22px] leading-[30px] md:text-headline-lg" : "text-[19px] leading-7 md:text-hanzi-body"} text-on-surface`}>
           {groups.map((g) => {
             const pinyinClass = `text-[11px] leading-[14px] md:text-pinyin-reading font-sans ${active ? "text-on-surface" : "text-on-surface-variant"}`;
             const content = g.parts.map((part, i) => {
