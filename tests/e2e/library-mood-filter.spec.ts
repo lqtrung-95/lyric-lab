@@ -73,6 +73,32 @@ test("Bài hát của tôi: lọc theo cảm xúc cho cả bài chỉ lưu ở t
   await expect(page.getByText("Bài cảm xúc 1")).toHaveCount(0);
 });
 
+test("Bài hát của tôi: danh sách bài đổi khi tải (bài cục bộ rồi danh sách server) thì hàng chip không biến mất rồi hiện lại", async ({ page }) => {
+  const local = { ...song(1), openedAt: 1_700_000_000_000 };
+  await page.addInitScript((value) => localStorage.setItem("lyric-lab-recent-songs", value), JSON.stringify([local]));
+  // Danh sách server về chậm hơn bài cục bộ và có thêm bài, nên khoá id đổi lần hai; lần tải cảm xúc thứ hai cũng trả chậm.
+  await page.route("**/api/library/songs", async (route) => { await new Promise((r) => setTimeout(r, 300)); await route.fulfill({ json: { songs: [{ ...song(2), progress: 0, completed: false, lastOpenedAt: "2026-10-01T00:00:00Z", openedAt: 1_700_000_000_001 }] } }); });
+  let calls = 0;
+  await page.route(/\/api\/songs\/moods/, async (route) => {
+    calls++;
+    if (calls > 1) await new Promise((r) => setTimeout(r, 600));
+    await route.fulfill({ json: { moods: { [song(1).videoId]: ["buon"], [song(2).videoId]: ["buon"] } } });
+  });
+  await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
+  await page.goto("/library");
+  const group = page.getByRole("group", { name: "Lọc theo cảm xúc" });
+  await expect(group).toBeVisible();
+  // Theo dõi trong lúc danh sách đổi: nhóm chip không được biến mất ở bất kỳ khung hình nào.
+  const vanished = await page.evaluate(() => new Promise<boolean>((resolve) => {
+    let gone = false;
+    const t = setInterval(() => { if (!document.querySelector('[role="group"][aria-label="Lọc theo cảm xúc"]')) gone = true; }, 16);
+    setTimeout(() => { clearInterval(t); resolve(gone); }, 1500);
+  }));
+  expect(vanished).toBe(false);
+  await expect(page.getByText("Bài cảm xúc 2")).toBeVisible();
+  await expect(group.getByRole("button", { name: "Buồn, đau lòng (2 bài)" })).toBeVisible();
+});
+
 test("trang bài: tag cảm xúc thuộc nhóm là liên kết tới Khám phá đã lọc", async ({ page }) => {
   await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
   await page.goto("/dev/preview-fixture");
