@@ -27,14 +27,12 @@ const ERRORS: Record<string, string> = {
   unauthorized: "Cần mở lại trang để có phiên đăng nhập, rồi thử lại.",
   server_error: "Có lỗi ở máy chủ. Thử lại sau nhé.",
 };
-/** Các lỗi mà cách lấy phụ đề tự động không đủ: mở sẵn phần dán phụ đề/dấu trang để người dùng làm tiếp. */
-const NEEDS_MANUAL = new Set(["captions_required", "no_chinese_captions", "fetch_unavailable", "invalid_captions", "not_chinese"]);
 const skipMessage = (reason: string) => (reason === "not_embeddable" ? "Chủ video không cho nhúng, nên không thêm được." : "Chưa tạo được bài từ phụ đề này.");
 
 /**
- * Thêm video tiếng Trung (podcast, vlog...) để chép chính tả và shadowing. Mặc định chỉ cần dán link: máy chủ tự lấy phụ đề (nếu có cấu hình dịch vụ lấy
- * phụ đề). Khi không lấy được (hoặc người dùng chủ động mở) mới hiện phần dán phụ đề và dấu trang; dấu trang gửi bản chép lời sang qua phần `#` của địa chỉ,
- * lúc đó phần này tự mở và tự gửi luôn (người dùng đã chủ động bấm dấu trang, không cần bấm thêm). Video thêm xong dùng chung cho mọi người.
+ * Thêm video tiếng Trung (podcast, vlog...) để chép chính tả và shadowing. Chỉ cần dán link là máy chủ tự lấy phụ đề (nếu có cấu hình dịch vụ lấy phụ đề);
+ * ô dán phụ đề và hướng dẫn dấu trang luôn hiện sẵn cho người cần. Dấu trang gửi bản chép lời sang qua phần `#` của địa chỉ và trang tự gửi luôn
+ * (người dùng đã chủ động bấm dấu trang, không cần bấm thêm). Video thêm xong dùng chung cho mọi người.
  */
 export function AddVideoScreen() {
   const router = useRouter();
@@ -44,11 +42,9 @@ export function AddVideoScreen() {
   const [captions, setCaptions] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [manualOpen, setManualOpen] = useState(false);
 
   const videoValue = video ?? received?.v ?? "";
   const captionsValue = captions ?? received?.t ?? "";
-  const showManual = manualOpen || received !== null;
   const canSubmit = !busy && videoValue.trim().length > 0;
 
   async function send(video: string, captionText: string) {
@@ -63,7 +59,6 @@ export function AddVideoScreen() {
       if (res.status === 401 && (await ensureAnonymousSession())) res = await post();
       const data = (await res.json().catch(() => ({}))) as { kind?: string; videoId?: string; reason?: string; error?: string };
       if (res.ok && (data.kind === "added" || data.kind === "exists") && data.videoId) { router.push(`/video/${data.videoId}`); return; }
-      if (NEEDS_MANUAL.has(data.error ?? "")) setManualOpen(true);
       setMessage(res.ok ? skipMessage(data.reason ?? "") : (ERRORS[data.error ?? ""] ?? ERRORS.server_error));
     } catch {
       setMessage(ERRORS.server_error);
@@ -99,23 +94,19 @@ export function AddVideoScreen() {
           <input type="text" inputMode="url" autoComplete="off" value={videoValue} onChange={(e) => setVideo(e.target.value)} placeholder="https://www.youtube.com/watch?v=..."
             className="min-h-11 w-full rounded-full bg-surface-container-high px-4 text-body-md text-on-surface" />
         </label>
-        {showManual ? (
-          <label className="block space-y-1">
-            <span className="text-label-md font-semibold text-on-surface">Phụ đề tiếng Trung <span className="font-normal text-on-surface-variant">(bỏ trống nếu muốn thử lấy tự động)</span></span>
-            {received && <p role="status" className="text-label-md text-primary">Đã nhận bản chép lời từ YouTube.</p>}
-            <textarea value={captionsValue} onChange={(e) => setCaptions(e.target.value)} rows={6} placeholder={"Dán file SRT/VTT, hoặc văn bản copy từ \"Hiện bản chép lời\" của YouTube:\n0:00\n大家好\n0:05\n欢迎收听..."}
-              className="w-full rounded-2xl bg-surface-container-high p-3 text-body-md text-on-surface" />
-          </label>
-        ) : (
-          <button type="button" onClick={() => setManualOpen(true)} className="min-h-11 text-label-md font-medium text-primary underline-offset-2 hover:underline">Tự dán phụ đề hoặc dùng dấu trang</button>
-        )}
+        <label className="block space-y-1">
+          <span className="text-label-md font-semibold text-on-surface">Phụ đề tiếng Trung <span className="font-normal text-on-surface-variant">(bỏ trống nếu muốn thử lấy tự động)</span></span>
+          {received && <p role="status" className="text-label-md text-primary">Đã nhận bản chép lời từ YouTube.</p>}
+          <textarea value={captionsValue} onChange={(e) => setCaptions(e.target.value)} rows={6} placeholder={"Dán file SRT/VTT, hoặc văn bản copy từ \"Hiện bản chép lời\" của YouTube:\n0:00\n大家好\n0:05\n欢迎收听..."}
+            className="w-full rounded-2xl bg-surface-container-high p-3 text-body-md text-on-surface" />
+        </label>
         {busy && <p role="status" className="text-label-md text-on-surface-variant">Đang xử lý video, bạn đừng đóng trang này nhé.</p>}
         {message && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{message}</p>}
         <button type="submit" disabled={!canSubmit} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
           {busy ? <><Spinner size={16} className="mr-2" />Đang đọc phụ đề và dịch, có thể mất tới một phút…</> : "Thêm video"}
         </button>
       </form>
-      {showManual && <BookmarkletInstall />}
+      <BookmarkletInstall />
     </div>
   );
 }

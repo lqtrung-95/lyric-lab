@@ -17,15 +17,13 @@ async function mockAdd(page: Page, respond: { status?: number; json: unknown }) 
   return bodies;
 }
 
-const OPEN_MANUAL = "Tự dán phụ đề hoặc dùng dấu trang";
-
-test("mặc định chỉ có ô link; phần dán phụ đề và dấu trang mở ra khi bấm, không có lỗi trợ năng", async ({ page }) => {
+test("trang luôn hiện sẵn ô dán phụ đề và hướng dẫn dấu trang, không có lỗi trợ năng", async ({ page }) => {
   await page.goto("/video/add");
   await expect(page.getByRole("heading", { name: "Thêm video của bạn" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Thêm video" })).toBeDisabled();
-  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Gửi sang SongHanzi" })).toHaveCount(0);
-  await page.getByRole("button", { name: OPEN_MANUAL }).click();
+  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toBeVisible();
+  await expect(page.getByRole("button", { name: /Tự dán phụ đề/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /Sao chép mã/ })).toHaveCount(0);
   const bookmarklet = page.getByRole("link", { name: "Gửi sang SongHanzi" });
   await expect.poll(() => bookmarklet.getAttribute("href")).toMatch(/^javascript:/);
   await bookmarklet.click();
@@ -37,7 +35,6 @@ test("dán link và phụ đề, gửi đúng nội dung rồi mở bài vừa t
   const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
   await page.goto("/video/add");
   await page.getByLabel("Link video YouTube").fill(`https://www.youtube.com/watch?v=${VIDEO_ID}`);
-  await page.getByRole("button", { name: OPEN_MANUAL }).click();
   await page.getByLabel(/Phụ đề tiếng Trung/).fill("0:00\n大家好\n0:05\n欢迎收听");
   await page.getByRole("button", { name: "Thêm video" }).click();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
@@ -53,7 +50,7 @@ test("chỉ dán link, máy chủ tự lấy phụ đề: gửi không kèm ph�
   expect(bodies).toEqual([{ video: VIDEO_ID }]);
 });
 
-test("không lấy tự động được thì báo cần phụ đề, tự mở phần dán phụ đề và dấu trang, giữ nguyên nội dung đã nhập", async ({ page }) => {
+test("không lấy tự động được thì báo cần phụ đề, giữ nguyên nội dung đã nhập", async ({ page }) => {
   await mockAdd(page, { status: 422, json: { error: "captions_required" } });
   await page.goto("/video/add");
   await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
@@ -65,7 +62,7 @@ test("không lấy tự động được thì báo cần phụ đề, tự mở 
   await expect(page.getByRole("link", { name: "Gửi sang SongHanzi" })).toBeVisible();
 });
 
-test("phụ đề không phải tiếng Trung thì báo đổi ngôn ngữ và mở phần dán phụ đề", async ({ page }) => {
+test("phụ đề không phải tiếng Trung thì báo đổi ngôn ngữ", async ({ page }) => {
   await mockAdd(page, { status: 422, json: { error: "not_chinese" } });
   await page.goto("/video/add");
   await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
