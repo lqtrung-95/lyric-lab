@@ -15,7 +15,8 @@ const STUB = `window.__yt = []; window.YT = { PlayerState: { PLAYING: 1 }, Playe
   setPlaybackRate: function () {}, getCurrentTime: function () { return 0; }, getPlayerState: function () { return 2; } } }); }, 0); this.destroy = function () {}; } };
 window.onYouTubeIframeAPIReady && window.onYouTubeIframeAPIReady();`;
 
-async function open(page: Page, contextStatus = 200) {
+async function open(page: Page, contextStatus = 200, videoLessonIds: string[] = []) {
+  await page.route("**/api/videos/lessons-among**", (r) => r.fulfill({ json: { videoIds: videoLessonIds } }));
   await page.addInitScript((s) => localStorage.setItem("lyric-lab-learner-state", JSON.stringify(s)), STATE);
   await page.route("https://www.youtube.com/iframe_api", (r) => r.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 500, json: {} }));
@@ -53,4 +54,13 @@ test("bài đã bị gỡ: báo lỗi rõ ràng, không treo", async ({ page }) 
   await open(page, 404);
   await page.getByRole("listitem").filter({ hasText: "巢" }).getByRole("button", { name: "Nghe đoạn chứa 巢" }).click();
   await expect(page.getByText("Không tìm thấy câu hát chứa “巢”")).toBeVisible();
+});
+
+test("\"Xem bài\" dẫn thẳng tới /video khi từ lưu từ video, còn bài hát vẫn tới /learn", async ({ page }) => {
+  await open(page, 200, ["e2eFixture1"]);
+  const link = page.getByRole("listitem").filter({ hasText: "巢" }).getByRole("link", { name: "Xem bài" });
+  await expect(link).toHaveAttribute("href", "/video/e2eFixture1");
+  await page.unroute("**/api/videos/lessons-among**");
+  await open(page, 200, []);
+  await expect(page.getByRole("listitem").filter({ hasText: "巢" }).getByRole("link", { name: "Xem bài" })).toHaveAttribute("href", "/learn/e2eFixture1");
 });

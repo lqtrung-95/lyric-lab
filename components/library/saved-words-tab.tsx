@@ -9,6 +9,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { filterSavedItems, type SavedFilter } from "@/lib/library/filter-saved-items";
 import { levelLabel } from "@/lib/preview/preview-format";
 import { useSongSnippet } from "./use-song-snippet";
+import { useVideoLessonIds } from "./use-video-lesson-ids";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 
 
@@ -18,6 +19,7 @@ export function SavedWordsTab() {
   const [filter, setFilter] = useState<SavedFilter>({ query: "", level: "all", kind: "all" });
   const { play, player, loadingKey, error } = useSongSnippet();
   const items = useMemo(() => filterSavedItems(state.saved, filter), [state.saved, filter]);
+  const videoIds = useVideoLessonIds(useMemo(() => state.saved.map((s) => s.videoId).filter(Boolean), [state.saved]));
 
   if (state.saved.length === 0) {
     return (
@@ -76,7 +78,7 @@ export function SavedWordsTab() {
                     </button>
                   )}
                   <span className="mx-1 shrink-0 rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant">{levelLabel(item.level ?? null)}</span>
-                  {item.videoId && <Link href={`/learn/${item.videoId}`} className="inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-label-md font-medium text-primary hover:bg-surface-container">Xem bài</Link>}
+                  {item.videoId && <Link href={`${videoIds.has(item.videoId) ? "/video" : "/learn"}/${item.videoId}`} className="inline-flex min-h-11 shrink-0 items-center rounded-full px-3 text-label-md font-medium text-primary hover:bg-surface-container">Xem bài</Link>}
                   <button type="button" onClick={() => toggleSaved(item)} aria-label={`Bỏ lưu ${item.term}`} className="min-h-11 shrink-0 rounded-full px-3 text-label-md text-on-surface-variant hover:bg-surface-container">Bỏ lưu</button>
                 </div>
               </div>

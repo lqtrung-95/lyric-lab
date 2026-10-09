@@ -49,7 +49,7 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 
 | Triệu chứng | Nguyên nhân | Cách xử lý |
 |---|---|---|
-| Từ lưu ở video bấm ▶ báo `song_unavailable`, "Xem bài" mở trang phân tích bài hát | Thẻ video dùng chung `user_cards` với bài hát, không có cột nguồn | `/api/review/context` fallback sang `getLessonForReview`; `/learn/<id>` chuyển sang `/video/<id>` (`hasVisibleLesson`). Không tách bảng vì từ đã lưu/đã biết/lịch ôn tính theo từ; id vừa là bài hát vừa là video thì bài hát thắng |
+| Từ lưu ở video bấm ▶ báo `song_unavailable`, "Xem bài" mở trang phân tích bài hát | Thẻ video dùng chung `user_cards` với bài hát, không có cột nguồn | `/api/review/context` fallback sang `getLessonForReview`; `/learn/<id>` chuyển sang `/video/<id>` (`hasVisibleLesson`); tab Từ đã lưu hỏi `/api/videos/lessons-among` (`useVideoLessonIds`) để link thẳng `/video/<id>`, bước chuyển hướng chỉ còn là dự phòng. Không tách bảng vì từ đã lưu/đã biết/lịch ôn tính theo từ; id vừa là bài hát vừa là video thì bài hát thắng |
 | Bài lạ hoắc / lời sai hoàn toàn | LRCLIB có nhiều bản cùng tên bài + nghệ sĩ nhưng lời khác nhau; khớp theo thời lượng có thể chọn nhầm (ca `pbSji_3prUc`) | Ép đúng id LRCLIB rồi chạy lại phân tích |
 | Lời bài `7I1SPKwTXJ0` bị lặp dồn giữa các câu | Caption của riêng video này chứa các cue nối tiếp lặp phần lời trước | Đã sửa dữ liệu của bài này; không tự động áp dụng cách cắt phần lặp cho bài khác |
 | Đăng nhập Google xong vẫn ẩn danh, phải đăng nhập lần 2 (đã sửa) | Trước đây luôn thử `linkIdentity` trước; Google đã có tài khoản thì bị từ chối, chưa có phiên nào, phải đăng nhập lại để gộp | Nay mọi trường hợp đi một đường qua `signInGoogle` + trang gộp (tự gộp khi không có gì bị đè). Cần migration `20261004000001` đã chạy |
