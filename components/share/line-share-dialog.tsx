@@ -18,7 +18,12 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
 
   useEffect(() => {
     const dialog = ref.current;
-    if (dialog && !dialog.open) dialog.showModal();
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+      // showModal tự đưa tiêu điểm vào nút đầu tiên có mặt lúc đó; nút Chia sẻ chỉ xuất hiện sau khi dựng ảnh xong nên "Đóng" bị chọn và hiện viền
+      // tiêu điểm (nhất là trên iOS). Đặt tiêu điểm ở chính hộp thoại: trình đọc màn hình vẫn đọc tiêu đề, bàn phím vẫn Tab được vào các nút.
+      dialog.focus({ preventScroll: true });
+    }
     let cancelled = false;
     let url: string | null = null;
     renderLineCard({ ...card, site: SITE_URL.replace(/^https?:\/\//, "") })
@@ -57,8 +62,8 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
   const btn = "inline-flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-label-md font-semibold";
   return (
     <dialog
-      ref={ref} aria-labelledby="line-share-title" onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose(); }}
-      className="m-auto w-[min(94vw,26rem)] rounded-3xl bg-surface-container-lowest p-0 text-on-surface shadow-[0_24px_60px_-20px_rgba(20,10,5,0.5)] backdrop:bg-black/50 backdrop:backdrop-blur-[2px]"
+      ref={ref} aria-labelledby="line-share-title" tabIndex={-1} onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose(); }}
+      className="m-auto w-[min(94vw,26rem)] rounded-3xl outline-none bg-surface-container-lowest p-0 text-on-surface shadow-[0_24px_60px_-20px_rgba(20,10,5,0.5)] backdrop:bg-black/50 backdrop:backdrop-blur-[2px]"
     >
       <div className="space-y-space-md p-space-lg">
         <h2 id="line-share-title" className="font-serif text-headline-md">Chia sẻ câu này</h2>

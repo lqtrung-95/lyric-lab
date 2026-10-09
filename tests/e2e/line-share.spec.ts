@@ -69,6 +69,15 @@ test.describe("điện thoại Android", () => {
     expect(box.y + box.height).toBeLessThanOrEqual(row.y + row.height); // nằm trong dòng, không kéo dài thêm hàng
   });
 
+  test("mở popup không làm nút Đóng nhận tiêu điểm (không hiện viền tiêu điểm)", async ({ page }) => {
+    await openFixture(page);
+    await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
+    await expect(dialog.getByRole("img")).toBeVisible();
+    const focused = await page.evaluate(() => document.activeElement?.tagName);
+    expect(focused).toBe("DIALOG");
+  });
+
   test("nút Chia sẻ trong popup nằm một dòng, rộng cả hàng", async ({ page }) => {
     await page.addInitScript(() => { navigator.canShare = () => true; });
     await openFixture(page);
