@@ -70,7 +70,7 @@ export function SavedWordsTab() {
                 <div className="flex shrink-0 flex-wrap items-center gap-1 sm:flex-nowrap">
                   {item.type === "vocab" && <PronounceButton text={item.term} />}
                   {item.videoId && (
-                    <button type="button" onClick={() => play(item)} aria-busy={loadingKey === item.key} aria-label={`Nghe đoạn hát chứa ${item.term}`} title="Nghe đoạn hát chứa từ này"
+                    <button type="button" onClick={() => play(item)} aria-busy={loadingKey === item.key} aria-label={`Nghe đoạn chứa ${item.term}`} title="Nghe đoạn chứa từ này"
                       className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container text-primary hover:bg-surface-container-high">
                       {loadingKey === item.key ? <Spinner size={18} /> : <Icon name="play_circle" size={24} />}
                     </button>

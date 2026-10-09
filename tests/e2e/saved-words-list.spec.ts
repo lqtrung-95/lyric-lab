@@ -44,13 +44,13 @@ test("bấm ▶ nghe đúng đoạn hát chứa từ (lùi 0,3 giây), có nút 
   await open(page);
   const row = page.getByRole("listitem").filter({ hasText: "巢" });
   await expect(row.getByRole("button", { name: "Nghe phát âm 巢" })).toBeVisible();
-  await row.getByRole("button", { name: "Nghe đoạn hát chứa 巢" }).click();
+  await row.getByRole("button", { name: "Nghe đoạn chứa 巢" }).click();
   await expect(page.getByRole("region", { name: "Nghe thử đoạn" })).toBeVisible();
   await expect.poll(() => page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:11.7");
 });
 
 test("bài đã bị gỡ: báo lỗi rõ ràng, không treo", async ({ page }) => {
   await open(page, 404);
-  await page.getByRole("listitem").filter({ hasText: "巢" }).getByRole("button", { name: "Nghe đoạn hát chứa 巢" }).click();
+  await page.getByRole("listitem").filter({ hasText: "巢" }).getByRole("button", { name: "Nghe đoạn chứa 巢" }).click();
   await expect(page.getByText("Không tìm thấy câu hát chứa “巢”")).toBeVisible();
 });

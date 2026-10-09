@@ -46,6 +46,7 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 6. Local và production **dùng chung một DB Supabase**. Chạy script ghi DB từ máy local là đang ghi vào dữ liệu thật.
 
 ## Các bẫy đã gặp (đọc trước khi debug)
+- **Thẻ từ lưu ở video dùng chung bảng `user_cards` với bài hát, không có cột nguồn.** Phân biệt bằng `videoId`: `/api/review/context` thử phân tích bài hát trước, không có thì đọc bài học video (`getLessonForReview`, bỏ video đã ẩn); `/learn/<id>` chuyển sang `/video/<id>` khi không có phân tích mà có bài học video (`hasVisibleLesson`). Không tách bảng vì từ đã lưu/đã biết/lịch ôn tính theo từ. Nếu một videoId vừa là bài hát vừa là video thì bài hát thắng.
 
 | Triệu chứng | Nguyên nhân | Cách xử lý |
 |---|---|---|

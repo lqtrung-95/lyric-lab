@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { LearnMobileHeader } from "@/components/layout/learn-mobile-header";
 import { SiteHeader } from "@/components/layout/site-header";
 import { AnalyzingScreen } from "@/components/learn/analyzing-screen";
@@ -8,6 +8,7 @@ import { PreviewScreen } from "@/components/preview/preview-screen";
 import { loadWordStats } from "@/lib/preview/load-word-stats";
 import { readCachedAnalysis, readSongRow } from "@/lib/analysis/server-deps";
 import { buildLineShareMetadata } from "@/lib/seo/line-share-metadata";
+import { hasVisibleLesson } from "@/lib/video/video-repo";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
 /** Link cũ dạng `/learn/<id>?line=<số câu>` vẫn có thẻ xem trước đúng câu (link mới trỏ thẳng trang Nghe, xem `listen/page.tsx`). */
@@ -23,6 +24,8 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
   // Hai truy vấn độc lập: chạy song song (bài chưa phân tích thì `song` bị bỏ qua bên dưới).
   const [analysis, songRow] = await Promise.all([readCachedAnalysis(videoId), readSongRow(videoId)]);
   const song = analysis ? songRow : null;
+  // Link cũ tới bài học video (thẻ từ đã lưu ở video trỏ về /learn/<id>) thì chuyển sang trang video thay vì phân tích như bài hát.
+  if (!analysis && (await hasVisibleLesson(videoId))) redirect(`/video/${videoId}`);
   const wordStats = analysis ? await loadWordStats(analysis.lines) : null;
 
   return (

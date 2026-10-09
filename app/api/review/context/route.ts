@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { readCachedAnalysis, readSongRow } from "@/lib/analysis/server-deps";
 import type { ReviewContext } from "@/lib/review/review-context-types";
 import { createSupabaseServerClient } from "@/lib/supabase/server-client";
+import { getLessonForReview } from "@/lib/video/video-repo";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
 export const runtime = "nodejs";
@@ -23,9 +24,18 @@ export async function GET(req: Request) {
   if (wanted.size === 0) return Response.json({ error: "no_cards" }, { status: 404 });
 
   const [analysis, song] = await Promise.all([readCachedAnalysis(videoId), readSongRow(videoId)]);
-  if (!analysis) return Response.json({ error: "song_unavailable" }, { status: 404 });
-
   const lines: ReviewContext["lines"] = {};
+  if (!analysis) {
+    // Không phải bài hát: thẻ có thể lưu từ video học tiếng Trung, lấy câu từ bài học video (không có độ lệch lời).
+    const lesson = await getLessonForReview(videoId);
+    if (!lesson) return Response.json({ error: "song_unavailable" }, { status: 404 });
+    for (const line of lesson.lines) {
+      if (wanted.has(line.idx)) lines[line.idx] = { text: line.text, pinyin: line.pinyin, translation: line.translation ?? undefined, start: line.start, end: line.end };
+    }
+    const body: ReviewContext = { videoId, lines, title: lesson.title, artist: lesson.channelTitle, lyricOffsetSec: 0 };
+    return Response.json(body, { headers: { "Cache-Control": "private, no-store" } });
+  }
+
   for (const line of analysis.lines) {
     if (wanted.has(line.index)) {
       lines[line.index] = { text: line.text, pinyin: line.pinyin, translation: line.translation, start: line.start, end: line.end };

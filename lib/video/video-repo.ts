@@ -52,6 +52,22 @@ export async function getLessonLinesForExplain(videoId: string): Promise<LessonL
   return data ? ((data as unknown as { lines: LessonLine[] }).lines) : null;
 }
 
+/** Tiêu đề, kênh và các dòng của video (trừ video đã ẩn) để dựng câu cho thẻ ôn và nghe lại đoạn của từ đã lưu: null nếu không có hoặc bị ẩn. */
+export async function getLessonForReview(videoId: string): Promise<{ title: string; channelTitle: string; lines: LessonLine[] } | null> {
+  const { data, error } = await createSupabaseServiceClient().from("video_lessons").select("title, channel_title, lines").eq("video_id", videoId).neq("status", "hidden").maybeSingle();
+  if (error) throw new Error(`getLessonForReview: ${error.message}`);
+  if (!data) return null;
+  const row = data as unknown as { title: string; channel_title: string; lines: LessonLine[] };
+  return { title: row.title, channelTitle: row.channel_title, lines: row.lines };
+}
+
+/** Video còn hiện được (chưa bị ẩn) có bài học trong kho video không. */
+export async function hasVisibleLesson(videoId: string): Promise<boolean> {
+  const { data, error } = await createSupabaseServiceClient().from("video_lessons").select("video_id").eq("video_id", videoId).neq("status", "hidden").maybeSingle();
+  if (error) throw new Error(`hasVisibleLesson: ${error.message}`);
+  return !!data;
+}
+
 // ---- Quản trị (chỉ gọi từ route đã kiểm tra quyền admin) ----
 
 export interface AdminLessonSummary extends LessonSummary {
