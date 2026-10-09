@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { levelToBand } from "@/lib/home/home-logic";
+import { DEFAULT_LEVEL } from "@/lib/user-state/learner-state";
 import { E2E_VIDEO_ID, hasSupabaseEnv, removeFixtureSong, seedFixtureSong } from "./helpers/seed-analysis";
 
 // Trang chủ của app (/app): hành động nổi bật, mục tiêu ngày, gợi ý theo level, trạng thái người mới. API được giả lập.
@@ -16,19 +18,26 @@ async function mock(page: Page, opts: { songs?: object[]; discover?: object[] } 
   return discoverUrls;
 }
 
-test("người mới: ba bước, gợi ý theo level (dải HSK 3–4 rồi bù bài chung), thẻ 'Chưa biết học bài nào?' và vòng mục tiêu", async ({ page }) => {
+test("người mới: ba bước, hành động 'Học ngay' một bài gợi ý, gợi ý theo level (dải của level mặc định rồi bù bài chung) và vòng mục tiêu", async ({ page }) => {
   const urls = await mock(page, { discover: [rec(1), rec(2)] });
   await page.goto("/app");
   await expect(page.getByRole("heading", { name: "Bắt đầu chỉ với ba bước" })).toBeVisible();
-  await expect(page.getByText("Chưa biết học bài nào?")).toBeVisible();
-  await expect(page.getByRole("link", { name: "Xem bài gợi ý" })).toHaveAttribute("href", "/library?tab=discover");
+  await expect(page.getByText("Bài gợi ý cho bạn hôm nay")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Học ngay" })).toHaveAttribute("href", "/learn/rec00000001");
   await expect(page.getByRole("img", { name: "Mục tiêu hôm nay: đã học 0 trên 15 thẻ mới" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Gợi ý cho bạn" })).toBeVisible();
-  await expect(page.getByText("Bài gợi ý 1")).toBeVisible();
-  expect(urls[0]).toContain("band=3-4"); // level mặc định là HSK 3
+  await expect(page.getByText("Bài gợi ý 1").first()).toBeVisible();
+  expect(urls[0]).toContain(`band=${levelToBand(DEFAULT_LEVEL)}`); // level mặc định của tài khoản mới
   expect(urls.some((u) => !u.includes("band="))).toBe(true); // ít hơn 4 bài trong dải → bù bằng bài phổ biến chung
   await expect(page.getByRole("heading", { name: "Bài hát gần đây" })).toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("kho chưa có bài gợi ý nào: thẻ 'Chưa biết học bài nào?' trỏ về Khám phá", async ({ page }) => {
+  await mock(page, { discover: [] });
+  await page.goto("/app");
+  await expect(page.getByText("Chưa biết học bài nào?")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Xem bài gợi ý" })).toHaveAttribute("href", "/library?tab=discover");
 });
 
 test("đang nghe dở: hiện 'Tiếp tục nghe' dẫn tới đúng vị trí; bài gợi ý không lặp bài đã mở", async ({ page }) => {

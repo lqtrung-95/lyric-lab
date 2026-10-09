@@ -4,7 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 export const runtime = "nodejs";
 
 /**
- * GET /api/discover?sort=new|popular&band=1-2|3-4|5-6|7&q=…&offset=… → bài đã được phân tích để người dùng chọn học.
+ * GET /api/discover?sort=new|popular&band=1-2|3-4|5-6|7&mood=<nhóm cảm xúc>&q=…&offset=… → bài đã được phân tích để người dùng chọn học.
  * Chỉ trả tên bài, kênh, cấp trung bình và số người đã nghe (không lời, không danh tính). Dữ liệu chung nên cache ở edge vài phút.
  */
 export async function GET(req: Request) {
@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     .select("video_id,title,channel_title,level_avg,listeners,likes", { count: "exact" });
   if (params.band) query = query.gte("level_avg", params.band[0]).lt("level_avg", params.band[1]);
   if (params.query) query = query.ilike("title", `%${params.query}%`);
+  if (params.mood) query = query.contains("mood_groups", [params.mood]);
   query = params.sort === "popular"
     ? query.order("likes", { ascending: false }).order("listeners", { ascending: false }).order("created_at", { ascending: false })
     : query.order("created_at", { ascending: false });

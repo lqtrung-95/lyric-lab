@@ -2,6 +2,7 @@ import type { SongAnalysis } from "./analysis-types";
 import { assessAnalysisQuality } from "./analysis-quality";
 import { averageVocabLevel } from "./song-level-average";
 import type { VideoMeta } from "@/lib/lyrics/lyrics-types";
+import { moodGroupsForSong } from "@/lib/library/mood-groups";
 
 /** Khóa cache (quy tắc 8): videoId + ngôn ngữ học + ngôn ngữ giải thích + phiên bản prompt. */
 export interface CacheKey {
@@ -17,6 +18,8 @@ type DbResult<T> = PromiseLike<{ data: T; error: { message: string } | null }>;
 export interface CacheDb {
   selectAnalysis(key: CacheKey): DbResult<{ analysis: SongAnalysis }[] | null>;
   upsertSong(row: { video_id: string; title: string; channel_title: string; duration_sec: number; level_avg: number | null; listed?: boolean }): DbResult<unknown>;
+  /** Ghi nhóm cảm xúc của bài (lọc ở Thư viện). Tuỳ chọn và chỉ gọi theo kiểu "cố gắng hết sức": cột có thể chưa tồn tại nếu chưa chạy migration. */
+  updateMoodGroups?(videoId: string, groups: string[]): DbResult<unknown>;
   upsertAnalysis(row: {
     video_id: string; learn_lang: string; explain_lang: string; prompt_version: string;
     lyrics_source: string; model: string; analysis: SongAnalysis;
@@ -42,4 +45,10 @@ export async function saveAnalysis(db: CacheDb, key: CacheKey, video: VideoMeta,
     lyrics_source: analysis.lyricsSource, model: analysis.model, analysis,
   });
   if (saved.error) throw new Error(`Ghi phân tích lỗi: ${saved.error.message}`);
+  // Nhóm cảm xúc chỉ phục vụ bộ lọc: lỗi (vd. chưa chạy migration) không được làm hỏng việc lưu phân tích.
+  try {
+    await db.updateMoodGroups?.(key.videoId, moodGroupsForSong(analysis.moods ?? []));
+  } catch (error) {
+    console.error("Ghi nhóm cảm xúc lỗi:", error);
+  }
 }

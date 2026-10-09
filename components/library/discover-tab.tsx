@@ -1,10 +1,13 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { SelectField } from "@/components/ui/select-field";
 import { Spinner } from "@/components/ui/spinner";
 import type { DiscoverSong } from "@/lib/discover/discover-query";
+import { parseMoodGroup, type MoodGroupId } from "@/lib/library/mood-groups";
 import { AdminSongActions } from "./admin-song-actions";
+import { MoodChips } from "./mood-chips";
 import { SongCard } from "./song-card";
 import { SongLikeButton } from "./song-like-button";
 import { useIsAdmin } from "./use-is-admin";
@@ -31,6 +34,11 @@ const metaOf = (s: DiscoverSong) =>
 export function DiscoverTab() {
   const isAdmin = useIsAdmin();
   const { liked, setLiked } = useLikedSongs();
+  const router = useRouter();
+  const pathname = usePathname();
+  // Nhóm cảm xúc nằm trong URL (?tab=discover&mood=…) để chia sẻ/quay lại được và để chip ở trang bài dẫn thẳng tới đây.
+  const mood = parseMoodGroup(useSearchParams().get("mood"));
+  const [moodCounts, setMoodCounts] = useState<Partial<Record<MoodGroupId, number>> | null>(null);
   const [sort, setSort] = useState<"new" | "popular">("new");
   const [band, setBand] = useState("");
   const [query, setQuery] = useState("");
@@ -42,6 +50,15 @@ export function DiscoverTab() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
+    fetch("/api/discover/moods").then((r) => (r.ok ? r.json() : null)).then((d) => setMoodCounts(d?.counts ?? null), () => setMoodCounts(null));
+  }, []);
+
+  function selectMood(next: MoodGroupId | null) {
+    setState("loading");
+    router.replace(`${pathname}?tab=discover${next ? `&mood=${next}` : ""}`, { scroll: false });
+  }
+
+  useEffect(() => {
     const t = setTimeout(() => setDebounced(query), 300);
     return () => clearTimeout(t);
   }, [query]);
@@ -50,13 +67,14 @@ export function DiscoverTab() {
     const params = new URLSearchParams({ sort, offset: String(offset) });
     if (band) params.set("band", band);
     if (debounced) params.set("q", debounced);
+    if (mood) params.set("mood", mood);
     try {
       const res = await fetch(`/api/discover?${params}`);
       return res.ok ? ((await res.json()) as Page) : null;
     } catch {
       return null;
     }
-  }, [sort, band, debounced]);
+  }, [sort, band, debounced, mood]);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,6 +121,7 @@ export function DiscoverTab() {
           </SelectField>
         </label>
       </div>
+      {moodCounts && Object.keys(moodCounts).length > 0 && <MoodChips className="mt-space-sm" value={mood} onChange={selectMood} counts={moodCounts} />}
       <p className="mt-space-sm text-label-md text-on-surface-variant">
         {total !== null && total > 0 ? `${total.toLocaleString("vi-VN")} bài đã được phân tích` : "Bài hát đã được người dùng khác phân tích"}: mở là học được ngay, không phải chờ.
       </p>

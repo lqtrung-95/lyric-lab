@@ -8,6 +8,7 @@ export function createSupabaseCacheDb(sb: SupabaseClient): CacheDb {
       sb.from("song_analyses").select("analysis").eq("video_id", k.videoId).eq("learn_lang", k.learnLang)
         .eq("explain_lang", k.explainLang).eq("prompt_version", k.promptVersion).limit(1) as never,
     upsertSong: (row) => sb.from("songs").upsert(row, { onConflict: "video_id" }) as never,
+    updateMoodGroups: (videoId, groups) => sb.from("songs").update({ mood_groups: groups }).eq("video_id", videoId) as never,
     upsertAnalysis: (row) =>
       sb.from("song_analyses").upsert(row, { onConflict: "video_id,learn_lang,explain_lang,prompt_version" }) as never,
   };

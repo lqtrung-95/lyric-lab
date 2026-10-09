@@ -5,7 +5,10 @@ import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 
 import { SelectField } from "@/components/ui/select-field";
 import { SongCard } from "./song-card";
 import { SongLikeButton } from "./song-like-button";
+import type { MoodGroupId } from "@/lib/library/mood-groups";
+import { MoodChips } from "./mood-chips";
 import { useLikedSongs } from "./use-liked-songs";
+import { useSongMoods } from "./use-song-moods";
 import { useSongRemoval } from "./use-song-removal";
 import { mergeLibrarySongs, type LibrarySong, type RemoteSongProgress } from "@/lib/library/merge-library-songs";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
@@ -35,6 +38,7 @@ export function SongsTab() {
   const recentRaw = useSyncExternalStore(noop, readRecent, () => null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<StatusFilter>("all");
+  const [mood, setMood] = useState<MoodGroupId | null>(null);
   const { liked, setLiked } = useLikedSongs();
 
   const load = useCallback(() => {
@@ -45,9 +49,15 @@ export function SongsTab() {
 
   const allSongs = useMemo(() => mergeLibrarySongs(remote ?? [], parseRecentSongs(recentRaw)), [remote, recentRaw]);
   const q = query.trim().toLowerCase();
+  const songMoods = useSongMoods(useMemo(() => allSongs.map((s) => s.videoId), [allSongs]));
+  const moodCounts = useMemo(() => {
+    const counts: Partial<Record<MoodGroupId, number>> = {};
+    for (const s of allSongs) for (const g of songMoods[s.videoId] ?? []) counts[g] = (counts[g] ?? 0) + 1;
+    return counts;
+  }, [allSongs, songMoods]);
   const songs = useMemo(
-    () => allSongs.filter((s) => matchesStatus(s, status, liked) && (!q || s.title.toLowerCase().includes(q) || s.channelTitle.toLowerCase().includes(q))),
-    [allSongs, status, q, liked],
+    () => allSongs.filter((s) => matchesStatus(s, status, liked) && (!mood || songMoods[s.videoId]?.includes(mood)) && (!q || s.title.toLowerCase().includes(q) || s.channelTitle.toLowerCase().includes(q))),
+    [allSongs, status, q, liked, mood, songMoods],
   );
 
   if (remote === null && allSongs.length === 0) return <p role="status" className="py-space-lg text-body-md text-on-surface-variant">Đang tải…</p>;
@@ -77,6 +87,7 @@ export function SongsTab() {
         </SelectField>
       </label>
     </div>
+    {Object.keys(moodCounts).length > 0 && <MoodChips className="mb-space-md" value={mood} onChange={setMood} counts={moodCounts} />}
     {songs.length === 0 ? (
       <p className="rounded-2xl bg-surface-container-low p-space-lg text-body-md text-on-surface-variant">Không có bài nào khớp tìm kiếm/bộ lọc.</p>
     ) : (

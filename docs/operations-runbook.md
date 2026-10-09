@@ -176,3 +176,9 @@ Mỗi email có link hủy nhận (`/unsubscribe/[token]`, nút bấm gọi `POS
 
 ## Video PR cho TikTok/Reels (`scripts/pr-video`)
 Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư-mục-xuất]` (mặc định `~/Desktop/songhanzi-pr`). Cần Playwright (đã có), `ffmpeg` và, với giọng macOS, lệnh `say`. Kịch bản, phụ đề (`**cụm**` thành chữ vàng), bài hát quay (`videoId`) và thời lượng sửa ở `scripts/pr-video/config.json`. Giọng đọc ưu tiên: file của bạn `scripts/pr-video/voice/1.m4a`, `2.mp3`… (số = thứ tự cảnh) > ElevenLabs nếu đặt biến môi trường `ELEVENLABS_API_KEY` (voice theo tên, mặc định Adam; tiếng Việt cần model `eleven_flash_v2_5` hoặc `eleven_turbo_v2_5`) > `say` Linh. Khóa API chỉ để trong biến môi trường của shell, không ghi vào file. Quay bài thật có thể bị TikTok báo bản quyền (ảnh bìa MV, lời bài hát); muốn an toàn thì đổi `videoId`.
+
+## Lọc bài theo cảm xúc (migration + điền dữ liệu bài cũ)
+1. Chạy tay `supabase/migrations/20261009000001_song_mood_groups.sql` ở Supabase (thêm cột `songs.mood_groups`, chỉ mục GIN, cập nhật view `discover_songs`). Chưa chạy thì app vẫn chạy bình thường, chỉ ẩn hàng chip cảm xúc.
+2. Điền cho bài đã phân tích: `NODE_OPTIONS=--experimental-websocket npx tsx scripts/backfill-mood-groups.mts` (thêm `--dry` để chỉ xem độ phủ từng nhóm và các tag chưa có nhóm, chạy được trước migration). Bài mới tự có nhóm lúc phân tích xong.
+3. Đổi bảng từ khóa ở `lib/library/mood-groups.ts` thì chạy lại bước 2 (idempotent).
+

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { SongAnalysis } from "@/lib/analysis/analysis-types";
 import { ReportSongButton } from "./report-song-button";
+import { moodGroupLabel, primaryMoodGroupForTag } from "@/lib/library/mood-groups";
 import { Icon } from "@/components/ui/icon";
 import { formatTimestamp, levelRangeLabel } from "@/lib/preview/preview-format";
 import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
@@ -41,9 +42,20 @@ export function PreviewHeader({ analysis, song, listenHref }: PreviewHeaderProps
           </div>
           <div className="flex flex-col gap-4 lg:col-span-8">
             <ul aria-label="Cảm xúc của bài" className="flex flex-wrap items-center gap-2">
-              {analysis.moods.map((m) => (
-                <li key={m} className="rounded-full bg-surface px-2.5 py-0.5 text-label-sm text-on-surface-variant">#{m}</li>
-              ))}
+              {analysis.moods.map((m) => {
+                // Tag thuộc một nhóm cảm xúc thì bấm để xem các bài cùng nhóm ở Khám phá; tag lẻ (không thuộc nhóm nào) chỉ là chữ.
+                const group = primaryMoodGroupForTag(m);
+                return (
+                  <li key={m}>
+                    {group ? (
+                      <Link href={`/library?tab=discover&mood=${group}`} title={`Xem bài cùng nhóm "${moodGroupLabel(group)}"`}
+                        className="inline-flex min-h-11 items-center rounded-full bg-surface px-3 text-label-md text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">#{m}</Link>
+                    ) : (
+                      <span className="rounded-full bg-surface px-2.5 py-0.5 text-label-sm text-on-surface-variant">#{m}</span>
+                    )}
+                  </li>
+                );
+              })}
               <li className="text-label-sm text-on-surface-variant">• {artist}</li>
             </ul>
             <h1 lang="zh" className="font-serif text-headline-lg-mobile tracking-tight text-on-surface md:text-headline-xl">{title}</h1>

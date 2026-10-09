@@ -1,3 +1,5 @@
+import { parseMoodGroup, type MoodGroupId } from "@/lib/library/mood-groups";
+
 export type DiscoverSort = "new" | "popular";
 export const DISCOVER_PAGE_SIZE = 24;
 
@@ -6,6 +8,8 @@ export interface DiscoverParams {
   /** Dải cấp HSK trung bình của bài, hoặc null nếu không lọc. */
   band: [number, number] | null;
   query: string;
+  /** Nhóm cảm xúc cần lọc, hoặc null nếu không lọc. */
+  mood: MoodGroupId | null;
   offset: number;
 }
 
@@ -17,7 +21,7 @@ export function parseDiscoverParams(sp: URLSearchParams): DiscoverParams {
   const offset = Math.max(0, Math.min(2000, Math.floor(Number(sp.get("offset")) || 0)));
   // Bỏ ký tự đặc biệt của ilike (% _ \) và giới hạn độ dài để từ khóa không thành mẫu tìm kiếm tùy ý.
   const query = (sp.get("q") ?? "").replace(/[%_\\,()]/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
-  return { sort, band: BANDS[sp.get("band") ?? ""] ?? null, query, offset };
+  return { sort, band: BANDS[sp.get("band") ?? ""] ?? null, query, mood: parseMoodGroup(sp.get("mood")), offset };
 }
 
 export interface DiscoverSong {
