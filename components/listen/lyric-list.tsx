@@ -49,8 +49,8 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
   const shareTitle = shareContext?.title;
   const shareArtist = shareContext?.artist;
   const shareCard = useMemo(
-    () => (sharedLine && shareTitle ? { han: sharedLine.text, pinyin: sharedLine.pinyin, translation: sharedLine.translation, title: shareTitle, artist: shareArtist } : null),
-    [sharedLine, shareTitle, shareArtist],
+    () => (sharedLine && shareTitle ? { han: sharedLine.text, pinyin: sharedLine.pinyin, translation: sharedLine.translation, title: shareTitle, artist: shareArtist, videoId } : null),
+    [sharedLine, shareTitle, shareArtist, videoId],
   );
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);

@@ -1,4 +1,22 @@
+import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
+import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 import { balancedWrapText } from "./wrap-text";
+
+const THUMB_W = 272;
+const THUMB_H = 153;
+
+/** Ảnh bìa YouTube (16:9) để vẽ lên thẻ. YouTube cho phép đọc ảnh chéo nguồn (CORS *) nên canvas không bị "nhiễm"; lỗi mạng hoặc quá 4 giây thì bỏ ảnh, thẻ vẫn vẽ bình thường. */
+function loadThumbnail(videoId: string | undefined): Promise<HTMLImageElement | null> {
+  if (!videoId || !isValidVideoId(videoId)) return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    const timer = setTimeout(() => resolve(null), 4000);
+    img.onload = () => { clearTimeout(timer); resolve(img.naturalWidth > 0 ? img : null); };
+    img.onerror = () => { clearTimeout(timer); resolve(null); };
+    img.src = videoThumbnailUrl(videoId, "mqdefault");
+  });
+}
 
 const W = 1080;
 const H = 1350;
@@ -14,6 +32,8 @@ export interface LineCardData {
   translation?: string;
   title: string;
   artist?: string;
+  /** Có thì vẽ ảnh bìa video ở chân thẻ cạnh tên bài. */
+  videoId?: string;
   /** Tên miền hiển thị cuối thẻ (không có giao thức). */
   site: string;
 }
@@ -23,6 +43,7 @@ export interface LineCardData {
  * không tạo trang công khai chứa lời (quy tắc bản quyền của dự án). Dòng quá dài bị cắt bớt ở cuối.
  */
 export async function renderLineCard(d: LineCardData): Promise<Blob> {
+  const thumbnail = loadThumbnail(d.videoId); // tải song song với font
   await document.fonts.ready;
   const canvas = document.createElement("canvas");
   canvas.width = W;
@@ -38,6 +59,9 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
     document.fonts.load(hanFont, d.han),
     document.fonts.load(`600 40px ${sans}`, `${d.title}${d.artist ?? ""}`),
   ]).catch(() => undefined);
+  const thumb = await thumbnail;
+  // Có ảnh bìa thì chân thẻ cao hơn: đường kẻ và vùng chữ giữa dời lên tương ứng.
+  const footerTop = thumb ? 1092 : 1130;
   const left = 90;
   const maxWidth = W - left * 2;
   const measureWith = (font: string) => (s: string) => { c.font = font; return c.measureText(s).width; };
@@ -76,7 +100,7 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
 
   const GAP = 52;
   const regionTop = 230;
-  const regionBottom = 1090;
+  const regionBottom = footerTop - 40;
   const total = blocks.reduce((sum, b) => sum + b.lines.length * b.lineHeight, 0) + GAP * (blocks.length - 1);
   let y = regionTop + Math.max(0, (regionBottom - regionTop - total) / 2);
   c.textBaseline = "middle";
@@ -91,15 +115,51 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
   c.strokeStyle = "rgba(28, 22, 17, 0.12)";
   c.lineWidth = 2;
   c.beginPath();
-  c.moveTo(left, 1130);
-  c.lineTo(W - left, 1130);
+  c.moveTo(left, footerTop);
+  c.lineTo(W - left, footerTop);
   c.stroke();
-  c.fillStyle = INK;
-  c.font = `600 40px ${sans}`;
-  c.fillText(d.artist ? `${d.title} · ${d.artist}` : d.title, left, 1195, maxWidth);
-  c.fillStyle = MUTED;
-  c.font = `400 34px ${sans}`;
-  c.fillText(`Học tiếng Trung qua bài hát · ${d.site}`, left, 1255, maxWidth);
+  const heading = d.artist ? `${d.title} · ${d.artist}` : d.title;
+  if (thumb) {
+    // Chân thẻ có ảnh bìa: ảnh bo góc bên trái, tên bài (tối đa 2 dòng) và tên miền căn giữa theo chiều dọc bên phải ảnh.
+    const thumbY = footerTop + 40;
+    const textLeft = left + THUMB_W + 32;
+    const textWidth = W - left - textLeft;
+    const titleFont = `600 36px ${sans}`;
+    const titleLines = balancedWrapText(heading, measureWith(titleFont), textWidth, "word").slice(0, 2);
+    if (balancedWrapText(heading, measureWith(titleFont), textWidth, "word").length > 2) titleLines[1] = `${titleLines[1]}…`;
+    c.save();
+    c.shadowColor = "rgba(28, 22, 17, 0.25)";
+    c.shadowBlur = 18;
+    c.shadowOffsetY = 6;
+    c.beginPath();
+    c.roundRect(left, thumbY, THUMB_W, THUMB_H, 18);
+    c.fillStyle = "#e9ded6";
+    c.fill();
+    c.restore();
+    c.save();
+    c.beginPath();
+    c.roundRect(left, thumbY, THUMB_W, THUMB_H, 18);
+    c.clip();
+    c.drawImage(thumb, left, thumbY, THUMB_W, THUMB_H);
+    c.restore();
+    const total = titleLines.length * 46 + 14 + 34;
+    let y = thumbY + (THUMB_H - total) / 2;
+    c.textBaseline = "middle";
+    c.fillStyle = INK;
+    c.font = titleFont;
+    for (const line of titleLines) { c.fillText(line, textLeft, y + 23); y += 46; }
+    c.fillStyle = MUTED;
+    c.font = `400 30px ${sans}`;
+    c.fillText(d.site, textLeft, y + 14 + 17);
+    c.textBaseline = "alphabetic";
+  } else {
+    c.fillStyle = INK;
+    c.font = `600 40px ${sans}`;
+    c.fillText(heading, left, 1195, maxWidth);
+    c.fillStyle = MUTED;
+    c.font = `400 34px ${sans}`;
+    c.fillText(`Học tiếng Trung qua bài hát · ${d.site}`, left, 1255, maxWidth);
+  }
 
   return new Promise((resolve, reject) => canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png"));
 }

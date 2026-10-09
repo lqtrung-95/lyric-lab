@@ -20,7 +20,43 @@ async function openFixture(page: Page) {
   });
 }
 
+// PNG 1x1 đỏ để giả ảnh bìa YouTube (có header CORS như thật, nếu không canvas bị chặn).
+const RED_PIXEL = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==", "base64");
+
+/** Màu điểm ảnh (toạ độ trên ảnh thẻ 1080×1350) của thẻ đang hiện trong popup. */
+async function cardPixel(page: Page, x: number, y: number): Promise<number[]> {
+  return page.evaluate(async ([px, py]) => {
+    const img = document.querySelector<HTMLImageElement>("dialog img")!;
+    const bitmap = await createImageBitmap(await (await fetch(img.src)).blob());
+    const canvas = document.createElement("canvas");
+    canvas.width = bitmap.width; canvas.height = bitmap.height;
+    const c = canvas.getContext("2d")!;
+    c.drawImage(bitmap, 0, 0);
+    return [...c.getImageData(px, py, 1, 1).data];
+  }, [x, y]);
+}
+
 test.describe("máy tính", () => {
+  test("thẻ ảnh có ảnh bìa video ở chân thẻ; lỗi tải ảnh bìa thì thẻ vẫn tạo được, không có ảnh", async ({ page }) => {
+    for (const withThumb of [true, false]) {
+      await page.route("https://i.ytimg.com/**", (route) => withThumb
+        ? route.fulfill({ contentType: "image/png", headers: { "access-control-allow-origin": "*" }, body: RED_PIXEL })
+        : route.fulfill({ status: 404 }));
+      await openFixture(page);
+      const row = page.locator('[data-line-index="0"]');
+      await row.evaluate((el) => el.scrollIntoView({ block: "center" }));
+      await row.hover();
+      await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
+      await expect(page.getByRole("dialog", { name: "Chia sẻ câu này" }).getByRole("img")).toBeVisible();
+      const [r, g, b] = await cardPixel(page, 226, 1208); // giữa ô ảnh bìa
+      if (withThumb) expect(r > 200 && g < 60 && b < 60).toBe(true);
+      else expect(r > 200 && g > 200 && b > 200).toBe(true); // nền thẻ sáng
+      await page.keyboard.press("Escape");
+      await page.unroute("https://i.ytimg.com/**");
+    }
+  });
+
+
   test("bấm chia sẻ mở popup có ảnh, nút Tải ảnh tải được file PNG", async ({ page }) => {
     await openFixture(page);
     // Nút chia sẻ chỉ hiện khi rê chuột lên dòng; cuộn dòng xuống dưới phần video dính ở đầu trang rồi mới bấm (bấm ép sẽ trúng phần dính).
