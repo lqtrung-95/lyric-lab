@@ -5,6 +5,7 @@ import type { CaptionLine } from "@/lib/captions/caption-provider-types";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
+import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { decideAddLimit, decideDuration, decideTranslationBudget } from "@/lib/video/add-video-limits";
 import { chineseRatio, isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
@@ -67,7 +68,9 @@ export async function POST(req: Request) {
       if (error) throw new Error(`đếm video đã thêm: ${error.message}`);
       return n ?? 0;
     };
-    const limit = decideAddLimit(await count(true), await count(false));
+    const admin = isAdminAccount(user.email ?? null);
+    // Admin không bị giới hạn số video, nên khỏi đếm.
+    const limit = admin ? "ok" : decideAddLimit(await count(true), await count(false));
     if (limit !== "ok") return fail(limit, 429);
 
     // Ngân sách AI dịch toàn app (theo phút video): hết thì vẫn thêm video nhưng không nhờ AI dịch, admin dịch bù sau. Video dùng được phụ đề tiếng Việt có sẵn không tốn AI.

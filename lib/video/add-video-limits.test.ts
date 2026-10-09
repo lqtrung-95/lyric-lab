@@ -4,6 +4,10 @@ import { AI_TRANSLATION_MINUTES_PER_DAY, MAX_ADDED_VIDEO_SECONDS, MAX_USER_VIDEO
 describe("decideAddLimit", () => {
   it("cho thêm khi dưới cả hai trần", () => expect(decideAddLimit(MAX_VIDEOS_PER_USER_PER_DAY - 1, 5)).toBe("ok"));
   it("chặn người đã đủ số video trong ngày", () => expect(decideAddLimit(MAX_VIDEOS_PER_USER_PER_DAY, 5)).toBe("user_limit"));
+  it("admin không bị giới hạn từng người lẫn trần chung", () => {
+    expect(decideAddLimit(MAX_VIDEOS_PER_USER_PER_DAY, 5, true)).toBe("ok");
+    expect(decideAddLimit(MAX_VIDEOS_PER_USER_PER_DAY, MAX_USER_VIDEOS_PER_DAY_TOTAL, true)).toBe("ok");
+  });
   it("chặn mọi người khi trần chung đã đầy, ưu tiên hơn giới hạn từng người", () => expect(decideAddLimit(0, MAX_USER_VIDEOS_PER_DAY_TOTAL)).toBe("global_limit"));
 });
 
