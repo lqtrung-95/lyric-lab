@@ -1,3 +1,4 @@
+import { GEMINI_MODELS } from "@/lib/analysis/gemini-models";
 import type { ChatFn } from "@/lib/analysis/groq-chat";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { EXPLAIN_SYSTEM_PROMPT, buildExplainPrompt } from "./build-explain-prompt";
@@ -11,7 +12,9 @@ import { withGroqFallback } from "@/lib/analysis/openrouter-chat";
 // Groq VÀ BytePlus đều không dùng được mới sang OpenRouter (chỉ dùng khi có OPENROUTER_API_KEY): gemini-2.5-flash-
 // lite trước (rẻ, đủ cho tác vụ ngắn) rồi mới tới gemini-2.5-flash.
 const EXPLAIN_GROQ_MODELS = ["openai/gpt-oss-20b", "openai/gpt-oss-120b"];
+// Gemini (khóa Google AI Studio, nhiều khóa) đứng đầu để chia tải khỏi hạn mức Groq; thiếu GEMINI_API_KEYS thì rớt ngay sang model sau, không lỗi.
 export const EXPLAIN_MODELS = [
+  ...GEMINI_MODELS,
   ...EXPLAIN_GROQ_MODELS,
   ...withGroqFallback(EXPLAIN_GROQ_MODELS),
   "byteplus:doubao",

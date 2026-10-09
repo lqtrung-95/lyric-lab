@@ -6,6 +6,8 @@ export const OPENROUTER_PREFIX = "openrouter:";
 export const GROQ_FALLBACK_PREFIX = "groq-fallback:";
 /** Tiền tố cho model gọi thẳng API DeepSeek (không qua OpenRouter), vd. "deepseek:deepseek-chat". */
 export const DEEPSEEK_PREFIX = "deepseek:";
+/** Tiền tố cho model gọi API Gemini bằng khóa Google AI Studio (GEMINI_API_KEYS, có thể nhiều khóa), vd. "gemini:gemini-2.5-flash-lite". */
+export const GEMINI_PREFIX = "gemini:";
 /** Tiền tố cho model gọi API BytePlus ModelArk; model thật lấy từ BYTE_PLUS_MODEL_ID, chuỗi sau dấu ":" chỉ để đọc hiểu, vd. "byteplus:doubao". */
 export const BYTEPLUS_PREFIX = "byteplus:";
 
@@ -29,10 +31,10 @@ export const withGroqFallback = (models: string[]): string[] => models.map((m) =
 
 /**
  * Chọn nhà cung cấp theo tiền tố model: "openrouter:<model>" đi OpenRouter, "deepseek:<model>" gọi thẳng API
- * DeepSeek, "byteplus:<model>" gọi BytePlus ModelArk, "groq-fallback:<model>" đi Groq bằng khóa thứ hai, còn lại đi
+ * DeepSeek, "gemini:<model>" gọi Gemini bằng khóa Google AI Studio, "byteplus:<model>" gọi BytePlus ModelArk, "groq-fallback:<model>" đi Groq bằng khóa thứ hai, còn lại đi
  * Groq bằng khóa chính. Thiếu khóa tương ứng thì báo lỗi để pipeline bỏ qua và thử model kế tiếp.
  */
-export function createChatRouter(groq: ChatFn, groqFallback?: ChatFn, openrouter?: ChatFn, deepseek?: ChatFn, byteplus?: ChatFn): ChatFn {
+export function createChatRouter(groq: ChatFn, groqFallback?: ChatFn, openrouter?: ChatFn, deepseek?: ChatFn, byteplus?: ChatFn, gemini?: ChatFn): ChatFn {
   return (req) => {
     if (req.model.startsWith(OPENROUTER_PREFIX)) {
       if (!openrouter) return Promise.reject(new Error("Chưa cấu hình OPENROUTER_API_KEY"));
@@ -42,6 +44,10 @@ export function createChatRouter(groq: ChatFn, groqFallback?: ChatFn, openrouter
     if (req.model.startsWith(DEEPSEEK_PREFIX)) {
       if (!deepseek) return Promise.reject(new Error("Chưa cấu hình DEEPSEEK_API_KEY"));
       return deepseek({ ...req, model: req.model.slice(DEEPSEEK_PREFIX.length), maxTokens: req.maxTokens ?? DEEPSEEK_MAX_TOKENS });
+    }
+    if (req.model.startsWith(GEMINI_PREFIX)) {
+      if (!gemini) return Promise.reject(new Error("Chưa cấu hình GEMINI_API_KEYS"));
+      return gemini({ ...req, model: req.model.slice(GEMINI_PREFIX.length) });
     }
     if (req.model.startsWith(BYTEPLUS_PREFIX)) {
       if (!byteplus) return Promise.reject(new Error("Chưa cấu hình BYTE_PLUS_API_KEY/BYTE_PLUS_MODEL_ID"));

@@ -12,6 +12,7 @@ import { EXPLAIN_LANG, LEARN_LANG, type AnalyzeStep, type AnalyzeVideoDeps } fro
 import { createByteplusChat } from "./byteplus-chat";
 import { PROMPT_VERSION } from "./build-analysis-prompt";
 import { createDeepSeekChat } from "./deepseek-chat";
+import { createGeminiChat, parseGeminiKeys } from "./gemini-chat";
 import { createGroqChat } from "./groq-chat";
 import { createChatRouter, createOpenRouterChat } from "./openrouter-chat";
 import { buildLinePinyin, withSubwordEntries } from "./build-line-pinyin";
@@ -32,7 +33,7 @@ const FAST_FAIL_LIMITS = { maxRetries: 1, maxWaitSec: 8 };
  */
 export function createChat(env: {
   GROQ_API_KEY: string; FALLBACK_LLM_API_KEY?: string; OPENROUTER_API_KEY?: string; DEEPSEEK_API_KEY?: string;
-  BYTE_PLUS_API_KEY?: string; BYTE_PLUS_MODEL_ID?: string;
+  BYTE_PLUS_API_KEY?: string; BYTE_PLUS_MODEL_ID?: string; GEMINI_API_KEYS?: string;
 }) {
   const deepseek = env.DEEPSEEK_API_KEY ? createDeepSeekChat(env.DEEPSEEK_API_KEY, FAST_FAIL_LIMITS) : undefined;
   const openrouter = env.OPENROUTER_API_KEY ? createOpenRouterChat(env.OPENROUTER_API_KEY, FAST_FAIL_LIMITS) : undefined;
@@ -43,7 +44,9 @@ export function createChat(env: {
     ? createGroqChat(env.FALLBACK_LLM_API_KEY, fetch, undefined, openrouter ? FAST_FAIL_LIMITS : {})
     : undefined;
   const groq = createGroqChat(env.GROQ_API_KEY, fetch, undefined, groqFallback || openrouter ? FAST_FAIL_LIMITS : {});
-  return createChatRouter(groq, groqFallback, openrouter, deepseek, byteplus);
+  const geminiKeys = parseGeminiKeys(env.GEMINI_API_KEYS);
+  const gemini = geminiKeys.length > 0 ? createGeminiChat(geminiKeys) : undefined;
+  return createChatRouter(groq, groqFallback, openrouter, deepseek, byteplus, gemini);
 }
 
 /** Ghép mọi phụ thuộc thật (Supabase service role, Groq, YouTube, LRCLIB) cho pipeline. Chỉ dùng ở server. */

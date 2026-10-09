@@ -17,9 +17,18 @@ describe("createChatRouter", () => {
     expect(or).toHaveBeenCalledWith(expect.objectContaining({ maxTokens: 9000 }));
     expect(groq).toHaveBeenCalledTimes(1);
   });
+  it("tiền tố gemini đi Gemini (khóa Google AI Studio), tên đã bỏ tiền tố", async () => {
+    const groq = vi.fn().mockResolvedValue("g");
+    const gemini = vi.fn().mockResolvedValue("gm");
+    const chat = createChatRouter(groq, undefined, undefined, undefined, undefined, gemini);
+    expect(await chat(req("gemini:gemini-2.5-flash-lite"))).toBe("gm");
+    expect(gemini).toHaveBeenCalledWith(expect.objectContaining({ model: "gemini-2.5-flash-lite" }));
+    expect(groq).not.toHaveBeenCalled();
+  });
   it("thiếu khóa tương ứng thì báo lỗi để pipeline thử model kế tiếp", async () => {
     await expect(createChatRouter(vi.fn())(req("openrouter:x/y"))).rejects.toThrow("OPENROUTER_API_KEY");
     await expect(createChatRouter(vi.fn())(req("groq-fallback:x/y"))).rejects.toThrow("FALLBACK_LLM_API_KEY");
+    await expect(createChatRouter(vi.fn())(req("gemini:gemini-2.5-flash-lite"))).rejects.toThrow("GEMINI_API_KEYS");
   });
 });
 

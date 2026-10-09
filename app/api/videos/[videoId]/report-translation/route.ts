@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_MODELS } from "@/lib/analysis/analyze-lyrics";
+import { GEMINI_MODELS } from "@/lib/analysis/gemini-models";
 import { createChat } from "@/lib/analysis/server-deps";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { getServerEnv } from "@/lib/env/server-env";
@@ -61,7 +62,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ videoId
 
     let translation: string | null = null;
     if (decision === "retranslate") {
-      translation = await retranslateLine(createChat(getServerEnv()), DEFAULT_MODELS, lines, lines.findIndex((l) => l.idx === lineIndex));
+      translation = await retranslateLine(createChat(getServerEnv()), [...GEMINI_MODELS, ...DEFAULT_MODELS], lines, lines.findIndex((l) => l.idx === lineIndex));
       if (translation) {
         const next = lines.map((l) => (l.idx === lineIndex ? { ...l, translation, translationBy: "ai" as const } : l));
         const { error: updateError } = await sb.from("video_lessons").update({ lines: next, updated_at: new Date().toISOString() }).eq("video_id", videoId);

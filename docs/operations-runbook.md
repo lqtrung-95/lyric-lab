@@ -14,6 +14,8 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `SUPABASE_SERVICE_ROLE_KEY` | Có | Ghi DB ở server, bỏ qua RLS. Tuyệt đối không lộ ra client |
 | `GROQ_API_KEY` | Có | Model Groq (dự phòng phân tích; chính cho giải nghĩa khi bấm) |
 | `YOUTUBE_DATA_API_KEY` | Có | Lấy tiêu đề/thời lượng/embeddable |
+| `GEMINI_API_KEYS` | Không | Khóa Google AI Studio (Gemini API), nhiều khóa ngăn cách bằng dấu phẩy hoặc xuống dòng. Dùng ĐẦU TIÊN cho giải nghĩa từ khi bấm, nút AI giải nghĩa câu, và AI dịch lại dòng video bị báo sai (`lib/analysis/gemini-chat.ts`: xoay vòng khóa, khóa bị 429 nghỉ 60 giây, hạn mức ngày nghỉ 15 phút, hết khóa thì rớt sang Groq...). Hạn mức của Google tính theo **dự án Google Cloud**, không theo khóa: nhiều khóa cùng một dự án dùng chung một hạn mức. Số liệu hạn mức miễn phí thay đổi và các nguồn không thống nhất, xem trực tiếp trong AI Studio. Gói miễn phí có thể dùng nội dung gửi lên để cải thiện sản phẩm của Google |
+| `GEMINI_MODEL` | Không | Đổi model Gemini (mặc định `gemini-2.5-flash-lite`) khi Google đổi/ngừng model; tên sai chỉ làm lần gọi lỗi rồi rớt sang model sau |
 | `SUPADATA_API_KEY` | Không | Tự lấy phụ đề tiếng Trung cho video người dùng dán link mà không kèm phụ đề (Supadata, `mode=native`, 1 credit/lần gọi, thường 1 credit/video và 2 credit khi video có sẵn phụ đề tiếng Việt (lấy thêm để khỏi nhờ AI dịch); gói free 100 credit/tháng, hết credit trả 402 thì người dùng chuyển sang dán phụ đề). Bỏ trống thì chỉ nhận phụ đề dán vào/dấu trang |
 | `DEEPSEEK_API_KEY` | Nên có | Model phân tích chính (gọi thẳng api.deepseek.com). Thiếu thì rớt sang Groq |
 | `FALLBACK_LLM_API_KEY` | Nên có | Khóa Groq thứ hai (hạn mức đếm riêng) |
