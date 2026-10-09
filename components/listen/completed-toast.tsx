@@ -21,17 +21,23 @@ export function CompletedToast({ videoId, onDismiss }: CompletedToastProps) {
   const { songs: recent } = useRecentSongs();
   const openedIds = useMemo(() => (recent === null ? null : recent.map((s) => s.videoId)), [recent]);
   const next = useRecommendedSongs(state.level, openedIds)?.find((s) => s.videoId !== videoId);
-  const pill = "inline-flex min-h-9 items-center rounded-full bg-on-secondary/15 px-4 text-label-md font-semibold hover:bg-on-secondary/25";
+  // Điện thoại: thẻ rộng gần hết bề ngang, hàng trên là lời nhắc + nút đóng, hàng dưới chia đều các nút (một nút thì rộng cả hàng); đứng trên thanh "Đang hát"
+  // (bottom sheet thu gọn, ~64px) để không che nó. Từ sm trở lên gộp thành một hàng ở góc phải như cũ.
+  const pill = "inline-flex min-h-11 flex-1 items-center justify-center gap-1 rounded-full px-4 text-label-md font-semibold whitespace-nowrap sm:flex-none";
 
   return (
-    <div role="status" className="fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-40 flex justify-center sm:inset-x-auto sm:right-4 sm:justify-end">
-      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-3xl bg-secondary py-2 pl-5 pr-2 text-on-secondary shadow-[0_8px_30px_rgba(20,10,5,0.35)]">
-        <p className="text-label-md font-medium">Bạn đã nghe xong bài</p>
-        <Link href={`/learn/${videoId}/summary`} className={pill}>Xem tổng kết</Link>
-        {next && <Link href={`/learn/${next.videoId}`} className={`${pill} gap-1`}>Bài tiếp theo<Icon name="arrow_forward" size={16} /></Link>}
-        <button type="button" onClick={onDismiss} aria-label="Đóng thông báo" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full hover:bg-on-secondary/15">
-          <Icon name="close" size={18} />
-        </button>
+    <div role="status" className="fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+4.75rem)] z-40 sm:inset-x-auto sm:right-4 lg:bottom-4">
+      <div className="flex flex-col gap-2 rounded-3xl bg-secondary p-3 pl-4 text-on-secondary shadow-[0_8px_30px_rgba(20,10,5,0.35)] sm:flex-row sm:items-center sm:gap-3 sm:py-2 sm:pr-2">
+        <div className="flex items-center justify-between gap-2 sm:contents">
+          <p className="flex items-center gap-2 text-label-md font-medium"><Icon name="check_circle" filled size={20} />Bạn đã nghe xong bài</p>
+          <button type="button" onClick={onDismiss} aria-label="Đóng thông báo" className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full hover:bg-on-secondary/15 sm:order-last sm:h-9 sm:w-9">
+            <Icon name="close" size={18} />
+          </button>
+        </div>
+        <div className="flex gap-2 pr-1 sm:pr-0">
+          <Link href={`/learn/${videoId}/summary`} className={`${pill} bg-on-secondary/15 hover:bg-on-secondary/25`}>Xem tổng kết</Link>
+          {next && <Link href={`/learn/${next.videoId}`} className={`${pill} bg-on-secondary text-secondary hover:bg-on-secondary/90`}>Bài tiếp theo<Icon name="arrow_forward" size={16} /></Link>}
+        </div>
       </div>
     </div>
   );
