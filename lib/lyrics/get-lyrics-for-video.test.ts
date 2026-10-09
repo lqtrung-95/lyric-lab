@@ -84,4 +84,37 @@ describe("getLyricsForVideo", () => {
     const promise = getLyricsForVideo(video, { captions: captions({ listTracks: async () => [] }), lrclib: lrclib([]) });
     await expect(promise).rejects.toBeInstanceOf(NoLyricsError);
   });
+
+  describe("Supadata (bước cuối)", () => {
+    const none = { captions: captions({ listTracks: async () => [] }), lrclib: lrclib([]), netease: netease([]) };
+
+    it("mọi nguồn khác không có lời → dùng phụ đề qua Supadata", async () => {
+      const r = await getLyricsForVideo(video, { ...none, supadata: async () => lines });
+      expect(r.source).toBe("supadata");
+      expect(r.lines).toHaveLength(6);
+      expect(r.attempts.at(-1)).toEqual({ source: "supadata", outcome: "used" });
+    });
+
+    it("không gọi Supadata khi LRCLIB đã có lời (không tốn credit)", async () => {
+      const r = await getLyricsForVideo(video, { ...none, lrclib: lrclib([lrclibItem]), supadata: async () => { throw new Error("không được gọi"); } });
+      expect(r.source).toBe("lrclib");
+    });
+
+    it("Supadata trả rỗng (không có phụ đề hoặc hết hạn mức) → không có lời", async () => {
+      await expect(getLyricsForVideo(video, { ...none, supadata: async () => [] })).rejects.toBeInstanceOf(NoLyricsError);
+    });
+
+    it("phụ đề không phải chữ Hán hoặc ngắn quá → low_quality, không có lời", async () => {
+      const latin = TEXTS.map((_, i) => ({ text: "la la la hello", start: i * 5, end: i * 5 + 5 }));
+      const err = await getLyricsForVideo(video, { ...none, supadata: async () => latin }).catch((e) => e);
+      expect(err).toBeInstanceOf(NoLyricsError);
+      expect((err as NoLyricsError).attempts.at(-1)).toMatchObject({ source: "supadata", outcome: "low_quality" });
+    });
+
+    it("Supadata lỗi (hết credit...) → ghi lỗi, không có lời, không ném lỗi lạ", async () => {
+      const err = await getLyricsForVideo(video, { ...none, supadata: async () => { throw new Error("Supadata 402"); } }).catch((e) => e);
+      expect(err).toBeInstanceOf(NoLyricsError);
+      expect((err as NoLyricsError).attempts.at(-1)).toMatchObject({ source: "supadata", outcome: "error", detail: "Supadata 402" });
+    });
+  });
 });

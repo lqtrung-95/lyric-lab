@@ -5,6 +5,8 @@ import { getServerEnv } from "@/lib/env/server-env";
 import { COMMON_READING, lookupWords } from "@/lib/dictionary/lookup-words";
 import { LrclibProvider } from "@/lib/lyrics/lrclib-provider";
 import { NeteaseProvider } from "@/lib/lyrics/netease-provider";
+import { decideSupadataLyricsBudget, monthStartIso } from "@/lib/lyrics/supadata-lyrics-budget";
+import { fetchSupadataLines } from "@/lib/video/supadata-transcript";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { shiftLines } from "@/lib/listen/lyric-offset";
 import { MANUAL_VARIANTS } from "@/lib/text/to-simplified-chinese";
@@ -49,6 +51,18 @@ export function createChat(env: {
   return createChatRouter(groq, groqFallback, openrouter, deepseek, byteplus, gemini);
 }
 
+/**
+ * Lời bài hát qua Supadata (bước cuối khi mọi nguồn khác không có). Còn trong hạn mức tháng mới gọi; không đếm được số bài đã dùng thì coi như hết,
+ * để lỗi DB không thành đường đốt credit. Video không có phụ đề tiếng Trung thì trả rỗng.
+ */
+function createSupadataLyrics(sb: ReturnType<typeof createSupabaseServiceClient>, apiKey: string) {
+  return async (videoId: string) => {
+    const { count, error } = await sb.from("song_analyses").select("video_id", { count: "exact", head: true }).eq("lyrics_source", "supadata").gte("created_at", monthStartIso());
+    if (error || decideSupadataLyricsBudget(count ?? Infinity) === "exhausted") return [];
+    return (await fetchSupadataLines(videoId, apiKey, "zh")).lines;
+  };
+}
+
 /** Ghép mọi phụ thuộc thật (Supabase service role, Groq, YouTube, LRCLIB) cho pipeline. Chỉ dùng ở server. */
 export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): AnalyzeVideoDeps {
   const sb = createSupabaseServiceClient();
@@ -57,6 +71,7 @@ export function createAnalyzeDeps(onProgress?: (step: AnalyzeStep) => void): Ana
     captions: new YoutubeInnertubeCaptionProvider(),
     lrclib: new LrclibProvider(),
     netease: new NeteaseProvider(),
+    supadata: env.SUPADATA_API_KEY ? createSupadataLyrics(sb, env.SUPADATA_API_KEY) : undefined,
     cache: createSupabaseCacheDb(sb),
     chat: createChat(env),
     lookupDictionary: (terms) => lookupWords(sb as never, terms),

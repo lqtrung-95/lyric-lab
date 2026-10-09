@@ -1,3 +1,4 @@
+import type { CaptionLine } from "@/lib/captions/caption-provider-types";
 import { assessLyricQuality } from "@/lib/captions/assess-lyric-quality";
 import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
 import { cleanCaptionLines } from "@/lib/captions/clean-caption-lines";
@@ -18,6 +19,11 @@ export interface LyricsDeps {
   lrclib: LrclibSearch;
   /** Kho lời dự phòng thứ hai (sau LRCLIB), coverage nhạc Hoa rộng hơn. Không có thì bỏ qua bước này. */
   netease?: NeteaseSearch;
+  /**
+   * Phụ đề tiếng Trung có sẵn của video qua Supadata, thử SAU CÙNG khi mọi nguồn trên đều không có lời (tốn credit). Trả mảng rỗng khi video không có
+   * phụ đề hoặc hết hạn mức (nơi dựng hàm tự quyết định), ném lỗi khi gọi thất bại.
+   */
+  supadata?: (videoId: string) => Promise<CaptionLine[]>;
 }
 
 /** Lấy lời cho video: caption YouTube (chính chủ) trước, không được thì LRCLIB, cuối cùng NetEase. Không bao giờ để LLM sinh lời. */
@@ -35,7 +41,34 @@ export async function getLyricsForVideo(video: VideoMeta, deps: LyricsDeps): Pro
     if (fromNetease) return { ...fromNetease, source: "netease", attempts };
   }
 
+  if (deps.supadata) {
+    const fromSupadata = await trySupadata(video, deps.supadata, attempts);
+    if (fromSupadata) return { ...fromSupadata, source: "supadata", attempts };
+  }
+
   throw new NoLyricsError(attempts);
+}
+
+async function trySupadata(video: VideoMeta, fetchLines: (videoId: string) => Promise<CaptionLine[]>, attempts: LyricsAttempt[]) {
+  const source = "supadata" as const;
+  try {
+    const lines = cleanCaptionLines(await fetchLines(video.videoId));
+    if (lines.length === 0) {
+      attempts.push({ source, outcome: "no_data" });
+      return null;
+    }
+    const quality = assessLyricQuality(lines, video.durationSec);
+    const coverage = video.durationSec > 0 ? quality.coverageSec / video.durationSec : 1;
+    if (quality.verdict !== "ok" || coverage < MIN_CAPTION_COVERAGE) {
+      attempts.push({ source, outcome: "low_quality", detail: `han=${quality.hanLineRatio.toFixed(2)} coverage=${coverage.toFixed(2)} timing=${quality.timingIssue ?? "-"}` });
+      return null;
+    }
+    attempts.push({ source, outcome: "used" });
+    return { lines, script: quality.script };
+  } catch (e) {
+    attempts.push({ source, outcome: "error", detail: errMsg(e) });
+    return null;
+  }
 }
 
 async function tryCaption(video: VideoMeta, captions: CaptionProvider, attempts: LyricsAttempt[]) {

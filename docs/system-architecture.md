@@ -48,7 +48,7 @@ Stack: Next.js 16 (Turbopack), TypeScript strict, Tailwind v4, Supabase (Auth �
 
 ### Nguồn lời (không bao giờ do LLM sinh)
 
-Thứ tự trong `getLyricsForVideo`: **caption YouTube** (phải phủ ≥ 50% thời lượng và qua `assessLyricQuality`) → **LRCLIB** (`pickLrclibVersion` khớp theo thời lượng) → **NetEase** → `NoLyricsError`. Nguồn được ghi ở `song_analyses.lyrics_source` (`youtube_caption` | `lrclib` | `netease`).
+Thứ tự trong `getLyricsForVideo`: **caption YouTube** (phải phủ ≥ 50% thời lượng và qua `assessLyricQuality`) → **LRCLIB** (`pickLrclibVersion` khớp theo thời lượng) → **NetEase** → **Supadata** (`deps.supadata`, bước cuối, chỉ khi có `SUPADATA_API_KEY`: phụ đề tiếng Trung có sẵn của YouTube qua IP của Supadata, qua cùng bộ kiểm tra chất lượng và độ phủ ≥ 50%; tốn 1 credit mỗi bài nên chỉ chạy khi mọi nguồn khác không có lời) → `NoLyricsError`. Hạn mức `SUPADATA_SONGS_PER_MONTH` = 40 bài/tháng (`lib/lyrics/supadata-lyrics-budget.ts`, đếm `song_analyses.lyrics_source = 'supadata'` từ đầu tháng UTC; không đếm được thì coi như hết), chừa credit cho luồng thêm video. Nguồn được ghi ở `song_analyses.lyrics_source` (`youtube_caption` | `lrclib` | `netease` | `supadata`).
 
 ### Chuỗi model phân tích (`DEFAULT_MODELS`, `lib/analysis/analyze-lyrics.ts`)
 
