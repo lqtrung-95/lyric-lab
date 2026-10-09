@@ -6,12 +6,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
 import type { AdminTranslationReport } from "@/lib/video/translation-report-repo";
+import type { AdminVideoReport } from "@/lib/video/video-report-repo";
+import { VIDEO_REPORT_LABELS } from "@/lib/video/video-report-reasons";
 import type { AdminLessonDetail } from "@/lib/video/video-repo";
 import type { LessonLine, LessonStatus } from "@/lib/video/video-lesson-types";
 import { STATUS_LABEL, patchVideo } from "./video-admin-actions";
 import { VideoStatusButtons } from "./video-status-buttons";
 
-type AdminDetail = AdminLessonDetail & { reports?: AdminTranslationReport[] };
+type AdminDetail = AdminLessonDetail & { reports?: AdminTranslationReport[]; videoReports?: AdminVideoReport[] };
 
 const BADGE = "rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant";
 
@@ -102,6 +104,7 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
   const [lesson, setLesson] = useState<AdminDetail | null | "missing">(null);
   const [onlyMissing, setOnlyMissing] = useState(false);
   const [onlyReported, setOnlyReported] = useState(false);
+  const [dismissing, setDismissing] = useState<"idle" | "busy" | "error">("idle");
   const [translating, setTranslating] = useState<"idle" | "busy" | "error">("idle");
   const [translateNote, setTranslateNote] = useState<string | null>(null);
 
@@ -121,6 +124,14 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
     if (lesson && lesson !== "missing") for (const r of lesson.reports ?? []) map.set(r.lineIdx, [...(map.get(r.lineIdx) ?? []), r]);
     return map;
   }, [lesson]);
+
+  async function dismissReports() {
+    setDismissing("busy");
+    const ok = await patchVideo(videoId, { action: "dismiss_reports" });
+    if (!ok) { setDismissing("error"); return; }
+    setDismissing("idle");
+    setLesson((cur) => (cur && cur !== "missing" ? { ...cur, videoReports: (cur.videoReports ?? []).map((r) => ({ ...r, resolved: true })) } : cur));
+  }
 
   async function translateMissing() {
     setTranslating("busy");
@@ -146,6 +157,8 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
     setLesson({ ...lesson, lines: lesson.lines.map((l) => (l.idx === idx ? { ...l, translation, translationBy: translation ? ("admin" as const) : undefined } : l)) });
   const onRestored = (idx: number, translation: string) =>
     setLesson({ ...lesson, lines: lesson.lines.map((l) => (l.idx === idx ? { ...l, translation, translationBy: "admin" as const } : l)) });
+  const openVideoReports = (lesson.videoReports ?? []).filter((r) => !r.resolved);
+  const openByReason = openVideoReports.reduce<Record<string, number>>((acc, r) => ({ ...acc, [r.reason]: (acc[r.reason] ?? 0) + 1 }), {});
   const shown = lesson.lines.filter((l) => (!onlyMissing || !l.translation) && (!onlyReported || reportsByLine.has(l.idx)));
 
   return (
@@ -156,6 +169,21 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
         <p className="text-label-md text-on-surface-variant">{lesson.channelTitle} · {STATUS_LABEL[lesson.status]} · {lesson.lines.length} dòng · {missing} dòng thiếu bản dịch{reportsByLine.size > 0 ? ` · ${reportsByLine.size} dòng bị báo sai` : ""}</p>
       </div>
       <VideoStatusButtons videoId={videoId} status={lesson.status} onStatus={setStatus} onDeleted={() => router.replace("/admin/videos")} />
+      {openVideoReports.length > 0 && (
+        <section aria-label="Báo cáo video của người học" className="rounded-xl bg-error-container/40 p-space-sm">
+          <p className="text-label-md font-semibold text-on-error-container">{openVideoReports.length} báo cáo chưa xử lý từ người học</p>
+          <ul className="mt-1 flex flex-wrap gap-1.5">
+            {Object.entries(openByReason).map(([reason, n]) => <li key={reason} className={BADGE}>{VIDEO_REPORT_LABELS[reason as keyof typeof VIDEO_REPORT_LABELS]}: {n}</li>)}
+          </ul>
+          <p className="mt-1 text-label-sm text-on-surface-variant">Ẩn hoặc xóa video nếu đúng là có vấn đề. Nếu video ổn thì bỏ qua báo cáo (video đang ẩn vì bị báo thì bấm “Duyệt, hiện công khai” để hiện lại).</p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <button type="button" disabled={dismissing === "busy"} onClick={() => void dismissReports()} className="inline-flex min-h-11 items-center gap-1 rounded-full bg-surface-container-high px-4 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest disabled:opacity-50">
+              <Icon name="check" size={18} />{dismissing === "busy" ? "Đang xử lý…" : "Bỏ qua báo cáo"}
+            </button>
+            {dismissing === "error" && <span role="alert" className="text-label-md text-error">Chưa xử lý được, thử lại nhé.</span>}
+          </div>
+        </section>
+      )}
       {lesson.status === "listed" && <Link href={`/video/${videoId}`} className="text-label-md font-medium text-primary hover:underline">Mở trang xem như người dùng</Link>}
       {missing > 0 && (
         <div className="flex flex-wrap items-center gap-2">

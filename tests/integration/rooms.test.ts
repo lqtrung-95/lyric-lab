@@ -444,6 +444,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "push_subscriptions.user_id", // đăng ký theo thiết bị: app đăng ký lại endpoint với tài khoản hiện tại mỗi lần mở, nên tự gắn lại sau khi gộp
       "video_lessons.added_by", // on delete set null: video người dùng thêm là dữ liệu dùng chung nên giữ lại, chỉ mất liên kết người thêm (bộ đếm 3 video/ngày của tài khoản gộp có thể được đặt lại, trần chung 100 video/ngày vẫn chặn lạm dụng)
       "video_translation_reports.user_id", // on delete set null: báo cáo giữ lại cho quản trị, chỉ mất liên kết người báo
+      "video_reports.user_id", // on delete set null: báo cáo giữ lại cho quản trị, chỉ mất liên kết người báo
     ]);
     const { data, error } = await service.rpc("tables_referencing_users");
     expect(error).toBeNull();

@@ -3,6 +3,7 @@ import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { translateMissingLessonLines } from "@/lib/video/admin-translate-missing";
 import { listTranslationReports, restoreTranslationFromReport } from "@/lib/video/translation-report-repo";
+import { dismissOpenReports, listVideoReports } from "@/lib/video/video-report-repo";
 import { deleteLesson, editLessonTranslation, getLessonForAdmin, setLessonStatus } from "@/lib/video/video-repo";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
@@ -16,7 +17,7 @@ async function adminOr403() {
   return isAdminAccount(user?.email ?? null) ? null : Response.json({ error: "forbidden" }, { status: 403 });
 }
 
-/** GET → một video kèm toàn bộ dòng, mọi trạng thái, và các báo cáo bản dịch của nó (chỉ quản trị viên), để xem trước và rà bản dịch. */
+/** GET → một video kèm toàn bộ dòng, mọi trạng thái, báo cáo bản dịch từng dòng (`reports`) và báo cáo cả video của người học (`videoReports`) (chỉ quản trị viên). */
 export async function GET(_req: Request, { params }: { params: Promise<{ videoId: string }> }) {
   const denied = await adminOr403();
   if (denied) return denied;
@@ -24,7 +25,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ videoId
   if (!isValidVideoId(videoId)) return Response.json({ error: "not_found" }, { status: 404 });
   try {
     const lesson = await getLessonForAdmin(videoId);
-    return lesson ? Response.json({ ...lesson, reports: await listTranslationReports(videoId) }, { headers: { "Cache-Control": "private, no-store" } }) : Response.json({ error: "not_found" }, { status: 404 });
+    return lesson ? Response.json({ ...lesson, reports: await listTranslationReports(videoId), videoReports: await listVideoReports(videoId) }, { headers: { "Cache-Control": "private, no-store" } }) : Response.json({ error: "not_found" }, { status: 404 });
   } catch (error) {
     console.error(JSON.stringify({ event: "admin_video_error", message: (error as Error)?.message }));
     return Response.json({ error: "server_error" }, { status: 500 });
@@ -34,6 +35,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ videoId
 /**
  * PATCH { action: "list" | "hide" | "draft" } → đổi trạng thái (list = hiện cho người dùng, hide = ẩn, draft = về nháp).
  * PATCH { action: "edit_translation", idx, translation } → sửa bản dịch một dòng ("" = xóa bản dịch).
+ * PATCH { action: "dismiss_reports" } → bỏ qua mọi báo cáo cả video đang mở (admin đã xem, video ổn); trả {done, dismissed}.
  * PATCH { action: "translate_missing" } → dịch bù bằng AI các dòng còn trống của video; trả {done, translated, remaining}.
  * PATCH { action: "restore_translation", reportId } → trả bản dịch cũ của một báo cáo "AI đã dịch lại" (409 `unchanged` nếu dòng đã được sửa/khôi phục trước đó).
  * PATCH { action: "delete" } → xóa hẳn video (kèm cache nghĩa từ của nó).
@@ -57,6 +59,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
       const result = await editLessonTranslation(videoId, body.idx as number, body.translation);
       if (result === "invalid") return Response.json({ error: "invalid_translation" }, { status: 400 });
       found = result === "ok";
+    } else if (body?.action === "dismiss_reports") {
+      const dismissed = await dismissOpenReports(videoId);
+      return Response.json({ done: "dismiss_reports", dismissed });
     } else if (body?.action === "translate_missing") {
       const result = await translateMissingLessonLines(videoId);
       if (result === "not_found") return Response.json({ error: "not_found" }, { status: 404 });

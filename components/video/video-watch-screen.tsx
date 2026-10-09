@@ -15,6 +15,7 @@ import { useTermLookup } from "@/components/listen/use-term-lookup";
 import { usePlaybackSync } from "@/components/listen/use-playback-sync";
 import { ViewToggles } from "@/components/listen/view-toggles";
 import { WordPopover } from "@/components/listen/word-popover";
+import { ReportVideoButton } from "./report-video-button";
 import { VideoModeNav } from "./video-mode-nav";
 import { ShortcutsHelpButton } from "@/components/listen/shortcuts-help-button";
 import { useListenShortcuts } from "@/components/listen/use-listen-shortcuts";
@@ -141,6 +142,7 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-1">
+          <ReportVideoButton videoId={lesson.videoId} />
           <ShortcutsHelpButton />
           <VideoModeNav videoId={lesson.videoId} current="watch" />
           <ViewToggles

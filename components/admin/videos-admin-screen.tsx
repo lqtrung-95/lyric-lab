@@ -9,6 +9,8 @@ import { STATUS_LABEL } from "./video-admin-actions";
 import { VideoIngestPanel } from "./video-ingest-panel";
 import { VideoStatusButtons } from "./video-status-buttons";
 
+type AdminVideo = AdminLessonSummary & { openReportCount?: number };
+
 const BADGE: Record<LessonStatus, string> = {
   draft: "bg-surface-container-high text-on-surface-variant",
   listed: "bg-secondary-container text-on-secondary-container",
@@ -17,7 +19,7 @@ const BADGE: Record<LessonStatus, string> = {
 
 /** Quản lý video luyện nghe: duyệt bản nháp thành "đang hiện", ẩn hoặc xóa; bấm vào một video để xem bản chép và sửa bản dịch. */
 export function VideosAdminScreen() {
-  const [videos, setVideos] = useState<AdminLessonSummary[] | null | "error">(null);
+  const [videos, setVideos] = useState<AdminVideo[] | null | "error">(null);
 
   const [reload, setReload] = useState(0);
   const refresh = useCallback(() => setReload((n) => n + 1), []);
@@ -25,8 +27,9 @@ export function VideosAdminScreen() {
   useEffect(() => {
     let cancelled = false;
     fetch("/api/admin/videos", { cache: "no-store" })
-      .then(async (r) => (r.ok ? ((await r.json()) as { videos: AdminLessonSummary[] }).videos : Promise.reject(new Error("videos"))))
-      .then((v) => { if (!cancelled) setVideos(v); })
+      .then(async (r) => (r.ok ? ((await r.json()) as { videos: AdminVideo[] }).videos : Promise.reject(new Error("videos"))))
+      // Video đang bị người học báo xếp lên đầu để admin thấy ngay (giữ nguyên thứ tự cũ trong từng nhóm).
+      .then((v) => { if (!cancelled) setVideos([...v].sort((a, b) => Number((b.openReportCount ?? 0) > 0) - Number((a.openReportCount ?? 0) > 0))); })
       .catch(() => { if (!cancelled) setVideos("error"); });
     return () => { cancelled = true; };
   }, [reload]);
@@ -52,6 +55,7 @@ export function VideosAdminScreen() {
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0">
                   <Link href={`/admin/videos/${v.videoId}`} className="block truncate text-body-lg font-medium text-primary hover:underline">{v.title}</Link>
+                  {(v.openReportCount ?? 0) > 0 && <span className="mt-0.5 inline-block rounded-full bg-error px-2 py-0.5 text-label-sm font-semibold text-on-error">Bị báo {v.openReportCount} lần</span>}
                   <p className="text-label-md text-on-surface-variant">{v.channelTitle} · {Math.max(1, Math.round(v.durationSec / 60))} phút · {v.lineCount} dòng · dịch {v.translatedLineCount}/{v.lineCount}{v.levelAvg !== null && ` · HSK ~${v.levelAvg.toFixed(1)}`}</p>
                 </div>
                 <span className={`rounded-full px-3 py-0.5 text-label-md font-semibold ${BADGE[v.status]}`}>{STATUS_LABEL[v.status]}</span>

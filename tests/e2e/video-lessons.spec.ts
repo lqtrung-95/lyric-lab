@@ -366,6 +366,89 @@ test("quản trị video: dịch bù các dòng còn thiếu bằng AI rồi t�
   await expect(page.getByRole("button", { name: /Dịch .* dòng còn thiếu bằng AI/ })).toHaveCount(0);
 });
 
+test.describe("báo cả video sai", () => {
+  async function openMenu(page: Page, respond: { status?: number; json: unknown }) {
+    await mockVideoApis(page);
+    const bodies: unknown[] = [];
+    await page.route(`**/api/videos/${VIDEO_ID}/report`, (route) => {
+      bodies.push(route.request().postDataJSON());
+      return route.fulfill({ status: respond.status ?? 201, json: respond.json });
+    });
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`/video/${VIDEO_ID}`);
+    await page.getByRole("button", { name: "Báo video sai" }).click();
+    return bodies;
+  }
+
+  test("chọn lý do rồi gửi: cảm ơn, nút thay bằng lời cảm ơn", async ({ page }) => {
+    const bodies = await openMenu(page, { json: { ok: true } });
+    const group = page.getByRole("group", { name: "Lý do báo video sai" });
+    for (const label of ["Phụ đề tiếng Trung sai hoặc lệch", "Bản dịch sai nhiều", "Không phải tiếng Trung", "Nội dung không phù hợp"]) await expect(group.getByRole("button", { name: label })).toBeVisible();
+    await noViolations(page);
+    await group.getByRole("button", { name: "Nội dung không phù hợp" }).click();
+    await expect(page.getByText("Cảm ơn bạn đã báo")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Báo video sai" })).toHaveCount(0);
+    expect(bodies).toEqual([{ reason: "inappropriate" }]);
+  });
+
+  test("báo quá nhiều trong ngày thì báo rõ và vẫn thử lại được", async ({ page }) => {
+    await openMenu(page, { status: 429, json: { error: "user_limit" } });
+    await page.getByRole("button", { name: "Bản dịch sai nhiều" }).click();
+    await expect(page.getByRole("alert").filter({ hasText: "Hôm nay bạn đã báo nhiều rồi" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Báo video sai" })).toBeVisible();
+  });
+
+  test("Esc đóng danh sách lý do", async ({ page }) => {
+    await openMenu(page, { json: { ok: true } });
+    await expect(page.getByRole("group", { name: "Lý do báo video sai" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("group", { name: "Lý do báo video sai" })).toHaveCount(0);
+  });
+});
+
+test("API báo video từ chối khi chưa có phiên hoặc dữ liệu sai", async ({ request }) => {
+  const res = await request.post(`/api/videos/${VIDEO_ID}/report`, { data: { reason: "khong-hop-le" } });
+  expect([400, 401]).toContain(res.status());
+  expect((await res.json()).error).toBeTruthy();
+});
+
+test("quản trị video: video bị báo xếp lên đầu danh sách kèm số lần bị báo", async ({ page }) => {
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  const other = { ...adminSummary, videoId: "zZzZzZzZzZz", title: "Video khác", openReportCount: 0 };
+  await page.route("**/api/admin/videos", (route) => route.fulfill({ json: { videos: [other, { ...adminSummary, status: "hidden", openReportCount: 3 }] } }));
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/admin/videos");
+  await expect(page.getByText("Bị báo 3 lần")).toBeVisible();
+  await expect(page.getByRole("listitem").filter({ has: page.getByRole("link") }).first()).toContainText("Cuộc trò chuyện mẫu");
+  await expect(page.getByText(/Bị báo 0 lần/)).toHaveCount(0);
+});
+
+test("quản trị video: xem báo cáo của người học theo lý do và bỏ qua báo cáo", async ({ page }) => {
+  const patches: unknown[] = [];
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route(`**/api/admin/videos/${VIDEO_ID}`, (route) => {
+    if (route.request().method() === "PATCH") { patches.push(route.request().postDataJSON()); return route.fulfill({ json: { done: "dismiss_reports", dismissed: 3 } }); }
+    const videoReports = [
+      { id: 1, reason: "inappropriate", createdAt: "2026-10-10T01:00:00Z", resolved: false },
+      { id: 2, reason: "inappropriate", createdAt: "2026-10-10T01:05:00Z", resolved: false },
+      { id: 3, reason: "not_chinese", createdAt: "2026-10-10T01:10:00Z", resolved: false },
+      { id: 4, reason: "wrong_translation", createdAt: "2026-10-09T01:10:00Z", resolved: true },
+    ];
+    return route.fulfill({ json: { ...adminSummary, status: "hidden", lines: lesson.lines.map((l) => ({ ...l })), reports: [], videoReports } });
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/admin/videos/${VIDEO_ID}`);
+  const section = page.getByRole("region", { name: "Báo cáo video của người học" });
+  await expect(section.getByText("3 báo cáo chưa xử lý từ người học")).toBeVisible();
+  await expect(section.getByText("Nội dung không phù hợp: 2")).toBeVisible();
+  await expect(section.getByText("Không phải tiếng Trung: 1")).toBeVisible();
+  await expect(section.getByText(/Bản dịch sai nhiều/)).toHaveCount(0); // báo cáo đã xử lý không tính
+  await noViolations(page);
+  await section.getByRole("button", { name: "Bỏ qua báo cáo" }).click();
+  await expect(section).toHaveCount(0);
+  expect(patches).toEqual([{ action: "dismiss_reports" }]);
+});
+
 // ---- Luyện nói theo (shadowing) ----
 const FAKE_MIC = `navigator.mediaDevices.getUserMedia = async function () { return { getTracks: function () { return [{ stop: function () {} }]; } }; };
 window.MediaRecorder = class { constructor() { this.mimeType = 'audio/webm'; }
