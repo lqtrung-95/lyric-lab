@@ -76,6 +76,8 @@ export function LineShareDialog({ card, shareUrl, onClose }: { card: Omit<LineCa
     }
   }
 
+  // Nút phụ ở bản máy tính: cùng kiểu chữ và màu nền với lưới nút mạng xã hội bên dưới (`SocialShareButtons`) để cả popup đồng nhất.
+  const desktopBtn = "inline-flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-surface-container px-3 text-label-md font-medium text-on-surface hover:bg-surface-container-high";
   const btn = "inline-flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-label-md font-semibold";
   return (
     <dialog
@@ -102,8 +104,8 @@ export function LineShareDialog({ card, shareUrl, onClose }: { card: Omit<LineCa
         {desktop ? (
           <>
             <div className="flex gap-2">
-              <button type="button" onClick={download} disabled={!previewUrl} className={`${btn} bg-surface-container-high text-on-surface disabled:opacity-50`}>Tải ảnh</button>
-              <button type="button" onClick={() => void copyImage()} disabled={!previewUrl} className={`${btn} bg-surface-container-high text-on-surface disabled:opacity-50`}>
+              <button type="button" onClick={download} disabled={!previewUrl} className={`${desktopBtn} disabled:opacity-50`}>Tải ảnh</button>
+              <button type="button" onClick={() => void copyImage()} disabled={!previewUrl} className={`${desktopBtn} disabled:opacity-50`}>
                 <Icon name={imageCopied ? "check" : "content_copy"} size={18} />
                 {imageCopied ? "Đã sao chép ảnh" : "Sao chép ảnh"}
               </button>
