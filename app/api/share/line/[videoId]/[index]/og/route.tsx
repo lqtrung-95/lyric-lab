@@ -20,7 +20,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ videoId: strin
     if (!analysis || !line) return fallback();
     const res = await renderLineOgImage({
       han: line.text, pinyin: line.pinyin, translation: line.translation,
-      title: analysis.track?.title ?? song?.title ?? "", artist: analysis.track?.artist ?? song?.channelTitle,
+      title: analysis.track?.title ?? song?.title ?? "", artist: analysis.track?.artist ?? song?.channelTitle, videoId,
     });
     for (const [k, v] of Object.entries(headers)) res.headers.set(k, v);
     return res;

@@ -3,6 +3,7 @@ import path from "node:path";
 import { ImageResponse } from "next/og";
 import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
 import { MARKETING_OG_SIZE } from "./marketing-og-image";
+import { fetchOgThumbnail } from "./og-thumbnail";
 
 const PRIMARY = "#b03a2e";
 const INK = "#1c1611";
@@ -10,17 +11,6 @@ const MUTED = "#5c5147";
 const HAN = /[㐀-鿿]/g;
 
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
-
-/** Ảnh bìa YouTube của video (đã hiện sẵn trong app). Lỗi mạng hay hết giờ thì bỏ ảnh, thẻ vẫn dựng được chỉ với chữ. */
-async function fetchThumbnail(videoId: string): Promise<string | null> {
-  try {
-    const res = await fetch(`https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`, { signal: AbortSignal.timeout(4000) });
-    if (!res.ok) return null;
-    return `data:image/jpeg;base64,${Buffer.from(await res.arrayBuffer()).toString("base64")}`;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Ảnh xem trước khi dán link một bài học (og:image, twitter:image): ảnh bìa video + tên bài + nghệ sĩ + thương hiệu SongHanzi. Chỉ có thông tin bài,
@@ -33,7 +23,7 @@ export async function renderSongOgImage({ videoId, title, artist }: { videoId: s
   const [fonts, cjk, thumb, mark] = await Promise.all([
     loadOgFonts().catch(() => []),
     hanChars ? loadCjkGlyphFont(hanChars).then((f) => [f]).catch(() => []) : Promise.resolve([]),
-    fetchThumbnail(videoId),
+    fetchOgThumbnail(videoId, "hqdefault"),
     readFile(path.join(process.cwd(), "public", "songhanzi-mark-light.png")),
   ]);
   const markUrl = `data:image/png;base64,${mark.toString("base64")}`;

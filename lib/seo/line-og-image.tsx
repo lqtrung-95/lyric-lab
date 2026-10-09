@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { balancedWrapText } from "@/lib/share/wrap-text";
 import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
 import { MARKETING_OG_SIZE } from "./marketing-og-image";
+import { fetchOgThumbnail } from "./og-thumbnail";
 
 const PRIMARY = "#b03a2e";
 const SECONDARY = "#2e6b5e";
@@ -18,6 +19,8 @@ export interface LineOgData {
   translation?: string;
   title: string;
   artist?: string;
+  /** Có thì đặt ảnh bìa video cạnh tên bài ở chân ảnh (lỗi tải ảnh thì bỏ, ảnh vẫn dựng được). */
+  videoId?: string;
 }
 
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
@@ -37,7 +40,10 @@ function lines(text: string, size: number, unit: "char" | "word"): string[] {
  * Ba khối cách nhau đều nhau, mỗi khối ngắt dòng cân bằng và cả cụm căn giữa theo chiều dọc.
  */
 export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
-  // Vùng chữ giữa phần đầu và chân ảnh cao ~410px. Câu dài thì thu nhỏ cả ba khối cùng tỉ lệ cho tới khi vừa (không để chữ tràn lên tên bài/xuống chân ảnh).
+  const thumb = d.videoId ? await fetchOgThumbnail(d.videoId) : null;
+  // Vùng chữ giữa cao ~410px; có ảnh bìa ở chân thì còn ~330px.
+  const maxHeight = thumb ? 330 : 410;
+  // Câu dài thì thu nhỏ cả ba khối cùng tỉ lệ cho tới khi vừa (không để chữ tràn lên tên bài/xuống chân ảnh).
   const baseHan = d.han.length > 22 ? 62 : d.han.length > 12 ? 76 : 92;
   const layoutAt = (k: number) => {
     const hanSize = Math.round(baseHan * k), pinyinSize = Math.round(34 * k), translationSize = Math.round(40 * k);
@@ -48,7 +54,7 @@ export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
     const height = han.length * hanSize * 1.3 + pinyin.length * pinyinSize * 1.4 + translation.length * translationSize * 1.4 + gaps;
     return { hanSize, pinyinSize, translationSize, han, pinyin, translation, height };
   };
-  const layout = [1, 0.88, 0.78, 0.7, 0.62].map(layoutAt).find((l) => l.height <= 410) ?? layoutAt(0.55);
+  const layout = [1, 0.88, 0.78, 0.7, 0.62].map(layoutAt).find((l) => l.height <= maxHeight) ?? layoutAt(0.55);
   const { hanSize, pinyinSize, translationSize } = layout;
   const hanLines = layout.han, pinyinLines = layout.pinyin, translationLines = layout.translation;
   const meta = [clip(d.title, 46), d.artist ? clip(d.artist, 26) : ""].filter(Boolean).join(" · ");
@@ -67,14 +73,25 @@ export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
         <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "40px 88px 44px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", fontSize: 38, fontWeight: 700, fontFamily: "serif-bold", color: INK }}>SongHanzi</div>
-            <div style={{ display: "flex", fontSize: 26, color: MUTED, fontFamily: "sans, serif-cjk" }}>{meta}</div>
+            {!thumb && <div style={{ display: "flex", fontSize: 26, color: MUTED, fontFamily: "sans, serif-cjk" }}>{meta}</div>}
           </div>
           <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center" }}>
             {block(hanLines, { fontSize: hanSize, fontWeight: 700, fontFamily: "serif-bold, serif-cjk", color: INK, lineHeight: 1.3 })}
             {pinyinLines.length > 0 && block(pinyinLines, { marginTop: 30, fontSize: pinyinSize, fontFamily: "sans", color: PRIMARY, lineHeight: 1.4 })}
             {translationLines.length > 0 && block(translationLines, { marginTop: 30, fontSize: translationSize, fontFamily: "sans", color: MUTED, lineHeight: 1.4 })}
           </div>
-          <div style={{ display: "flex", fontSize: 28, color: MUTED, fontFamily: "sans" }}>Học tiếng Trung qua bài hát · songhanzi.com</div>
+          {thumb ? (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
+              <img src={thumb} width={208} height={117} alt="" style={{ borderRadius: 16, objectFit: "cover", boxShadow: "0 8px 24px rgba(28, 22, 17, 0.25)" }} />
+              <div style={{ display: "flex", flexDirection: "column", marginLeft: 28, flex: 1 }}>
+                <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: INK, fontFamily: "sans, serif-cjk", lineHeight: 1.3 }}>{meta}</div>
+                <div style={{ display: "flex", marginTop: 6, fontSize: 26, color: MUTED, fontFamily: "sans" }}>Học tiếng Trung qua bài hát · songhanzi.com</div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", fontSize: 28, color: MUTED, fontFamily: "sans" }}>Học tiếng Trung qua bài hát · songhanzi.com</div>
+          )}
         </div>
       </div>
     ),
