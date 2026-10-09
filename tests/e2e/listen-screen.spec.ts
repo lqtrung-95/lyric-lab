@@ -142,12 +142,19 @@ test("lặp câu: cấu hình đúng số lần, hết lượt thì tự tắt v
   expect((await calls(page)).filter((c) => c === "seek:5")).toHaveLength(1);
 });
 
-test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", async ({ page }) => {
-  // Nút tốc độ là 1 nút xoay vòng (nhãn = tốc độ hiện tại), không phải 3 nút rời: [0.5, 0.75, 1] → bấm 2 lần từ
-  // mặc định 1x mới tới 0,75x.
+test("tốc độ nhanh 1,25x / 1,5x / 2x được áp dụng, xoay vòng về 0,5x rồi 0,75x", async ({ page }) => {
   const rateBtn = page.getByRole("button", { name: /^Tốc độ/ });
-  await rateBtn.click();
-  await rateBtn.click();
+  for (const [label, rate] of [["1,25x", "1.25"], ["1,5x", "1.5"], ["2x", "2"], ["0,5x", "0.5"]]) {
+    await rateBtn.click();
+    await expect(rateBtn).toHaveText(label);
+    await expect.poll(() => calls(page)).toContain(`rate:${rate}`);
+  }
+});
+
+test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", async ({ page }) => {
+  // Nút tốc độ là 1 nút xoay vòng (nhãn = tốc độ hiện tại): [0.5, 0.75, 1, 1.25, 1.5, 2] → từ mặc định 1x bấm 5 lần mới tới 0,75x.
+  const rateBtn = page.getByRole("button", { name: /^Tốc độ/ });
+  for (let i = 0; i < 5; i++) await rateBtn.click();
   await expect(rateBtn).toHaveText("0,75x");
   await expect.poll(() => calls(page)).toContain("rate:0.75");
   await page.reload();

@@ -1,6 +1,6 @@
 // Tùy chọn màn Nghe, nhớ cho lần sau (LS-03).
 export const LISTEN_PREFS_KEY = "lyric-lab-listen-prefs";
-export const PLAYBACK_RATES = [0.5, 0.75, 1] as const;
+export const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 2] as const;
 
 export const PLAYER_SIZES = ["large", "medium", "small"] as const;
 export type PlayerSize = (typeof PLAYER_SIZES)[number];
