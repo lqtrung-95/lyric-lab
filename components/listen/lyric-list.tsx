@@ -7,6 +7,7 @@ import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-r
 import { useIsAdmin } from "@/components/library/use-is-admin";
 import { LineEditDialog } from "./line-edit-dialog";
 import { LineShareDialog } from "@/components/share/line-share-dialog";
+import { SITE_URL } from "@/lib/seo/site-url";
 import { ViewToggles } from "./view-toggles";
 
 // Sau khi người dùng tự cuộn, tạm ngừng tự cuộn theo lời để không giật màn hình.
@@ -151,7 +152,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
           );
         })}
       </ol>
-      {shareCard && <LineShareDialog card={shareCard} onClose={() => setSharing(null)} />}
+      {shareCard && <LineShareDialog card={shareCard} shareUrl={`${SITE_URL}/learn/${videoId}`} onClose={() => setSharing(null)} />}
       {editedLine && <LineEditDialog videoId={videoId} line={editedLine} onClose={() => setEditing(null)} />}
     </div>
   );

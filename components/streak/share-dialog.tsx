@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { socialNetworks } from "@/lib/share/social-networks";
+import { SocialShareButtons } from "@/components/share/social-share-buttons";
 import { renderShareCard } from "@/lib/streak/share-card";
 import type { StreakData } from "@/lib/streak/load-streak";
 
@@ -21,7 +22,6 @@ export function ShareDialog({ streak, onClose }: { streak: Pick<StreakData, "cur
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -50,12 +50,6 @@ export function ShareDialog({ streak, onClose }: { streak: Pick<StreakData, "cur
     // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ tạo 1 lần lúc mở, không theo dõi thay đổi streak giữa chừng.
   }, []);
 
-  async function copyLink() {
-    if (!shareUrl) return;
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={onClose}>
       <div
@@ -83,24 +77,9 @@ export function ShareDialog({ streak, onClose }: { streak: Pick<StreakData, "cur
           <p role="alert" className="mt-3 text-label-md text-error">{error}</p>
         ) : (
           <>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {NETWORKS.map((n) => (
-                <a
-                  key={n.label} href={shareUrl ? n.href(shareUrl) : undefined} target="_blank" rel="noopener noreferrer"
-                  aria-disabled={!shareUrl}
-                  className="inline-flex min-h-11 flex-1 basis-[calc(33%-6px)] items-center justify-center rounded-full bg-surface-container px-3 text-label-md font-medium text-on-surface hover:bg-surface-container-high aria-disabled:pointer-events-none aria-disabled:opacity-50"
-                >
-                  {n.label}
-                </a>
-              ))}
+            <div className="mt-3">
+              <SocialShareButtons networks={NETWORKS} url={shareUrl} />
             </div>
-            <button
-              type="button" onClick={() => void copyLink()} disabled={!shareUrl}
-              className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-surface-container px-4 text-label-md font-medium text-on-surface hover:bg-surface-container-high disabled:opacity-50"
-            >
-              <Icon name={copied ? "check" : "content_copy"} size={18} />
-              {copied ? "Đã sao chép" : "Sao chép link"}
-            </button>
           </>
         )}
       </div>

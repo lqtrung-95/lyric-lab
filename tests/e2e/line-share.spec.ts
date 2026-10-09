@@ -33,6 +33,25 @@ test.describe("máy tính", () => {
     const [download] = await Promise.all([page.waitForEvent("download"), dialog.getByRole("button", { name: "Tải ảnh" }).click()]);
     expect(download.suggestedFilename()).toBe("songhanzi-cau-hat.png");
   });
+
+  test("popup có nút các mạng xã hội và sao chép link tới bài (link không chứa lời), không có nút Chia sẻ của hệ điều hành", async ({ page }) => {
+    await page.addInitScript(() => { navigator.canShare = () => true; });
+    await openFixture(page);
+    const row = page.locator('[data-line-index="0"]');
+    await row.evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await row.hover();
+    await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
+    await expect(dialog.getByRole("img")).toBeVisible();
+    for (const name of ["Facebook", "X", "Zalo", "Telegram", "Threads"]) await expect(dialog.getByRole("link", { name, exact: true })).toBeVisible();
+    const facebook = await dialog.getByRole("link", { name: "Facebook" }).getAttribute("href");
+    expect(decodeURIComponent(facebook!)).toMatch(/\/learn\/[^/]+$/);
+    await expect(dialog.getByRole("button", { name: "Sao chép link" })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Sao chép ảnh" })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Chia sẻ", exact: true })).toHaveCount(0);
+    await dialog.getByRole("button", { name: "Đóng" }).click();
+    await expect(dialog).toHaveCount(0);
+  });
 });
 
 test.describe("điện thoại Android", () => {
@@ -50,6 +69,7 @@ test.describe("điện thoại Android", () => {
     await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
     const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
     await expect(dialog.getByRole("img")).toBeVisible();
+    await expect(dialog.getByRole("link", { name: "Facebook" })).toHaveCount(0); // điện thoại dùng share sheet, không có lưới mạng xã hội
     expect(await page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared.length)).toBe(0);
     await dialog.getByRole("button", { name: "Chia sẻ" }).click();
     await expect.poll(() => page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared.length)).toBe(1);
