@@ -5,27 +5,53 @@ import { BOOKMARKLET_SOURCE, buildBookmarklet, decodeBookmarkletHash } from "./b
 interface Opts {
   search?: string;
   hostname?: string;
-  /** Chữ của bảng bản chép lời khi đã mở. */
+  /** Chữ của khung bản chép lời (theo target-id) khi đã mở. */
   panelText?: string | null;
+  /** Các dòng bản chép lời (khung "In this video" mới không có target-id chứa "transcript"). */
+  segments?: string[];
   /** Nút "Hiện bản chép lời" có trong trang; bấm vào thì bảng mở ra với `panelText`. */
   hasTranscriptButton?: boolean;
+  /** Hai thẻ cạnh nhau (thẻ đầu là mục lục, thẻ sau là bản chép lời): bấm thẻ sau thì các dòng `segments` mới hiện. */
+  hasTranscriptTab?: boolean;
+  /** Giao diện YouTube ở ngôn ngữ mà bookmarklet không có trong danh sách chữ: phải tìm theo cấu trúc trang, không theo chữ. */
+  foreignUi?: boolean;
+  /** window.open bị trình duyệt chặn (trả null). */
+  popupBlocked?: boolean;
 }
 
 function run(opts: Opts) {
   const opened: string[] = [];
   const alerts: string[] = [];
   const clicks: string[] = [];
+  const messages: string[] = [];
   let panelOpen = !opts.hasTranscriptButton && opts.panelText != null;
-  const button = { getAttribute: () => "Show transcript", innerText: "", click: () => { clicks.push("transcript"); panelOpen = opts.panelText != null; } };
-  const doc = {
-    // YouTube có hai bảng cùng target-id (một ẩn, một mở): bảng ẩn chữ ngắn, bookmarklet phải chọn bảng có mốc giờ.
-    querySelectorAll: (sel: string) => (sel.includes("target-id") ? [{ innerText: "Trong video này" }, ...(panelOpen ? [{ innerText: opts.panelText }] : [])] : opts.hasTranscriptButton ? [button] : []),
-    querySelector: () => ({ click: () => { clicks.push("expand"); } }),
+  let segmentsShown = !opts.hasTranscriptTab && (opts.segments?.length ?? 0) > 0;
+  const element = (name: string, onClick?: () => void) => ({ getAttribute: () => name, innerText: name, click: () => { clicks.push(name); onClick?.(); } });
+  const button = element(opts.foreignUi ? "แสดงข้อความถอดเสียง" : "Show transcript", () => { panelOpen = opts.panelText != null; });
+  const timelineTab = element(opts.foreignUi ? "ไทม์ไลน์" : "Timeline");
+  const transcriptTab = element(opts.foreignUi ? "ข้อความถอดเสียง" : "Transcript", () => { segmentsShown = true; });
+  const toast = {
+    style: { cssText: "" },
+    appendChild: (child: { href?: string }) => { if (child.href) messages.push(`link:${child.href.slice(0, 40)}`); },
+    remove: () => { messages.push("hidden"); },
+    set textContent(v: string) { messages.push(v); },
   };
-  const win = { open: (u: string) => { opened.push(u); } };
+  const doc = {
+    body: { appendChild: () => undefined },
+    createElement: () => (toast.style = { cssText: "" }, { ...toast, style: toast.style, set textContent(v: string) { messages.push(v); }, href: "", target: "" }),
+    querySelectorAll: (sel: string) => {
+      if (sel.includes("target-id")) return [{ innerText: "Trong video này" }, ...(panelOpen ? [{ innerText: opts.panelText }] : [])];
+      if (sel.startsWith("ytd-transcript-segment")) return segmentsShown ? (opts.segments ?? []).map((innerText) => ({ innerText })) : [];
+      if (sel.includes("yt-chip-cloud-chip-renderer")) return opts.hasTranscriptTab ? [timelineTab, transcriptTab] : [];
+      if (sel.startsWith("ytd-engagement-panel")) return [];
+      return opts.hasTranscriptButton && !opts.foreignUi ? [button] : []; // quét theo chữ chỉ tìm thấy nút khi giao diện là ngôn ngữ đã biết
+    },
+    querySelector: (sel: string) => (sel.includes("transcript-section") ? (opts.hasTranscriptButton ? button : null) : { click: () => { clicks.push("expand"); } }),
+  };
+  const win = { open: (u: string) => { opened.push(u); return opts.popupBlocked ? null : {}; } };
   const fn = new Function("location", "document", "window", "alert", "btoa", "unescape", `return ${BOOKMARKLET_SOURCE}("https://songhanzi.test");`);
   fn({ search: opts.search ?? "?v=abcdefghijk", hostname: opts.hostname ?? "www.youtube.com" }, doc, win, (m: string) => alerts.push(m), (s: string) => Buffer.from(s, "binary").toString("base64"), unescape);
-  return { opened, alerts, clicks };
+  return { opened, alerts, clicks, messages };
 }
 const payloadOf = (url: string) => decodeBookmarkletHash(url.split("/video/add")[1]);
 const PANEL = "0:00\n大家好\n0:05\n欢迎收听我们的节目";
@@ -42,12 +68,51 @@ describe("bookmarklet", () => {
     expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
   });
 
+  it("khung 'In this video' mới (không có target-id chứa transcript): ghép từ các dòng bản chép lời", () => {
+    const { opened, alerts } = run({ segments: ["0:00\n这么难得的好天气里", "0:24\n如果我找不到我就回来这里"] });
+    expect(alerts).toEqual([]);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: "0:00\n这么难得的好天气里\n0:24\n如果我找不到我就回来这里" });
+  });
+
+  it("đang ở thẻ Timeline thì tự bấm thẻ Transcript rồi đọc", async () => {
+    const { opened, alerts, clicks } = run({ segments: ["0:00\n这么难得的好天气里", "0:24\n如果我找不到我就回来这里"], hasTranscriptTab: true });
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(alerts).toEqual([]);
+    expect(clicks).toEqual(["expand", "Timeline", "Transcript"]); // thử lần lượt từng thẻ cho tới khi các dòng bản chép lời hiện ra
+    expect(payloadOf(opened[0])?.t).toContain("这么难得的好天气里");
+  });
+
   it("bảng chưa mở: tự mở rộng mô tả, bấm Hiện bản chép lời, chờ tải rồi gửi", async () => {
     const { opened, alerts, clicks } = run({ panelText: PANEL, hasTranscriptButton: true });
     await vi.advanceTimersByTimeAsync(2000);
     expect(alerts).toEqual([]);
-    expect(clicks).toEqual(["expand", "transcript"]);
+    expect(clicks).toEqual(["expand", "Show transcript"]);
     expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
+  });
+
+  it("giao diện YouTube ở ngôn ngữ lạ: vẫn mở được bản chép lời và chọn đúng thẻ (tìm theo cấu trúc, không theo chữ)", async () => {
+    const viaButton = run({ panelText: PANEL, hasTranscriptButton: true, foreignUi: true });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(viaButton.clicks).toEqual(["expand", "แสดงข้อความถอดเสียง"]);
+    expect(payloadOf(viaButton.opened[0])?.t).toBe(PANEL);
+    const viaTab = run({ segments: ["0:00\n这么难得的好天气里", "0:24\n如果我找不到我就回来这里"], hasTranscriptTab: true, foreignUi: true });
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(viaTab.clicks).toEqual(["expand", "ไทม์ไลน์", "ข้อความถอดเสียง"]);
+    expect(payloadOf(viaTab.opened[0])?.t).toContain("这么难得的好天气里");
+  });
+
+  it("có thông báo tiến trình ngay trên trang trong lúc chờ, và gỡ đi khi xong", async () => {
+    const { messages } = run({ panelText: PANEL, hasTranscriptButton: true });
+    expect(messages[0]).toContain("đang đọc bản chép lời");
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(messages.some((m) => m.includes("đang mở SongHanzi"))).toBe(true);
+    expect(messages).toContain("hidden");
+  });
+
+  it("trình duyệt chặn cửa sổ mới thì hiện liên kết để người dùng tự bấm mở", async () => {
+    const { messages, opened } = run({ panelText: PANEL, popupBlocked: true });
+    expect(opened).toHaveLength(1);
+    expect(messages.some((m) => m.startsWith("link:https://songhanzi.test/video/add#d="))).toBe(true);
   });
 
   it("bản chép lời không phải tiếng Trung thì báo đổi ngôn ngữ, không mở gì", async () => {
@@ -57,13 +122,11 @@ describe("bookmarklet", () => {
     expect(alerts[0]).toContain("không phải tiếng Trung");
   });
 
-  it("không có nút bản chép lời hoặc bảng không tải thì báo cách xử lý", async () => {
-    const noButton = run({ panelText: null });
-    await vi.advanceTimersByTimeAsync(2000);
-    expect(noButton.alerts[0]).toContain("không có bản chép lời");
+  it("bảng không tải thì báo cách xử lý kèm mã lỗi để hỗ trợ", async () => {
     const neverLoads = run({ panelText: null, hasTranscriptButton: true });
-    await vi.advanceTimersByTimeAsync(10_000);
+    await vi.advanceTimersByTimeAsync(12_000);
     expect(neverLoads.alerts[0]).toContain("chưa tải được");
+    expect(neverLoads.alerts[0]).toContain("mã lỗi");
     expect(neverLoads.opened).toEqual([]);
   });
 

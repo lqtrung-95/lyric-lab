@@ -82,15 +82,29 @@ test("báo rõ khi đã hết lượt trong ngày", async ({ page }) => {
   await expect(page.getByRole("alert").filter({ hasText: "đã thêm đủ 3 video" })).toBeVisible();
 });
 
-test("dấu trang gửi bản chép lời qua #: điền sẵn link và phụ đề", async ({ page }) => {
-  const bodies = await mockAdd(page, { json: { kind: "exists", videoId: VIDEO_ID } });
+test("dấu trang gửi bản chép lời qua #: điền sẵn, tự gửi luôn và hiện trạng thái đang xử lý trong lúc chờ", async ({ page }) => {
+  const bodies: Record<string, unknown>[] = [];
+  await page.route("**/api/videos/*", (route) => route.fulfill({ status: 404, json: { error: "not_found" } }));
+  await page.route("**/api/videos/add", async (route) => {
+    bodies.push(route.request().postDataJSON());
+    await new Promise((r) => setTimeout(r, 800)); // đủ lâu để thấy trạng thái chờ
+    await route.fulfill({ json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
+  });
   await page.goto(`/video/add${hashOf({ v: VIDEO_ID, t: "0:00\n大家好\n0:05\n欢迎收听" })}`);
   await expect(page.getByLabel("Link video YouTube")).toHaveValue(VIDEO_ID);
-  await expect(page.getByRole("status").filter({ hasText: "Đã nhận bản chép lời" })).toBeVisible();
-  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toHaveValue("0:00\n大家好\n0:05\n欢迎收听");
-  await page.getByRole("button", { name: "Thêm video" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Đang xử lý video" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Đang đọc phụ đề và dịch/ })).toBeDisabled();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
-  expect(bodies[0]).toMatchObject({ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听" });
+  expect(bodies).toEqual([{ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听" }]); // gửi đúng một lần
+});
+
+test("dấu trang gửi bản chép lời nhưng server báo lỗi: hiện lỗi, giữ phụ đề đã nhận, không tự gửi lại", async ({ page }) => {
+  const bodies = await mockAdd(page, { status: 422, json: { error: "not_chinese" } });
+  await page.goto(`/video/add${hashOf({ v: VIDEO_ID, t: "0:00\nHello\n0:05\nWelcome to the show" })}`);
+  await expect(page.getByRole("alert").filter({ hasText: "không phải tiếng Trung" })).toBeVisible();
+  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toHaveValue("0:00\nHello\n0:05\nWelcome to the show");
+  await page.waitForTimeout(500);
+  expect(bodies).toHaveLength(1);
 });
 
 test("từ trang Video có lối vào Thêm video của bạn", async ({ page }) => {
