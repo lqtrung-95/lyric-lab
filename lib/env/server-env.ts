@@ -22,7 +22,7 @@ const serverEnvSchema = z.object({
   YOUTUBE_DATA_API_KEY: z.string().min(1),
   // Khóa Google AI Studio (Gemini API), nhiều khóa ngăn cách bằng dấu phẩy hoặc xuống dòng: dùng đầu tiên cho giải nghĩa từ/câu khi bấm và dịch lại dòng video bị báo sai.
   GEMINI_API_KEYS: z.string().min(1).optional(),
-  // Đổi model Gemini (mặc định gemini-2.5-flash-lite), xem lib/analysis/gemini-models.ts.
+  // Đổi model Gemini (mặc định gemini-flash-lite-latest), xem lib/analysis/gemini-models.ts.
   GEMINI_MODEL: z.string().min(1).optional(),
   // Dịch vụ lấy phụ đề tiếng Trung của video YouTube (Supadata) cho người dùng dán link mà không có phụ đề đi kèm. Bỏ trống thì chỉ nhận phụ đề dán vào/bookmarklet.
   SUPADATA_API_KEY: z.string().min(1).optional(),
