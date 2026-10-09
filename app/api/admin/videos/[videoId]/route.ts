@@ -1,12 +1,15 @@
 import { revalidatePath } from "next/cache";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { translateMissingLessonLines } from "@/lib/video/admin-translate-missing";
 import { listTranslationReports, restoreTranslationFromReport } from "@/lib/video/translation-report-repo";
 import { deleteLesson, editLessonTranslation, getLessonForAdmin, setLessonStatus } from "@/lib/video/video-repo";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// Dịch bù bằng AI cả video (nhiều đoạn, có hạn chót 35 giây bên trong) nên cần thời gian tối đa của gói Hobby.
+export const maxDuration = 60;
 
 async function adminOr403() {
   const user = await getCurrentUser();
@@ -31,6 +34,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ videoId
 /**
  * PATCH { action: "list" | "hide" | "draft" } → đổi trạng thái (list = hiện cho người dùng, hide = ẩn, draft = về nháp).
  * PATCH { action: "edit_translation", idx, translation } → sửa bản dịch một dòng ("" = xóa bản dịch).
+ * PATCH { action: "translate_missing" } → dịch bù bằng AI các dòng còn trống của video; trả {done, translated, remaining}.
  * PATCH { action: "restore_translation", reportId } → trả bản dịch cũ của một báo cáo "AI đã dịch lại" (409 `unchanged` nếu dòng đã được sửa/khôi phục trước đó).
  * PATCH { action: "delete" } → xóa hẳn video (kèm cache nghĩa từ của nó).
  * API công khai cache ở edge nên mỗi thay đổi đều làm mới cache của danh sách và của video đó.
@@ -53,6 +57,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
       const result = await editLessonTranslation(videoId, body.idx as number, body.translation);
       if (result === "invalid") return Response.json({ error: "invalid_translation" }, { status: 400 });
       found = result === "ok";
+    } else if (body?.action === "translate_missing") {
+      const result = await translateMissingLessonLines(videoId);
+      if (result === "not_found") return Response.json({ error: "not_found" }, { status: 404 });
+      revalidatePath("/api/videos");
+      revalidatePath(`/api/videos/${videoId}`);
+      return Response.json({ done: "translate_missing", ...result });
     } else if (body?.action === "restore_translation") {
       if (!Number.isInteger(body.reportId)) return Response.json({ error: "invalid_request" }, { status: 400 });
       const result = await restoreTranslationFromReport(videoId, body.reportId as number);

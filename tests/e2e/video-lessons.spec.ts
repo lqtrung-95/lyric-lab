@@ -319,6 +319,53 @@ test("quản trị video: khôi phục khi dòng đã được sửa trước đ
   await expect(page.getByLabel("Bản dịch dòng 2")).toHaveValue("Bản AI mới.");
 });
 
+test("video chưa có bản dịch nào: người học thấy thông báo, vẫn xem được bản chép", async ({ page }) => {
+  await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
+  await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: { ...lesson, translationSource: "none", lines: lesson.lines.map((l) => ({ ...l, translation: null })) } }));
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}`);
+  await expect(page.getByRole("note").filter({ hasText: "chưa có bản dịch tiếng Việt" })).toBeVisible();
+  await expect(page.locator('[data-line-index="0"]')).toBeVisible();
+});
+
+test("video đã có bản dịch thì không hiện thông báo thiếu bản dịch", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}`);
+  await expect(page.getByText("Xin chào, bạn bè.")).toBeVisible();
+  await expect(page.getByRole("note")).toHaveCount(0);
+});
+
+test("quản trị video: dịch bù các dòng còn thiếu bằng AI rồi tải lại bản dịch", async ({ page }) => {
+  const patches: unknown[] = [];
+  let translated = false;
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route(`**/api/admin/videos/${VIDEO_ID}`, async (route) => {
+    if (route.request().method() === "PATCH") {
+      patches.push(route.request().postDataJSON());
+      await new Promise((r) => setTimeout(r, 400));
+      translated = true;
+      return route.fulfill({ json: { done: "translate_missing", translated: 1, remaining: 0 } });
+    }
+    // Dòng 2 thiếu bản dịch cho tới khi AI dịch bù.
+    const lines = lesson.lines.map((l, i) => {
+      if (i !== 1) return l;
+      return translated ? { ...l, translation: "Bản AI vừa dịch.", translationBy: "ai" } : { ...l, translation: null };
+    });
+    return route.fulfill({ json: { ...adminSummary, translationSource: "none", lines, reports: [] } });
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/admin/videos/${VIDEO_ID}`);
+  const button = page.getByRole("button", { name: "Dịch 1 dòng còn thiếu bằng AI" });
+  await expect(button).toBeVisible();
+  await button.click();
+  await expect(page.getByRole("button", { name: /AI đang dịch/ })).toBeDisabled();
+  await expect(page.getByText("Đã dịch thêm 1 dòng")).toBeVisible();
+  expect(patches).toEqual([{ action: "translate_missing" }]);
+  await expect(page.getByLabel("Bản dịch dòng 2")).toHaveValue("Bản AI vừa dịch.");
+  await expect(page.getByRole("button", { name: /Dịch .* dòng còn thiếu bằng AI/ })).toHaveCount(0);
+});
+
 // ---- Luyện nói theo (shadowing) ----
 const FAKE_MIC = `navigator.mediaDevices.getUserMedia = async function () { return { getTracks: function () { return [{ stop: function () {} }]; } }; };
 window.MediaRecorder = class { constructor() { this.mimeType = 'audio/webm'; }

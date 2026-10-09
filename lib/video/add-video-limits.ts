@@ -23,3 +23,17 @@ export function decideDuration(durationSec: number): DurationDecision {
   if (durationSec < MIN_ADDED_VIDEO_SECONDS) return "too_short";
   return "ok";
 }
+
+/**
+ * Ngân sách AI dịch toàn app trong 24 giờ, tính theo tổng số PHÚT video (không theo số video: 100 video 60 phút tốn gấp ba 100 video 20 phút).
+ * Khoảng 60 video 20 phút/ngày. Hết ngân sách thì video vẫn được thêm nhưng chưa dịch (chép chính tả và shadowing không cần bản dịch),
+ * admin dịch bù sau. Video dùng phụ đề tiếng Việt có sẵn không tốn AI nên không tính vào ngân sách.
+ */
+export const AI_TRANSLATION_MINUTES_PER_DAY = 1200;
+
+export type TranslationBudgetDecision = "ok" | "exhausted";
+
+/** `usedMinutes`: tổng phút video đã được AI dịch trong 24 giờ qua; `videoSeconds`: video sắp thêm. Vừa đủ ngân sách vẫn tính là ok. */
+export function decideTranslationBudget(usedMinutes: number, videoSeconds: number): TranslationBudgetDecision {
+  return usedMinutes + videoSeconds / 60 <= AI_TRANSLATION_MINUTES_PER_DAY ? "ok" : "exhausted";
+}

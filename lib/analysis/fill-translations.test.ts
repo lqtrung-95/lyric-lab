@@ -35,4 +35,38 @@ describe("fillMissingTranslations", () => {
     expect(chat).toHaveBeenCalledTimes(3);
     expect(out.every((l) => l.translation)).toBe(true);
   });
+  it("giới hạn số đoạn chạy cùng lúc nhưng vẫn dịch đủ", async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const chat = vi.fn().mockImplementation(async ({ user }: { user: string }) => {
+      inFlight++;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight--;
+      return reply([...user.matchAll(/^(\d+)\t/gm)].map((m) => Number(m[1])));
+    });
+    const out = await fillMissingTranslations(Array.from({ length: 150 }, (_, i) => line(i)), chat, ["m1"], { concurrency: 2 }); // 5 đoạn
+    expect(chat).toHaveBeenCalledTimes(5);
+    expect(maxInFlight).toBe(2);
+    expect(out.every((l) => l.translation)).toBe(true);
+  });
+  it("không giới hạn thì chạy tất cả đoạn cùng lúc như trước", async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const chat = vi.fn().mockImplementation(async ({ user }: { user: string }) => {
+      inFlight++;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((r) => setTimeout(r, 5));
+      inFlight--;
+      return reply([...user.matchAll(/^(\d+)\t/gm)].map((m) => Number(m[1])));
+    });
+    await fillMissingTranslations(Array.from({ length: 90 }, (_, i) => line(i)), chat, ["m1"]);
+    expect(maxInFlight).toBe(3);
+  });
+  it("quá hạn chót thì không bắt đầu đoạn mới, các dòng chưa dịch để trống", async () => {
+    const chat = vi.fn().mockImplementation(async ({ user }: { user: string }) => reply([...user.matchAll(/^(\d+)\t/gm)].map((m) => Number(m[1]))));
+    const out = await fillMissingTranslations(Array.from({ length: 65 }, (_, i) => line(i)), chat, ["m1"], { concurrency: 1, deadline: Date.now() - 1 });
+    expect(chat).not.toHaveBeenCalled();
+    expect(out.every((l) => !l.translation)).toBe(true);
+  });
 });

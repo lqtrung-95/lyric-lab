@@ -102,6 +102,8 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
   const [lesson, setLesson] = useState<AdminDetail | null | "missing">(null);
   const [onlyMissing, setOnlyMissing] = useState(false);
   const [onlyReported, setOnlyReported] = useState(false);
+  const [translating, setTranslating] = useState<"idle" | "busy" | "error">("idle");
+  const [translateNote, setTranslateNote] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,6 +121,22 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
     if (lesson && lesson !== "missing") for (const r of lesson.reports ?? []) map.set(r.lineIdx, [...(map.get(r.lineIdx) ?? []), r]);
     return map;
   }, [lesson]);
+
+  async function translateMissing() {
+    setTranslating("busy");
+    setTranslateNote(null);
+    try {
+      const res = await fetch(`/api/admin/videos/${videoId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "translate_missing" }) });
+      if (!res.ok) { setTranslating("error"); return; }
+      const result = (await res.json()) as { translated: number; remaining: number };
+      const fresh = await fetch(`/api/admin/videos/${videoId}`, { cache: "no-store" });
+      if (fresh.ok) setLesson((await fresh.json()) as AdminDetail);
+      setTranslateNote(`Đã dịch thêm ${result.translated} dòng${result.remaining > 0 ? `, còn ${result.remaining} dòng trống (bấm lại để dịch tiếp)` : ""}.`);
+      setTranslating("idle");
+    } catch {
+      setTranslating("error");
+    }
+  }
 
   if (lesson === null) return <p role="status" className="flex items-center gap-2 text-body-md text-on-surface-variant"><Spinner size={18} />Đang tải…</p>;
   if (lesson === "missing") return <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">Không tìm thấy video này.</p>;
@@ -139,6 +157,16 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
       </div>
       <VideoStatusButtons videoId={videoId} status={lesson.status} onStatus={setStatus} onDeleted={() => router.replace("/admin/videos")} />
       {lesson.status === "listed" && <Link href={`/video/${videoId}`} className="text-label-md font-medium text-primary hover:underline">Mở trang xem như người dùng</Link>}
+      {missing > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" disabled={translating === "busy"} onClick={() => void translateMissing()} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary disabled:opacity-50">
+            {translating === "busy" ? <Spinner size={16} /> : <Icon name="translate" size={18} />}
+            {translating === "busy" ? "AI đang dịch, có thể mất tới một phút…" : `Dịch ${missing} dòng còn thiếu bằng AI`}
+          </button>
+          {translating === "error" && <span role="alert" className="text-label-md text-error">Chưa dịch được, thử lại sau nhé.</span>}
+        </div>
+      )}
+      {translateNote && <p role="status" className="text-label-md text-on-surface-variant">{translateNote}</p>}
       <label className="inline-flex min-h-11 items-center gap-2 text-label-md text-on-surface">
         <input type="checkbox" checked={onlyMissing} onChange={(e) => setOnlyMissing(e.target.checked)} className="h-5 w-5 accent-primary" />
         Chỉ hiện dòng thiếu bản dịch
@@ -150,7 +178,8 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
         </label>
       )}
       <ul className="flex flex-col gap-space-sm">
-        {shown.map((l) => <LineRow key={l.idx} videoId={videoId} line={l} reports={reportsByLine.get(l.idx) ?? []} onSaved={onSaved} onRestored={onRestored} />)}
+        {/* key gồm bản dịch từ máy chủ: khi nó đổi (AI dịch bù, khôi phục) dòng dựng lại, ô nhập không giữ giá trị cũ rồi lỡ lưu đè. */}
+        {shown.map((l) => <LineRow key={`${l.idx}:${l.translation ?? ""}:${l.translationBy ?? ""}`} videoId={videoId} line={l} reports={reportsByLine.get(l.idx) ?? []} onSaved={onSaved} onRestored={onRestored} />)}
       </ul>
     </div>
   );

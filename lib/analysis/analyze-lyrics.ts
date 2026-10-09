@@ -15,7 +15,7 @@ import { validateLlmOutput, type Dropped } from "./validate-llm-output";
 // lịch sử), đổi sang gọi thẳng mới hết vấn đề đó. Không có DEEPSEEK_API_KEY thì rớt nhanh qua model sau, không lỗi.
 // Sau đó: 2 model Groq bằng GROQ_API_KEY → cùng 2 model đó bằng FALLBACK_LLM_API_KEY (khóa Groq thứ hai) →
 // gemini-2.5-flash (OpenRouter, cân bằng chất lượng/giá) làm lưới an toàn cuối.
-const GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"];
+export const GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"];
 export const DEFAULT_MODELS = [
   "deepseek:deepseek-chat",
   ...GROQ_MODELS,

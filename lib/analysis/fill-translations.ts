@@ -33,16 +33,31 @@ async function translateChunk(chat: ChatFn, models: string[], lines: Pick<Analyz
   return result;
 }
 
+export interface FillOptions {
+  /** Số đoạn dịch chạy cùng lúc (mặc định: tất cả cùng lúc). Đặt thấp để không vượt hạn mức token/phút của gói miễn phí. */
+  concurrency?: number;
+  /** Mốc thời gian tuyệt đối (ms): quá mốc này thì không bắt đầu đoạn mới, các dòng chưa dịch để trống (giữ cho route nằm trong thời gian tối đa). */
+  deadline?: number;
+}
+
 /**
  * Bù bản dịch cho các dòng mà lần phân tích chính bỏ sót (bài dài làm LLM dịch dở dang hoặc bị cắt vì hết token).
  * Chỉ điền dòng còn thiếu, không đụng dòng đã có. Trả cùng mảng dòng, dòng nào vẫn dịch không được thì để trống.
  */
-export async function fillMissingTranslations<T extends Pick<AnalyzedLine, "index" | "text" | "translation">>(lines: T[], chat: ChatFn, models: string[]): Promise<T[]> {
+export async function fillMissingTranslations<T extends Pick<AnalyzedLine, "index" | "text" | "translation">>(lines: T[], chat: ChatFn, models: string[], options: FillOptions = {}): Promise<T[]> {
   const missing = lines.filter((l) => !l.translation && l.text.trim());
   if (missing.length === 0) return lines;
   const chunks: typeof missing[] = [];
   for (let i = 0; i < missing.length; i += CHUNK_SIZE) chunks.push(missing.slice(i, i + CHUNK_SIZE));
-  const maps = await Promise.all(chunks.map((c) => translateChunk(chat, models, c)));
-  const filled = new Map(maps.flatMap((m) => [...m]));
+  const maps: Map<number, string>[] = [];
+  let next = 0;
+  const worker = async () => {
+    while (next < chunks.length && !(options.deadline !== undefined && Date.now() > options.deadline)) {
+      const i = next++;
+      maps[i] = await translateChunk(chat, models, chunks[i]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.max(1, Math.min(options.concurrency ?? chunks.length, chunks.length)) }, worker));
+  const filled = new Map(maps.flatMap((m) => (m ? [...m] : [])));
   return lines.map((l) => (!l.translation && filled.has(l.index) ? { ...l, translation: filled.get(l.index) } : l));
 }

@@ -5,13 +5,13 @@ import type { CaptionLine } from "@/lib/captions/caption-provider-types";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
-import { decideAddLimit, decideDuration } from "@/lib/video/add-video-limits";
+import { decideAddLimit, decideDuration, decideTranslationBudget } from "@/lib/video/add-video-limits";
 import { chineseRatio, isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { MAX_TRANSCRIPT_LINES, parsePastedTranscript } from "@/lib/video/parse-pasted-transcript";
 import { SupadataError, fetchSupadataLines } from "@/lib/video/supadata-transcript";
-import { translatePreparedLines } from "@/lib/video/translate-lines";
+import { translateLines } from "@/lib/video/translate-lines";
 import { fetchVideosMeta } from "@/lib/video/youtube-data-api";
 import { parseVideoId } from "@/lib/youtube/parse-video-id";
 
@@ -36,7 +36,7 @@ const ok = (body: Record<string, unknown>) => Response.json(body, { headers: { "
 
 /**
  * POST {video, captions? | lines?} → thêm một video vào kho dùng chung, hiện ngay cho mọi người (admin ẩn/xóa được sau).
- * Trả {kind:"added", videoId, lineCount, translatedLineCount} | {kind:"exists", videoId} | {kind:"skipped", reason}; lỗi: 400 invalid_video/invalid_captions,
+ * Trả {kind:"added", videoId, lineCount, translatedLineCount, translation: "youtube"|"ai"|"none", aiBudgetExhausted} | {kind:"exists", videoId} | {kind:"skipped", reason}; lỗi: 400 invalid_video/invalid_captions,
  * 401 unauthorized, 404 video_not_found, 413 too_long, 422 too_short/unavailable/captions_required/no_chinese_captions/not_chinese, 429 user_limit/global_limit, 503 fetch_unavailable.
  */
 export async function POST(req: Request) {
@@ -70,6 +70,12 @@ export async function POST(req: Request) {
     const limit = decideAddLimit(await count(true), await count(false));
     if (limit !== "ok") return fail(limit, 429);
 
+    // Ngân sách AI dịch toàn app (theo phút video): hết thì vẫn thêm video nhưng không nhờ AI dịch, admin dịch bù sau. Video dùng được phụ đề tiếng Việt có sẵn không tốn AI.
+    const { data: aiVideos, error: budgetError } = await sb.from("video_lessons").select("duration_sec").not("added_by", "is", null).eq("translation_source", "ai").gte("created_at", since);
+    if (budgetError) throw new Error(`đếm ngân sách dịch: ${budgetError.message}`);
+    const usedMinutes = ((aiVideos ?? []) as { duration_sec: number }[]).reduce((sum, v) => sum + v.duration_sec / 60, 0);
+    const canTranslate = decideTranslationBudget(usedMinutes, meta.durationSec) === "ok";
+
     let lines: CaptionLine[] = parsed.data.lines ?? (parsed.data.captions ? parsePastedTranscript(parsed.data.captions, meta.durationSec) : []);
     if (lines.length === 0 && (parsed.data.captions || parsed.data.lines)) return fail("invalid_captions", 400);
     // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI: do dấu trang gửi kèm (`viCaptions`) hoặc lấy thêm ở đường Supadata. Lõi nạp chỉ giữ khi ghép đủ tốt.
@@ -99,10 +105,10 @@ export async function POST(req: Request) {
     const chat = createChat(env);
     const outcome = await ingestVideo(
       { sb, provider: new FixedCaptionProvider(lines, "zh-Hans", viLines), lookup: (terms) => lookupWords(sb as never, terms) },
-      { meta, sourceId: null, status: "listed", addedBy: user.id, translateMissing: (prepared) => translatePreparedLines(prepared, chat) },
+      { meta, sourceId: null, status: "listed", addedBy: user.id, requireGoodTranslationTrack: true, translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat) : undefined },
     );
     if (outcome.kind === "skipped") return ok({ kind: "skipped", reason: outcome.reason });
-    return ok({ kind: "added", videoId, lineCount: outcome.lineCount, translatedLineCount: outcome.translatedLineCount });
+    return ok({ kind: "added", videoId, lineCount: outcome.lineCount, translatedLineCount: outcome.translatedLineCount, translation: outcome.translationSource, aiBudgetExhausted: !canTranslate });
   } catch (error) {
     console.error(JSON.stringify({ event: "video_add_error", videoId, message: (error as Error)?.message }));
     // Hết credit hoặc bị giới hạn tốc độ ở dịch vụ lấy phụ đề: người dùng vẫn dán phụ đề thủ công được.

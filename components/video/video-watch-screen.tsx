@@ -167,6 +167,11 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
             </p>
           )}
         </div>
+        {lines.every((l) => !l.translation) && (
+          <p role="note" className="rounded-xl bg-surface-container-low p-3 text-label-md text-on-surface-variant">
+            Video này chưa có bản dịch tiếng Việt, sẽ được bổ sung sau. Bạn vẫn luyện chép chính tả và nói theo như bình thường.
+          </p>
+        )}
         <LyricList
           videoId={lesson.videoId} promptVersion="video" variant="speech"
           lines={lines} currentIndex={currentIndex} vocab={[]} grammar={[]}
