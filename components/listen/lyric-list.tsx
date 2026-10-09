@@ -152,7 +152,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
           );
         })}
       </ol>
-      {shareCard && <LineShareDialog card={shareCard} shareUrl={`${SITE_URL}/learn/${videoId}`} onClose={() => setSharing(null)} />}
+      {shareCard && <LineShareDialog card={shareCard} shareUrl={`${SITE_URL}/learn/${videoId}?line=${sharing}`} onClose={() => setSharing(null)} />}
       {editedLine && <LineEditDialog videoId={videoId} line={editedLine} onClose={() => setEditing(null)} />}
     </div>
   );

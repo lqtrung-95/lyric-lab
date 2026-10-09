@@ -28,6 +28,29 @@ test.describe("xem trước link bài học", () => {
     writeFileSync("test-results/learn-og-image.png", body);
   });
 
+  test("link chia sẻ một câu (?line=) có thẻ xem trước là đúng câu đó, ảnh dựng riêng cho câu", async ({ page, request }) => {
+    await page.goto(`/learn/${E2E_VIDEO_ID}?line=0`);
+    const meta = (selector: string) => page.locator(`meta[${selector}]`).first().getAttribute("content");
+    expect(await meta('property="og:title"')).toBe("窗外的城市慢慢睡了");
+    expect(await meta('property="og:description"')).toContain("Thành phố ngoài cửa sổ");
+    expect(await meta('name="robots"')).toContain("noindex");
+    const image = await meta('property="og:image"');
+    expect(image).toContain(`/api/share/line/${E2E_VIDEO_ID}/0/og`);
+    const res = await request.get(new URL(image!).pathname);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toContain("image/png");
+    expect(res.headers()["x-robots-tag"]).toBe("noindex");
+    writeFileSync("test-results/line-og-image.png", await res.body());
+  });
+
+  test("số câu không hợp lệ thì ảnh chung, không lỗi", async ({ request }) => {
+    for (const path of [`/api/share/line/${E2E_VIDEO_ID}/999/og`, `/api/share/line/${E2E_VIDEO_ID}/abc/og`, "/api/share/line/bad!id/0/og"]) {
+      const res = await request.get(path);
+      expect(res.status(), path).toBe(200);
+      expect(res.headers()["content-type"]).toContain("image/png");
+    }
+  });
+
   test("link sai định dạng hoặc bài chưa có trong kho vẫn có ảnh xem trước chung", async ({ request }) => {
     const res = await request.get("/learn/notInStore01/opengraph-image");
     expect(res.status()).toBe(200);
