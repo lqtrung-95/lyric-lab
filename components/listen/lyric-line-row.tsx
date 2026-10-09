@@ -41,28 +41,37 @@ interface LyricLineRowProps {
 function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onEdit }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
-  const actions = (onShare || onEdit) ? (
-    <>
-      {onEdit && (
-        <button
-          type="button" aria-label={`Sửa lời câu ${line.index + 1} (quản trị)`} title="Sửa lời (quản trị)"
-          onClick={(e) => { e.stopPropagation(); onEdit(line.index); }}
-          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
-        >
-          <Icon name="edit" size={18} />
-        </button>
-      )}
-      {onShare && (
-        <button
-          type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
-          onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
-          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
-        >
-          <Icon name="share" size={18} />
-        </button>
-      )}
-    </>
-  ) : null;
+  // Nút của dòng: cột biểu tượng bên phải ở máy tính (hiện khi rê chuột); điện thoại dùng nút có chữ nằm dưới câu đang hát để không bóp hẹp lời.
+  const actionButtons = (labeled: boolean) => {
+    const base = labeled
+      ? "inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full bg-surface-container-high px-4 text-label-md font-semibold text-on-surface-variant hover:text-on-surface"
+      : "flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high";
+    return (
+      <>
+        {onShare && (
+          <button
+            type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
+            onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
+            className={base}
+          >
+            <Icon name="share" size={18} />
+            {labeled && "Chia sẻ"}
+          </button>
+        )}
+        {onEdit && (
+          <button
+            type="button" aria-label={`Sửa lời câu ${line.index + 1} (quản trị)`} title="Sửa lời (quản trị)"
+            onClick={(e) => { e.stopPropagation(); onEdit(line.index); }}
+            className={base}
+          >
+            <Icon name="edit" size={18} />
+            {labeled && "Sửa lời"}
+          </button>
+        )}
+      </>
+    );
+  };
+  const hasActions = Boolean(onShare || onEdit);
 
   return (
     <li
@@ -129,9 +138,9 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
           </div>
         )}
         {/* Điện thoại: nút chia sẻ/sửa không chiếm một cột bên phải (làm lời bị bóp hẹp, ngắt dòng liên tục) mà nằm dưới câu đang hát. */}
-        {actions && active && <div className="-ml-2 flex md:hidden">{actions}</div>}
+        {hasActions && active && <div className="mt-1 flex flex-wrap gap-2 md:hidden">{actionButtons(true)}</div>}
       </div>
-      {actions && <div className="ml-auto mt-0.5 hidden shrink-0 opacity-0 transition-opacity focus-within:opacity-100 group-hover/line:opacity-100 md:flex">{actions}</div>}
+      {hasActions && <div className="ml-auto mt-0.5 hidden shrink-0 opacity-0 transition-opacity focus-within:opacity-100 group-hover/line:opacity-100 md:flex">{actionButtons(false)}</div>}
     </li>
   );
 }

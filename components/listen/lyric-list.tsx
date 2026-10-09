@@ -7,8 +7,6 @@ import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-r
 import { useIsAdmin } from "@/components/library/use-is-admin";
 import { LineEditDialog } from "./line-edit-dialog";
 import { LineShareDialog } from "@/components/share/line-share-dialog";
-import { shareLineCardNative } from "@/lib/share/share-line-card-native";
-import { isMobileDevice } from "@/lib/streak/share-card";
 import { ViewToggles } from "./view-toggles";
 
 // Sau khi người dùng tự cuộn, tạm ngừng tự cuộn theo lời để không giật màn hình.
@@ -39,7 +37,7 @@ interface LyricListProps {
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
 export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, shareContext, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, variant = "lyrics" }: LyricListProps) {
   const [sharing, setSharing] = useState<number | null>(null);
-  const sharingNow = useRef(false);
+  const shareLine = useCallback((index: number) => setSharing(index), []);
   // Quản trị viên sửa lời ngay trên danh sách (chỉ bài hát, không phải video luyện nghe; video có trang quản trị riêng).
   const isAdmin = useIsAdmin();
   const [editing, setEditing] = useState<number | null>(null);
@@ -53,17 +51,6 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
     () => (sharedLine && shareTitle ? { han: sharedLine.text, pinyin: sharedLine.pinyin, translation: sharedLine.translation, title: shareTitle, artist: shareArtist } : null),
     [sharedLine, shareTitle, shareArtist],
   );
-  // Điện thoại: mở thẳng share sheet của hệ điều hành với ảnh thẻ; nơi không hỗ trợ (hoặc desktop) mới hiện popup xem trước.
-  const shareLine = useCallback((index: number) => {
-    const line = lines.find((l) => l.index === index);
-    if (!isMobileDevice() || !line || !shareTitle) { setSharing(index); return; }
-    if (sharingNow.current) return;
-    sharingNow.current = true;
-    shareLineCardNative({ han: line.text, pinyin: line.pinyin, translation: line.translation, title: shareTitle, artist: shareArtist })
-      .then((result) => { if (result === "unsupported") setSharing(index); })
-      .catch(() => setSharing(index))
-      .finally(() => { sharingNow.current = false; });
-  }, [lines, shareTitle, shareArtist]);
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 

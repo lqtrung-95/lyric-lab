@@ -39,7 +39,7 @@ test.describe("điện thoại Android", () => {
   const { userAgent, viewport, deviceScaleFactor, isMobile, hasTouch } = devices["Pixel 7"];
   test.use({ userAgent, viewport, deviceScaleFactor, isMobile, hasTouch });
 
-  test("bấm chia sẻ mở thẳng share sheet với file ảnh, không hiện popup", async ({ page }) => {
+  test("bấm chia sẻ ở dòng hiện popup xem ảnh trước, bấm Chia sẻ trong popup mới mở share sheet", async ({ page }) => {
     await page.addInitScript(() => {
       const w = window as unknown as { __shared: { name: string; type: string; size: number }[] };
       w.__shared = [];
@@ -48,28 +48,45 @@ test.describe("điện thoại Android", () => {
     });
     await openFixture(page);
     await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
+    await expect(dialog.getByRole("img")).toBeVisible();
+    expect(await page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared.length)).toBe(0);
+    await dialog.getByRole("button", { name: "Chia sẻ" }).click();
     await expect.poll(() => page.evaluate(() => (window as unknown as { __shared: unknown[] }).__shared.length)).toBe(1);
     const [file] = await page.evaluate(() => (window as unknown as { __shared: { name: string; type: string; size: number }[] }).__shared);
     expect(file).toMatchObject({ name: "songhanzi-cau-hat.png", type: "image/png" });
     expect(file.size).toBeGreaterThan(10_000);
-    await expect(page.getByRole("dialog")).toHaveCount(0);
   });
 
-  test("máy không chia sẻ được file thì hiện popup để xem ảnh và tải về", async ({ page }) => {
+  test("nút Chia sẻ của dòng có chữ, đủ vùng bấm 44 px", async ({ page }) => {
+    await openFixture(page);
+    const box = await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(43.5);
+    await expect(page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" })).toContainText("Chia sẻ");
+  });
+
+  test("máy không chia sẻ được file thì popup chỉ có Tải ảnh và Đóng", async ({ page }) => {
     await page.addInitScript(() => { navigator.canShare = () => false; });
     await openFixture(page);
     await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
-    await expect(page.getByRole("dialog", { name: "Chia sẻ câu này" }).getByRole("img")).toBeVisible();
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
+    await expect(dialog.getByRole("img")).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Chia sẻ" })).toHaveCount(0);
+    await expect(dialog.getByRole("button", { name: "Tải ảnh" })).toBeVisible();
   });
 
-  test("người dùng đóng share sheet thì không hiện popup", async ({ page }) => {
+  test("người dùng đóng share sheet thì popup vẫn mở, không báo lỗi", async ({ page }) => {
     await page.addInitScript(() => {
       navigator.canShare = () => true;
       navigator.share = async () => { throw new DOMException("cancelled", "AbortError"); };
     });
     await openFixture(page);
     await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
-    await page.waitForTimeout(800);
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
+    await expect(dialog.getByRole("img")).toBeVisible();
+    await dialog.getByRole("button", { name: "Chia sẻ" }).click();
+    await page.waitForTimeout(500);
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole("alert")).toHaveCount(0);
   });
 });
