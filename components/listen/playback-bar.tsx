@@ -83,7 +83,11 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
       <div className="flex flex-col gap-1 px-2 py-2">
         <PlaybackProgressBar controller={controller} durationSec={durationSec} onSeekBy={onSeekBy} />
         <div role="group" aria-label="Điều khiển nhanh" className="flex items-center justify-between gap-1">
-          <button type="button" data-tour="rate" onClick={() => setPanel((p) => (p === "rate" ? null : "rate"))} aria-expanded={panel === "rate"} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px] ${panel === "rate" || rate !== 1 ? "!bg-primary/15 text-primary" : ""}`}>{formatRate(rate)}</button>
+          {/* Khung `relative` bọc nút để bảng tốc độ mọc ngay phía trên nút. */}
+          <div className="relative shrink-0">
+            <button type="button" data-tour="rate" onClick={() => setPanel((p) => (p === "rate" ? null : "rate"))} aria-expanded={panel === "rate"} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px] ${panel === "rate" || rate !== 1 ? "!bg-primary/15 text-primary" : ""}`}>{formatRate(rate)}</button>
+            {panel === "rate" && <PlaybackRatePopover rate={rate} onChange={onRate} className="absolute bottom-full left-0 z-40 mb-1" />}
+          </div>
           <button type="button" disabled={!ready} data-tour="loop" onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
           <button type="button" data-tour="pin" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>
           <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
@@ -96,7 +100,6 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
         </div>
       </div>
       {panel === "sync" && onOffsetChange && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-2 bottom-full z-40 mb-1" />}
-      {panel === "rate" && <PlaybackRatePopover rate={rate} onChange={onRate} className="absolute left-2 bottom-full z-40 mb-1" />}
     </div>
   );
 }
