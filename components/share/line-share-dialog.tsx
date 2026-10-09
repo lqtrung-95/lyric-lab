@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { renderLineCard, type LineCardData } from "@/lib/share/line-card";
+import { SITE_URL } from "@/lib/seo/site-url";
 
 /**
  * Hộp thoại chia sẻ một câu lời dưới dạng ảnh. Ảnh dựng ngay trên máy (không gửi lời lên server, không có trang công khai). Điện thoại
@@ -20,7 +21,7 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
     if (dialog && !dialog.open) dialog.showModal();
     let cancelled = false;
     let url: string | null = null;
-    renderLineCard({ ...card, site: location.host })
+    renderLineCard({ ...card, site: SITE_URL.replace(/^https?:\/\//, "") })
       .then((b) => { if (cancelled) return; url = URL.createObjectURL(b); setBlob(b); setPreviewUrl(url); })
       .catch(() => { if (!cancelled) setError("Chưa tạo được ảnh. Thử lại sau nhé."); });
     return () => { cancelled = true; if (url) URL.revokeObjectURL(url); };
@@ -53,7 +54,7 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
     setSaved(true);
   }
 
-  const btn = "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-label-md font-semibold";
+  const btn = "inline-flex min-h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 text-label-md font-semibold";
   return (
     <dialog
       ref={ref} aria-labelledby="line-share-title" onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose(); }}
@@ -67,10 +68,10 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
         ) : (
           <div role="status" className="flex aspect-[4/5] items-center justify-center rounded-2xl bg-surface-container text-label-md text-on-surface-variant">{error ?? "Đang tạo ảnh…"}</div>
         )}
-        {saved && !error && <p role="status" className="text-label-md text-on-surface-variant">Đã gửi yêu cầu tải ảnh. Kiểm tra thư mục Tải xuống hoặc thanh thông báo của trình duyệt; không thấy thì bấm Chia sẻ rồi chọn Lưu.</p>}
+        {saved && !error && <p role="status" className="text-label-md text-on-surface-variant">Đã gửi yêu cầu tải ảnh. Không thấy file thì bấm Chia sẻ rồi chọn Lưu.</p>}
         {error && previewUrl && <p role="alert" className="text-label-md text-error">{error}</p>}
         <div className="flex flex-wrap gap-2">
-          {canShareFile && <button type="button" onClick={() => void share()} className={`${btn} bg-primary text-on-primary hover:bg-primary-container`}><Icon name="share" size={18} />Chia sẻ</button>}
+          {canShareFile && <button type="button" onClick={() => void share()} className={`${btn} basis-full bg-primary text-on-primary hover:bg-primary-container`}><Icon name="share" size={18} />Chia sẻ</button>}
           {previewUrl && <button type="button" onClick={download} className={`${btn} ${canShareFile ? "bg-surface-container-high text-on-surface" : "bg-primary text-on-primary"}`}>Tải ảnh</button>}
           <button type="button" onClick={onClose} className={`${btn} bg-surface-container-high text-on-surface`}>Đóng</button>
         </div>

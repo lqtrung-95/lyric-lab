@@ -58,11 +58,27 @@ test.describe("điện thoại Android", () => {
     expect(file.size).toBeGreaterThan(10_000);
   });
 
-  test("nút Chia sẻ của dòng có chữ, đủ vùng bấm 44 px", async ({ page }) => {
+  test("nút chia sẻ ở câu đang hát là biểu tượng ở cột phải (không chiếm riêng một hàng), đủ vùng bấm 44 px", async ({ page }) => {
     await openFixture(page);
-    const box = await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).boundingBox();
-    expect(box!.height).toBeGreaterThanOrEqual(43.5);
-    await expect(page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" })).toContainText("Chia sẻ");
+    const button = page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" });
+    const box = (await button.boundingBox())!;
+    const row = (await page.locator('[data-line-index="0"]').boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(43.5);
+    expect(box.height).toBeGreaterThanOrEqual(43.5);
+    expect(box.x + box.width).toBeGreaterThan(row.x + row.width - 24); // sát mép phải của dòng
+    expect(box.y + box.height).toBeLessThanOrEqual(row.y + row.height); // nằm trong dòng, không kéo dài thêm hàng
+  });
+
+  test("nút Chia sẻ trong popup nằm một dòng, rộng cả hàng", async ({ page }) => {
+    await page.addInitScript(() => { navigator.canShare = () => true; });
+    await openFixture(page);
+    await page.getByRole("button", { name: "Chia sẻ câu 1 thành ảnh" }).click();
+    const dialog = page.getByRole("dialog", { name: "Chia sẻ câu này" });
+    const share = (await dialog.getByRole("button", { name: "Chia sẻ" }).boundingBox())!;
+    const dlg = (await dialog.boundingBox())!;
+    expect(share.height).toBeLessThan(56);
+    expect(share.width).toBeGreaterThan(dlg.width * 0.8);
+    await page.screenshot({ path: "test-results/line-share-dialog-mobile.png" });
   });
 
   test("máy không chia sẻ được file thì popup chỉ có Tải ảnh và Đóng", async ({ page }) => {
