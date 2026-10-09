@@ -65,8 +65,11 @@ test("nghe tới câu cuối: mời xem tổng kết", async ({ page }) => {
   await page.route("https://www.youtube.com/iframe_api", (r) => r.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.goto("/dev/listen-fixture");
   await expect(page.getByText("Bạn đã nghe xong bài")).toHaveCount(0);
-  await page.evaluate(() => { (window as unknown as { __t: number }).__t = 27; });
-  await expect(page.getByText("Bạn đã nghe xong bài")).toBeVisible();
+  // Player giả nạp trễ và tự đặt lại thời gian về 0 lúc sẵn sàng: đặt lại mốc cuối bài tới khi thông báo hiện, thay vì chỉ một lần.
+  await expect(async () => {
+    await page.evaluate(() => { (window as unknown as { __t: number }).__t = 27; });
+    await expect(page.getByText("Bạn đã nghe xong bài")).toBeVisible({ timeout: 1500 });
+  }).toPass({ timeout: 15_000 });
   await expect(page.getByRole("link", { name: "Xem tổng kết" })).toHaveAttribute("href", /\/summary$/);
 });
 
