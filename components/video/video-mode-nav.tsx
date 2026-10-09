@@ -18,11 +18,11 @@ export function VideoModeNav({ videoId, current }: { videoId: string; current: V
       {MODES.map((m) => (
         <Link
           key={m.id} href={`/video/${videoId}${m.path}`} aria-current={m.id === current ? "page" : undefined}
-          className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-label-md font-semibold transition-colors ${
+          className={`inline-flex min-h-9 items-center gap-1 rounded-full px-2.5 text-label-sm font-semibold transition-colors ${
             m.id === current ? "bg-primary text-on-primary" : "text-on-surface hover:bg-surface-container-highest"
           }`}
         >
-          <Icon name={m.icon} size={18} />
+          <Icon name={m.icon} size={16} />
           <span aria-hidden="true" className="sm:hidden">{m.short}</span>
           <span className="hidden sm:inline">{m.label}</span>
           <span className="sr-only sm:hidden">{m.label}</span>

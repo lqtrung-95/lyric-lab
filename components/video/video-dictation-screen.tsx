@@ -107,7 +107,7 @@ export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
         <div className="flex min-w-0 flex-1 basis-64 items-center gap-3">
           <Link href={`/video/${lesson.videoId}`} aria-label="Về màn xem video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
           <div className="min-w-0">
-            <p lang="zh" title={lesson.title} className="truncate font-serif text-headline-md text-primary">{lesson.title}</p>
+            <p lang="zh" title={lesson.title} className="truncate font-serif text-body-lg font-semibold leading-6 text-primary">{lesson.title}</p>
             <p className="truncate text-label-sm text-on-surface-variant">Chép chính tả · {stats.done}/{stats.total} câu</p>
           </div>
         </div>

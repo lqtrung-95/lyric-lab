@@ -23,7 +23,7 @@ export function ShortcutsHelpButton() {
     <>
       <button type="button" onClick={() => setOpen(true)} aria-label="Phím tắt" title="Phím tắt"
         className="hidden min-h-11 min-w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container md:inline-flex">
-        <Icon name="keyboard" size={20} />
+        <Icon name="keyboard" size={18} />
       </button>
       <dialog ref={ref} aria-labelledby="shortcuts-title" onClose={() => setOpen(false)} onClick={(e) => { if (e.target === ref.current) setOpen(false); }}
         className="m-auto w-[min(92vw,24rem)] rounded-3xl bg-surface-container-lowest p-0 text-on-surface shadow-[0_24px_60px_-20px_rgba(20,10,5,0.5)] backdrop:bg-black/50 backdrop:backdrop-blur-[2px]">

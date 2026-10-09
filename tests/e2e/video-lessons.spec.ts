@@ -54,10 +54,10 @@ test("danh sách video: hiện thẻ video đã duyệt, mục Video có trên t
 });
 
 test("xem video: tiêu đề rất dài bị cắt (rê chuột đọc đủ), thanh trên gọn và không tràn ở mọi cỡ màn hình", async ({ page }) => {
-  const LONG = "Slow Chinese Vlog | What's in a Chinese Shopping Mall? | Comprehensible Input for HSK 1–3 | Một tiêu đề cực kỳ dài để thử cắt chữ";
+  const LONG = "Slow Chinese Vlog | What's in a Chinese Shopping Mall? | Comprehensible Input for HSK 1–3 | Một tiêu đề cực kỳ dài để thử cắt chữ | Slow Chinese Vlog | What's in a Chinese Shopping Mall? | Comprehensible Input for HSK 1–3";
   await mockVideoApis(page);
   await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: { ...lesson, title: LONG } }));
-  for (const [width, height] of [[1280, 800], [900, 800], [390, 800]]) {
+  for (const [width, height] of [[1920, 800], [1280, 800], [900, 800], [390, 800]]) {
     await page.setViewportSize({ width, height });
     await page.goto(`/video/${VIDEO_ID}`);
     const title = page.locator("p[lang=zh][title]").first();
