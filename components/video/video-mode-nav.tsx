@@ -11,15 +11,15 @@ const MODES: { id: VideoMode; label: string; short: string; icon: IconName; path
   { id: "shadowing", label: "Luyện nói", short: "Nói", icon: "mic", path: "/shadowing" },
 ];
 
-/** Chuyển giữa ba cách học một video (xem, chép chính tả, luyện nói); đặt ở bên phải thanh tiêu đề của cả ba màn để luôn đủ đầy và nhất quán. */
+/** Chuyển giữa ba cách học một video (xem, chép chính tả, luyện nói), dạng thanh chọn một khối gọn; đặt ở bên phải thanh tiêu đề của cả ba màn để luôn đủ đầy và nhất quán. */
 export function VideoModeNav({ videoId, current }: { videoId: string; current: VideoMode }) {
   return (
-    <nav aria-label="Cách học video này" className="flex flex-wrap gap-1">
+    <nav aria-label="Cách học video này" className="flex shrink-0 gap-0.5 rounded-full bg-surface-container-high p-1">
       {MODES.map((m) => (
         <Link
           key={m.id} href={`/video/${videoId}${m.path}`} aria-current={m.id === current ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 sm:px-4 text-label-md font-semibold transition-colors ${
-            m.id === current ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"
+          className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-label-md font-semibold transition-colors ${
+            m.id === current ? "bg-primary text-on-primary" : "text-on-surface hover:bg-surface-container-highest"
           }`}
         >
           <Icon name={m.icon} size={18} />

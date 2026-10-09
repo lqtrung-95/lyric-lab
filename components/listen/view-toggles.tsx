@@ -8,22 +8,24 @@ interface ViewTogglesProps {
   onTogglePinyin: () => void;
   onToggleTranslation: () => void;
   className?: string;
+  /** Chỉ hiện biểu tượng (nhãn chỉ hiện từ màn rộng 2xl) để thanh tiêu đề đỡ chật; tên truy cập vẫn đầy đủ. */
+  compact?: boolean;
 }
 
 const toggleClass = (on: boolean) =>
   `inline-flex min-h-11 items-center gap-2 rounded-full px-3 text-label-md transition-colors ${on ? "bg-surface-container-high text-on-surface" : "text-on-surface-variant hover:bg-surface-container"}`;
 
 /** Bật/tắt từng lớp pinyin và bản dịch (LS-03). Dùng ở thanh trên (desktop) và đầu danh sách lời (mobile). */
-export function ViewToggles({ showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, className = "" }: ViewTogglesProps) {
+export function ViewToggles({ showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, className = "", compact = false }: ViewTogglesProps) {
   return (
     <div role="group" aria-label="Lớp hiển thị" data-tour="view-toggles" className={`items-center gap-1 ${className}`}>
-      <button type="button" aria-pressed={showPinyin} onClick={onTogglePinyin} className={toggleClass(showPinyin)}>
+      <button type="button" aria-pressed={showPinyin} onClick={onTogglePinyin} aria-label="Pinyin" title="Pinyin" className={toggleClass(showPinyin)}>
         <Icon name="translate" size={18} />
-        Pinyin
+        <span className={compact ? "hidden 2xl:inline" : ""}>Pinyin</span>
       </button>
-      <button type="button" aria-pressed={showTranslation} onClick={onToggleTranslation} className={toggleClass(showTranslation)}>
+      <button type="button" aria-pressed={showTranslation} onClick={onToggleTranslation} aria-label="Bản dịch" title="Bản dịch" className={toggleClass(showTranslation)}>
         <Icon name="subtitles" size={18} />
-        Bản dịch
+        <span className={compact ? "hidden 2xl:inline" : ""}>Bản dịch</span>
       </button>
     </div>
   );

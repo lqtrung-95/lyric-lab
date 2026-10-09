@@ -133,22 +133,22 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
   return (
     <>
       <h1 className="sr-only">Video: {lesson.title}</h1>
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
-        <div className="flex min-w-0 items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
+        <div className="flex min-w-0 flex-1 basis-64 items-center gap-3">
           <Link href="/video" aria-label="Về danh sách video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
           <div className="min-w-0">
-            <p lang="zh" className="truncate font-serif text-headline-md text-primary">{lesson.title}</p>
+            <p lang="zh" title={lesson.title} className="truncate font-serif text-headline-md text-primary">{lesson.title}</p>
             <p className="truncate text-label-sm text-on-surface-variant">{lesson.channelTitle}</p>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-1">
-          <ReportVideoButton videoId={lesson.videoId} />
-          <ShortcutsHelpButton />
+        <div className="flex shrink-0 flex-wrap items-center gap-1">
           <VideoModeNav videoId={lesson.videoId} current="watch" />
-          <ViewToggles
+          <ViewToggles compact
           className="hidden md:flex" showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
           onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
         />
+          <ShortcutsHelpButton />
+          <ReportVideoButton videoId={lesson.videoId} />
         </div>
       </div>
       <div className="mx-auto flex max-w-3xl flex-col gap-6 px-gutter py-space-lg pb-32 md:px-6">

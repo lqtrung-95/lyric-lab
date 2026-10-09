@@ -50,8 +50,8 @@ export function ReportVideoButton({ videoId }: { videoId: string }) {
   if (status === "sent") return <p role="status" className="inline-flex min-h-11 items-center text-label-md text-on-surface-variant">Cảm ơn bạn đã báo. Mình sẽ kiểm tra video này.</p>;
   return (
     <div ref={wrapRef} className="relative">
-      <button type="button" aria-expanded={open} onClick={() => setOpen((o) => !o)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
-        <Icon name="flag" size={18} />Báo video sai
+      <button type="button" aria-expanded={open} aria-label="Báo video sai" title="Báo video sai" onClick={() => setOpen((o) => !o)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+        <Icon name="flag" size={18} /><span className="hidden 2xl:inline">Báo video sai</span>
       </button>
       {open && (
         <fieldset className="absolute right-0 top-full z-30 mt-1 flex w-max max-w-[calc(100vw-2rem)] flex-col gap-1.5 rounded-2xl bg-surface-container-lowest p-2 shadow-lg ring-1 ring-outline-variant" disabled={status === "sending"}>

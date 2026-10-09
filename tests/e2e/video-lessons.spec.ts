@@ -53,6 +53,24 @@ test("danh sách video: hiện thẻ video đã duyệt, mục Video có trên t
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
 });
 
+test("xem video: tiêu đề rất dài bị cắt (rê chuột đọc đủ), thanh trên gọn và không tràn ở mọi cỡ màn hình", async ({ page }) => {
+  const LONG = "Slow Chinese Vlog | What's in a Chinese Shopping Mall? | Comprehensible Input for HSK 1–3 | Một tiêu đề cực kỳ dài để thử cắt chữ";
+  await mockVideoApis(page);
+  await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: { ...lesson, title: LONG } }));
+  for (const [width, height] of [[1280, 800], [900, 800], [390, 800]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto(`/video/${VIDEO_ID}`);
+    const title = page.locator("p[lang=zh][title]").first();
+    await expect(title).toHaveAttribute("title", LONG);
+    expect(await title.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true); // bị cắt bằng dấu …
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true); // không tràn ngang
+    const nav = await page.getByRole("navigation", { name: "Cách học video này" }).boundingBox();
+    expect(nav!.x + nav!.width).toBeLessThanOrEqual(width);
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.screenshot({ path: `test-results/video-header-${width}.png`, clip: { x: 0, y: 0, width, height: 260 } });
+  }
+});
+
 test("xem video: 5 nút điều khiển, nút phát nằm chính giữa thanh", async ({ page }) => {
   await mockVideoApis(page);
   await page.setViewportSize({ width: 1200, height: 900 });
