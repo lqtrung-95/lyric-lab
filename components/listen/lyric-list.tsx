@@ -129,7 +129,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
           onTogglePinyin={onTogglePinyin} onToggleTranslation={onToggleTranslation}
         />
       </div>
-      <ol ref={listRef} className="flex flex-col gap-0.5 md:gap-2">
+      <ol ref={listRef} data-tour="lyric-list" className="flex flex-col gap-0.5 md:gap-2">
         {lines.map((line) => {
           const state: LineState = line.index === currentIndex ? "active" : line.index < currentIndex ? "past" : "upcoming";
           return (

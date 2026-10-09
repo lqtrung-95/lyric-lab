@@ -19,6 +19,8 @@ function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number,
  */
 export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWords" | "weekCount">): Promise<Blob> {
   await document.fonts.ready;
+  // Chữ 歌 trang trí dùng font chữ Hán đã chia mảnh: yêu cầu tải đúng mảnh trước khi vẽ (xem ghi chú ở lib/share/line-card.ts).
+  await document.fonts.load('700 760px "Noto Serif SC"', "歌").catch(() => undefined);
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;

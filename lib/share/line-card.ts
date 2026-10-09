@@ -31,6 +31,13 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
   const sans = "'Be Vietnam Pro', system-ui, sans-serif";
   const serif = "Lora, Georgia, serif";
   const hanFont = `600 96px "Noto Serif SC", ${serif}`;
+  // Font chữ Hán của trang chia thành hàng chục mảnh theo unicode-range và theo từng độ đậm, trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở ĐÚNG độ đậm
+  // ấy. `fonts.ready` không đợi các mảnh này nên canvas vẽ ngay: chữ nào có sẵn mảnh (vd. từ vựng in đậm trên trang) dùng Noto, chữ còn lại rơi về font hệ
+  // thống với nét đậm nhạt khác. Yêu cầu tải đúng chữ, đúng độ đậm sắp vẽ rồi mới vẽ.
+  await Promise.all([
+    document.fonts.load(hanFont, d.han),
+    document.fonts.load(`600 40px ${sans}`, `${d.title}${d.artist ?? ""}`),
+  ]).catch(() => undefined);
   const left = 90;
   const maxWidth = W - left * 2;
   const measureWith = (font: string) => (s: string) => { c.font = font; return c.measureText(s).width; };

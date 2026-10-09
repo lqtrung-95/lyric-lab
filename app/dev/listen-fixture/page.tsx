@@ -7,14 +7,17 @@ import { yeCheAnalysis, yeCheSong } from "@/lib/preview/fixtures/ye-che-analysis
 // Trang thử màn Nghe với dữ liệu mẫu hư cấu, không gọi DB/AI. Chỉ có ở môi trường phát triển và test.
 export const metadata = { robots: { index: false, follow: false } };
 
-export default function ListenFixturePage() {
+export default async function ListenFixturePage({ searchParams }: { searchParams: Promise<{ t?: string }> }) {
   if (process.env.NODE_ENV === "production") notFound();
+  // `?t=<giây>` giống trang Nghe thật: mở giữa bài (để thử luồng người nhận link chia sẻ một câu).
+  const t = Number((await searchParams).t);
+  const startAt = Number.isFinite(t) && t > 0 ? t : undefined;
   return (
     <>
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title="Nghe" />
       <main id="main" tabIndex={-1} className="pt-16 outline-none">
-        <ListenScreen analysis={yeCheAnalysis} song={yeCheSong} />
+        <ListenScreen analysis={yeCheAnalysis} song={yeCheSong} startAt={startAt} />
       </main>
     </>
   );

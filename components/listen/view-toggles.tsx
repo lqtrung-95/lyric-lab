@@ -16,7 +16,7 @@ const toggleClass = (on: boolean) =>
 /** Bật/tắt từng lớp pinyin và bản dịch (LS-03). Dùng ở thanh trên (desktop) và đầu danh sách lời (mobile). */
 export function ViewToggles({ showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, className = "" }: ViewTogglesProps) {
   return (
-    <div role="group" aria-label="Lớp hiển thị" className={`items-center gap-1 ${className}`}>
+    <div role="group" aria-label="Lớp hiển thị" data-tour="view-toggles" className={`items-center gap-1 ${className}`}>
       <button type="button" aria-pressed={showPinyin} onClick={onTogglePinyin} className={toggleClass(showPinyin)}>
         <Icon name="translate" size={18} />
         Pinyin

@@ -23,7 +23,9 @@ import { SyncPanel } from "./sync-panel";
 import { usePublishDefaultOffset } from "./use-publish-default-offset";
 import { SongReportBanner } from "@/components/admin/song-report-banner";
 import { ListenTopBar } from "./listen-top-bar";
+import { ListenTour } from "./listen-tour";
 import { LyricList } from "./lyric-list";
+import { isListenTourDone, markListenTourDone } from "@/lib/listen/listen-tour";
 import type { WordSelection } from "./lyric-line-row";
 import { SingingPanel } from "./singing-panel";
 import { useLineExplain } from "./use-line-explain";
@@ -48,6 +50,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
   const [quickSync, setQuickSync] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [toastDismissed, setToastDismissed] = useState(false);
   const [pinToast, setPinToast] = useState<string | null>(null);
   // Video + thanh điều khiển dính ở đầu màn hình khi cuộn xuống đọc lời (mọi cỡ màn hình) — `data-sticky-player`
@@ -79,6 +82,16 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const { completed } = useSongProgress(analysis.videoId, lines, liveIndex);
   const lookup = useTermLookup(analysis.videoId, word);
   const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
+
+  // Hướng dẫn màn Nghe tự hiện một lần ở lần nghe đầu tiên, sau khi player sẵn sàng. Người mở từ link chia sẻ một câu (startAt có sẵn) chờ tới khi họ
+  // bấm phát lần đầu, để không che câu hát họ vừa được mời nghe.
+  const arrivedMidSong = startAt !== undefined;
+  useEffect(() => {
+    if (!controller || isListenTourDone() || (arrivedMidSong && !playing)) return;
+    const timer = setTimeout(() => setTourOpen(true), 1500);
+    return () => clearTimeout(timer);
+  }, [controller, arrivedMidSong, playing]);
+  const closeTour = useCallback(() => { markListenTourDone(); setTourOpen(false); }, []);
 
   const known = useMemo(() => new Set(learner.state.known), [learner.state.known]);
   const savedKeys = useMemo(() => new Set(learner.state.saved.map((s) => s.key)), [learner.state.saved]);
@@ -196,6 +209,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
         onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })}
         onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
         liked={liked.has(analysis.videoId)} onToggleLike={(v) => setLiked(analysis.videoId, v)}
+        onShowTour={() => setTourOpen(true)}
       />
       <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
         <div className="flex flex-col gap-6 lg:col-span-7">
@@ -240,6 +254,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           <SingingPanel line={lines[currentIndex] ?? null} items={currentItems} savedKeys={savedKeys} onToggleSave={saveFromPanel} />
         </div>
       </div>
+      {tourOpen && <ListenTour onClose={closeTour} />}
       {word && (
         <WordPopover
           word={word} item={wordItem} lookup={lookup}

@@ -81,3 +81,6 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 - Danh sách lời ưu tiên nhìn được nhiều câu: chữ, pinyin, padding và khoảng cách dòng dùng cỡ nhỏ hơn dưới `md` (xem `lyric-line-row.tsx`), cỡ gốc từ `md` trở lên. Không thêm cột bên phải cạnh dòng lời trên điện thoại vì nó bóp hẹp chữ Hán và làm lời ngắt dòng liên tục; hành động của dòng (chia sẻ, sửa) nằm dưới câu đang hát.
 - Vùng bấm vẫn ≥ 44 px bằng cách phình nút rồi kéo lề âm (`-mr-5`), không bằng cách cho nút chiếm chỗ.
 - Khối phụ (canh lời, báo lỗi) đứng sau danh sách lời trên điện thoại (`max-lg:order-last`).
+
+## Vẽ canvas với font chữ Hán
+- Font chữ Hán của trang (Noto Serif SC qua Google Fonts) chia thành nhiều mảnh theo unicode-range và theo độ đậm; trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở đúng độ đậm. `document.fonts.ready` KHÔNG đợi các mảnh này nên vẽ canvas ngay sẽ có chữ rơi về font hệ thống, nét đậm nhạt khác nhau trong cùng một câu. Trước khi `fillText` chữ Hán, gọi `await document.fonts.load(font, đoạnChữSắpVẽ)` (xem `lib/share/line-card.ts`).

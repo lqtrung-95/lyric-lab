@@ -83,16 +83,16 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
       <div className="flex flex-col gap-1 px-2 py-2">
         <PlaybackProgressBar controller={controller} durationSec={durationSec} onSeekBy={onSeekBy} />
         <div role="group" aria-label="Điều khiển nhanh" className="flex items-center justify-between gap-1">
-          <button type="button" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px]`}>{label(rate)}</button>
-          <button type="button" disabled={!ready} onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
-          <button type="button" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>
+          <button type="button" data-tour="rate" onClick={() => onRate(nextRate)} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px]`}>{label(rate)}</button>
+          <button type="button" disabled={!ready} data-tour="loop" onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
+          <button type="button" data-tour="pin" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>
           <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50 lg:h-14 lg:w-14">
             <Icon name={playing ? "pause" : "play_arrow"} filled size={null} className="text-[22px] lg:text-[28px]" />
           </button>
-          {onExplain && <button type="button" disabled={explainDisabled} onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>}
-          {onPractice && <button type="button" disabled={practiceDisabled} onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>}
-          {onOffsetChange && <button type="button" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel} className={`${tile} ${syncOpen || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>}
+          {onExplain && <button type="button" disabled={explainDisabled} data-tour="explain" onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>}
+          {onPractice && <button type="button" disabled={practiceDisabled} data-tour="practice" onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>}
+          {onOffsetChange && <button type="button" data-tour="offset" onClick={() => setSyncOpen((o) => !o)} aria-expanded={syncOpen} aria-label={offsetLabel} className={`${tile} ${syncOpen || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>}
         </div>
       </div>
       {syncOpen && onOffsetChange && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-2 bottom-full z-40 mb-1" />}

@@ -17,10 +17,12 @@ interface ListenTopBarProps {
   onToggleTranslation: () => void;
   liked: boolean;
   onToggleLike: (liked: boolean) => void;
+  /** Mở lại hướng dẫn màn Nghe. */
+  onShowTour?: () => void;
 }
 
 /** Thanh phụ màn Nghe: quay lại xem trước, tên bài, nút thích; trên desktop có cả nút bật/tắt pinyin và bản dịch. */
-export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, liked, onToggleLike }: ListenTopBarProps) {
+export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, liked, onToggleLike, onShowTour }: ListenTopBarProps) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
       <div className="flex min-w-0 items-center gap-3">
@@ -33,6 +35,12 @@ export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, sho
         </div>
       </div>
       <div className="flex items-center gap-1">
+        {onShowTour && (
+          <button type="button" onClick={onShowTour} aria-label="Xem hướng dẫn màn Nghe" title="Hướng dẫn"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container">
+            <Icon name="lightbulb" size={20} />
+          </button>
+        )}
         <ShortcutsHelpButton />
         <ListenLikeButton videoId={videoId} liked={liked} onChange={onToggleLike} />
         <ViewToggles
