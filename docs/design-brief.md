@@ -139,7 +139,7 @@ Tương tác trên thẻ: **Lưu** (bật/tắt, đổi màu ngay), **Đã biế
 - Từ vựng đã xem trước: nền đỏ nhạt + gạch chân đậm. Ngữ pháp: chỉ gạch chân xanh. Bấm vào thì mở thẻ tương ứng trong panel.
 - Từ thường (không tô sáng) vẫn bấm được, mở S6.
 
-**Hàng điều khiển:** Phát/Dừng (nút tròn lớn), tốc độ 0,5x / 0,75x / 1x, Lặp câu này (bật/tắt, khi bật hiện "Đang lặp câu 2"), bật/tắt Pinyin, bật/tắt Bản dịch.
+**Hàng điều khiển:** Phát/Dừng (nút tròn lớn), tốc độ 0,5x / 0,75x / 1x / 1,25x / 1,5x / 2x (nút xoay vòng), Lặp câu này (bật/tắt, khi bật hiện "Đang lặp câu 2"), bật/tắt Pinyin, bật/tắt Bản dịch.
 
 ### S6 — Tra từ (popover / sheet)
 
