@@ -50,6 +50,27 @@ describe("ingestVideo với phụ đề người dùng", () => {
     expect(written[0]).not.toHaveProperty("added_by"); // video admin nạp không ghi cột added_by, nên chạy được cả khi migration chưa có
   });
 
+  it("có phụ đề tiếng Việt sẵn thì ghép làm bản dịch (nguồn youtube); AI chỉ được gọi cho dòng còn thiếu", async () => {
+    const vi = [{ text: "Xin chào các bạn", start: 0, end: 4 }]; // dòng 2 không có bản dịch tương ứng
+    const asked: string[][] = [];
+    const translateMissing = async (prepared: PreparedLine[]) => { asked.push(prepared.filter((l) => !l.translation).map((l) => l.text)); return prepared.map((l) => (l.translation ? l : { ...l, translation: "AI dịch" })); };
+    const { sb, written } = fakeDb();
+    await ingestVideo({ sb, provider: new FixedCaptionProvider(lines, "zh-Hans", vi), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
+    expect(asked).toEqual([["今天我们来聊一聊学习汉语"]]);
+    expect((written[0].lines as { translation: string }[]).map((l) => l.translation)).toEqual(["Xin chào các bạn", "AI dịch"]);
+    expect(written[0]).toMatchObject({ translation_source: "youtube" });
+  });
+
+  it("phụ đề tiếng Việt phủ hết các dòng thì không gọi AI", async () => {
+    const vi = [{ text: "Xin chào các bạn", start: 0, end: 4 }, { text: "Hôm nay nói về học tiếng Trung", start: 4, end: 9 }];
+    let called = false;
+    const translateMissing = async (prepared: PreparedLine[]) => { called = true; return prepared; };
+    const { sb, written } = fakeDb();
+    await ingestVideo({ sb, provider: new FixedCaptionProvider(lines, "zh-Hans", vi), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
+    expect(called).toBe(false);
+    expect(written[0]).toMatchObject({ translation_source: "youtube", translated_line_count: 2 });
+  });
+
   it("bỏ qua video đã có và video không nhúng được", async () => {
     expect(await ingestVideo({ sb: fakeDb(["abcdefghijk"]).sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null })).toEqual({ kind: "skipped", reason: "exists" });
     expect(await ingestVideo({ sb: fakeDb().sb, provider: new FixedCaptionProvider(lines), lookup }, { meta: { ...meta, embeddable: false }, sourceId: null })).toEqual({ kind: "skipped", reason: "not_embeddable" });

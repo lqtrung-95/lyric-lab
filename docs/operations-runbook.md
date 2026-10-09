@@ -14,7 +14,7 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `SUPABASE_SERVICE_ROLE_KEY` | Có | Ghi DB ở server, bỏ qua RLS. Tuyệt đối không lộ ra client |
 | `GROQ_API_KEY` | Có | Model Groq (dự phòng phân tích; chính cho giải nghĩa khi bấm) |
 | `YOUTUBE_DATA_API_KEY` | Có | Lấy tiêu đề/thời lượng/embeddable |
-| `SUPADATA_API_KEY` | Không | Tự lấy phụ đề tiếng Trung cho video người dùng dán link mà không kèm phụ đề (Supadata, `mode=native`, 1 credit/video; gói free 100 credit/tháng, hết credit trả 402 thì người dùng chuyển sang dán phụ đề). Bỏ trống thì chỉ nhận phụ đề dán vào/dấu trang |
+| `SUPADATA_API_KEY` | Không | Tự lấy phụ đề tiếng Trung cho video người dùng dán link mà không kèm phụ đề (Supadata, `mode=native`, 1 credit/lần gọi, thường 1 credit/video và 2 credit khi video có sẵn phụ đề tiếng Việt (lấy thêm để khỏi nhờ AI dịch); gói free 100 credit/tháng, hết credit trả 402 thì người dùng chuyển sang dán phụ đề). Bỏ trống thì chỉ nhận phụ đề dán vào/dấu trang |
 | `DEEPSEEK_API_KEY` | Nên có | Model phân tích chính (gọi thẳng api.deepseek.com). Thiếu thì rớt sang Groq |
 | `FALLBACK_LLM_API_KEY` | Nên có | Khóa Groq thứ hai (hạn mức đếm riêng) |
 | `OPENROUTER_API_KEY` | Nên có | Lưới an toàn cuối (gemini flash) |

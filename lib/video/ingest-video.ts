@@ -47,7 +47,7 @@ export interface IngestInput {
   status?: LessonStatus;
   /** Người thêm (video người dùng tự thêm); null với video admin nạp. */
   addedBy?: string | null;
-  /** Dịch các dòng chưa có bản dịch (ví dụ bằng LLM) khi không có track tiếng Việt; trả cùng số dòng, dòng dịch không được thì để null. */
+  /** Dịch các dòng còn chưa có bản dịch (ví dụ bằng LLM) sau khi ghép track tiếng Việt (nếu có); trả cùng số dòng, dòng dịch không được thì để null. */
   translateMissing?: (lines: PreparedLine[]) => Promise<PreparedLine[]>;
 }
 
@@ -71,8 +71,8 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
 
   let prepared = prepareLessonLines(zh, vi);
   if (prepared.length === 0) return { kind: "skipped", reason: "no_lines" };
-  const needsTranslation = !vi && translateMissing !== undefined;
-  if (needsTranslation) prepared = await translateMissing(prepared);
+  // Có track tiếng Việt thì dùng nó; vẫn nhờ nơi gọi dịch những dòng còn thiếu (không ghép được dòng nào thì không tốn lượt gọi).
+  if (translateMissing && prepared.some((l) => !l.translation)) prepared = await translateMissing(prepared);
   const terms = termsToLookUp(prepared);
   const dictionary = await withSubwordEntries(lookup, await lookup(terms), terms);
   const lines = toLessonLines(prepared, dictionary);
@@ -81,7 +81,7 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
 
   const row = {
     video_id: meta.videoId, source_id: sourceId, title: meta.title, channel_title: meta.channelTitle, duration_sec: meta.durationSec, level_avg: levelAvg,
-    translation_source: vi ? "youtube" : needsTranslation && translatedLineCount > 0 ? "ai" : "none", line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
+    translation_source: vi ? "youtube" : translateMissing && translatedLineCount > 0 ? "ai" : "none", line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
   };
   const { error } = exists
     ? await sb.from("video_lessons").update(row).eq("video_id", meta.videoId)

@@ -27,7 +27,7 @@ if(link){var a=document.createElement('a');a.href=link;a.target='_blank';a.textC
 function stop(){if(timer){clearInterval(timer);timer=null;}}
 function hide(){stop();if(box){box.remove();box=null;}}
 function fail(msg){hide();alert(msg);}
-function dbg(){var p=document.querySelectorAll(OPEN),ids=[];for(var i=0;i<p.length;i++){ids.push(p[i].getAttribute('target-id'));}return ' (mã lỗi: '+document.querySelectorAll(SEG).length+' dòng; '+ids.join(',')+')';}
+function dbg(){var p=document.querySelectorAll(OPEN),ids=[];for(var i=0;i<p.length;i++){ids.push(p[i].getAttribute('target-id'));}var tr=null;try{tr=langTrigger();}catch(e){}return ' (mã lỗi: '+document.querySelectorAll(SEG).length+' dòng; '+ids.join(',')+'; ngôn ngữ: '+(tr?norm(tr.innerText):'?')+')';}
 var help='Video này có thể không có bản chép lời. Bạn thử bấm "Hiện bản chép lời" dưới phần mô tả rồi bấm lại, hoặc dán phụ đề vào trang Thêm video.';
 function go(p){var b=btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');var url=O+'/video/add#d='+b;stop();say('Đã đọc xong, đang mở SongHanzi…');var w=window.open(url,'_blank');if(w){setTimeout(hide,2500);}else{say('Trình duyệt chặn cửa sổ mới.',url);}}
 function ok(t){return /(^|\\n)(\\d{1,2}:)?\\d{1,2}:\\d{2}(\\n|\\s)/.test(t);}
@@ -38,7 +38,46 @@ var els=document.querySelectorAll('[target-id*="transcript"],'+OPEN);var best=''
 for(var k=0;k<els.length;k++){var s=els[k].innerText||'';if(s.length>best.length&&ok(s)){best=s;}}
 return best;
 }
-function send(t){var han=(t.match(/[\\u4e00-\\u9fff]/g)||[]).length;if(han<10){fail('Bản chép lời đang không phải tiếng Trung. Hãy đổi ngôn ngữ ở cuối bảng bản chép lời sang tiếng Trung rồi bấm lại.');return;}go({v:id,t:t});}
+function han(t){return (t.match(/[\\u4e00-\\u9fff]/g)||[]).length;}
+var LANGS=['ar','zh','en','fr','de','id','it','ja','ko','pt','ru','es','th','ur','vi','hi','tr','nl','pl','ms'];
+var dn=null;try{dn=new Intl.DisplayNames([document.documentElement.lang||navigator.language||'en'],{type:'language'});}catch(e){}
+function nm(c){try{return dn?dn.of(c):null;}catch(e){return null;}}
+function norm(t){return (t||'').replace(/\\s+/g,' ').trim().toLowerCase();}
+function isLang(t){t=norm(t);if(!t||t.length>50){return false;}for(var i=0;i<LANGS.length;i++){var n=nm(LANGS[i]);if(n&&t.indexOf(n.toLowerCase())===0){return true;}}return false;}
+function isZh(t){var n=nm('zh');return !!n&&norm(t).indexOf(n.toLowerCase())===0;}
+function shown(e){return !!(e.offsetWidth||e.offsetHeight||(e.getClientRects&&e.getClientRects().length));}
+function langTrigger(){
+var segs=document.querySelectorAll(SEG);
+var root=(segs[0]&&(segs[0].closest('ytd-engagement-panel-section-list-renderer')||segs[0].closest('[target-id]')))||document;
+var c=root.querySelectorAll('yt-dropdown-menu,tp-yt-paper-button,[role="combobox"],[role="button"],button');
+for(var i=c.length-1;i>=0;i--){if(shown(c[i])&&isLang(c[i].innerText)){return c[i];}}
+return null;
+}
+function zhItem(){
+var c=document.querySelectorAll('tp-yt-paper-item,[role="menuitem"],[role="option"],[role="menuitemradio"],yt-list-item-view-model,ytd-menu-service-item-renderer,a');
+for(var i=0;i<c.length;i++){if(shown(c[i])&&isZh(c[i].innerText)){return c[i];}}
+return null;
+}
+function switchZh(done){
+var tr=langTrigger();if(!tr){done(false);return;}
+tr.click();
+setTimeout(function(){
+var it=zhItem();if(!it){tr.click();done(false);return;}
+it.click();
+var n=0;(function w(){var t=readPanel();if(t&&han(t)>=10){done(t);return;}n++;if(n>10){done(false);return;}setTimeout(w,500);})();
+},500);
+}
+function send(t,sw){
+if(han(t)<10){
+if(sw){fail('Chưa tự chuyển được bản chép lời sang tiếng Trung. Hãy chọn tiếng Trung ở ô ngôn ngữ cuối bảng bản chép lời rồi bấm lại.'+dbg());return;}
+say('SongHanzi: đang chuyển bản chép lời sang tiếng Trung…');
+switchZh(function(x){if(x){send(x,true);}else{send(t,true);}});
+return;
+}
+go({v:id,t:t});
+}
+function noZh(){try{var tr=document.getElementById('movie_player').getPlayerResponse().captions.playerCaptionsTracklistRenderer.captionTracks;if(tr&&tr.length){for(var i=0;i<tr.length;i++){if(/^(zh|yue)/i.test(tr[i].languageCode)){return false;}}return true;}}catch(e){}return false;}
+if(noZh()){alert('Video này không có phụ đề tiếng Trung nên chưa thêm được. Hãy thử video khác.');return;}
 var now=readPanel();
 if(now){send(now);return;}
 var base='SongHanzi: đang đọc bản chép lời';

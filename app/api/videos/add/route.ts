@@ -6,11 +6,11 @@ import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { decideAddLimit, decideDuration } from "@/lib/video/add-video-limits";
-import { isMostlyChinese } from "@/lib/video/chinese-ratio";
+import { chineseRatio, isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { MAX_TRANSCRIPT_LINES, parsePastedTranscript } from "@/lib/video/parse-pasted-transcript";
-import { SupadataError, fetchSupadataChineseLines } from "@/lib/video/supadata-transcript";
+import { SupadataError, fetchSupadataLines } from "@/lib/video/supadata-transcript";
 import { translatePreparedLines } from "@/lib/video/translate-lines";
 import { fetchVideosMeta } from "@/lib/video/youtube-data-api";
 import { parseVideoId } from "@/lib/youtube/parse-video-id";
@@ -70,10 +70,21 @@ export async function POST(req: Request) {
 
     let lines: CaptionLine[] = parsed.data.lines ?? (parsed.data.captions ? parsePastedTranscript(parsed.data.captions, meta.durationSec) : []);
     if (lines.length === 0 && (parsed.data.captions || parsed.data.lines)) return fail("invalid_captions", 400);
+    // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI. Chỉ lấy được ở đường Supadata (dán tay/dấu trang chỉ có tiếng Trung).
+    let viLines: CaptionLine[] | null = null;
     if (lines.length === 0) {
       if (!env.SUPADATA_API_KEY) return fail("captions_required", 422);
-      lines = await fetchSupadataChineseLines(videoId, env.SUPADATA_API_KEY);
+      const zh = await fetchSupadataLines(videoId, env.SUPADATA_API_KEY, "zh");
+      lines = zh.lines;
       if (lines.length === 0) return fail("no_chinese_captions", 422);
+      if (zh.availableLangs.some((l) => l.toLowerCase().startsWith("vi"))) {
+        try {
+          const vi = (await fetchSupadataLines(videoId, env.SUPADATA_API_KEY, "vi")).lines;
+          if (vi.length > 0 && chineseRatio(vi) < 0.1) viLines = vi;
+        } catch {
+          // Không lấy được tiếng Việt thì để AI dịch như thường, không làm hỏng cả lần thêm video.
+        }
+      }
     }
 
     // Bản chép lời của YouTube hay mặc định sang ngôn ngữ giao diện của người xem: không phải tiếng Trung thì dừng, không tốn lượt dịch.
@@ -81,7 +92,7 @@ export async function POST(req: Request) {
 
     const chat = createChat(env);
     const outcome = await ingestVideo(
-      { sb, provider: new FixedCaptionProvider(lines), lookup: (terms) => lookupWords(sb as never, terms) },
+      { sb, provider: new FixedCaptionProvider(lines, "zh-Hans", viLines), lookup: (terms) => lookupWords(sb as never, terms) },
       { meta, sourceId: null, status: "listed", addedBy: user.id, translateMissing: (prepared) => translatePreparedLines(prepared, chat) },
     );
     if (outcome.kind === "skipped") return ok({ kind: "skipped", reason: outcome.reason });
