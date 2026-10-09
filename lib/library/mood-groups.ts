@@ -8,19 +8,21 @@ export type MoodGroupId = "buon" | "hoai-niem" | "co-don" | "lang-man" | "hy-von
 export interface MoodGroup {
   id: MoodGroupId;
   label: string;
+  /** Nhãn ngắn một hai chữ cho chip lọc (nhãn đầy đủ dùng làm tooltip và tên cho trình đọc màn hình). */
+  short: string;
   /** Mẫu chuỗi (chữ thường) tìm trong từng tag; khớp một mẫu là thuộc nhóm. */
   keywords: string[];
 }
 
 export const MOOD_GROUPS: MoodGroup[] = [
-  { id: "lang-man", label: "Lãng mạn, ngọt ngào", keywords: ["lãng mạn", "ngọt ngào", "yêu", "tình cảm", "tình ái", "say đắm", "đắm say", "mê đắm", "ngây ngất", "rung động", "nồng", "cuồng nhiệt", "mãnh liệt", "thầm thương", "thầm yêu", "thơ mộng", "dịu dàng", "thủy chung", "e ấp", "si tình", "đam mê", "mộng mơ", "tương tư"] },
-  { id: "hoai-niem", label: "Hoài niệm, tiếc nuối", keywords: ["hoài niệm", "nostalgic", "tiếc", "nuối", "nhớ", "hối", "luyến", "day dứt", "da diết", "man mác", "bâng khuâng", "bồi hồi", "khắc khoải", "thao thức", "ân hận", "thanh xuân", "đơn phương", "chia tay", "tạm biệt", "duyên phận", "định mệnh", "nỗi niềm", "xao xuyến"] },
-  { id: "buon", label: "Buồn, đau lòng", keywords: ["buồn", "đau", "tuyệt vọng", "vô vọng", "bi thương", "thất vọng", "chua xót", "xót xa", "u sầu", "u uất", "u ám", "tổn thương", "vỡ mộng", "bế tắc", "mất mát", "tủi", "cam chịu", "bất lực", "vô lực", "mệt mỏi", "buông", "từ bỏ", "lạnh lẽo", "khổ", "nhẫn nhục", "nhẫn nhịn", "dằn lòng", "yếu đuối"] },
-  { id: "co-don", label: "Cô đơn", keywords: ["cô đơn", "đơn độc", "lạc lõng", "lạc lối", "lẻ loi", "bị bỏ rơi", "cô độc", "lạc đường"] },
-  { id: "hy-vong", label: "Hy vọng, tiếp thêm động lực", keywords: ["hy vọng", "hi vọng", "hopeful", "encouraging", "lạc quan", "kiên", "quyết tâm", "quyết liệt", "dũng cảm", "tự tin", "cảm hứng", "động viên", "khích lệ", "mạnh mẽ", "nhiệt huyết", "nỗ lực", "vượt", "chiến thắng", "tự hào", "hoài bão", "tự khẳng định", "khát vọng", "ước mơ", "mong ước", "sống trọn"] },
-  { id: "vui-tuoi", label: "Vui tươi, tràn năng lượng", keywords: ["vui", "hạnh phúc", "tinh nghịch", "nghịch ngợm", "hào hứng", "hứng khởi", "năng động", "phấn khích", "tươi", "trẻ trung", "hài hước", "dễ thương", "hồn nhiên", "ngây thơ", "trong sáng", "trong trẻo", "yêu đời", "sảng khoái", "hồi hộp", "tự do", "ánh sáng"] },
-  { id: "am-ap", label: "Ấm áp, chữa lành", keywords: ["ấm áp", "chữa lành", "an ủi", "bình yên", "yên bình", "yên tĩnh", "tĩnh lặng", "nhẹ nhàng", "nhẹ nhõm", "thư giãn", "thanh thản", "thanh tao", "biết ơn", "chân thành", "tin tưởng", "bao dung", "trân trọng", "đồng cảm", "cảm động", "xúc động", "chúc phúc", "đồng hành", "sâu lắng", "sâu sắc", "chiêm nghiệm", "suy tư", "trưởng thành", "chấp nhận", "khoảng lặng", "tha thiết"] },
-  { id: "giang-xe", label: "Giằng xé, bối rối", keywords: ["bối rối", "lo lắng", "lo âu", "hoang mang", "giằng xé", "mâu thuẫn", "xung đột", "bồn chồn", "bất an", "bất định", "do dự", "lưỡng lự", "ngập ngừng", "hoài nghi", "không chắc", "sợ hãi", "tức giận", "phẫn uất", "bực bội", "bức xúc", "uất ức", "căng thẳng", "ghen tuông", "ám ảnh", "băn khoăn", "mơ hồ"] },
+  { id: "lang-man", label: "Lãng mạn, ngọt ngào", short: "Lãng mạn", keywords: ["lãng mạn", "ngọt ngào", "yêu", "tình cảm", "tình ái", "say đắm", "đắm say", "mê đắm", "ngây ngất", "rung động", "nồng", "cuồng nhiệt", "mãnh liệt", "thầm thương", "thầm yêu", "thơ mộng", "dịu dàng", "thủy chung", "e ấp", "si tình", "đam mê", "mộng mơ", "tương tư"] },
+  { id: "hoai-niem", label: "Hoài niệm, tiếc nuối", short: "Hoài niệm", keywords: ["hoài niệm", "nostalgic", "tiếc", "nuối", "nhớ", "hối", "luyến", "day dứt", "da diết", "man mác", "bâng khuâng", "bồi hồi", "khắc khoải", "thao thức", "ân hận", "thanh xuân", "đơn phương", "chia tay", "tạm biệt", "duyên phận", "định mệnh", "nỗi niềm", "xao xuyến"] },
+  { id: "buon", label: "Buồn, đau lòng", short: "Buồn", keywords: ["buồn", "đau", "tuyệt vọng", "vô vọng", "bi thương", "thất vọng", "chua xót", "xót xa", "u sầu", "u uất", "u ám", "tổn thương", "vỡ mộng", "bế tắc", "mất mát", "tủi", "cam chịu", "bất lực", "vô lực", "mệt mỏi", "buông", "từ bỏ", "lạnh lẽo", "khổ", "nhẫn nhục", "nhẫn nhịn", "dằn lòng", "yếu đuối"] },
+  { id: "co-don", label: "Cô đơn", short: "Cô đơn", keywords: ["cô đơn", "đơn độc", "lạc lõng", "lạc lối", "lẻ loi", "bị bỏ rơi", "cô độc", "lạc đường"] },
+  { id: "hy-vong", label: "Hy vọng, tiếp thêm động lực", short: "Hy vọng", keywords: ["hy vọng", "hi vọng", "hopeful", "encouraging", "lạc quan", "kiên", "quyết tâm", "quyết liệt", "dũng cảm", "tự tin", "cảm hứng", "động viên", "khích lệ", "mạnh mẽ", "nhiệt huyết", "nỗ lực", "vượt", "chiến thắng", "tự hào", "hoài bão", "tự khẳng định", "khát vọng", "ước mơ", "mong ước", "sống trọn"] },
+  { id: "vui-tuoi", label: "Vui tươi, tràn năng lượng", short: "Vui tươi", keywords: ["vui", "hạnh phúc", "tinh nghịch", "nghịch ngợm", "hào hứng", "hứng khởi", "năng động", "phấn khích", "tươi", "trẻ trung", "hài hước", "dễ thương", "hồn nhiên", "ngây thơ", "trong sáng", "trong trẻo", "yêu đời", "sảng khoái", "hồi hộp", "tự do", "ánh sáng"] },
+  { id: "am-ap", label: "Ấm áp, chữa lành", short: "Ấm áp", keywords: ["ấm áp", "chữa lành", "an ủi", "bình yên", "yên bình", "yên tĩnh", "tĩnh lặng", "nhẹ nhàng", "nhẹ nhõm", "thư giãn", "thanh thản", "thanh tao", "biết ơn", "chân thành", "tin tưởng", "bao dung", "trân trọng", "đồng cảm", "cảm động", "xúc động", "chúc phúc", "đồng hành", "sâu lắng", "sâu sắc", "chiêm nghiệm", "suy tư", "trưởng thành", "chấp nhận", "khoảng lặng", "tha thiết"] },
+  { id: "giang-xe", label: "Giằng xé, bối rối", short: "Giằng xé", keywords: ["bối rối", "lo lắng", "lo âu", "hoang mang", "giằng xé", "mâu thuẫn", "xung đột", "bồn chồn", "bất an", "bất định", "do dự", "lưỡng lự", "ngập ngừng", "hoài nghi", "không chắc", "sợ hãi", "tức giận", "phẫn uất", "bực bội", "bức xúc", "uất ức", "căng thẳng", "ghen tuông", "ám ảnh", "băn khoăn", "mơ hồ"] },
 ];
 
 const BY_ID = new Map(MOOD_GROUPS.map((g) => [g.id, g]));

@@ -50,6 +50,8 @@ describe("primaryMoodGroupForTag / parseMoodGroup / label", () => {
     for (const g of MOOD_GROUPS) {
       expect(moodGroupLabel(g.id)).toBe(g.label);
       expect(g.keywords.length).toBeGreaterThan(0);
+      expect(g.short.length).toBeGreaterThan(0);
+      expect(g.short.length).toBeLessThanOrEqual(12); // nhãn chip phải ngắn để cả hàng vừa một dòng
     }
   });
 });

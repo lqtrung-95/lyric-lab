@@ -22,8 +22,8 @@ test("Khám phá: hiện chip có số bài, bỏ nhóm 0 bài, chọn chip gử
   await page.goto("/library?tab=discover");
   const group = page.getByRole("group", { name: "Lọc theo cảm xúc" });
   await expect(group.getByRole("button", { name: "Tất cả" })).toHaveAttribute("aria-pressed", "true");
-  await expect(group.getByRole("button", { name: /Buồn, đau lòng\s*5/ })).toBeVisible();
-  await expect(group.getByRole("button", { name: /Lãng mạn, ngọt ngào\s*12/ })).toBeVisible();
+  await expect(group.getByRole("button", { name: "Buồn, đau lòng (5 bài)" })).toBeVisible();
+  await expect(group.getByRole("button", { name: "Lãng mạn, ngọt ngào (12 bài)" })).toBeVisible();
   await expect(group.getByRole("button", { name: /Cô đơn/ })).toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
@@ -62,7 +62,7 @@ test("Bài hát của tôi: lọc theo cảm xúc cho cả bài chỉ lưu ở t
   await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
   await page.goto("/library");
   const group = page.getByRole("group", { name: "Lọc theo cảm xúc" });
-  await expect(group.getByRole("button", { name: /Buồn, đau lòng\s*2/ })).toBeVisible();
+  await expect(group.getByRole("button", { name: "Buồn, đau lòng (2 bài)" })).toBeVisible();
   await expect(page.getByText("Bài cảm xúc 3")).toBeVisible();
   await group.getByRole("button", { name: /Buồn, đau lòng/ }).click();
   await expect(page.getByText("Bài cảm xúc 1")).toBeVisible();
@@ -89,3 +89,21 @@ test("API cảm xúc luôn trả JSON hợp lệ, id sai bị bỏ qua", async (
   expect(moods.status()).toBe(200);
   expect((await moods.json()).moods).toEqual({});
 });
+
+test("điện thoại: hàng chip một dòng cuộn ngang và tự cuộn tới chip đang chọn", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await mockDiscover(page, { buon: 5, "lang-man": 12, "hoai-niem": 8, "co-don": 3, "hy-vong": 9, "vui-tuoi": 2, "am-ap": 7, "giang-xe": 4 });
+  await page.goto("/library?tab=discover&mood=giang-xe");
+  const row = page.getByRole("group", { name: "Lọc theo cảm xúc" });
+  const chip = row.getByRole("button", { name: /Giằng xé/ });
+  await expect(chip).toHaveAttribute("aria-pressed", "true");
+  // Một dòng: mọi chip cùng độ cao; chip đang chọn nằm trọn trong vùng nhìn của hàng sau khi cuộn.
+  await expect.poll(async () => {
+    const [r, c] = await Promise.all([row.boundingBox(), chip.boundingBox()]);
+    return !!r && !!c && c.x >= r.x - 1 && c.x + c.width <= r.x + r.width + 1;
+  }).toBe(true);
+  const heights = await row.getByRole("button").evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
+  expect(heights[0]).toBeGreaterThanOrEqual(44);
+});
+

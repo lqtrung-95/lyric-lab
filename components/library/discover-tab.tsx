@@ -122,8 +122,8 @@ export function DiscoverTab() {
         </label>
       </div>
       {moodCounts && Object.keys(moodCounts).length > 0 && <MoodChips className="mt-space-sm" value={mood} onChange={selectMood} counts={moodCounts} />}
-      <p className="mt-space-sm text-label-md text-on-surface-variant">
-        {total !== null && total > 0 ? `${total.toLocaleString("vi-VN")} bài đã được phân tích` : "Bài hát đã được người dùng khác phân tích"}: mở là học được ngay, không phải chờ.
+      <p className="mt-space-sm text-label-sm text-on-surface-variant">
+        {total !== null && total > 0 ? `${total.toLocaleString("vi-VN")} bài` : "Bài hát đã được phân tích"} · mở là học được ngay, không phải chờ
       </p>
 
       {state === "loading" ? (
