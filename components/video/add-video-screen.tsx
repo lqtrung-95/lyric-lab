@@ -88,7 +88,7 @@ export function AddVideoScreen() {
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Thêm video của bạn</h1>
         <p className="mt-1 text-body-lg text-on-surface-variant">Dán link video tiếng Trung (podcast, vlog...) để luyện chép chính tả và nói theo. Video thêm vào sẽ hiện cho mọi người trong mục Video. Mỗi người thêm tối đa {MAX_VIDEOS_PER_USER_PER_DAY} video mỗi ngày, mỗi video dài tối đa {MAX_ADDED_VIDEO_SECONDS / 60} phút.</p>
-        <p className="mt-2 text-label-md font-medium text-on-surface">Lưu ý: video YouTube phải có phụ đề tiếng Trung (CC). Video không có phụ đề thì chưa thêm được.</p>
+        <p className="mt-2 text-label-md font-medium text-on-surface">Lưu ý: video YouTube cần có phụ đề tiếng Trung (CC) nhé. Video không có phụ đề thì chưa thêm được nha.</p>
       </header>
       <form onSubmit={submit} className="space-y-space-md">
         <label className="block space-y-1">

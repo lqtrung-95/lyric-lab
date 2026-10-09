@@ -22,6 +22,7 @@ test("trang luôn hiện sẵn ô dán phụ đề và hướng dẫn dấu tran
   await expect(page.getByRole("heading", { name: "Thêm video của bạn" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Thêm video" })).toBeDisabled();
   await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toBeVisible();
+  await expect(page.getByText("video YouTube cần có phụ đề tiếng Trung (CC) nhé. Video không có phụ đề thì chưa thêm được nha.")).toBeVisible();
   await expect(page.getByRole("button", { name: /Tự dán phụ đề/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Sao chép mã/ })).toHaveCount(0);
   const bookmarklet = page.getByRole("link", { name: "Gửi sang SongHanzi" });
