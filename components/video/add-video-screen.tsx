@@ -13,12 +13,12 @@ const readHash = () => window.location.hash;
 
 const ERRORS: Record<string, string> = {
   invalid_video: "Link chưa đúng. Dán link video YouTube, ví dụ https://www.youtube.com/watch?v=...",
-  invalid_captions: "Chưa đọc được phụ đề đã dán. Cần có mốc thời gian (file SRT/VTT, hoặc văn bản copy từ \"Hiện bản chép lời\" của YouTube).",
+  invalid_captions: "Chưa đọc được phụ đề đã dán. Cần có mốc thời gian (file SRT/VTT, hoặc phụ đề copy từ YouTube bằng nút \"Show transcript\" dưới phần mô tả video).",
   video_not_found: "Không tìm thấy video này (có thể riêng tư hoặc đã bị xóa).",
   too_long: `Video dài quá ${MAX_ADDED_VIDEO_SECONDS / 60} phút, hiện chưa hỗ trợ.`,
   too_short: "Video quá ngắn để luyện (dưới 30 giây).",
   unavailable: "Video này hiện không có trong thư viện.",
-  not_chinese: "Phụ đề này không phải tiếng Trung (YouTube hay mặc định sang ngôn ngữ của bạn). Đổi ngôn ngữ của bản chép lời sang tiếng Trung rồi gửi lại.",
+  not_chinese: "Phụ đề này không phải tiếng Trung (YouTube hay mặc định sang ngôn ngữ của bạn). Đổi ngôn ngữ của phụ đề sang tiếng Trung rồi gửi lại.",
   captions_required: "Cần có phụ đề tiếng Trung của video. Dán phụ đề vào ô bên dưới hoặc dùng dấu trang trên máy tính.",
   no_chinese_captions: "Video này không có phụ đề tiếng Trung. Dán phụ đề vào ô bên dưới nếu bạn có.",
   fetch_unavailable: "Chưa lấy tự động được phụ đề lúc này. Dán phụ đề vào ô bên dưới nhé.",
@@ -88,6 +88,7 @@ export function AddVideoScreen() {
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Thêm video của bạn</h1>
         <p className="mt-1 text-body-lg text-on-surface-variant">Dán link video tiếng Trung (podcast, vlog...) để luyện chép chính tả và nói theo. Video thêm vào sẽ hiện cho mọi người trong mục Video. Mỗi người thêm tối đa {MAX_VIDEOS_PER_USER_PER_DAY} video mỗi ngày, mỗi video dài tối đa {MAX_ADDED_VIDEO_SECONDS / 60} phút.</p>
+        <p className="mt-2 text-label-md font-medium text-on-surface">Lưu ý: video YouTube phải có phụ đề tiếng Trung (CC). Video không có phụ đề thì chưa thêm được.</p>
       </header>
       <form onSubmit={submit} className="space-y-space-md">
         <label className="block space-y-1">
@@ -97,8 +98,8 @@ export function AddVideoScreen() {
         </label>
         <label className="block space-y-1">
           <span className="text-label-md font-semibold text-on-surface">Phụ đề tiếng Trung <span className="font-normal text-on-surface-variant">(bỏ trống nếu muốn thử lấy tự động)</span></span>
-          {received && <p role="status" className="text-label-md text-primary">Đã nhận bản chép lời từ YouTube{received.vt ? " (kèm phụ đề tiếng Việt)" : ""}.</p>}
-          <textarea value={captionsValue} onChange={(e) => setCaptions(e.target.value)} rows={6} placeholder={"Dán file SRT/VTT, hoặc văn bản copy từ \"Hiện bản chép lời\" của YouTube:\n0:00\n大家好\n0:05\n欢迎收听..."}
+          {received && <p role="status" className="text-label-md text-primary">Đã nhận phụ đề từ YouTube{received.vt ? " (kèm phụ đề tiếng Việt)" : ""}.</p>}
+          <textarea value={captionsValue} onChange={(e) => setCaptions(e.target.value)} rows={6} placeholder={"Dán file SRT/VTT, hoặc phụ đề copy từ YouTube (nút \"Show transcript\" dưới phần mô tả video):\n0:00\n大家好\n0:05\n欢迎收听..."}
             className="w-full rounded-2xl bg-surface-container-high p-3 text-body-md text-on-surface" />
         </label>
         {busy && <p role="status" className="text-label-md text-on-surface-variant">Đang xử lý video, bạn đừng đóng trang này nhé.</p>}

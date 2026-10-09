@@ -114,6 +114,13 @@ test("dấu trang gửi bản chép lời nhưng server báo lỗi: hiện lỗi
 
 test("chưa có phiên đăng nhập (401) thì tạo phiên rồi tự thử lại một lần, không hiện lỗi", async ({ page }) => {
   const bodies: Record<string, unknown>[] = [];
+  // Đăng nhập ẩn danh giả lập: dự án Supabase thật bật CAPTCHA (trình duyệt localhost không có token Turnstile nên bị từ chối), test không được phụ thuộc vào đó.
+  await page.route("**/auth/v1/signup*", (route) => route.fulfill({
+    json: {
+      access_token: "e2e.access.token", token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: "e2e-refresh",
+      user: { id: "00000000-0000-4000-8000-000000000001", aud: "authenticated", role: "authenticated", is_anonymous: true, app_metadata: {}, user_metadata: {}, created_at: new Date().toISOString() },
+    },
+  }));
   await page.route("**/api/videos/*", (route) => route.fulfill({ status: 404, json: { error: "not_found" } }));
   await page.route("**/api/videos/add", (route) => {
     bodies.push(route.request().postDataJSON());

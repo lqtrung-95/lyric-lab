@@ -32,7 +32,7 @@ function stop(){if(timer){clearInterval(timer);timer=null;}}
 function hide(){stop();if(box){box.remove();box=null;}}
 function fail(msg){hide();alert(msg);}
 function dbg(){var p=document.querySelectorAll(OPEN),ids=[];for(var i=0;i<p.length;i++){ids.push(p[i].getAttribute('target-id'));}var tr=null;try{tr=langTrigger();}catch(e){}return ' (mã lỗi: '+document.querySelectorAll(SEG).length+' dòng; '+ids.join(',')+'; ngôn ngữ: '+(tr?norm(tr.innerText):'?')+')';}
-var help='Video này có thể không có bản chép lời. Bạn thử bấm "Hiện bản chép lời" dưới phần mô tả rồi bấm lại, hoặc dán phụ đề vào trang Thêm video.';
+var help='Video này có thể không có phụ đề. Bạn thử bấm nút hiện phụ đề dạng văn bản (Show transcript) dưới phần mô tả rồi bấm lại, hoặc dán phụ đề vào trang Thêm video.';
 function go(p){var b=btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');var url=O+'/video/add#d='+b;stop();say('Đã đọc xong, đang mở SongHanzi…');var w=window.open(url,'_blank');if(w){setTimeout(hide,2500);}else{say('Trình duyệt chặn cửa sổ mới.',url);}}
 function ok(t){return /(^|\\n)(\\d{1,2}:)?\\d{1,2}:\\d{2}(\\n|\\s)/.test(t);}
 function readPanel(){
@@ -79,8 +79,8 @@ switchLang('vi',function(x){return x!==t&&han(x)<10;},function(x){go(x?{v:id,t:t
 }
 function send(t,sw){
 if(han(t)<10){
-if(sw){fail('Chưa tự chuyển được bản chép lời sang tiếng Trung. Hãy chọn tiếng Trung ở ô ngôn ngữ cuối bảng bản chép lời rồi bấm lại.'+dbg());return;}
-say('SongHanzi: đang chuyển bản chép lời sang tiếng Trung…');
+if(sw){fail('Chưa tự chuyển được phụ đề sang tiếng Trung. Hãy chọn tiếng Trung ở ô ngôn ngữ cuối bảng phụ đề rồi bấm lại.'+dbg());return;}
+say('SongHanzi: đang chuyển phụ đề sang tiếng Trung…');
 switchLang('zh',function(x){return han(x)>=10;},function(x){if(x){send(x,true);}else{send(t,true);}});
 return;
 }
@@ -90,7 +90,7 @@ function noZh(){try{var tr=document.getElementById('movie_player').getPlayerResp
 if(noZh()){alert('Video này không có phụ đề tiếng Trung nên chưa thêm được. Hãy thử video khác.');return;}
 var now=readPanel();
 if(now){send(now);return;}
-var base='SongHanzi: đang đọc bản chép lời';
+var base='SongHanzi: đang đọc phụ đề';
 say(base+'.');
 timer=setInterval(function(){dots=(dots+1)%3;if(box){say(base+new Array(dots+2).join('.'));}},400);
 var ex=document.querySelector('#description-inline-expander #expand')||document.querySelector('tp-yt-paper-button#expand');
@@ -112,7 +112,7 @@ if(!readPanel()){var btn=openButton();if(btn){btn.click();}}
 var tries=0;
 (function wait(){
 var t=readPanel();if(t){send(t);return;}
-tries++;if(tries>14){fail('Bản chép lời chưa tải được. '+help+dbg());return;}
+tries++;if(tries>14){fail('Phụ đề chưa tải được. '+help+dbg());return;}
 if(tries%2===0&&!document.querySelectorAll(SEG).length){tryTab();}
 setTimeout(wait,500);
 })();

@@ -15,8 +15,8 @@ export function BookmarkletInstall() {
       <p className="text-label-md font-semibold text-on-surface">Dấu trang trên máy tính (khi không lấy tự động được)</p>
       <ol className="list-decimal space-y-1 pl-5 text-body-md text-on-surface-variant">
         <li>Kéo nút dưới đây lên thanh dấu trang của trình duyệt (một lần duy nhất).</li>
-        <li>Mở video trên youtube.com và bấm dấu trang <b>Gửi sang SongHanzi</b>: nó tự mở bản chép lời và gửi sang đây.</li>
-        <li>Nếu YouTube hiện bản chép lời không phải tiếng Trung, đổi ngôn ngữ ở cuối bảng bản chép lời rồi bấm lại.</li>
+        <li>Mở video trên youtube.com và bấm dấu trang <b>Gửi sang SongHanzi</b>: nó tự mở phụ đề và gửi sang đây.</li>
+        <li>Nếu YouTube hiện phụ đề không phải tiếng Trung, đổi ngôn ngữ ở cuối bảng phụ đề rồi bấm lại.</li>
       </ol>
       <div className="flex flex-wrap items-center gap-2">
         <a

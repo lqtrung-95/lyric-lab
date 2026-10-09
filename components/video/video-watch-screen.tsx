@@ -78,7 +78,7 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
   const toggleAutoScroll = useCallback(() => {
     const next = !prefs.autoScroll;
     update({ autoScroll: next });
-    setPinToast(next ? "Đã bỏ ghim: bản chép tự cuộn theo câu đang phát" : "Đã ghim: bản chép sẽ không tự cuộn theo câu đang phát nữa");
+    setPinToast(next ? "Đã bỏ ghim: phụ đề tự cuộn theo câu đang phát" : "Đã ghim: phụ đề sẽ không tự cuộn theo câu đang phát nữa");
   }, [prefs.autoScroll, update]);
 
   const reportTranslation = useCallback(async (index: number) => {

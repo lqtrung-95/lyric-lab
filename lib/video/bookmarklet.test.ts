@@ -127,7 +127,7 @@ describe("bookmarklet", () => {
 
   it("có thông báo tiến trình ngay trên trang trong lúc chờ, và gỡ đi khi xong", async () => {
     const { messages } = run({ panelText: PANEL, hasTranscriptButton: true });
-    expect(messages[0]).toContain("đang đọc bản chép lời");
+    expect(messages[0]).toContain("đang đọc phụ đề");
     await vi.advanceTimersByTimeAsync(5000);
     expect(messages.some((m) => m.includes("đang mở SongHanzi"))).toBe(true);
     expect(messages).toContain("hidden");

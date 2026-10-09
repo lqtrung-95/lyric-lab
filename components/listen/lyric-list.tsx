@@ -122,7 +122,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-serif text-headline-md text-on-surface max-md:sr-only">
           <Icon name="format_quote" size={20} className="text-primary" />
-          {variant === "speech" ? "Bản chép" : "Lời ca & nhịp điệu"}
+          {variant === "speech" ? "Phụ đề" : "Lời ca & nhịp điệu"}
         </h2>
         <p className="text-label-sm text-on-surface-variant max-md:hidden">Bấm câu để nhảy tới đó · bấm từ để tra</p>
         <ViewToggles
