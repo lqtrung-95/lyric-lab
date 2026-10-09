@@ -50,15 +50,28 @@ describe("ingestVideo với phụ đề người dùng", () => {
     expect(written[0]).not.toHaveProperty("added_by"); // video admin nạp không ghi cột added_by, nên chạy được cả khi migration chưa có
   });
 
-  it("có phụ đề tiếng Việt sẵn thì ghép làm bản dịch (nguồn youtube); AI chỉ được gọi cho dòng còn thiếu", async () => {
-    const vi = [{ text: "Xin chào các bạn", start: 0, end: 4 }]; // dòng 2 không có bản dịch tương ứng
+  it("có phụ đề tiếng Việt đủ tốt thì ghép làm bản dịch (nguồn youtube); AI chỉ được gọi cho dòng còn thiếu", async () => {
+    const zhTen = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
+    const viNine = zhTen.slice(0, 9).map((l, i) => ({ text: `Câu số ${i + 1}`, start: l.start, end: l.end })); // dòng 10 không có bản dịch tương ứng
     const asked: string[][] = [];
     const translateMissing = async (prepared: PreparedLine[]) => { asked.push(prepared.filter((l) => !l.translation).map((l) => l.text)); return prepared.map((l) => (l.translation ? l : { ...l, translation: "AI dịch" })); };
     const { sb, written } = fakeDb();
-    await ingestVideo({ sb, provider: new FixedCaptionProvider(lines, "zh-Hans", vi), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
-    expect(asked).toEqual([["今天我们来聊一聊学习汉语"]]);
-    expect((written[0].lines as { translation: string }[]).map((l) => l.translation)).toEqual(["Xin chào các bạn", "AI dịch"]);
+    await ingestVideo({ sb, provider: new FixedCaptionProvider(zhTen, "zh-Hans", viNine), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
+    expect(asked).toEqual([["这是第10个句子，我们继续学习"]]);
+    const translations = (written[0].lines as { translation: string }[]).map((l) => l.translation);
+    expect(translations.slice(0, 9)).toEqual(Array.from({ length: 9 }, (_, i) => `Câu số ${i + 1}`));
+    expect(translations[9]).toBe("AI dịch");
     expect(written[0]).toMatchObject({ translation_source: "youtube" });
+  });
+
+  it("phụ đề tiếng Việt ghép kém (lệch số dòng) thì bỏ, AI dịch cả bài", async () => {
+    const zhMany = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
+    const viFew = [{ text: "Một câu duy nhất", start: 0, end: 30 }]; // 1 dòng cho 10 dòng tiếng Trung
+    const translateMissing = async (prepared: PreparedLine[]) => prepared.map((l) => ({ ...l, translation: "AI dịch" }));
+    const { sb, written } = fakeDb();
+    await ingestVideo({ sb, provider: new FixedCaptionProvider(zhMany, "zh-Hans", viFew), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
+    expect((written[0].lines as { translation: string }[]).every((l) => l.translation === "AI dịch")).toBe(true);
+    expect(written[0]).toMatchObject({ translation_source: "ai" });
   });
 
   it("phụ đề tiếng Việt phủ hết các dòng thì không gọi AI", async () => {

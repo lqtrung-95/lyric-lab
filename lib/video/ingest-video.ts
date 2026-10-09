@@ -3,6 +3,7 @@ import { withSubwordEntries } from "@/lib/analysis/build-line-pinyin";
 import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
 import { pickBestChineseTrack } from "@/lib/captions/pick-best-chinese-track";
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
+import { isUsableTranslationTrack } from "./align-translation";
 import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines, type PreparedLine } from "./build-lesson-lines";
 import type { LessonStatus } from "./video-lesson-types";
 import type { VideoMeta } from "./youtube-data-api";
@@ -71,6 +72,12 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
 
   let prepared = prepareLessonLines(zh, vi);
   if (prepared.length === 0) return { kind: "skipped", reason: "no_lines" };
+  // Người dùng thêm video (có nơi dịch bù): chỉ dùng phụ đề tiếng Việt khi ghép đủ tốt, lệch dòng thì tệ hơn là AI dịch. Đường của admin giữ nguyên (admin rà tay).
+  let useVi = vi !== null;
+  if (vi && translateMissing && !isUsableTranslationTrack(prepared.length, vi.length, prepared.filter((l) => l.translation).length)) {
+    prepared = prepareLessonLines(zh, null);
+    useVi = false;
+  }
   // Có track tiếng Việt thì dùng nó; vẫn nhờ nơi gọi dịch những dòng còn thiếu (không ghép được dòng nào thì không tốn lượt gọi).
   if (translateMissing && prepared.some((l) => !l.translation)) prepared = await translateMissing(prepared);
   const terms = termsToLookUp(prepared);
@@ -81,7 +88,7 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
 
   const row = {
     video_id: meta.videoId, source_id: sourceId, title: meta.title, channel_title: meta.channelTitle, duration_sec: meta.durationSec, level_avg: levelAvg,
-    translation_source: vi ? "youtube" : translateMissing && translatedLineCount > 0 ? "ai" : "none", line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
+    translation_source: useVi ? "youtube" : translateMissing && translatedLineCount > 0 ? "ai" : "none", line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
   };
   const { error } = exists
     ? await sb.from("video_lessons").update(row).eq("video_id", meta.videoId)

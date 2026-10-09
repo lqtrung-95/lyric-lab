@@ -26,3 +26,14 @@ export function alignTranslations(zh: CaptionLine[], vi: CaptionLine[]): (string
   }
   return parts.map((p) => (p.length ? p.join(" ") : null));
 }
+
+/** Phụ đề tiếng Việt chỉ dùng thẳng làm bản dịch khi ghép đủ tốt: số dòng cùng cỡ với bản tiếng Trung và phần lớn dòng tiếng Trung có bản dịch. Lệch hơn thì dịch bằng AI cho chắc. */
+export const MIN_LINE_COUNT_RATIO = 0.5;
+export const MAX_LINE_COUNT_RATIO = 2;
+export const MIN_ALIGNED_SHARE = 0.7;
+
+export function isUsableTranslationTrack(zhLineCount: number, viLineCount: number, alignedCount: number): boolean {
+  if (zhLineCount === 0 || viLineCount === 0) return false;
+  const ratio = viLineCount / zhLineCount;
+  return ratio >= MIN_LINE_COUNT_RATIO && ratio <= MAX_LINE_COUNT_RATIO && alignedCount / zhLineCount >= MIN_ALIGNED_SHARE;
+}

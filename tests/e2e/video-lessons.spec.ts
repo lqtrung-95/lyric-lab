@@ -85,6 +85,53 @@ test("xem video: bản chép chạy theo thời gian, bấm từ tra được v�
   expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:8");
 });
 
+test.describe("báo bản dịch một dòng sai", () => {
+  async function openAndReport(page: Page, respond: { status?: number; json: unknown }) {
+    await mockVideoApis(page);
+    const bodies: unknown[] = [];
+    await page.route(`**/api/videos/${VIDEO_ID}/report-translation`, (route) => {
+      bodies.push(route.request().postDataJSON());
+      return route.fulfill({ status: respond.status ?? 200, json: respond.json });
+    });
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`/video/${VIDEO_ID}`);
+    const row = page.locator('[data-line-index="1"]');
+    await row.evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await row.hover();
+    await page.getByRole("button", { name: "Báo bản dịch câu 2 sai" }).click();
+    return bodies;
+  }
+
+  test("AI dịch lại ngay: bản dịch mới thay trên màn hình, báo cáo gửi đúng dòng", async ({ page }) => {
+    const bodies = await openAndReport(page, { json: { kind: "retranslated", translation: "Hôm nay trời đẹp thật." } });
+    await expect(page.getByText("Đã dịch lại câu này")).toBeVisible();
+    await expect(page.getByText("Hôm nay trời đẹp thật.")).toBeVisible();
+    await expect(page.getByText("Hôm nay thời tiết đẹp.")).toHaveCount(0);
+    expect(bodies).toEqual([{ lineIndex: 1 }]);
+  });
+
+  test("đã là bản AI hoặc hết trần: chỉ ghi nhận, bản dịch giữ nguyên", async ({ page }) => {
+    await openAndReport(page, { json: { kind: "reported" } });
+    await expect(page.getByText("Đã ghi nhận, quản trị viên sẽ xem lại")).toBeVisible();
+    await expect(page.getByText("Hôm nay thời tiết đẹp.")).toBeVisible();
+  });
+
+  test("báo quá nhiều trong ngày thì báo rõ", async ({ page }) => {
+    await openAndReport(page, { status: 429, json: { error: "user_limit" } });
+    await expect(page.getByText("Hôm nay bạn đã báo nhiều rồi")).toBeVisible();
+  });
+
+  test("dòng chưa có bản dịch thì không có nút báo", async ({ page }) => {
+    await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
+    await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: { ...lesson, lines: lesson.lines.map((l, i) => (i === 1 ? { ...l, translation: null } : l)) } }));
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`/video/${VIDEO_ID}`);
+    await expect(page.locator('[data-line-index="1"]')).toBeVisible();
+    await expect(page.getByRole("button", { name: "Báo bản dịch câu 2 sai" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Báo bản dịch câu 1 sai" })).toHaveCount(1);
+  });
+});
+
 test("video chưa duyệt hoặc không có: báo rõ và có đường về danh sách", async ({ page }) => {
   await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ status: 404, json: { error: "not_found" } }));

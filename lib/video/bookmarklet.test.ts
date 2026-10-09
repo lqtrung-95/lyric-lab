@@ -20,9 +20,9 @@ interface Opts {
   /** Ngôn ngữ giao diện YouTube (thuộc tính lang của trang), mặc định "en". */
   uiLang?: string;
   /** Video có nhiều ngôn ngữ: bảng mở bằng ngôn ngữ khác, cần chọn tiếng Trung ở ô chọn ngôn ngữ ở cuối bảng. */
-  langSwitch?: { triggerLabel: string; menuLabels: string[]; zhLabel: string; zhText: string };
-  /** Các track phụ đề của video (languageCode) theo trình phát. */
-  trackCodes?: string[];
+  langSwitch?: { triggerLabel: string; menuLabels: string[]; zhLabel: string; zhText: string; viLabel?: string; viText?: string };
+  /** Các track phụ đề của video theo trình phát: mã ngôn ngữ, hoặc {code, kind} (kind "asr" là phụ đề tự động). */
+  trackCodes?: (string | { code: string; kind?: string })[];
 }
 
 function run(opts: Opts) {
@@ -40,9 +40,15 @@ function run(opts: Opts) {
   const transcriptTab = element(opts.foreignUi ? "ข้อความถอดเสียง" : "Transcript", () => { segmentsShown = true; });
   const visible = { offsetWidth: 1, closest: () => null };
   const trigger = opts.langSwitch ? { ...visible, innerText: opts.langSwitch.triggerLabel, click: () => { clicks.push("trigger"); menuOpen = !menuOpen; } } : null;
-  const menuItems = (opts.langSwitch ? [...opts.langSwitch.menuLabels, opts.langSwitch.zhLabel] : []).map((label) => ({
+  const sw = opts.langSwitch;
+  const menuItems = (sw ? [...sw.menuLabels, sw.zhLabel, ...(sw.viLabel ? [sw.viLabel] : [])] : []).map((label) => ({
     ...visible, innerText: label,
-    click: () => { clicks.push(label); if (label === opts.langSwitch!.zhLabel) currentText = opts.langSwitch!.zhText; menuOpen = false; },
+    click: () => {
+      clicks.push(label);
+      if (label === sw!.zhLabel) currentText = sw!.zhText;
+      if (label === sw!.viLabel) currentText = sw!.viText ?? "";
+      menuOpen = false;
+    },
   }));
   const toast = {
     style: { cssText: "" },
@@ -63,7 +69,7 @@ function run(opts: Opts) {
       return opts.hasTranscriptButton && !opts.foreignUi ? [button] : []; // quét theo chữ chỉ tìm thấy nút khi giao diện là ngôn ngữ đã biết
     },
     documentElement: { lang: opts.uiLang ?? "en" },
-    getElementById: () => (opts.trackCodes ? { getPlayerResponse: () => ({ captions: { playerCaptionsTracklistRenderer: { captionTracks: opts.trackCodes!.map((languageCode) => ({ languageCode })) } } }) } : null),
+    getElementById: () => (opts.trackCodes ? { getPlayerResponse: () => ({ captions: { playerCaptionsTracklistRenderer: { captionTracks: opts.trackCodes!.map((t) => (typeof t === "string" ? { languageCode: t } : { languageCode: t.code, kind: t.kind })) } } }) } : null),
     querySelector: (sel: string) => (sel.includes("transcript-section") ? (opts.hasTranscriptButton ? button : null) : { click: () => { clicks.push("expand"); } }),
   };
   const win = { open: (u: string) => { opened.push(u); return opts.popupBlocked ? null : {}; } };
@@ -164,6 +170,41 @@ describe("bookmarklet", () => {
     expect(payloadOf(opened[0])?.t).toBe(PANEL);
   });
 
+  const viSwitch = (extra: object = {}) => ({
+    triggerLabel: "Chinese (China)", menuLabels: ["Arabic", "French"], zhLabel: "Chinese (China)", zhText: PANEL,
+    viLabel: "Vietnamese", viText: "0:00\nXin chào mọi người\n0:05\nChào mừng bạn đến với chương trình", ...extra,
+  });
+
+  it("video có phụ đề tiếng Việt do người làm: chuyển sang tiếng Việt, đọc rồi gửi kèm cả hai bản", async () => {
+    const { opened, alerts, clicks } = run({ panelText: PANEL, trackCodes: ["zh-CN", "vi"], langSwitch: viSwitch() });
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(alerts).toEqual([]);
+    expect(clicks).toEqual(["trigger", "Vietnamese"]);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL, vt: "0:00\nXin chào mọi người\n0:05\nChào mừng bạn đến với chương trình" });
+  });
+
+  it("track tiếng Việt chỉ là phụ đề tự động (asr) hoặc không có: không chuyển ngôn ngữ, gửi riêng tiếng Trung", async () => {
+    for (const trackCodes of [["zh-CN", { code: "vi", kind: "asr" }], ["zh-CN", "en"]]) {
+      const { opened, clicks } = run({ panelText: PANEL, trackCodes, langSwitch: viSwitch() });
+      await vi.advanceTimersByTimeAsync(2000);
+      expect(clicks).toEqual([]);
+      expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
+    }
+  });
+
+  it("không chuyển được sang tiếng Việt (không có mục) thì vẫn gửi tiếng Trung, không lỗi", async () => {
+    const { opened, alerts } = run({ panelText: PANEL, trackCodes: ["zh-CN", "vi"], langSwitch: viSwitch({ viLabel: undefined }) });
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(alerts).toEqual([]);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
+  });
+
+  it("bản đọc được sau khi chọn tiếng Việt vẫn toàn chữ Hán (chọn nhầm) thì bỏ, gửi riêng tiếng Trung", async () => {
+    const { opened } = run({ panelText: PANEL, trackCodes: ["zh-CN", "vi"], langSwitch: viSwitch({ viText: PANEL }) });
+    await vi.advanceTimersByTimeAsync(12_000);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
+  });
+
   it("video không có track tiếng Trung thì báo ngay, không mở bảng", () => {
     const { alerts, opened, clicks } = run({ trackCodes: ["en", "vi"], panelText: "0:00\nHello\n0:05\nWorld" });
     expect(alerts[0]).toContain("không có phụ đề tiếng Trung");
@@ -205,5 +246,11 @@ describe("decodeBookmarkletHash", () => {
     for (const bad of [{ v: "short", t: "x" }, { v: "abcdefghijk" }]) {
       expect(decodeBookmarkletHash(`#d=${Buffer.from(JSON.stringify(bad)).toString("base64url")}`)).toBeNull();
     }
+  });
+
+  it("nhận bản tiếng Việt kèm theo, bỏ qua nếu sai kiểu", () => {
+    const enc = (p: object) => `#d=${Buffer.from(JSON.stringify(p)).toString("base64url")}`;
+    expect(decodeBookmarkletHash(enc({ v: "abcdefghijk", t: "x", vt: "y" }))).toEqual({ v: "abcdefghijk", t: "x", vt: "y" });
+    expect(decodeBookmarkletHash(enc({ v: "abcdefghijk", t: "x", vt: 5 }))).toEqual({ v: "abcdefghijk", t: "x" });
   });
 });

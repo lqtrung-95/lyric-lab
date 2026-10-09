@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
 import { Toast } from "@/components/ui/toast";
+import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { PLAYER_SIZE_CLASS } from "@/components/listen/player-size-class";
 import { LyricList } from "@/components/listen/lyric-list";
 import type { WordSelection } from "@/components/listen/lyric-line-row";
@@ -29,7 +30,9 @@ import type { LessonDetail } from "@/lib/video/video-repo";
  * hay panel "Đang hát"; mọi từ chữ Hán đều bấm tra được.
  */
 export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; startAt?: number }) {
-  const lines = useMemo(() => lessonLinesToAnalyzed(lesson.lines), [lesson.lines]);
+  // Bản dịch AI vừa dịch lại sau khi người học báo sai: thay ngay trên màn này mà không cần tải lại bài.
+  const [retranslated, setRetranslated] = useState<Record<number, string>>({});
+  const lines = useMemo(() => lessonLinesToAnalyzed(lesson.lines).map((l) => (retranslated[l.index] ? { ...l, translation: retranslated[l.index] } : l)), [lesson.lines, retranslated]);
   const { containerRef, controller, failed } = useYouTubePlayer(lesson.videoId);
   const { prefs, update } = useListenPrefs();
   const learner = useLearnerState();
@@ -37,6 +40,8 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
   const [repeatConfig, setRepeatConfig] = useState<RepeatConfig>(defaultRepeatConfig);
   const [word, setWord] = useState<WordSelection | null>(null);
   const [pinToast, setPinToast] = useState<string | null>(null);
+  const [reportToast, setReportToast] = useState<string | null>(null);
+  const reporting = useRef(new Set<number>());
   const onRepeatsExhausted = useCallback(() => setLoopIndex(null), []);
   const { currentIndex, playing, cancelPendingResume } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
   const lookup = useTermLookup(lesson.videoId, word);
@@ -71,6 +76,30 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
     update({ autoScroll: next });
     setPinToast(next ? "Đã bỏ ghim: bản chép tự cuộn theo câu đang phát" : "Đã ghim: bản chép sẽ không tự cuộn theo câu đang phát nữa");
   }, [prefs.autoScroll, update]);
+
+  const reportTranslation = useCallback(async (index: number) => {
+    if (reporting.current.has(index)) return;
+    reporting.current.add(index);
+    setReportToast("Đang nhờ AI dịch lại câu này…");
+    const post = () => fetch(`/api/videos/${lesson.videoId}/report-translation`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lineIndex: index }) });
+    try {
+      await ensureAnonymousSession();
+      let res = await post();
+      if (res.status === 401 && (await ensureAnonymousSession())) res = await post();
+      const data = (await res.json().catch(() => ({}))) as { kind?: string; translation?: string; error?: string };
+      if (res.ok && data.kind === "retranslated" && data.translation) {
+        setRetranslated((prev) => ({ ...prev, [index]: data.translation! }));
+        setReportToast("Đã dịch lại câu này. Cảm ơn bạn đã báo!");
+      } else if (res.ok && data.kind === "duplicate") setReportToast("Bạn đã báo câu này rồi.");
+      else if (res.ok) setReportToast("Đã ghi nhận, quản trị viên sẽ xem lại bản dịch này.");
+      else if (data.error === "user_limit") setReportToast("Hôm nay bạn đã báo nhiều rồi, mai báo tiếp nhé.");
+      else setReportToast("Chưa gửi được báo cáo, thử lại sau nhé.");
+    } catch {
+      setReportToast("Chưa gửi được báo cáo, thử lại sau nhé.");
+    } finally {
+      reporting.current.delete(index);
+    }
+  }, [lesson.videoId]);
 
   const selectWord = useCallback((selection: WordSelection) => {
     pause();
@@ -141,9 +170,10 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
           showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
           shareContext={{ title: lesson.title, artist: lesson.channelTitle }}
           onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
-          onSeek={seekToLine} onWord={selectWord} onPauseSong={pause}
+          onSeek={seekToLine} onWord={selectWord} onPauseSong={pause} onReportTranslation={(i) => void reportTranslation(i)}
         />
         {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}
+        {reportToast && <Toast message={reportToast} onDismiss={() => setReportToast(null)} />}
       </div>
       {word && (
         <WordPopover

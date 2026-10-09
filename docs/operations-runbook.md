@@ -131,6 +131,8 @@ Tùy chọn: `--delay 60000` (nghỉ 60 giây giữa các video, nên dùng khi 
 ### Người dùng tự thêm video (`/video/add`)
 Chạy migration `20261010000001_video_lessons_added_by.sql` (cột `added_by`) **trước khi deploy**: thiếu cột thì `POST /api/videos/add` trả 500 (đếm giới hạn lỗi nên không bỏ qua giới hạn), việc nạp video của admin vẫn chạy bình thường. Video người dùng thêm vào `listed` ngay; gỡ ở `/admin/videos` (ẩn/xóa) hoặc SQL `delete from video_lessons where video_id = '...'`. Xem ai thêm nhiều: `select added_by, count(*) from video_lessons where added_by is not null group by 1 order by 2 desc`. Chi phí mỗi video: một lượt dịch LLM (chia đoạn 30 dòng chạy song song, vài đoạn lỗi thì dòng đó trống bản dịch) và tùy chọn một credit Supadata. Giới hạn nằm ở `lib/video/add-video-limits.ts`.
 
+Báo bản dịch sai ở video (migration `20261010000002_video_translation_reports.sql`, chạy **trước khi deploy**: thiếu bảng thì nút báo trả lỗi 500, phần còn lại không ảnh hưởng). Xem các dòng cần quản trị sửa tay: `select video_id, line_idx, old_translation, created_at from video_translation_reports where outcome = 'reported' order by created_at desc;` rồi sửa ở `/admin/videos/<id>` (sửa bản dịch từng dòng). Dòng bị báo nhiều: `select video_id, line_idx, count(*) from video_translation_reports group by 1,2 order by 3 desc`.
+
 ## 6. Khi LLM lỗi / hết hạn mức
 
 | Hiện tượng | Xử lý |

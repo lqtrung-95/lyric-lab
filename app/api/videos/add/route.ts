@@ -26,6 +26,8 @@ const bodySchema = z.object({
   video: z.string().min(1).max(300),
   // Phụ đề dán vào (SRT/VTT/bản chép lời của YouTube) hoặc các dòng do bookmarklet gửi sang; bỏ trống thì thử lấy tự động nếu máy chủ có khóa Supadata.
   captions: z.string().max(400_000).optional(),
+  // Phụ đề tiếng Việt của track do người làm (dấu trang gửi kèm): ghép làm bản dịch thay vì nhờ AI. Chỉ có nghĩa khi đi cùng `captions`.
+  viCaptions: z.string().max(400_000).optional(),
   lines: z.array(lineSchema).max(MAX_TRANSCRIPT_LINES).optional(),
 });
 
@@ -70,8 +72,12 @@ export async function POST(req: Request) {
 
     let lines: CaptionLine[] = parsed.data.lines ?? (parsed.data.captions ? parsePastedTranscript(parsed.data.captions, meta.durationSec) : []);
     if (lines.length === 0 && (parsed.data.captions || parsed.data.lines)) return fail("invalid_captions", 400);
-    // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI. Chỉ lấy được ở đường Supadata (dán tay/dấu trang chỉ có tiếng Trung).
+    // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI: do dấu trang gửi kèm (`viCaptions`) hoặc lấy thêm ở đường Supadata. Lõi nạp chỉ giữ khi ghép đủ tốt.
     let viLines: CaptionLine[] | null = null;
+    if (parsed.data.captions && parsed.data.viCaptions) {
+      const vi = parsePastedTranscript(parsed.data.viCaptions, meta.durationSec);
+      if (vi.length > 0 && chineseRatio(vi) < 0.1) viLines = vi;
+    }
     if (lines.length === 0) {
       if (!env.SUPADATA_API_KEY) return fail("captions_required", 422);
       const zh = await fetchSupadataLines(videoId, env.SUPADATA_API_KEY, "zh");
