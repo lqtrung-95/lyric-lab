@@ -22,7 +22,6 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION` | Tùy chọn | TTS thần kinh. Thiếu → `/api/tts` trả 503, nút loa dùng giọng hệ thống |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Tùy chọn | Captcha Turnstile (cần bật trước khi công khai rộng) |
 | `NEXT_PUBLIC_SENTRY_DSN` | Tùy chọn | Sentry |
-| `NEXT_PUBLIC_VIDEO_PUBLIC` | Tùy chọn | `1` = hiện mục "Video" trên menu cho mọi người. Không đặt: mục này chỉ hiện ở môi trường phát triển, ẩn cả với admin ở production (admin vẫn vào thẳng `/video` và `/admin/videos` bằng đường dẫn để thử). Đặt xong cần deploy lại (biến `NEXT_PUBLIC_*` được nhúng lúc build). |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | Tùy chọn | Khóa thông báo đẩy cho nhắc học. Sinh bằng `npx tsx scripts/generate-vapid-keys.mts` (in ra màn hình, không ghi file). Thiếu thì mục "Nhắc học" tự ẩn. Biến `NEXT_PUBLIC_*` cần deploy lại. |
 | `CRON_SECRET` | Tùy chọn | Chuỗi ngẫu nhiên ≥ 16 ký tự; Vercel Cron gửi kèm `Authorization: Bearer` khi gọi `/api/cron/reminders`. Thiếu thì route từ chối (401). |
 | `RESEND_API_KEY`, `EMAIL_FROM` | Tùy chọn | Gửi email (chào mừng, tổng kết tuần, nhắc quay lại) qua Resend. `EMAIL_FROM` dạng `SongHanzi <no-reply@ten-mien.com>` và **tên miền phải được xác thực (SPF/DKIM) trong Resend**: không xác thực thì chỉ gửi được tới chính chủ tài khoản Resend. Thiếu một trong hai thì mọi tính năng email tự tắt. |
