@@ -142,20 +142,30 @@ test("lặp câu: cấu hình đúng số lần, hết lượt thì tự tắt v
   expect((await calls(page)).filter((c) => c === "seek:5")).toHaveLength(1);
 });
 
-test("tốc độ nhanh 1,25x / 1,5x / 2x được áp dụng, xoay vòng về 0,5x rồi 0,75x", async ({ page }) => {
-  const rateBtn = page.getByRole("button", { name: /^Tốc độ/ });
-  for (const [label, rate] of [["1,25x", "1.25"], ["1,5x", "1.5"], ["2x", "2"], ["0,5x", "0.5"]]) {
-    await rateBtn.click();
-    await expect(rateBtn).toHaveText(label);
+test("bảng tốc độ: nút chọn nhanh, thanh trượt và nút −/+ đổi tốc độ, mức nhanh tới 2x, không có 3x", async ({ page }) => {
+  await page.getByRole("button", { name: /^Tốc độ/ }).click();
+  const panel = page.getByRole("group", { name: "Chỉnh tốc độ nghe" });
+  await expect(panel.locator("output")).toHaveText("1x");
+  await expect(panel.getByRole("button", { name: "3" })).toHaveCount(0);
+  for (const [name, rate] of [["1,25", "1.25"], ["1,5", "1.5"], ["2", "2"], ["0,5", "0.5"]]) {
+    await panel.getByRole("button", { name, exact: true }).click();
     await expect.poll(() => calls(page)).toContain(`rate:${rate}`);
   }
+  await panel.getByRole("button", { name: "Tăng tốc độ 0,05" }).click();
+  await expect(panel.locator("output")).toHaveText("0,55x");
+  await expect.poll(() => calls(page)).toContain("rate:0.55");
+  await panel.getByRole("slider", { name: "Tốc độ nghe" }).fill("1.35");
+  await expect(panel.locator("output")).toHaveText("1,35x");
+  await expect.poll(() => calls(page)).toContain("rate:1.35");
+  await page.keyboard.press("Escape");
+  await expect(panel).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Tốc độ/ })).toHaveText("1,35x");
 });
 
 test("tốc độ 0,75x được áp dụng và nhớ sau khi tải lại", async ({ page }) => {
-  // Nút tốc độ là 1 nút xoay vòng (nhãn = tốc độ hiện tại): [0.5, 0.75, 1, 1.25, 1.5, 2] → từ mặc định 1x bấm 5 lần mới tới 0,75x.
-  const rateBtn = page.getByRole("button", { name: /^Tốc độ/ });
-  for (let i = 0; i < 5; i++) await rateBtn.click();
-  await expect(rateBtn).toHaveText("0,75x");
+  await page.getByRole("button", { name: /^Tốc độ/ }).click();
+  await page.getByRole("group", { name: "Chỉnh tốc độ nghe" }).getByRole("button", { name: "0,75", exact: true }).click();
+  await expect(page.getByRole("button", { name: /^Tốc độ/ })).toHaveText("0,75x");
   await expect.poll(() => calls(page)).toContain("rate:0.75");
   await page.reload();
   await page.waitForFunction(() => typeof (window as unknown as { YT?: unknown }).YT !== "undefined");
@@ -311,7 +321,9 @@ test.describe("thanh điều khiển dính theo video khi cuộn", () => {
     await page.getByRole("button", { name: "Tới 5 giây" }).click();
     expect((await calls(page)).some((c) => c.startsWith("seek:"))).toBe(true);
     await bar.getByRole("button", { name: /^Tốc độ 1x/ }).click();
+    await page.getByRole("group", { name: "Chỉnh tốc độ nghe" }).getByRole("button", { name: "0,5", exact: true }).click();
     expect((await calls(page)).includes("rate:0.5")).toBe(true);
+    await page.keyboard.press("Escape");
     // Chỉnh lời lệch ngay trên thanh: mở bảng nhỏ, "Muộn hơn 0,5s" thì hiện +0,5s. Bảng này định vị tuyệt đối ra
     // ngoài group "Điều khiển nhanh" (neo theo cả thanh, không theo hàng nút) nên dò bằng `page`, không qua `bar`.
     await bar.getByRole("button", { name: /^Canh lời lệch/ }).click();
