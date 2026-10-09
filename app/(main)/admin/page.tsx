@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdminReportsBadge } from "@/components/admin/admin-reports-badge";
+import { AdminVideoReportsBadge } from "@/components/admin/admin-video-reports-badge";
 import { AdminGate } from "@/components/admin/admin-gate";
 import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
@@ -28,7 +29,7 @@ export default function AdminHomePage() {
                   <Icon name={l.icon} size={20} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="flex items-center gap-2 text-body-lg font-medium text-on-surface">{l.label}{l.href === "/admin/reports" && <AdminReportsBadge />}</span>
+                  <span className="flex items-center gap-2 text-body-lg font-medium text-on-surface">{l.label}{l.href === "/admin/reports" && <AdminReportsBadge />}{l.href === "/admin/videos" && <AdminVideoReportsBadge />}</span>
                   <span className="block text-label-md text-on-surface-variant">{l.description}</span>
                 </span>
                 <Icon name="chevron_right" size={20} className="shrink-0 text-on-surface-variant" />

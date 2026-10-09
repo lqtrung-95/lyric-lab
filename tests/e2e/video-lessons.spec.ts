@@ -449,6 +449,34 @@ test("quản trị video: xem báo cáo của người học theo lý do và b�
   expect(patches).toEqual([{ action: "dismiss_reports" }]);
 });
 
+test.describe("huy hiệu video bị báo ở trang quản trị", () => {
+  const link = (page: Page) => page.getByRole("link", { name: /Quản lý video/ });
+
+  test("hiện số video đang bị báo cạnh mục Quản lý video", async ({ page }) => {
+    await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+    await page.route("**/api/admin/song-reports*", (route) => route.fulfill({ json: { items: [] } }));
+    await page.route("**/api/admin/video-reports", (route) => route.fulfill({ json: { videos: 2, reports: 5 } }));
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto("/admin");
+    await expect(link(page).getByLabel("2 video đang bị báo")).toHaveText("2");
+    await noViolations(page);
+  });
+
+  test("không có video bị báo hoặc không lấy được số liệu thì không hiện huy hiệu", async ({ page }) => {
+    await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+    await page.route("**/api/admin/song-reports*", (route) => route.fulfill({ json: { items: [] } }));
+    await page.route("**/api/admin/video-reports", (route) => route.fulfill({ json: { videos: 0, reports: 0 } }));
+    await page.goto("/admin");
+    await expect(link(page)).toBeVisible();
+    await expect(link(page).getByLabel(/video đang bị báo/)).toHaveCount(0);
+    await page.unroute("**/api/admin/video-reports");
+    await page.route("**/api/admin/video-reports", (route) => route.fulfill({ status: 403, json: { error: "forbidden" } }));
+    await page.reload();
+    await expect(link(page)).toBeVisible();
+    await expect(link(page).getByLabel(/video đang bị báo/)).toHaveCount(0);
+  });
+});
+
 // ---- Luyện nói theo (shadowing) ----
 const FAKE_MIC = `navigator.mediaDevices.getUserMedia = async function () { return { getTracks: function () { return [{ stop: function () {} }]; } }; };
 window.MediaRecorder = class { constructor() { this.mimeType = 'audio/webm'; }
