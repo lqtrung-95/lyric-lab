@@ -45,7 +45,7 @@ test.describe("máy tính", () => {
     await expect(dialog.getByRole("img")).toBeVisible();
     for (const name of ["Facebook", "X", "Zalo", "Telegram", "Threads"]) await expect(dialog.getByRole("link", { name, exact: true })).toBeVisible();
     const facebook = await dialog.getByRole("link", { name: "Facebook" }).getAttribute("href");
-    expect(decodeURIComponent(facebook!)).toMatch(/\/learn\/[^/?]+\?line=\d+$/); // link trỏ tới đúng câu đang chia sẻ để thẻ xem trước là câu đó
+    expect(decodeURIComponent(facebook!)).toMatch(/\/learn\/[^/?]+\/listen\?line=\d+$/); // link trỏ tới đúng câu đang chia sẻ để thẻ xem trước là câu đó
     await expect(dialog.getByRole("button", { name: "Sao chép link" })).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Sao chép ảnh" })).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Chia sẻ", exact: true })).toHaveCount(0);

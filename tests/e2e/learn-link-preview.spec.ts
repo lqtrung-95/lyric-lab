@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { writeFileSync } from "node:fs";
 import { E2E_VIDEO_ID, hasSupabaseEnv, removeFixtureSong, seedFixtureSong } from "./helpers/seed-analysis";
+import { stubYouTube } from "./helpers/youtube-stub";
 
 // Thẻ xem trước khi dán link bài học vào Telegram/Facebook/Zalo (dữ liệu hư cấu "夜车"). Chỉ có tên bài và ảnh, không có lời bài hát.
 test.describe("xem trước link bài học", () => {
@@ -41,6 +42,17 @@ test.describe("xem trước link bài học", () => {
     expect(res.headers()["content-type"]).toContain("image/png");
     expect(res.headers()["x-robots-tag"]).toBe("noindex");
     writeFileSync("test-results/line-og-image.png", await res.body());
+  });
+
+  test("link chia sẻ một câu trỏ trang Nghe: có thẻ riêng của câu và mở đúng câu đó", async ({ page }) => {
+    await stubYouTube(page);
+    await page.goto(`/learn/${E2E_VIDEO_ID}/listen?line=2`);
+    const meta = (selector: string) => page.locator(`meta[${selector}]`).first().getAttribute("content");
+    expect(await meta('property="og:image"')).toContain(`/api/share/line/${E2E_VIDEO_ID}/2/og`);
+    expect(await meta('property="og:title"')).not.toBe("");
+    // Câu 3 (chỉ số 2) bắt đầu ở giây 10: player được tua tới đầu câu và câu đó thành câu đang hát.
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:10.05");
+    await expect(page.locator('[data-line-index="2"]')).toHaveAttribute("aria-current", "true");
   });
 
   test("số câu không hợp lệ thì ảnh chung, không lỗi", async ({ request }) => {
