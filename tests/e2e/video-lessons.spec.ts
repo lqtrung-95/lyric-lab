@@ -53,6 +53,17 @@ test("danh sách video: hiện thẻ video đã duyệt, mục Video có trên t
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
 });
 
+test("xem video: 5 nút điều khiển, nút phát nằm chính giữa thanh", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 1200, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}`);
+  const bar = page.getByRole("group", { name: "Điều khiển nhanh" });
+  await expect(bar.getByRole("button")).toHaveCount(5);
+  await expect(bar.getByRole("button", { name: "Phát lại câu đang hát" })).toBeVisible();
+  const [barBox, playBox] = [await bar.boundingBox(), await bar.getByRole("button").nth(2).boundingBox()];
+  expect(Math.abs(playBox!.x + playBox!.width / 2 - (barBox!.x + barBox!.width / 2))).toBeLessThan(2);
+});
+
 test("xem video: bản chép chạy theo thời gian, bấm từ tra được và lưu thẻ, bấm câu nhảy tới đó", async ({ page }) => {
   await mockVideoApis(page);
   await page.setViewportSize({ width: 1280, height: 900 });

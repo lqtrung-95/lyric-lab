@@ -33,6 +33,8 @@ interface PlaybackBarProps {
   /** Giải thích câu đang hát bằng AI (nghĩa tự nhiên hơn bản dịch máy, kèm ghi chú ngữ pháp). */
   onExplain?: () => void;
   explainDisabled?: boolean;
+  /** Phát lại từ đầu câu đang hát (video). Có thì thanh còn 5 nút, nút phát nằm giữa: tốc độ, lặp câu, PHÁT, phát lại câu, ghim. */
+  onReplayLine?: () => void;
   /** Mở popup luyện phát âm riêng cho câu đang hát (Nghe → Nghĩ → Hát → Nghe lại), giống nút của app Miraa. */
   onPractice?: () => void;
   practiceDisabled?: boolean;
@@ -47,7 +49,7 @@ const iconSize = "text-[20px] lg:text-[26px]";
  * xem `PlaybackProgressBar`), hàng dưới là các nút bấm nhanh: tốc độ, lặp câu, ghim, phát/dừng, giải thích AI,
  * luyện phát âm, canh lời lệch.
  */
-export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, offset = 0, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onPractice, practiceDisabled }: PlaybackBarProps) {
+export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, onSeekBy, loopIndex, loopStart, onToggleLoop, rate, onRate, offset = 0, onOffsetChange, autoScroll, onToggleAutoScroll, repeatConfig, onRepeatConfigChange, onExplain, explainDisabled, onReplayLine, onPractice, practiceDisabled }: PlaybackBarProps) {
   // Bảng nhỏ đang mở trên thanh: canh lời lệch hoặc chỉnh tốc độ (chỉ mở một bảng một lúc).
   const [panel, setPanel] = useState<"sync" | "rate" | null>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -66,6 +68,14 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
   const pinned = !autoScroll;
   const pinLabel = pinned ? "Bỏ ghim, tự cuộn theo câu đang hát" : "Ghim, không tự cuộn theo câu đang hát";
   const offsetLabel = `Canh lời lệch (đang lệch ${Number(offset.toFixed(2))} giây)`;
+
+  const pinButton = (<button type="button" data-tour="pin" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>);
+  const playButton = (
+    <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50 lg:h-14 lg:w-14">
+            <Icon name={playing ? "pause" : "play_arrow"} filled size={null} className="text-[22px] lg:text-[28px]" />
+          </button>
+  );
 
   return (
     // `relative` ở khung ngoài cùng (trọn bề rộng thanh) để popup canh lời neo theo mép phải thật — neo theo khung
@@ -89,11 +99,10 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
             {panel === "rate" && <PlaybackRatePopover rate={rate} onChange={onRate} className="absolute bottom-full left-0 z-40 mb-1" />}
           </div>
           <button type="button" disabled={!ready} data-tour="loop" onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
-          <button type="button" data-tour="pin" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>
-          <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50 lg:h-14 lg:w-14">
-            <Icon name={playing ? "pause" : "play_arrow"} filled size={null} className="text-[22px] lg:text-[28px]" />
-          </button>
+          {!onReplayLine && pinButton}
+          {playButton}
+          {onReplayLine && <button type="button" disabled={!ready} onClick={onReplayLine} aria-label="Phát lại câu đang hát" className={tile}><Icon name="replay" size={null} className={iconSize} /></button>}
+          {onReplayLine && pinButton}
           {onExplain && <button type="button" disabled={explainDisabled} data-tour="explain" onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>}
           {onPractice && <button type="button" disabled={practiceDisabled} data-tour="practice" onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>}
           {onOffsetChange && <button type="button" data-tour="offset" onClick={() => setPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={panel === "sync"} aria-label={offsetLabel} className={`${tile} ${panel === "sync" || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>}

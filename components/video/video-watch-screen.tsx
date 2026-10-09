@@ -160,6 +160,7 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
             loopIndex={loopIndex} loopStart={loopIndex !== null ? lines[loopIndex]?.start ?? null : null} onToggleLoop={toggleLoop}
             rate={prefs.rate} onRate={(rate) => update({ rate })}
             autoScroll={prefs.autoScroll} onToggleAutoScroll={toggleAutoScroll}
+            onReplayLine={() => seekToLine(Math.max(0, currentIndex))}
             repeatConfig={repeatConfig} onRepeatConfigChange={setRepeatConfig}
           />
           {failed && (
