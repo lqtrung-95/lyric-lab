@@ -6,6 +6,7 @@ import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { decideAddLimit, decideDuration } from "@/lib/video/add-video-limits";
+import { isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { MAX_TRANSCRIPT_LINES, parsePastedTranscript } from "@/lib/video/parse-pasted-transcript";
@@ -34,7 +35,7 @@ const ok = (body: Record<string, unknown>) => Response.json(body, { headers: { "
 /**
  * POST {video, captions? | lines?} → thêm một video vào kho dùng chung, hiện ngay cho mọi người (admin ẩn/xóa được sau).
  * Trả {kind:"added", videoId, lineCount, translatedLineCount} | {kind:"exists", videoId} | {kind:"skipped", reason}; lỗi: 400 invalid_video/invalid_captions,
- * 401 unauthorized, 404 video_not_found, 413 too_long, 422 too_short/unavailable/captions_required/no_chinese_captions, 429 user_limit/global_limit, 503 fetch_unavailable.
+ * 401 unauthorized, 404 video_not_found, 413 too_long, 422 too_short/unavailable/captions_required/no_chinese_captions/not_chinese, 429 user_limit/global_limit, 503 fetch_unavailable.
  */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
@@ -74,6 +75,9 @@ export async function POST(req: Request) {
       lines = await fetchSupadataChineseLines(videoId, env.SUPADATA_API_KEY);
       if (lines.length === 0) return fail("no_chinese_captions", 422);
     }
+
+    // Bản chép lời của YouTube hay mặc định sang ngôn ngữ giao diện của người xem: không phải tiếng Trung thì dừng, không tốn lượt dịch.
+    if (!isMostlyChinese(lines)) return fail("not_chinese", 422);
 
     const chat = createChat(env);
     const outcome = await ingestVideo(

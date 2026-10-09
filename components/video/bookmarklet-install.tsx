@@ -23,11 +23,11 @@ export function BookmarkletInstall() {
 
   return (
     <div className="space-y-3 rounded-2xl bg-surface-container-low p-space-md">
-      <p className="text-label-md font-semibold text-on-surface">Cách nhanh trên máy tính</p>
+      <p className="text-label-md font-semibold text-on-surface">Dấu trang trên máy tính (khi không lấy tự động được)</p>
       <ol className="list-decimal space-y-1 pl-5 text-body-md text-on-surface-variant">
         <li>Kéo nút dưới đây lên thanh dấu trang của trình duyệt (một lần duy nhất).</li>
-        <li>Mở video trên youtube.com, bật <b>Hiện bản chép lời</b> dưới phần mô tả (nếu có).</li>
-        <li>Bấm dấu trang <b>Gửi sang SongHanzi</b>: phụ đề tự điền vào đây.</li>
+        <li>Mở video trên youtube.com và bấm dấu trang <b>Gửi sang SongHanzi</b>: nó tự mở bản chép lời và gửi sang đây.</li>
+        <li>Nếu YouTube hiện bản chép lời không phải tiếng Trung, đổi ngôn ngữ ở cuối bảng bản chép lời rồi bấm lại.</li>
       </ol>
       <div className="flex flex-wrap items-center gap-2">
         <a

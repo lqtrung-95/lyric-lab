@@ -17,10 +17,15 @@ async function mockAdd(page: Page, respond: { status?: number; json: unknown }) 
   return bodies;
 }
 
-test("trang hiện form, hướng dẫn dấu trang và không có lỗi trợ năng", async ({ page }) => {
+const OPEN_MANUAL = "Tự dán phụ đề hoặc dùng dấu trang";
+
+test("mặc định chỉ có ô link; phần dán phụ đề và dấu trang mở ra khi bấm, không có lỗi trợ năng", async ({ page }) => {
   await page.goto("/video/add");
   await expect(page.getByRole("heading", { name: "Thêm video của bạn" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Thêm video" })).toBeDisabled();
+  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Gửi sang SongHanzi" })).toHaveCount(0);
+  await page.getByRole("button", { name: OPEN_MANUAL }).click();
   const bookmarklet = page.getByRole("link", { name: "Gửi sang SongHanzi" });
   await expect.poll(() => bookmarklet.getAttribute("href")).toMatch(/^javascript:/);
   await bookmarklet.click();
@@ -32,13 +37,23 @@ test("dán link và phụ đề, gửi đúng nội dung rồi mở bài vừa t
   const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
   await page.goto("/video/add");
   await page.getByLabel("Link video YouTube").fill(`https://www.youtube.com/watch?v=${VIDEO_ID}`);
+  await page.getByRole("button", { name: OPEN_MANUAL }).click();
   await page.getByLabel(/Phụ đề tiếng Trung/).fill("0:00\n大家好\n0:05\n欢迎收听");
   await page.getByRole("button", { name: "Thêm video" }).click();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
   expect(bodies).toEqual([{ video: `https://www.youtube.com/watch?v=${VIDEO_ID}`, captions: "0:00\n大家好\n0:05\n欢迎收听" }]);
 });
 
-test("không dán phụ đề mà máy chủ không lấy tự động được thì báo cần phụ đề, giữ nguyên nội dung đã nhập", async ({ page }) => {
+test("chỉ dán link, máy chủ tự lấy phụ đề: gửi không kèm phụ đề rồi mở bài", async ({ page }) => {
+  const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 3, translatedLineCount: 3 } });
+  await page.goto("/video/add");
+  await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
+  await page.getByRole("button", { name: "Thêm video" }).click();
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
+  expect(bodies).toEqual([{ video: VIDEO_ID }]);
+});
+
+test("không lấy tự động được thì báo cần phụ đề, tự mở phần dán phụ đề và dấu trang, giữ nguyên nội dung đã nhập", async ({ page }) => {
   await mockAdd(page, { status: 422, json: { error: "captions_required" } });
   await page.goto("/video/add");
   await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
@@ -46,6 +61,17 @@ test("không dán phụ đề mà máy chủ không lấy tự động được 
   await expect(page.getByRole("alert").filter({ hasText: "Cần có phụ đề tiếng Trung" })).toBeVisible();
   await expect(page.getByLabel("Link video YouTube")).toHaveValue(VIDEO_ID);
   await expect(page.getByRole("button", { name: "Thêm video" })).toBeEnabled();
+  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "Gửi sang SongHanzi" })).toBeVisible();
+});
+
+test("phụ đề không phải tiếng Trung thì báo đổi ngôn ngữ và mở phần dán phụ đề", async ({ page }) => {
+  await mockAdd(page, { status: 422, json: { error: "not_chinese" } });
+  await page.goto("/video/add");
+  await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
+  await page.getByRole("button", { name: "Thêm video" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "không phải tiếng Trung" })).toBeVisible();
+  await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toBeVisible();
 });
 
 test("báo rõ khi đã hết lượt trong ngày", async ({ page }) => {
@@ -60,19 +86,11 @@ test("dấu trang gửi bản chép lời qua #: điền sẵn link và phụ đ
   const bodies = await mockAdd(page, { json: { kind: "exists", videoId: VIDEO_ID } });
   await page.goto(`/video/add${hashOf({ v: VIDEO_ID, t: "0:00\n大家好\n0:05\n欢迎收听" })}`);
   await expect(page.getByLabel("Link video YouTube")).toHaveValue(VIDEO_ID);
+  await expect(page.getByRole("status").filter({ hasText: "Đã nhận bản chép lời" })).toBeVisible();
   await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toHaveValue("0:00\n大家好\n0:05\n欢迎收听");
   await page.getByRole("button", { name: "Thêm video" }).click();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
   expect(bodies[0]).toMatchObject({ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听" });
-});
-
-test("dấu trang gửi phụ đề dạng cặp [giây, lời]: báo số dòng nhận được và gửi dưới dạng dòng có mốc", async ({ page }) => {
-  const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 0 } });
-  await page.goto(`/video/add${hashOf({ v: VIDEO_ID, l: [[1.5, "你好"], [4, "谢谢"]] })}`);
-  await expect(page.getByRole("status").filter({ hasText: "Đã nhận 2 dòng" })).toBeVisible();
-  await page.getByRole("button", { name: "Thêm video" }).click();
-  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
-  expect(bodies[0]).toEqual({ video: VIDEO_ID, lines: [{ text: "你好", start: 1.5, end: 4 }, { text: "谢谢", start: 4, end: 9 }] });
 });
 
 test("từ trang Video có lối vào Thêm video của bạn", async ({ page }) => {

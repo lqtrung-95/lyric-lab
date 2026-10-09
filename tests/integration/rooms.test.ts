@@ -442,6 +442,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "player_reports.reporter_id", // on delete set null: báo cáo giữ lại cho quản trị
       "email_prefs.user_id", // tùy chọn email gắn với tài khoản có email thật (Google); tài khoản ẩn danh không có hàng này nên không có gì để gộp
       "push_subscriptions.user_id", // đăng ký theo thiết bị: app đăng ký lại endpoint với tài khoản hiện tại mỗi lần mở, nên tự gắn lại sau khi gộp
+      "video_lessons.added_by", // on delete set null: video người dùng thêm là dữ liệu dùng chung nên giữ lại, chỉ mất liên kết người thêm (bộ đếm 3 video/ngày của tài khoản gộp có thể được đặt lại, trần chung 100 video/ngày vẫn chặn lạm dụng)
     ]);
     const { data, error } = await service.rpc("tables_referencing_users");
     expect(error).toBeNull();
