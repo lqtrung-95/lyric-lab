@@ -14,6 +14,7 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 | `SUPABASE_SERVICE_ROLE_KEY` | Có | Ghi DB ở server, bỏ qua RLS. Tuyệt đối không lộ ra client |
 | `GROQ_API_KEY` | Có | Model Groq (dự phòng phân tích; chính cho giải nghĩa khi bấm) |
 | `YOUTUBE_DATA_API_KEY` | Có | Lấy tiêu đề/thời lượng/embeddable |
+| `SUPADATA_API_KEY` | Không | Tự lấy phụ đề tiếng Trung cho video người dùng dán link mà không kèm phụ đề (Supadata, `mode=native`, 1 credit/video; gói free 100 credit/tháng, hết credit trả 402 thì người dùng chuyển sang dán phụ đề). Bỏ trống thì chỉ nhận phụ đề dán vào/dấu trang |
 | `DEEPSEEK_API_KEY` | Nên có | Model phân tích chính (gọi thẳng api.deepseek.com). Thiếu thì rớt sang Groq |
 | `FALLBACK_LLM_API_KEY` | Nên có | Khóa Groq thứ hai (hạn mức đếm riêng) |
 | `OPENROUTER_API_KEY` | Nên có | Lưới an toàn cuối (gemini flash) |
@@ -126,6 +127,9 @@ NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/inge
 NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-from-podcast-output.mts --dir "/đường/dẫn/podcast_tool/output" [--apply]
 ```
 Tùy chọn: `--delay 60000` (nghỉ 60 giây giữa các video, nên dùng khi YouTube chặn 429: thường chỉ qua được vài video liền ở tốc độ mặc định), `--videos id1,id2` (chỉ định video thay cho cả kênh), `--limit N` (mặc định 40 video gần nhất), `--refresh` (làm mới dòng của video đã có, giữ nguyên trạng thái). Cần `YOUTUBE_DATA_API_KEY`. YouTube tạm chặn (429) khi tải phụ đề dồn dập từ một IP (dễ gặp sau nhiều lần chạy thử liên tiếp): script nghỉ 30s/90s/180s rồi thử lại, nhiều video liền vẫn bị chặn thì tự dừng; chờ khoảng một giờ rồi chạy lại. Chạy lại được: video đã có bị bỏ qua. Gỡ video theo yêu cầu: `delete from video_lessons where video_id = '...'` (cache nghĩa từ của video xóa theo). Migration `20261006000004_video_term_explanations.sql` (cache nghĩa theo ngữ cảnh khi bấm từ trong video) phải chạy **trước khi deploy trang Video**: thiếu bảng thì việc giải nghĩa vẫn chạy nhưng không cache được. Video mới nạp ở trạng thái `draft`; vào `/admin/videos` (tài khoản admin) để xem trước, sửa bản dịch và duyệt thành `listed` thì mới hiện ở `/video` cho người dùng (ẩn/xóa cũng ở đó, không cần SQL).
+
+### Người dùng tự thêm video (`/video/add`)
+Chạy migration `20261010000001_video_lessons_added_by.sql` (cột `added_by`) **trước khi deploy**: thiếu cột thì `POST /api/videos/add` trả 500 (đếm giới hạn lỗi nên không bỏ qua giới hạn), việc nạp video của admin vẫn chạy bình thường. Video người dùng thêm vào `listed` ngay; gỡ ở `/admin/videos` (ẩn/xóa) hoặc SQL `delete from video_lessons where video_id = '...'`. Xem ai thêm nhiều: `select added_by, count(*) from video_lessons where added_by is not null group by 1 order by 2 desc`. Chi phí mỗi video: một lượt dịch LLM (chia đoạn 30 dòng chạy song song, vài đoạn lỗi thì dòng đó trống bản dịch) và tùy chọn một credit Supadata. Giới hạn nằm ở `lib/video/add-video-limits.ts`.
 
 ## 6. Khi LLM lỗi / hết hạn mức
 

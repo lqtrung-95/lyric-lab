@@ -98,6 +98,7 @@ Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice
 - **Hướng đề xuất:** bookmarklet (sau này extension) chạy trên trang youtube.com, đọc track CC tiếng Trung rồi gửi sang `/learn/ID`; server nhận phụ đề và chạy lại pipeline hiện có (làm sạch → tách từ → từ điển → LLM), lưu cache. Bookmarklet hiện chỉ chuyển hướng, chưa lấy phụ đề. Bản nhỏ hơn để kiểm chứng nhu cầu: cho dán phụ đề thủ công trên trang bài.
 - **Giới hạn:** chỉ máy tính (điện thoại không chạy bookmarklet, Android share target không đọc được trang); cần giới hạn số video mỗi người mỗi ngày (mỗi video tốn một lượt gọi LLM) và chặn nội dung không phù hợp trước khi phân tích.
 - **YouTube ToS:** chỉ lấy phụ đề của video người dùng đang xem, không lưu video/audio, player nhúng vẫn hiện; chưa đối chiếu lại điều khoản mới nhất trước khi làm.
+- **Cập nhật 2026-10-10:** đã làm bản đầu: người dùng dán link + phụ đề dán vào / dấu trang / Supadata, bài vào kho Video dùng chung (xem PRD VD-01). Chưa làm: nhận dạng giọng nói cho video không có phụ đề (chủ dự án chọn bỏ đợt này; nếu làm sau, chỉ với file audio người dùng tự tải lên vì luật dự án cấm tải audio YouTube ở server), extension thay dấu trang, hỗ trợ điện thoại.
 - **Trả lời công khai đã dùng:** app tập trung vào bài hát trước, đang nghiên cứu tính năng này, hỏi lại loại nội dung họ muốn học.
 
 ## Kỹ thuật

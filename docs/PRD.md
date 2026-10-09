@@ -160,6 +160,7 @@ Mức ưu tiên: **P0** = bắt buộc cho MVP, **P1** = nên có trong MVP, **P
 | LS-07 | Bấm câu để nhảy tới | P0 | Phát từ đầu câu đó |
 | LS-08 | Lặp câu | P0 | Lặp vô hạn câu hiện tại cho tới khi tắt |
 | LS-09 | Đổi tốc độ | P0 | 0,5x–2x (thanh trượt bước 0,05 + nút chọn nhanh, `PlaybackRatePopover`) qua `setPlaybackRate` |
+| VD-01 | Người dùng thêm video của mình | P1 | Dán link YouTube (podcast, vlog) kèm phụ đề dán vào hoặc dấu trang gửi từ youtube.com; không kèm thì máy chủ thử lấy qua dịch vụ transcript nếu có cấu hình. Bài vào kho Video dùng chung ngay (`listed`, admin ẩn/xóa được), dịch Việt bằng LLM, dùng được chép chính tả và shadowing. Tối đa 3 video/người/ngày, 100/ngày toàn hệ thống, video 30 giây–60 phút, phải nhúng được. Không lưu audio/video |
 | LS-10 | Phím tắt | P1 | Space phát/dừng, ←/→ câu trước/sau, L lặp câu, R nghe lại câu, M/T bật tắt pinyin/bản dịch. Nút bàn phím ở thanh trên (từ md) mở hộp thoại liệt kê phím tắt, dùng cho cả màn Nghe bài hát và màn Xem video. Chỉ hoạt động khi focus không nằm trong ô nhập |
 | LS-11 | Tô sáng theo từng từ (karaoke) | P2 | Cần timestamp mức từ từ forced alignment |
 

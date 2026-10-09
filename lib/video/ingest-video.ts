@@ -3,7 +3,8 @@ import { withSubwordEntries } from "@/lib/analysis/build-line-pinyin";
 import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
 import { pickBestChineseTrack } from "@/lib/captions/pick-best-chinese-track";
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
-import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines } from "./build-lesson-lines";
+import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines, type PreparedLine } from "./build-lesson-lines";
+import type { LessonStatus } from "./video-lesson-types";
 import type { VideoMeta } from "./youtube-data-api";
 
 // Nạp MỘT video vào kho video luyện nghe (dùng chung cho script `scripts/ingest-video-source.mts` và API quản trị): chỉ nhận video nhúng được
@@ -38,13 +39,25 @@ export async function existingVideoIds(sb: SupabaseClient, ids: string[]): Promi
   return new Set((data ?? []).map((r) => r.video_id as string));
 }
 
+export interface IngestInput {
+  meta: VideoMeta;
+  sourceId: string | null;
+  refresh?: boolean;
+  /** Trạng thái video mới (mặc định `draft`, chờ admin duyệt). Video người dùng tự thêm vào thẳng `listed`. */
+  status?: LessonStatus;
+  /** Người thêm (video người dùng tự thêm); null với video admin nạp. */
+  addedBy?: string | null;
+  /** Dịch các dòng chưa có bản dịch (ví dụ bằng LLM) khi không có track tiếng Việt; trả cùng số dòng, dòng dịch không được thì để null. */
+  translateMissing?: (lines: PreparedLine[]) => Promise<PreparedLine[]>;
+}
+
 /**
  * Nạp một video. `refresh` làm mới dòng của video đã có (giữ nguyên trạng thái duyệt); không có thì video đã có bị bỏ qua.
  * Ném lỗi nếu tải phụ đề hoặc ghi DB thất bại (nơi gọi dùng `isTransientCaptionError` để quyết định có thử lại).
  */
-export async function ingestVideo(deps: IngestDeps, input: { meta: VideoMeta; sourceId: string | null; refresh?: boolean }): Promise<IngestOutcome> {
+export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise<IngestOutcome> {
   const { sb, provider, lookup } = deps;
-  const { meta, sourceId, refresh = false } = input;
+  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, translateMissing } = input;
   if (!meta.embeddable) return { kind: "skipped", reason: "not_embeddable" };
   const exists = (await existingVideoIds(sb, [meta.videoId])).has(meta.videoId);
   if (exists && !refresh) return { kind: "skipped", reason: "exists" };
@@ -56,8 +69,10 @@ export async function ingestVideo(deps: IngestDeps, input: { meta: VideoMeta; so
   const zh = await provider.fetchLines(meta.videoId, zhTrack);
   const vi = viTrack ? await provider.fetchLines(meta.videoId, viTrack) : null;
 
-  const prepared = prepareLessonLines(zh, vi);
+  let prepared = prepareLessonLines(zh, vi);
   if (prepared.length === 0) return { kind: "skipped", reason: "no_lines" };
+  const needsTranslation = !vi && translateMissing !== undefined;
+  if (needsTranslation) prepared = await translateMissing(prepared);
   const terms = termsToLookUp(prepared);
   const dictionary = await withSubwordEntries(lookup, await lookup(terms), terms);
   const lines = toLessonLines(prepared, dictionary);
@@ -66,11 +81,11 @@ export async function ingestVideo(deps: IngestDeps, input: { meta: VideoMeta; so
 
   const row = {
     video_id: meta.videoId, source_id: sourceId, title: meta.title, channel_title: meta.channelTitle, duration_sec: meta.durationSec, level_avg: levelAvg,
-    translation_source: vi ? "youtube" : "none", line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
+    translation_source: vi ? "youtube" : needsTranslation && translatedLineCount > 0 ? "ai" : "none", line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
   };
   const { error } = exists
     ? await sb.from("video_lessons").update(row).eq("video_id", meta.videoId)
-    : await sb.from("video_lessons").insert({ ...row, status: "draft" });
+    : await sb.from("video_lessons").insert({ ...row, status, ...(addedBy ? { added_by: addedBy } : {}) });
   if (error) throw new Error(`Ghi video_lessons lỗi: ${error.message}`);
   return { kind: "ingested", lineCount: lines.length, translatedLineCount, levelAvg, refreshed: exists };
 }

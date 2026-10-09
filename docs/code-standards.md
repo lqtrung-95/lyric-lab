@@ -39,6 +39,7 @@ Bổ sung cho [`CLAUDE.md`](../CLAUDE.md) (quy tắc bắt buộc) và `~/.claud
 - Tailwind v4; dark mode bằng class `dark` trên `<html>`; logo đổi bằng `dark:hidden` / `hidden dark:block`.
 - Thumbnail YouTube (`videoThumbnailUrl`) hiển thị bằng `next/image` phải có `unoptimized`: qua trình tối ưu của Vercel, mỗi bài mới tốn một ảnh nguồn của hạn mức tháng (Hobby) và hết hạn mức thì ảnh vỡ (402 `OPTIMIZED_IMAGE_REQUEST_PAYMENT_REQUIRED`). Chỉ ảnh tĩnh của app (logo) đi qua trình tối ưu.
 - Hook tải dữ liệu phụ thuộc danh sách đổi nhiều lần khi trang tải (bài lưu cục bộ rồi danh sách server) không được trả rỗng giữa các lần tải: giữ dữ liệu cũ và gộp bản mới (mẫu: `components/library/use-song-moods.ts`), nếu không phần giao diện phụ thuộc nó (hàng chip cảm xúc) biến mất rồi hiện lại.
+- Mã chạy trên trang bên thứ ba (bookmarklet) viết ES5 thuần trong một chuỗi, test bằng cách chạy chính chuỗi đó trong môi trường giả (`lib/video/bookmarklet.test.ts`), và truyền dữ liệu về app qua phần `#` của địa chỉ (không phụ thuộc `window.opener`). Playwright ưu tiên route đăng ký SAU: route chung phải đăng ký trước route cụ thể.
 - Điều hướng trạng thái giao diện có ý nghĩa (tab thư viện) phải nằm trên URL (`?tab=`) để nút Back hoạt động.
 
 ## Làm việc với LLM

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SongCard } from "@/components/library/song-card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +27,7 @@ export function VideoListScreen() {
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Video luyện nghe</h1>
         <p className="mt-1 max-w-2xl text-body-lg text-on-surface-variant">Xem video tiếng Trung có bản chép từng câu kèm pinyin và bản dịch. Bấm vào một từ để tra nghĩa và lưu vào bộ thẻ ôn.</p>
+        <Link href="/video/add" className="mt-3 inline-flex min-h-11 items-center rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary-container hover:bg-primary hover:text-on-primary">Thêm video của bạn</Link>
       </header>
       {videos === null ? (
         <ul role="status" aria-label="Đang tải video" className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
