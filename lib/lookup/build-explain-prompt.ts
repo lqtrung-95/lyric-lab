@@ -21,7 +21,7 @@ Từ cần giải nghĩa: ${term}
 Nghĩa tiếng Anh trong từ điển: ${dictionary}
 
 Trả về JSON: {"meaningInContext": "...", "note": "..."}
-- meaningInContext: nghĩa của từ trong ĐÚNG ${noun.toLowerCase()} này, tiếng Việt, tối đa 2 câu ngắn. Bám vào nghĩa từ điển ở trên; không trích nguyên ${noun.toLowerCase()}. TUYỆT ĐỐI KHÔNG nhắc lại từ gốc (chữ Hán) trong nội dung này vì nó được dùng làm gợi ý cho bài tập; mở đầu thẳng bằng nghĩa, ví dụ: "Ở câu này mang nghĩa là “đã mất” hoặc “không còn có”. Trong ngữ cảnh, nó diễn tả…".
-- note: ghi chú ngữ pháp hoặc cách dùng ngắn gọn bằng tiếng Việt (không bắt buộc, bỏ trống nếu không cần).
+- meaningInContext: nghĩa NGẮN GỌN của từ trong ĐÚNG ${noun.toLowerCase()} này, tiếng Việt, như một mục từ điển: một cụm từ hoặc tối đa khoảng 10 chữ, không viết thành câu, không mở đầu bằng "Ở câu này", "Trong câu này", "mang nghĩa là". Bám vào nghĩa từ điển ở trên; không trích nguyên ${noun.toLowerCase()}. TUYỆT ĐỐI KHÔNG nhắc lại từ gốc (chữ Hán) vì nội dung này được dùng làm gợi ý cho bài tập. Ví dụ: "đã mất, không còn", "tiếp xúc, chạm vào".
+- note: giải thích thêm vì sao từ mang nghĩa đó trong câu, hoặc ghi chú ngữ pháp/cách dùng, ngắn gọn (tối đa 2 câu) bằng tiếng Việt (không bắt buộc, bỏ trống nếu không cần).
 - KHÔNG ghi pinyin, cấp HSK hay âm Hán Việt (hệ thống tự tra từ điển).`;
 }
