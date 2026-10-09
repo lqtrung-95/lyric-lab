@@ -16,6 +16,8 @@ export interface BookmarkletPayload {
 
 // ES5 thuần để chạy được ở mọi trình duyệt; mỗi lệnh kết thúc bằng dấu chấm phẩy vì mã bị nén về một dòng. Chỉ dùng textContent/createElement (YouTube
 // bật Trusted Types nên innerHTML bị chặn) và style qua CSSOM (không phụ thuộc CSP).
+// `visibleSegs` (trong SOURCE): YouTube giữ nhiều bản của khung bản chép lời trong trang (khung ẩn, khung cũ sau khi đổi ngôn ngữ), nên chỉ lấy các dòng đang hiện và thuộc MỘT khung (khung nhiều dòng nhất).
+// Không được viết chú thích `//` bên trong SOURCE: bản `javascript:` bỏ hết xuống dòng nên chú thích sẽ nuốt phần mã phía sau.
 const SOURCE = `(function(O){
 var m=location.search.match(/[?&]v=([\\w-]{11})/);
 if(!/(^|\\.)youtube\\.com$/.test(location.hostname)||!m){alert('Hãy mở một video trên youtube.com rồi bấm lại nhé.');return;}
@@ -35,7 +37,6 @@ function dbg(){var p=document.querySelectorAll(OPEN),ids=[];for(var i=0;i<p.leng
 var help='Video này có thể không có phụ đề. Bạn thử bấm nút hiện phụ đề dạng văn bản (Show transcript) dưới phần mô tả rồi bấm lại, hoặc dán phụ đề vào trang Thêm video.';
 function go(p){var b=btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');var url=O+'/video/add#d='+b;stop();say('Đã đọc xong, đang mở SongHanzi…');var w=window.open(url,'_blank');if(w){setTimeout(hide,2500);}else{say('Trình duyệt chặn cửa sổ mới.',url);}}
 function ok(t){return /(^|\\n)(\\d{1,2}:)?\\d{1,2}:\\d{2}(\\n|\\s)/.test(t);}
-// YouTube giữ nhiều bản của khung bản chép lời trong trang (khung ẩn, khung cũ sau khi đổi ngôn ngữ); chỉ lấy các dòng đang hiện và thuộc MỘT khung (khung nhiều dòng nhất).
 function visibleSegs(){var all=document.querySelectorAll(SEG),vis=[],i;for(i=0;i<all.length;i++){if(shown(all[i])){vis.push(all[i]);}}
 if(!vis.length){return all;}var roots=[],groups=[];for(i=0;i<vis.length;i++){var r=vis[i].closest('ytd-engagement-panel-section-list-renderer')||document,k=roots.indexOf(r);if(k<0){roots.push(r);groups.push([]);k=roots.length-1;}groups[k].push(vis[i]);}
 var best=groups[0];for(i=1;i<groups.length;i++){if(groups[i].length>best.length){best=groups[i];}}return best;}

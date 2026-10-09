@@ -254,3 +254,14 @@ describe("decodeBookmarkletHash", () => {
     expect(decodeBookmarkletHash(enc({ v: "abcdefghijk", t: "x", vt: 5 }))).toEqual({ v: "abcdefghijk", t: "x" });
   });
 });
+
+describe("mã javascript: thật (đã bỏ xuống dòng)", () => {
+  it("vẫn biên dịch được và không có chú thích // nuốt mã phía sau", () => {
+    const code = decodeURIComponent(buildBookmarklet("https://songhanzi.test").slice("javascript:".length));
+    expect(code).not.toContain("\n");
+    // Chú thích // trong một chuỗi mã không xuống dòng sẽ cắt cụt phần còn lại; mã phải kết thúc đúng bằng lời gọi hàm.
+    expect(code.endsWith('("https://songhanzi.test");')).toBe(true);
+    expect(() => new Function(code)).not.toThrow();
+    expect(BOOKMARKLET_SOURCE.split("\n").some((l) => /^\s*\/\//.test(l))).toBe(false);
+  });
+});
