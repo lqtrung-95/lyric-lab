@@ -41,14 +41,36 @@ interface LyricLineRowProps {
 function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onEdit }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
+  const actions = (onShare || onEdit) ? (
+    <>
+      {onEdit && (
+        <button
+          type="button" aria-label={`Sửa lời câu ${line.index + 1} (quản trị)`} title="Sửa lời (quản trị)"
+          onClick={(e) => { e.stopPropagation(); onEdit(line.index); }}
+          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
+        >
+          <Icon name="edit" size={18} />
+        </button>
+      )}
+      {onShare && (
+        <button
+          type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
+          onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
+          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
+        >
+          <Icon name="share" size={18} />
+        </button>
+      )}
+    </>
+  ) : null;
 
   return (
     <li
       data-line-index={line.index}
       aria-current={active ? "true" : undefined}
       onClick={() => onSeek(line.index)}
-      className={`group/line relative flex cursor-pointer items-start gap-3 rounded-xl p-3.5 transition-colors ${
-        active ? "bg-surface-container p-5 shadow-md" : state === "past" ? "opacity-60 hover:bg-surface-container-low/50" : "hover:bg-surface-container-low/50"
+      className={`group/line relative flex cursor-pointer items-start gap-2 rounded-xl p-2.5 transition-colors md:gap-3 md:p-3.5 ${
+        active ? "bg-surface-container p-3 shadow-md md:p-5" : state === "past" ? "opacity-60 hover:bg-surface-container-low/50" : "hover:bg-surface-container-low/50"
       }`}
     >
       {active && <div aria-hidden="true" className="absolute -left-1 bottom-4 top-4 w-2 rounded-full bg-primary" />}
@@ -56,14 +78,14 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
         type="button"
         aria-label={`Phát từ câu ${line.index + 1}`}
         onClick={(e) => { e.stopPropagation(); onSeek(line.index); }}
-        className={`mt-0.5 min-h-11 w-11 shrink-0 cursor-pointer text-left text-label-sm ${active ? "font-bold text-primary" : "text-on-surface-variant"}`}
+        className={`-mr-5 mt-0.5 min-h-11 w-11 shrink-0 cursor-pointer text-left text-label-sm md:mr-0 ${active ? "font-bold text-primary" : "text-on-surface-variant"}`}
       >
         {String(line.index + 1).padStart(2, "0")}
       </button>
-      <div className="flex min-w-0 flex-col gap-1">
-        <p className={`flex flex-wrap items-end gap-x-0.5 font-serif ${active ? "text-headline-lg-mobile leading-tight md:text-headline-lg" : "text-hanzi-body"} text-on-surface`}>
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5 md:gap-1">
+        <p className={`flex flex-wrap items-end gap-x-0.5 font-serif ${active ? "text-[22px] leading-[30px] md:text-headline-lg" : "text-[19px] leading-7 md:text-hanzi-body"} text-on-surface`}>
           {groups.map((g) => {
-            const pinyinClass = `text-pinyin-reading font-sans ${active ? "text-on-surface" : "text-on-surface-variant"}`;
+            const pinyinClass = `text-[11px] leading-[14px] md:text-pinyin-reading font-sans ${active ? "text-on-surface" : "text-on-surface-variant"}`;
             const content = g.parts.map((part, i) => {
               const chars = showPinyin && part.pinyinChars
                 ? [...part.text].map((ch, k) => (
@@ -91,7 +113,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 onClick={(e) => { e.stopPropagation(); onWord({ lineIndex: line.index, term: g.text, itemId: g.vocabId }); }}
                 className={
                   g.vocabId
-                    ? "mx-0.5 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary/15 px-2 py-0.5 font-bold text-primary ring-2 ring-primary/20"
+                    ? "mx-0 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary/15 px-1 py-0.5 font-bold text-primary ring-2 ring-primary/20 md:mx-0.5 md:px-2"
                     : "cursor-pointer rounded px-0.5 hover:bg-primary/10 hover:text-primary"
                 }
               >
@@ -102,33 +124,14 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
         </p>
         {showTranslation && line.translation && (
           <div className="flex items-center gap-1">
-            <p className={active ? "text-body-lg font-medium text-primary" : "text-body-md italic text-on-surface-variant/80"}>{line.translation}</p>
+            <p className={active ? "text-[15px] font-medium leading-6 text-primary md:text-body-lg" : "text-[13px] italic leading-5 text-on-surface-variant/80 md:text-body-md"}>{line.translation}</p>
             {allowTranslationSuggestion && <TranslationSuggestionButton videoId={videoId} promptVersion={promptVersion} lineIndex={line.index} currentTranslation={line.translation} onPauseSong={onPauseSong} />}
           </div>
         )}
+        {/* Điện thoại: nút chia sẻ/sửa không chiếm một cột bên phải (làm lời bị bóp hẹp, ngắt dòng liên tục) mà nằm dưới câu đang hát. */}
+        {actions && active && <div className="-ml-2 flex md:hidden">{actions}</div>}
       </div>
-      {(onShare || onEdit) && (
-        <div className="ml-auto mt-0.5 flex shrink-0 opacity-0 transition-opacity focus-within:opacity-100 group-hover/line:opacity-100 [@media(hover:none)]:opacity-60">
-          {onEdit && (
-            <button
-              type="button" aria-label={`Sửa lời câu ${line.index + 1} (quản trị)`} title="Sửa lời (quản trị)"
-              onClick={(e) => { e.stopPropagation(); onEdit(line.index); }}
-              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
-            >
-              <Icon name="edit" size={18} />
-            </button>
-          )}
-          {onShare && (
-            <button
-              type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này"
-              onClick={(e) => { e.stopPropagation(); onShare(line.index); }}
-              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high"
-            >
-              <Icon name="share" size={18} />
-            </button>
-          )}
-        </div>
-      )}
+      {actions && <div className="ml-auto mt-0.5 hidden shrink-0 opacity-0 transition-opacity focus-within:opacity-100 group-hover/line:opacity-100 md:flex">{actions}</div>}
     </li>
   );
 }

@@ -76,3 +76,8 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 - Trang Cài đặt: mỗi nhóm một tab (`SettingsTabs`), mọi bảng đều được dựng sẵn và chỉ ẩn bảng không chọn (các phần tự tải dữ liệu không mất trạng thái). Dòng cài đặt nào có thể tự ẩn (thông báo, email) thì thẻ chứa nó cần dòng chú thích `only:block` để không hiện thẻ trống.
 
 - Font: không thêm `<link rel="stylesheet">` font nặng vào `<head>` (chặn lần vẽ đầu). Font chữ Hán nạp qua `CjkFontLoader`; font Latin/Việt tự host bằng `next/font` chỉ với các biến thể đang dùng (mỗi kiểu × đậm × bộ ký tự là một file được preload). Ảnh `icon.png` giữ nhỏ (đang tải ở mọi trang); ảnh lớn cho manifest để ở `public/`.
+
+## Màn Nghe trên điện thoại (mật độ lời)
+- Danh sách lời ưu tiên nhìn được nhiều câu: chữ, pinyin, padding và khoảng cách dòng dùng cỡ nhỏ hơn dưới `md` (xem `lyric-line-row.tsx`), cỡ gốc từ `md` trở lên. Không thêm cột bên phải cạnh dòng lời trên điện thoại vì nó bóp hẹp chữ Hán và làm lời ngắt dòng liên tục; hành động của dòng (chia sẻ, sửa) nằm dưới câu đang hát.
+- Vùng bấm vẫn ≥ 44 px bằng cách phình nút rồi kéo lề âm (`-mr-5`), không bằng cách cho nút chiếm chỗ.
+- Khối phụ (canh lời, báo lỗi) đứng sau danh sách lời trên điện thoại (`max-lg:order-last`).

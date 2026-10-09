@@ -65,6 +65,7 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 | Lộ khóa | `.env.example` bị dán khóa thật | `.env.example` chỉ chứa tên biến/giá trị mẫu. Kiểm tra `git diff` trước mỗi commit |
 
 ## Việc mới nhất đã làm (để tiện nối tiếp)
+- 2026-10-09: màn Nghe trên điện thoại gọn hơn (lời nhỏ hơn, nút chia sẻ dưới câu đang hát, canh lời/báo lỗi xuống sau danh sách); chia sẻ câu mở thẳng share sheet trên điện thoại; thẻ chia sẻ khoảng cách đều và ngắt dòng cân bằng; nút Tải ảnh dùng link blob mới lúc bấm. Chưa kiểm chứng trên máy Android thật: nguyên nhân Tải ảnh lỗi chưa tái hiện được (trên Chromium giả lập vẫn tải được), giả thuyết là link blob cũ bị thu hồi hoặc chế độ PWA đã cài. Nếu vẫn lỗi cần biết người dùng thấy gì (không có gì, báo lỗi, hay file nằm đâu).
 
 - Prompt v6 (20–25 từ vựng, dịch thoát ý, quy tắc xưng hô); DeepSeek trực tiếp + BytePlus cho giải nghĩa khi bấm.
 - Script `reanalyze-songs.mts`, `reanalyze-reuse-old-lyrics.mts`, `backfill-pinyin.mts`.

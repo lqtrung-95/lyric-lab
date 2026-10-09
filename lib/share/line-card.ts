@@ -1,4 +1,4 @@
-import { wrapText } from "./wrap-text";
+import { balancedWrapText } from "./wrap-text";
 
 const W = 1080;
 const H = 1350;
@@ -56,27 +56,30 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
   c.font = `600 44px ${serif}`;
   c.fillText("SongHanzi", left, 150);
 
+  // Ba khối (chữ Hán, pinyin, bản dịch) cách nhau đúng một khoảng GAP và cả cụm được căn giữa trong vùng giữa tiêu đề và đường kẻ chân thẻ,
+  // nên thẻ cân đối dù câu ngắn hay dài. Mỗi khối ngắt dòng cân bằng để không có dòng cuối chỉ một, hai chữ.
   const limit = (lines: string[]) => (lines.length > MAX_LINES ? [...lines.slice(0, MAX_LINES - 1), `${lines[MAX_LINES - 1]}…`] : lines);
-  let y = 330;
-  c.fillStyle = INK;
-  c.font = hanFont;
-  const hanLines = limit(wrapText(d.han, measureWith(hanFont), maxWidth, "char"));
-  for (const line of hanLines) { c.fillText(line, left, y); y += 140; }
+  const pinyinFont = `400 40px ${sans}`;
+  const translationFont = `italic 400 46px ${sans}`;
+  const blocks: { lines: string[]; font: string; color: string; lineHeight: number }[] = [
+    { lines: limit(balancedWrapText(d.han, measureWith(hanFont), maxWidth, "char")), font: hanFont, color: INK, lineHeight: 132 },
+  ];
+  if (d.pinyin) blocks.push({ lines: limit(balancedWrapText(d.pinyin, measureWith(pinyinFont), maxWidth, "word")), font: pinyinFont, color: PRIMARY, lineHeight: 58 });
+  if (d.translation) blocks.push({ lines: limit(balancedWrapText(`“${d.translation}”`, measureWith(translationFont), maxWidth, "word")), font: translationFont, color: MUTED, lineHeight: 66 });
 
-  if (d.pinyin) {
-    y += 10;
-    const font = `400 40px ${sans}`;
-    c.fillStyle = PRIMARY;
-    c.font = font;
-    for (const line of limit(wrapText(d.pinyin, measureWith(font), maxWidth, "word"))) { c.fillText(line, left, y); y += 58; }
+  const GAP = 52;
+  const regionTop = 230;
+  const regionBottom = 1090;
+  const total = blocks.reduce((sum, b) => sum + b.lines.length * b.lineHeight, 0) + GAP * (blocks.length - 1);
+  let y = regionTop + Math.max(0, (regionBottom - regionTop - total) / 2);
+  c.textBaseline = "middle";
+  for (const b of blocks) {
+    c.fillStyle = b.color;
+    c.font = b.font;
+    for (const line of b.lines) { c.fillText(line, left, y + b.lineHeight / 2); y += b.lineHeight; }
+    y += GAP;
   }
-  if (d.translation) {
-    y += 40;
-    const font = `italic 400 46px ${sans}`;
-    c.fillStyle = MUTED;
-    c.font = font;
-    for (const line of limit(wrapText(`“${d.translation}”`, measureWith(font), maxWidth, "word"))) { c.fillText(line, left, y); y += 66; }
-  }
+  c.textBaseline = "alphabetic";
 
   c.strokeStyle = "rgba(28, 22, 17, 0.12)";
   c.lineWidth = 2;

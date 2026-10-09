@@ -219,9 +219,12 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
               </p>
             )}
           </div>
-          <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)}
-            publish={publishOffset.canPublish ? { state: publishOffset.state, onPublish: publishOffset.publish } : undefined} />
-          <ReportSongButton videoId={analysis.videoId} prominent />
+          {/* Điện thoại: đẩy hai khối phụ (canh lời, báo lỗi) xuống sau danh sách lời để màn đầu thấy được nhiều câu hát hơn; từ lg trở lên giữ nguyên chỗ. */}
+          <div className="flex flex-col gap-6 max-lg:order-last">
+            <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)}
+              publish={publishOffset.canPublish ? { state: publishOffset.state, onPublish: publishOffset.publish } : undefined} />
+            <ReportSongButton videoId={analysis.videoId} prominent />
+          </div>
           <LyricList
             videoId={analysis.videoId} promptVersion={analysis.promptVersion}
             lines={lines} currentIndex={currentIndex} vocab={view.vocab} grammar={view.grammar}

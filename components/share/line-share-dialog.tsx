@@ -13,6 +13,7 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
   const [blob, setBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     const dialog = ref.current;
@@ -37,6 +38,21 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
     }
   }
 
+  // Tạo link blob mới ngay lúc bấm (không dùng lại link của ảnh xem trước): link cũ có thể đã bị thu hồi khi popup dựng lại ảnh, khiến Android báo
+  // tải thất bại. Gắn thẻ <a> vào trang rồi mới bấm vì vài trình duyệt di động bỏ qua click lên thẻ chưa nằm trong tài liệu.
+  function download() {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "songhanzi-cau-hat.png";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30_000);
+    setSaved(true);
+  }
+
   const btn = "inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-label-md font-semibold";
   return (
     <dialog
@@ -51,10 +67,11 @@ export function LineShareDialog({ card, onClose }: { card: Omit<LineCardData, "s
         ) : (
           <div role="status" className="flex aspect-[4/5] items-center justify-center rounded-2xl bg-surface-container text-label-md text-on-surface-variant">{error ?? "Đang tạo ảnh…"}</div>
         )}
+        {saved && !error && <p role="status" className="text-label-md text-on-surface-variant">Đã gửi yêu cầu tải ảnh. Kiểm tra thư mục Tải xuống hoặc thanh thông báo của trình duyệt; không thấy thì bấm Chia sẻ rồi chọn Lưu.</p>}
         {error && previewUrl && <p role="alert" className="text-label-md text-error">{error}</p>}
         <div className="flex flex-wrap gap-2">
           {canShareFile && <button type="button" onClick={() => void share()} className={`${btn} bg-primary text-on-primary hover:bg-primary-container`}><Icon name="share" size={18} />Chia sẻ</button>}
-          {previewUrl && <a href={previewUrl} download="songhanzi-cau-hat.png" className={`${btn} ${canShareFile ? "bg-surface-container-high text-on-surface" : "bg-primary text-on-primary"}`}>Tải ảnh</a>}
+          {previewUrl && <button type="button" onClick={download} className={`${btn} ${canShareFile ? "bg-surface-container-high text-on-surface" : "bg-primary text-on-primary"}`}>Tải ảnh</button>}
           <button type="button" onClick={onClose} className={`${btn} bg-surface-container-high text-on-surface`}>Đóng</button>
         </div>
       </div>
