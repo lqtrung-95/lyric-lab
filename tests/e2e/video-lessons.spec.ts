@@ -99,6 +99,7 @@ test.describe("báo bản dịch một dòng sai", () => {
     await row.evaluate((el) => el.scrollIntoView({ block: "center" }));
     await row.hover();
     await page.getByRole("button", { name: "Báo bản dịch câu 2 sai" }).click();
+    await page.getByRole("dialog", { name: "Báo bản dịch này sai?" }).getByRole("button", { name: "Báo và dịch lại" }).click();
     return bodies;
   }
 
@@ -108,6 +109,25 @@ test.describe("báo bản dịch một dòng sai", () => {
     await expect(page.getByText("Hôm nay trời đẹp thật.")).toBeVisible();
     await expect(page.getByText("Hôm nay thời tiết đẹp.")).toHaveCount(0);
     expect(bodies).toEqual([{ lineIndex: 1 }]);
+  });
+
+  test("hỏi xác nhận trước khi báo: bấm Hủy thì không gửi gì", async ({ page }) => {
+    await mockVideoApis(page);
+    let calls = 0;
+    await page.route(`**/api/videos/${VIDEO_ID}/report-translation`, (route) => { calls++; return route.fulfill({ json: { kind: "reported" } }); });
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`/video/${VIDEO_ID}`);
+    const row = page.locator('[data-line-index="1"]');
+    await row.evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await row.hover();
+    await page.getByRole("button", { name: "Báo bản dịch câu 2 sai" }).click();
+    const dialog = page.getByRole("dialog", { name: "Báo bản dịch này sai?" });
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole("button", { name: "Hủy" }).click();
+    await expect(dialog).toBeHidden();
+    await page.waitForTimeout(400);
+    expect(calls).toBe(0);
+    await expect(page.getByText("Hôm nay thời tiết đẹp.")).toBeVisible();
   });
 
   test("đã là bản AI hoặc hết trần: chỉ ghi nhận, bản dịch giữ nguyên", async ({ page }) => {
@@ -250,6 +270,53 @@ test("quản trị video: rà bản dịch từng dòng, lọc dòng thiếu d�
   await page.getByRole("button", { name: "Lưu bản dịch" }).click();
   await expect.poll(() => patches).toEqual([{ action: "edit_translation", idx: 1, translation: "Hôm nay trời đẹp." }]);
   await expect(page.getByText(/0 dòng thiếu bản dịch/)).toBeVisible();
+});
+
+test("quản trị video: dòng bị báo hiện số lần, bản cũ và khôi phục được; dòng đã khôi phục không còn nút", async ({ page }) => {
+  const patches: unknown[] = [];
+  let restored = false;
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route(`**/api/admin/videos/${VIDEO_ID}`, async (route) => {
+    if (route.request().method() === "PATCH") {
+      patches.push(route.request().postDataJSON());
+      restored = true;
+      return route.fulfill({ json: { done: "restore_translation" } });
+    }
+    const reports = [
+      { id: 7, lineIdx: 1, oldTranslation: "Hôm nay trời nắng đẹp.", outcome: "retranslated", createdAt: "2026-10-10T01:00:00Z" },
+      { id: 6, lineIdx: 2, oldTranslation: "Chúng ta đi công viên nhé.", outcome: "reported", createdAt: "2026-10-09T01:00:00Z" },
+    ];
+    const lines = lesson.lines.map((l, i) => (i === 1 ? { ...l, translation: "Bản AI mới.", translationBy: "ai" } : { ...l }));
+    return route.fulfill({ json: { ...adminSummary, lines, reports } });
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/admin/videos/${VIDEO_ID}`);
+  await expect(page.getByText(/2 dòng bị báo sai/)).toBeVisible();
+  await expect(page.getByText("AI đã dịch lại", { exact: true })).toBeVisible();
+  await expect(page.getByText("Hôm nay trời nắng đẹp.")).toBeVisible();
+  await noViolations(page);
+  await page.getByLabel("Chỉ hiện dòng bị báo sai").check();
+  await expect(page.getByLabel(/Bản dịch dòng/)).toHaveCount(2);
+  await page.getByRole("button", { name: "Khôi phục bản cũ" }).click();
+  await expect.poll(() => patches).toEqual([{ action: "restore_translation", reportId: 7 }]);
+  expect(restored).toBe(true);
+  await expect(page.getByLabel("Bản dịch dòng 2")).toHaveValue("Hôm nay trời nắng đẹp.");
+  await expect(page.getByText("Admin đã xác nhận", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Khôi phục bản cũ" })).toHaveCount(0);
+});
+
+test("quản trị video: khôi phục khi dòng đã được sửa trước đó (409) thì báo, không đổi nội dung", async ({ page }) => {
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route(`**/api/admin/videos/${VIDEO_ID}`, (route) => {
+    if (route.request().method() === "PATCH") return route.fulfill({ status: 409, json: { error: "unchanged" } });
+    const lines = lesson.lines.map((l, i) => (i === 1 ? { ...l, translation: "Bản AI mới.", translationBy: "ai" } : { ...l }));
+    return route.fulfill({ json: { ...adminSummary, lines, reports: [{ id: 7, lineIdx: 1, oldTranslation: "Bản cũ.", outcome: "retranslated", createdAt: "2026-10-10T01:00:00Z" }] } });
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/admin/videos/${VIDEO_ID}`);
+  await page.getByRole("button", { name: "Khôi phục bản cũ" }).click();
+  await expect(page.getByRole("alert").filter({ hasText: "đã được sửa trước đó" })).toBeVisible();
+  await expect(page.getByLabel("Bản dịch dòng 2")).toHaveValue("Bản AI mới.");
 });
 
 // ---- Luyện nói theo (shadowing) ----

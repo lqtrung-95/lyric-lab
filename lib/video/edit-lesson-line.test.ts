@@ -12,6 +12,11 @@ describe("withLineTranslation", () => {
     expect(r.translatedLineCount).toBe(2);
     expect(lines[1].translation).toBeNull(); // không sửa mảng gốc
   });
+  it("bản admin gõ được khóa khỏi AI dịch lại; xóa bản dịch thì bỏ dấu", () => {
+    const ai = [{ ...line(0, "Bản AI"), translationBy: "ai" as const }];
+    expect(withLineTranslation(ai, 0, "Bản admin")!.lines[0]).toMatchObject({ translation: "Bản admin", translationBy: "admin" });
+    expect(withLineTranslation(ai, 0, " ")!.lines[0]).not.toHaveProperty("translationBy");
+  });
   it("chuỗi rỗng xóa bản dịch", () => {
     const r = withLineTranslation(lines, 0, "   ")!;
     expect(r.lines[0].translation).toBeNull();

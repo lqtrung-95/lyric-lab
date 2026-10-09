@@ -10,8 +10,11 @@ export interface LessonLine {
   /** Bản dịch tiếng Việt của dòng; null khi không ghép được (admin rà lại). */
   translation: string | null;
   tokens: { text: string }[];
-  /** Dòng đã được AI dịch lại sau khi người học báo sai: báo tiếp thì chuyển cho quản trị thay vì cho AI dịch lại chính nó. */
-  translationBy?: "ai";
+  /**
+   * Ai đặt bản dịch hiện tại, khi không phải bản gốc của phụ đề: "ai" = AI dịch lại sau khi người học báo sai; "admin" = quản trị viên đã sửa hoặc
+   * khôi phục. Cả hai đều khóa dòng khỏi việc AI dịch lại tiếp: báo tiếp chỉ ghi nhận cho quản trị (tránh vòng lặp và người phá bản đã xác nhận).
+   */
+  translationBy?: "ai" | "admin";
 }
 
 export type LessonStatus = "draft" | "listed" | "hidden";

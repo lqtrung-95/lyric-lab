@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Icon } from "@/components/ui/icon";
 import { Toast } from "@/components/ui/toast";
 import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
@@ -41,6 +42,8 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
   const [word, setWord] = useState<WordSelection | null>(null);
   const [pinToast, setPinToast] = useState<string | null>(null);
   const [reportToast, setReportToast] = useState<string | null>(null);
+  // Dòng đang chờ xác nhận báo sai: báo là AI dịch lại và bản mới hiện cho mọi người, nên hỏi lại để tránh bấm nhầm (nút cờ nằm cạnh nút chia sẻ).
+  const [confirmReport, setConfirmReport] = useState<number | null>(null);
   const reporting = useRef(new Set<number>());
   const onRepeatsExhausted = useCallback(() => setLoopIndex(null), []);
   const { currentIndex, playing, cancelPendingResume } = usePlaybackSync(controller, lines, loopIndex, repeatConfig, onRepeatsExhausted);
@@ -170,10 +173,17 @@ export function VideoWatchScreen({ lesson, startAt }: { lesson: LessonDetail; st
           showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation} autoScroll={prefs.autoScroll}
           shareContext={{ title: lesson.title, artist: lesson.channelTitle }}
           onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
-          onSeek={seekToLine} onWord={selectWord} onPauseSong={pause} onReportTranslation={(i) => void reportTranslation(i)}
+          onSeek={seekToLine} onWord={selectWord} onPauseSong={pause} onReportTranslation={setConfirmReport}
         />
         {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}
         {reportToast && <Toast message={reportToast} onDismiss={() => setReportToast(null)} />}
+        <ConfirmDialog
+          open={confirmReport !== null} title="Báo bản dịch này sai?"
+          body="AI sẽ dịch lại đúng câu này và bản mới hiện cho mọi người. Chỉ báo khi bản dịch hiện tại sai hoặc khó hiểu."
+          confirmLabel="Báo và dịch lại" cancelLabel="Hủy"
+          onCancel={() => setConfirmReport(null)}
+          onConfirm={() => { const index = confirmReport; setConfirmReport(null); if (index !== null) void reportTranslation(index); }}
+        />
       </div>
       {word && (
         <WordPopover

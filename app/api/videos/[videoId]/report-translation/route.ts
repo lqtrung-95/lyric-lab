@@ -20,7 +20,7 @@ const ok = (body: Record<string, unknown>) => Response.json(body, { headers: { "
 
 /**
  * POST {lineIndex} → người học báo bản dịch một dòng của video là sai.
- * Trả {kind:"retranslated", translation} (AI đã dịch lại dòng đó, đã lưu cho mọi người), {kind:"reported"} (đã ghi nhận cho quản trị: dòng đã là bản AI,
+ * Trả {kind:"retranslated", translation} (AI đã dịch lại dòng đó, đã lưu cho mọi người), {kind:"reported"} (đã ghi nhận cho quản trị: dòng đã là bản AI hoặc admin đã xác nhận,
  * hết trần dịch lại hôm nay, hoặc model không cho được bản tốt hơn) hoặc {kind:"duplicate"} (người này đã báo dòng này rồi).
  * Lỗi: 400 invalid_request, 401 unauthorized, 404 not_found, 429 user_limit.
  */
@@ -54,7 +54,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ videoId
       alreadyReportedByUser: (await count((q) => q.eq("user_id", user.id).eq("video_id", videoId).eq("line_idx", lineIndex))) > 0,
       userReportsToday: await count((q) => q.eq("user_id", user.id)),
       aiRetranslationsToday: await count((q) => q.eq("outcome", "retranslated")),
-      lineAlreadyAi: line.translationBy === "ai" || source === "ai",
+      lineLockedFromAi: line.translationBy !== undefined || source === "ai",
     });
     if (decision === "duplicate") return ok({ kind: "duplicate" });
     if (decision === "user_limit") return fail("user_limit", 429);
