@@ -83,8 +83,10 @@ if(!humanVi()){go({v:id,t:t});return;}
 say('SongHanzi: đang đọc phụ đề tiếng Việt…');
 switchLang('vi',function(x){return x!==t&&han(x)<10;},function(x){go(x?{v:id,t:t,vt:x}:{v:id,t:t});});
 }
+function zhShown(){var tr=langTrigger();return !!tr&&isLangItem('zh',tr.innerText);}
 function send(t,sw){
 if(han(t)<10){
+if(zhShown()){fail('Video này có phụ đề gắn nhãn tiếng Trung nhưng nội dung không phải chữ Hán (có thể là tiếng Anh), nên chưa thêm được. Hãy thử video khác nhé.');return;}
 if(sw){fail('Chưa tự chuyển được phụ đề sang tiếng Trung. Hãy chọn tiếng Trung ở ô ngôn ngữ cuối bảng phụ đề rồi bấm lại.'+dbg());return;}
 say('SongHanzi: đang chuyển phụ đề sang tiếng Trung…');
 switchLang('zh',function(x){return han(x)>=10;},function(x){if(x){send(x,true);}else{send(t,true);}});

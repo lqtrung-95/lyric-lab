@@ -146,6 +146,16 @@ describe("bookmarklet", () => {
     expect(alerts[0]).toContain("Chưa tự chuyển được");
   });
 
+  it("ô ngôn ngữ đã là Chinese mà nội dung không phải chữ Hán (nhãn gắn sai) thì báo đúng nguyên nhân, không bảo chọn lại", async () => {
+    const english = "0:00\nHow much is that pot?\n0:05\n60 yuan per pot";
+    const { opened, alerts, clicks } = run({ panelText: english, langSwitch: { triggerLabel: "Chinese", menuLabels: ["English"], zhLabel: "Chinese", zhText: english } });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(opened).toEqual([]);
+    expect(alerts[0]).toContain("gắn nhãn tiếng Trung nhưng nội dung không phải chữ Hán");
+    expect(alerts[0]).not.toContain("mã lỗi");
+    expect(clicks).not.toContain("trigger"); // không mở ô chọn ngôn ngữ vô ích
+  });
+
   it("bảng mở bằng ngôn ngữ khác: tự mở ô chọn ngôn ngữ, chọn tiếng Trung rồi gửi", async () => {
     const { opened, alerts, clicks } = run({
       panelText: "0:00\nHello everyone\n0:05\nWelcome to the show",
