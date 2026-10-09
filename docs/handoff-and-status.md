@@ -49,6 +49,7 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 
 | Triệu chứng | Nguyên nhân | Cách xử lý |
 |---|---|---|
+| Video thêm bằng dấu trang bị lặp cả bản chép lời (mốc giờ về 0 giữa chừng, số dòng gấp đôi) | YouTube giữ nhiều bản khung bản chép lời trong trang; `querySelectorAll` trên cả `document` gom hết | Dấu trang chỉ lấy dòng đang hiện của MỘT khung (`visibleSegs`, chưa kiểm chứng trên DOM thật); `dropRepeatedPass` (`lib/video/drop-repeated-pass.ts`) cắt bản lặp ở `ingestVideo` cho mọi nguồn. Video đã lỡ lặp phải cắt tay trong `video_lessons.lines` (giữ phần đầu) |
 | Từ lưu ở video bấm ▶ báo `song_unavailable`, "Xem bài" mở trang phân tích bài hát | Thẻ video dùng chung `user_cards` với bài hát, không có cột nguồn | `/api/review/context` fallback sang `getLessonForReview`; `/learn/<id>` chuyển sang `/video/<id>` (`hasVisibleLesson`); tab Từ đã lưu hỏi `/api/videos/lessons-among` (`useVideoLessonIds`) để link thẳng `/video/<id>`, bước chuyển hướng chỉ còn là dự phòng. Không tách bảng vì từ đã lưu/đã biết/lịch ôn tính theo từ; id vừa là bài hát vừa là video thì bài hát thắng |
 | Bài lạ hoắc / lời sai hoàn toàn | LRCLIB có nhiều bản cùng tên bài + nghệ sĩ nhưng lời khác nhau; khớp theo thời lượng có thể chọn nhầm (ca `pbSji_3prUc`) | Ép đúng id LRCLIB rồi chạy lại phân tích |
 | Lời bài `7I1SPKwTXJ0` bị lặp dồn giữa các câu | Caption của riêng video này chứa các cue nối tiếp lặp phần lời trước | Đã sửa dữ liệu của bài này; không tự động áp dụng cách cắt phần lặp cho bài khác |

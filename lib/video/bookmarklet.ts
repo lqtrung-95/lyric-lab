@@ -35,8 +35,12 @@ function dbg(){var p=document.querySelectorAll(OPEN),ids=[];for(var i=0;i<p.leng
 var help='Video này có thể không có phụ đề. Bạn thử bấm nút hiện phụ đề dạng văn bản (Show transcript) dưới phần mô tả rồi bấm lại, hoặc dán phụ đề vào trang Thêm video.';
 function go(p){var b=btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');var url=O+'/video/add#d='+b;stop();say('Đã đọc xong, đang mở SongHanzi…');var w=window.open(url,'_blank');if(w){setTimeout(hide,2500);}else{say('Trình duyệt chặn cửa sổ mới.',url);}}
 function ok(t){return /(^|\\n)(\\d{1,2}:)?\\d{1,2}:\\d{2}(\\n|\\s)/.test(t);}
+// YouTube giữ nhiều bản của khung bản chép lời trong trang (khung ẩn, khung cũ sau khi đổi ngôn ngữ); chỉ lấy các dòng đang hiện và thuộc MỘT khung (khung nhiều dòng nhất).
+function visibleSegs(){var all=document.querySelectorAll(SEG),vis=[],i;for(i=0;i<all.length;i++){if(shown(all[i])){vis.push(all[i]);}}
+if(!vis.length){return all;}var roots=[],groups=[];for(i=0;i<vis.length;i++){var r=vis[i].closest('ytd-engagement-panel-section-list-renderer')||document,k=roots.indexOf(r);if(k<0){roots.push(r);groups.push([]);k=roots.length-1;}groups[k].push(vis[i]);}
+var best=groups[0];for(i=1;i<groups.length;i++){if(groups[i].length>best.length){best=groups[i];}}return best;}
 function readPanel(){
-var segs=document.querySelectorAll(SEG);
+var segs=visibleSegs();
 if(segs.length){var a=[];for(var i=0;i<segs.length;i++){a.push(segs[i].innerText||'');}var j=a.join('\\n');if(ok(j)){return j;}}
 var els=document.querySelectorAll('[target-id*="transcript"],'+OPEN);var best='';
 for(var k=0;k<els.length;k++){var s=els[k].innerText||'';if(s.length>best.length&&ok(s)){best=s;}}

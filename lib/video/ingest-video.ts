@@ -1,3 +1,4 @@
+import { dropRepeatedPass } from "./drop-repeated-pass";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { withSubwordEntries } from "@/lib/analysis/build-line-pinyin";
 import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
@@ -72,8 +73,8 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
   const zhTrack = pickBestChineseTrack(tracks);
   if (!zhTrack || zhTrack.kind !== "manual") return { kind: "skipped", reason: "no_human_zh_captions" };
   const viTrack = tracks.find((t) => t.lang.toLowerCase().startsWith("vi") && t.kind === "manual") ?? null;
-  const zh = await provider.fetchLines(meta.videoId, zhTrack);
-  const vi = viTrack ? await provider.fetchLines(meta.videoId, viTrack) : null;
+  const zh = dropRepeatedPass(await provider.fetchLines(meta.videoId, zhTrack));
+  const vi = viTrack ? dropRepeatedPass(await provider.fetchLines(meta.videoId, viTrack)) : null;
 
   let prepared = prepareLessonLines(zh, vi);
   if (prepared.length === 0) return { kind: "skipped", reason: "no_lines" };
