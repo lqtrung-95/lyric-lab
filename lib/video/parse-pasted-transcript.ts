@@ -31,10 +31,30 @@ function parseCues(text: string): CaptionLine[] {
   return lines;
 }
 
+/** Các con số khác 0 của một chuỗi (hoặc [0] nếu toàn số 0), để so mốc giờ với nhãn đọc to của nó bất kể ngôn ngữ. */
+const significantNumbers = (nums: number[]): number[] => (nums.some((n) => n > 0) ? nums.filter((n) => n > 0) : [0]);
+
+/**
+ * YouTube chèn sau mỗi mốc giờ một nhãn ẩn cho trình đọc màn hình ("25 minutes, 57 seconds", "25 phút 57 giây"...) và nhãn này đổi theo ngôn ngữ
+ * giao diện. Nhận ra nó không dựa vào chữ: dòng ngắn có các con số trùng đúng với các phần khác 0 của mốc giờ liền trước.
+ */
+function isTimeLabel(row: string, stamp: RegExpMatchArray): boolean {
+  if (row.length > 40) return false;
+  const nums = (row.match(/\d+/g) ?? []).map(Number);
+  if (nums.length === 0) return false;
+  const parts = [Number(stamp[1] ?? 0), Number(stamp[2]), Number(stamp[3])];
+  const want = significantNumbers(parts);
+  const got = significantNumbers(nums);
+  return want.length === got.length && want.every((n, i) => n === got[i]);
+}
+
 function parsePanel(rows: string[], durationSec: number | undefined): CaptionLine[] {
   const entries: { start: number; text: string }[] = [];
+  let stamp: RegExpMatchArray | null = null; // mốc giờ của dòng ngay trước, còn chờ xem dòng kế có phải nhãn của nó không
   for (const row of rows) {
+    if (stamp && isTimeLabel(row, stamp)) { stamp = null; continue; }
     const only = row.match(PANEL_TIME);
+    stamp = only;
     if (only) { entries.push({ start: panelSeconds(only), text: "" }); continue; }
     const inline = row.match(PANEL_INLINE);
     const time = inline?.[1].match(PANEL_TIME);

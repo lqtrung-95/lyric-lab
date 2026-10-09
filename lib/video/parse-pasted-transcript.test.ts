@@ -34,6 +34,16 @@ describe("parsePastedTranscript", () => {
     ]);
   });
 
+  it("bỏ nhãn đọc to của mốc giờ mà YouTube chèn vào (mọi ngôn ngữ), giữ lời", () => {
+    const panel = "0:00\n0 seconds\n大家好\n25:57\n25 minutes, 57 seconds\n但是我觉得我做得越来越好了\n1:02:03\n1 giờ 2 phút 3 giây\n再见\n10:00\n10分\n结束";
+    expect(parsePastedTranscript(panel, 4000).map((l) => l.text)).toEqual(["大家好", "但是我觉得我做得越来越好了", "再见", "结束"]);
+  });
+
+  it("câu có chứa số nhưng không trùng mốc giờ thì giữ nguyên", () => {
+    const lines = parsePastedTranscript("0:05\n我们有3个人\n0:09\n5 个苹果\n");
+    expect(lines.map((l) => l.text)).toEqual(["我们有3个人", "5 个苹果"]);
+  });
+
   it("văn bản không có mốc giờ thì trả mảng rỗng", () => {
     expect(parsePastedTranscript("大家好\n欢迎收听")).toEqual([]);
     expect(parsePastedTranscript("")).toEqual([]);

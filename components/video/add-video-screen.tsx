@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { MAX_ADDED_VIDEO_SECONDS, MAX_VIDEOS_PER_USER_PER_DAY } from "@/lib/video/add-video-limits";
 import { decodeBookmarkletHash } from "@/lib/video/bookmarklet";
 import { BookmarkletInstall } from "./bookmarklet-install";
@@ -54,8 +55,12 @@ export function AddVideoScreen() {
     setBusy(true);
     setMessage(null);
     const body = { video, ...(captionText.trim() ? { captions: captionText } : {}) };
+    // Trang này chưa tự tạo phiên như các màn khác; người mở thẳng từ dấu trang có thể chưa có phiên nên bảo đảm có trước khi gửi (và thử lại một lần khi 401).
+    const post = () => fetch("/api/videos/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     try {
-      const res = await fetch("/api/videos/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      await ensureAnonymousSession();
+      let res = await post();
+      if (res.status === 401 && (await ensureAnonymousSession())) res = await post();
       const data = (await res.json().catch(() => ({}))) as { kind?: string; videoId?: string; reason?: string; error?: string };
       if (res.ok && (data.kind === "added" || data.kind === "exists") && data.videoId) { router.push(`/video/${data.videoId}`); return; }
       if (NEEDS_MANUAL.has(data.error ?? "")) setManualOpen(true);

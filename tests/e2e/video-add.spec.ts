@@ -107,6 +107,22 @@ test("dấu trang gửi bản chép lời nhưng server báo lỗi: hiện lỗi
   expect(bodies).toHaveLength(1);
 });
 
+test("chưa có phiên đăng nhập (401) thì tạo phiên rồi tự thử lại một lần, không hiện lỗi", async ({ page }) => {
+  const bodies: Record<string, unknown>[] = [];
+  await page.route("**/api/videos/*", (route) => route.fulfill({ status: 404, json: { error: "not_found" } }));
+  await page.route("**/api/videos/add", (route) => {
+    bodies.push(route.request().postDataJSON());
+    return bodies.length === 1
+      ? route.fulfill({ status: 401, json: { error: "unauthorized" } })
+      : route.fulfill({ json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
+  });
+  await page.goto("/video/add");
+  await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
+  await page.getByRole("button", { name: "Thêm video" }).click();
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
+  expect(bodies).toHaveLength(2);
+});
+
 test("từ trang Video có lối vào Thêm video của bạn", async ({ page }) => {
   await page.route("**/api/videos", (route) => route.fulfill({ json: { videos: [] } }));
   await page.goto("/video");
