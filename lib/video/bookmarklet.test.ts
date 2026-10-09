@@ -58,7 +58,7 @@ function run(opts: Opts) {
   };
   const doc = {
     body: { appendChild: () => undefined },
-    createElement: () => (toast.style = { cssText: "" }, { ...toast, style: toast.style, set textContent(v: string) { messages.push(v); }, href: "", target: "" }),
+    createElement: () => (toast.style = { cssText: "" }, { ...toast, style: toast.style, set textContent(v: string) { if (v !== "×") messages.push(v); }, setAttribute: () => undefined, href: "", target: "" }),
     querySelectorAll: (sel: string) => {
       if (sel.includes("target-id")) return [{ innerText: "Trong video này" }, ...(panelOpen ? [{ innerText: currentText }] : [])];
       if (sel.startsWith("ytd-transcript-segment")) return segmentsShown ? (opts.segments ?? []).map((innerText) => ({ innerText, ...visible })) : [];
@@ -263,5 +263,12 @@ describe("mã javascript: thật (đã bỏ xuống dòng)", () => {
     expect(code.endsWith('("https://songhanzi.test");')).toBe(true);
     expect(() => new Function(code)).not.toThrow();
     expect(BOOKMARKLET_SOURCE.split("\n").some((l) => /^\s*\/\//.test(l))).toBe(false);
+  });
+});
+
+describe("hộp thông báo trên trang YouTube", () => {
+  it("có nút đóng (×) có nhãn Đóng, bấm vào gỡ hộp thông báo", () => {
+    expect(BOOKMARKLET_SOURCE).toContain("setAttribute('aria-label','Đóng')");
+    expect(BOOKMARKLET_SOURCE).toContain("x.onclick=hide");
   });
 });

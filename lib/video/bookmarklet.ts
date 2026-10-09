@@ -26,9 +26,10 @@ var SEG='ytd-transcript-segment-renderer,transcript-segment-view-model';
 var OPEN='ytd-engagement-panel-section-list-renderer[visibility="ENGAGEMENT_PANEL_VISIBILITY_EXPANDED"]';
 var box=null,timer=null,dots=0;
 function say(msg,link){
-if(!box){box=document.createElement('div');box.style.cssText='position:fixed;top:16px;right:16px;z-index:2147483647;max-width:320px;padding:12px 16px;border-radius:14px;background:#7a1b10;color:#fff;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4)';document.body.appendChild(box);}
+if(!box){box=document.createElement('div');box.style.cssText='position:fixed;top:16px;right:16px;z-index:2147483647;max-width:320px;padding:12px 40px 12px 16px;border-radius:14px;background:#7a1b10;color:#fff;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4)';document.body.appendChild(box);}
 box.textContent=msg;
 if(link){var a=document.createElement('a');a.href=link;a.target='_blank';a.textContent=' Bấm để mở SongHanzi';a.style.cssText='color:#ffd54a;text-decoration:underline';box.appendChild(a);}
+var x=document.createElement('button');x.type='button';x.textContent='\u00d7';x.setAttribute('aria-label','Đóng');x.style.cssText='position:absolute;top:6px;right:8px;width:28px;height:28px;border:0;border-radius:14px;background:transparent;color:#fff;font:400 22px/28px system-ui,sans-serif;cursor:pointer';x.onclick=hide;box.appendChild(x);
 }
 function stop(){if(timer){clearInterval(timer);timer=null;}}
 function hide(){stop();if(box){box.remove();box=null;}}
