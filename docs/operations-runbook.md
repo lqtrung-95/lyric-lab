@@ -213,17 +213,30 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 5. Secret `BACKUP_PASSPHRASE` = chuỗi ngẫu nhiên dài (`openssl rand -base64 32`). **Cất thêm một bản ở trình quản lý mật khẩu**: mất nó là không giải mã được mọi bản sao lưu.
 6. Chạy thử bằng Run workflow, mở kho sao lưu kiểm tra có file mới.
 
-**Giải mã và khôi phục** (đã thử thật ngày 2026-10-11 vào một project Supabase trống: nạp xong bảng dữ liệu trong ~56 giây với `-j 4`; chạy một luồng thì quá 8 phút chưa xong):
+**Giải mã và khôi phục.** Đã thử trọn quy trình ngày 2026-10-11 vào một project Supabase trống và đạt: 1256 tài khoản, 1251 ẩn danh, 5 danh tính khớp project gốc; schema `public` nạp trong ~58 giây, **0 lỗi**. Thứ tự bắt buộc để giữ khóa ngoại tới `auth.users`: **`auth` trước, `public` sau**.
 ```
-gpg --decrypt public-YYYY-MM-DD.dump.gpg > public.dump   # ngày trong tên file tính theo giờ UTC; xem `ls` để lấy tên thật
+# 0) Đặt chuỗi kết nối project ĐÍCH vào biến (không gõ mật khẩu thẳng vào lệnh, tránh vào lịch sử shell)
+read -s "RESTORE_URL?Chuỗi kết nối: "; export RESTORE_URL      # zsh
+
+# 1) Tài khoản (auth): chỉ cần users và identities
+gpg --decrypt auth-YYYY-MM-DD.dump.gpg > auth.dump              # ngày trong tên file tính theo giờ UTC; xem `ls` để lấy tên thật
+pg_restore --list auth.dump | grep -E " auth (users|identities) " > auth.list
+pg_restore --data-only -L auth.list --no-owner --no-privileges --dbname "$RESTORE_URL" auth.dump
+
+# 2) Dữ liệu app (public)
+gpg --decrypt public-YYYY-MM-DD.dump.gpg > public.dump
 pg_restore --list public.dump | grep -v " SCHEMA - public" | grep -v "COMMENT - SCHEMA public" > restore.list
 pg_restore -j 4 -L restore.list --no-owner --no-privileges --dbname "$RESTORE_URL" public.dump
-rm public.dump restore.list   # chứa dữ liệu người dùng chưa mã hóa
+
+# 3) Xóa file giải mã (chứa dữ liệu người dùng chưa mã hóa)
+rm auth.dump auth.list public.dump restore.list; unset RESTORE_URL
 ```
-- Dùng danh sách `-L` để bỏ lệnh `CREATE SCHEMA public` (project Supabase mới đã có sẵn schema `public`, nếu không sẽ báo lỗi "already exists"). Project đích đã có dữ liệu dở thì dọn trước bằng `drop schema public cascade; create schema public;` rồi cấp lại quyền (`grant usage on schema public to postgres, anon, authenticated, service_role; grant all on schema public to postgres, service_role;`).
-- Đặt chuỗi kết nối bằng `read -s "RESTORE_URL?..."; export RESTORE_URL` để mật khẩu không nằm trong lịch sử lệnh.
-- **Lỗi `violates foreign key constraint ... auth.users` là đúng như dự kiến** khi chỉ khôi phục `public`: các bảng của app có khóa ngoại tới `auth.users`, mà project mới chưa có tài khoản nào. Dữ liệu các bảng vẫn được nạp, chỉ thiếu ràng buộc khóa ngoại (lần thử có 48 lỗi bị bỏ qua, toàn loại này). Muốn đủ ràng buộc khi khôi phục thật sau sự cố: khôi phục dữ liệu `auth` (file `auth-*.dump.gpg`, `pg_restore --data-only`) TRƯỚC, rồi mới khôi phục `public`. Cách này chưa thử; thử trên project trống trước.
-- Kiểm tra sau khôi phục: đếm hàng vài bảng chính (songs, song_analyses, video_lessons, dict_words) ở project đích và so với project gốc.
+- **Bỏ bảng `sessions`, `refresh_tokens`:** project mới có khóa ký riêng nên token cũ không còn hợp lệ, người dùng tự đăng nhập lại (tài khoản ẩn danh được tạo phiên mới). Nạp cả `auth` đủ 24 bảng thì kẹt rất lâu ở `COPY auth.sessions` (hơn 3 phút chưa xong), không cần thiết. Đừng nạp `schema_migrations`, `instances` (project mới đã có sẵn, sẽ trùng khóa).
+- **Danh sách `-L` bỏ `CREATE SCHEMA public`:** project Supabase mới đã có sẵn schema `public`, nếu không bỏ sẽ lỗi "already exists". Project đích đã nạp dở thì dọn bằng `drop schema public cascade; create schema public;` rồi cấp lại quyền (`grant usage on schema public to postgres, anon, authenticated, service_role; grant all on schema public to postgres, service_role;`).
+- **Chạy song song `-j 4`:** ~58 giây; một luồng thì quá 8 phút chưa xong (client chỉ chờ server nạp dữ liệu và dựng chỉ mục).
+- **Nạp `public` TRƯỚC `auth`** sẽ cho 24 lỗi `violates foreign key constraint ... auth.users` (dữ liệu vẫn nạp, thiếu ràng buộc khóa ngoại): đã thử, nên theo đúng thứ tự trên.
+- **Kiểm tra sau khôi phục:** đếm `auth.users`, `auth.users where is_anonymous`, `auth.identities` và vài bảng chính (songs, video_lessons, user_cards, review_logs), cùng số ràng buộc khóa ngoại tới `auth.users` (`select count(*) from pg_constraint where confrelid = 'auth.users'::regclass`) ở project đích so với project gốc.
+- **Khôi phục thật sau sự cố:** project mới cần cấu hình lại biến môi trường Vercel (URL và các khóa Supabase), JWT secret mới, nhà cung cấp đăng nhập Google; việc này CHƯA có trong quy trình.
 
 **Lưu ý:** workflow chạy theo lịch bị GitHub tự tắt sau 60 ngày repo không có hoạt động; lúc đó vào tab Actions bật lại. Lỗi sao lưu gửi email báo cho người sửa lịch cuối cùng. Lịch sử git của kho sao lưu giữ cả các bản đã xóa khỏi cây thư mục, nên kho sẽ lớn dần theo thời gian (hiện dữ liệu nhỏ); khi quá lớn thì tạo kho sao lưu mới. Dump tăng kích thước theo dữ liệu: GitHub khuyến nghị mỗi file dưới 100 MB.
 
