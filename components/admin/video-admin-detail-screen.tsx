@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -11,6 +12,7 @@ import type { AdminVideoReport } from "@/lib/video/video-report-repo";
 import { VIDEO_REPORT_LABELS } from "@/lib/video/video-report-reasons";
 import type { AdminLessonDetail } from "@/lib/video/video-repo";
 import type { LessonLine, LessonStatus } from "@/lib/video/video-lesson-types";
+import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
 import { STATUS_LABEL, patchVideo } from "./video-admin-actions";
 import { VideoStatusButtons } from "./video-status-buttons";
 
@@ -182,9 +184,14 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-space-md">
       <Link href="/admin/videos" className="inline-flex min-h-11 items-center gap-1 text-label-md font-medium text-primary hover:underline"><Icon name="arrow_back" size={18} />Quản lý video</Link>
-      <div>
-        <h1 lang="zh" className="font-serif text-headline-md">{lesson.title}</h1>
-        <p className="text-label-md text-on-surface-variant">{lesson.channelTitle} · {STATUS_LABEL[lesson.status]} · {lesson.lines.length} dòng · {missing} dòng thiếu bản dịch{reportsByLine.size > 0 ? ` · ${reportsByLine.size} dòng bị báo sai` : ""}</p>
+      <div className="flex items-start gap-space-sm">
+        <a href={`https://www.youtube.com/watch?v=${videoId}`} target="_blank" rel="noopener noreferrer" aria-label="Mở video trên YouTube" className="relative aspect-video w-28 shrink-0 overflow-hidden rounded-lg bg-surface-container-high sm:w-44">
+          <Image src={videoThumbnailUrl(videoId, "mqdefault")} alt="" fill sizes="176px" unoptimized className="object-cover" />
+        </a>
+        <div className="min-w-0">
+          <h1 lang="zh" className="font-serif text-headline-md">{lesson.title}</h1>
+          <p className="text-label-md text-on-surface-variant">{lesson.channelTitle} · {STATUS_LABEL[lesson.status]} · {lesson.lines.length} dòng · {missing} dòng thiếu bản dịch{reportsByLine.size > 0 ? ` · ${reportsByLine.size} dòng bị báo sai` : ""}</p>
+        </div>
       </div>
       <VideoStatusButtons videoId={videoId} status={lesson.status} onStatus={setStatus} onDeleted={() => router.replace("/admin/videos")} />
       {openVideoReports.length > 0 && (
