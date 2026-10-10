@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
-import { InlineBoldText } from "@/components/ui/inline-bold-text";
+import { FormattedAnswer } from "@/components/ui/formatted-answer";
 import { MAX_QUESTION_CHARS } from "@/lib/lookup/ask-line-schema";
 import { useAskLine } from "./use-ask-line";
 
@@ -36,7 +36,7 @@ export function AskLineBox({ videoId, lineIndex }: { videoId: string; lineIndex:
           {turns.map((t, i) => (
             <li key={i} className="space-y-1">
               <p className="text-label-md font-semibold text-on-surface">{t.q}</p>
-              <p className="whitespace-pre-line text-label-md text-on-surface-variant"><InlineBoldText text={t.a} /></p>
+              <FormattedAnswer text={t.a} />
             </li>
           ))}
         </ol>

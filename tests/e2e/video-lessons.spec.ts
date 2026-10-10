@@ -720,7 +720,7 @@ test("tab Phụ đề: hỏi AI về một câu, gửi kèm lượt hỏi trư�
     const b = route.request().postDataJSON();
     bodies.push(b);
     if (b.question.includes("quá nhiều")) return route.fulfill({ status: 429, json: { error: "rate_limited" } });
-    await route.fulfill({ json: { answer: `Trả lời cho: ${b.question} **đậm**`, model: "gemini-flash-lite-latest" } });
+    await route.fulfill({ json: { answer: `Trả lời cho: ${b.question} **đậm**\n- **好** (hǎo): tốt\n- **了** (le): trợ từ`, model: "gemini-flash-lite-latest" } });
   });
   await page.goto(`/video/${VIDEO_ID}`);
   await page.getByRole("button", { name: "Hỏi AI về câu 1" }).click();
@@ -732,9 +732,10 @@ test("tab Phụ đề: hỏi AI về một câu, gửi kèm lượt hỏi trư�
   await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
   await expect(dialog.getByText("Trả lời cho: Còn câu sau thì sao?")).toBeVisible();
   expect(bodies[0]).toMatchObject({ videoId: VIDEO_ID, lineIndex: 0, question: "Vì sao dùng 好?", history: [] });
-  expect(bodies[1].history).toEqual([{ q: "Vì sao dùng 好?", a: "Trả lời cho: Vì sao dùng 好? **đậm**" }]);
+  expect(bodies[1].history).toEqual([{ q: "Vì sao dùng 好?", a: "Trả lời cho: Vì sao dùng 好? **đậm**\n- **好** (hǎo): tốt\n- **了** (le): trợ từ" }]);
   await expect(dialog.locator("strong").first()).toHaveText("đậm"); // **đậm** được in đậm, không hiện ký hiệu
   await expect(dialog).not.toContainText("**");
+  await expect(dialog.locator("ul.list-disc li").first()).toContainText("好 (hǎo): tốt"); // dòng gạch đầu dòng thành danh sách
   await dialog.getByPlaceholder(/Hỏi thêm/).fill("hỏi quá nhiều rồi");
   await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
   await expect(dialog.getByRole("alert")).toContainText("mai hỏi tiếp nhé");

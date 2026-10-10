@@ -21,5 +21,7 @@ export function buildAskLinePrompt({ line, translation, before, after, question,
   const context = [before && `Câu trước: ${before}`, `CÂU ĐANG HỌC: ${line}`, translation && `Bản dịch hiện có: ${translation}`, after && `Câu sau: ${after}`].filter(Boolean).join("\n");
   const prior = history?.length ? `\nCÁC LƯỢT HỎI ĐÁP TRƯỚC:\n${history.map((t) => `Hỏi: ${t.q}\nĐáp: ${t.a}`).join("\n")}\n` : "";
   return `${context}\n${prior}\nCÂU HỎI CỦA NGƯỜI HỌC:\n"""\n${question}\n"""\n\n` +
-    'Trả về JSON {"answer": "..."}. Trả lời bằng tiếng Việt, ngắn gọn (tối đa khoảng 150 từ), đi thẳng vào câu hỏi; ví dụ chữ Hán thì kèm pinyin có dấu thanh và nghĩa. Có thể dùng **in đậm** (đúng cú pháp **chữ**) cho từ khóa; không dùng tiêu đề #, bảng hay khối mã.';
+    'Trả về JSON {"answer": "..."}. Trả lời bằng tiếng Việt, ngắn gọn (tối đa khoảng 150 từ), đi thẳng vào câu hỏi, chỉ dùng tiếng Việt, chữ Hán và pinyin (không xen từ của ngôn ngữ khác). ' +
+    'Trình bày dễ đọc, dùng ký tự xuống dòng \\n trong chuỗi: câu mở đầu một dòng; rồi các ý dưới dạng gạch đầu dòng, mỗi dòng bắt đầu bằng "- " theo mẫu "- **từ/cụm** (pinyin): nghĩa hoặc vai trò"; ' +
+    'cách một dòng trống giữa các phần; kết bằng một dòng "Ý nghĩa cả câu: ...". Dùng **in đậm** (đúng cú pháp **chữ**) cho từ khóa; không dùng tiêu đề #, bảng hay khối mã, không viết thành một đoạn dài liền.';
 }
