@@ -198,3 +198,27 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 - `/api/pronunciation-feedback` chỉ chạy khi có `GEMINI_API_KEYS` (thiếu thì trả 503 `feedback_unavailable`, nút báo "chưa bật"). Âm thanh người học được chuyển tiếp sang Google Gemini để nghe; gói miễn phí của Google có thể dùng dữ liệu để cải thiện sản phẩm: cân nhắc gói trả phí nếu có nhiều người dùng, và nhớ UI đã ghi rõ điều này cạnh nút.
 - Hạn mức mặc định (24 giờ): hỏi AI 60/300, nghe giọng 30/150 (ẩn danh/đã đăng nhập; đang để rộng vì ít người dùng, siết lại khi đông), cộng lớp IP trong bộ nhớ 300 và 500 lượt/ngày; lỗi phía hệ thống tự hoàn lượt; đổi ở `lib/rate-limit/usage-limit-config.ts`.
 - Thử nhanh: tạo giọng mẫu bằng `say -v Tingting "..." -o a.wav --file-format=WAVE --data-format=LEI16@16000` rồi gọi `giveFeedback` với khóa thật (đã thử: đọc đúng ~95-98 điểm, nói câu khác ~40).
+
+## Sao lưu cơ sở dữ liệu (GitHub Action hằng tuần)
+
+`.github/workflows/db-backup.yml` chạy 02:00 sáng thứ Hai (giờ Việt Nam), hoặc bấm tay ở tab Actions → "Sao lưu cơ sở dữ liệu" → Run workflow: `pg_dump` (client 17) → kiểm tra file đọc lại được (`pg_restore --list`) → mã hóa gpg AES256 → đẩy vào **một kho riêng tư khác**, giữ 12 bản gần nhất (mỗi loại). Hai file mỗi lần: `public-YYYY-MM-DD.dump.gpg` (cấu trúc và dữ liệu schema `public`) và `auth-YYYY-MM-DD.dump.gpg` (chỉ dữ liệu tài khoản người dùng; bước này lỗi thì chỉ cảnh báo, bản public vẫn lưu).
+
+**Vì sao không dùng artifact của workflow:** repo này công khai, artifact của repo công khai ai có tài khoản GitHub cũng tải được; dữ liệu người dùng không được để ở đó, kể cả đã mã hóa.
+
+**Cấu hình một lần (Settings → Secrets and variables → Actions):**
+1. Tạo kho **riêng tư** trống, ví dụ `lqtrung-95/songhanzi-backups`.
+2. Tạo fine-grained personal access token chỉ chọn kho đó, quyền Contents: Read and write → secret `BACKUP_REPO_TOKEN`.
+3. Variable `BACKUP_REPO` = tên kho ở bước 1.
+4. Secret `SUPABASE_DB_URL` = chuỗi kết nối **Session pooler** (Dashboard → Project Settings → Database → Connection string, chế độ Session pooler). Không dùng kết nối trực tiếp: nó chỉ có IPv6, runner GitHub không có IPv6.
+5. Secret `BACKUP_PASSPHRASE` = chuỗi ngẫu nhiên dài (`openssl rand -base64 32`). **Cất thêm một bản ở trình quản lý mật khẩu**: mất nó là không giải mã được mọi bản sao lưu.
+6. Chạy thử bằng Run workflow, mở kho sao lưu kiểm tra có file mới.
+
+**Giải mã và khôi phục:**
+```
+gpg --decrypt public-2026-10-11.dump.gpg > public.dump
+pg_restore --no-owner --no-privileges --dbname "$DB_URL_MOI" public.dump
+```
+Dữ liệu `auth` (tài khoản) khôi phục bằng `pg_restore --data-only` vào project Supabase đã có sẵn schema `auth`; làm thận trọng và thử trên project trống trước. **Nên thử khôi phục vào một project Supabase trống ít nhất một lần**: bản sao lưu chưa thử khôi phục thì chưa chắc dùng được.
+
+**Lưu ý:** workflow chạy theo lịch bị GitHub tự tắt sau 60 ngày repo không có hoạt động; lúc đó vào tab Actions bật lại. Lỗi sao lưu gửi email báo cho người sửa lịch cuối cùng. Lịch sử git của kho sao lưu giữ cả các bản đã xóa khỏi cây thư mục, nên kho sẽ lớn dần theo thời gian (hiện dữ liệu nhỏ); khi quá lớn thì tạo kho sao lưu mới. Dump tăng kích thước theo dữ liệu: GitHub khuyến nghị mỗi file dưới 100 MB.
+

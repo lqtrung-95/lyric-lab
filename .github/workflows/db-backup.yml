@@ -1,0 +1,102 @@
+# Sao lưu Postgres (Supabase) hằng tuần: pg_dump → mã hóa bằng gpg → đẩy vào MỘT KHO RIÊNG TƯ khác.
+# Repo này công khai nên TUYỆT ĐỐI không dùng artifact của workflow (ai có tài khoản GitHub cũng tải được).
+# Cần cấu hình (xem docs/operations-runbook.md, mục "Sao lưu cơ sở dữ liệu"):
+#   secrets.SUPABASE_DB_URL     chuỗi kết nối Session pooler (IPv4) của Supabase, runner GitHub không có IPv6 nên không dùng kết nối trực tiếp
+#   secrets.BACKUP_PASSPHRASE   mật khẩu mã hóa file sao lưu (cất thêm ở trình quản lý mật khẩu: mất là không giải mã được)
+#   secrets.BACKUP_REPO_TOKEN   token chi tiết (fine-grained PAT) chỉ có quyền Contents: Read and write trên kho sao lưu
+#   vars.BACKUP_REPO            tên kho riêng tư, ví dụ "lqtrung-95/songhanzi-backups"
+name: Sao lưu cơ sở dữ liệu
+
+on:
+  schedule:
+    - cron: "0 19 * * 0" # 02:00 sáng thứ Hai giờ Việt Nam
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+env:
+  KEEP_BACKUPS: "12" # số bản gần nhất giữ lại trong cây thư mục của kho sao lưu
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Kiểm tra đã cấu hình đủ
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+          TOKEN: ${{ secrets.BACKUP_REPO_TOKEN }}
+          REPO: ${{ vars.BACKUP_REPO }}
+        run: |
+          missing=""
+          [ -z "$DB_URL" ] && missing="$missing SUPABASE_DB_URL"
+          [ -z "$PASS" ] && missing="$missing BACKUP_PASSPHRASE"
+          [ -z "$TOKEN" ] && missing="$missing BACKUP_REPO_TOKEN"
+          [ -z "$REPO" ] && missing="$missing vars.BACKUP_REPO"
+          if [ -n "$missing" ]; then echo "::error::Thiếu cấu hình:$missing"; exit 1; fi
+
+      - name: Cài pg_dump 17
+        run: |
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y --no-install-recommends postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
+
+      - name: Lấy kho sao lưu riêng tư
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.BACKUP_REPO }}
+          token: ${{ secrets.BACKUP_REPO_TOKEN }}
+          path: backups
+
+      - name: Sao lưu schema public (cấu trúc và dữ liệu)
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          stamp=$(date -u +%F)
+          raw="$RUNNER_TEMP/public-$stamp.dump"
+          /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --schema=public --no-owner --no-privileges -Fc -f "$raw"
+          [ "$(stat -c %s "$raw")" -gt 1024 ] || { echo "::error::File sao lưu quá nhỏ, có thể dump lỗi"; exit 1; }
+          /usr/lib/postgresql/17/bin/pg_restore --list "$raw" > /dev/null # file hợp lệ, đọc lại được
+          printf %s "$PASS" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 -o "backups/public-$stamp.dump.gpg" "$raw"
+          rm -f "$raw"
+
+      - name: Sao lưu tài khoản người dùng (schema auth, chỉ dữ liệu)
+        # Không làm hỏng cả lần sao lưu nếu bước này lỗi (bản public vẫn quý), nhưng báo cảnh báo rõ ràng.
+        continue-on-error: true
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          stamp=$(date -u +%F)
+          raw="$RUNNER_TEMP/auth-$stamp.dump"
+          if ! /usr/lib/postgresql/17/bin/pg_dump "$DB_URL" --schema=auth --data-only --no-owner --no-privileges -Fc -f "$raw"; then
+            echo "::warning::Không sao lưu được schema auth (tài khoản người dùng). Bản public vẫn đã được sao lưu."
+            exit 1
+          fi
+          /usr/lib/postgresql/17/bin/pg_restore --list "$raw" > /dev/null
+          printf %s "$PASS" | gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 --symmetric --cipher-algo AES256 -o "backups/auth-$stamp.dump.gpg" "$raw"
+          rm -f "$raw"
+
+      - name: Dọn bản cũ và đẩy lên kho sao lưu
+        working-directory: backups
+        run: |
+          set -euo pipefail
+          for prefix in public auth; do
+            # `|| true`: chưa có file nào cùng tiền tố (ví dụ bước auth từng lỗi) thì ls trả lỗi, không được làm hỏng cả bước.
+            { ls -1 "$prefix"-*.dump.gpg 2>/dev/null || true; } | sort | head -n -"$KEEP_BACKUPS" | xargs -r git rm -q
+          done
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then echo "Không có gì mới để đẩy"; exit 0; fi
+          git commit -m "chore: sao lưu cơ sở dữ liệu $(date -u +%F)"
+          git push
