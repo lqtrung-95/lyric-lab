@@ -46,7 +46,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScre
     <>
       <h1 className="sr-only">Video: {lesson.title}</h1>
       <div className="bg-surface-container-low">
-       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-gutter py-2 md:px-6 lg:px-12">
+       <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-1 px-gutter py-2 md:px-6 lg:px-12">
         <div className="flex min-w-0 flex-1 basis-64 items-center gap-3">
           <Link href="/video" aria-label="Về danh sách video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
           <div className="min-w-0">
@@ -67,7 +67,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScre
        </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-space-md px-gutter py-space-md pb-32 md:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] lg:gap-8 lg:px-12">
+      <div className="mx-auto grid max-w-page gap-space-md px-gutter py-space-md pb-32 md:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] lg:gap-8 lg:px-12">
         <div data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface lg:mx-0 lg:self-start">
           <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface lg:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
           {failed && (

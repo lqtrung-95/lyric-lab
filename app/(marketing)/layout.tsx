@@ -6,7 +6,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
   return (
     <>
       <MarketingHeader />
-      <main id="main" tabIndex={-1} className="mx-auto max-w-7xl px-gutter pt-24 outline-none md:px-6 lg:px-12">
+      <main id="main" tabIndex={-1} className="mx-auto max-w-page px-gutter pt-24 outline-none md:px-6 lg:px-12">
         <span id="top" />
         {children}
       </main>

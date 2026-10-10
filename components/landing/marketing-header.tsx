@@ -12,7 +12,7 @@ const LINKS = [
 export function MarketingHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-surface/85 pt-safe backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-gutter md:px-6 lg:px-12">
+      <div className="mx-auto flex h-16 max-w-page items-center justify-between gap-4 px-gutter md:px-6 lg:px-12">
         <Link href="/" className="flex min-h-11 items-center gap-2">
           <LogoMark size={32} />
           <span className="font-serif text-headline-md font-semibold tracking-tight text-on-surface">Song<span className="text-primary">Hanzi</span></span>

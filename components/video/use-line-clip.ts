@@ -5,7 +5,7 @@ import type { PlayerController } from "@/components/player/use-youtube-player";
 
 /**
  * Phát đoạn của một dòng (từ `start` tới `end`) rồi tự dừng. Có thể phát chậm (0.75x). Dùng cho chép chính tả: người học bấm "Nghe"
- * bao nhiêu lần tùy ý. Phát chỉ bắt đầu từ thao tác của người dùng (trình duyệt chặn tự phát).
+ * bao nhiêu lần tùy ý. `onEnd` (nếu có) chạy khi đoạn phát hết (không chạy khi bị `stop`). Phát chỉ bắt đầu từ thao tác của người dùng (trình duyệt chặn tự phát).
  */
 export function useLineClip(controller: PlayerController | null) {
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -14,7 +14,7 @@ export function useLineClip(controller: PlayerController | null) {
     timer.current = null;
   }, []);
 
-  const play = useCallback((start: number, end: number, rate: number) => {
+  const play = useCallback((start: number, end: number, rate: number, onEnd?: () => void) => {
     if (!controller) return;
     stop();
     controller.setRate(rate);
@@ -23,6 +23,7 @@ export function useLineClip(controller: PlayerController | null) {
       if (controller.getCurrentTime() >= end) {
         controller.pause();
         stop();
+        onEnd?.();
       }
     }, 100);
   }, [controller, stop]);

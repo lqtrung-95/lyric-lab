@@ -26,7 +26,7 @@ export function SongReportBanner({ videoId }: { videoId: string }) {
   }
 
   return (
-    <div role="status" className="mx-auto mt-space-sm flex max-w-7xl flex-wrap items-center gap-3 rounded-2xl bg-error-container px-space-md py-3 text-on-error-container">
+    <div role="status" className="mx-auto mt-space-sm flex max-w-page flex-wrap items-center gap-3 rounded-2xl bg-error-container px-space-md py-3 text-on-error-container">
       <Icon name="warning" size={22} />
       <p className="min-w-0 flex-1 text-label-md">
         <strong className="font-semibold">Bài này đang bị báo sai ({report.total} báo cáo{report.hidden ? ", đang ẩn" : ""}):</strong> {reasonSummary(report.byReason)}. Sửa lời bằng nút bút chì ở từng dòng trong màn Nghe.

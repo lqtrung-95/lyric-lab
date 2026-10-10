@@ -80,6 +80,10 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 
 - Font: không thêm `<link rel="stylesheet">` font nặng vào `<head>` (chặn lần vẽ đầu). Font chữ Hán nạp qua `CjkFontLoader`; font Latin/Việt tự host bằng `next/font` chỉ với các biến thể đang dùng (mỗi kiểu × đậm × bộ ký tự là một file được preload). Ảnh `icon.png` giữ nhỏ (đang tải ở mọi trang); ảnh lớn cho manifest để ở `public/`.
 
+## Bề rộng khung nội dung
+
+Khung nội dung chính của mọi trang (header, `main`, chân trang, màn học) dùng `max-w-page` (biến `--container-page` = 100rem trong `app/globals.css`), không dùng `max-w-7xl` rời rạc: đổi một chỗ là đổi cả app. Đã nới từ 1280px lên 1600px để màn lớn đỡ thừa lề hai bên.
+
 ## Màn Nghe trên điện thoại (mật độ lời)
 - Danh sách lời ưu tiên nhìn được nhiều câu: chữ, pinyin, padding và khoảng cách dòng dùng cỡ nhỏ hơn dưới `md` (xem `lyric-line-row.tsx`), cỡ gốc từ `md` trở lên. Không thêm cột bên phải cạnh dòng lời trên điện thoại vì nó bóp hẹp chữ Hán và làm lời ngắt dòng liên tục; hành động của dòng (chia sẻ, sửa) nằm dưới câu đang hát.
 - Vùng bấm vẫn ≥ 44 px bằng cách phình nút rồi kéo lề âm (`-mr-5`), không bằng cách cho nút chiếm chỗ.

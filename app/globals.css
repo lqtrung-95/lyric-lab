@@ -5,6 +5,8 @@
 
 /* Token lấy từ thiết kế Stitch "Warm Literary Paper" (design/*.html). Màu đi qua biến CSS để đổi được sáng/tối. */
 @theme inline {
+  /* Bề rộng tối đa của khung nội dung toàn app (header, trang, chân trang): dùng `max-w-page`. Rộng hơn max-w-page (1280px) để màn lớn đỡ thừa lề hai bên. */
+  --container-page: 100rem;
   --color-surface: var(--surface);
   --color-surface-dim: var(--surface-dim);
   --color-surface-bright: var(--surface-bright);

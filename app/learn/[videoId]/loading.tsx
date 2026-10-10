@@ -9,7 +9,7 @@ export default function LearnLoading() {
       <div className="fixed inset-x-0 top-0 z-50 flex h-16 items-center bg-surface/90 px-gutter md:px-6 lg:px-12">
         <LogoMark size={32} />
       </div>
-      <main className="mx-auto max-w-7xl px-gutter pt-24 md:px-6 lg:px-12">
+      <main className="mx-auto max-w-page px-gutter pt-24 md:px-6 lg:px-12">
         <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_1.4fr]">
           <div className="aspect-video animate-pulse rounded-2xl bg-surface-container-high motion-reduce:animate-none" />
           <div className="flex flex-col gap-4 pt-2">

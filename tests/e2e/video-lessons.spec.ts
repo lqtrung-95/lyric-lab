@@ -554,16 +554,19 @@ test.describe("huy hiệu video bị báo ở trang quản trị", () => {
 });
 
 // ---- Luyện nói theo (shadowing) ----
+// Micro và nhận dạng giọng nói giả: bản ghi là một mẩu byte, nhận dạng "nghe" ra đúng câu mẫu thứ nhất.
 const FAKE_MIC = `navigator.mediaDevices.getUserMedia = async function () { return { getTracks: function () { return [{ stop: function () {} }]; } }; };
 window.MediaRecorder = class { constructor() { this.mimeType = 'audio/webm'; }
-  start() {} stop() { this.ondataavailable({ data: new Blob(['x'], { type: 'audio/webm' }) }); this.onstop(); } };`;
+  start() {} stop() { this.ondataavailable({ data: new Blob(['x'], { type: 'audio/webm' }) }); this.onstop(); } };
+window.MediaRecorder.isTypeSupported = function () { return true; };
+window.SpeechRecognition = class { start() { var self = this; setTimeout(function () { self.onresult({ resultIndex: 0, results: [{ isFinal: true, 0: { transcript: '你好朋友' } }] }); }, 20); } stop() { if (this.onend) this.onend(); } };`;
 
-test("luyện nói: nghe, nhớ nghĩa, ghi âm rồi nghe lại; ẩn bớt chữ; sang câu khác đặt lại các bước", async ({ page }) => {
+test("luyện nói: bắt đầu lượt (nghe mẫu rồi tự ghi âm), chấm sơ bộ, nghe lại giọng mình; ẩn bớt chữ; sang câu khác thì bỏ kết quả", async ({ page }) => {
   await mockVideoApis(page);
   await page.addInitScript(FAKE_MIC);
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto(`/video/${VIDEO_ID}/shadowing`);
-  await expect(page.getByText("Câu 1 / 3")).toBeVisible();
+  await page.goto(`/video/${VIDEO_ID}?tab=shadowing`);
+  await expect(page.getByText("/ 3", { exact: false }).first()).toBeVisible();
   await expect(page.locator('section[aria-label="Câu đang luyện"] ruby').first()).toBeVisible();
   await noViolations(page);
 
@@ -574,21 +577,31 @@ test("luyện nói: nghe, nhớ nghĩa, ghi âm rồi nghe lại; ẩn bớt ch�
   await page.getByRole("button", { name: "Chữ Hán" }).click();
   await page.getByRole("button", { name: "Pinyin", exact: true }).click();
 
-  await page.getByRole("button", { name: "Nghe bản gốc" }).click();
+  await page.getByRole("button", { name: "Bắt đầu lượt" }).click();
   expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:0");
-  await page.getByRole("tab", { name: "Nghĩ" }).click();
-  await expect(page.getByText("Xin chào, bạn bè.").last()).toBeVisible();
-  await page.getByRole("button", { name: "Đã nhớ nghĩa, nói thôi" }).click();
-  await page.getByRole("button", { name: "Bắt đầu ghi âm" }).click();
-  await page.getByRole("button", { name: "Dừng ghi âm" }).click();
-  await expect(page.locator("audio")).toBeVisible();
-  expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("pause");
+  await page.evaluate(() => { (window as unknown as { __t: number }).__t = 4; }); // hết câu mẫu: tự chuyển sang ghi âm
+  await expect(page.getByRole("button", { name: /^Đang ghi/ })).toBeVisible();
+  await expect(page.getByText("你好朋友").first()).toBeVisible(); // chữ máy đang nghe
+  await page.getByRole("button", { name: /^Dừng/ }).click();
+  await expect(page.getByLabel("Điểm 100")).toBeVisible();
+  await expect(page.getByText("Máy nghe được: 你好朋友")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Nghe giọng mình" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Mẫu → mình" })).toBeVisible();
 
-  await page.getByRole("button", { name: "Câu sau" }).click();
-  await expect(page.getByText("Câu 2 / 3")).toBeVisible();
-  await expect(page.getByRole("tab", { name: "Nghe", exact: true })).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("audio")).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Câu trước" })).toBeEnabled();
+  await page.getByRole("button", { name: "Sau →" }).click();
+  await expect(page.getByText("Câu 2")).toBeVisible();
+  await expect(page.getByRole("list", { name: "Các lần nói gần đây" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "← Trước" })).toBeEnabled();
+});
+
+test("luyện nói: trình duyệt không có nhận dạng giọng nói thì báo rõ và vẫn ghi âm được", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.addInitScript(FAKE_MIC.replace(/window\.SpeechRecognition = [\s\S]*$/, "delete window.SpeechRecognition; delete window.webkitSpeechRecognition;"));
+  await page.goto(`/video/${VIDEO_ID}?tab=shadowing`);
+  await expect(page.getByText("không có nhận dạng giọng nói")).toBeVisible();
+  await page.getByRole("button", { name: "Tự ghi âm" }).click();
+  await page.getByRole("button", { name: /^Dừng/ }).click();
+  await expect(page.getByRole("button", { name: "Nghe giọng mình" })).toBeVisible();
 });
 
 // ---- Nạp video từ kênh (API giả lập) ----

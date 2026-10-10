@@ -211,7 +211,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
         liked={liked.has(analysis.videoId)} onToggleLike={(v) => setLiked(analysis.videoId, v)}
         onShowTour={() => setTourOpen(true)}
       />
-      <div className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
+      <div className="mx-auto grid max-w-page grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
         <div className="flex flex-col gap-6 lg:col-span-7">
           <div ref={stickyPlayerRef} data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
             <div ref={containerRef} className={`mx-auto aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full ${PLAYER_SIZE_CLASS[prefs.playerSize]}`} />

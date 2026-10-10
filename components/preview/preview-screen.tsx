@@ -80,7 +80,7 @@ export function PreviewScreen({ analysis, song, wordStats }: PreviewScreenProps)
       <SongReportBanner videoId={analysis.videoId} />
       <PreviewHeader analysis={analysis} song={song} listenHref={listenHref} />
 
-      <div className="mx-auto max-w-7xl px-gutter py-space-lg md:px-6 lg:px-12">
+      <div className="mx-auto max-w-page px-gutter py-space-lg md:px-6 lg:px-12">
         {comprehension && <ComprehensionBanner value={comprehension} />}
         <LevelFilterBar
           chips={view.chips} active={activeFilter} onChange={setLevelFilter} userLevel={state.level}

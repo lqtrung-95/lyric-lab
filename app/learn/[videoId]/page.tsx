@@ -39,7 +39,7 @@ export default async function LearnPage({ params }: { params: Promise<{ videoId:
             <PreviewScreen analysis={analysis} song={song} wordStats={wordStats} />
           </>
         ) : (
-          <div className="mx-auto max-w-7xl px-gutter pt-space-lg md:px-6 lg:px-12"><AnalyzingScreen videoId={videoId} /></div>
+          <div className="mx-auto max-w-page px-gutter pt-space-lg md:px-6 lg:px-12"><AnalyzingScreen videoId={videoId} /></div>
         )}
       </main>
     </>
