@@ -32,16 +32,6 @@ export function dictationLines(lines: LessonLine[]): LessonLine[] {
   return lines.filter((l) => hanChars(l.text).length >= MIN_HAN_CHARS);
 }
 
-/**
- * Số chữ Hán của từng từ trong câu (theo cách tách từ lúc nạp), để cho người học biết cần điền bao nhiêu chữ/từ khi ngắt câu của video chưa chuẩn.
- * Các từ không có chữ Hán (dấu câu, chữ Latin) bị bỏ; nếu tổng số chữ Hán của các từ không khớp số chữ Hán của câu thì coi cả câu là một nhóm.
- */
-export function answerSlots(line: LessonLine): number[] {
-  const total = hanChars(line.text).length;
-  const groups = line.tokens.map((t) => hanChars(t.text).length).filter((n) => n > 0);
-  return groups.reduce((a, b) => a + b, 0) === total ? groups : total > 0 ? [total] : [];
-}
-
 /** Đáp án chuẩn theo chế độ: từng chữ Hán, hoặc từng âm tiết pinyin (có dấu) của các chữ Hán đó. */
 export function expectedUnits(line: LessonLine, mode: DictationMode): string[] {
   if (mode === "hanzi") return hanChars(line.text);

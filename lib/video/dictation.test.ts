@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { answerSlots, compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing } from "./dictation";
+import { compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing } from "./dictation";
 import type { LessonLine } from "./video-lesson-types";
 
 const line = (text: string, pinyin: string): LessonLine => ({ idx: 0, start: 0, end: 4, text, pinyin, translation: null, tokens: [{ text }] });
@@ -89,15 +89,4 @@ describe("detectTypedMode", () => {
     expect(detectTypedMode("nǐ hǎo")).toBe("pinyin");
     expect(detectTypedMode("")).toBe("pinyin");
   });
-});
-
-describe("answerSlots", () => {
-  const withTokens = (text: string, tokens: string[]): LessonLine => ({ ...line(text, ""), tokens: tokens.map((t) => ({ text: t })) });
-  it("đếm số chữ Hán của từng từ, bỏ dấu câu và chữ Latin", () => {
-    expect(answerSlots(withTokens("你好，朋友 OK。", ["你好", "，", "朋友", "OK", "。"]))).toEqual([2, 2]);
-  });
-  it("tách từ không khớp số chữ Hán của câu thì coi cả câu là một nhóm", () => {
-    expect(answerSlots(withTokens("你好朋友", ["你好"]))).toEqual([4]);
-  });
-  it("câu không có chữ Hán thì rỗng", () => expect(answerSlots(withTokens("OK", ["OK"]))).toEqual([]));
 });

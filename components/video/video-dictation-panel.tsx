@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PlayerController } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
-import { answerSlots, compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
+import { compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
 import { dictationKey, emptyDictationProgress, firstUndone, parseDictationProgress, summarizeProgress, withScore, type DictationProgress } from "@/lib/video/dictation-progress";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { submitVideoStudy } from "@/lib/practice/submit-video-study";
@@ -159,7 +159,7 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
             </div>
           </div>
           {line && <ClipAdjustControls adjust={adjust.get(line.idx)} onNudge={nudgeClip} onReset={() => { adjust.reset(line.idx); listen(); }} />}
-          {!checked && line && <DictationSlots slots={answerSlots(line)} />}
+          {!checked && line && <DictationSlots count={expectedUnits(line, "hanzi").length} />}
           {hint === "pinyin" && !checked && line && (
             <p role="status" className="text-label-md text-on-surface-variant">Pinyin: <span className="font-medium text-on-surface">{expectedUnits(line, "pinyin").join(" ")}</span></p>
           )}
