@@ -95,7 +95,10 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
   const centerLine = useCallback((index: number, smooth: boolean) => {
     const el = listRef.current?.querySelector<HTMLElement>(`[data-line-index="${index}"]`);
     if (!el) return;
-    const stickyBottom = document.querySelector("[data-sticky-player]")?.getBoundingClientRect().bottom ?? 64;
+    // Khối video dính nằm phía trên danh sách thì chừa chỗ cho nó; nằm bên cạnh (bố cục hai cột trên màn rộng) thì chỉ chừa thanh trang web phía trên.
+    const sticky = document.querySelector("[data-sticky-player]")?.getBoundingClientRect();
+    const stickyAbove = !!sticky && sticky.left < el.getBoundingClientRect().right && sticky.right > el.getBoundingClientRect().left;
+    const stickyBottom = sticky && stickyAbove ? sticky.bottom : 64;
     const target = stickyBottom + (window.innerHeight - stickyBottom) / 2;
     const rect = el.getBoundingClientRect();
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

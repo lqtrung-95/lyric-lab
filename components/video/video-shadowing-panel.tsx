@@ -1,18 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
-import { useYouTubePlayer } from "@/components/player/use-youtube-player";
+import type { PlayerController } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
 import { LinePracticeCard } from "@/components/listen/line-practice-card";
-import { PLAYER_SIZE_CLASS } from "@/components/listen/player-size-class";
-import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { alignPinyinToText } from "@/lib/rooms/align-pinyin";
 import { dictationLines } from "@/lib/video/dictation";
 import { lessonLinesToAnalyzed } from "@/lib/video/lesson-to-lines";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { useLineClip } from "./use-line-clip";
-import { VideoModeNav } from "./video-mode-nav";
 
 const SLOW_RATE = 0.75;
 
@@ -21,12 +17,11 @@ const LAYERS: { id: Layer; label: string }[] = [{ id: "hanzi", label: "Chữ Há
 
 /**
  * Shadowing theo video: lặp từng câu (nghe, phát chậm), ẩn bớt chữ Hán/pinyin/bản dịch để buộc tai làm việc, rồi nói theo, ghi âm và tự nghe lại
- * so với bản gốc. Ghi âm chỉ lưu tạm trong trình duyệt, không gửi đi và không chấm tự động. Khung video luôn hiện (điều khoản YouTube).
+ * so với bản gốc. Ghi âm chỉ lưu tạm trong trình duyệt, không gửi đi và không chấm tự động. Là một tab của màn học video: khung video (luôn hiện theo điều
+ * khoản YouTube) và tiêu đề do màn cha dựng, tab này dùng chung trình phát qua `controller`.
  */
-export function VideoShadowingScreen({ lesson }: { lesson: LessonDetail }) {
+export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDetail; controller: PlayerController | null }) {
   const lines = useMemo(() => lessonLinesToAnalyzed(dictationLines(lesson.lines)), [lesson.lines]);
-  const { containerRef, controller, failed } = useYouTubePlayer(lesson.videoId);
-  const { prefs } = useListenPrefs();
   const clip = useLineClip(controller);
   const [position, setPosition] = useState(0);
   const [slow, setSlow] = useState(false);
@@ -44,29 +39,7 @@ export function VideoShadowingScreen({ lesson }: { lesson: LessonDetail }) {
 
   const aligned = alignPinyinToText(line.text, line.pinyin);
   return (
-    <>
-      <h1 className="sr-only">Luyện nói theo: {lesson.title}</h1>
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
-        <div className="flex min-w-0 flex-1 basis-64 items-center gap-3">
-          <Link href={`/video/${lesson.videoId}`} aria-label="Về màn xem video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
-          <div className="min-w-0">
-            <p lang="zh" title={lesson.title} className="truncate font-serif text-body-lg font-semibold leading-6 text-primary">{lesson.title}</p>
-            <p className="truncate text-label-sm text-on-surface-variant">Luyện nói theo</p>
-          </div>
-        </div>
-        <VideoModeNav videoId={lesson.videoId} current="shadowing" />
-      </div>
-      <div className="mx-auto flex max-w-2xl flex-col gap-space-md px-gutter py-space-lg pb-32 md:px-6">
-        <div className={`mx-auto w-full ${PLAYER_SIZE_CLASS[prefs.playerSize === "large" ? "medium" : prefs.playerSize]}`}>
-          <div ref={containerRef} className="aspect-video w-full overflow-hidden rounded-xl bg-inverse-surface [&_iframe]:h-full [&_iframe]:w-full" />
-          {failed && (
-            <p role="alert" className="mt-2 rounded-xl bg-error-container p-3 text-label-md text-on-error-container">
-              Không phát được video này.{" "}
-              <a className="font-semibold underline" href={`https://www.youtube.com/watch?v=${lesson.videoId}`} target="_blank" rel="noopener noreferrer">Mở trên YouTube</a>
-            </p>
-          )}
-        </div>
-
+    <div className="flex flex-col gap-space-md">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1">
             <button type="button" onClick={() => go(position - 1)} disabled={position === 0} aria-label="Câu trước" className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-high text-on-surface hover:bg-surface-container-highest disabled:opacity-40"><Icon name="arrow_back" size={20} /></button>
@@ -103,7 +76,6 @@ export function VideoShadowingScreen({ lesson }: { lesson: LessonDetail }) {
           {/* `key` đặt lại các bước và bản ghi mỗi khi sang câu khác. */}
           <LinePracticeCard key={line.index} line={line} variant="speech" onListenLine={listen} onPauseSong={pause} />
         </div>
-      </div>
-    </>
+    </div>
   );
 }

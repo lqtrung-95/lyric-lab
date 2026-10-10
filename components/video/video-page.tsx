@@ -1,9 +1,9 @@
 "use client";
 
 import { VideoLessonLoader } from "./video-lesson-loader";
-import { VideoWatchScreen } from "./video-watch-screen";
+import { VideoStudyScreen } from "./video-study-screen";
 
-/** Trang xem video luyện nghe (bản chép, bấm từ để tra). */
-export function VideoPage({ videoId, startAt }: { videoId: string; startAt?: number }) {
-  return <VideoLessonLoader videoId={videoId}>{(lesson) => <VideoWatchScreen lesson={lesson} startAt={startAt} />}</VideoLessonLoader>;
+/** Trang học một video (xem phụ đề, nghe – chép, luyện nói), tải video rồi dựng màn học. `tab` là giá trị `?tab=` của địa chỉ. */
+export function VideoPage({ videoId, startAt, tab }: { videoId: string; startAt?: number; tab?: string }) {
+  return <VideoLessonLoader videoId={videoId}>{(lesson) => <VideoStudyScreen lesson={lesson} startAt={startAt} initialTab={tab} />}</VideoLessonLoader>;
 }

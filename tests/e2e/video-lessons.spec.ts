@@ -64,11 +64,58 @@ test("xem video: tiêu đề rất dài bị cắt (rê chuột đọc đủ), t
     await expect(title).toHaveAttribute("title", LONG);
     expect(await title.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true); // bị cắt bằng dấu …
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true); // không tràn ngang
-    const nav = await page.getByRole("navigation", { name: "Cách học video này" }).boundingBox();
+    const nav = await page.getByRole("tablist", { name: "Cách học video này" }).boundingBox();
     expect(nav!.x + nav!.width).toBeLessThanOrEqual(width);
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.screenshot({ path: `test-results/video-header-${width}.png`, clip: { x: 0, y: 0, width, height: 260 } });
   }
+});
+
+test("học video: ba tab dùng chung một trình phát, đổi tab không tải lại trang và ghi tab lên địa chỉ; link cũ vẫn mở đúng tab", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}`);
+  const tabs = page.getByRole("tablist", { name: "Cách học video này" });
+  await expect(tabs.getByRole("tab")).toHaveText(["Phụ đề", "Nghe – chép", "Luyện nói"]);
+  await expect(tabs.getByRole("tab", { name: "Phụ đề" })).toHaveAttribute("aria-selected", "true");
+  await page.evaluate(() => { (window as unknown as { __marker: number }).__marker = 1; });
+
+  await tabs.getByRole("tab", { name: "Nghe – chép" }).click();
+  await expect(page.getByRole("radiogroup", { name: "Chế độ gõ" })).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}\\?tab=dictation$`));
+  await expect(page.locator("[data-line-index]")).toHaveCount(0); // danh sách phụ đề không còn
+  await tabs.getByRole("tab", { name: "Luyện nói" }).click();
+  await expect(page.getByRole("region", { name: "Câu đang luyện" })).toBeVisible();
+  await tabs.getByRole("tab", { name: "Phụ đề" }).click();
+  await expect(page.locator('[data-line-index="0"]')).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
+  expect(await page.evaluate(() => (window as unknown as { __marker?: number }).__marker)).toBe(1); // không tải lại trang
+
+  // Bố cục hai cột: video bên trái, tab bên phải, khối video dính khi cuộn.
+  const player = await page.locator("[data-sticky-player]").boundingBox();
+  const panel = await page.getByRole("tabpanel").boundingBox();
+  expect(player!.x + player!.width).toBeLessThanOrEqual(panel!.x + 1);
+  await page.screenshot({ path: "test-results/video-study-subtitles.png" });
+
+  await page.goto(`/video/${VIDEO_ID}/dictation`); // link cũ
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}\\?tab=dictation$`));
+  await expect(page.getByRole("tab", { name: "Nghe – chép" })).toHaveAttribute("aria-selected", "true");
+  await page.screenshot({ path: "test-results/video-study-dictation.png" });
+  await page.goto(`/video/${VIDEO_ID}/shadowing`);
+  await expect(page.getByRole("tab", { name: "Luyện nói" })).toHaveAttribute("aria-selected", "true");
+  await page.goto(`/video/${VIDEO_ID}?tab=bậy`); // tab sai: về Phụ đề
+  await expect(page.getByRole("tab", { name: "Phụ đề" })).toHaveAttribute("aria-selected", "true");
+});
+
+test("học video trên điện thoại: video dính ở trên, tab xếp ngay dưới, không tràn ngang", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto(`/video/${VIDEO_ID}?tab=dictation`);
+  const player = await page.locator("[data-sticky-player]").boundingBox();
+  const tabs = await page.getByRole("tablist", { name: "Cách học video này" }).boundingBox();
+  expect(tabs!.y).toBeGreaterThanOrEqual(player!.y + player!.height - 1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({ path: "test-results/video-study-mobile.png" });
 });
 
 test("xem video: 5 nút điều khiển, nút phát nằm chính giữa thanh", async ({ page }) => {
@@ -109,7 +156,7 @@ test("xem video: bản chép chạy theo thời gian, bấm từ tra được v�
   // Phát tới câu 2: câu đang phát chuyển theo thời gian video.
   await page.evaluate(() => { (window as unknown as { __t: number }).__t = 5; });
   await expect(line(1)).toHaveAttribute("aria-current", "true");
-
+  await line(2).click({ position: { x: 6, y: 6 } }); // mép dòng: ở giữa dòng có thể trúng nút từ (mở tra từ) thay vì tua
   await line(2).click();
   expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:8");
 });

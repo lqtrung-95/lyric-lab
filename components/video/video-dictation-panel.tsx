@@ -1,18 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useYouTubePlayer } from "@/components/player/use-youtube-player";
+import type { PlayerController } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
-import { PLAYER_SIZE_CLASS } from "@/components/listen/player-size-class";
-import { useListenPrefs } from "@/lib/user-state/use-listen-prefs";
 import { pinyinHint } from "@/lib/practice/pinyin-answer";
 import { compareDictation, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
 import { dictationKey, emptyDictationProgress, firstUndone, parseDictationProgress, summarizeProgress, withScore, type DictationProgress } from "@/lib/video/dictation-progress";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { DictationFeedback } from "./dictation-feedback";
 import { DictationSummary } from "./dictation-summary";
-import { VideoModeNav } from "./video-mode-nav";
 import { useLineClip } from "./use-line-clip";
 
 const MODES: { id: DictationMode; label: string }[] = [{ id: "pinyin", label: "Gõ pinyin" }, { id: "hanzi", label: "Gõ chữ Hán" }];
@@ -28,13 +24,12 @@ function readProgress(videoId: string): DictationProgress {
 
 /**
  * Chép chính tả theo video: nghe từng câu (nghe lại và phát chậm tùy ý), gõ pinyin hoặc chữ Hán, kiểm tra từng chữ rồi sang câu kế.
- * Khung video luôn hiện (điều khoản YouTube), người học có thể nhìn hình. Tiến độ lưu trong trình duyệt theo từng video.
+ * Là một tab của màn học video: khung video (luôn hiện theo điều khoản YouTube) và tiêu đề do màn cha dựng, tab này dùng chung trình phát qua `controller`.
+ * Tiến độ lưu trong trình duyệt theo từng video.
  */
-export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
+export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDetail; controller: PlayerController | null }) {
   const lines = useMemo(() => dictationLines(lesson.lines), [lesson.lines]);
   const lineIdxs = useMemo(() => lines.map((l) => l.idx), [lines]);
-  const { containerRef, controller, failed } = useYouTubePlayer(lesson.videoId);
-  const { prefs } = useListenPrefs();
   const clip = useLineClip(controller);
   const [progress, setProgress] = useState<DictationProgress>(emptyDictationProgress);
   const [position, setPosition] = useState(0);
@@ -101,29 +96,7 @@ export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
   const unitCount = line ? expectedUnits(line, progress.mode).length : 0;
 
   return (
-    <>
-      <h1 className="sr-only">Chép chính tả: {lesson.title}</h1>
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
-        <div className="flex min-w-0 flex-1 basis-64 items-center gap-3">
-          <Link href={`/video/${lesson.videoId}`} aria-label="Về màn xem video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
-          <div className="min-w-0">
-            <p lang="zh" title={lesson.title} className="truncate font-serif text-body-lg font-semibold leading-6 text-primary">{lesson.title}</p>
-            <p className="truncate text-label-sm text-on-surface-variant">Chép chính tả · {stats.done}/{stats.total} câu</p>
-          </div>
-        </div>
-        <VideoModeNav videoId={lesson.videoId} current="dictation" />
-      </div>
-      <div className="mx-auto flex max-w-2xl flex-col gap-space-md px-gutter py-space-lg pb-32 md:px-6">
-        <div className={`mx-auto w-full ${PLAYER_SIZE_CLASS[prefs.playerSize === "large" ? "medium" : prefs.playerSize]}`}>
-          <div ref={containerRef} className="aspect-video w-full overflow-hidden rounded-xl bg-inverse-surface [&_iframe]:h-full [&_iframe]:w-full" />
-          {failed && (
-            <p role="alert" className="mt-2 rounded-xl bg-error-container p-3 text-label-md text-on-error-container">
-              Không phát được video này.{" "}
-              <a className="font-semibold underline" href={`https://www.youtube.com/watch?v=${lesson.videoId}`} target="_blank" rel="noopener noreferrer">Mở trên YouTube</a>
-            </p>
-          )}
-        </div>
-
+    <div className="flex flex-col gap-space-md">
         {summary ? (
           <DictationSummary lesson={lesson} lines={lines} progress={progress} onRestart={restart} />
         ) : (
@@ -137,7 +110,7 @@ export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
               ))}
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-label-md font-semibold text-on-surface-variant">Câu {position + 1} / {lines.length}</p>
+              <p className="text-label-md font-semibold text-on-surface-variant">Câu {position + 1} / {lines.length} · đã làm {stats.done}</p>
               <div className="flex items-center gap-2">
                 <button type="button" aria-pressed={slow} onClick={() => setSlow((s) => !s)} className={`min-h-11 rounded-full px-4 text-label-md font-medium ${slow ? "bg-primary/15 text-primary" : "bg-surface-container-high text-on-surface"}`}>Chậm {String(SLOW_RATE).replace(".", ",")}x</button>
                 <button type="button" onClick={listen} disabled={!controller} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
@@ -171,7 +144,6 @@ export function VideoDictationScreen({ lesson }: { lesson: LessonDetail }) {
             {result && line && <DictationFeedback line={line} mode={progress.mode} typed={typed} result={result} passed={isPassing(result)} />}
           </>
         )}
-      </div>
-    </>
+    </div>
   );
 }
