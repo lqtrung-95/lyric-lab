@@ -5,6 +5,8 @@ import { Icon } from "@/components/ui/icon";
 import { track } from "@/lib/analytics/track";
 import { isMobileDevice, shareLinkNative } from "@/lib/streak/share-card";
 import { WEEKLY_GOAL_DAYS } from "@/lib/streak/streak-logic";
+import { DailyGoalBar } from "./daily-goal-bar";
+import { MilestonesRow } from "./milestones-row";
 import { ShareDialog } from "./share-dialog";
 import { useStreak } from "./use-streak";
 
@@ -79,6 +81,10 @@ export function StreakCard() {
         {note && <p role="status" className="text-label-sm text-on-surface-variant">{note}</p>}
       </div>
       {note && <p role="status" className="text-label-sm text-on-surface-variant md:hidden">{note}</p>}
+      <div className="space-y-3 border-t border-outline-variant/40 pt-3 md:col-span-3">
+        <DailyGoalBar items={streak.todayItems ?? 0} goal={streak.dailyGoal ?? 0} />
+        <MilestonesRow stats={{ longest: streak.longest, learnedWords: streak.learnedWords, videoLines: streak.videoLines ?? 0 }} />
+      </div>
       {dialogOpen && <ShareDialog streak={streak} onClose={() => setDialogOpen(false)} />}
     </section>
   );

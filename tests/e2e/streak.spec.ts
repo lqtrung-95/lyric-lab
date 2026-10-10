@@ -39,8 +39,8 @@ test("thẻ chuỗi ngày học: đếm hoạt động luyện tập, hiện tu�
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
       await expect(card.getByRole("button", { name: "Chia sẻ" })).toBeVisible();
     }
-    expect(heights.mobile).toBeLessThan(190);
-    expect(heights.desktop).toBeLessThan(130);
+    expect(heights.mobile).toBeLessThan(330);
+    expect(heights.desktop).toBeLessThan(240);
 
     const axe = await new AxeBuilder({ page }).analyze();
     expect(axe.violations.filter((v) => ["serious", "critical"].includes(v.impact ?? ""))).toEqual([]);

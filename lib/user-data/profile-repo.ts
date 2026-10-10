@@ -1,5 +1,6 @@
 import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
+import { DEFAULT_DAILY_GOAL, parseDailyGoal } from "@/lib/streak/daily-goal";
 
 export interface Profile {
   newCardsPerDay: number;
@@ -26,5 +27,22 @@ export async function saveProfile(patch: Partial<Profile>): Promise<boolean> {
   if (patch.newCardsPerDay !== undefined) row.new_cards_per_day = patch.newCardsPerDay;
   if (patch.onboarded !== undefined) row.onboarded = patch.onboarded;
   const { error } = await sb.from("user_profiles").upsert(row);
+  return !error;
+}
+
+/** Mục tiêu học mỗi ngày (số mục, 0 = tắt). Đọc riêng với hồ sơ chính để chưa chạy migration `daily_goal` cũng không làm hỏng các thiết lập khác. */
+export async function fetchDailyGoal(): Promise<number> {
+  const { data, error } = await createSupabaseBrowserClient().from("user_profiles").select("daily_goal").maybeSingle();
+  if (error) throw new Error(error.message);
+  return data ? parseDailyGoal(data.daily_goal) : DEFAULT_DAILY_GOAL;
+}
+
+export async function saveDailyGoal(goal: number): Promise<boolean> {
+  if (!(await ensureAnonymousSession())) return false;
+  const sb = createSupabaseBrowserClient();
+  const { data } = await sb.auth.getSession();
+  const userId = data.session?.user.id;
+  if (!userId) return false;
+  const { error } = await sb.from("user_profiles").upsert({ user_id: userId, daily_goal: parseDailyGoal(goal), updated_at: new Date().toISOString() });
   return !error;
 }

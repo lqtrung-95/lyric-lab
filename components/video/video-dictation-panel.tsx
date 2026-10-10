@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/icon";
 import { compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
 import { dictationKey, emptyDictationProgress, firstUndone, parseDictationProgress, summarizeProgress, withScore, type DictationProgress } from "@/lib/video/dictation-progress";
 import type { LessonDetail } from "@/lib/video/video-repo";
+import { submitVideoStudy } from "@/lib/practice/submit-video-study";
 import { DictationFeedback } from "./dictation-feedback";
 import { DictationProgressGrid } from "./dictation-progress-grid";
 import { DictationSummary } from "./dictation-summary";
@@ -75,6 +76,7 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
     const result = compareDictation(answer, line, answer.trim() ? mode : "hanzi"); // bỏ trống (xem đáp án): hiện đáp án theo chữ Hán
     setChecked({ result, mode: answer.trim() ? mode : "hanzi" });
     persist(withScore(progress, line.idx, result.score));
+    void submitVideoStudy("dictation", isPassing(result));
     clip.stop();
   }
 

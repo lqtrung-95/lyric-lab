@@ -27,6 +27,7 @@ const lesson = {
 };
 
 async function mockVideoApis(page: Page) {
+  await page.route("**/api/practice/video", (route) => route.fulfill({ json: { ok: true } }));
   await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
   await page.route("**/api/videos", (route) => route.fulfill({ json: { videos: [summary] } }));
   await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: lesson }));
@@ -251,8 +252,12 @@ test("chép chính tả: nghe câu, gõ pinyin, kiểm tra từng âm tiết, l�
 
   // Câu 1: gõ pinyin không thanh vẫn đạt (nửa điểm cho thanh).
   await answerBox(page).fill("ni hao peng you");
+  const studyPosts: string[] = [];
+  page.on("request", (r) => { if (r.url().endsWith("/api/practice/video")) studyPosts.push(r.postData() ?? ""); });
   await page.getByRole("button", { name: "Kiểm tra" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Đúng chữ, chú ý thanh điệu nhé" })).toBeVisible();
+  await expect.poll(() => studyPosts.length).toBe(1); // mỗi câu chép xong báo máy chủ một lần để tính chuỗi ngày và mục tiêu
+  expect(JSON.parse(studyPosts[0])).toEqual({ mode: "dictation", lines: 1, correct: 1 }); // đúng chữ, chỉ thiếu thanh: vẫn là đạt
   await expect(page.getByText("Xin chào, bạn bè.")).toBeVisible();
   await noViolations(page);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}"))).toEqual({ scores: { 0: 0.625 } });

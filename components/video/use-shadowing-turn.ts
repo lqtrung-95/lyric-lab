@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { PlayerController } from "@/components/player/use-youtube-player";
+import { submitVideoStudy } from "@/lib/practice/submit-video-study";
 import { recognitionSupported, startMicRecording, startRecognition, type MicRecording } from "@/lib/practice/mic-recording";
 import { compareDictation, type DictationResult } from "@/lib/video/dictation";
 import type { LessonLine } from "@/lib/video/video-lesson-types";
@@ -19,6 +20,8 @@ export interface ShadowAttempt {
 }
 
 const MAX_ATTEMPTS = 3;
+/** Điểm nhận dạng từ mức này trở lên được tính là nói tốt khi ghi nhận hoạt động học. */
+const SHADOW_GOOD_SCORE = 0.6;
 const SLOW_RATE = 0.75;
 /** Thời gian ghi tự động sau câu mẫu = độ dài câu (theo tốc độ phát) cộng thêm chừng này giây. */
 const TAIL_SECONDS = 1.5;
@@ -70,6 +73,7 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
       list.slice(MAX_ATTEMPTS).forEach((a) => URL.revokeObjectURL(a.url));
       return { ...all, [line.idx]: list.slice(0, MAX_ATTEMPTS) };
     });
+    void submitVideoStudy("shadowing", (attempt.result?.score ?? 0) >= SHADOW_GOOD_SCORE);
     setPhase("idle");
   }, [line, canRecognize]);
 
