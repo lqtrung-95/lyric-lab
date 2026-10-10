@@ -10,7 +10,7 @@ import { decideAddLimit, decideDuration, decideTranslationBudget } from "@/lib/v
 import { isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
-import { stripPinyinFromLines } from "@/lib/video/strip-pinyin";
+import { stripNonChineseFromLines } from "@/lib/video/strip-non-chinese";
 import { MAX_TRANSCRIPT_LINES, parsePastedTranscript } from "@/lib/video/parse-pasted-transcript";
 import { SupadataError, fetchSupadataLines } from "@/lib/video/supadata-transcript";
 import { translateLines } from "@/lib/video/translate-lines";
@@ -90,8 +90,8 @@ export async function POST(req: Request) {
       if (lines.length === 0) return fail("no_chinese_captions", 422);
     }
 
-    // Phụ đề song ngữ chen pinyin cùng dòng: bỏ pinyin trước khi đo tỉ lệ chữ Hán (pinyin dài làm tỉ lệ tụt oan).
-    lines = stripPinyinFromLines(lines);
+    // Phụ đề nhiều tầng (pinyin, tiếng Anh chen cùng dòng hoặc ở dòng riêng): chỉ giữ chữ Hán trước khi đo tỉ lệ chữ Hán (pinyin/tiếng Anh dài làm tỉ lệ tụt oan).
+    lines = stripNonChineseFromLines(lines);
     if (lines.length === 0) return fail("invalid_captions", 400);
 
     // Bản chép lời của YouTube hay mặc định sang ngôn ngữ giao diện của người xem: không phải tiếng Trung thì dừng, không tốn lượt dịch.
