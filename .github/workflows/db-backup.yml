@@ -24,7 +24,8 @@ env:
 
 jobs:
   backup:
-    runs-on: ubuntu-latest
+    # Ghim bản Ubuntu: nhãn ubuntu-latest sẽ chuyển sang Ubuntu 26 từ 19/10/2026, kho apt của PostgreSQL có thể chưa hỗ trợ ngay và làm hỏng bước cài pg_dump.
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - name: Kiểm tra đã cấu hình đủ
@@ -48,7 +49,7 @@ jobs:
           /usr/lib/postgresql/17/bin/pg_dump --version
 
       - name: Lấy kho sao lưu riêng tư
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: ${{ vars.BACKUP_REPO }}
           token: ${{ secrets.BACKUP_REPO_TOKEN }}
