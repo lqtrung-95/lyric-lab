@@ -35,7 +35,7 @@ interface RecognitionLike {
   maxAlternatives: number;
   onresult: ((e: RecognitionEventLike) => void) | null;
   onend: (() => void) | null;
-  onerror: (() => void) | null;
+  onerror: ((e: { error?: string }) => void) | null;
   start(): void;
   stop(): void;
 }
@@ -49,8 +49,8 @@ const ctorOf = (): RecognitionCtor | null => {
 
 export const recognitionSupported = () => ctorOf() !== null;
 
-/** Nhận dạng tiếng Trung (zh-CN) liên tục; `onText` nhận toàn bộ chữ nghe được tới lúc này (cả phần tạm). Trả hàm dừng. */
-export function startRecognition(onText: (text: string) => void): { stop(): void } {
+/** Nhận dạng tiếng Trung (zh-CN) liên tục; `onText` nhận toàn bộ chữ nghe được tới lúc này (cả phần tạm), `onError` nhận mã lỗi của trình duyệt (network, not-allowed, no-speech, audio-capture...). Trả hàm dừng. */
+export function startRecognition(onText: (text: string) => void, onError?: (code: string) => void): { stop(): void } {
   const Ctor = ctorOf();
   if (!Ctor) return { stop: () => undefined };
   const r = new Ctor();
@@ -69,7 +69,7 @@ export function startRecognition(onText: (text: string) => void): { stop(): void
     onText(finalText + interim);
   };
   r.onend = () => onText(finalText);
-  r.onerror = () => undefined;
+  r.onerror = (e) => onError?.(e?.error ?? "unknown");
   r.start();
   return { stop: () => r.stop() };
 }

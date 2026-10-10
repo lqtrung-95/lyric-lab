@@ -1,6 +1,15 @@
 import type { ShadowAttempt } from "./use-shadowing-turn";
 import type { VoiceFeedbackState } from "./use-voice-feedback";
 
+/** Vì sao trình duyệt không ra chữ: mã lỗi của Web Speech API → câu giải thích; không có mã thì chỉ là không nghe ra. */
+function recognitionFailText(code?: string): string {
+  if (code === "network") return "Trình duyệt không kết nối được dịch vụ nhận dạng giọng nói (Chrome cần mạng; Brave, Arc thường không hỗ trợ). Bấm “Nhờ AI nhận xét” để chấm.";
+  if (code === "not-allowed" || code === "service-not-allowed") return "Trình duyệt chặn nhận dạng giọng nói. Bấm “Nhờ AI nhận xét” để chấm.";
+  if (code === "audio-capture") return "Nhận dạng giọng nói không dùng được micro lúc này (đang bận ghi âm). Bấm “Nhờ AI nhận xét” để chấm.";
+  if (code === "no-speech") return "Trình duyệt không nghe thấy tiếng nói. Thử nói gần micro hơn, hoặc bấm “Nhờ AI nhận xét”.";
+  return "Trình duyệt chưa nhận ra chữ nào (nhận dạng của trình duyệt khá hay lỡ, không hẳn do bạn nói nhỏ). Bấm “Nhờ AI nhận xét” để chấm chính xác hơn.";
+}
+
 const FEEDBACK_FAIL = {
   rate_limited: "Bạn đã nhờ AI nhận xét nhiều lần hôm nay, mai thử lại nhé.",
   unavailable: "Tính năng nhận xét giọng chưa bật.",
@@ -42,7 +51,7 @@ export function ShadowingAttempts({ attempts, canRecognize, feedback, onPlayMine
               {a.result.units.map((u, k) => <span key={k} className={u.status === "correct" ? "text-on-surface" : "text-error underline decoration-wavy"}>{u.expected}</span>)}
             </p>
           ) : canRecognize && fb?.status !== "ok" ? (
-            <p className="mt-2 text-label-md text-on-surface-variant">Không nhận ra chữ nào. Thử nói to và rõ hơn nhé.</p>
+            <p className="mt-2 text-label-md text-on-surface-variant">{recognitionFailText(a.recError)}</p>
           ) : null}
           {a.heard && <p lang="zh" className="mt-1 text-label-md text-on-surface-variant">Máy nghe được: {a.heard}</p>}
         </li>

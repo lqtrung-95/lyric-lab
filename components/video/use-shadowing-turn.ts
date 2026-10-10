@@ -17,6 +17,8 @@ export interface ShadowAttempt {
   blob: Blob;
   /** Chữ máy nghe được (rỗng khi trình duyệt không nhận dạng được hoặc không nghe ra). */
   heard: string;
+  /** Mã lỗi của nhận dạng giọng nói trình duyệt (nếu có), để giải thích vì sao không ra chữ. */
+  recError?: string;
   /** Chấm sơ bộ theo số chữ Hán nghe đúng; null khi không có chữ nhận dạng. */
   result: DictationResult | null;
   at: number;
@@ -28,6 +30,7 @@ const SHADOW_GOOD_SCORE = 0.6;
 const SLOW_RATE = 0.75;
 /** Thời gian ghi tự động sau câu mẫu = độ dài câu (theo tốc độ phát) cộng thêm chừng này giây. */
 const TAIL_SECONDS = 1.5;
+const FINAL_RESULT_WAIT_MS = 1500;
 
 /**
  * Một lượt luyện nói theo câu của video: nghe mẫu rồi tự ghi âm giọng người học ("Bắt đầu lượt"), hoặc nghe mẫu / ghi âm riêng lẻ, rồi nghe lại
@@ -44,6 +47,7 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
   const rec = useRef<MicRecording | null>(null);
   const recognition = useRef<{ stop(): void } | null>(null);
   const heard = useRef("");
+  const recError = useRef<string | undefined>(undefined);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
   const audio = useRef<HTMLAudioElement | null>(null);
   const loopRef = useRef(loop);
@@ -65,10 +69,11 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
     recognition.current = null;
     if (!current || !line) { setPhase("idle"); return; }
     const blob = await current.stop();
-    await new Promise((r) => setTimeout(r, 450)); // chờ kết quả nhận dạng cuối cùng
+    // Chờ kết quả nhận dạng cuối cùng: Chrome thường trả chậm sau khi dừng (có khi hơn 1 giây), nên chờ tới khi có chữ hoặc quá hạn.
+    for (let waited = 0; canRecognize && !heard.current.trim() && !recError.current && waited < FINAL_RESULT_WAIT_MS; waited += 100) await new Promise((r) => setTimeout(r, 100));
     const text = heard.current.trim();
     const attempt: ShadowAttempt = {
-      url: URL.createObjectURL(blob), blob, heard: text, at: Date.now(),
+      url: URL.createObjectURL(blob), blob, heard: text, recError: recError.current, at: Date.now(),
       result: canRecognize && text ? compareDictation(text, line, "hanzi") : null,
     };
     setAttempts((all) => {
@@ -83,6 +88,7 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
   const beginRecording = useCallback(async (autoStopSec?: number) => {
     setMicError(null);
     heard.current = "";
+    recError.current = undefined;
     setHeardLive("");
     try {
       rec.current = await startMicRecording();
@@ -93,7 +99,7 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
       setPhase("idle");
       return;
     }
-    if (canRecognize) recognition.current = startRecognition((text) => { heard.current = text; setHeardLive(text); });
+    if (canRecognize) recognition.current = startRecognition((text) => { heard.current = text; setHeardLive(text); }, (code) => { recError.current = code; });
     setPhase("recording");
     if (autoStopSec) {
       const until = Date.now() + autoStopSec * 1000;

@@ -661,6 +661,16 @@ test("luyện nói: trình duyệt không có nhận dạng giọng nói thì b�
   await expect(page.getByRole("button", { name: "Nghe giọng mình" })).toBeVisible();
 });
 
+test("luyện nói: nhận dạng giọng nói của trình duyệt lỗi mạng thì giải thích lý do và gợi ý nhờ AI, không đổ lỗi cho người nói", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.addInitScript(FAKE_MIC.replace(/window\.SpeechRecognition = [\s\S]*$/, "window.SpeechRecognition = class { start() { var self = this; setTimeout(function () { self.onerror({ error: 'network' }); }, 20); } stop() { if (this.onend) this.onend(); } };"));
+  await page.goto(`/video/${VIDEO_ID}?tab=shadowing`);
+  await page.getByRole("button", { name: "Tự ghi âm" }).click();
+  await page.getByRole("button", { name: /^Dừng/ }).click();
+  await expect(page.getByText("không kết nối được dịch vụ nhận dạng giọng nói")).toBeVisible();
+  await expect(page.getByText("Thử nói to và rõ hơn")).toHaveCount(0);
+});
+
 // Giải mã/ghi lại âm thanh giả: bản ghi giả (một byte) không giải mã được thật, nên thay AudioContext để luồng "Nhờ AI nhận xét" chạy tới bước gọi API.
 const FAKE_AUDIO_DECODE = `window.AudioContext = class { decodeAudioData() { return Promise.resolve({ duration: 1 }); } close() { return Promise.resolve(); } };
 window.OfflineAudioContext = class { constructor() { this.destination = {}; }
