@@ -37,6 +37,23 @@ const ROWS: Row[] = [
     ),
   },
   {
+    icon: "smart_display", eyebrow: "Học qua video", title: "Podcast, vlog tiếng Trung: học theo ba cách",
+    points: ["Phụ đề chạy theo video, bấm từ để tra nghĩa theo ngữ cảnh và lưu thẻ", "Nghe – chép: nghe từng câu rồi gõ chữ Hán hoặc pinyin (ni3 hao3 cũng đúng), chấm từng chữ", "Luyện nói: nói theo mẫu, nghe lại giọng mình, nhờ AI nhận xét thanh điệu (bản thử nghiệm)", "Thêm video YouTube có phụ đề tiếng Trung, bản dịch tiếng Việt do AI làm"],
+    visual: (
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-2"><span className={chip}>Phụ đề</span><span className={chip}>Nghe – chép</span><span className={chip}>Luyện nói</span></div>
+        <div className="rounded-2xl bg-surface-container-lowest p-4 shadow-sm">
+          <p className="text-label-md text-on-surface-variant">Cần điền <strong className="text-on-surface">6 chữ Hán</strong></p>
+          <div className="mt-2 flex gap-1.5">{Array.from({ length: 6 }).map((_, k) => <span key={k} className="h-7 w-7 rounded-md border-b-2 border-outline bg-surface-container-high" />)}</div>
+        </div>
+        <div className="rounded-2xl bg-surface-container-lowest p-4 shadow-sm">
+          <p className="inline-flex items-center gap-2 text-label-md font-semibold text-on-surface"><Icon name="mic" size={16} />Nhận xét của AI · <span className="text-primary">92/100</span></p>
+          <p className="mt-1 text-body-md text-on-surface-variant">Đọc rõ và trôi chảy. Chú ý thanh 3 ở “好”: hạ giọng rồi mới lên.</p>
+        </div>
+      </div>
+    ),
+  },
+  {
     icon: "style", eyebrow: "Ôn tập", title: "Nhớ lâu nhờ ôn đúng lúc",
     points: ["Lưu từ thành flashcard chỉ với một cú bấm", "FSRS xếp lịch riêng cho từng thẻ, thẻ mới theo hạn mức mỗi ngày bạn đặt", "Ôn xong, nghe lại đúng câu hát chứa từ đó"],
     visual: (

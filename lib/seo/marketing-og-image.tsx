@@ -4,7 +4,7 @@ import { ImageResponse } from "next/og";
 import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
 
 export const MARKETING_OG_SIZE = { width: 1200, height: 630 };
-export const MARKETING_OG_ALT = "SongHanzi: học tiếng Trung qua bài hát, dành cho người Việt";
+export const MARKETING_OG_ALT = "SongHanzi: học tiếng Trung qua bài hát và video, dành cho người Việt";
 
 const PRIMARY = "#b03a2e";
 const INK = "#1c1611";
@@ -42,7 +42,7 @@ export async function renderMarketingOgImage(): Promise<ImageResponse> {
             <div style={{ display: "flex", fontSize: 84, fontWeight: 700, fontFamily: "serif-bold", color: INK, lineHeight: 1.12 }}>Nghe một bài hát,</div>
             <div style={{ display: "flex", fontSize: 84, fontWeight: 700, fontFamily: "serif-bold", color: PRIMARY, lineHeight: 1.12 }}>nhớ cả trăm chữ Hán.</div>
             <div style={{ display: "flex", flexDirection: "column", marginTop: 30, fontSize: 32, color: MUTED, lineHeight: 1.45 }}>
-              <div style={{ display: "flex" }}>Học tiếng Trung qua bài hát, dành cho người Việt</div>
+              <div style={{ display: "flex" }}>Học tiếng Trung qua bài hát và video</div>
               <div style={{ display: "flex" }}>Pinyin · âm Hán Việt · flashcard FSRS</div>
             </div>
           </div>

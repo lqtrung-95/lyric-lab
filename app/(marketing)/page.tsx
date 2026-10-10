@@ -12,8 +12,8 @@ import { Reveal } from "@/components/landing/reveal";
 import { ProblemSolution } from "@/components/landing/problem-solution";
 import { landingJsonLd } from "@/lib/seo/landing-json-ld";
 
-const TITLE = "SongHanzi: học tiếng Trung qua bài hát, dành cho người Việt";
-const DESCRIPTION = "Dán link YouTube hoặc gõ tên bài hát, SongHanzi chọn từ vựng và ngữ pháp đáng học kèm pinyin, âm Hán Việt và nghĩa theo câu hát. Nghe với lời chạy theo nhạc, ôn bằng flashcard FSRS và trò chơi luyện tập. Miễn phí, chữ giản thể.";
+const TITLE = "SongHanzi: học tiếng Trung qua bài hát và video, dành cho người Việt";
+const DESCRIPTION = "Dán link YouTube hoặc gõ tên bài hát, SongHanzi chọn từ vựng và ngữ pháp đáng học kèm pinyin, âm Hán Việt và nghĩa theo câu hát. Học thêm qua video tiếng Trung (podcast, vlog) bằng chép chính tả và luyện nói có AI nhận xét giọng. Ôn bằng flashcard FSRS và trò chơi luyện tập. Miễn phí, chữ giản thể.";
 
 // Trang giới thiệu là trang duy nhất cho công cụ tìm kiếm lập chỉ mục; mọi trang học đều noindex.
 export const metadata: Metadata = {

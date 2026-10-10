@@ -10,10 +10,13 @@ const FEATURES: { icon: IconName; title: string; body: string; accent?: boolean 
   { icon: "schedule", title: "Ôn tập FSRS", body: "Thuật toán ghi nhớ hiện đại, khoảng ôn tính riêng cho từng thẻ. Dữ liệu của bạn có thể xóa bất cứ lúc nào." },
   { icon: "link", title: "Tìm bài bằng tên hoặc nghệ sĩ", body: "Không nhớ bài? Gõ tên bài hát hay nghệ sĩ, SongHanzi gợi ý các bản phù hợp, bỏ video không phát được." },
   { icon: "library_music", title: "Khám phá bài đã có sẵn", body: "Chọn bài người khác đã phân tích theo level HSK: mở là học ngay, không phải chờ AI." },
-  { icon: "local_fire_department", title: "Chuỗi ngày học và bảng xếp hạng", body: "Giữ nhịp học mỗi ngày, chia sẻ thành tích bằng một tấm ảnh, thi đua vui bằng biệt danh do bạn đặt.", accent: true },
+  { icon: "mic", title: "AI nghe giọng, nhận xét thanh điệu", body: "Luyện nói theo mẫu rồi nhờ AI nghe lại: điểm, chỗ sai thanh điệu và cách sửa, bằng tiếng Việt. Bản thử nghiệm, chỉ gửi khi bạn bấm." },
+  { icon: "lightbulb", title: "Hỏi AI về từng câu", body: "Không hiểu vì sao dùng 了 ở đây? Hỏi thẳng về câu đang học: nghĩa, ngữ pháp, cách dùng ngoài đời, trả lời ngắn bằng tiếng Việt." },
+  { icon: "local_fire_department", title: "Chuỗi ngày và mục tiêu mỗi ngày", body: "Đặt số mục học mỗi ngày, giữ chuỗi, nhận nhắc nhẹ trước khi chuỗi đứt. Có cột mốc và bảng xếp hạng nếu bạn thích thi đua." },
+  { icon: "group", title: "Thi đấu 1v1 với bạn bè", body: "Tạo phòng, gửi mã 6 số, cùng chơi một bộ câu điền lời từ bài hát. Hoặc thách đấu để bạn bè chơi lúc nào cũng được." },
 ];
 
-/** Lưới chín điểm mạnh; hai ô tô nền xanh nhấn vào Hán Việt và giản thể. */
+/** Lưới mười hai điểm mạnh; hai ô tô nền xanh nhấn vào Hán Việt và giản thể. */
 export function FeaturesGrid() {
   return (
     <section id="features" aria-labelledby="features-heading" className="mt-24 scroll-mt-24">

@@ -11,7 +11,7 @@ export function MarketingFooter() {
             <LogoMark size={28} />
             <span className="font-serif text-headline-md font-semibold text-on-surface">Song<span className="text-primary">Hanzi</span></span>
           </div>
-          <p className="mt-2 max-w-sm text-label-md text-on-surface-variant">Học tiếng Trung qua bài hát, dành cho người Việt.</p>
+          <p className="mt-2 max-w-sm text-label-md text-on-surface-variant">Học tiếng Trung qua bài hát và video, dành cho người Việt.</p>
         </div>
         <nav aria-label="Liên kết cuối trang" className="flex flex-wrap gap-x-6 gap-y-2 text-label-md">
           <Link href="/app" className="inline-flex min-h-11 items-center text-primary hover:underline">Mở app</Link>

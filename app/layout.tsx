@@ -18,7 +18,7 @@ const serif = Lora({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "6
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "SongHanzi", template: "%s · SongHanzi" },
-  description: "Học tiếng Trung qua bài hát: xem trước từ vựng, nghe với lời chạy theo nhạc, ôn bằng flashcard.",
+  description: "Học tiếng Trung qua bài hát và video: xem trước từ vựng, nghe với lời chạy theo nhạc, chép chính tả, luyện nói, ôn bằng flashcard.",
 };
 
 export const viewport: Viewport = {
