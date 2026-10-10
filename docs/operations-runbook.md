@@ -213,12 +213,12 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 5. Secret `BACKUP_PASSPHRASE` = chuỗi ngẫu nhiên dài (`openssl rand -base64 32`). **Cất thêm một bản ở trình quản lý mật khẩu**: mất nó là không giải mã được mọi bản sao lưu.
 6. Chạy thử bằng Run workflow, mở kho sao lưu kiểm tra có file mới.
 
-**Giải mã và khôi phục:**
+**Giải mã và khôi phục** (đã thử giải mã và `pg_restore --list` thành công ngày 2026-10-11: Postgres 17.6, 300 mục, 38 bảng dữ liệu; chưa thử khôi phục thật vào project trống):
 ```
-gpg --decrypt public-2026-10-11.dump.gpg > public.dump
+gpg --decrypt public-YYYY-MM-DD.dump.gpg > public.dump   # ngày trong tên file tính theo giờ UTC; xem `ls` để lấy tên thật
 pg_restore --no-owner --no-privileges --dbname "$DB_URL_MOI" public.dump
 ```
-Dữ liệu `auth` (tài khoản) khôi phục bằng `pg_restore --data-only` vào project Supabase đã có sẵn schema `auth`; làm thận trọng và thử trên project trống trước. **Nên thử khôi phục vào một project Supabase trống ít nhất một lần**: bản sao lưu chưa thử khôi phục thì chưa chắc dùng được.
+Xóa file `.dump` đã giải mã ngay sau khi dùng (`rm public.dump`): nó chứa dữ liệu người dùng dạng chưa mã hóa. Dữ liệu `auth` (tài khoản) khôi phục bằng `pg_restore --data-only` vào project Supabase đã có sẵn schema `auth`; làm thận trọng và thử trên project trống trước. **Nên thử khôi phục vào một project Supabase trống ít nhất một lần**: bản sao lưu chưa thử khôi phục thì chưa chắc dùng được.
 
 **Lưu ý:** workflow chạy theo lịch bị GitHub tự tắt sau 60 ngày repo không có hoạt động; lúc đó vào tab Actions bật lại. Lỗi sao lưu gửi email báo cho người sửa lịch cuối cùng. Lịch sử git của kho sao lưu giữ cả các bản đã xóa khỏi cây thư mục, nên kho sẽ lớn dần theo thời gian (hiện dữ liệu nhỏ); khi quá lớn thì tạo kho sao lưu mới. Dump tăng kích thước theo dữ liệu: GitHub khuyến nghị mỗi file dưới 100 MB.
 
