@@ -636,7 +636,7 @@ test("luyện nói: bắt đầu lượt (nghe mẫu rồi tự ghi âm), chấm
 
   await page.getByRole("button", { name: "Bắt đầu lượt" }).click();
   expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:0");
-  await page.evaluate(() => { (window as unknown as { __t: number }).__t = 5; }); // hết câu mẫu (đoạn phát có đệm đuôi, tới 4,7): tự chuyển sang ghi âm
+  await page.evaluate(() => { (window as unknown as { __t: number }).__t = 4; }); // hết câu mẫu : tự chuyển sang ghi âm
   await expect(page.getByRole("button", { name: /^Đang ghi/ })).toBeVisible();
   await expect(page.getByText("你好朋友").first()).toBeVisible(); // chữ máy đang nghe
   await page.getByRole("button", { name: /^Dừng/ }).click();
@@ -740,15 +740,15 @@ test("luyện nói: chỉnh đầu/cuối đoạn nghe theo từng câu, phát l
   await page.getByText("Đoạn nghe bị lệch", { exact: false }).click();
   await page.getByRole("button", { name: "Nghe mẫu" }).click();
   const seeks = () => page.evaluate(() => (window as unknown as { __yt: string[] }).__yt.filter((e) => e.startsWith("seek:")));
-  expect((await seeks()).at(-1)).toBe("seek:0"); // đầu câu 0 không lùi dưới giây 0
-  await page.getByRole("button", { name: "Bắt đầu muộn hơn 0,5 giây" }).click();
-  await expect(page.getByRole("group", { name: "Đầu đoạn" })).toContainText("+0,5s");
-  expect(Number((await seeks()).at(-1)!.split(":")[1])).toBeCloseTo(0.2, 1); // phát lại từ mốc đã chỉnh (câu bắt đầu ở 0, lùi đệm 0,3 rồi chỉnh +0,5)
-  await page.getByRole("button", { name: "Kết thúc muộn hơn 0,5 giây" }).click();
-  await expect(page.getByRole("group", { name: "Cuối đoạn" })).toContainText("+0,5s");
+  expect((await seeks()).at(-1)).toBe("seek:0");
+  await page.getByRole("button", { name: "Bắt đầu muộn hơn 0,1 giây" }).click();
+  await expect(page.getByRole("group", { name: "Đầu đoạn" })).toContainText("+0,1s");
+  expect(Number((await seeks()).at(-1)!.split(":")[1])).toBeCloseTo(0.1, 2); // phát lại từ mốc đã chỉnh (câu bắt đầu ở 0, chỉnh +0,1)
+  await page.getByRole("button", { name: "Kết thúc muộn hơn 0,1 giây" }).click();
+  await expect(page.getByRole("group", { name: "Cuối đoạn" })).toContainText("+0,1s");
   await page.reload();
   await expect(page.getByText("đã chỉnh")).toBeVisible();
-  await expect(page.getByRole("group", { name: "Đầu đoạn" })).toContainText("+0,5s");
+  await expect(page.getByRole("group", { name: "Đầu đoạn" })).toContainText("+0,1s");
   await page.getByRole("button", { name: "Đặt lại" }).click();
   await expect(page.getByText("đã chỉnh")).toHaveCount(0);
 });
