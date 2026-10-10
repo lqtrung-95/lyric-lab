@@ -679,7 +679,7 @@ test("luyện nói: nhờ AI nhận xét giọng gửi WAV base64 lên API và h
   await page.goto(`/video/${VIDEO_ID}?tab=shadowing`);
   await page.getByRole("button", { name: "Tự ghi âm" }).click();
   await page.getByRole("button", { name: /^Dừng/ }).click();
-  await expect(page.getByText("gửi đúng lần ghi âm đó sang Google Gemini")).toBeVisible();
+  await expect(page.getByText("gửi đúng lần ghi âm đó sang AI để nghe và nhận xét")).toBeVisible();
   await page.getByRole("button", { name: "Nhờ AI nhận xét" }).click();
   const feedback = page.getByLabel("Nhận xét của AI");
   await expect(feedback).toContainText("72/100");
@@ -711,7 +711,7 @@ test("tab Phụ đề: hỏi AI về một câu, gửi kèm lượt hỏi trư�
     const b = route.request().postDataJSON();
     bodies.push(b);
     if (b.question.includes("quá nhiều")) return route.fulfill({ status: 429, json: { error: "rate_limited" } });
-    await route.fulfill({ json: { answer: `Trả lời cho: ${b.question}`, model: "gemini-flash-lite-latest" } });
+    await route.fulfill({ json: { answer: `Trả lời cho: ${b.question} **đậm**`, model: "gemini-flash-lite-latest" } });
   });
   await page.goto(`/video/${VIDEO_ID}`);
   await page.getByRole("button", { name: "Hỏi AI về câu 1" }).click();
@@ -723,7 +723,9 @@ test("tab Phụ đề: hỏi AI về một câu, gửi kèm lượt hỏi trư�
   await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
   await expect(dialog.getByText("Trả lời cho: Còn câu sau thì sao?")).toBeVisible();
   expect(bodies[0]).toMatchObject({ videoId: VIDEO_ID, lineIndex: 0, question: "Vì sao dùng 好?", history: [] });
-  expect(bodies[1].history).toEqual([{ q: "Vì sao dùng 好?", a: "Trả lời cho: Vì sao dùng 好?" }]);
+  expect(bodies[1].history).toEqual([{ q: "Vì sao dùng 好?", a: "Trả lời cho: Vì sao dùng 好? **đậm**" }]);
+  await expect(dialog.locator("strong").first()).toHaveText("đậm"); // **đậm** được in đậm, không hiện ký hiệu
+  await expect(dialog).not.toContainText("**");
   await dialog.getByPlaceholder(/Hỏi thêm/).fill("hỏi quá nhiều rồi");
   await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
   await expect(dialog.getByRole("alert")).toContainText("mai hỏi tiếp nhé");

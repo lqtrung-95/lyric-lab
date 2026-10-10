@@ -88,7 +88,7 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
 
       <ShadowingAttempts attempts={turn.attempts[raw.idx] ?? []} canRecognize={turn.canRecognize} onPlayMine={(url) => turn.playMine(url)} onCompare={turn.compare}
         feedback={voice.byAttempt} onFeedback={(a) => void voice.request(a.at, a.blob, raw.idx)} />
-      {(turn.attempts[raw.idx]?.length ?? 0) > 0 && <p className="text-label-sm text-on-surface-variant">&ldquo;Nhờ AI nhận xét&rdquo; gửi đúng lần ghi âm đó sang Google Gemini để nghe; ta không lưu âm thanh.</p>}
+      {(turn.attempts[raw.idx]?.length ?? 0) > 0 && <p className="text-label-sm text-on-surface-variant">&ldquo;Nhờ AI nhận xét&rdquo; gửi đúng lần ghi âm đó sang AI để nghe và nhận xét; chúng tôi không lưu giọng nói của bạn.</p>}
 
       <div role="group" aria-label="Ẩn bớt để luyện nghe" className="flex flex-wrap items-center gap-1 border-t border-outline-variant/40 pt-space-sm">
         <span className="mr-1 text-label-md text-on-surface-variant">Hiện:</span>
