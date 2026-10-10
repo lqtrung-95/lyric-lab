@@ -32,6 +32,8 @@ interface LyricLineRowProps {
   onShare?: (index: number) => void;
   /** Có thì hiện nút báo bản dịch của câu này là sai (video luyện nghe: AI dịch lại ngay câu đó). */
   onReportTranslation?: (index: number) => void;
+  /** Có thì hiện nút hỏi AI về câu này (video luyện nghe; bài hát hỏi trong bảng "Giải thích câu"). */
+  onAsk?: (index: number) => void;
   /** Có thì hiện nút sửa lời (chỉ quản trị viên). */
   onEdit?: (index: number) => void;
 }
@@ -40,14 +42,14 @@ interface LyricLineRowProps {
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onReportTranslation, onEdit }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onReportTranslation, onAsk, onEdit }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
   // Nút của dòng nằm ở cột biểu tượng bên phải. Máy tính: hiện khi rê chuột. Điện thoại: chỉ ở câu đang hát (để không bóp hẹp các dòng còn lại)
   // và xếp dọc khi có cả nút sửa của quản trị, nên cột luôn rộng đúng một nút.
   const iconButton = "flex h-11 w-11 cursor-pointer items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high";
   const canReport = Boolean(onReportTranslation && line.translation);
-  const hasActions = Boolean(onShare || onEdit || canReport);
+  const hasActions = Boolean(onShare || onEdit || canReport || onAsk);
 
   return (
     <li
@@ -119,6 +121,11 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
           {onShare && (
             <button type="button" aria-label={`Chia sẻ câu ${line.index + 1} thành ảnh`} title="Chia sẻ câu này" onClick={(e) => { e.stopPropagation(); onShare(line.index); }} className={iconButton}>
               <Icon name="share" size={18} />
+            </button>
+          )}
+          {onAsk && (
+            <button type="button" aria-label={`Hỏi AI về câu ${line.index + 1}`} title="Hỏi AI về câu này" onClick={(e) => { e.stopPropagation(); onAsk(line.index); }} className={iconButton}>
+              <Icon name="auto_awesome" size={18} />
             </button>
           )}
           {canReport && (

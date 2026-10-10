@@ -6,7 +6,7 @@ Tóm tắt kiến trúc **hiện hành**. Yêu cầu và lý do sản phẩm ở
 
 ```
 Trình duyệt (Next.js App Router, React 19, Tailwind v4)
-   │  SSE /api/analyze/[videoId]      REST /api/explain, /api/explain-line, /api/lookup, /api/tts, ...
+   │  SSE /api/analyze/[videoId]      REST /api/explain, /api/explain-line, /api/ask-line, /api/pronunciation-feedback, /api/lookup, /api/tts, ...
    ▼
 Next.js route handlers (Vercel, nodejs runtime, vùng sin1, maxDuration 60s)
    ├── Supabase Postgres (service role ở server; RLS cho dữ liệu người dùng)
@@ -25,7 +25,7 @@ Stack: Next.js 16 (Turbopack), TypeScript strict, Tailwind v4, Supabase (Auth �
 | `app/(marketing)` | Trang giới thiệu `/` (được index) |
 | `app/(main)` | `/app`, `/library`, `/review/*` (game luyện tập, bảng xếp hạng), `/settings`, `/feedback`, `/admin/*`, `/welcome` (đều `noindex`) |
 | `app/learn/[videoId]` | Xem trước, `listen` (nghe), `summary` (tổng kết) |
-| `app/api/*` | Route handlers: `analyze` (SSE), `explain`, `explain-line`, `lookup`, `tts`, `discover`, `search`, `library`, `review`, `practice/score`, `leaderboard`, `streak`, `feedback`, `reports`, `translation-suggestions`, `account/*`, `admin/*`, `debug/caption-probe` |
+| `app/api/*` | Route handlers: `analyze` (SSE), `explain`, `explain-line`, `ask-line`, `pronunciation-feedback`, `lookup`, `tts`, `discover`, `search`, `library`, `review`, `practice/score`, `leaderboard`, `streak`, `feedback`, `reports`, `translation-suggestions`, `account/*`, `admin/*`, `debug/caption-probe` |
 | `components/` | UI dùng lại (lyric list, vocab card, player controls, library, brand…) |
 | `lib/captions` | `CaptionProvider` (interface) + implement InnerTube, parse json3, đánh giá chất lượng lời |
 | `lib/lyrics` | Lấy lời nhiều nguồn: `get-lyrics-for-video.ts`, LRCLIB, NetEase, parse LRC, chuẩn hoá |
@@ -147,7 +147,7 @@ Mỗi tài khoản có MỘT biệt danh (`leaderboard_profiles.nickname`, duy n
 
 ## Hạn mức và bảo vệ
 
-Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản (ẩn danh / đã đăng nhập): phân tích 10/30, giải nghĩa 60/200, TTS 80/250; điểm game 40/giờ. Thêm lớp theo IP (30 phân tích/24h, bộ nhớ trong tiến trình). Bài đã cache không tốn hạn mức. Chạy `next dev` (`NODE_ENV=development`) bỏ qua hạn mức phân tích. Email trong `UNLIMITED_USAGE_EMAILS` không bị giới hạn; `ADMIN_EMAILS` vào được trang admin. Captcha Turnstile (tùy chọn) ở `lib/auth/turnstile-token.ts`.
+Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản (ẩn danh / đã đăng nhập): phân tích 10/30, giải nghĩa 60/200, hỏi AI về câu (`ask`) 20/80, nhờ AI nghe giọng (`voice`) 10/40, TTS 80/250; điểm game 40/giờ. Thêm lớp theo IP (30 phân tích/24h, bộ nhớ trong tiến trình). Bài đã cache không tốn hạn mức. Chạy `next dev` (`NODE_ENV=development`) bỏ qua hạn mức phân tích. Email trong `UNLIMITED_USAGE_EMAILS` không bị giới hạn; `ADMIN_EMAILS` vào được trang admin. Captcha Turnstile (tùy chọn) ở `lib/auth/turnstile-token.ts`.
 
 ## Ràng buộc kiến trúc quan trọng
 
@@ -182,3 +182,5 @@ Cấu hình: `lib/rate-limit/usage-limit-config.ts`. Trong 24h theo tài khoản
 **Sửa lời bài hát (quản trị):** nút bút chì ở mỗi dòng lời (chỉ hiện với tài khoản admin theo `/api/admin/whoami`, chỉ ở bài hát) mở `LineEditDialog`: sửa chữ Hán, pinyin và bản dịch của MỘT dòng. `PATCH /api/admin/songs/[videoId]` action `edit_line` → `editSongLine` (`lib/analysis/edit-song-line.ts`): tách từ lại bằng jieba, pinyin tự tính từ từ điển trừ khi admin gõ tay, mốc thời gian giữ nguyên; `applyLineEdit` (hàm thuần, `edit-analysis-line.ts`) tính lại liên kết từ vựng của dòng (từ khớp token mới được thêm lần xuất hiện, ngữ pháp ở dòng đó bị bỏ, mục hết lần xuất hiện bị xóa). Lưu thẳng vào `song_analyses.analysis`, xóa `line_explanations` của dòng, làm mới cache Next bằng `revalidateTag("song-analysis", { expire: 0 })`. Chưa có thêm/xóa dòng.
 
 **Báo cáo bài hát cho admin:** `/admin/reports` (`SongReportsAdminScreen`) liệt kê bài bị người dùng báo sai gộp theo bài (số báo, lý do, bài đang ẩn không), kèm "Mở bài để sửa lời", "Đã xử lý" (xóa báo cáo của bài) và Ẩn/Hiện lại. API admin: `GET /api/admin/song-reports[?videoId=]`, `PATCH /api/admin/song-reports/[videoId]` `{action:"dismiss"}`; logic gộp ở `lib/admin/song-reports.ts`. Dải cảnh báo `SongReportBanner` hiện ở đầu màn Xem trước và màn Nghe của bài (chỉ admin, chỉ khi bài có báo cáo); huy hiệu số bài bị báo cạnh "Quản trị" ở Cài đặt và ở trang gốc khu quản trị. Báo cáo cấp mục từ vựng (`item_reports`) chưa có giao diện admin.
+
+**Hỏi AI về câu và nhận xét phát âm bằng Gemini (2026-10-10):** hai API mới, cùng đọc câu qua `loadLinesForVideo` (bài hát đã phân tích, không có thì dòng video luyện nghe). (1) `POST /api/ask-line {videoId, lineIndex, question, history?}` (`lib/lookup/ask-line.ts`): câu hỏi tự do về MỘT câu (≤ 300 ký tự), prompt kèm câu trước/sau và tối đa 4 lượt hỏi đáp trước (client giữ, gửi lại 3 lượt cuối), model theo `EXPLAIN_MODELS` (Gemini đứng đầu), không cache, hạn mức DB `ask`; prompt tách câu hỏi người học trong khối ngăn cách và dặn không làm theo chỉ thị trong đó. UI: `AskLineBox` (`components/listen/`) nằm cuối bảng "Giải thích câu" của bài hát và trong `AskLineSheet` của video (nút ✨ trên từng dòng ở tab Phụ đề, `LyricList onAsk`). (2) `POST /api/pronunciation-feedback {videoId, lineIndex, mimeType, audio(base64)}` (`lib/pronunciation/`): ở tab Luyện nói, nút "Nhờ AI nhận xét" trên từng lần ghi âm; client đổi bản ghi (WebM/MP4) sang WAV 16 kHz mono 16-bit ≤ 20 giây (`lib/practice/audio-to-wav.ts`, ~640 KB, dưới trần 4,5 MB của Vercel) rồi gửi; server chuyển tiếp cho Gemini (CHỈ `GEMINI_MODELS`, không có model dự phòng vì Groq/DeepSeek không nghe được âm thanh), không lưu âm thanh. `ChatRequest.audio` được `createGeminiChat` gắn thành `inlineData` **đứng TRƯỚC văn bản** (đặt sau thì flash-lite hay trả lời như ghi âm im lặng, đo thực tế). Đầu ra: `heard`, `score` 0-100, `summary`, `issues[{word,problem,tip}]`; `issues` có `word` không nằm trong câu mẫu bị loại. Hạn mức DB `voice`. Migration `20261010000007_ask_and_voice_usage_kinds.sql` mở rộng ràng buộc `usage_events.kind` (thêm `ask`, `voice`). Hạn chế: chấm điểm của model hơi rộng tay (nói câu khác vẫn từng cho 40 thay vì ≤ 30) và chưa so với người bản ngữ; thang điểm chỉ mang tính tham khảo.

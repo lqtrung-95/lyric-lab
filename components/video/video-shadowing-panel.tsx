@@ -9,6 +9,7 @@ import { TONE_TEXT_CLASS, toneOfSyllable } from "@/lib/video/pinyin-tone";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { ShadowingAttempts } from "./shadowing-attempts";
 import { useShadowingTurn } from "./use-shadowing-turn";
+import { useVoiceFeedback } from "./use-voice-feedback";
 
 type Layer = "hanzi" | "pinyin" | "translation";
 const LAYERS: { id: Layer; label: string }[] = [{ id: "hanzi", label: "Chữ Hán" }, { id: "pinyin", label: "Pinyin" }, { id: "translation", label: "Bản dịch" }];
@@ -26,6 +27,7 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
   const [hidden, setHidden] = useState<Set<Layer>>(new Set());
   const raw = lessonLines[position];
   const turn = useShadowingTurn(controller, raw, slow);
+  const voice = useVoiceFeedback(lesson.videoId);
   const line = lines[position];
   const toggleLayer = (l: Layer) => setHidden((h) => { const n = new Set(h); if (n.has(l)) n.delete(l); else n.add(l); return n; });
   const go = (to: number) => { turn.stopAll(); setPosition(Math.min(lines.length - 1, Math.max(0, to))); };
@@ -84,7 +86,9 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
       {!turn.canRecognize && <p role="note" className="rounded-xl bg-surface-container-low p-3 text-label-md text-on-surface-variant">Trình duyệt này không có nhận dạng giọng nói nên chỉ ghi âm để bạn tự nghe so sánh. Dùng Chrome hoặc Edge để có điểm.</p>}
       {turn.phase === "recording" && turn.canRecognize && <p lang="zh" role="status" className="rounded-xl bg-surface-container-low p-3 text-body-md">{turn.heardLive || <span className="text-on-surface-variant">Đang nghe…</span>}</p>}
 
-      <ShadowingAttempts attempts={turn.attempts[raw.idx] ?? []} canRecognize={turn.canRecognize} onPlayMine={(url) => turn.playMine(url)} onCompare={turn.compare} />
+      <ShadowingAttempts attempts={turn.attempts[raw.idx] ?? []} canRecognize={turn.canRecognize} onPlayMine={(url) => turn.playMine(url)} onCompare={turn.compare}
+        feedback={voice.byAttempt} onFeedback={(a) => void voice.request(a.at, a.blob, raw.idx)} />
+      {(turn.attempts[raw.idx]?.length ?? 0) > 0 && <p className="text-label-sm text-on-surface-variant">&ldquo;Nhờ AI nhận xét&rdquo; gửi đúng lần ghi âm đó sang Google Gemini để nghe; ta không lưu âm thanh.</p>}
 
       <div role="group" aria-label="Ẩn bớt để luyện nghe" className="flex flex-wrap items-center gap-1 border-t border-outline-variant/40 pt-space-sm">
         <span className="mr-1 text-label-md text-on-surface-variant">Hiện:</span>

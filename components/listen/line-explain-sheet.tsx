@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Icon } from "@/components/ui/icon";
+import { AskLineBox } from "./ask-line-box";
 import type { LineExplainResult } from "./use-line-explain";
 
 const FAIL_TEXT = {
@@ -12,7 +13,7 @@ const FAIL_TEXT = {
 const sectionTitle = "text-label-sm font-semibold uppercase tracking-wider text-on-surface-variant";
 
 /** Bottom sheet hiện kết quả giải thích cả câu đang hát: dịch tự nhiên, từ vựng, điểm ngữ pháp, ghi chú khác. */
-export function LineExplainSheet({ lineText, linePinyin, result, onClose }: { lineText: string; linePinyin?: string; result: LineExplainResult; onClose: () => void }) {
+export function LineExplainSheet({ videoId, lineIndex, lineText, linePinyin, result, onClose }: { videoId: string; lineIndex: number; lineText: string; linePinyin?: string; result: LineExplainResult; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
@@ -114,6 +115,7 @@ export function LineExplainSheet({ lineText, linePinyin, result, onClose }: { li
           </div>
         </div>
       )}
+      <AskLineBox videoId={videoId} lineIndex={lineIndex} />
     </div>
   );
 }

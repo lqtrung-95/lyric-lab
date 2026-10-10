@@ -213,7 +213,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
       />
       <div className="mx-auto grid max-w-page grid-cols-1 items-start gap-8 px-gutter py-space-lg pb-32 md:px-6 lg:grid-cols-12 lg:px-12 lg:pb-space-lg">
         <div className="flex flex-col gap-6 lg:col-span-7">
-          <div ref={stickyPlayerRef} data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface md:mx-0">
+          <div ref={stickyPlayerRef} data-sticky-player className="sticky top-[7.5rem] z-20 -mx-gutter bg-surface md:mx-0">
             <div ref={containerRef} className={`mx-auto aspect-video w-full overflow-hidden bg-inverse-surface md:rounded-xl [&_iframe]:h-full [&_iframe]:w-full ${PLAYER_SIZE_CLASS[prefs.playerSize]}`} />
             <PlaybackBar
               controller={controller} durationSec={song.durationSec ?? 0} playing={playing} onTogglePlay={togglePlay}
@@ -250,7 +250,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           {completed && !toastDismissed && <CompletedToast videoId={analysis.videoId} onDismiss={() => setToastDismissed(true)} />}
           {pinToast && <Toast message={pinToast} onDismiss={() => setPinToast(null)} />}
         </div>
-        <div className="listen-panel-scroll lg:sticky lg:top-24 lg:col-span-5 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:overscroll-contain">
+        <div className="listen-panel-scroll lg:sticky lg:top-[8.5rem] lg:col-span-5 lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto lg:overscroll-contain">
           <SingingPanel line={lines[currentIndex] ?? null} items={currentItems} savedKeys={savedKeys} onToggleSave={saveFromPanel} />
         </div>
       </div>
@@ -264,7 +264,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
       )}
       {explainOpen && currentIndex >= 0 && (
         <LineExplainSheet
-          lineText={lines[currentIndex].text} linePinyin={lines[currentIndex].pinyin} result={explainResult}
+          videoId={analysis.videoId} lineIndex={lines[currentIndex].index} lineText={lines[currentIndex].text} linePinyin={lines[currentIndex].pinyin} result={explainResult}
           onClose={() => { setExplainOpen(false); resetExplain(); }}
         />
       )}

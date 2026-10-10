@@ -156,8 +156,9 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
               id="dictation-input" ref={inputRef} value={typed} onChange={(e) => setTyped(e.target.value)} onKeyDown={onKeyDown} readOnly={!!checked} rows={3}
               autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false}
               className="w-full resize-y rounded-2xl bg-surface-container-high px-4 py-3 text-body-lg text-on-surface outline-none ring-2 ring-transparent focus:ring-primary read-only:opacity-70"
-              placeholder="Gõ lại câu vừa nghe (chữ Hán, hoặc pinyin: ni hao)…"
+              placeholder="Gõ lại câu vừa nghe (chữ Hán, hoặc pinyin: ni3 hao3)…"
             />
+            {!checked && <p className="text-label-sm text-on-surface-variant">Gõ pinyin kèm số thanh (<span className="font-medium text-on-surface">ni3 hao3</span>, thanh nhẹ gõ 5 hoặc bỏ trống) được tính đúng 100%; gõ không thanh (ni hao) chỉ được nửa điểm. Cũng có thể gõ có dấu (nǐ hǎo).</p>}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-label-md text-on-surface-variant">
                 <kbd className="rounded border border-outline-variant px-1.5 font-mono text-label-sm">Enter</kbd> kiểm tra / câu sau · <kbd className="rounded border border-outline-variant px-1.5 font-mono text-label-sm">Esc</kbd> nghe lại

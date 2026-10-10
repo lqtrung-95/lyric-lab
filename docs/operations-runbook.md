@@ -192,3 +192,9 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 2. Điền cho bài đã phân tích: `NODE_OPTIONS=--experimental-websocket npx tsx scripts/backfill-mood-groups.mts` (thêm `--dry` để chỉ xem độ phủ từng nhóm và các tag chưa có nhóm, chạy được trước migration). Bài mới tự có nhóm lúc phân tích xong.
 3. Đổi bảng từ khóa ở `lib/library/mood-groups.ts` thì chạy lại bước 2 (idempotent).
 
+## Hỏi AI và nhận xét phát âm (Gemini)
+
+- Cần chạy migration `supabase/migrations/20261010000007_ask_and_voice_usage_kinds.sql` (Supabase SQL Editor) TRƯỚC khi deploy: thiếu nó, `consume_usage` với loại `ask`/`voice` vi phạm ràng buộc `usage_events_kind_check` và hai nút báo lỗi.
+- `/api/pronunciation-feedback` chỉ chạy khi có `GEMINI_API_KEYS` (thiếu thì trả 503 `feedback_unavailable`, nút báo "chưa bật"). Âm thanh người học được chuyển tiếp sang Google Gemini để nghe; gói miễn phí của Google có thể dùng dữ liệu để cải thiện sản phẩm: cân nhắc gói trả phí nếu có nhiều người dùng, và nhớ UI đã ghi rõ điều này cạnh nút.
+- Hạn mức mặc định (24 giờ): hỏi AI 20/80, nghe giọng 10/40 (ẩn danh/đã đăng nhập); đổi ở `lib/rate-limit/usage-limit-config.ts`.
+- Thử nhanh: tạo giọng mẫu bằng `say -v Tingting "..." -o a.wav --file-format=WAVE --data-format=LEI16@16000` rồi gọi `giveFeedback` với khóa thật (đã thử: đọc đúng ~95-98 điểm, nói câu khác ~40).

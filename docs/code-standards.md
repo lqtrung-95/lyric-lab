@@ -95,3 +95,9 @@ Khung nội dung chính của mọi trang (header, `main`, chân trang, màn h�
 
 ## Vẽ canvas với font chữ Hán
 - Font chữ Hán của trang (Noto Serif SC qua Google Fonts) chia thành nhiều mảnh theo unicode-range và theo độ đậm; trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở đúng độ đậm. `document.fonts.ready` KHÔNG đợi các mảnh này nên vẽ canvas ngay sẽ có chữ rơi về font hệ thống, nét đậm nhạt khác nhau trong cùng một câu. Trước khi `fillText` chữ Hán, gọi `await document.fonts.load(font, đoạnChữSắpVẽ)` (xem `lib/share/line-card.ts`).
+
+## Âm thanh gửi LLM và header dính
+
+- Âm thanh gửi cho model (`ChatRequest.audio`) luôn đặt TRƯỚC phần văn bản trong `parts`; chỉ gửi khi người dùng bấm nút, ghi rõ trên UI là sẽ gửi sang bên thứ ba, không lưu ở server. Chuyển sang WAV 16 kHz mono ở client (`lib/practice/audio-to-wav.ts`) thay vì gửi nguyên định dạng của trình duyệt.
+- Kết quả LLM trỏ vào văn bản (ví dụ `issues[].word`) phải kiểm tra có nằm trong câu mẫu, không khớp thì loại (cùng tinh thần quy tắc khớp vị trí).
+- Thanh tiêu đề của màn Nghe và màn học video **dính** dưới thanh điều hướng chung (`sticky top-16 z-30 h-14`); trình phát dính ở `top-[7.5rem]` (4rem + 3,5rem) và panel bên phải ở `lg:top-[8.5rem]`. Đổi chiều cao thanh tiêu đề thì đổi cả các mốc `top` này. Sau khi gửi form làm nút bị khóa, trả tiêu điểm về ô nhập để phím Esc vẫn đóng được hộp thoại.

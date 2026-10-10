@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
+import { ReportSongButton } from "@/components/preview/report-song-button";
 import { ListenLikeButton } from "./listen-like-button";
 import { ShortcutsHelpButton } from "./shortcuts-help-button";
 import { ViewToggles } from "./view-toggles";
@@ -24,17 +25,17 @@ interface ListenTopBarProps {
 /** Thanh phụ màn Nghe: quay lại xem trước, tên bài, nút thích; trên desktop có cả nút bật/tắt pinyin và bản dịch. */
 export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, showTranslation, onTogglePinyin, onToggleTranslation, liked, onToggleLike, onShowTour }: ListenTopBarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 bg-surface-container-low px-gutter py-2 md:px-6 lg:px-12">
+    <div className="sticky top-16 z-30 flex h-14 items-center justify-between gap-3 bg-surface-container-low px-gutter md:px-6 lg:px-12">
       <div className="flex min-w-0 items-center gap-3">
         <Link href={backHref} aria-label="Quay lại xem trước" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex">
           <Icon name="arrow_back" size={22} />
         </Link>
         <div className="min-w-0">
-          <p lang="zh" className="truncate font-serif text-headline-md text-primary">{title}</p>
+          <p lang="zh" title={title} className="truncate font-serif text-body-lg font-semibold leading-6 text-primary">{title}</p>
           <p className="truncate text-label-sm text-on-surface-variant">{artist}</p>
         </div>
       </div>
-      <div className="flex items-center gap-1">
+      <div className="flex shrink-0 items-center gap-1">
         {onShowTour && (
           <button type="button" onClick={onShowTour} aria-label="Xem hướng dẫn màn Nghe" title="Hướng dẫn"
             className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container">
@@ -42,6 +43,7 @@ export function ListenTopBar({ videoId, title, artist, backHref, showPinyin, sho
           </button>
         )}
         <ShortcutsHelpButton />
+        <ReportSongButton videoId={videoId} bar />
         <ListenLikeButton videoId={videoId} liked={liked} onChange={onToggleLike} />
         <ViewToggles
           className="hidden md:flex"

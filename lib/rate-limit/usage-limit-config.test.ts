@@ -24,6 +24,6 @@ describe("usageLimit", () => {
     expect(usageWindowHours("room")).toBe(24);
     expect(usageLimit("room_join", true)).toBe(30);
     expect(usageWindowHours("room_join")).toBe(1);
-    for (const kind of ["room", "room_join"] as const) expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
+    for (const kind of ["room", "room_join", "ask", "voice"] as const) expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
   });
 });

@@ -37,6 +37,9 @@ async function cardPixel(page: Page, x: number, y: number): Promise<number[]> {
 }
 
 test.describe("máy tính", () => {
+  // Đủ cao để dòng được cuộn ra giữa màn hình không bị khối video dính (nằm dưới thanh tiêu đề dính) che.
+  test.use({ viewport: { width: 1280, height: 1000 } });
+
   test("thẻ ảnh có ảnh bìa video ở chân thẻ; lỗi tải ảnh bìa thì thẻ vẫn tạo được, không có ảnh", async ({ page }) => {
     for (const withThumb of [true, false]) {
       await page.route("https://i.ytimg.com/**", (route) => withThumb

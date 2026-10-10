@@ -42,6 +42,13 @@ describe("createGeminiChat", () => {
     });
   });
 
+  it("đính kèm âm thanh dưới dạng inlineData đứng trước đoạn văn bản", async () => {
+    const f = fakeFetch([() => ok("{}")]);
+    await createGeminiChat([K1], f)({ ...req, audio: { mimeType: "audio/wav", data: "QUJD" } });
+    const parts = (f.calls[0].body.contents as { parts: unknown[] }[])[0].parts;
+    expect(parts).toEqual([{ inlineData: { mimeType: "audio/wav", data: "QUJD" } }, { text: "USER" }]);
+  });
+
   it("model không thuộc Gemini 2.5 Flash thì không gửi cấu hình tắt suy nghĩ", async () => {
     const { fetchFn, calls } = fakeFetch([() => ok("{}")]);
     await createGeminiChat([K1], { random: () => 0, fetchFn })({ ...req, model: "gemini-3-pro" });

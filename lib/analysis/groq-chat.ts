@@ -7,6 +7,8 @@ export interface ChatRequest {
   maxTokens?: number;
   /** Hạn chót một lần gọi (ms) của nhà cung cấp hỗ trợ (hiện chỉ Gemini). Model "suy nghĩ" dịch 30 dòng mất ~15 giây nên cần nới hơn mặc định. */
   timeoutMs?: number;
+  /** Đoạn âm thanh đính kèm cho model nghe được (hiện chỉ Gemini; `data` là base64, định dạng WAV/MP3/AAC/OGG/FLAC). */
+  audio?: { mimeType: string; data: string };
 }
 export type ChatFn = (req: ChatRequest) => Promise<string>;
 

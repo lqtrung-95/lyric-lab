@@ -13,6 +13,7 @@ const ATTEMPT_WINDOW_MS = 12_000;
 // khi có hàng chục khóa, đủ hẹp để không đập vào cả bầy khóa khi Google lỗi diện rộng.
 const MAX_ATTEMPTS = 5;
 const DEFAULT_MAX_OUTPUT_TOKENS = 1024;
+// Âm thanh phải đứng TRƯỚC văn bản: đặt sau thì flash-lite hay trả lời như thể ghi âm im lặng (đo thực tế với cùng một file).
 const RATE_LIMIT_COOLDOWN_MS = 60_000; // giới hạn theo phút
 const DAILY_LIMIT_COOLDOWN_MS = 15 * 60_000; // giới hạn theo ngày: thử lại muộn hơn, đỡ đập vào khóa đã cạn
 const TRANSIENT_COOLDOWN_MS = 5_000;
@@ -67,7 +68,7 @@ export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}
           headers: { "Content-Type": "application/json", "x-goog-api-key": key },
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: req.system }] },
-            contents: [{ role: "user", parts: [{ text: req.user }] }],
+            contents: [{ role: "user", parts: [...(req.audio ? [{ inlineData: { mimeType: req.audio.mimeType, data: req.audio.data } }] : []), { text: req.user }] }],
             generationConfig: {
               responseMimeType: "application/json",
               maxOutputTokens: req.maxTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,

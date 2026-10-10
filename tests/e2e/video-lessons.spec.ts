@@ -661,6 +661,76 @@ test("luyện nói: trình duyệt không có nhận dạng giọng nói thì b�
   await expect(page.getByRole("button", { name: "Nghe giọng mình" })).toBeVisible();
 });
 
+// Giải mã/ghi lại âm thanh giả: bản ghi giả (một byte) không giải mã được thật, nên thay AudioContext để luồng "Nhờ AI nhận xét" chạy tới bước gọi API.
+const FAKE_AUDIO_DECODE = `window.AudioContext = class { decodeAudioData() { return Promise.resolve({ duration: 1 }); } close() { return Promise.resolve(); } };
+window.OfflineAudioContext = class { constructor() { this.destination = {}; }
+  createBufferSource() { return { connect() {}, start() {} }; }
+  startRendering() { return Promise.resolve({ getChannelData: function () { return new Float32Array(1600); } }); } };`;
+
+test("luyện nói: nhờ AI nhận xét giọng gửi WAV base64 lên API và hiện điểm, lỗi cần sửa, chữ AI nghe được", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.addInitScript(FAKE_MIC);
+  await page.addInitScript(FAKE_AUDIO_DECODE);
+  let body: { videoId: string; lineIndex: number; mimeType: string; audio: string } | null = null;
+  await page.route("**/api/pronunciation-feedback", async (route) => {
+    body = route.request().postDataJSON();
+    await route.fulfill({ json: { heard: "你好朋友", score: 72, summary: "Bạn đọc khá rõ, chú ý thanh 3.", issues: [{ word: "好", problem: "thanh 3 đọc thành thanh 1", tip: "hạ giọng rồi lên" }], model: "gemini-flash-lite-latest" } });
+  });
+  await page.goto(`/video/${VIDEO_ID}?tab=shadowing`);
+  await page.getByRole("button", { name: "Tự ghi âm" }).click();
+  await page.getByRole("button", { name: /^Dừng/ }).click();
+  await expect(page.getByText("gửi đúng lần ghi âm đó sang Google Gemini")).toBeVisible();
+  await page.getByRole("button", { name: "Nhờ AI nhận xét" }).click();
+  const feedback = page.getByLabel("Nhận xét của AI");
+  await expect(feedback).toContainText("72/100");
+  await expect(feedback).toContainText("Bạn đọc khá rõ, chú ý thanh 3.");
+  await expect(feedback).toContainText("thanh 3 đọc thành thanh 1");
+  await expect(feedback).toContainText("AI nghe được: 你好朋友");
+  expect(body).toMatchObject({ videoId: VIDEO_ID, lineIndex: 0, mimeType: "audio/wav" });
+  expect(body!.audio.length).toBeGreaterThan(100);
+  await expect(page.getByRole("button", { name: "Nhờ AI nhận xét" })).toHaveCount(0);
+});
+
+test("luyện nói: nhận xét giọng hết hạn mức thì báo rõ và cho bấm lại", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.addInitScript(FAKE_MIC);
+  await page.addInitScript(FAKE_AUDIO_DECODE);
+  await page.route("**/api/pronunciation-feedback", (route) => route.fulfill({ status: 429, json: { error: "rate_limited" } }));
+  await page.goto(`/video/${VIDEO_ID}?tab=shadowing`);
+  await page.getByRole("button", { name: "Tự ghi âm" }).click();
+  await page.getByRole("button", { name: /^Dừng/ }).click();
+  await page.getByRole("button", { name: "Nhờ AI nhận xét" }).click();
+  await expect(page.getByText("mai thử lại nhé")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Nhờ AI nhận xét" })).toBeEnabled();
+});
+
+test("tab Phụ đề: hỏi AI về một câu, gửi kèm lượt hỏi trước và hiện câu trả lời; hết hạn mức thì báo", async ({ page }) => {
+  await mockVideoApis(page);
+  const bodies: { videoId: string; lineIndex: number; question: string; history?: { q: string; a: string }[] }[] = [];
+  await page.route("**/api/ask-line", async (route) => {
+    const b = route.request().postDataJSON();
+    bodies.push(b);
+    if (b.question.includes("quá nhiều")) return route.fulfill({ status: 429, json: { error: "rate_limited" } });
+    await route.fulfill({ json: { answer: `Trả lời cho: ${b.question}`, model: "gemini-flash-lite-latest" } });
+  });
+  await page.goto(`/video/${VIDEO_ID}`);
+  await page.getByRole("button", { name: "Hỏi AI về câu 1" }).click();
+  const dialog = page.getByRole("dialog", { name: /Hỏi AI về câu/ });
+  await dialog.getByPlaceholder(/Hỏi thêm/).fill("Vì sao dùng 好?");
+  await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
+  await expect(dialog.getByText("Trả lời cho: Vì sao dùng 好?")).toBeVisible();
+  await dialog.getByPlaceholder(/Hỏi thêm/).fill("Còn câu sau thì sao?");
+  await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
+  await expect(dialog.getByText("Trả lời cho: Còn câu sau thì sao?")).toBeVisible();
+  expect(bodies[0]).toMatchObject({ videoId: VIDEO_ID, lineIndex: 0, question: "Vì sao dùng 好?", history: [] });
+  expect(bodies[1].history).toEqual([{ q: "Vì sao dùng 好?", a: "Trả lời cho: Vì sao dùng 好?" }]);
+  await dialog.getByPlaceholder(/Hỏi thêm/).fill("hỏi quá nhiều rồi");
+  await dialog.getByRole("button", { name: "Hỏi", exact: true }).click();
+  await expect(dialog.getByRole("alert")).toContainText("mai hỏi tiếp nhé");
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+});
+
 // ---- Nạp video từ kênh (API giả lập) ----
 const planVideos = [
   { videoId: "aaaaaaaaaa1", title: "Video có phụ đề", durationSec: 600, embeddable: true, exists: false },

@@ -1,4 +1,4 @@
-export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join";
+export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice";
 
 // Hạn mức trong 24 giờ theo tài khoản. Phân tích bài mới theo PRD §7; giải nghĩa từ bằng LLM tốn ít hơn nên cho nhiều hơn.
 const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
@@ -11,9 +11,12 @@ const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
   // Tạo phòng thi đấu (mỗi phòng giữ một mã 6 số trong vài phút) và số lần thử vào phòng bằng mã trong 1 GIỜ (chống đoán mã).
   room: { anonymous: 10, member: 30 },
   room_join: { anonymous: 30, member: 60 },
+  // Hỏi thêm về một câu (vài trăm token mỗi lần) và nhờ AI nghe ghi âm nhận xét phát âm (gửi âm thanh sang Gemini nên tốn hơn, cho ít hơn).
+  ask: { anonymous: 20, member: 80 },
+  voice: { anonymous: 10, member: 40 },
 };
 
-const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1 };
+const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24 };
 
 /** Cửa sổ đếm (giờ) của từng loại: điểm luyện tập tính theo giờ, còn lại theo 24 giờ. */
 export const usageWindowHours = (kind: UsageKind): number => WINDOW_HOURS[kind];

@@ -31,6 +31,12 @@ describe("compareDictation (pinyin)", () => {
     expect(statuses("ni3 hao3 peng2 you5")).toEqual(["correct", "correct", "correct", "correct"]);
     expect(statuses("ni3hao3peng2you")).toEqual(["correct", "correct", "correct", "correct"]);
   });
+  it("câu nhiều âm tiết: gõ số thanh đúng được 100%, gõ không thanh chỉ nửa điểm", () => {
+    const greeting = line("大家好我是雯", "dà jiā hǎo wǒ shì wén");
+    expect(compareDictation("da4 jia1 hao3 wo3 shi4 wen2", greeting, "pinyin").score).toBe(1);
+    expect(compareDictation("da4jia1hao3wo3shi4wen2", greeting, "pinyin").score).toBe(1);
+    expect(compareDictation("da jia hao wo shi wen", greeting, "pinyin").score).toBe(0.5);
+  });
   it("không gõ thanh hoặc sai thanh tính là 'tone' (nửa điểm), sai chữ cái là 'wrong'", () => {
     expect(statuses("ni hao peng you")).toEqual(["tone", "tone", "tone", "correct"]);
     expect(statuses("ni2 hao3 peng2 you")).toEqual(["tone", "correct", "correct", "correct"]);

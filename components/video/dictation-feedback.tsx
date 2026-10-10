@@ -41,6 +41,9 @@ export function DictationFeedback({ line, mode, typed, result, passed }: { line:
             </li>
           ))}
         </ul>
+        {mode === "pinyin" && result.units.some((u) => u.status === "tone") && !/[0-9\u0300-\u030f\u00c0-\u01dc]/.test(typed) && (
+          <p className="mt-1 text-label-md text-primary">Mẹo: gõ kèm số thanh (da4 jia1 hao3) sẽ được tính đúng 100%.</p>
+        )}
         {result.extra > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Bạn gõ thừa một vài ký tự.</p>}
       </div>
       <p className="text-label-md text-on-surface-variant">Bạn đã gõ: <span lang={mode === "hanzi" ? "zh" : undefined} className="font-medium text-on-surface">{typed.trim() || "(chưa gõ gì)"}</span></p>

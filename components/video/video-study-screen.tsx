@@ -45,16 +45,17 @@ export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScre
   return (
     <>
       <h1 className="sr-only">Video: {lesson.title}</h1>
-      <div className="bg-surface-container-low">
-       <div className="mx-auto flex max-w-page flex-wrap items-center justify-between gap-x-6 gap-y-1 px-gutter py-2 md:px-6 lg:px-12">
-        <div className="flex min-w-0 flex-1 basis-64 items-center gap-3">
+      {/* Thanh tiêu đề dính ngay dưới thanh điều hướng chung (cao cố định 3,5rem) để đổi chế độ xem hoặc báo video sai bất cứ lúc nào; trình phát dính bên dưới nó. */}
+      <div className="sticky top-16 z-30 bg-surface-container-low">
+       <div className="mx-auto flex h-14 max-w-page items-center justify-between gap-x-6 px-gutter md:px-6 lg:px-12">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <Link href="/video" aria-label="Về danh sách video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
           <div className="min-w-0">
             <p lang="zh" title={lesson.title} className="truncate font-serif text-body-lg font-semibold leading-6 text-primary">{lesson.title}</p>
             <p className="truncate text-label-sm text-on-surface-variant">{lesson.channelTitle}</p>
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-0.5">
+        <div className="flex shrink-0 items-center gap-0.5">
           {tab === "subtitles" && (
             <ViewToggles
               compact className="hidden md:flex" showPinyin={prefs.showPinyin} showTranslation={prefs.showTranslation}
@@ -68,7 +69,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScre
       </div>
 
       <div className="mx-auto grid max-w-page gap-space-md px-gutter py-space-md pb-32 md:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,4fr)] lg:gap-8 lg:px-12">
-        <div data-sticky-player className="sticky top-16 z-20 -mx-gutter bg-surface lg:mx-0 lg:self-start">
+        <div data-sticky-player className="sticky top-[7.5rem] z-20 -mx-gutter bg-surface lg:mx-0 lg:self-start">
           <div ref={containerRef} className="aspect-video w-full overflow-hidden bg-inverse-surface lg:rounded-xl [&_iframe]:h-full [&_iframe]:w-full" />
           {failed && (
             <p role="alert" className="mt-2 rounded-xl bg-error-container p-3 text-label-md text-on-error-container">

@@ -50,7 +50,7 @@ export function ReportVideoButton({ videoId }: { videoId: string }) {
   if (status === "sent") return <p role="status" className="inline-flex min-h-11 items-center text-label-md text-on-surface-variant">Cảm ơn bạn đã báo. Mình sẽ kiểm tra video này.</p>;
   return (
     <div ref={wrapRef} className="relative">
-      <button type="button" aria-expanded={open} aria-label="Báo video sai" title="Báo video sai" onClick={() => setOpen((o) => !o)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-2.5 text-label-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+      <button type="button" aria-expanded={open} aria-label="Báo video sai" title="Báo video sai" onClick={() => setOpen((o) => !o)} className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-2.5 text-label-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
         <Icon name="flag" size={16} /><span className="hidden 2xl:inline">Báo video sai</span>
       </button>
       {open && (

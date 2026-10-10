@@ -12,6 +12,8 @@ export type ShadowPhase = "idle" | "listening" | "recording";
 
 export interface ShadowAttempt {
   url: string;
+  /** Bản ghi gốc, để gửi cho AI nghe và nhận xét khi người học bấm nút. */
+  blob: Blob;
   /** Chữ máy nghe được (rỗng khi trình duyệt không nhận dạng được hoặc không nghe ra). */
   heard: string;
   /** Chấm sơ bộ theo số chữ Hán nghe đúng; null khi không có chữ nhận dạng. */
@@ -65,7 +67,7 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
     await new Promise((r) => setTimeout(r, 450)); // chờ kết quả nhận dạng cuối cùng
     const text = heard.current.trim();
     const attempt: ShadowAttempt = {
-      url: URL.createObjectURL(blob), heard: text, at: Date.now(),
+      url: URL.createObjectURL(blob), blob, heard: text, at: Date.now(),
       result: canRecognize && text ? compareDictation(text, line, "hanzi") : null,
     };
     setAttempts((all) => {

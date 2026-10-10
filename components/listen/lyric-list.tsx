@@ -33,12 +33,14 @@ interface LyricListProps {
   onPauseSong: () => void;
   /** Có thì mỗi dòng có bản dịch hiện nút báo bản dịch sai (video luyện nghe). */
   onReportTranslation?: (index: number) => void;
+  /** Có thì mỗi dòng có nút hỏi AI về câu đó (video luyện nghe). */
+  onAsk?: (index: number) => void;
   /** Mặc định bật; video luyện nghe tắt gợi ý sửa bản dịch và đổi tiêu đề/mô tả cho hợp lời nói. */
   variant?: "lyrics" | "speech";
 }
 
 /** Danh sách lời chạy theo nhạc: câu đang hát nằm giữa màn hình (LS-02), các câu qua rồi mờ đi. */
-export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, shareContext, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, onReportTranslation, variant = "lyrics" }: LyricListProps) {
+export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, grammar, showPinyin, showTranslation, autoScroll, shareContext, onTogglePinyin, onToggleTranslation, onSeek, onWord, onPauseSong, onReportTranslation, onAsk, variant = "lyrics" }: LyricListProps) {
   const [sharing, setSharing] = useState<number | null>(null);
   const shareLine = useCallback((index: number) => setSharing(index), []);
   // Quản trị viên sửa lời ngay trên danh sách (chỉ bài hát, không phải video luyện nghe; video có trang quản trị riêng).
@@ -153,6 +155,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               allowTranslationSuggestion={variant === "lyrics"}
               onShare={shareContext ? shareLine : undefined}
               onReportTranslation={onReportTranslation}
+              onAsk={onAsk}
               onEdit={variant === "lyrics" && isAdmin === true ? editLine : undefined}
             />
           );
