@@ -81,7 +81,7 @@ export async function POST(req: Request) {
 
     let lines: CaptionLine[] = parsed.data.lines ?? (parsed.data.captions ? parsePastedTranscript(parsed.data.captions, meta.durationSec) : []);
     if (lines.length === 0 && (parsed.data.captions || parsed.data.lines)) return fail("invalid_captions", 400);
-    // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI: do dấu trang gửi kèm (`viCaptions`) hoặc lấy thêm ở đường Supadata. Lõi nạp chỉ giữ khi ghép đủ tốt.
+    // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI: chỉ khi dấu trang gửi kèm (`viCaptions`). Đường Supadata CHỈ lấy tiếng Trung (1 credit) rồi để AI dịch: track tiếng Việt của YouTube hay chia câu lệch và là bản dịch tự động, ghép vào dễ ra bản dịch sai. Lõi nạp chỉ giữ khi ghép đủ tốt.
     let viLines: CaptionLine[] | null = null;
     if (parsed.data.captions && parsed.data.viCaptions) {
       const vi = parsePastedTranscript(parsed.data.viCaptions, meta.durationSec);
@@ -92,14 +92,6 @@ export async function POST(req: Request) {
       const zh = await fetchSupadataLines(videoId, env.SUPADATA_API_KEY, "zh");
       lines = zh.lines;
       if (lines.length === 0) return fail("no_chinese_captions", 422);
-      if (zh.availableLangs.some((l) => l.toLowerCase().startsWith("vi"))) {
-        try {
-          const vi = (await fetchSupadataLines(videoId, env.SUPADATA_API_KEY, "vi")).lines;
-          if (vi.length > 0 && chineseRatio(vi) < 0.1) viLines = vi;
-        } catch {
-          // Không lấy được tiếng Việt thì để AI dịch như thường, không làm hỏng cả lần thêm video.
-        }
-      }
     }
 
     // Bản chép lời của YouTube hay mặc định sang ngôn ngữ giao diện của người xem: không phải tiếng Trung thì dừng, không tốn lượt dịch.

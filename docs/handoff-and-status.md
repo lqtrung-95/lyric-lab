@@ -71,6 +71,8 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 
 ## Việc mới nhất đã làm (để tiện nối tiếp)
 
+- **Supadata chỉ lấy tiếng Trung (2026-10-10):** đường Supadata của `POST /api/videos/add` không lấy track tiếng Việt nữa (tiết kiệm 1 credit mỗi video có sẵn phụ đề Việt và tránh bản dịch lệch câu); bản dịch luôn do AI làm (Groq trước, trong ngân sách ngày). Đường dấu trang vẫn có thể gửi kèm phụ đề Việt (qua cổng chất lượng `isUsableTranslationTrack` có đo `straddleShare`).
+
 - **Giữ chân người học (2026-10-10):** mục tiêu hằng ngày (thanh tiến độ trên thẻ chuỗi ngày, đặt ở Cài đặt → Học tập), cột mốc (chuỗi ngày, từ đã ôn, câu học qua video) và việc học video nay tính vào chuỗi ngày. Cần chạy migration `20261010000005_daily_goal_and_video_activity.sql`. Email "chuỗi N ngày sắp đứt" (20:00 giờ Việt Nam, cần migration `20261010000006_email_streak_reminder.sql`) đã xong ở code, chưa gửi thử thật. Web push vẫn chạy song song nhưng không đầu tư thêm (ít người bật). Chưa làm: tính câu video vào bảng xếp hạng (cố ý để 0 điểm).
 
 - **Màn học video gộp thành một trang ba tab** (Phụ đề, Nghe – chép, Luyện nói; hai cột từ lg, theo bản prototype `songhanzi-video-lab`): xem `docs/system-architecture.md`. Link cũ `/dictation` và `/shadowing` chuyển hướng về `?tab=`. Không làm tab Sổ từ của prototype (đã có Thư viện → Từ đã lưu và Ôn tập).
