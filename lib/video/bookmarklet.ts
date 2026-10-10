@@ -24,7 +24,7 @@ if(!/(^|\\.)youtube\\.com$/.test(location.hostname)||!m){alert('Hãy mở một 
 var id=m[1];
 var SEG='ytd-transcript-segment-renderer,transcript-segment-view-model';
 var OPEN='ytd-engagement-panel-section-list-renderer[visibility="ENGAGEMENT_PANEL_VISIBILITY_EXPANDED"]';
-var box=null,timer=null,dots=0;
+var box=null,timer=null,dots=0,moved=false;
 function say(msg,link){
 if(!box){box=document.createElement('div');box.style.cssText='position:fixed;top:16px;right:16px;z-index:2147483647;max-width:320px;padding:12px 40px 12px 16px;border-radius:14px;background:#7a1b10;color:#fff;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4)';document.body.appendChild(box);}
 box.textContent=msg;
@@ -63,18 +63,21 @@ var c=root.querySelectorAll('yt-dropdown-menu,tp-yt-paper-button,[role="combobox
 for(var i=c.length-1;i>=0;i--){if(shown(c[i])&&isLang(c[i].innerText)){return c[i];}}
 return null;
 }
+function navLink(e){var h=e.getAttribute&&e.getAttribute('href');return e.tagName==='A'&&!!h&&/^(\\/|https?:)/.test(h);}
+function inPopup(e){return !!(e.closest&&e.closest('tp-yt-iron-dropdown,ytd-menu-popup-renderer,tp-yt-paper-listbox'));}
 function langItem(code){
 var c=document.querySelectorAll('tp-yt-paper-item,[role="menuitem"],[role="option"],[role="menuitemradio"],yt-list-item-view-model,ytd-menu-service-item-renderer,a');
-for(var i=0;i<c.length;i++){if(shown(c[i])&&isLangItem(code,c[i].innerText)){return c[i];}}
-return null;
+var fb=null;
+for(var i=0;i<c.length;i++){if(shown(c[i])&&isLangItem(code,c[i].innerText)&&!navLink(c[i])){if(inPopup(c[i])){return c[i];}if(!fb){fb=c[i];}}}
+return fb;
 }
 function switchLang(code,accept,done){
 var tr=langTrigger();if(!tr){done(false);return;}
 tr.click();
 setTimeout(function(){
 var it=langItem(code);if(!it){tr.click();done(false);return;}
-it.click();
-var n=0;(function w(){var t=readPanel();if(t&&accept(t)){done(t);return;}n++;if(n>10){done(false);return;}setTimeout(w,500);})();
+var u0=location.href;it.click();
+var n=0;(function w(){if(location.href!==u0){moved=true;done(false);return;}var t=readPanel();if(t&&accept(t)){done(t);return;}n++;if(n>10){done(false);return;}setTimeout(w,500);})();
 },500);
 }
 function humanVi(){try{var tr=document.getElementById('movie_player').getPlayerResponse().captions.playerCaptionsTracklistRenderer.captionTracks;for(var i=0;i<tr.length;i++){if(/^vi/i.test(tr[i].languageCode)&&tr[i].kind!=='asr'){return true;}}}catch(e){}return false;}
@@ -85,6 +88,7 @@ switchLang('vi',function(x){return x!==t&&han(x)<10;},function(x){go(x?{v:id,t:t
 }
 function zhShown(){var tr=langTrigger();return !!tr&&isLangItem('zh',tr.innerText);}
 function send(t,sw){
+if(moved){fail('YouTube vừa chuyển sang trang khác khi chọn ngôn ngữ nên dừng lại. Hãy mở lại video, chọn tiếng Trung ở ô ngôn ngữ cuối bảng phụ đề rồi bấm lại.');return;}
 if(han(t)<10){
 if(zhShown()){fail('Video này có phụ đề gắn nhãn tiếng Trung nhưng nội dung không phải chữ Hán (có thể là tiếng Anh), nên chưa thêm được. Hãy thử video khác nhé.');return;}
 if(sw){fail('Chưa tự chuyển được phụ đề sang tiếng Trung. Hãy chọn tiếng Trung ở ô ngôn ngữ cuối bảng phụ đề rồi bấm lại.'+dbg());return;}

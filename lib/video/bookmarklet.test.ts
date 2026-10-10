@@ -23,6 +23,8 @@ interface Opts {
   langSwitch?: { triggerLabel: string; menuLabels: string[]; zhLabel: string; zhText: string; viLabel?: string; viText?: string };
   /** Các track phụ đề của video theo trình phát: mã ngôn ngữ, hoặc {code, kind} (kind "asr" là phụ đề tự động). */
   trackCodes?: (string | { code: string; kind?: string })[];
+  /** Liên kết tên kênh (vd. "Chinese with HuanYu") luôn hiện trong trang, đứng TRƯỚC các mục menu trong DOM: bấm nhầm vào nó là chuyển sang trang kênh. */
+  channelLink?: boolean;
 }
 
 function run(opts: Opts) {
@@ -50,6 +52,7 @@ function run(opts: Opts) {
       menuOpen = false;
     },
   }));
+  const channel = { ...visible, innerText: "Chinese with HuanYu", tagName: "A", getAttribute: (n: string) => (n === "href" ? "/@SherryPeng-ii9vv" : null), click: () => { clicks.push("CHANNEL"); } };
   const toast = {
     style: { cssText: "" },
     appendChild: (child: { href?: string }) => { if (child.href) messages.push(`link:${child.href.slice(0, 40)}`); },
@@ -63,7 +66,7 @@ function run(opts: Opts) {
       if (sel.includes("target-id")) return [{ innerText: "Trong video này" }, ...(panelOpen ? [{ innerText: currentText }] : [])];
       if (sel.startsWith("ytd-transcript-segment")) return segmentsShown ? (opts.segments ?? []).map((innerText) => ({ innerText, ...visible })) : [];
       if (sel.startsWith("yt-dropdown-menu")) return trigger ? [trigger] : [];
-      if (sel.startsWith("tp-yt-paper-item")) return menuOpen ? menuItems : [];
+      if (sel.startsWith("tp-yt-paper-item")) return [...(opts.channelLink ? [channel] : []), ...(menuOpen ? menuItems : [])];
       if (sel.includes("yt-chip-cloud-chip-renderer")) return opts.hasTranscriptTab ? [timelineTab, transcriptTab] : [];
       if (sel.startsWith("ytd-engagement-panel")) return [];
       return opts.hasTranscriptButton && !opts.foreignUi ? [button] : []; // quét theo chữ chỉ tìm thấy nút khi giao diện là ngôn ngữ đã biết
@@ -164,6 +167,18 @@ describe("bookmarklet", () => {
     await vi.advanceTimersByTimeAsync(3000);
     expect(alerts).toEqual([]);
     expect(clicks).toEqual(["trigger", "Chinese (China)"]);
+    expect(payloadOf(opened[0])?.t).toBe(PANEL);
+  });
+
+  it("tên kênh bắt đầu bằng 'Chinese' nằm trước menu trong DOM: không bấm vào liên kết kênh, chọn đúng mục trong menu", async () => {
+    const { opened, alerts, clicks } = run({
+      panelText: "0:00\nHello everyone\n0:05\nWelcome to the show", channelLink: true,
+      langSwitch: { triggerLabel: "English", menuLabels: ["Arabic", "English"], zhLabel: "Chinese (China)", zhText: PANEL },
+    });
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(clicks).not.toContain("CHANNEL");
+    expect(clicks).toEqual(["trigger", "Chinese (China)"]);
+    expect(alerts).toEqual([]);
     expect(payloadOf(opened[0])?.t).toBe(PANEL);
   });
 
