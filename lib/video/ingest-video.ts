@@ -4,7 +4,7 @@ import { withSubwordEntries } from "@/lib/analysis/build-line-pinyin";
 import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
 import { pickBestChineseTrack } from "@/lib/captions/pick-best-chinese-track";
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
-import { isUsableTranslationTrack } from "./align-translation";
+import { isUsableTranslationTrack, straddleShare } from "./align-translation";
 import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines, type PreparedLine } from "./build-lesson-lines";
 import type { LessonStatus, TranslationSource } from "./video-lesson-types";
 import type { VideoMeta } from "./youtube-data-api";
@@ -79,7 +79,7 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
   let prepared = prepareLessonLines(zh, vi);
   if (prepared.length === 0) return { kind: "skipped", reason: "no_lines" };
   let useVi = vi !== null;
-  if (vi && requireGoodTranslationTrack && !isUsableTranslationTrack(prepared.length, vi.length, prepared.filter((l) => l.translation).length)) {
+  if (vi && requireGoodTranslationTrack && !isUsableTranslationTrack(prepared.length, vi.length, prepared.filter((l) => l.translation).length, straddleShare(zh, vi))) {
     prepared = prepareLessonLines(zh, null);
     useVi = false;
   }

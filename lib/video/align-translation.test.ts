@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alignTranslations, isUsableTranslationTrack } from "./align-translation";
+import { alignTranslations, isUsableTranslationTrack, straddleShare } from "./align-translation";
 
 const line = (text: string, start: number, end: number) => ({ text, start, end });
 
@@ -44,5 +44,30 @@ describe("isUsableTranslationTrack", () => {
   it("từ chối khi một trong hai bên rỗng", () => {
     expect(isUsableTranslationTrack(0, 10, 0)).toBe(false);
     expect(isUsableTranslationTrack(10, 0, 0)).toBe(false);
+  });
+});
+
+describe("straddleShare", () => {
+  const zh = [line("甲", 0, 2), line("乙", 2, 4), line("丙", 4, 6), line("丁", 6, 8)];
+  it("hai track cùng cách chia câu thì không có dòng vắt ngang", () => {
+    expect(straddleShare(zh, [line("a", 0, 2), line("b", 2, 4), line("c", 4, 6), line("d", 6, 8)])).toBe(0);
+  });
+  it("dòng dịch nằm gọn trong dòng tiếng Trung (chia nhỏ hơn) vẫn không tính là vắt ngang", () => {
+    expect(straddleShare(zh, [line("a", 0, 1), line("b", 1, 2), line("c", 2, 3), line("d", 3, 4)])).toBe(0);
+  });
+  it("dòng dịch chia câu lệch (nửa nọ nửa kia) là vắt ngang", () => {
+    const shifted = [line("a", 1, 3), line("b", 3, 5), line("c", 5, 7), line("d", 7, 8)];
+    expect(straddleShare(zh, shifted)).toBeGreaterThanOrEqual(0.75);
+  });
+  it("bỏ qua dòng rỗng hoặc không có thời lượng; không có dòng nào thì 0", () => {
+    expect(straddleShare(zh, [line("  ", 0, 2), line("x", 3, 3)])).toBe(0);
+    expect(straddleShare(zh, [])).toBe(0);
+  });
+});
+
+describe("isUsableTranslationTrack với độ vắt ngang", () => {
+  it("track số dòng và độ phủ đạt nhưng vắt ngang nhiều thì bị loại", () => {
+    expect(isUsableTranslationTrack(100, 100, 95, 0.1)).toBe(true);
+    expect(isUsableTranslationTrack(100, 100, 95, 0.4)).toBe(false);
   });
 });

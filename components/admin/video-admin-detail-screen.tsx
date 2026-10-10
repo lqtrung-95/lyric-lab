@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
 import type { AdminTranslationReport } from "@/lib/video/translation-report-repo";
@@ -107,6 +108,7 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
   const [dismissing, setDismissing] = useState<"idle" | "busy" | "error">("idle");
   const [translating, setTranslating] = useState<"idle" | "busy" | "error">("idle");
   const [translateNote, setTranslateNote] = useState<string | null>(null);
+  const [confirmRetranslate, setConfirmRetranslate] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -143,6 +145,22 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
       const fresh = await fetch(`/api/admin/videos/${videoId}`, { cache: "no-store" });
       if (fresh.ok) setLesson((await fresh.json()) as AdminDetail);
       setTranslateNote(`Đã dịch thêm ${result.translated} dòng${result.remaining > 0 ? `, còn ${result.remaining} dòng trống (bấm lại để dịch tiếp)` : ""}.`);
+      setTranslating("idle");
+    } catch {
+      setTranslating("error");
+    }
+  }
+
+  async function retranslateAll() {
+    setTranslating("busy");
+    setTranslateNote(null);
+    try {
+      const res = await fetch(`/api/admin/videos/${videoId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "retranslate_all" }) });
+      if (!res.ok) { setTranslating("error"); return; }
+      const result = (await res.json()) as { replaced: number; remaining: number };
+      const fresh = await fetch(`/api/admin/videos/${videoId}`, { cache: "no-store" });
+      if (fresh.ok) setLesson((await fresh.json()) as AdminDetail);
+      setTranslateNote(`Đã dịch lại ${result.replaced} dòng bằng AI${result.remaining > 0 ? `, còn ${result.remaining} dòng giữ bản cũ (bấm lại để dịch tiếp)` : ""}.`);
       setTranslating("idle");
     } catch {
       setTranslating("error");
@@ -194,6 +212,22 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
           {translating === "error" && <span role="alert" className="text-label-md text-error">Chưa dịch được, thử lại sau nhé.</span>}
         </div>
       )}
+      {lesson.translationSource === "youtube" && (
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" disabled={translating === "busy"} onClick={() => setConfirmRetranslate(true)} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-high px-4 text-label-md font-medium text-on-surface hover:bg-surface-container-highest disabled:opacity-60">
+            {translating === "busy" ? <Spinner size={16} /> : <Icon name="translate" size={18} />}
+            {translating === "busy" ? "AI đang dịch, có thể mất tới một phút…" : "Dịch lại toàn bộ bằng AI"}
+          </button>
+          <span className="text-label-sm text-on-surface-variant">Dùng khi bản dịch lấy từ phụ đề YouTube bị lệch câu. Dòng đã sửa tay được giữ nguyên.</span>
+        </div>
+      )}
+      <ConfirmDialog
+        open={confirmRetranslate} title="Dịch lại toàn bộ bằng AI?"
+        body="Bản dịch hiện tại (lấy từ phụ đề YouTube) sẽ được thay bằng bản AI dịch. Các dòng bạn đã sửa tay được giữ nguyên."
+        confirmLabel="Dịch lại" cancelLabel="Hủy"
+        onCancel={() => setConfirmRetranslate(false)}
+        onConfirm={() => { setConfirmRetranslate(false); void retranslateAll(); }}
+      />
       {translateNote && <p role="status" className="text-label-md text-on-surface-variant">{translateNote}</p>}
       <label className="inline-flex min-h-11 items-center gap-2 text-label-md text-on-surface">
         <input type="checkbox" checked={onlyMissing} onChange={(e) => setOnlyMissing(e.target.checked)} className="h-5 w-5 accent-primary" />

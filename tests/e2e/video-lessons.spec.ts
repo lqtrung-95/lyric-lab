@@ -466,6 +466,34 @@ test("quản trị video: dịch bù các dòng còn thiếu bằng AI rồi t�
   await expect(page.getByRole("button", { name: /Dịch .* dòng còn thiếu bằng AI/ })).toHaveCount(0);
 });
 
+test("quản trị video: video dùng bản dịch YouTube có nút dịch lại toàn bộ bằng AI, hỏi xác nhận rồi tải lại bản dịch", async ({ page }) => {
+  const patches: unknown[] = [];
+  let retranslated = false;
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route(`**/api/admin/videos/${VIDEO_ID}`, async (route) => {
+    if (route.request().method() === "PATCH") {
+      patches.push(route.request().postDataJSON());
+      retranslated = true;
+      return route.fulfill({ json: { done: "retranslate_all", replaced: 3, remaining: 0 } });
+    }
+    const lines = lesson.lines.map((l) => (retranslated ? { ...l, translation: `AI dịch ${l.idx}`, translationBy: "ai" } : l));
+    return route.fulfill({ json: { ...adminSummary, translationSource: retranslated ? "ai" : "youtube", lines, reports: [] } });
+  });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/admin/videos/${VIDEO_ID}`);
+  const button = page.getByRole("button", { name: "Dịch lại toàn bộ bằng AI" });
+  await button.click();
+  const dialog = page.getByRole("dialog", { name: "Dịch lại toàn bộ bằng AI?" });
+  await dialog.getByRole("button", { name: "Hủy" }).click();
+  expect(patches).toEqual([]); // hủy thì không làm gì
+  await button.click();
+  await dialog.getByRole("button", { name: "Dịch lại" }).click();
+  await expect(page.getByText("Đã dịch lại 3 dòng bằng AI")).toBeVisible();
+  expect(patches).toEqual([{ action: "retranslate_all" }]);
+  await expect(page.getByLabel("Bản dịch dòng 1")).toHaveValue("AI dịch 0");
+  await expect(page.getByRole("button", { name: "Dịch lại toàn bộ bằng AI" })).toHaveCount(0); // đã là bản AI
+});
+
 test.describe("báo cả video sai", () => {
   async function openMenu(page: Page, respond: { status?: number; json: unknown }) {
     await mockVideoApis(page);

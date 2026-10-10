@@ -31,9 +31,30 @@ export function alignTranslations(zh: CaptionLine[], vi: CaptionLine[]): (string
 export const MIN_LINE_COUNT_RATIO = 0.5;
 export const MAX_LINE_COUNT_RATIO = 2;
 export const MIN_ALIGNED_SHARE = 0.7;
+/** Một dòng dịch coi là "vắt ngang" khi dưới chừng này thời lượng của nó nằm trong dòng tiếng Trung khớp nhất (nó chia câu khác hẳn track tiếng Trung). */
+export const STRADDLE_MIN_FIT = 0.6;
+/** Quá chừng này số dòng dịch vắt ngang thì bản ghép là các mẩu câu lệch chỗ (vd. "Đừng" / "bận tâm, thế thôi"), tệ hơn dịch máy cả bài. */
+export const MAX_STRADDLE_SHARE = 0.25;
 
-export function isUsableTranslationTrack(zhLineCount: number, viLineCount: number, alignedCount: number): boolean {
+/**
+ * Tỉ lệ dòng dịch vắt ngang nhiều dòng tiếng Trung. Hai track cùng người làm thì cùng cách chia câu nên gần 0; track tiếng Việt do YouTube dịch tự động từ phụ đề
+ * tự động thường chia câu theo cách khác: số dòng và độ phủ vẫn "đạt" nhưng từng dòng ghép ra thiếu hoặc thừa nửa câu.
+ */
+export function straddleShare(zh: CaptionLine[], vi: CaptionLine[]): number {
+  let total = 0;
+  let straddling = 0;
+  for (const v of vi) {
+    const duration = v.end - v.start;
+    if (!v.text.trim() || duration <= 0) continue;
+    total++;
+    const best = zh.reduce((max, z) => Math.max(max, overlap(z, v)), 0);
+    if (best / duration < STRADDLE_MIN_FIT) straddling++;
+  }
+  return total === 0 ? 0 : straddling / total;
+}
+
+export function isUsableTranslationTrack(zhLineCount: number, viLineCount: number, alignedCount: number, straddle = 0): boolean {
   if (zhLineCount === 0 || viLineCount === 0) return false;
   const ratio = viLineCount / zhLineCount;
-  return ratio >= MIN_LINE_COUNT_RATIO && ratio <= MAX_LINE_COUNT_RATIO && alignedCount / zhLineCount >= MIN_ALIGNED_SHARE;
+  return ratio >= MIN_LINE_COUNT_RATIO && ratio <= MAX_LINE_COUNT_RATIO && alignedCount / zhLineCount >= MIN_ALIGNED_SHARE && straddle <= MAX_STRADDLE_SHARE;
 }
