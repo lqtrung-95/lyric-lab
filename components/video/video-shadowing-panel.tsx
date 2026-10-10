@@ -7,6 +7,8 @@ import { dictationLines } from "@/lib/video/dictation";
 import { lessonLinesToAnalyzed } from "@/lib/video/lesson-to-lines";
 import { TONE_TEXT_CLASS, toneOfSyllable } from "@/lib/video/pinyin-tone";
 import type { LessonDetail } from "@/lib/video/video-repo";
+import { ClipAdjustControls } from "./clip-adjust-controls";
+import { useClipAdjust } from "./use-clip-adjust";
 import { ShadowingAttempts } from "./shadowing-attempts";
 import { useShadowingTurn } from "./use-shadowing-turn";
 import { useVoiceFeedback } from "./use-voice-feedback";
@@ -26,7 +28,8 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
   const [slow, setSlow] = useState(false);
   const [hidden, setHidden] = useState<Set<Layer>>(new Set());
   const raw = lessonLines[position];
-  const turn = useShadowingTurn(controller, raw, slow);
+  const clipAdjust = useClipAdjust(lesson.videoId);
+  const turn = useShadowingTurn(controller, raw, slow, raw ? clipAdjust.get(raw.idx) : undefined);
   const voice = useVoiceFeedback(lesson.videoId);
   const line = lines[position];
   const toggleLayer = (l: Layer) => setHidden((h) => { const n = new Set(h); if (n.has(l)) n.delete(l); else n.add(l); return n; });
@@ -67,7 +70,7 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
         <button type="button" onClick={turn.runTurn} disabled={busy || !controller} className="min-h-14 rounded-2xl bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
           {turn.phase === "listening" ? "Đang phát mẫu…" : turn.phase === "recording" ? "Đang ghi…" : "Bắt đầu lượt"}
         </button>
-        <button type="button" onClick={turn.listen} disabled={turn.phase === "recording" || !controller} className={secondary}>Nghe mẫu</button>
+        <button type="button" onClick={() => turn.listen()} disabled={turn.phase === "recording" || !controller} className={secondary}>Nghe mẫu</button>
         {turn.phase === "recording" ? (
           <button type="button" onClick={() => void turn.stopRecording()} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-error-container px-4 text-label-md font-semibold text-on-error-container">
             <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-error" /> Dừng{turn.countdown > 0 && ` (${turn.countdown}s)`}
@@ -80,6 +83,7 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
         <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface"><input type="checkbox" checked={turn.loop} onChange={(e) => turn.setLoop(e.target.checked)} className="h-4 w-4 accent-primary" />Lặp mẫu</label>
         <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface"><input type="checkbox" checked={slow} onChange={(e) => setSlow(e.target.checked)} className="h-4 w-4 accent-primary" />Chậm 0,75×</label>
       </div>
+      <ClipAdjustControls adjust={clipAdjust.get(raw.idx)} onNudge={(edge, delta) => turn.listen(clipAdjust.nudge(raw.idx, edge, delta))} onReset={() => turn.listen(clipAdjust.reset(raw.idx))} />
       <p className="text-label-md text-on-surface-variant">&ldquo;Bắt đầu lượt&rdquo;: phát câu mẫu, xong tự ghi âm giọng bạn. Nói đè theo (shadow) hoặc nói ngay sau khi mẫu dừng.</p>
 
       {turn.micError && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{turn.micError}</p>}

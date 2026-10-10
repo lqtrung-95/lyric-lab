@@ -10,6 +10,9 @@ import { submitVideoStudy } from "@/lib/practice/submit-video-study";
 import { DictationFeedback } from "./dictation-feedback";
 import { DictationProgressGrid } from "./dictation-progress-grid";
 import { DictationSummary } from "./dictation-summary";
+import { clipRange } from "@/lib/video/clip-range";
+import { ClipAdjustControls } from "./clip-adjust-controls";
+import { useClipAdjust } from "./use-clip-adjust";
 import { useLineClip } from "./use-line-clip";
 
 type HintLevel = "none" | "count" | "pinyin";
@@ -34,6 +37,7 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
   const lines = useMemo(() => dictationLines(lesson.lines), [lesson.lines]);
   const lineIdxs = useMemo(() => lines.map((l) => l.idx), [lines]);
   const clip = useLineClip(controller);
+  const adjust = useClipAdjust(lesson.videoId);
   const [progress, setProgress] = useState<DictationProgress>(emptyDictationProgress);
   const [position, setPosition] = useState(0);
   const [typed, setTyped] = useState("");
@@ -65,8 +69,16 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
   const listen = useCallback(() => {
     if (!line) return;
     setPlays((n) => n + 1);
-    clip.play(line.start, line.end, slow ? SLOW_RATE : 1);
-  }, [clip, line, slow]);
+    const r = clipRange(line, adjust.get(line.idx));
+    clip.play(r.start, r.end, slow ? SLOW_RATE : 1);
+  }, [adjust, clip, line, slow]);
+
+  /** Chỉnh đầu/cuối đoạn rồi phát lại ngay đoạn vừa chỉnh để nghe thử. */
+  const nudgeClip = (edge: "start" | "end", delta: number) => {
+    if (!line) return;
+    const r = clipRange(line, adjust.nudge(line.idx, edge, delta));
+    clip.play(r.start, r.end, slow ? SLOW_RATE : 1);
+  };
 
   function resetAnswer() { setTyped(""); setChecked(null); setPlays(0); }
 
@@ -87,7 +99,8 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
     // Phát luôn câu kế: người dùng vừa bấm nên trình duyệt cho phép tự phát.
     const nextLine = lines[position + 1];
     setPlays(1);
-    clip.play(nextLine.start, nextLine.end, slow ? SLOW_RATE : 1);
+    const r = clipRange(nextLine, adjust.get(nextLine.idx));
+    clip.play(r.start, r.end, slow ? SLOW_RATE : 1);
     inputRef.current?.focus();
   }
 
@@ -145,6 +158,7 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
               ))}
             </div>
           </div>
+          {line && <ClipAdjustControls adjust={adjust.get(line.idx)} onNudge={nudgeClip} onReset={() => { adjust.reset(line.idx); listen(); }} />}
           {hint !== "none" && !checked && line && (
             <p role="status" className="text-label-md text-on-surface-variant">
               {hint === "count" ? `${hanCount} chữ Hán` : <>Pinyin: <span className="font-medium text-on-surface">{expectedUnits(line, "pinyin").join(" ")}</span></>}

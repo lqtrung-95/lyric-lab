@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { PlayerController } from "@/components/player/use-youtube-player";
 import { submitVideoStudy } from "@/lib/practice/submit-video-study";
 import { recognitionSupported, startMicRecording, startRecognition, type MicRecording } from "@/lib/practice/mic-recording";
+import { clipRange, NO_ADJUST, type ClipAdjust } from "@/lib/video/clip-range";
 import { compareDictation, type DictationResult } from "@/lib/video/dictation";
 import type { LessonLine } from "@/lib/video/video-lesson-types";
 import { useLineClip } from "./use-line-clip";
@@ -32,7 +33,7 @@ const TAIL_SECONDS = 1.5;
  * Một lượt luyện nói theo câu của video: nghe mẫu rồi tự ghi âm giọng người học ("Bắt đầu lượt"), hoặc nghe mẫu / ghi âm riêng lẻ, rồi nghe lại
  * giọng mình và so với mẫu. Có nhận dạng giọng nói (Chrome/Edge) thì chấm sơ bộ theo số chữ Hán nghe đúng. Ghi âm chỉ giữ trong trình duyệt.
  */
-export function useShadowingTurn(controller: PlayerController | null, line: LessonLine | undefined, slow: boolean) {
+export function useShadowingTurn(controller: PlayerController | null, line: LessonLine | undefined, slow: boolean, adjust: ClipAdjust = NO_ADJUST) {
   const clip = useLineClip(controller);
   const [phase, setPhase] = useState<ShadowPhase>("idle");
   const [loop, setLoop] = useState(false);
@@ -109,15 +110,18 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
   const runTurn = useCallback(() => {
     if (!line) return;
     setPhase("listening");
-    clip.play(line.start, line.end, rate, () => void beginRecording((line.end - line.start) / rate + TAIL_SECONDS));
-  }, [beginRecording, clip, line, rate]);
+    const r = clipRange(line, adjust);
+    clip.play(r.start, r.end, rate, () => void beginRecording((r.end - r.start) / rate + TAIL_SECONDS));
+  }, [adjust, beginRecording, clip, line, rate]);
 
-  const listen = useCallback(() => {
+  /** Nghe mẫu; `override` là phần chỉnh vừa đổi (state chưa kịp cập nhật trong cùng lượt bấm). */
+  const listen = useCallback((override?: ClipAdjust) => {
     if (!line) return;
     setPhase("idle");
-    const again = () => clip.play(line.start, line.end, rate, () => { if (loopRef.current) again(); });
+    const r = clipRange(line, override ?? adjust);
+    const again = () => clip.play(r.start, r.end, rate, () => { if (loopRef.current) again(); });
     again();
-  }, [clip, line, rate]);
+  }, [adjust, clip, line, rate]);
 
   const playMine = useCallback((url: string, after?: () => void) => {
     audio.current?.pause();
@@ -130,8 +134,9 @@ export function useShadowingTurn(controller: PlayerController | null, line: Less
   /** Nghe mẫu rồi nghe giọng mình ngay sau đó để so sánh. */
   const compare = useCallback((url: string) => {
     if (!line) return;
-    clip.play(line.start, line.end, rate, () => setTimeout(() => playMine(url), 300));
-  }, [clip, line, playMine, rate]);
+    const r = clipRange(line, adjust);
+    clip.play(r.start, r.end, rate, () => setTimeout(() => playMine(url), 300));
+  }, [adjust, clip, line, playMine, rate]);
 
   /** Dừng mọi thứ đang chạy (khi sang câu khác hoặc rời tab). */
   const stopAll = useCallback(() => {
