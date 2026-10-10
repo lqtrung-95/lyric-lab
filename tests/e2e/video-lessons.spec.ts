@@ -287,13 +287,12 @@ test("chép chính tả: nghe câu, gõ pinyin, kiểm tra từng âm tiết, l�
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}").scores)).toEqual({});
 });
 
-test("chép chính tả: cùng một ô nhận chữ Hán (chấm từng chữ), gợi ý ba mức, lưới tiến độ nhảy tới câu bất kỳ", async ({ page }) => {
+test("chép chính tả: cùng một ô nhận chữ Hán (chấm từng chữ), gợi ý pinyin, lưới tiến độ nhảy tới câu bất kỳ", async ({ page }) => {
   await mockVideoApis(page);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`/video/${VIDEO_ID}/dictation`);
 
-  await page.getByRole("radio", { name: "Số chữ" }).check({ force: true });
-  await expect(page.getByText("4 chữ Hán")).toBeVisible();
+  await expect(page.getByText("Cần điền 4 chữ Hán")).toBeVisible(); // luôn hiện số chữ cần điền, không cần chọn gợi ý
   await page.getByRole("radio", { name: "Pinyin" }).check({ force: true });
   await expect(page.getByText(/Pinyin:.*nǐ hǎo/)).toBeVisible();
 

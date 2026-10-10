@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PlayerController } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
-import { compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
+import { answerSlots, compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
 import { dictationKey, emptyDictationProgress, firstUndone, parseDictationProgress, summarizeProgress, withScore, type DictationProgress } from "@/lib/video/dictation-progress";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { submitVideoStudy } from "@/lib/practice/submit-video-study";
@@ -11,12 +11,13 @@ import { DictationFeedback } from "./dictation-feedback";
 import { DictationProgressGrid } from "./dictation-progress-grid";
 import { DictationSummary } from "./dictation-summary";
 import { clipRange } from "@/lib/video/clip-range";
+import { DictationSlots } from "./dictation-slots";
 import { ClipAdjustControls } from "./clip-adjust-controls";
 import { useClipAdjust } from "./use-clip-adjust";
 import { useLineClip } from "./use-line-clip";
 
-type HintLevel = "none" | "count" | "pinyin";
-const HINTS: { id: HintLevel; label: string }[] = [{ id: "none", label: "Không gợi ý" }, { id: "count", label: "Số chữ" }, { id: "pinyin", label: "Pinyin" }];
+type HintLevel = "none" | "pinyin";
+const HINTS: { id: HintLevel; label: string }[] = [{ id: "none", label: "Không gợi ý" }, { id: "pinyin", label: "Pinyin" }];
 const SLOW_RATE = 0.75;
 const secondary = "min-h-11 rounded-full border border-outline-variant px-4 text-label-md font-medium text-on-surface hover:bg-surface-container disabled:opacity-50";
 
@@ -128,7 +129,6 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
   }
 
   const stats = summarizeProgress(lineIdxs, progress);
-  const hanCount = line ? expectedUnits(line, "hanzi").length : 0;
   return (
     <div className="flex flex-col gap-space-md">
       {summary ? (
@@ -159,10 +159,9 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
             </div>
           </div>
           {line && <ClipAdjustControls adjust={adjust.get(line.idx)} onNudge={nudgeClip} onReset={() => { adjust.reset(line.idx); listen(); }} />}
-          {hint !== "none" && !checked && line && (
-            <p role="status" className="text-label-md text-on-surface-variant">
-              {hint === "count" ? `${hanCount} chữ Hán` : <>Pinyin: <span className="font-medium text-on-surface">{expectedUnits(line, "pinyin").join(" ")}</span></>}
-            </p>
+          {!checked && line && <DictationSlots slots={answerSlots(line)} />}
+          {hint === "pinyin" && !checked && line && (
+            <p role="status" className="text-label-md text-on-surface-variant">Pinyin: <span className="font-medium text-on-surface">{expectedUnits(line, "pinyin").join(" ")}</span></p>
           )}
           <form onSubmit={(e) => { e.preventDefault(); if (checked) next(); else check(); }} className="space-y-space-sm">
             <label htmlFor="dictation-input" className="sr-only">Gõ lại câu bạn nghe được, bằng chữ Hán hoặc pinyin</label>
