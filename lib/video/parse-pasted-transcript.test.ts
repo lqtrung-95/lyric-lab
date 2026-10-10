@@ -35,7 +35,7 @@ describe("parsePastedTranscript", () => {
   });
 
   it("bỏ nhãn đọc to của mốc giờ mà YouTube chèn vào (mọi ngôn ngữ), giữ lời", () => {
-    const panel = "0:00\n0 seconds\n大家好\n25:57\n25 minutes, 57 seconds\n但是我觉得我做得越来越好了\n1:02:03\n1 giờ 2 phút 3 giây\n再见\n10:00\n10分\n结束";
+    const panel = "0:00\n0 seconds\n大家好\n25:57\n25 minutes, 57 seconds\n但是我觉得我做得越来越好了\n1:02:03\n1 giờ 2 phút 3 giây\n再见\n1:10:00\n1 giờ 10 phút\n结束";
     expect(parsePastedTranscript(panel, 4000).map((l) => l.text)).toEqual(["大家好", "但是我觉得我做得越来越好了", "再见", "结束"]);
   });
 
@@ -54,5 +54,18 @@ describe("parsePastedTranscript", () => {
     const lines = parsePastedTranscript(`0:00\n${long}\n0:05\n`);
     expect(lines).toHaveLength(1);
     expect(lines[0].text).toHaveLength(300);
+  });
+
+  it("vài dòng cuối nằm đầu bản chép (thứ tự trang YouTube sai): sắp lại theo mốc giờ, mốc kết thúc tính theo dòng kế tiếp", () => {
+    const panel = "10:31\n在中超买了一些食材\n10:34\n又去买了零食\n0:23\n早上好我是佳佳\n0:28\n我刚刚送了女儿\n9:59\n好现在出发吧\n10:50\n赶紧把菜放进冰箱\n";
+    const lines = parsePastedTranscript(panel, 700);
+    expect(lines.map((l) => l.text)).toEqual(["早上好我是佳佳", "我刚刚送了女儿", "好现在出发吧", "在中超买了一些食材", "又去买了零食", "赶紧把菜放进冰箱"]);
+    expect(lines.find((l) => l.text === "好现在出发吧")).toMatchObject({ start: 599, end: 631 });
+    for (let i = 1; i < lines.length; i++) expect(lines[i].start).toBeGreaterThanOrEqual(lines[i - 1].end - 1e-9);
+  });
+
+  it("bản chép bị lặp cả lượt thì cắt phần lặp, không bị trộn lẫn khi sắp xếp", () => {
+    const pass = "0:00\n你好大家\n0:05\n我是小明\n0:10\n很高兴认识你\n0:15\n再见\n";
+    expect(parsePastedTranscript(pass + pass, 60).map((l) => l.text)).toEqual(["你好大家", "我是小明", "很高兴认识你", "再见"]);
   });
 });

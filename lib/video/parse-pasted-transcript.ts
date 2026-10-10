@@ -1,3 +1,4 @@
+import { dropRepeatedPass } from "./drop-repeated-pass";
 import type { CaptionLine } from "@/lib/captions/caption-provider-types";
 
 // Đọc phụ đề người dùng dán vào ô "Thêm video": file SRT/VTT, hoặc văn bản copy từ bảng "Bản chép lời" của YouTube (mốc giờ một dòng, lời ở dòng sau,
@@ -62,7 +63,11 @@ function parsePanel(rows: string[], durationSec: number | undefined): CaptionLin
     const last = entries.at(-1);
     if (last) last.text = `${last.text} ${row}`.trim();
   }
-  const filled = entries.map((e) => ({ ...e, text: clean(e.text) })).filter((e) => e.text);
+  // Thứ tự các dòng trong trang YouTube không phải lúc nào cũng theo mốc giờ (từng thấy vài dòng cuối video nằm đầu danh sách làm lệch cả bản chép):
+  // bỏ bản lặp trước (lặp thì mốc giờ lùi về 0, sắp xếp sẽ trộn lẫn hai lượt), rồi sắp xếp theo mốc giờ và mới tính mốc kết thúc từ dòng kế tiếp.
+  const cleaned = entries.map((e) => ({ ...e, text: clean(e.text) })).filter((e) => e.text);
+  const kept = dropRepeatedPass(cleaned.map((e) => ({ ...e, end: e.start }))).length;
+  const filled = cleaned.slice(0, kept).sort((a, b) => a.start - b.start);
   return filled.map((e, i) => {
     const next = filled[i + 1]?.start;
     const cap = durationSec !== undefined ? Math.min(e.start + LAST_LINE_SECONDS, durationSec) : e.start + LAST_LINE_SECONDS;
