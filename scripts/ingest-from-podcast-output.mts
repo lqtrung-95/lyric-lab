@@ -1,5 +1,5 @@
 // Nạp video của kênh mình từ file phụ đề (.srt) do công cụ làm podcast xuất ra, thay cho việc tải phụ đề từ YouTube (bị chặn IP).
-// Mỗi tập có <tên>.zh.srt + <tên>.vi.srt (cùng mốc thời gian với video đã đăng); tiêu đề lấy từ <tên>_script.json (nếu có) để ghép với video trên kênh,
+// Mỗi tập có <tên>.zh.srt (chỉ file tiếng Trung được dùng; <tên>.vi.srt bị bỏ qua, bản dịch do AI làm sau ở /admin/videos/<id>) (cùng mốc thời gian với video đã đăng); tiêu đề lấy từ <tên>_script.json (nếu có) để ghép với video trên kênh,
 // không ghép được thì ghép theo thời lượng. Chỉ đọc file .srt và _script.json, KHÔNG đọc .env hay client_secret.json trong thư mục đó.
 // Dùng Data API cho thông tin video; không tải audio/video. Mặc định chỉ xem (dry-run); --apply để ghi DB (trạng thái draft); --refresh để làm mới video đã có.
 //   NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-from-podcast-output.mts --dir "/đường/dẫn/podcast_tool/output" [--handle ChineseGlow] [--apply] [--refresh]

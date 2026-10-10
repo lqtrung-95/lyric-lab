@@ -55,12 +55,12 @@ describe.skipIf(!(url && serviceKey))("nạp video luyện nghe (nguồn phụ �
     await sb.from("video_sources").delete().eq("youtube_ref", CHANNEL);
   });
 
-  it("nạp video có phụ đề tiếng Trung và tiếng Việt: vào nháp, dịch ghép đủ, có pinyin và level", async () => {
+  it("nạp video có phụ đề tiếng Trung và tiếng Việt: vào nháp, có pinyin và level, track tiếng Việt bị bỏ qua (bản dịch do AI, chưa có)", async () => {
     const outcome = await ingestVideo(deps(), { meta: meta(ids.ok), sourceId });
-    expect(outcome).toMatchObject({ kind: "ingested", lineCount: 2, translatedLineCount: 2, refreshed: false });
+    expect(outcome).toMatchObject({ kind: "ingested", lineCount: 2, translatedLineCount: 0, refreshed: false });
     const { data } = await sb.from("video_lessons").select("status, translation_source, source_id, lines").eq("video_id", ids.ok).single();
-    expect(data).toMatchObject({ status: "draft", translation_source: "youtube", source_id: sourceId });
-    expect((data!.lines as { pinyin: string; translation: string }[])[0]).toMatchObject({ pinyin: expect.stringContaining("nǐ"), translation: "Xin chào, bạn bè." });
+    expect(data).toMatchObject({ status: "draft", translation_source: "none", source_id: sourceId });
+    expect((data!.lines as { pinyin: string; translation: string | null }[])[0]).toMatchObject({ pinyin: expect.stringContaining("nǐ"), translation: null });
   });
 
   it("chạy lại thì bỏ qua video đã có; --refresh làm mới nhưng giữ nguyên trạng thái đã duyệt", async () => {
@@ -70,7 +70,7 @@ describe.skipIf(!(url && serviceKey))("nạp video luyện nghe (nguồn phụ �
     expect((await sb.from("video_lessons").select("status").eq("video_id", ids.ok).single()).data?.status).toBe("listed");
   });
 
-  it("thiếu track tiếng Việt vẫn nạp được nhưng không có bản dịch", async () => {
+  it("video không có track tiếng Việt cũng nạp như nhau, chưa có bản dịch", async () => {
     expect(await ingestVideo(deps(), { meta: meta(ids.noVi), sourceId })).toMatchObject({ kind: "ingested", translatedLineCount: 0 });
     expect((await sb.from("video_lessons").select("translation_source").eq("video_id", ids.noVi).single()).data?.translation_source).toBe("none");
   });

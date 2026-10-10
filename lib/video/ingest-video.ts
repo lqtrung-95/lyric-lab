@@ -4,7 +4,6 @@ import { withSubwordEntries } from "@/lib/analysis/build-line-pinyin";
 import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
 import { pickBestChineseTrack } from "@/lib/captions/pick-best-chinese-track";
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
-import { isUsableTranslationTrack, straddleShare } from "./align-translation";
 import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines, type PreparedLine } from "./build-lesson-lines";
 import type { LessonStatus, TranslationSource } from "./video-lesson-types";
 import type { VideoMeta } from "./youtube-data-api";
@@ -50,11 +49,9 @@ export interface IngestInput {
   /** Người thêm (video người dùng tự thêm); null với video admin nạp. */
   addedBy?: string | null;
   /**
-   * Chỉ dùng track tiếng Việt khi ghép đủ tốt (`isUsableTranslationTrack`); lệch dòng thì bỏ cả track thay vì giữ bản dịch lệch. Video người dùng thêm bật cờ này;
-   * đường của admin để tắt (admin rà tay các dòng lệch).
+   * Dịch các dòng chưa có bản dịch bằng LLM; trả cùng số dòng, dòng dịch không được thì để null. Bản dịch KHÔNG lấy từ phụ đề tiếng Việt của YouTube (hay chia câu lệch với
+   * tiếng Trung và là bản dịch tự động nên ghép vào ra bản dịch sai); không truyền hàm này thì video vào với `translation_source = none`.
    */
-  requireGoodTranslationTrack?: boolean;
-  /** Dịch các dòng còn chưa có bản dịch (ví dụ bằng LLM) sau khi ghép track tiếng Việt (nếu có); trả cùng số dòng, dòng dịch không được thì để null. */
   translateMissing?: (lines: PreparedLine[]) => Promise<PreparedLine[]>;
 }
 
@@ -64,7 +61,7 @@ export interface IngestInput {
  */
 export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise<IngestOutcome> {
   const { sb, provider, lookup } = deps;
-  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, requireGoodTranslationTrack = false, translateMissing } = input;
+  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, translateMissing } = input;
   if (!meta.embeddable) return { kind: "skipped", reason: "not_embeddable" };
   const exists = (await existingVideoIds(sb, [meta.videoId])).has(meta.videoId);
   if (exists && !refresh) return { kind: "skipped", reason: "exists" };
@@ -72,26 +69,18 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
   const tracks = await provider.listTracks(meta.videoId);
   const zhTrack = pickBestChineseTrack(tracks);
   if (!zhTrack || zhTrack.kind !== "manual") return { kind: "skipped", reason: "no_human_zh_captions" };
-  const viTrack = tracks.find((t) => t.lang.toLowerCase().startsWith("vi") && t.kind === "manual") ?? null;
   const zh = dropRepeatedPass(await provider.fetchLines(meta.videoId, zhTrack));
-  const vi = viTrack ? dropRepeatedPass(await provider.fetchLines(meta.videoId, viTrack)) : null;
 
-  let prepared = prepareLessonLines(zh, vi);
+  let prepared = prepareLessonLines(zh);
   if (prepared.length === 0) return { kind: "skipped", reason: "no_lines" };
-  let useVi = vi !== null;
-  if (vi && requireGoodTranslationTrack && !isUsableTranslationTrack(prepared.length, vi.length, prepared.filter((l) => l.translation).length, straddleShare(zh, vi))) {
-    prepared = prepareLessonLines(zh, null);
-    useVi = false;
-  }
-  // Có track tiếng Việt thì dùng nó; vẫn nhờ nơi gọi dịch những dòng còn thiếu (không ghép được dòng nào thì không tốn lượt gọi).
-  if (translateMissing && prepared.some((l) => !l.translation)) prepared = await translateMissing(prepared);
+  if (translateMissing) prepared = await translateMissing(prepared);
   const terms = termsToLookUp(prepared);
   const dictionary = await withSubwordEntries(lookup, await lookup(terms), terms);
   const lines = toLessonLines(prepared, dictionary);
   const translatedLineCount = lines.filter((l) => l.translation).length;
   const levelAvg = averageLessonLevel(prepared, dictionary);
 
-  const translationSource: TranslationSource = useVi ? "youtube" : translateMissing && translatedLineCount > 0 ? "ai" : "none";
+  const translationSource: TranslationSource = translateMissing && translatedLineCount > 0 ? "ai" : "none";
   const row = {
     video_id: meta.videoId, source_id: sourceId, title: meta.title, channel_title: meta.channelTitle, duration_sec: meta.durationSec, level_avg: levelAvg,
     translation_source: translationSource, line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),

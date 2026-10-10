@@ -200,34 +200,14 @@ describe("bookmarklet", () => {
     viLabel: "Vietnamese", viText: "0:00\nXin chào mọi người\n0:05\nChào mừng bạn đến với chương trình", ...extra,
   });
 
-  it("video có phụ đề tiếng Việt do người làm: chuyển sang tiếng Việt, đọc rồi gửi kèm cả hai bản", async () => {
-    const { opened, alerts, clicks } = run({ panelText: PANEL, trackCodes: ["zh-CN", "vi"], langSwitch: viSwitch() });
-    await vi.advanceTimersByTimeAsync(4000);
-    expect(alerts).toEqual([]);
-    expect(clicks).toEqual(["trigger", "Vietnamese"]);
-    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL, vt: "0:00\nXin chào mọi người\n0:05\nChào mừng bạn đến với chương trình" });
-  });
-
-  it("track tiếng Việt chỉ là phụ đề tự động (asr) hoặc không có: không chuyển ngôn ngữ, gửi riêng tiếng Trung", async () => {
-    for (const trackCodes of [["zh-CN", { code: "vi", kind: "asr" }], ["zh-CN", "en"]]) {
-      const { opened, clicks } = run({ panelText: PANEL, trackCodes, langSwitch: viSwitch() });
-      await vi.advanceTimersByTimeAsync(2000);
-      expect(clicks).toEqual([]);
+  it("video có cả phụ đề tiếng Việt: KHÔNG chuyển sang tiếng Việt, chỉ gửi tiếng Trung (bản dịch luôn do AI)", async () => {
+    for (const trackCodes of [["zh-CN", "vi"], ["zh-CN", { code: "vi", kind: "asr" }], ["zh-CN", "en"]]) {
+      const { opened, alerts, clicks } = run({ panelText: PANEL, trackCodes, langSwitch: viSwitch() });
+      await vi.advanceTimersByTimeAsync(4000);
+      expect(alerts).toEqual([]);
+      expect(clicks).toEqual([]); // không mở ô chọn ngôn ngữ, không bấm mục Vietnamese
       expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
     }
-  });
-
-  it("không chuyển được sang tiếng Việt (không có mục) thì vẫn gửi tiếng Trung, không lỗi", async () => {
-    const { opened, alerts } = run({ panelText: PANEL, trackCodes: ["zh-CN", "vi"], langSwitch: viSwitch({ viLabel: undefined }) });
-    await vi.advanceTimersByTimeAsync(4000);
-    expect(alerts).toEqual([]);
-    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
-  });
-
-  it("bản đọc được sau khi chọn tiếng Việt vẫn toàn chữ Hán (chọn nhầm) thì bỏ, gửi riêng tiếng Trung", async () => {
-    const { opened } = run({ panelText: PANEL, trackCodes: ["zh-CN", "vi"], langSwitch: viSwitch({ viText: PANEL }) });
-    await vi.advanceTimersByTimeAsync(12_000);
-    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
   });
 
   it("video không có track tiếng Trung thì báo ngay, không mở bảng", () => {
@@ -273,9 +253,9 @@ describe("decodeBookmarkletHash", () => {
     }
   });
 
-  it("nhận bản tiếng Việt kèm theo, bỏ qua nếu sai kiểu", () => {
+  it("dấu trang cũ còn gửi phụ đề tiếng Việt (vt): bị bỏ qua, chỉ giữ v và t", () => {
     const enc = (p: object) => `#d=${Buffer.from(JSON.stringify(p)).toString("base64url")}`;
-    expect(decodeBookmarkletHash(enc({ v: "abcdefghijk", t: "x", vt: "y" }))).toEqual({ v: "abcdefghijk", t: "x", vt: "y" });
+    expect(decodeBookmarkletHash(enc({ v: "abcdefghijk", t: "x", vt: "y" }))).toEqual({ v: "abcdefghijk", t: "x" });
     expect(decodeBookmarkletHash(enc({ v: "abcdefghijk", t: "x", vt: 5 }))).toEqual({ v: "abcdefghijk", t: "x" });
   });
 });

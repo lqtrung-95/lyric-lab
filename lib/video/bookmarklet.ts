@@ -5,13 +5,12 @@
 // vì thiếu mã xác thực mà chỉ trình phát của YouTube có.
 
 /**
- * Dữ liệu bookmarklet gửi: `t` là văn bản bản chép lời tiếng Trung đọc từ bảng của YouTube (mốc giờ và lời, parse bằng `parsePastedTranscript`);
- * `vt` (nếu có) là bản chép lời tiếng Việt của track phụ đề tiếng Việt do người làm, để ghép làm bản dịch thay vì nhờ AI.
+ * Dữ liệu bookmarklet gửi: `t` là văn bản bản chép lời tiếng Trung đọc từ bảng của YouTube (mốc giờ và lời, parse bằng `parsePastedTranscript`).
+ * Không gửi phụ đề tiếng Việt: bản dịch luôn do AI (track tiếng Việt của YouTube hay chia câu lệch và là bản dịch tự động). Dấu trang cũ có thể còn gửi `vt`, bị bỏ qua.
  */
 export interface BookmarkletPayload {
   v: string;
   t: string;
-  vt?: string;
 }
 
 // ES5 thuần để chạy được ở mọi trình duyệt; mỗi lệnh kết thúc bằng dấu chấm phẩy vì mã bị nén về một dòng. Chỉ dùng textContent/createElement (YouTube
@@ -80,12 +79,6 @@ var u0=location.href;it.click();
 var n=0;(function w(){if(location.href!==u0){moved=true;done(false);return;}var t=readPanel();if(t&&accept(t)){done(t);return;}n++;if(n>10){done(false);return;}setTimeout(w,500);})();
 },500);
 }
-function humanVi(){try{var tr=document.getElementById('movie_player').getPlayerResponse().captions.playerCaptionsTracklistRenderer.captionTracks;for(var i=0;i<tr.length;i++){if(/^vi/i.test(tr[i].languageCode)&&tr[i].kind!=='asr'){return true;}}}catch(e){}return false;}
-function withVi(t){
-if(!humanVi()){go({v:id,t:t});return;}
-say('SongHanzi: đang đọc phụ đề tiếng Việt…');
-switchLang('vi',function(x){return x!==t&&han(x)<10;},function(x){go(x?{v:id,t:t,vt:x}:{v:id,t:t});});
-}
 function zhShown(){var tr=langTrigger();return !!tr&&isLangItem('zh',tr.innerText);}
 function send(t,sw){
 if(moved){fail('YouTube vừa chuyển sang trang khác khi chọn ngôn ngữ nên dừng lại. Hãy mở lại video, chọn tiếng Trung ở ô ngôn ngữ cuối bảng phụ đề rồi bấm lại.');return;}
@@ -96,7 +89,7 @@ say('SongHanzi: đang chuyển phụ đề sang tiếng Trung…');
 switchLang('zh',function(x){return han(x)>=10;},function(x){if(x){send(x,true);}else{send(t,true);}});
 return;
 }
-withVi(t);
+go({v:id,t:t});
 }
 function noZh(){try{var tr=document.getElementById('movie_player').getPlayerResponse().captions.playerCaptionsTracklistRenderer.captionTracks;if(tr&&tr.length){for(var i=0;i<tr.length;i++){if(/^(zh|yue)/i.test(tr[i].languageCode)){return false;}}return true;}}catch(e){}return false;}
 if(noZh()){alert('Video này không có phụ đề tiếng Trung nên chưa thêm được. Hãy thử video khác.');return;}
@@ -148,7 +141,7 @@ export function decodeBookmarkletHash(hash: string): BookmarkletPayload | null {
     const bytes = Uint8Array.from(atob(b64 + "=".repeat((4 - (b64.length % 4)) % 4)), (c) => c.charCodeAt(0));
     const p = JSON.parse(new TextDecoder().decode(bytes)) as BookmarkletPayload;
     if (typeof p?.v !== "string" || !/^[A-Za-z0-9_-]{11}$/.test(p.v) || typeof p.t !== "string") return null;
-    return typeof p.vt === "string" ? p : { v: p.v, t: p.t };
+    return { v: p.v, t: p.t };
   } catch {
     return null;
   }

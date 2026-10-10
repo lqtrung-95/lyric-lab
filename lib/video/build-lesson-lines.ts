@@ -6,7 +6,6 @@ import { collectHanTerms, tokenizeLyricLines } from "@/lib/analysis/tokenize-lyr
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
 import { pickPrimaryEntry } from "@/lib/dictionary/lookup-words";
 import { normalizeLyricLines } from "@/lib/lyrics/normalize-lyric-lines";
-import { alignTranslations } from "./align-translation";
 import type { LessonLine } from "./video-lesson-types";
 
 type Dictionary = ReadonlyMap<string, DictWordRow[]>;
@@ -16,13 +15,12 @@ export interface PreparedLine extends TokenizedLine {
 }
 
 /**
- * Bước 1 (chưa cần từ điển): làm sạch dòng tiếng Trung, bỏ dòng không phải lời nói, chia từ (jieba) và ghép bản dịch theo thời gian.
- * Dòng gộp ngắn dùng ngưỡng mặc định của `cleanCaptionLines`; bản dịch ghép sau khi làm sạch nên khớp với đúng các dòng sẽ hiển thị.
+ * Bước 1 (chưa cần từ điển): làm sạch dòng tiếng Trung, bỏ dòng không phải lời nói, chia từ (jieba). Chưa có bản dịch (`translation: null`): bản dịch do LLM điền ở bước
+ * sau, theo đúng các dòng đã làm sạch này. Dòng gộp ngắn dùng ngưỡng mặc định của `cleanCaptionLines`.
  */
-export function prepareLessonLines(zh: CaptionLine[], vi: CaptionLine[] | null): PreparedLine[] {
+export function prepareLessonLines(zh: CaptionLine[]): PreparedLine[] {
   const lines = tokenizeLyricLines(normalizeLyricLines(cleanCaptionLines(zh)));
-  const translations = vi ? alignTranslations(lines, vi) : lines.map(() => null);
-  return lines.map((l, i) => ({ ...l, translation: translations[i] }));
+  return lines.map((l) => ({ ...l, translation: null }));
 }
 
 /** Các từ chữ Hán cần tra từ điển để dựng pinyin và tính level (không trùng). */

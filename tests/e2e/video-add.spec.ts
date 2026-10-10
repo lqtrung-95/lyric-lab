@@ -96,12 +96,11 @@ test("dấu trang gửi bản chép lời qua #: điền sẵn, tự gửi luôn
   expect(bodies).toEqual([{ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听" }]); // gửi đúng một lần
 });
 
-test("dấu trang gửi kèm phụ đề tiếng Việt: báo đã nhận và gửi cả hai bản", async ({ page }) => {
+test("dấu trang cũ còn gửi kèm phụ đề tiếng Việt: bỏ qua, chỉ gửi tiếng Trung lên server", async ({ page }) => {
   const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
   await page.goto(`/video/add${hashOf({ v: VIDEO_ID, t: "0:00\n大家好\n0:05\n欢迎收听", vt: "0:00\nXin chào\n0:05\nChào mừng" })}`);
-  await expect(page.getByRole("status").filter({ hasText: "kèm phụ đề tiếng Việt" })).toBeVisible();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
-  expect(bodies).toEqual([{ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听", viCaptions: "0:00\nXin chào\n0:05\nChào mừng" }]);
+  expect(bodies).toEqual([{ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听" }]);
 });
 
 test("dấu trang gửi bản chép lời nhưng server báo lỗi: hiện lỗi, giữ phụ đề đã nhận, không tự gửi lại", async ({ page }) => {

@@ -117,7 +117,7 @@ Tăng hậu tố `revN` trong `analysisCache` (`lib/analysis/server-deps.ts`) r�
 
 ### Nạp video luyện nghe (kho Video, tách khỏi bài hát)
 **Cách chính: nút nạp ở `/admin/videos`** (nhập tên kênh, "Tìm video", "Nạp N video"; chạy trên server nên không bị chặn IP máy bạn; video vào ở trạng thái Nháp). Script bên dưới là phương án dự phòng.
-Migration `20261006000003_video_lessons.sql` (chạy tay, một lần) tạo `video_sources` và `video_lessons`. Script `scripts/ingest-video-source.mts` đưa video của một kênh vào kho ở trạng thái `draft`: chỉ nhận video **nhúng được** và có phụ đề tiếng Trung **do người làm** (bỏ phụ đề tự động); bản dịch lấy từ track tiếng Việt thủ công (không gọi LLM); chia từ bằng jieba, pinyin và level từ từ điển. Không tải audio/video và không in nội dung phụ đề.
+Migration `20261006000003_video_lessons.sql` (chạy tay, một lần) tạo `video_sources` và `video_lessons`. Script `scripts/ingest-video-source.mts` đưa video của một kênh vào kho ở trạng thái `draft`: chỉ nhận video **nhúng được** và có phụ đề tiếng Trung **do người làm** (bỏ phụ đề tự động); chia từ bằng jieba, pinyin và level từ từ điển. Không tải audio/video và không in nội dung phụ đề.
 ```
 NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow --owned          # xem thử (dry-run)
 NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/ingest-video-source.mts --handle ChineseGlow --owned --apply  # ghi DB

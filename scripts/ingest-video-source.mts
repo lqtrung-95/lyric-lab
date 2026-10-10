@@ -1,6 +1,7 @@
 // Đưa video của một kênh YouTube vào kho "Video luyện nghe" (bảng video_lessons), trạng thái `draft` chờ admin duyệt.
 // Chỉ nhận video có phụ đề tiếng Trung do người làm (không nhận phụ đề tự động) và nhúng được. Không tải audio/video, không gọi LLM:
-// bản dịch lấy từ track tiếng Việt do người làm; chia từ bằng jieba, pinyin và level từ từ điển. Không in nội dung phụ đề.
+// chỉ lấy phụ đề tiếng Trung (KHÔNG lấy track tiếng Việt của YouTube); chia từ bằng jieba, pinyin và level từ từ điển. Video vào chưa có bản dịch: admin bấm "Dịch N dòng còn thiếu bằng AI"
+// ở /admin/videos/<id>. Không in nội dung phụ đề.
 // Lõi nạp dùng chung với nút "Nạp video" ở /admin/videos (lib/video/ingest-video.ts). Nên ưu tiên nút đó: chạy trên server nên không vướng
 // việc YouTube chặn IP máy bạn; script này là phương án dự phòng.
 // Mặc định chỉ xem (dry-run), thêm --apply để ghi DB. Video đã có bị bỏ qua (--refresh để cập nhật dòng, giữ nguyên trạng thái).

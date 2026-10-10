@@ -7,7 +7,7 @@ import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { decideAddLimit, decideDuration, decideTranslationBudget } from "@/lib/video/add-video-limits";
-import { chineseRatio, isMostlyChinese } from "@/lib/video/chinese-ratio";
+import { isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { MAX_TRANSCRIPT_LINES, parsePastedTranscript } from "@/lib/video/parse-pasted-transcript";
@@ -28,6 +28,7 @@ const bodySchema = z.object({
   // Phụ đề dán vào (SRT/VTT/bản chép lời của YouTube) hoặc các dòng do bookmarklet gửi sang; bỏ trống thì thử lấy tự động nếu máy chủ có khóa Supadata.
   captions: z.string().max(400_000).optional(),
   // Phụ đề tiếng Việt của track do người làm (dấu trang gửi kèm): ghép làm bản dịch thay vì nhờ AI. Chỉ có nghĩa khi đi cùng `captions`.
+  // Dấu trang cũ (đã kéo lên thanh dấu trang của người dùng) còn gửi kèm phụ đề tiếng Việt: nhận nhưng BỎ QUA, bản dịch luôn do AI.
   viCaptions: z.string().max(400_000).optional(),
   lines: z.array(lineSchema).max(MAX_TRANSCRIPT_LINES).optional(),
 });
@@ -81,12 +82,6 @@ export async function POST(req: Request) {
 
     let lines: CaptionLine[] = parsed.data.lines ?? (parsed.data.captions ? parsePastedTranscript(parsed.data.captions, meta.durationSec) : []);
     if (lines.length === 0 && (parsed.data.captions || parsed.data.lines)) return fail("invalid_captions", 400);
-    // Phụ đề tiếng Việt có sẵn của video (nếu có) dùng luôn làm bản dịch, khỏi nhờ AI: chỉ khi dấu trang gửi kèm (`viCaptions`). Đường Supadata CHỈ lấy tiếng Trung (1 credit) rồi để AI dịch: track tiếng Việt của YouTube hay chia câu lệch và là bản dịch tự động, ghép vào dễ ra bản dịch sai. Lõi nạp chỉ giữ khi ghép đủ tốt.
-    let viLines: CaptionLine[] | null = null;
-    if (parsed.data.captions && parsed.data.viCaptions) {
-      const vi = parsePastedTranscript(parsed.data.viCaptions, meta.durationSec);
-      if (vi.length > 0 && chineseRatio(vi) < 0.1) viLines = vi;
-    }
     if (lines.length === 0) {
       if (!env.SUPADATA_API_KEY) return fail("captions_required", 422);
       const zh = await fetchSupadataLines(videoId, env.SUPADATA_API_KEY, "zh");
@@ -99,8 +94,8 @@ export async function POST(req: Request) {
 
     const chat = createChat(env);
     const outcome = await ingestVideo(
-      { sb, provider: new FixedCaptionProvider(lines, "zh-Hans", viLines), lookup: (terms) => lookupWords(sb as never, terms) },
-      { meta, sourceId: null, status: "listed", addedBy: user.id, requireGoodTranslationTrack: true, translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
+      { sb, provider: new FixedCaptionProvider(lines, "zh-Hans"), lookup: (terms) => lookupWords(sb as never, terms) },
+      { meta, sourceId: null, status: "listed", addedBy: user.id, translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
     );
     if (outcome.kind === "skipped") return ok({ kind: "skipped", reason: outcome.reason });
     return ok({ kind: "added", videoId, lineCount: outcome.lineCount, translatedLineCount: outcome.translatedLineCount, translation: outcome.translationSource, aiBudgetExhausted: !canTranslate });

@@ -29,7 +29,7 @@ describe("ingestVideo với phụ đề người dùng", () => {
   it("ghi bài với trạng thái, người thêm và bản dịch AI do nơi gọi truyền vào", async () => {
     const { sb, written } = fakeDb();
     const translateMissing = async (prepared: PreparedLine[]) => prepared.map((l, i) => ({ ...l, translation: `dịch ${i}` }));
-    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true, translateMissing });
+    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
     expect(out).toMatchObject({ kind: "ingested", translatedLineCount: written[0] ? (written[0].lines as unknown[]).length : -1 });
     expect(written[0]).toMatchObject({ video_id: "abcdefghijk", status: "listed", added_by: "user-1", translation_source: "ai", source_id: null });
     expect((written[0].lines as { translation: string }[]).map((l) => l.translation)).toEqual(["dịch 0", "dịch 1"]);
@@ -38,7 +38,7 @@ describe("ingestVideo với phụ đề người dùng", () => {
   it("dịch không được dòng nào thì translation_source là none, bài vẫn được ghi", async () => {
     const { sb, written } = fakeDb();
     const translateMissing = async (prepared: PreparedLine[]) => prepared.map((l) => ({ ...l, translation: null }));
-    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true, translateMissing });
+    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
     expect(out.kind).toBe("ingested");
     expect(written[0]).toMatchObject({ translation_source: "none", translated_line_count: 0 });
   });
@@ -50,64 +50,27 @@ describe("ingestVideo với phụ đề người dùng", () => {
     expect(written[0]).not.toHaveProperty("added_by"); // video admin nạp không ghi cột added_by, nên chạy được cả khi migration chưa có
   });
 
-  it("có phụ đề tiếng Việt đủ tốt thì ghép làm bản dịch (nguồn youtube); AI chỉ được gọi cho dòng còn thiếu", async () => {
+  it("không bao giờ dùng phụ đề tiếng Việt của YouTube: provider có track tiếng Việt thì vẫn bị bỏ qua, AI dịch cả bài", async () => {
     const zhTen = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
-    const viNine = zhTen.slice(0, 9).map((l, i) => ({ text: `Câu số ${i + 1}`, start: l.start, end: l.end })); // dòng 10 không có bản dịch tương ứng
+    const viTrackLines = zhTen.map((l, i) => ({ text: `Câu số ${i + 1}`, start: l.start, end: l.end }));
+    const provider = {
+      listTracks: async () => [{ lang: "zh-Hans", kind: "manual" as const }, { lang: "vi", kind: "manual" as const }],
+      fetchLines: async (_id: string, track: { lang: string }) => (track.lang === "vi" ? viTrackLines : zhTen),
+    };
     const asked: string[][] = [];
-    const translateMissing = async (prepared: PreparedLine[]) => { asked.push(prepared.filter((l) => !l.translation).map((l) => l.text)); return prepared.map((l) => (l.translation ? l : { ...l, translation: "AI dịch" })); };
+    const translateMissing = async (prepared: PreparedLine[]) => { asked.push(prepared.map((l) => l.text)); return prepared.map((l) => ({ ...l, translation: "AI dịch" })); };
     const { sb, written } = fakeDb();
-    await ingestVideo({ sb, provider: new FixedCaptionProvider(zhTen, "zh-Hans", viNine), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true, translateMissing });
-    expect(asked).toEqual([["这是第10个句子，我们继续学习"]]);
-    const translations = (written[0].lines as { translation: string }[]).map((l) => l.translation);
-    expect(translations.slice(0, 9)).toEqual(Array.from({ length: 9 }, (_, i) => `Câu số ${i + 1}`));
-    expect(translations[9]).toBe("AI dịch");
-    expect(written[0]).toMatchObject({ translation_source: "youtube" });
-  });
-
-  it("phụ đề tiếng Việt ghép kém (lệch số dòng) thì bỏ, AI dịch cả bài", async () => {
-    const zhMany = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
-    const viFew = [{ text: "Một câu duy nhất", start: 0, end: 30 }]; // 1 dòng cho 10 dòng tiếng Trung
-    const translateMissing = async (prepared: PreparedLine[]) => prepared.map((l) => ({ ...l, translation: "AI dịch" }));
-    const { sb, written } = fakeDb();
-    await ingestVideo({ sb, provider: new FixedCaptionProvider(zhMany, "zh-Hans", viFew), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true, translateMissing });
+    await ingestVideo({ sb, provider, lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", translateMissing });
+    expect(asked[0]).toHaveLength(10); // AI nhận cả 10 dòng
     expect((written[0].lines as { translation: string }[]).every((l) => l.translation === "AI dịch")).toBe(true);
     expect(written[0]).toMatchObject({ translation_source: "ai" });
   });
 
-  it("phụ đề tiếng Việt phủ hết các dòng thì không gọi AI", async () => {
-    const vi = [{ text: "Xin chào các bạn", start: 0, end: 4 }, { text: "Hôm nay nói về học tiếng Trung", start: 4, end: 9 }];
-    let called = false;
-    const translateMissing = async (prepared: PreparedLine[]) => { called = true; return prepared; };
+  it("không có nơi dịch (hết ngân sách AI hoặc đường chưa cấu hình): vẫn thêm video, chưa dịch, nguồn none", async () => {
     const { sb, written } = fakeDb();
-    await ingestVideo({ sb, provider: new FixedCaptionProvider(lines, "zh-Hans", vi), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true, translateMissing });
-    expect(called).toBe(false);
-    expect(written[0]).toMatchObject({ translation_source: "youtube", translated_line_count: 2 });
-  });
-
-  it("hết ngân sách AI (không có nơi dịch bù): vẫn thêm video, chưa dịch; track tiếng Việt ghép kém bị bỏ chứ không giữ bản dịch lệch", async () => {
-    const zhMany = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
-    const viFew = [{ text: "Một câu duy nhất", start: 0, end: 30 }];
-    const { sb, written } = fakeDb();
-    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(zhMany, "zh-Hans", viFew), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true });
+    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1" });
     expect(out).toMatchObject({ kind: "ingested", translatedLineCount: 0, translationSource: "none" });
     expect(written[0]).toMatchObject({ translation_source: "none", translated_line_count: 0 });
-  });
-
-  it("hết ngân sách AI nhưng có track tiếng Việt đủ tốt: dùng track, dòng thiếu để trống", async () => {
-    const zhTen = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
-    const viNine = zhTen.slice(0, 9).map((l, i) => ({ text: `Câu số ${i + 1}`, start: l.start, end: l.end }));
-    const { sb, written } = fakeDb();
-    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(zhTen, "zh-Hans", viNine), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", requireGoodTranslationTrack: true });
-    expect(out).toMatchObject({ translatedLineCount: 9, translationSource: "youtube" });
-    expect(written[0]).toMatchObject({ translation_source: "youtube" });
-  });
-
-  it("đường admin (không bật cổng chất lượng) giữ track tiếng Việt dù ghép kém", async () => {
-    const zhMany = Array.from({ length: 10 }, (_, i) => ({ text: `这是第${i + 1}个句子，我们继续学习`, start: i * 3, end: i * 3 + 3 }));
-    const viFew = [{ text: "Một câu duy nhất", start: 0, end: 30 }];
-    const { sb, written } = fakeDb();
-    await ingestVideo({ sb, provider: new FixedCaptionProvider(zhMany, "zh-Hans", viFew), lookup }, { meta, sourceId: "src" });
-    expect(written[0]).toMatchObject({ translation_source: "youtube" });
   });
 
   it("bỏ qua video đã có và video không nhúng được", async () => {

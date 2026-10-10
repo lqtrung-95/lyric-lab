@@ -47,10 +47,10 @@ export function AddVideoScreen() {
   const captionsValue = captions ?? received?.t ?? "";
   const canSubmit = !busy && videoValue.trim().length > 0;
 
-  async function send(video: string, captionText: string, viText?: string) {
+  async function send(video: string, captionText: string) {
     setBusy(true);
     setMessage(null);
-    const body = { video, ...(captionText.trim() ? { captions: captionText } : {}), ...(viText ? { viCaptions: viText } : {}) };
+    const body = { video, ...(captionText.trim() ? { captions: captionText } : {}) };
     // Trang này chưa tự tạo phiên như các màn khác; người mở thẳng từ dấu trang có thể chưa có phiên nên bảo đảm có trước khi gửi (và thử lại một lần khi 401).
     const post = () => fetch("/api/videos/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     try {
@@ -69,7 +69,7 @@ export function AddVideoScreen() {
   function submit(e: React.FormEvent) {
     e.preventDefault();
     // Phụ đề tiếng Việt của dấu trang chỉ khớp với bản tiếng Trung đi cùng; người dùng sửa ô tiếng Trung thì bỏ nó, để AI dịch.
-    if (canSubmit) void send(videoValue, captionsValue, captions === null ? received?.vt : undefined);
+    if (canSubmit) void send(videoValue, captionsValue);
   }
 
   // Bản chép lời đến từ dấu trang: gửi luôn một lần, hẹn bằng timer để không đặt state ngay trong effect.
@@ -79,7 +79,7 @@ export function AddVideoScreen() {
   useEffect(() => {
     if (!received || autoStarted.current) return;
     autoStarted.current = true;
-    const timer = setTimeout(() => void sendRef.current(received.v, received.t, received.vt), 0);
+    const timer = setTimeout(() => void sendRef.current(received.v, received.t), 0);
     return () => clearTimeout(timer);
   }, [received]);
 
@@ -98,7 +98,7 @@ export function AddVideoScreen() {
         </label>
         <label className="block space-y-1">
           <span className="text-label-md font-semibold text-on-surface">Phụ đề tiếng Trung <span className="font-normal text-on-surface-variant">(bỏ trống nếu muốn thử lấy tự động)</span></span>
-          {received && <p role="status" className="text-label-md text-primary">Đã nhận phụ đề từ YouTube{received.vt ? " (kèm phụ đề tiếng Việt)" : ""}.</p>}
+          {received && <p role="status" className="text-label-md text-primary">Đã nhận phụ đề từ YouTube.</p>}
           <textarea value={captionsValue} onChange={(e) => setCaptions(e.target.value)} rows={6} placeholder={"Dán file SRT/VTT, hoặc phụ đề copy từ YouTube (nút \"Show transcript\" dưới phần mô tả video):\n0:00\n大家好\n0:05\n欢迎收听..."}
             className="w-full rounded-2xl bg-surface-container-high p-3 text-body-md text-on-surface" />
         </label>
