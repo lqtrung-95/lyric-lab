@@ -241,6 +241,8 @@
 
 html {
   background: var(--surface);
+  /* Luôn chừa chỗ cho thanh cuộn dọc: trang ngắn (không có thanh) và trang dài (có thanh) có cùng bề rộng nội dung, nên giao diện không bị xô sang trái khi đổi tab hoặc chuyển trang. Máy dùng thanh cuộn nổi (macOS mặc định) không bị ảnh hưởng. */
+  scrollbar-gutter: stable;
   /* Cuộn tới một phần tử (neo, focus bằng bàn phím) thì chừa chỗ cho thanh đầu trang và thanh điều khiển nổi ở đáy. */
   scroll-padding-top: 5rem;
   scroll-padding-bottom: 6rem;
