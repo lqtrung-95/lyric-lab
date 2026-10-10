@@ -64,3 +64,24 @@ export async function listDigestCandidates(limit: number): Promise<EmailPrefs[]>
   if (error) throw new Error(`email_prefs: ${error.message}`);
   return (data as Row[]).map(toPrefs);
 }
+
+export interface StreakEmailCandidate {
+  userId: string;
+  lastStreakAt: string | null;
+  unsubscribeToken: string;
+}
+
+/**
+ * Những người còn bật nhắc học, ưu tiên người lâu chưa được nhắc giữ chuỗi. Đọc cột `last_streak_at` riêng với các truy vấn khác để chưa chạy
+ * migration thì chỉ email giữ chuỗi lỗi, tổng kết tuần và nhắc quay lại vẫn chạy.
+ */
+export async function listStreakCandidates(limit: number): Promise<StreakEmailCandidate[]> {
+  const { data, error } = await sb().from("email_prefs").select("user_id, last_streak_at, unsubscribe_token").eq("reminder_enabled", true)
+    .order("last_streak_at", { ascending: true, nullsFirst: true }).limit(limit);
+  if (error) throw new Error(`email_prefs: ${error.message}`);
+  return (data as { user_id: string; last_streak_at: string | null; unsubscribe_token: string }[]).map((r) => ({ userId: r.user_id, lastStreakAt: r.last_streak_at, unsubscribeToken: r.unsubscribe_token }));
+}
+
+export async function markStreakSent(userId: string): Promise<void> {
+  await sb().from("email_prefs").update({ last_streak_at: new Date().toISOString() }).eq("user_id", userId);
+}

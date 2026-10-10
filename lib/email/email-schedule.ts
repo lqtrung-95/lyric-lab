@@ -4,6 +4,9 @@ import { shiftDay } from "@/lib/streak/streak-logic";
 export const REMINDER_MIN_INACTIVE_DAYS = 3;
 export const REMINDER_MAX_INACTIVE_DAYS = 30;
 const WEEK_MS = 7 * 86_400_000;
+/** Email "chuỗi sắp đứt": chỉ khi chuỗi đã đủ dài để đáng giữ, và cách nhau ít nhất ~3 ngày (trừ 2 giờ cho cron chạy lệch giờ). */
+export const STREAK_RISK_MIN_STREAK = 3;
+const STREAK_GAP_MS = 3 * 86_400_000 - 2 * 3_600_000;
 /** Cách nhau ít nhất 6 ngày giữa hai email cùng loại (cron có thể chạy lệch giờ). */
 const MIN_GAP_MS = 6 * 86_400_000;
 
@@ -35,6 +38,14 @@ export function shouldSendReminder(p: { enabled: boolean; lastSentAt: string | n
   if (!p.enabled || p.inactiveDays === null) return false;
   if (p.inactiveDays < REMINDER_MIN_INACTIVE_DAYS || p.inactiveDays > REMINDER_MAX_INACTIVE_DAYS) return false;
   return longAgo(p.lastSentAt, now, WEEK_MS);
+}
+
+/**
+ * Nhắc giữ chuỗi vào buổi tối: đã bật, chuỗi hiện tại ≥ 3 ngày, hôm nay chưa học và lần nhắc trước cách ≥ ~3 ngày. Người đã bỏ học lâu (chuỗi 0)
+ * thuộc về email nhắc quay lại, hai loại không bao giờ trùng nhau.
+ */
+export function shouldSendStreakRisk(p: { enabled: boolean; lastSentAt: string | null; currentStreak: number; studiedToday: boolean }, now: Date): boolean {
+  return p.enabled && !p.studiedToday && p.currentStreak >= STREAK_RISK_MIN_STREAK && longAgo(p.lastSentAt, now, STREAK_GAP_MS);
 }
 
 /** Thứ Hai (theo giờ Việt Nam) là ngày gửi tổng kết tuần. */

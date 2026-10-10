@@ -6,7 +6,7 @@ import { SettingRow } from "@/components/settings/settings-card";
 
 interface Prefs { weeklyEnabled: boolean; reminderEnabled: boolean }
 
-/** Hai công tắc email trong Cài đặt (tổng kết tuần, nhắc quay lại). Ẩn khi tài khoản không có email thật hoặc server chưa bật email. */
+/** Hai công tắc email trong Cài đặt (tổng kết tuần, nhắc học: chuỗi sắp đứt và nhắc quay lại). Ẩn khi tài khoản không có email thật hoặc server chưa bật email. */
 export function EmailRows() {
   const [prefs, setPrefs] = useState<Prefs | null>(null);
 
@@ -29,7 +29,7 @@ export function EmailRows() {
   return (
     <>
       <SettingRow label="Email tổng kết tuần" hint="Mỗi sáng thứ Hai, chỉ khi tuần qua bạn có học.">{toggle("Email tổng kết tuần", prefs.weeklyEnabled, () => void change({ weeklyEnabled: !prefs.weeklyEnabled }))}</SettingRow>
-      <SettingRow label="Email nhắc quay lại" hint="Khi bạn đã vài ngày chưa học. Tối đa một email mỗi tuần.">{toggle("Email nhắc quay lại", prefs.reminderEnabled, () => void change({ reminderEnabled: !prefs.reminderEnabled }))}</SettingRow>
+      <SettingRow label="Email nhắc quay lại" hint="Khi chuỗi ngày sắp đứt (tối đa một email mỗi 3 ngày) hoặc khi bạn đã vài ngày chưa học (tối đa một email mỗi tuần).">{toggle("Email nhắc quay lại", prefs.reminderEnabled, () => void change({ reminderEnabled: !prefs.reminderEnabled }))}</SettingRow>
     </>
   );
 }

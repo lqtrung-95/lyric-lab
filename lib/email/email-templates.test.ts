@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderReminderEmail, renderWeeklyEmail, renderWelcomeEmail } from "./email-templates";
+import { renderReminderEmail, renderWeeklyEmail, renderWelcomeEmail, renderStreakRiskEmail } from "./email-templates";
 
 const base = { siteUrl: "https://example.test", unsubscribeUrl: "https://example.test/unsubscribe/abc" };
 
@@ -29,5 +29,17 @@ describe("mẫu email", () => {
   it("không chèn HTML thô từ dữ liệu", () => {
     const m = renderWelcomeEmail({ siteUrl: "https://x.test", unsubscribeUrl: 'https://x.test/u?"><script>' });
     expect(m.html).not.toContain("<script>");
+  });
+
+  it("email chuỗi sắp đứt: nêu số ngày, trỏ về ôn thẻ khi có thẻ đến hạn, có link hủy, escape đúng", () => {
+    const withDue = renderStreakRiskEmail(base, { streak: 12, dueCards: 5 });
+    expect(withDue.subject).toBe("Chuỗi 12 ngày của bạn sắp đứt");
+    expect(withDue.html).toContain("https://example.test/review");
+    expect(withDue.html).toContain("5");
+    expect(withDue.text).toContain(base.unsubscribeUrl);
+    const noDue = renderStreakRiskEmail(base, { streak: 3, dueCards: 0 });
+    expect(noDue.html).toContain("https://example.test/app");
+    expect(noDue.html).not.toContain("/review");
+    expect(renderStreakRiskEmail({ ...base, unsubscribeUrl: 'https://x.test/u?"><script>' }, { streak: 3, dueCards: 0 }).html).not.toContain("<script>");
   });
 });

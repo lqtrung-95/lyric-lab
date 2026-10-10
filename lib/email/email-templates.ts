@@ -91,3 +91,19 @@ export function renderReminderEmail(base: EmailBase, s: { inactiveDays: number; 
   });
   return { subject: `Đã ${s.inactiveDays} ngày bạn chưa học tiếng Trung`, html, text: `Đã ${s.inactiveDays} ngày bạn chưa học.\n${s.dueCards > 0 ? `Bạn có ${s.dueCards} thẻ đang chờ ôn.` : "Quay lại nghe một bài nhé."}\n${href}\n\nHủy nhận email: ${base.unsubscribeUrl}` };
 }
+
+/** Nhắc giữ chuỗi ngày vào buổi tối khi hôm nay chưa học (xem `shouldSendStreakRisk`). */
+export function renderStreakRiskEmail(base: EmailBase, s: { streak: number; dueCards: number }): RenderedEmail {
+  const href = s.dueCards > 0 ? `${base.siteUrl}/review` : `${base.siteUrl}/app`;
+  const lead = s.dueCards > 0 ? `Bạn đang có ${b(s.dueCards)} thẻ chờ ôn, vài phút là xong.` : "Nghe một bài hoặc làm vài câu chép chính tả là đủ.";
+  const html = layout({
+    siteUrl: base.siteUrl, heading: `Chuỗi ${s.streak} ngày của bạn sắp đứt`, unsubscribeUrl: base.unsubscribeUrl,
+    cta: { label: s.dueCards > 0 ? "Ôn thẻ ngay" : "Học một chút", href },
+    body: p(`Hôm nay bạn chưa học, mà bạn đang giữ chuỗi ${b(s.streak)} ngày liên tiếp.`) + p(lead),
+    why: "Bạn nhận email này vì đang có chuỗi ngày học và hôm nay chưa học. Chúng tôi chỉ nhắc tối đa một lần mỗi 3 ngày.",
+  });
+  return {
+    subject: `Chuỗi ${s.streak} ngày của bạn sắp đứt`, html,
+    text: `Chuỗi ${s.streak} ngày của bạn sắp đứt.\nHôm nay bạn chưa học.\n${s.dueCards > 0 ? `Bạn có ${s.dueCards} thẻ chờ ôn.` : "Nghe một bài hoặc làm vài câu chép chính tả là đủ."}\n\n${href}\n\nHủy nhận: ${base.unsubscribeUrl}`,
+  };
+}

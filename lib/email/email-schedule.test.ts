@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeDaysInLastWeek, daysBetween, isWeeklyDay, lastStudiedDay, shouldSendReminder, shouldSendWeekly } from "./email-schedule";
+import { activeDaysInLastWeek, daysBetween, isWeeklyDay, lastStudiedDay, shouldSendReminder, shouldSendStreakRisk, shouldSendWeekly } from "./email-schedule";
 
 const now = new Date("2026-10-12T02:00:00Z"); // thứ Hai 09:00 giờ Việt Nam
 const daysAgo = (n: number) => new Date(now.getTime() - n * 86_400_000).toISOString();
@@ -33,5 +33,15 @@ describe("lịch gửi email", () => {
     expect(isWeeklyDay(now)).toBe(true);
     expect(isWeeklyDay(new Date("2026-10-11T20:00:00Z"))).toBe(true); // Chủ nhật 20:00 UTC = thứ Hai 03:00 VN
     expect(isWeeklyDay(new Date("2026-10-13T02:00:00Z"))).toBe(false);
+  });
+  it("chuỗi sắp đứt: bật, chuỗi ≥ 3, hôm nay chưa học, và cách lần trước ~3 ngày", () => {
+    const ok = { enabled: true, lastSentAt: null, currentStreak: 5, studiedToday: false };
+    expect(shouldSendStreakRisk(ok, now)).toBe(true);
+    expect(shouldSendStreakRisk({ ...ok, lastSentAt: daysAgo(3) }, now)).toBe(true);
+    expect(shouldSendStreakRisk({ ...ok, lastSentAt: daysAgo(2) }, now)).toBe(false);
+    expect(shouldSendStreakRisk({ ...ok, currentStreak: 2 }, now)).toBe(false);
+    expect(shouldSendStreakRisk({ ...ok, currentStreak: 0 }, now)).toBe(false);
+    expect(shouldSendStreakRisk({ ...ok, studiedToday: true }, now)).toBe(false);
+    expect(shouldSendStreakRisk({ ...ok, enabled: false }, now)).toBe(false);
   });
 });
