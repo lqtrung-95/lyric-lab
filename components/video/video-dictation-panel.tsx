@@ -3,16 +3,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PlayerController } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
-import { pinyinHint } from "@/lib/practice/pinyin-answer";
-import { compareDictation, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
+import { compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing, type DictationMode, type DictationResult } from "@/lib/video/dictation";
 import { dictationKey, emptyDictationProgress, firstUndone, parseDictationProgress, summarizeProgress, withScore, type DictationProgress } from "@/lib/video/dictation-progress";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { DictationFeedback } from "./dictation-feedback";
+import { DictationProgressGrid } from "./dictation-progress-grid";
 import { DictationSummary } from "./dictation-summary";
 import { useLineClip } from "./use-line-clip";
 
-const MODES: { id: DictationMode; label: string }[] = [{ id: "pinyin", label: "Gõ pinyin" }, { id: "hanzi", label: "Gõ chữ Hán" }];
+type HintLevel = "none" | "count" | "pinyin";
+const HINTS: { id: HintLevel; label: string }[] = [{ id: "none", label: "Không gợi ý" }, { id: "count", label: "Số chữ" }, { id: "pinyin", label: "Pinyin" }];
 const SLOW_RATE = 0.75;
+const secondary = "min-h-11 rounded-full border border-outline-variant px-4 text-label-md font-medium text-on-surface hover:bg-surface-container disabled:opacity-50";
 
 function readProgress(videoId: string): DictationProgress {
   try {
@@ -23,9 +25,9 @@ function readProgress(videoId: string): DictationProgress {
 }
 
 /**
- * Chép chính tả theo video: nghe từng câu (nghe lại và phát chậm tùy ý), gõ pinyin hoặc chữ Hán, kiểm tra từng chữ rồi sang câu kế.
- * Là một tab của màn học video: khung video (luôn hiện theo điều khoản YouTube) và tiêu đề do màn cha dựng, tab này dùng chung trình phát qua `controller`.
- * Tiến độ lưu trong trình duyệt theo từng video.
+ * Tab Nghe – chép: nghe từng câu (nghe lại và phát chậm tùy ý), gõ lại bằng chữ Hán HOẶC pinyin trong cùng một ô (tự nhận theo điều gõ), kiểm tra từng chữ
+ * rồi sang câu kế. Lưới chấm cho thấy cả bài và nhảy tới câu bất kỳ; gợi ý theo ba mức; "Xem đáp án" bỏ qua câu mà vẫn thấy đáp án. Dùng chung trình phát của
+ * màn học video (`controller`). Tiến độ lưu trong trình duyệt theo từng video.
  */
 export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDetail; controller: PlayerController | null }) {
   const lines = useMemo(() => dictationLines(lesson.lines), [lesson.lines]);
@@ -34,11 +36,12 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
   const [progress, setProgress] = useState<DictationProgress>(emptyDictationProgress);
   const [position, setPosition] = useState(0);
   const [typed, setTyped] = useState("");
-  const [result, setResult] = useState<DictationResult | null>(null);
-  const [hint, setHint] = useState(false);
+  const [checked, setChecked] = useState<{ result: DictationResult; mode: DictationMode } | null>(null);
+  const [hint, setHint] = useState<HintLevel>("none");
+  const [plays, setPlays] = useState(0);
   const [summary, setSummary] = useState(false);
   const [slow, setSlow] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const line = lines[position];
 
   // Đọc tiến độ đã lưu (sau khi tải, tránh lệch giữa server và client) và đứng ở câu đầu tiên chưa làm.
@@ -58,92 +61,117 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
     try { localStorage.setItem(dictationKey(lesson.videoId), JSON.stringify(p)); } catch { /* không lưu được: tiến độ chỉ giữ trong phiên này */ }
   }, [lesson.videoId]);
 
-  const listen = useCallback(() => { if (line) clip.play(line.start, line.end, slow ? SLOW_RATE : 1); }, [clip, line, slow]);
+  const listen = useCallback(() => {
+    if (!line) return;
+    setPlays((n) => n + 1);
+    clip.play(line.start, line.end, slow ? SLOW_RATE : 1);
+  }, [clip, line, slow]);
+
+  function resetAnswer() { setTyped(""); setChecked(null); setPlays(0); }
 
   function check(answer = typed) {
-    if (!line || result) return;
-    const r = compareDictation(answer, line, progress.mode);
-    setResult(r);
-    persist(withScore(progress, line.idx, r.score));
+    if (!line || checked) return;
+    const mode = detectTypedMode(answer);
+    const result = compareDictation(answer, line, answer.trim() ? mode : "hanzi"); // bỏ trống (xem đáp án): hiện đáp án theo chữ Hán
+    setChecked({ result, mode: answer.trim() ? mode : "hanzi" });
+    persist(withScore(progress, line.idx, result.score));
     clip.stop();
   }
 
   function next() {
     if (position + 1 >= lines.length) { setSummary(true); return; }
     setPosition(position + 1);
-    setTyped(""); setResult(null); setHint(false);
+    resetAnswer();
     // Phát luôn câu kế: người dùng vừa bấm nên trình duyệt cho phép tự phát.
     const nextLine = lines[position + 1];
+    setPlays(1);
     clip.play(nextLine.start, nextLine.end, slow ? SLOW_RATE : 1);
     inputRef.current?.focus();
   }
 
-  function changeMode(mode: DictationMode) {
-    persist({ ...progress, mode });
-    setTyped(""); setHint(false);
+  function jump(to: number) {
+    clip.stop();
+    controller?.pause();
+    setSummary(false);
+    setPosition(to);
+    resetAnswer();
   }
 
   function restart() {
-    persist({ mode: progress.mode, scores: {} });
-    setPosition(0); setTyped(""); setResult(null); setHint(false); setSummary(false);
+    persist({ scores: {} });
+    jump(0);
+  }
+
+  // Enter kiểm tra hoặc sang câu kế (không chặn khi đang gõ dở bằng bộ gõ tiếng Trung); Shift+Enter xuống dòng; Esc nghe lại.
+  function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); if (checked) next(); else check(); }
+    else if (e.key === "Escape") { e.preventDefault(); listen(); }
   }
 
   if (lines.length === 0) {
-    return <p role="status" className="mx-auto mt-space-xl max-w-md rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Video này chưa có đủ câu để chép chính tả.</p>;
+    return <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Video này chưa có đủ câu để chép chính tả.</p>;
   }
 
   const stats = summarizeProgress(lineIdxs, progress);
-  const unitCount = line ? expectedUnits(line, progress.mode).length : 0;
-
+  const hanCount = line ? expectedUnits(line, "hanzi").length : 0;
   return (
     <div className="flex flex-col gap-space-md">
-        {summary ? (
-          <DictationSummary lesson={lesson} lines={lines} progress={progress} onRestart={restart} />
-        ) : (
-          <>
-            <div role="radiogroup" aria-label="Chế độ gõ" className="flex flex-wrap gap-1">
-              {MODES.map((m) => (
-                <label key={m.id} className={`flex min-h-11 cursor-pointer items-center rounded-full px-4 text-label-md font-medium ${progress.mode === m.id ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface hover:bg-surface-container-highest"}`}>
-                  <input type="radio" name="dictation-mode" checked={progress.mode === m.id} onChange={() => changeMode(m.id)} className="sr-only" />
-                  {m.label}
+      {summary ? (
+        <DictationSummary lesson={lesson} lines={lines} progress={progress} onRestart={restart} />
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-label-md text-on-surface-variant">
+              Câu <strong className="text-on-surface">{position + 1}</strong> / {lines.length} · đã làm {stats.done} câu{stats.done > 0 && `, điểm TB ${Math.round(stats.average * 100)}`}
+            </p>
+            <div className="flex gap-1">
+              <button type="button" onClick={() => jump(position - 1)} disabled={position === 0} className={secondary}>← Trước</button>
+              <button type="button" onClick={() => jump(position + 1)} disabled={position + 1 >= lines.length} className={secondary}>Sau →</button>
+            </div>
+          </div>
+          <DictationProgressGrid idxs={lineIdxs} scores={progress.scores} position={position} onJump={jump} />
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={listen} disabled={!controller} className="inline-flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+              <Icon name="play_arrow" filled size={20} /> Nghe{plays > 0 && <span className="font-normal opacity-80"> ×{plays}</span>}
+            </button>
+            <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface"><input type="checkbox" checked={slow} onChange={(e) => setSlow(e.target.checked)} className="h-4 w-4 accent-primary" />Chậm 0,75×</label>
+            <div role="radiogroup" aria-label="Mức gợi ý" className="flex gap-0.5 rounded-full bg-surface-container-high p-1">
+              {HINTS.map((h) => (
+                <label key={h.id} className={`flex min-h-9 cursor-pointer items-center rounded-full px-3 text-label-md font-medium ${hint === h.id ? "bg-surface text-on-surface shadow-sm" : "text-on-surface-variant hover:text-on-surface"}`}>
+                  <input type="radio" name="dictation-hint" checked={hint === h.id} onChange={() => setHint(h.id)} className="sr-only" />{h.label}
                 </label>
               ))}
             </div>
+          </div>
+          {hint !== "none" && !checked && line && (
+            <p role="status" className="text-label-md text-on-surface-variant">
+              {hint === "count" ? `${hanCount} chữ Hán` : <>Pinyin: <span className="font-medium text-on-surface">{expectedUnits(line, "pinyin").join(" ")}</span></>}
+            </p>
+          )}
+          <form onSubmit={(e) => { e.preventDefault(); if (checked) next(); else check(); }} className="space-y-space-sm">
+            <label htmlFor="dictation-input" className="sr-only">Gõ lại câu bạn nghe được, bằng chữ Hán hoặc pinyin</label>
+            <textarea
+              id="dictation-input" ref={inputRef} value={typed} onChange={(e) => setTyped(e.target.value)} onKeyDown={onKeyDown} readOnly={!!checked} rows={3}
+              autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false}
+              className="w-full resize-y rounded-2xl bg-surface-container-high px-4 py-3 text-body-lg text-on-surface outline-none ring-2 ring-transparent focus:ring-primary read-only:opacity-70"
+              placeholder="Gõ lại câu vừa nghe (chữ Hán, hoặc pinyin: ni hao)…"
+            />
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-label-md font-semibold text-on-surface-variant">Câu {position + 1} / {lines.length} · đã làm {stats.done}</p>
-              <div className="flex items-center gap-2">
-                <button type="button" aria-pressed={slow} onClick={() => setSlow((s) => !s)} className={`min-h-11 rounded-full px-4 text-label-md font-medium ${slow ? "bg-primary/15 text-primary" : "bg-surface-container-high text-on-surface"}`}>Chậm {String(SLOW_RATE).replace(".", ",")}x</button>
-                <button type="button" onClick={listen} disabled={!controller} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
-                  <Icon name="play_arrow" filled size={20} /> Nghe câu này
+              <p className="text-label-md text-on-surface-variant">
+                <kbd className="rounded border border-outline-variant px-1.5 font-mono text-label-sm">Enter</kbd> kiểm tra / câu sau · <kbd className="rounded border border-outline-variant px-1.5 font-mono text-label-sm">Esc</kbd> nghe lại
+              </p>
+              <div className="flex gap-2">
+                {!checked && <button type="button" onClick={() => check()} className={secondary}>Xem đáp án</button>}
+                {/* Một nút gửi duy nhất, chỉ đổi nhãn: thay nút khác vào đúng chỗ con trỏ đang bấm thì cú bấm "Xem đáp án" kích hoạt luôn nút mới và nhảy sang câu kế. */}
+                <button type="submit" className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+                  {checked ? (position + 1 >= lines.length ? "Xem tổng kết" : "Câu tiếp") : "Kiểm tra"}
                 </button>
               </div>
             </div>
-            <form onSubmit={(e) => { e.preventDefault(); if (result) next(); else check(); }} className="space-y-space-sm">
-              <label htmlFor="dictation-input" className="block text-label-md font-medium text-on-surface">
-                Gõ lại câu bạn nghe được ({unitCount} {progress.mode === "pinyin" ? "âm tiết" : "chữ Hán"})
-              </label>
-              <input
-                id="dictation-input" ref={inputRef} value={typed} onChange={(e) => setTyped(e.target.value)} readOnly={!!result}
-                lang={progress.mode === "hanzi" ? "zh" : undefined} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false} inputMode="text"
-                className="min-h-14 w-full rounded-2xl bg-surface-container-high px-4 text-body-lg text-on-surface outline-none ring-2 ring-transparent focus:ring-primary read-only:opacity-70"
-                placeholder={progress.mode === "pinyin" ? "ví dụ: ni3 hao3 hoặc nǐ hǎo" : "gõ chữ Hán"}
-              />
-              {hint && !result && line && <p role="status" className="text-label-md text-on-surface-variant">Gợi ý: {pinyinHint(expectedUnits(line, "pinyin").join(" "), 2)}</p>}
-              <div className="flex flex-wrap gap-2">
-                {result ? (
-                  <button type="submit" autoFocus className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">{position + 1 >= lines.length ? "Xem tổng kết" : "Câu tiếp"}</button>
-                ) : (
-                  <>
-                    <button type="submit" className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">Kiểm tra</button>
-                    <button type="button" onClick={() => setHint(true)} disabled={hint} className="min-h-12 rounded-full bg-surface-container-high px-5 text-label-md font-medium text-on-surface disabled:opacity-50">Gợi ý</button>
-                    <button type="button" onClick={() => { setTyped(""); check(""); }} className="min-h-12 rounded-full px-5 text-label-md font-medium text-on-surface-variant hover:bg-surface-container">Bỏ qua câu</button>
-                  </>
-                )}
-              </div>
-            </form>
-            {result && line && <DictationFeedback line={line} mode={progress.mode} typed={typed} result={result} passed={isPassing(result)} />}
-          </>
-        )}
+          </form>
+          {checked && line && <DictationFeedback line={line} mode={checked.mode} typed={typed} result={checked.result} passed={isPassing(checked.result)} />}
+        </>
+      )}
     </div>
   );
 }

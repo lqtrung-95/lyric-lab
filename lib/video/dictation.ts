@@ -24,6 +24,9 @@ const TONE_MARKS: Record<string, number> = { "\u0304": 1, "\u0301": 2, "\u030c":
 
 const hanChars = (text: string) => [...text].filter((c) => HAN.test(c));
 
+/** Chế độ chấm theo điều người học gõ: có chữ Hán thì chấm theo chữ Hán, còn lại (pinyin, trống) chấm theo pinyin. Một ô gõ nhận cả hai cách, không cần chọn chế độ. */
+export const detectTypedMode = (typed: string): DictationMode => (hanChars(typed).length > 0 ? "hanzi" : "pinyin");
+
 /** Các dòng đưa vào bài chép chính tả: bỏ dòng quá ngắn (tiếng đệm, "好的") vì không đủ để luyện nghe. */
 export function dictationLines(lines: LessonLine[]): LessonLine[] {
   return lines.filter((l) => hanChars(l.text).length >= MIN_HAN_CHARS);

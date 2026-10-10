@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compareDictation, dictationLines, expectedUnits, isPassing } from "./dictation";
+import { compareDictation, detectTypedMode, dictationLines, expectedUnits, isPassing } from "./dictation";
 import type { LessonLine } from "./video-lesson-types";
 
 const line = (text: string, pinyin: string): LessonLine => ({ idx: 0, start: 0, end: 4, text, pinyin, translation: null, tokens: [{ text }] });
@@ -73,5 +73,14 @@ describe("compareDictation (chữ Hán)", () => {
   });
   it("chưa gõ gì thì toàn 'missing'", () => {
     expect(compareDictation("", hello, "hanzi").units.every((u) => u.status === "missing")).toBe(true);
+  });
+});
+
+describe("detectTypedMode", () => {
+  it("có chữ Hán thì chấm theo chữ Hán, pinyin hoặc ô trống thì chấm theo pinyin", () => {
+    expect(detectTypedMode("你好")).toBe("hanzi");
+    expect(detectTypedMode("ni3 hao3 朋友")).toBe("hanzi");
+    expect(detectTypedMode("nǐ hǎo")).toBe("pinyin");
+    expect(detectTypedMode("")).toBe("pinyin");
   });
 });

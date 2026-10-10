@@ -6,9 +6,8 @@ describe("parseDictationProgress", () => {
     expect(parseDictationProgress(null)).toEqual(emptyDictationProgress);
     expect(parseDictationProgress("{hỏng")).toEqual(emptyDictationProgress);
   });
-  it("đọc chế độ và điểm hợp lệ, bỏ giá trị lạ", () => {
-    expect(parseDictationProgress('{"mode":"hanzi","scores":{"0":1,"2":0.5,"x":1,"3":2,"4":"a"}}')).toEqual({ mode: "hanzi", scores: { 0: 1, 2: 0.5 } });
-    expect(parseDictationProgress('{"mode":"lạ"}').mode).toBe("pinyin");
+  it("đọc điểm hợp lệ, bỏ giá trị lạ và trường mode của bản lưu cũ", () => {
+    expect(parseDictationProgress('{"mode":"hanzi","scores":{"0":1,"2":0.5,"x":1,"3":2,"4":"a"}}')).toEqual({ scores: { 0: 1, 2: 0.5 } });
   });
 });
 

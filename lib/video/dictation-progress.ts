@@ -1,24 +1,21 @@
-import type { DictationMode } from "./dictation";
-
 export const dictationKey = (videoId: string) => `lyric-lab-dictation:${videoId}`;
 
-/** Tiến độ chép chính tả của một video, lưu trong trình duyệt: chế độ gõ và điểm (0..1) lần làm gần nhất của từng dòng (theo `idx`). */
+/** Tiến độ chép chính tả của một video, lưu trong trình duyệt: điểm (0..1) lần làm gần nhất của từng dòng (theo `idx`). Bản lưu cũ có thêm `mode` (đã bỏ) vẫn đọc được, trường đó bị bỏ qua. */
 export interface DictationProgress {
-  mode: DictationMode;
   scores: Record<number, number>;
 }
 
-export const emptyDictationProgress: DictationProgress = { mode: "pinyin", scores: {} };
+export const emptyDictationProgress: DictationProgress = { scores: {} };
 
 export function parseDictationProgress(raw: string | null): DictationProgress {
   if (!raw) return emptyDictationProgress;
   try {
-    const d = JSON.parse(raw) as Partial<DictationProgress>;
+    const d = JSON.parse(raw) as Partial<DictationProgress> & { mode?: unknown };
     const scores: Record<number, number> = {};
     for (const [k, v] of Object.entries(d.scores && typeof d.scores === "object" ? d.scores : {})) {
       if (/^\d+$/.test(k) && typeof v === "number" && v >= 0 && v <= 1) scores[Number(k)] = v;
     }
-    return { mode: d.mode === "hanzi" ? "hanzi" : "pinyin", scores };
+    return { scores };
   } catch {
     return emptyDictationProgress;
   }

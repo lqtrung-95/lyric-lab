@@ -81,7 +81,7 @@ test("học video: ba tab dùng chung một trình phát, đổi tab không tả
   await page.evaluate(() => { (window as unknown as { __marker: number }).__marker = 1; });
 
   await tabs.getByRole("tab", { name: "Nghe – chép" }).click();
-  await expect(page.getByRole("radiogroup", { name: "Chế độ gõ" })).toBeVisible();
+  await expect(page.getByRole("radiogroup", { name: "Mức gợi ý" })).toBeVisible();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}\\?tab=dictation$`));
   await expect(page.locator("[data-line-index]")).toHaveCount(0); // danh sách phụ đề không còn
   await tabs.getByRole("tab", { name: "Luyện nói" }).click();
@@ -236,34 +236,38 @@ test("video chưa duyệt hoặc không có: báo rõ và có đường về dan
   await expect(page.getByRole("link", { name: "Về danh sách video" })).toBeVisible();
 });
 
+const answerBox = (page: Page) => page.getByLabel(/Gõ lại câu bạn nghe được/);
+
 test("chép chính tả: nghe câu, gõ pinyin, kiểm tra từng âm tiết, lưu tiến độ, tổng kết và làm lại", async ({ page }) => {
   await mockVideoApis(page);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`/video/${VIDEO_ID}/dictation`);
-  await expect(page.getByText("Câu 1 / 3")).toBeVisible();
-  await expect(page.getByLabel(/Gõ lại câu bạn nghe được \(4 âm tiết\)/)).toBeVisible();
+  await expect(page.getByText("Câu 1", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("radio", { name: /Gõ chữ Hán|Gõ pinyin/ })).toHaveCount(0); // không còn nút chọn chế độ gõ
 
-  await page.getByRole("button", { name: "Nghe câu này" }).click();
+  await page.getByRole("button", { name: /^Nghe/ }).click();
   expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:0");
+  await expect(page.getByRole("button", { name: /^Nghe ×1/ })).toBeVisible(); // đếm số lần nghe
 
-  // Câu 1: gõ không thanh vẫn đạt (nửa điểm cho thanh).
-  await page.getByLabel(/Gõ lại câu bạn nghe được/).fill("ni hao peng you");
+  // Câu 1: gõ pinyin không thanh vẫn đạt (nửa điểm cho thanh).
+  await answerBox(page).fill("ni hao peng you");
   await page.getByRole("button", { name: "Kiểm tra" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Đúng chữ, chú ý thanh điệu nhé" })).toBeVisible();
   await expect(page.getByText("Xin chào, bạn bè.")).toBeVisible();
   await noViolations(page);
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}"))).toMatchObject({ mode: "pinyin", scores: { 0: 0.625 } });
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}"))).toEqual({ scores: { 0: 0.625 } });
 
-  // Câu 2: gõ sai.
+  // Câu 2: gõ sai, Enter để kiểm tra.
   await page.getByRole("button", { name: "Câu tiếp" }).click();
-  await expect(page.getByText("Câu 2 / 3")).toBeVisible();
-  await page.getByLabel(/Gõ lại câu bạn nghe được/).fill("xyz");
+  await expect(page.getByText("Câu 2", { exact: false }).first()).toBeVisible();
+  await answerBox(page).fill("xyz");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("status").filter({ hasText: "Chưa đúng" })).toBeVisible();
 
-  // Câu 3: bỏ qua rồi xem tổng kết.
+  // Câu 3: xem đáp án (bỏ qua) rồi xem tổng kết.
   await page.getByRole("button", { name: "Câu tiếp" }).click();
-  await page.getByRole("button", { name: "Bỏ qua câu" }).click();
+  await page.getByRole("button", { name: "Xem đáp án" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Chưa đúng" })).toBeVisible();
   await page.getByRole("button", { name: "Xem tổng kết" }).click();
   await expect(page.getByRole("heading", { name: "Hoàn thành bài chép" })).toBeVisible();
   await expect(page.getByText(/0\/3 câu chính xác hoàn toàn/)).toBeVisible();
@@ -274,21 +278,36 @@ test("chép chính tả: nghe câu, gõ pinyin, kiểm tra từng âm tiết, l�
   await page.reload();
   await expect(page.getByRole("heading", { name: "Hoàn thành bài chép" })).toBeVisible();
   await page.getByRole("button", { name: "Làm lại từ đầu" }).click();
-  await expect(page.getByText("Câu 1 / 3")).toBeVisible();
+  await expect(page.getByText("Câu 1", { exact: false }).first()).toBeVisible();
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("lyric-lab-dictation:aBcDeFgHiJk") ?? "{}").scores)).toEqual({});
 });
 
-test("chép chính tả: chế độ chữ Hán chấm từng chữ và nhớ chế độ", async ({ page }) => {
+test("chép chính tả: cùng một ô nhận chữ Hán (chấm từng chữ), gợi ý ba mức, lưới tiến độ nhảy tới câu bất kỳ", async ({ page }) => {
   await mockVideoApis(page);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`/video/${VIDEO_ID}/dictation`);
-  await page.getByRole("radio", { name: "Gõ chữ Hán" }).check({ force: true });
-  await expect(page.getByLabel(/\(4 chữ Hán\)/)).toBeVisible();
-  await page.getByLabel(/Gõ lại câu bạn nghe được/).fill("你好朋友");
+
+  await page.getByRole("radio", { name: "Số chữ" }).check({ force: true });
+  await expect(page.getByText("4 chữ Hán")).toBeVisible();
+  await page.getByRole("radio", { name: "Pinyin" }).check({ force: true });
+  await expect(page.getByText(/Pinyin:.*nǐ hǎo/)).toBeVisible();
+
+  await answerBox(page).fill("你好朋友");
   await page.getByRole("button", { name: "Kiểm tra" }).click();
   await expect(page.getByRole("status").filter({ hasText: "Chính xác!" })).toBeVisible();
-  await page.reload();
-  await expect(page.getByRole("radio", { name: "Gõ chữ Hán" })).toBeChecked();
+  await expect(page.getByRole("button", { name: "Câu 1, 100 phần trăm" })).toBeVisible(); // lưới tiến độ cập nhật điểm
+  await expect(page.getByText(/đã làm 1 câu, điểm TB 100/)).toBeVisible();
+
+  await page.getByRole("button", { name: "Câu 3, chưa làm" }).click();
+  await expect(page.getByText("Câu 3", { exact: false }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Câu 3, chưa làm" })).toHaveAttribute("aria-current", "step");
+  await expect(answerBox(page)).toHaveValue("");
+
+  // Esc nghe lại câu đang làm.
+  await answerBox(page).focus();
+  const before = await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt.length);
+  await page.keyboard.press("Escape");
+  expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt.length)).toBeGreaterThan(before);
 });
 
 // ---- Quản trị video (API giả lập) ----
