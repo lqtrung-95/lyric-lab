@@ -489,9 +489,14 @@ test("quản trị video: video dùng bản dịch YouTube có nút dịch lại
   await button.click();
   await dialog.getByRole("button", { name: "Dịch lại" }).click();
   await expect(page.getByText("Đã dịch lại 3 dòng bằng AI")).toBeVisible();
-  expect(patches).toEqual([{ action: "retranslate_all" }]);
+  expect(patches).toEqual([{ action: "retranslate_all", includeAi: false }]);
   await expect(page.getByLabel("Bản dịch dòng 1")).toHaveValue("AI dịch 0");
-  await expect(page.getByRole("button", { name: "Dịch lại toàn bộ bằng AI" })).toHaveCount(0); // đã là bản AI
+  // Đã là bản AI: vẫn có nút làm lại bằng model tốt hơn, gửi includeAi để làm lại cả dòng AI cũ.
+  await expect(page.getByRole("button", { name: "Dịch lại toàn bộ bằng AI" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Dịch lại bản AI bằng model tốt hơn" }).click();
+  await dialog.getByRole("button", { name: "Dịch lại" }).click();
+  await expect.poll(() => patches.length).toBe(2);
+  expect(patches[1]).toEqual({ action: "retranslate_all", includeAi: true });
 });
 
 test.describe("báo cả video sai", () => {

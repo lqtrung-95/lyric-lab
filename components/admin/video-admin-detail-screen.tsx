@@ -155,7 +155,7 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
     setTranslating("busy");
     setTranslateNote(null);
     try {
-      const res = await fetch(`/api/admin/videos/${videoId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "retranslate_all" }) });
+      const res = await fetch(`/api/admin/videos/${videoId}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "retranslate_all", includeAi: lesson !== null && lesson !== "missing" && lesson.translationSource === "ai" }) });
       if (!res.ok) { setTranslating("error"); return; }
       const result = (await res.json()) as { replaced: number; remaining: number };
       const fresh = await fetch(`/api/admin/videos/${videoId}`, { cache: "no-store" });
@@ -212,18 +212,18 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
           {translating === "error" && <span role="alert" className="text-label-md text-error">Chưa dịch được, thử lại sau nhé.</span>}
         </div>
       )}
-      {lesson.translationSource === "youtube" && (
+      {(lesson.translationSource === "youtube" || lesson.translationSource === "ai") && (
         <div className="flex flex-wrap items-center gap-2">
           <button type="button" disabled={translating === "busy"} onClick={() => setConfirmRetranslate(true)} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-surface-container-high px-4 text-label-md font-medium text-on-surface hover:bg-surface-container-highest disabled:opacity-60">
             {translating === "busy" ? <Spinner size={16} /> : <Icon name="translate" size={18} />}
-            {translating === "busy" ? "AI đang dịch, có thể mất tới một phút…" : "Dịch lại toàn bộ bằng AI"}
+            {translating === "busy" ? "AI đang dịch, có thể mất tới một phút…" : lesson.translationSource === "ai" ? "Dịch lại bản AI bằng model tốt hơn" : "Dịch lại toàn bộ bằng AI"}
           </button>
-          <span className="text-label-sm text-on-surface-variant">Dùng khi bản dịch lấy từ phụ đề YouTube bị lệch câu. Dòng đã sửa tay được giữ nguyên.</span>
+          <span className="text-label-sm text-on-surface-variant">{lesson.translationSource === "ai" ? "Làm lại các dòng AI đã dịch (chất lượng cao hơn, chậm hơn)." : "Dùng khi bản dịch lấy từ phụ đề YouTube bị lệch câu."} Dòng đã sửa tay được giữ nguyên.</span>
         </div>
       )}
       <ConfirmDialog
         open={confirmRetranslate} title="Dịch lại toàn bộ bằng AI?"
-        body="Bản dịch hiện tại (lấy từ phụ đề YouTube) sẽ được thay bằng bản AI dịch. Các dòng bạn đã sửa tay được giữ nguyên."
+        body="Bản dịch hiện tại sẽ được thay bằng bản AI dịch lại. Các dòng bạn đã sửa tay được giữ nguyên."
         confirmLabel="Dịch lại" cancelLabel="Hủy"
         onCancel={() => setConfirmRetranslate(false)}
         onConfirm={() => { setConfirmRetranslate(false); void retranslateAll(); }}

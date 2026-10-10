@@ -9,18 +9,21 @@ export interface AppliedRetranslation {
   remaining: number;
 }
 
-/** Dòng được dịch lại: chưa có người chốt bản dịch. Dòng admin đã sửa/khôi phục và dòng AI đã dịch lại (kể cả lần bấm trước) được giữ nguyên. */
-export const canRetranslate = (l: LessonLine) => l.translationBy !== "admin" && l.translationBy !== "ai";
+/**
+ * Dòng được dịch lại: dòng admin đã sửa/khôi phục luôn được giữ nguyên. Mặc định dòng AI đã dịch lại cũng được giữ (để bấm lại thì dịch tiếp phần còn dở);
+ * `includeAi` = true khi muốn làm lại cả bản AI cũ bằng model tốt hơn.
+ */
+export const canRetranslate = (l: LessonLine, includeAi = false) => l.translationBy !== "admin" && (includeAi || l.translationBy !== "ai");
 
 /**
  * Áp kết quả dịch lại toàn bộ (cùng thứ tự và số dòng với `before`): thay bản dịch của các dòng đủ điều kiện bằng bản AI mới và đánh dấu `translationBy: "ai"`.
  * Dòng nào AI chưa dịch được thì GIỮ bản cũ (không để trống). Không sửa mảng gốc.
  */
-export function applyRetranslation(before: LessonLine[], fresh: { translation: string | null }[]): AppliedRetranslation {
+export function applyRetranslation(before: LessonLine[], fresh: { translation: string | null }[], includeAi = false): AppliedRetranslation {
   let replaced = 0;
   let remaining = 0;
   const lines = before.map((l, i) => {
-    if (!canRetranslate(l)) return l;
+    if (!canRetranslate(l, includeAi)) return l;
     const next = fresh[i]?.translation?.trim();
     if (!next) { remaining++; return l; }
     replaced++;

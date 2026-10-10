@@ -21,6 +21,11 @@ describe("applyRetranslation", () => {
     expect(r.lines.map((l) => l.translation)).toEqual(["mới", "cũ 2"]);
     expect(r).toMatchObject({ replaced: 1, remaining: 1 });
   });
+  it("includeAi: làm lại cả dòng AI cũ nhưng vẫn giữ dòng admin đã sửa", () => {
+    const r = applyRetranslation([line(0, "admin", "admin"), line(1, "ai cũ", "ai"), line(2, "youtube")], [{ translation: "x" }, { translation: "y" }, { translation: "z" }], true);
+    expect(r.lines.map((l) => l.translation)).toEqual(["admin", "y", "z"]);
+    expect(r.replaced).toBe(2);
+  });
   it("không sửa mảng gốc", () => {
     const before = [line(0, "cũ")];
     applyRetranslation(before, [{ translation: "mới" }]);

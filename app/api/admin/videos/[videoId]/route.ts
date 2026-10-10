@@ -38,7 +38,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ videoId
  * PATCH { action: "edit_translation", idx, translation } → sửa bản dịch một dòng ("" = xóa bản dịch).
  * PATCH { action: "dismiss_reports" } → bỏ qua mọi báo cáo cả video đang mở (admin đã xem, video ổn); trả {done, dismissed}.
  * PATCH { action: "translate_missing" } → dịch bù bằng AI các dòng còn trống của video; trả {done, translated, remaining}.
- * PATCH { action: "retranslate_all" } → dịch lại TOÀN BỘ bản dịch bằng AI (khi bản dịch YouTube ghép lệch câu); giữ dòng admin đã sửa; trả {done, replaced, remaining}.
+ * PATCH { action: "retranslate_all", includeAi? } → dịch lại TOÀN BỘ bản dịch bằng AI (khi bản dịch YouTube ghép lệch câu); giữ dòng admin đã sửa; trả {done, replaced, remaining}.
  * PATCH { action: "restore_translation", reportId } → trả bản dịch cũ của một báo cáo "AI đã dịch lại" (409 `unchanged` nếu dòng đã được sửa/khôi phục trước đó).
  * PATCH { action: "delete" } → xóa hẳn video (kèm cache nghĩa từ của nó).
  * API công khai cache ở edge nên mỗi thay đổi đều làm mới cache của danh sách và của video đó.
@@ -48,7 +48,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
   if (denied) return denied;
   const { videoId } = await params;
   if (!isValidVideoId(videoId)) return Response.json({ error: "invalid_video" }, { status: 400 });
-  const body = (await req.json().catch(() => null)) as { action?: string; idx?: unknown; translation?: unknown; reportId?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as { action?: string; idx?: unknown; translation?: unknown; reportId?: unknown; includeAi?: unknown } | null;
 
   try {
     let found = true;
@@ -71,7 +71,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
       revalidatePath(`/api/videos/${videoId}`);
       return Response.json({ done: "translate_missing", ...result });
     } else if (body?.action === "retranslate_all") {
-      const result = await retranslateLessonLines(videoId);
+      const result = await retranslateLessonLines(videoId, body.includeAi === true);
       if (result === "not_found") return Response.json({ error: "not_found" }, { status: 404 });
       revalidatePath("/api/videos");
       revalidatePath(`/api/videos/${videoId}`);
