@@ -53,11 +53,12 @@ Thứ tự trong `getLyricsForVideo`: **caption YouTube** (phải phủ ≥ 50% 
 ### Chuỗi model phân tích (`DEFAULT_MODELS`, `lib/analysis/analyze-lyrics.ts`)
 
 1. `deepseek:deepseek-chat` (API trực tiếp, timeout 25s)
-2. Groq `openai/gpt-oss-120b`, `openai/gpt-oss-20b` (khóa `GROQ_API_KEY`, timeout 15s)
-3. Hai model Groq trên bằng khóa thứ hai (`groq-fallback:`, `FALLBACK_LLM_API_KEY`)
-4. `openrouter:google/gemini-2.5-flash`
+2. `gemini:` (`GEMINI_MODEL`, mặc định `gemini-flash-lite-latest`; khóa `GEMINI_API_KEYS` xoay vòng; lần gọi phân tích nới `maxTokens` 4500 và timeout 25s vì mặc định Gemini chỉ 1024 token / 10s)
+3. `openrouter:google/gemini-2.5-flash`
+4. Groq `openai/gpt-oss-120b`, `openai/gpt-oss-20b` (khóa `GROQ_API_KEY`, timeout 15s)
+5. Hai model Groq trên bằng khóa thứ hai (`groq-fallback:`, `FALLBACK_LLM_API_KEY`) — Groq đứng cuối vì hạn mức token/phút nhỏ
 
-Router (`lib/analysis/openrouter-chat.ts`, `createChatRouter`) chọn client theo tiền tố `deepseek:`, `byteplus:`, `openrouter:`, `groq-fallback:`; không tiền tố = Groq. Model thiếu khóa thì bị bỏ qua. Kết quả LLM bị **validate bằng Zod** + kiểm tra từng mục phải khớp vị trí trong lời thật (mục không khớp bị loại); kết quả quá nghèo (< 6 vocab) coi như thất bại và thử model kế. Production dùng `FAST_FAIL_LIMITS` (retry 1, chờ 429 tối đa 8s) để rớt model nhanh trong trần 60s.
+Router (`lib/analysis/openrouter-chat.ts`, `createChatRouter`) chọn client theo tiền tố `deepseek:`, `byteplus:`, `gemini:`, `openrouter:`, `groq-fallback:`; không tiền tố = Groq. Model thiếu khóa thì bị bỏ qua. Kết quả LLM bị **validate bằng Zod** + kiểm tra từng mục phải khớp vị trí trong lời thật (mục không khớp bị loại); kết quả quá nghèo (< 6 vocab) coi như thất bại và thử model kế. Production dùng `FAST_FAIL_LIMITS` (retry 1, chờ 429 tối đa 8s) để rớt model nhanh trong trần 60s.
 
 Prompt: `lib/analysis/build-analysis-prompt.ts`, hằng `PROMPT_VERSION`. LLM chỉ chọn + giải thích; pinyin/HSK/Hán Việt do code ghép từ từ điển (`assemble-song-analysis.ts`, `build-line-pinyin.ts`).
 

@@ -140,7 +140,7 @@ Báo cả video sai (migration `20261010000003_video_reports.sql`, chạy **trư
 
 | Hiện tượng | Xử lý |
 |---|---|
-| Nhiều bài `Không phân tích được bài hát bằng model nào` | Xem log `attempts`: DeepSeek hết tiền/khoá sai? Groq 429? Nạp credit DeepSeek hoặc chờ reset hạn mức Groq; OpenRouter là lưới cuối |
+| Nhiều bài `Không phân tích được bài hát bằng model nào` | Xem log `attempts`: DeepSeek hết tiền/khoá sai? Gemini 429/thiếu khóa? Groq 429 (đứng cuối)? Nạp credit DeepSeek hoặc chờ reset hạn mức Groq; OpenRouter là lưới cuối |
 | Giải nghĩa khi bấm chậm/lỗi | Groq hết hạn mức → rớt sang khóa 2, BytePlus, OpenRouter; kiểm tra từng khoá còn hạn mức |
 | Bài dài timeout | Timeout từng model là cố ý ngắn (15–25s); bài rất dài cần tách job nền (backlog) |
 
