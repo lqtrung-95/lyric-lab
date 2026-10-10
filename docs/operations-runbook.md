@@ -213,12 +213,17 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 5. Secret `BACKUP_PASSPHRASE` = chuỗi ngẫu nhiên dài (`openssl rand -base64 32`). **Cất thêm một bản ở trình quản lý mật khẩu**: mất nó là không giải mã được mọi bản sao lưu.
 6. Chạy thử bằng Run workflow, mở kho sao lưu kiểm tra có file mới.
 
-**Giải mã và khôi phục** (đã thử giải mã và `pg_restore --list` thành công ngày 2026-10-11: Postgres 17.6, 300 mục, 38 bảng dữ liệu; chưa thử khôi phục thật vào project trống):
+**Giải mã và khôi phục** (đã thử thật ngày 2026-10-11 vào một project Supabase trống: nạp xong bảng dữ liệu trong ~56 giây với `-j 4`; chạy một luồng thì quá 8 phút chưa xong):
 ```
 gpg --decrypt public-YYYY-MM-DD.dump.gpg > public.dump   # ngày trong tên file tính theo giờ UTC; xem `ls` để lấy tên thật
-pg_restore --no-owner --no-privileges --dbname "$DB_URL_MOI" public.dump
+pg_restore --list public.dump | grep -v " SCHEMA - public" | grep -v "COMMENT - SCHEMA public" > restore.list
+pg_restore -j 4 -L restore.list --no-owner --no-privileges --dbname "$RESTORE_URL" public.dump
+rm public.dump restore.list   # chứa dữ liệu người dùng chưa mã hóa
 ```
-Xóa file `.dump` đã giải mã ngay sau khi dùng (`rm public.dump`): nó chứa dữ liệu người dùng dạng chưa mã hóa. Dữ liệu `auth` (tài khoản) khôi phục bằng `pg_restore --data-only` vào project Supabase đã có sẵn schema `auth`; làm thận trọng và thử trên project trống trước. **Nên thử khôi phục vào một project Supabase trống ít nhất một lần**: bản sao lưu chưa thử khôi phục thì chưa chắc dùng được.
+- Dùng danh sách `-L` để bỏ lệnh `CREATE SCHEMA public` (project Supabase mới đã có sẵn schema `public`, nếu không sẽ báo lỗi "already exists"). Project đích đã có dữ liệu dở thì dọn trước bằng `drop schema public cascade; create schema public;` rồi cấp lại quyền (`grant usage on schema public to postgres, anon, authenticated, service_role; grant all on schema public to postgres, service_role;`).
+- Đặt chuỗi kết nối bằng `read -s "RESTORE_URL?..."; export RESTORE_URL` để mật khẩu không nằm trong lịch sử lệnh.
+- **Lỗi `violates foreign key constraint ... auth.users` là đúng như dự kiến** khi chỉ khôi phục `public`: các bảng của app có khóa ngoại tới `auth.users`, mà project mới chưa có tài khoản nào. Dữ liệu các bảng vẫn được nạp, chỉ thiếu ràng buộc khóa ngoại (lần thử có 48 lỗi bị bỏ qua, toàn loại này). Muốn đủ ràng buộc khi khôi phục thật sau sự cố: khôi phục dữ liệu `auth` (file `auth-*.dump.gpg`, `pg_restore --data-only`) TRƯỚC, rồi mới khôi phục `public`. Cách này chưa thử; thử trên project trống trước.
+- Kiểm tra sau khôi phục: đếm hàng vài bảng chính (songs, song_analyses, video_lessons, dict_words) ở project đích và so với project gốc.
 
 **Lưu ý:** workflow chạy theo lịch bị GitHub tự tắt sau 60 ngày repo không có hoạt động; lúc đó vào tab Actions bật lại. Lỗi sao lưu gửi email báo cho người sửa lịch cuối cùng. Lịch sử git của kho sao lưu giữ cả các bản đã xóa khỏi cây thư mục, nên kho sẽ lớn dần theo thời gian (hiện dữ liệu nhỏ); khi quá lớn thì tạo kho sao lưu mới. Dump tăng kích thước theo dữ liệu: GitHub khuyến nghị mỗi file dưới 100 MB.
 
