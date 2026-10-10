@@ -5,6 +5,8 @@ export interface ChatRequest {
   user: string;
   /** Trần token đầu ra; Groq tính giá trị này vào hạn mức token/phút nên yêu cầu ngắn nên đặt thấp. */
   maxTokens?: number;
+  /** Hạn chót một lần gọi (ms) của nhà cung cấp hỗ trợ (hiện chỉ Gemini). Model "suy nghĩ" dịch 30 dòng mất ~15 giây nên cần nới hơn mặc định. */
+  timeoutMs?: number;
 }
 export type ChatFn = (req: ChatRequest) => Promise<string>;
 

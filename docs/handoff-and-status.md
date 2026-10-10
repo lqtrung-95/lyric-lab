@@ -71,6 +71,8 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 
 ## Việc mới nhất đã làm (để tiện nối tiếp)
 
+- **Bản dịch phụ đề video tốt hơn (2026-10-10):** trước đây dịch bằng Groq `gpt-oss-120b` với prompt dành cho LỜI BÀI HÁT, từng đoạn 30 dòng không có ngữ cảnh nên tệ hơn Google Dịch (video `xmfSsHDd6M0`). Nay: prompt riêng cho lời thoại video (tiêu đề + dòng lân cận làm ngữ cảnh), Gemini flash-lite đứng đầu chuỗi nhanh, Gemini flash đầy đủ cho nút admin "Dịch lại toàn bộ". Đã thử bằng 40 dòng thật của video đó: bản mới tự nhiên rõ rệt (flash còn bắt được ngữ cảnh: "Dạ cho cháu lấy cái này", Americano). Video đã dịch trước đây cần admin bấm dịch lại. Lỗi nghe nhầm của phụ đề (vd. "羊" thay vì "样") vẫn có thể dịch sai.
+
 - **Supadata chỉ lấy tiếng Trung (2026-10-10):** đường Supadata của `POST /api/videos/add` không lấy track tiếng Việt nữa (tiết kiệm 1 credit mỗi video có sẵn phụ đề Việt và tránh bản dịch lệch câu); bản dịch luôn do AI làm (Groq trước, trong ngân sách ngày). Đường dấu trang vẫn có thể gửi kèm phụ đề Việt (qua cổng chất lượng `isUsableTranslationTrack` có đo `straddleShare`).
 
 - **Giữ chân người học (2026-10-10):** mục tiêu hằng ngày (thanh tiến độ trên thẻ chuỗi ngày, đặt ở Cài đặt → Học tập), cột mốc (chuỗi ngày, từ đã ôn, câu học qua video) và việc học video nay tính vào chuỗi ngày. Cần chạy migration `20261010000005_daily_goal_and_video_activity.sql`. Email "chuỗi N ngày sắp đứt" (20:00 giờ Việt Nam, cần migration `20261010000006_email_streak_reminder.sql`) đã xong ở code, chưa gửi thử thật. Web push vẫn chạy song song nhưng không đầu tư thêm (ít người bật). Chưa làm: tính câu video vào bảng xếp hạng (cố ý để 0 điểm).

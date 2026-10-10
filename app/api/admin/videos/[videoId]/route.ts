@@ -10,7 +10,7 @@ import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-// Dịch bù bằng AI cả video (nhiều đoạn, có hạn chót 35 giây bên trong) nên cần thời gian tối đa của gói Hobby.
+// Dịch bù bằng AI cả video (nhiều đoạn, có hạn chót 25 giây bên trong) nên cần thời gian tối đa của gói Hobby.
 export const maxDuration = 60;
 
 async function adminOr403() {

@@ -100,7 +100,7 @@ export async function POST(req: Request) {
     const chat = createChat(env);
     const outcome = await ingestVideo(
       { sb, provider: new FixedCaptionProvider(lines, "zh-Hans", viLines), lookup: (terms) => lookupWords(sb as never, terms) },
-      { meta, sourceId: null, status: "listed", addedBy: user.id, requireGoodTranslationTrack: true, translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat) : undefined },
+      { meta, sourceId: null, status: "listed", addedBy: user.id, requireGoodTranslationTrack: true, translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
     );
     if (outcome.kind === "skipped") return ok({ kind: "skipped", reason: outcome.reason });
     return ok({ kind: "added", videoId, lineCount: outcome.lineCount, translatedLineCount: outcome.translatedLineCount, translation: outcome.translationSource, aiBudgetExhausted: !canTranslate });

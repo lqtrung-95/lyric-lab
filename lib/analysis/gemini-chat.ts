@@ -67,7 +67,7 @@ export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}
               ...(supportsThinkingOff(req.model) ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
             },
           }),
-          signal: AbortSignal.timeout(TIMEOUT_MS),
+          signal: AbortSignal.timeout(req.timeoutMs ?? TIMEOUT_MS),
         });
         if (res.ok) {
           const body = (await res.json()) as GeminiResponse;

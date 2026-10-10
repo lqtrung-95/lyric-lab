@@ -12,13 +12,13 @@ import type { LessonLine, TranslationSource } from "./video-lesson-types";
  */
 export async function translateMissingLessonLines(videoId: string): Promise<{ translated: number; remaining: number } | "not_found"> {
   const sb = createSupabaseServiceClient();
-  const { data, error } = await sb.from("video_lessons").select("lines, translation_source").eq("video_id", videoId).maybeSingle();
+  const { data, error } = await sb.from("video_lessons").select("lines, translation_source, title").eq("video_id", videoId).maybeSingle();
   if (error) throw new Error(`translateMissingLessonLines: ${error.message}`);
   if (!data) return "not_found";
-  const { lines, translation_source: source } = data as unknown as { lines: LessonLine[]; translation_source: TranslationSource };
+  const { lines, translation_source: source, title } = data as unknown as { lines: LessonLine[]; translation_source: TranslationSource; title: string };
   if (!lines.some((l) => !l.translation)) return { translated: 0, remaining: 0 };
 
-  const filled = await translateLines(lines, createChat(getServerEnv()));
+  const filled = await translateLines(lines, createChat(getServerEnv()), undefined, { title });
   const applied = applyTranslations(lines, filled);
   if (applied.newlyTranslated > 0) {
     const { error: updateError } = await sb.from("video_lessons").update({
