@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { consumeUsage } from "@/lib/rate-limit/consume-usage";
+import { consumeUsage, refundUsage } from "@/lib/rate-limit/consume-usage";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
 import { createChat } from "@/lib/analysis/server-deps";
 import { GEMINI_MODELS } from "@/lib/analysis/gemini-models";
@@ -11,7 +11,7 @@ import { FeedbackError, giveFeedback } from "@/lib/pronunciation/give-feedback";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const ipLimiter = new InMemoryRateLimiter(150, 24 * 60 * 60 * 1000);
+const ipLimiter = new InMemoryRateLimiter(500, 24 * 60 * 60 * 1000);
 
 /**
  * POST /api/pronunciation-feedback {videoId, lineIndex, mimeType, audio(base64)} → nhận xét phát âm bằng tiếng Việt.
@@ -32,17 +32,19 @@ export async function POST(req: Request) {
   const env = getServerEnv();
   if (!env.GEMINI_API_KEYS) return Response.json({ error: "feedback_unavailable" }, { status: 503 });
 
+  let consumed = false; // đã trừ lượt cho yêu cầu này: lỗi phía hệ thống thì hoàn lại
   try {
     const lines = await loadLinesForVideo(parsed.data.videoId);
     if (!lines) return Response.json({ error: "analysis_not_found" }, { status: 404 });
     const started = Date.now();
     const result = await giveFeedback(lines, parsed.data, {
       chat: createChat(env), models: GEMINI_MODELS,
-      allowLlmCall: async () => ipLimiter.tryConsume(ip) && (await consumeUsage(user, "voice")),
+      allowLlmCall: async () => (consumed = ipLimiter.tryConsume(ip) && (await consumeUsage(user, "voice"))),
     });
     console.info(JSON.stringify({ event: "pronunciation_feedback", videoId: parsed.data.videoId, model: result.model, score: result.score, ms: Date.now() - started }));
     return Response.json(result);
   } catch (error) {
+    if (consumed && (error as { code?: string })?.code !== "rate_limited") await refundUsage(user, "voice");
     if (error instanceof FeedbackError || (error as Error)?.name === "FeedbackError") {
       const code = (error as FeedbackError).code;
       return Response.json({ error: code }, { status: code === "line_not_found" ? 400 : code === "rate_limited" ? 429 : 502 });

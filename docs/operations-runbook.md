@@ -196,5 +196,5 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 
 - Cần chạy migration `supabase/migrations/20261010000007_ask_and_voice_usage_kinds.sql` (Supabase SQL Editor) TRƯỚC khi deploy: thiếu nó, `consume_usage` với loại `ask`/`voice` vi phạm ràng buộc `usage_events_kind_check` và hai nút báo lỗi.
 - `/api/pronunciation-feedback` chỉ chạy khi có `GEMINI_API_KEYS` (thiếu thì trả 503 `feedback_unavailable`, nút báo "chưa bật"). Âm thanh người học được chuyển tiếp sang Google Gemini để nghe; gói miễn phí của Google có thể dùng dữ liệu để cải thiện sản phẩm: cân nhắc gói trả phí nếu có nhiều người dùng, và nhớ UI đã ghi rõ điều này cạnh nút.
-- Hạn mức mặc định (24 giờ): hỏi AI 20/80, nghe giọng 10/40 (ẩn danh/đã đăng nhập); đổi ở `lib/rate-limit/usage-limit-config.ts`.
+- Hạn mức mặc định (24 giờ): hỏi AI 60/300, nghe giọng 30/150 (ẩn danh/đã đăng nhập; đang để rộng vì ít người dùng, siết lại khi đông), cộng lớp IP trong bộ nhớ 300 và 500 lượt/ngày; lỗi phía hệ thống tự hoàn lượt; đổi ở `lib/rate-limit/usage-limit-config.ts`.
 - Thử nhanh: tạo giọng mẫu bằng `say -v Tingting "..." -o a.wav --file-format=WAVE --data-format=LEI16@16000` rồi gọi `giveFeedback` với khóa thật (đã thử: đọc đúng ~95-98 điểm, nói câu khác ~40).
