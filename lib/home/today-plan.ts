@@ -1,10 +1,10 @@
 import type { DiscoverSong } from "@/lib/discover/discover-query";
 import { bandOfLevel } from "@/lib/video/video-level-filter";
 import type { LessonSummary } from "@/lib/video/video-repo";
-import { levelToBand, type ContinueSong } from "./home-logic";
+import { levelToBand } from "./home-logic";
 
 export interface StudyPick {
-  kind: "continue" | "video" | "song";
+  kind: "video" | "song";
   videoId: string;
   title: string;
   href: string;
@@ -15,15 +15,12 @@ export interface StudyPick {
 const dayNumber = (dayKey: string) => Math.floor(Date.parse(`${dayKey}T00:00:00Z`) / 86_400_000) || 0;
 
 /**
- * Một việc học vừa sức cho hôm nay: bài đang nghe dở (nếu có) → hoặc luân phiên theo ngày giữa một video và một bài hát hợp level
- * (ngày chẵn ưu tiên video, ngày lẻ ưu tiên bài hát; thiếu loại nào thì lấy loại kia). Video hợp level = cùng dải HSK với level người dùng,
- * thiếu thì lấy video bất kỳ. Trả null khi không có gì để gợi ý.
+ * Một gợi ý học vừa sức cho hôm nay: luân phiên theo ngày giữa một video và một bài hát hợp level (ngày chẵn ưu tiên video, ngày lẻ ưu tiên bài hát;
+ * thiếu loại nào thì lấy loại kia). Video hợp level = cùng dải HSK với level người dùng, thiếu thì lấy video bất kỳ. Trả null khi không có gì để gợi ý.
+ * Không gợi ý "tiếp tục bài nghe dở" và số thẻ cần ôn: bảng "Hôm nay" bên cạnh đã hiện hai việc đó, nhắc lại sẽ bị trùng.
  */
-export function pickTodayStudy(input: { continueSong: ContinueSong | null; videos: LessonSummary[]; songs: DiscoverSong[]; level: number; dayKey: string }): StudyPick | null {
-  const { continueSong, videos, songs, level, dayKey } = input;
-  if (continueSong) {
-    return { kind: "continue", videoId: continueSong.videoId, title: continueSong.title, href: `/learn/${continueSong.videoId}/listen?t=${continueSong.positionSec}`, levelAvg: null };
-  }
+export function pickTodayStudy(input: { videos: LessonSummary[]; songs: DiscoverSong[]; level: number; dayKey: string }): StudyPick | null {
+  const { videos, songs, level, dayKey } = input;
   const day = dayNumber(dayKey);
   const band = levelToBand(level);
   const fitting = videos.filter((v) => bandOfLevel(v.levelAvg) === band);

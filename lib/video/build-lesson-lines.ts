@@ -6,6 +6,7 @@ import { collectHanTerms, tokenizeLyricLines } from "@/lib/analysis/tokenize-lyr
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
 import { pickPrimaryEntry } from "@/lib/dictionary/lookup-words";
 import { normalizeLyricLines } from "@/lib/lyrics/normalize-lyric-lines";
+import { clampLineSeconds, estimateLessonLevel } from "./lesson-difficulty";
 import type { LessonLine } from "./video-lesson-types";
 
 type Dictionary = ReadonlyMap<string, DictWordRow[]>;
@@ -39,15 +40,22 @@ export function toLessonLines(prepared: PreparedLine[], dictionary: Dictionary):
   }));
 }
 
-/** Cấp HSK trung bình của các từ (mỗi lần xuất hiện tính một lần, bỏ từ ngoài HSK); null nếu không từ nào có cấp. Dùng để lọc "vừa sức". */
+/**
+ * Cấp HSK ước lượng của video theo độ khó từ vựng và tốc độ nói (xem `estimateLessonLevel`); null nếu chưa đủ từ để đánh giá. Dùng để lọc "vừa sức".
+ * Chỉ tính chữ Hán; từ ngoài danh sách HSK được tính là khó.
+ */
 export function averageLessonLevel(prepared: PreparedLine[], dictionary: Dictionary): number | null {
-  const levels: number[] = [];
+  const tokenLevels: (number | null)[] = [];
+  let hanChars = 0;
+  let speakingSeconds = 0;
   for (const line of prepared) {
+    speakingSeconds += clampLineSeconds(line.end - line.start);
+    for (const ch of line.text) if (/\p{Script=Han}/u.test(ch)) hanChars++;
     for (const t of line.tokens) {
       if (!t.isHan) continue;
       const level = pickPrimaryEntry(dictionary.get(t.simplified) ?? [])?.hsk_level;
-      if (typeof level === "number") levels.push(level);
+      tokenLevels.push(typeof level === "number" ? level : null);
     }
   }
-  return levels.length === 0 ? null : Math.round((levels.reduce((a, b) => a + b, 0) / levels.length) * 10) / 10;
+  return estimateLessonLevel({ tokenLevels, hanChars, speakingSeconds });
 }

@@ -7,13 +7,9 @@ const video = (videoId: string, levelAvg: number | null): LessonSummary => ({ vi
 const song = (videoId: string): DiscoverSong => ({ videoId, title: `S ${videoId}`, channelTitle: "k", levelAvg: 3, listeners: 1, likes: 0 });
 const EVEN = "2026-10-12"; // 20738 ngày: số chẵn
 const ODD = "2026-10-13";
-const base = { continueSong: null, videos: [video("v1", 3.2), video("v2", 1.5)], songs: [song("s1")], level: 3 };
+const base = { videos: [video("v1", 3.2), video("v2", 1.5)], songs: [song("s1")], level: 3 };
 
 describe("pickTodayStudy", () => {
-  it("bài đang nghe dở luôn được ưu tiên", () => {
-    const r = pickTodayStudy({ ...base, continueSong: { videoId: "c1", title: "Dở", positionSec: 42 }, dayKey: EVEN });
-    expect(r).toMatchObject({ kind: "continue", href: "/learn/c1/listen?t=42" });
-  });
   it("ngày chẵn gợi ý video cùng dải level; ngày lẻ gợi ý bài hát", () => {
     expect(pickTodayStudy({ ...base, dayKey: EVEN })).toMatchObject({ kind: "video", videoId: "v1", href: "/video/v1" });
     expect(pickTodayStudy({ ...base, dayKey: ODD })).toMatchObject({ kind: "song", videoId: "s1", href: "/learn/s1" });

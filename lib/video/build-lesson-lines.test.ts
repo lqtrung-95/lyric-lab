@@ -35,12 +35,20 @@ describe("toLessonLines", () => {
 });
 
 describe("termsToLookUp / averageLessonLevel", () => {
-  it("liệt kê từ chữ Hán không trùng và tính level trung bình theo lần xuất hiện", () => {
+  it("liệt kê từ chữ Hán không trùng; ít từ quá thì chưa đánh giá level (null)", () => {
     const lines = prepareLessonLines(zh);
     expect(new Set(termsToLookUp(lines))).toEqual(new Set(["你好", "今天", "朋友"]));
-    expect(averageLessonLevel(lines, dictionary)).toBe(1.3); // (1 + 2 + 1) / 3
+    expect(averageLessonLevel(lines, dictionary)).toBeNull(); // dưới 20 lượt từ
   });
-  it("không từ nào có cấp thì null", () => {
-    expect(averageLessonLevel(prepareLessonLines(zh), new Map())).toBeNull();
+  it("đủ từ thì quy ra thang HSK theo tỉ lệ từ HSK 1–3; từ ngoài từ điển tính là khó", () => {
+    // Dựng thẳng các dòng đã chuẩn bị (30 dòng, mỗi dòng 3 từ) để không bị bước làm sạch gộp các dòng giống nhau.
+    const word = (text: string) => ({ text, simplified: text, isHan: true });
+    const prepared = Array.from({ length: 30 }, (_, i) => ({
+      text: "你好朋友今天", start: i * 2, end: i * 2 + 2, tokens: [word("你好"), word("朋友"), word("今天")], translation: null,
+    })) as unknown as Parameters<typeof averageLessonLevel>[0];
+    const easy = averageLessonLevel(prepared, dictionary)!;
+    const hard = averageLessonLevel(prepared, new Map())!;
+    expect(easy).toBeLessThan(2);
+    expect(hard).toBeGreaterThan(easy + 3);
   });
 });
