@@ -96,6 +96,15 @@ test("dấu trang gửi bản chép lời qua #: điền sẵn, tự gửi luôn
   expect(bodies).toEqual([{ video: VIDEO_ID, captions: "0:00\n大家好\n0:05\n欢迎收听" }]); // gửi đúng một lần
 });
 
+test("dấu trang không lấy được bản chép tiếng Trung từ bảng Transcript (t rỗng): báo rõ lý do, tự gửi chỉ mã video để server lấy", async ({ page }) => {
+  const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
+  await page.goto(`/video/add${hashOf({ v: VIDEO_ID, t: "" })}`);
+  await expect(page.getByText("không có tiếng Trung để chọn")).toBeVisible();
+  await expect(page.getByText("Đã nhận phụ đề từ YouTube")).toHaveCount(0);
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
+  expect(bodies).toEqual([{ video: VIDEO_ID }]); // không kèm phụ đề
+});
+
 test("dấu trang cũ còn gửi kèm phụ đề tiếng Việt: bỏ qua, chỉ gửi tiếng Trung lên server", async ({ page }) => {
   const bodies = await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 2, translatedLineCount: 2 } });
   await page.goto(`/video/add${hashOf({ v: VIDEO_ID, t: "0:00\n大家好\n0:05\n欢迎收听", vt: "0:00\nXin chào\n0:05\nChào mừng" })}`);

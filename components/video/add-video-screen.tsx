@@ -98,7 +98,9 @@ export function AddVideoScreen() {
         </label>
         <label className="block space-y-1">
           <span className="text-label-md font-semibold text-on-surface">Phụ đề tiếng Trung <span className="font-normal text-on-surface-variant">(bỏ trống nếu muốn thử lấy tự động)</span></span>
-          {received && <p role="status" className="text-label-md text-primary">Đã nhận phụ đề từ YouTube.</p>}
+          {received && (received.t
+            ? <p role="status" className="text-label-md text-primary">Đã nhận phụ đề từ YouTube.</p>
+            : <p role="status" className="text-label-md text-primary">Bảng &ldquo;Transcript&rdquo; của video này không có tiếng Trung để chọn (thường là phụ đề tự tạo). SongHanzi đang thử lấy phụ đề tiếng Trung bằng cách khác.</p>)}
           <textarea value={captionsValue} onChange={(e) => setCaptions(e.target.value)} rows={6} placeholder={"Dán file SRT/VTT, hoặc phụ đề copy từ YouTube (nút \"Show transcript\" dưới phần mô tả video):\n0:00\n大家好\n0:05\n欢迎收听..."}
             className="w-full rounded-2xl bg-surface-container-high p-3 text-body-md text-on-surface" />
         </label>

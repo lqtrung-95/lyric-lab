@@ -142,11 +142,22 @@ describe("bookmarklet", () => {
     expect(messages.some((m) => m.startsWith("link:https://songhanzi.test/video/add#d="))).toBe(true);
   });
 
-  it("bản chép lời không phải tiếng Trung và không tự chuyển được thì báo chọn tay, không mở gì", async () => {
-    const { opened, alerts } = run({ panelText: "0:00\nHello everyone\n0:05\nWelcome to the show", hasTranscriptButton: true });
+  it("bảng Transcript không có ô chọn ngôn ngữ nhưng video có track tiếng Trung (phụ đề tự tạo): mở SongHanzi chỉ với mã video để server tự lấy", async () => {
+    const { opened, alerts } = run({ panelText: "0:00\nHello everyone\n0:05\nWelcome to the show", hasTranscriptButton: true, trackCodes: [{ code: "zh", kind: "asr" }, { code: "en", kind: "asr" }] });
     await vi.advanceTimersByTimeAsync(3000);
-    expect(opened).toEqual([]);
-    expect(alerts[0]).toContain("Chưa tự chuyển được");
+    expect(alerts).toEqual([]);
+    expect(opened).toHaveLength(1);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: "" });
+  });
+
+  it("ô chọn ngôn ngữ có nhưng không chuyển được sang tiếng Trung mà video có track tiếng Trung: cũng để server tự lấy", async () => {
+    const { opened, alerts } = run({
+      panelText: "0:00\nHello everyone\n0:05\nWelcome to the show", trackCodes: ["zh-Hans", "en"],
+      langSwitch: { triggerLabel: "English", menuLabels: ["Arabic", "French", "English"], zhLabel: "Español", zhText: "0:00\nHola" },
+    });
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(alerts).toEqual([]);
+    expect(payloadOf(opened[0])?.t).toBe("");
   });
 
   it("ô ngôn ngữ đã là Chinese mà nội dung không phải chữ Hán (nhãn gắn sai) thì báo đúng nguyên nhân, không bảo chọn lại", async () => {
