@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { DISCOVER_PAGE_SIZE, type DiscoverSong } from "@/lib/discover/discover-query";
 import { levelToBand, pickContinueSong, type ContinueSong } from "@/lib/home/home-logic";
 import type { RemoteSongProgress } from "@/lib/library/merge-library-songs";
+import type { LessonSummary } from "@/lib/video/video-repo";
 
 /** Bài đang nghe dở gần nhất của người dùng (từ tiến độ đã lưu trên tài khoản); undefined = đang tải, null = không có. */
 export function useContinueSong(): ContinueSong | null | undefined {
@@ -68,4 +69,18 @@ export function useRecommendedSongs(level: number, excludeIds: string[] | null):
   }, [level, excludeKey]);
 
   return songs;
+}
+
+/** Các video luyện nghe đã duyệt (/api/videos) để gợi ý video vừa sức; undefined = đang tải, mảng rỗng khi lỗi (gợi ý chỉ còn bài hát). */
+export function useVideoSummaries(): LessonSummary[] | undefined {
+  const [videos, setVideos] = useState<LessonSummary[] | undefined>(undefined);
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/videos")
+      .then((r) => (r.ok ? r.json() : { videos: [] }))
+      .then((d: { videos?: LessonSummary[] }) => { if (!cancelled) setVideos(d.videos ?? []); })
+      .catch(() => { if (!cancelled) setVideos([]); });
+    return () => { cancelled = true; };
+  }, []);
+  return videos;
 }

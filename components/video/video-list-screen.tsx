@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SongCard } from "@/components/library/song-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { levelToBand } from "@/lib/home/home-logic";
+import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { countByBand, filterAndSortVideos, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import type { LessonSummary } from "@/lib/video/video-repo";
+import { VideoListFilters } from "./video-list-filters";
 
 const meta = (v: LessonSummary) =>
   [v.levelAvg !== null ? `HSK ~${v.levelAvg.toFixed(1)}` : null, `${v.lineCount} câu`, `${Math.max(1, Math.round(v.durationSec / 60))} phút`].filter(Boolean).join(" · ");
@@ -12,6 +16,13 @@ const meta = (v: LessonSummary) =>
 /** Trang Video: các video luyện nghe đã được tuyển chọn, bấm vào để xem cùng bản chép và tra từ. */
 export function VideoListScreen() {
   const [videos, setVideos] = useState<LessonSummary[] | null | "error">(null);
+  const { state } = useLearnerState();
+  // Mặc định hiện TẤT CẢ (người mới không bị giấu video); dải hợp level chỉ được đánh dấu trên nút lọc.
+  const [band, setBand] = useState<BandId | null>(null);
+  const [sort, setSort] = useState<VideoSort>("new");
+  const list = Array.isArray(videos) ? videos : null;
+  const counts = useMemo(() => countByBand(list ?? []), [list]);
+  const shown = useMemo(() => filterAndSortVideos(list ?? [], band, sort), [list, band, sort]);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,13 +49,23 @@ export function VideoListScreen() {
       ) : videos.length === 0 ? (
         <p className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Chưa có video nào. Quay lại sau nhé.</p>
       ) : (
-        <ul className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
-          {videos.map((v) => (
-            <li key={v.videoId}>
-              <SongCard videoId={v.videoId} href={`/video/${v.videoId}`} title={v.title} channelTitle={v.channelTitle} meta={meta(v)} sizes="(min-width:1024px) 25vw, 50vw" />
-            </li>
-          ))}
-        </ul>
+        <>
+          <VideoListFilters counts={counts} total={videos.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={levelToBand(state.level) as BandId} />
+          {shown.length === 0 ? (
+            <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">
+              Chưa có video ở mức này.{" "}
+              <button type="button" onClick={() => setBand(null)} className="font-semibold text-primary underline">Xem tất cả video</button>
+            </p>
+          ) : (
+            <ul className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
+              {shown.map((v) => (
+                <li key={v.videoId}>
+                  <SongCard videoId={v.videoId} href={`/video/${v.videoId}`} title={v.title} channelTitle={v.channelTitle} meta={meta(v)} sizes="(min-width:1024px) 25vw, 50vw" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </div>
   );

@@ -3,6 +3,7 @@ import { OnboardingBanner } from "@/components/home/onboarding-banner";
 import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
 import { NewcomerSteps } from "@/components/home/newcomer-steps";
+import { TodayPlan } from "@/components/home/today-plan";
 import { NextActionPanel } from "@/components/home/next-action-panel";
 import { StreakCard } from "@/components/streak/streak-card";
 import { RecommendedSongs } from "@/components/home/recommended-songs";
@@ -28,6 +29,7 @@ export default function AppHomePage() {
         </section>
         <NextActionPanel />
       </div>
+      <TodayPlan />
       <StreakCard />
       <OnboardingBanner />
       <NewcomerSteps />

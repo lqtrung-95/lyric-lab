@@ -13,7 +13,8 @@ export interface DiscoverParams {
   offset: number;
 }
 
-const BANDS: Record<string, [number, number]> = { "1-2": [0, 2.5], "3-4": [2.5, 4.5], "5-6": [4.5, 6.5], "7": [6.5, 99] };
+/** Dải cấp HSK theo HSK trung bình của bài/video (dùng chung cho Khám phá và lọc video). */
+export const BANDS: Record<string, [number, number]> = { "1-2": [0, 2.5], "3-4": [2.5, 4.5], "5-6": [4.5, 6.5], "7": [6.5, 99] };
 
 /** Đọc tham số từ URL, kẹp về giá trị hợp lệ (không tin đầu vào của client). */
 export function parseDiscoverParams(sp: URLSearchParams): DiscoverParams {
