@@ -1,7 +1,6 @@
 import type { DiscoverSong } from "@/lib/discover/discover-query";
-import { bandOfLevel } from "@/lib/video/video-level-filter";
+import { bandOfLevel, videoBandForLevel } from "@/lib/video/video-level-filter";
 import type { LessonSummary } from "@/lib/video/video-repo";
-import { levelToBand } from "./home-logic";
 
 export interface StudyPick {
   kind: "video" | "song";
@@ -16,13 +15,13 @@ const dayNumber = (dayKey: string) => Math.floor(Date.parse(`${dayKey}T00:00:00Z
 
 /**
  * Một gợi ý học vừa sức cho hôm nay: luân phiên theo ngày giữa một video và một bài hát hợp level (ngày chẵn ưu tiên video, ngày lẻ ưu tiên bài hát;
- * thiếu loại nào thì lấy loại kia). Video hợp level = cùng dải HSK với level người dùng, thiếu thì lấy video bất kỳ. Trả null khi không có gì để gợi ý.
+ * thiếu loại nào thì lấy loại kia). Video hợp level = cùng dải (`videoBandForLevel`) với level người dùng, thiếu thì lấy video bất kỳ. Trả null khi không có gì để gợi ý.
  * Không gợi ý "tiếp tục bài nghe dở" và số thẻ cần ôn: bảng "Hôm nay" bên cạnh đã hiện hai việc đó, nhắc lại sẽ bị trùng.
  */
 export function pickTodayStudy(input: { videos: LessonSummary[]; songs: DiscoverSong[]; level: number; dayKey: string }): StudyPick | null {
   const { videos, songs, level, dayKey } = input;
   const day = dayNumber(dayKey);
-  const band = levelToBand(level);
+  const band = videoBandForLevel(level);
   const fitting = videos.filter((v) => bandOfLevel(v.levelAvg) === band);
   const videoPool = fitting.length > 0 ? fitting : videos;
   const video = videoPool.length > 0 ? videoPool[day % videoPool.length] : null;

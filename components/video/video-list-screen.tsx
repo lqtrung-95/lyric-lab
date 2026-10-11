@@ -4,9 +4,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { SongCard } from "@/components/library/song-card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { levelToBand } from "@/lib/home/home-logic";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
-import { countByBand, filterAndSortVideos, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
+import { countByBand, filterAndSortVideos, videoBandForLevel, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import type { LessonSummary } from "@/lib/video/video-repo";
 import { VideoListFilters } from "./video-list-filters";
 
@@ -50,7 +49,7 @@ export function VideoListScreen() {
         <p className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Chưa có video nào. Quay lại sau nhé.</p>
       ) : (
         <>
-          <VideoListFilters counts={counts} total={videos.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={levelToBand(state.level) as BandId} />
+          <VideoListFilters counts={counts} total={videos.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} />
           {shown.length === 0 ? (
             <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">
               Chưa có video ở mức này.{" "}
