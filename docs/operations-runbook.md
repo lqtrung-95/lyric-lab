@@ -240,3 +240,11 @@ rm auth.dump auth.list public.dump restore.list; unset RESTORE_URL
 
 **Lưu ý:** workflow chạy theo lịch bị GitHub tự tắt sau 60 ngày repo không có hoạt động; lúc đó vào tab Actions bật lại. Lỗi sao lưu gửi email báo cho người sửa lịch cuối cùng. Lịch sử git của kho sao lưu giữ cả các bản đã xóa khỏi cây thư mục, nên kho sẽ lớn dần theo thời gian (hiện dữ liệu nhỏ); khi quá lớn thì tạo kho sao lưu mới. Dump tăng kích thước theo dữ liệu: GitHub khuyến nghị mỗi file dưới 100 MB.
 
+## Tính lại level của video
+
+Level video (`video_lessons.level_avg`) tính lúc nạp theo độ khó từ vựng và tốc độ nói (`lib/video/lesson-difficulty.ts`). Đổi công thức hoặc hằng số thì tính lại cho video đã nạp:
+```
+NODE_OPTIONS=--experimental-websocket npx tsx scripts/backfill-video-levels.mts            # xem trước bảng cũ → mới và phân bố dải, không ghi
+NODE_OPTIONS=--experimental-websocket npx tsx scripts/backfill-video-levels.mts --apply    # ghi vào DB
+```
+Cần `.env.local` có khóa service role. Chạy xem trước rồi mới `--apply`.
