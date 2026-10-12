@@ -52,7 +52,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScre
           <Link href="/video" aria-label="Về danh sách video" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-surface-container-high md:flex"><Icon name="arrow_back" size={22} /></Link>
           <div className="min-w-0">
             <p lang="zh" title={lesson.title} className="truncate font-serif text-body-lg font-semibold leading-6 text-primary">{lesson.title}</p>
-            <p className="truncate text-label-sm text-on-surface-variant">{lesson.channelTitle}</p>
+            <p className="truncate text-label-sm text-on-surface-variant">{lesson.channelTitle}{lesson.levelAvg !== null && <span className="font-semibold text-on-surface"> · HSK ~{lesson.levelAvg.toFixed(1)}</span>}</p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-0.5">

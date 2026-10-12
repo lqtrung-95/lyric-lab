@@ -75,11 +75,11 @@ export async function POST(req: Request) {
     const limit = admin ? "ok" : decideAddLimit(await count(true), await count(false));
     if (limit !== "ok") return fail(limit, 429);
 
-    // Ngân sách AI dịch toàn app (theo phút video): hết thì vẫn thêm video nhưng không nhờ AI dịch, admin dịch bù sau. Video dùng được phụ đề tiếng Việt có sẵn không tốn AI.
+    // Ngân sách AI dịch toàn app (theo phút video; admin không bị trần này để import hàng loạt): hết thì vẫn thêm video nhưng không nhờ AI dịch, admin dịch bù sau. Video dùng được phụ đề tiếng Việt có sẵn không tốn AI.
     const { data: aiVideos, error: budgetError } = await sb.from("video_lessons").select("duration_sec").not("added_by", "is", null).eq("translation_source", "ai").gte("created_at", since);
     if (budgetError) throw new Error(`đếm ngân sách dịch: ${budgetError.message}`);
     const usedMinutes = ((aiVideos ?? []) as { duration_sec: number }[]).reduce((sum, v) => sum + v.duration_sec / 60, 0);
-    const canTranslate = decideTranslationBudget(usedMinutes, meta.durationSec) === "ok";
+    const canTranslate = admin || decideTranslationBudget(usedMinutes, meta.durationSec) === "ok";
 
     let lines: CaptionLine[] = parsed.data.lines ?? (parsed.data.captions ? parsePastedTranscript(parsed.data.captions, meta.durationSec) : []);
     if (lines.length === 0 && (parsed.data.captions || parsed.data.lines)) return fail("invalid_captions", 400);

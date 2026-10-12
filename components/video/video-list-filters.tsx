@@ -3,12 +3,12 @@ import { VIDEO_BANDS, VIDEO_SORTS, type BandId, type VideoSort } from "@/lib/vid
 const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md font-medium transition-colors";
 
 /**
- * Bộ lọc danh sách video theo cấp HSK (nút bấm, mặc định "Tất cả") và ô chọn cách sắp xếp. Dải trống bị ẩn; dải hợp với level của người học được đánh dấu
+ * Bộ lọc danh sách video theo cấp HSK (nút bấm, mặc định "Tất cả") nút "Nhóm theo kênh" và ô chọn cách sắp xếp. Dải trống bị ẩn; dải hợp với level của người học được đánh dấu
  * "hợp bạn" nhưng KHÔNG tự chọn, để người mới vẫn thấy toàn bộ video.
  */
-export function VideoListFilters({ counts, total, band, onBand, sort, onSort, suggested }: {
+export function VideoListFilters({ counts, total, band, onBand, sort, onSort, suggested, grouped, onGrouped }: {
   counts: Record<BandId, number>; total: number; band: BandId | null; onBand: (b: BandId | null) => void;
-  sort: VideoSort; onSort: (s: VideoSort) => void; suggested: BandId;
+  sort: VideoSort; onSort: (s: VideoSort) => void; suggested: BandId; grouped: boolean; onGrouped: (g: boolean) => void;
 }) {
   const on = "bg-primary text-on-primary";
   const off = "bg-surface-container-high text-on-surface hover:bg-surface-container-highest";
@@ -23,12 +23,15 @@ export function VideoListFilters({ counts, total, band, onBand, sort, onSort, su
           </button>
         ))}
       </div>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+      <button type="button" aria-pressed={grouped} onClick={() => onGrouped(!grouped)} className={`${chip} ${grouped ? on : off}`}>Nhóm theo kênh</button>
       <label className="flex items-center gap-2 text-label-md text-on-surface-variant">
         Sắp xếp
         <select value={sort} onChange={(e) => onSort(e.target.value as VideoSort)} className="min-h-11 rounded-full bg-surface-container-high px-4 text-label-md text-on-surface">
           {VIDEO_SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
       </label>
+      </div>
     </div>
   );
 }

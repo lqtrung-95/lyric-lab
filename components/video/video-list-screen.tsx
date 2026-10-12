@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { SongCard } from "@/components/library/song-card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { groupByChannel } from "@/lib/video/group-by-channel";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { countByBand, filterAndSortVideos, videoBandForLevel, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import type { LessonSummary } from "@/lib/video/video-repo";
@@ -19,9 +20,12 @@ export function VideoListScreen() {
   // Mặc định hiện TẤT CẢ (người mới không bị giấu video); dải hợp level chỉ được đánh dấu trên nút lọc.
   const [band, setBand] = useState<BandId | null>(null);
   const [sort, setSort] = useState<VideoSort>("new");
+  const [grouped, setGrouped] = useState(true);
   const list = Array.isArray(videos) ? videos : null;
   const counts = useMemo(() => countByBand(list ?? []), [list]);
   const shown = useMemo(() => filterAndSortVideos(list ?? [], band, sort), [list, band, sort]);
+
+  const groups = useMemo(() => (grouped ? groupByChannel(shown) : []), [grouped, shown]);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,23 +53,38 @@ export function VideoListScreen() {
         <p className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Chưa có video nào. Quay lại sau nhé.</p>
       ) : (
         <>
-          <VideoListFilters counts={counts} total={videos.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} />
+          <VideoListFilters counts={counts} total={videos.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} grouped={grouped} onGrouped={setGrouped} />
           {shown.length === 0 ? (
             <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">
               Chưa có video ở mức này.{" "}
               <button type="button" onClick={() => setBand(null)} className="font-semibold text-primary underline">Xem tất cả video</button>
             </p>
-          ) : (
-            <ul className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
-              {shown.map((v) => (
-                <li key={v.videoId}>
-                  <SongCard videoId={v.videoId} href={`/video/${v.videoId}`} title={v.title} channelTitle={v.channelTitle} meta={meta(v)} sizes="(min-width:1024px) 25vw, 50vw" />
-                </li>
+          ) : grouped ? (
+            <div className="space-y-space-lg">
+              {groups.map((g) => (
+                <section key={g.channelTitle} aria-label={`Kênh ${g.channelTitle}`}>
+                  <h2 className="mb-3 font-serif text-headline-md">{g.channelTitle} <span className="text-label-md font-normal text-on-surface-variant">{g.videos.length} video</span></h2>
+                  <VideoGrid videos={g.videos} />
+                </section>
               ))}
-            </ul>
+            </div>
+          ) : (
+            <VideoGrid videos={shown} />
           )}
         </>
       )}
     </div>
+  );
+}
+
+function VideoGrid({ videos }: { videos: LessonSummary[] }) {
+  return (
+    <ul className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
+      {videos.map((v) => (
+        <li key={v.videoId}>
+          <SongCard videoId={v.videoId} href={`/video/${v.videoId}`} title={v.title} channelTitle={v.channelTitle} meta={meta(v)} sizes="(min-width:1024px) 25vw, 50vw" />
+        </li>
+      ))}
+    </ul>
   );
 }
