@@ -10,6 +10,7 @@ const MODES = [
   { href: "/review/match", label: "Ghép cặp" },
   { href: "/review/listen", label: "Nghe và chọn" },
   { href: "/review/karaoke", label: "Karaoke" },
+  { href: "/review/restaurant", label: "Quán ăn" },
   { href: "/review/leaderboard", label: "Xếp hạng" },
 ];
 
