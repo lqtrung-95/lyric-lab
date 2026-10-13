@@ -5,11 +5,14 @@
  * Chỉ trả về khi mọi chữ Hán đều có trong bảng; thiếu chữ nào thì trả null (không đoán).
  * Chữ có nhiều âm lấy âm đầu tiên trong Unihan; Unihan lẫn cả âm Nôm nên có ca sai (袋 → "đãy" thay vì "đại").
  */
+// Chữ nhiều âm mà âm đầu tiên của Unihan không phải âm thông dụng (好 liệt kê "hiếu" trước "hảo"). Chỉ thêm khi đã xác nhận bằng dữ liệu thật.
+const COMMON_SINO_VIET: Record<string, string> = { 好: "hảo" };
+
 export function sinoVietForWord(word: string, readings: ReadonlyMap<string, string[]>): string | null {
   const parts: string[] = [];
   for (const ch of word) {
     if (!/\p{Script=Han}/u.test(ch)) return null;
-    const r = readings.get(ch)?.[0];
+    const r = COMMON_SINO_VIET[ch] ?? readings.get(ch)?.[0];
     if (!r) return null;
     parts.push(r);
   }

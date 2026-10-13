@@ -3,9 +3,9 @@ import { LogoMark } from "@/components/brand/logo-mark";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 const LINKS = [
-  { href: "#how", label: "Cách hoạt động" },
-  { href: "#features", label: "Tính năng" },
-  { href: "#faq", label: "Hỏi đáp" },
+  { href: "/#how", label: "Cách hoạt động" },
+  { href: "/#features", label: "Tính năng" },
+  { href: "/#faq", label: "Hỏi đáp" },
 ];
 
 /** Thanh trên của trang giới thiệu: neo tới các phần trong trang và nút vào app. */

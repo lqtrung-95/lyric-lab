@@ -10,3 +10,7 @@ describe("sinoVietForWord", () => {
   it("có ký tự không phải chữ Hán → null", () => expect(sinoVietForWord("A城", table)).toBeNull());
   it("chuỗi rỗng → null", () => expect(sinoVietForWord("", table)).toBeNull());
 });
+
+describe("sinoVietForWord, chữ có âm thông dụng ghi đè", () => {
+  it("好 lấy âm hảo dù Unihan liệt kê hiếu trước", () => expect(sinoVietForWord("好", new Map([["好", ["hiếu", "hảo"]]]))).toBe("hảo"));
+});

@@ -15,7 +15,8 @@ export function MarketingFooter() {
         </div>
         <nav aria-label="Liên kết cuối trang" className="flex flex-wrap gap-x-6 gap-y-2 text-label-md">
           <Link href="/app" className="inline-flex min-h-11 items-center text-primary hover:underline">Mở app</Link>
-          <a href="#faq" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Hỏi đáp</a>
+          <Link href="/chu-han-sang-pinyin" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Chữ Hán sang pinyin</Link>
+          <Link href="/#faq" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Hỏi đáp</Link>
           <a href="#top" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Lên đầu trang</a>
         </nav>
       </div>
