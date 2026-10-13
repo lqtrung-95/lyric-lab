@@ -193,4 +193,18 @@ describe.skipIf(!enabled)("RLS dữ liệu người dùng và hàm phía server"
       expect((await service.from(t).select("*").eq("user_id", aId)).data, t).toEqual([]);
     }
   });
+
+  it("merge_user_data: tin chat đi theo tài khoản đích và lệnh chặn được chuyển sang (không thoát chặn bằng cách đăng nhập Google)", async () => {
+    const inserted = await service.from("chat_messages").insert({ user_id: aId, nickname: "GopTest", body: "tin của tài khoản nguồn" }).select("id").single();
+    expect(inserted.error).toBeNull();
+    expect((await service.from("chat_blocked_users").insert({ user_id: aId })).error).toBeNull();
+
+    expect((await service.rpc("merge_user_data", { p_from: aId, p_to: bId })).error).toBeNull();
+
+    expect((await service.from("chat_messages").select("user_id").eq("id", inserted.data!.id).single()).data).toEqual({ user_id: bId });
+    expect((await service.from("chat_blocked_users").select("user_id").eq("user_id", bId)).data).toEqual([{ user_id: bId }]);
+    expect((await service.from("chat_blocked_users").select("user_id").eq("user_id", aId)).data).toEqual([]);
+    await service.from("chat_messages").delete().eq("id", inserted.data!.id);
+    await service.from("chat_blocked_users").delete().eq("user_id", bId);
+  });
 });
