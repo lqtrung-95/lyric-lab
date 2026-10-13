@@ -18,6 +18,17 @@ function fakeFetch(searchSongs: { id: number; name: string; artists: { name: str
   }) as unknown as typeof fetch;
 }
 
+describe("NeteaseProvider.lyricsById", () => {
+  const meta = [{ id: 7, name: "Bài B", artists: [{ name: "Ca sĩ B" }], duration: 123_000 }];
+  it("lấy lời có mốc thời gian theo id, kèm tên và độ dài truyền vào", async () => {
+    const item = await new NeteaseProvider(fakeFetch(meta, { 7: LRC })).lyricsById(7, "Bài B", "Ca sĩ B", 123);
+    expect(item).toEqual({ id: 7, trackName: "Bài B", artistName: "Ca sĩ B", duration: 123, instrumental: false, syncedLyrics: LRC });
+  });
+  it("bài không có lời có mốc thời gian thì trả null", async () => {
+    expect(await new NeteaseProvider(fakeFetch(meta, { 7: null })).lyricsById(7)).toBeNull();
+  });
+});
+
 describe("NeteaseProvider", () => {
   it("ghép kết quả tìm bài với lời tra riêng, đổi ms sang giây", async () => {
     const provider = new NeteaseProvider(fakeFetch(

@@ -40,6 +40,11 @@ export class NeteaseProvider implements NeteaseSearch {
     return items.filter((i): i is LrclibItem => i !== null);
   }
 
+  /** Lời có mốc thời gian của một bài NetEase theo id (khi chọn tay bản lời đúng thay cho bản tự chọn); null nếu bài không có lời có mốc thời gian. */
+  lyricsById(id: number, name = "", artists = "", durationSec = 0): Promise<LrclibItem | null> {
+    return this.fetchLyric({ id, name, artists, durationSec });
+  }
+
   private async post(url: string, params: Record<string, unknown>): Promise<unknown> {
     const { params: encParams, encSecKey } = weapiEncrypt({ ...params, csrf_token: "" });
     const res = await this.fetchFn(`${url}?csrf_token=`, {
