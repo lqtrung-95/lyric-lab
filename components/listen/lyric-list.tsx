@@ -12,6 +12,8 @@ import { ViewToggles } from "./view-toggles";
 
 // Sau khi người dùng tự cuộn, tạm ngừng tự cuộn theo lời để không giật màn hình.
 const MANUAL_SCROLL_PAUSE_MS = 4000;
+// Từ chừng này dòng trở lên (video dài, podcast), các dòng ngoài màn hình không được dựng hình (đo trên video 482 dòng: bật/tắt pinyin từ 187–429 ms còn 49–92 ms).
+const LAZY_RENDER_MIN_LINES = 80;
 
 interface LyricListProps {
   videoId: string;
@@ -157,6 +159,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               onReportTranslation={onReportTranslation}
               onAsk={onAsk}
               onEdit={variant === "lyrics" && isAdmin === true ? editLine : undefined}
+              lazyRender={lines.length >= LAZY_RENDER_MIN_LINES}
             />
           );
         })}

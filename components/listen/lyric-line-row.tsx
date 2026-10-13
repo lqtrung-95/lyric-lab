@@ -36,13 +36,15 @@ interface LyricLineRowProps {
   onAsk?: (index: number) => void;
   /** Có thì hiện nút sửa lời (chỉ quản trị viên). */
   onEdit?: (index: number) => void;
+  /** Danh sách rất dài: cho trình duyệt bỏ qua dựng hình dòng nằm ngoài màn hình (`content-visibility`), giảm mạnh độ giật khi cuộn và khi đổi cách hiển thị. */
+  lazyRender?: boolean;
 }
 
 /**
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onReportTranslation, onAsk, onEdit }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onReportTranslation, onAsk, onEdit, lazyRender = false }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
   // Nút của dòng nằm ở cột biểu tượng bên phải. Máy tính: hiện khi rê chuột. Điện thoại: chỉ ở câu đang hát (để không bóp hẹp các dòng còn lại)
@@ -56,7 +58,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
       data-line-index={line.index}
       aria-current={active ? "true" : undefined}
       onClick={() => onSeek(line.index)}
-      className={`group/line relative flex cursor-pointer items-start gap-2 rounded-xl p-2.5 transition-colors md:gap-3 md:p-3.5 ${
+      className={`group/line relative flex cursor-pointer items-start gap-2 rounded-xl p-2.5 transition-colors md:gap-3 md:p-3.5 ${lazyRender ? "[content-visibility:auto] [contain-intrinsic-size:auto_110px]" : ""} ${
         active ? "bg-surface-container p-3 shadow-md md:p-5" : state === "past" ? "opacity-60 hover:bg-surface-container-low/50" : "hover:bg-surface-container-low/50"
       }`}
     >

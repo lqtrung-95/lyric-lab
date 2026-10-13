@@ -817,3 +817,19 @@ test("nạp video từ kênh: YouTube chặn tạm thì báo lỗi, dừng sớm
   for (let i = 0; i < 4; i++) { await page.clock.fastForward(5_000); await page.waitForTimeout(150); }
   await expect(page.getByRole("status").filter({ hasText: /Xong 2 · bỏ qua 0 · lỗi 0/ })).toBeVisible({ timeout: 15_000 });
 });
+
+test("video dài (từ 80 dòng) cho trình duyệt bỏ qua dựng hình dòng ngoài màn hình; video ngắn thì không đổi", async ({ page }) => {
+  await mockVideoApis(page);
+  const many = Array.from({ length: 100 }, (_, i) => ({ idx: i, start: i * 4, end: i * 4 + 4, text: "你好，朋友。", pinyin: "nǐ hǎo ， péng you 。", translation: "Xin chào, bạn bè.", tokens: [{ text: "你好" }, { text: "，" }, { text: "朋友" }, { text: "。" }] }));
+  await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: { ...lesson, lineCount: 100, lines: many } }));
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(`/video/${VIDEO_ID}`);
+  const visibility = (index: number) => page.locator(`[data-line-index="${index}"]`).evaluate((el) => getComputedStyle(el).contentVisibility);
+  await expect(page.locator("[data-line-index]")).toHaveCount(100);
+  expect(await visibility(50)).toBe("auto");
+  // Video ngắn (3 dòng): giữ nguyên cách dựng cũ.
+  await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: lesson }));
+  await page.goto(`/video/${VIDEO_ID}`);
+  await expect(page.locator("[data-line-index]")).toHaveCount(3);
+  expect(await visibility(1)).toBe("visible");
+});
