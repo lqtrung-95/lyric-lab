@@ -7,6 +7,11 @@ describe("usageLimit", () => {
     expect(usageLimit("analyze", false)).toBe(30);
   });
 
+  it("tin nhắn cộng đồng đếm theo 1 giờ", () => {
+    expect(usageWindowHours("chat")).toBe(1);
+    expect(usageLimit("chat", true)).toBe(20);
+  });
+
   it("tài khoản đã đăng nhập luôn được hạn mức cao hơn ẩn danh", () => {
     for (const kind of ["analyze", "explain"] as const) {
       expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
@@ -24,6 +29,6 @@ describe("usageLimit", () => {
     expect(usageWindowHours("room")).toBe(24);
     expect(usageLimit("room_join", true)).toBe(30);
     expect(usageWindowHours("room_join")).toBe(1);
-    for (const kind of ["room", "room_join", "ask", "voice", "translate"] as const) expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
+    for (const kind of ["room", "room_join", "ask", "voice", "translate", "chat"] as const) expect(usageLimit(kind, false)).toBeGreaterThan(usageLimit(kind, true));
   });
 });

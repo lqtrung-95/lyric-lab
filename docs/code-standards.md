@@ -104,4 +104,6 @@ Khung nội dung chính của mọi trang (header, `main`, chân trang, màn h�
 - Phát đoạn một câu video luôn qua `clipRange` (không dùng thẳng `line.start`/`line.end`) để áp phần người học chỉnh. Nhãn nút chứa số thập phân viết dấu phẩy (0,1) để khớp văn bản hiển thị và test.
 - Component client không import module có `@node-rs/jieba` (hay bất kỳ gói native): đặt kiểu và hàm thuần dùng chung vào file `*-shared.ts` không có phụ thuộc nặng (ví dụ `lib/tools/han-converter-shared.ts`).
 - Chọn model LLM bằng tên cụ thể, không dùng alias `-latest` (có lúc trỏ vào model quá tải/ngưng); nhiều khóa API chỉ giải quyết hạn mức, không giải quyết model quá tải, nên luôn có model dự phòng thật sự chạy được (và có số dư).
+- Một `ConfirmDialog` cho cả danh sách: đừng render một hộp thoại cho từng dòng (trùng `id`, sai tên trợ năng); giữ trạng thái "đang xác nhận cho mục nào" ở cha và render đúng một hộp thoại.
+- Quyền hạn (huy hiệu admin, loại tin) do server quyết từ phiên, không nhận từ client.
 - Danh sách dài (video 400+ dòng) dùng `content-visibility: auto` trên từng dòng; đừng thêm `ruby`/nút theo từng chữ mà không đo lại, vì số phần tử DOM nhân lên rất nhanh (mỗi dòng đã ~120 phần tử).

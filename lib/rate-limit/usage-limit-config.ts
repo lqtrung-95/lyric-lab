@@ -1,4 +1,4 @@
-export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice" | "translate";
+export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice" | "translate" | "chat";
 
 // Hạn mức trong 24 giờ theo tài khoản. Phân tích bài mới theo PRD §7; giải nghĩa từ bằng LLM tốn ít hơn nên cho nhiều hơn.
 const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
@@ -16,9 +16,11 @@ const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
   voice: { anonymous: 30, member: 150 },
   // Mỗi lượt gọi dịch tối đa ~18 giây (khoảng 60–120 câu); video 480 câu cần 5–8 lượt nên để rộng, siết lại khi đông.
   translate: { anonymous: 20, member: 60 },
+  // Tin nhắn cộng đồng, đếm trong 1 GIỜ (chống spam; trò chuyện bình thường ít khi vượt).
+  chat: { anonymous: 20, member: 60 },
 };
 
-const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24, translate: 24 };
+const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24, translate: 24, chat: 1 };
 
 /** Cửa sổ đếm (giờ) của từng loại: điểm luyện tập tính theo giờ, còn lại theo 24 giờ. */
 export const usageWindowHours = (kind: UsageKind): number => WINDOW_HOURS[kind];

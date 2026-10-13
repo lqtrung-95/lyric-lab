@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AnnouncementBanner } from "@/components/chat/announcement-banner";
 import { OnboardingBanner } from "@/components/home/onboarding-banner";
 import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
@@ -16,6 +17,7 @@ export const metadata: Metadata = { title: "Trang chủ", robots: { index: false
 export default function AppHomePage() {
   return (
     <>
+      <AnnouncementBanner />
       <div className="grid gap-space-md lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
         <section className="relative isolate overflow-hidden rounded-3xl bg-surface-container-low px-space-md py-space-xl md:px-space-xl">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_95%_0%,color-mix(in_srgb,var(--primary-container)_18%,transparent),transparent)]" />

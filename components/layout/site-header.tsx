@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogoMark } from "@/components/brand/logo-mark";
 import { Icon } from "@/components/ui/icon";
+import { ChatNavLink } from "@/components/chat/chat-nav-link";
 import { DueBadge } from "@/components/review/due-badge";
 import { isNavActive, NAV_LINKS } from "./nav-links";
 import { ThemeToggle } from "./theme-toggle";
@@ -41,6 +42,7 @@ export function SiteHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-1">
+          <ChatNavLink />
           <Link href="/cong-cu" aria-label="Công cụ" title="Công cụ" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="build" size={20} />
           </Link>
