@@ -42,6 +42,8 @@ export const COMMON_READING: Record<string, string> = {
   说: "shuō",
   听: "tīng",
   读: "dú",
+  // Trợ từ "le" (hoàn thành/ngữ khí) phổ biến hơn hẳn "liǎo" (xong, có thể); thấy ở danh sách từ vựng HSK 1 và thẻ tra từ.
+  了: "le",
 };
 const pinyinKey = (p: string) => p.replace(/\s+/g, "").toLowerCase();
 

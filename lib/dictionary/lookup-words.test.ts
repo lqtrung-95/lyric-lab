@@ -63,3 +63,9 @@ describe("pickPrimaryEntry", () => {
     expect(pickPrimaryEntry([row("读", "dòu", 1), row("读", "dú", 1)])?.pinyin).toBe("dú");
   });
 });
+
+describe("pickPrimaryEntry: ghi đè cách đọc thông dụng", () => {
+  it("了 lấy âm nhẹ \"le\" (trợ từ) dù từ điển liệt kê \"liǎo\" trước", () => {
+    expect(pickPrimaryEntry([row("了", "liǎo", 1), row("了", "le", 1)])?.pinyin).toBe("le");
+  });
+});

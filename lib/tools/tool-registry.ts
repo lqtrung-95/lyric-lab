@@ -19,4 +19,10 @@ export const TOOLS: readonly ToolEntry[] = [
     description: "Dán đoạn chữ Hán (giản thể hoặc phồn thể), nhận pinyin có dấu thanh và âm Hán Việt từng từ, sao chép được.",
     icon: "dictionary",
   },
+  {
+    href: "/tu-vung-hsk",
+    title: "Từ vựng HSK có âm Hán Việt",
+    description: "Danh sách từ HSK 1–6 kèm pinyin, âm Hán Việt và nghĩa. Tìm nhanh, tải CSV để nạp vào Anki.",
+    icon: "list_alt",
+  },
 ];

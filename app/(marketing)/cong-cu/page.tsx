@@ -23,13 +23,13 @@ const jsonLd = {
 /** Mục lục các công cụ công khai (đọc từ `TOOLS`). Trang được lập chỉ mục và liên kết nội bộ tới từng công cụ. */
 export default function ToolsIndexPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-space-lg pb-space-lg">
+    <div className="mx-auto max-w-5xl space-y-space-lg pb-space-lg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Công cụ</h1>
         <p className="mt-2 text-body-lg text-on-surface-variant">Những công cụ nhỏ dùng được ngay, không cần đăng ký hay lưu thẻ học.</p>
       </header>
-      <ul className="grid gap-gutter sm:grid-cols-2">
+      <ul className="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
         {TOOLS.map((t) => (
           <li key={t.href}>
             <Link href={t.href} className="flex h-full min-h-28 flex-col gap-2 rounded-2xl bg-surface-container-low p-space-md transition-colors hover:bg-surface-container-high">
