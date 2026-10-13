@@ -41,6 +41,9 @@ export function SiteHeader() {
           </nav>
         </div>
         <div className="flex items-center gap-1">
+          <Link href="/cong-cu" aria-label="Công cụ" title="Công cụ" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+            <Icon name="build" size={20} />
+          </Link>
           <Link href="/review/leaderboard" aria-label="Bảng xếp hạng" title="Bảng xếp hạng" className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="leaderboard" size={20} />
           </Link>

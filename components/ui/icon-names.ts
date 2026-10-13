@@ -1,7 +1,7 @@
 // Danh sách icon Material Symbols đang dùng (theo thứ tự chữ cái). Google Fonts chỉ tải đúng các icon này (`icon_names`).
 // Thêm icon mới: thêm tên vào đây, giữ thứ tự bảng chữ cái.
 export const ICON_NAMES = [
-  "add", "arrow_back", "arrow_forward", "auto_awesome", "auto_stories", "bookmark", "bookmark_add", "brush", "check",
+  "add", "arrow_back", "arrow_forward", "auto_awesome", "auto_stories", "bookmark", "bookmark_add", "brush", "build", "check",
   "check_circle", "chevron_right", "close", "content_copy", "content_paste", "dark_mode", "dictionary", "edit", "emoji_events", "expand_less", "expand_more",
   "favorite", "favorite_border", "feedback", "flag", "format_quote", "forward_5", "graphic_eq", "group", "headphones", "history", "history_edu", "home", "hourglass_top",
   "keyboard", "laps", "leaderboard", "library_music", "light_mode", "lightbulb", "link", "list_alt", "local_fire_department", "logout", "menu_book", "mic", "more_horiz", "music_note",
