@@ -46,14 +46,14 @@ export function ChatComposer({ onSend }: { onSend: (body: string, announcement: 
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); void submit(); }} className="space-y-2">
-      <div className="flex items-end gap-2">
+      <div className="flex items-center gap-2">
         <label className="min-w-0 flex-1">
           <span className="sr-only">Tin nhắn</span>
           <textarea
             ref={input} value={text} rows={2} maxLength={CHAT_MAX_CHARS} onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); void submit(); } }}
             placeholder={`Nhắn với tên ${nick.nickname}… (Enter để gửi)`}
-            className="w-full resize-none rounded-2xl border border-outline-variant bg-surface-container-lowest p-3 text-body-md text-on-surface focus:border-primary focus:outline-none"
+            className="block w-full resize-none rounded-2xl border border-outline-variant bg-surface-container-lowest p-3 text-body-md text-on-surface focus:border-primary focus:outline-none"
           />
         </label>
         <button type="submit" disabled={busy || !text.trim()} aria-label="Gửi tin nhắn" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary hover:bg-primary-container disabled:opacity-50">

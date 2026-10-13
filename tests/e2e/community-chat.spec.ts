@@ -140,3 +140,11 @@ test("tin mới của người khác tự hiện sau vài giây (hỏi định k
   await expect(page.getByText("tin cũ sẽ bị xóa")).toHaveCount(0);
   expect(round).toBeGreaterThan(0);
 });
+
+test("nút gửi căn giữa theo chiều dọc với ô soạn tin", async ({ page }) => {
+  await setup(page);
+  await page.goto("/chat");
+  const box = await page.getByRole("textbox", { name: "Tin nhắn" }).boundingBox();
+  const button = await page.getByRole("button", { name: "Gửi tin nhắn" }).boundingBox();
+  expect(Math.abs(box!.y + box!.height / 2 - (button!.y + button!.height / 2))).toBeLessThanOrEqual(2);
+});
