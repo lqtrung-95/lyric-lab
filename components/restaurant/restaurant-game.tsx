@@ -5,18 +5,8 @@ import { SHIFT_SIZE, type Customer, type GameState } from "@/lib/games/restauran
 import { playChinese } from "@/lib/speech/play-chinese";
 import { RestaurantScene } from "./restaurant-scene";
 import { RestaurantTickets } from "./restaurant-tickets";
+import { useBestScore } from "./use-best-score";
 import { useRestaurantLoop } from "./use-restaurant-loop";
-
-const BEST_KEY = "songhanzi-restaurant-best";
-
-function readBest(): number | null {
-  try {
-    const v = Number(localStorage.getItem(BEST_KEY));
-    return Number.isFinite(v) && v > 0 ? v : null;
-  } catch {
-    return null;
-  }
-}
 
 const btn = "inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container";
 
@@ -28,18 +18,11 @@ export function RestaurantGame() {
   const [phase, setPhase] = useState<"intro" | "playing" | "result">("intro");
   const [autoPlay, setAutoPlay] = useState(true);
   const [listenOnly, setListenOnly] = useState(false);
-  const [best, setBest] = useState<number | null>(readBest);
+  const { best, submit } = useBestScore();
   const autoPlayRef = useRef(autoPlay);
   useEffect(() => { autoPlayRef.current = autoPlay; }, [autoPlay]);
   const onArrive = useCallback((c: Customer) => { if (autoPlayRef.current) void playChinese(c.order.zh).catch(() => undefined); }, []);
-  const onFinish = useCallback((g: GameState) => {
-    setBest((b) => {
-      if (b !== null && g.coins <= b) return b;
-      try { localStorage.setItem(BEST_KEY, String(g.coins)); } catch { /* không lưu được kỷ lục: không sao */ }
-      return g.coins;
-    });
-    setPhase("result");
-  }, []);
+  const onFinish = useCallback((g: GameState) => { submit(g.coins); setPhase("result"); }, [submit]);
   const { game, command, reset } = useRestaurantLoop(phase === "playing", onArrive, onFinish);
 
   const start = () => { reset(); setPhase("playing"); };

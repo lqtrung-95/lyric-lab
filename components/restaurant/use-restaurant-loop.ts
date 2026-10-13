@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useReducer, useRef } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState } from "react";
 import { clearTray, createGame, deliver, pickUp, tickGame, type Customer, type GameState } from "@/lib/games/restaurant-engine";
 import { inRange, nearestTarget, stepByDirection, stepToward, targetPoint, type Target } from "@/lib/games/restaurant-world";
 
@@ -25,7 +25,8 @@ function interact(g: GameState, target: Target, picks = 1) {
  * mục gần nhất. Trạng thái nằm trong `ref` (sửa tại chỗ), chỉ vẽ lại giao diện mỗi khung hình. Bấm lại đúng ô món đang đi tới thì lấy thêm một phần.
  */
 export function useRestaurantLoop(running: boolean, onArrive: (c: Customer) => void, onFinish: (g: GameState) => void) {
-  const game = useRef<GameState>(createGame());
+  // Hộp giữ ván chơi, tạo đúng một lần (useRef(createGame()) sẽ sinh cả ca mới ở mỗi khung hình rồi bỏ đi).
+  const [game] = useState(() => ({ current: createGame() }));
   const goal = useRef<Goal | null>(null);
   const keys = useRef(new Set<string>());
   const [, repaint] = useReducer((n: number) => n + 1, 0);
@@ -34,14 +35,14 @@ export function useRestaurantLoop(running: boolean, onArrive: (c: Customer) => v
   const finishRef = useRef(onFinish);
   finishRef.current = onFinish;
 
-  const reset = useCallback(() => { game.current = createGame(); goal.current = null; keys.current.clear(); repaint(); }, []);
+  const reset = useCallback(() => { game.current = createGame(); goal.current = null; keys.current.clear(); repaint(); }, [game]);
 
   const command = useCallback((target: Target) => {
     const g = game.current;
     if (target.kind !== "floor" && inRange(g.player, target)) { interact(g, target); goal.current = null; repaint(); return; }
     const cur = goal.current;
     goal.current = cur && cur.target.kind === "station" && target.kind === "station" && cur.target.dishId === target.dishId ? { target, picks: cur.picks + 1 } : { target, picks: 1 };
-  }, []);
+  }, [game]);
 
   useEffect(() => {
     if (!running) return;
@@ -80,7 +81,7 @@ export function useRestaurantLoop(running: boolean, onArrive: (c: Customer) => v
       raf = requestAnimationFrame(frame);
     });
     return () => { cancelAnimationFrame(raf); window.removeEventListener("keydown", down); window.removeEventListener("keyup", up); pressed.clear(); };
-  }, [running]);
+  }, [running, game]);
 
   return { game: game.current, command, reset };
 }
