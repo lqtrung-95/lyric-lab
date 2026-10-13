@@ -111,7 +111,7 @@ const analysisCache = unstable_cache(
     return analysis;
   },
   // Số cuối tăng khi sửa dữ liệu phân tích trực tiếp trong DB (vd. bù bản dịch) hoặc đổi nội dung được cache, để bỏ bản cache cũ ngay thay vì đợi hết 1 giờ.
-  ["song-analysis", PROMPT_VERSION, "rev13"],
+  ["song-analysis", PROMPT_VERSION, "rev14"],
   { revalidate: 3600, tags: ["song-analysis"] },
 );
 

@@ -9,6 +9,8 @@ const STUB = `window.YT = { PlayerState: { PLAYING: 1 }, Player: function (el, o
 window.onYouTubeIframeAPIReady && window.onYouTubeIframeAPIReady();`;
 
 test.beforeEach(async ({ page }) => {
+  // Khung đủ cao để khối video dính ở trên không che dòng lời cần rê chuột/bấm.
+  await page.setViewportSize({ width: 1280, height: 1000 });
   await page.route("https://www.youtube.com/iframe_api", (route) => route.fulfill({ contentType: "text/javascript", body: STUB }));
 });
 
@@ -53,4 +55,34 @@ test("admin chỉ sửa pinyin: gửi kèm pinyin gõ tay; lỗi từ server hi�
   await dialog.getByRole("button", { name: "Lưu" }).click();
   await expect(dialog.getByRole("alert")).toContainText("không hợp lệ");
   expect(body).toMatchObject({ action: "edit_line", lineIndex: 0, pinyin: "sửa tay" });
+});
+
+test("nút Làm mới dữ liệu bài: chỉ admin thấy; bấm gửi PATCH refresh_cache và báo đã làm mới", async ({ page }) => {
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: false } }));
+  await page.goto("/dev/listen-fixture");
+  await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+  await expect(page.getByRole("button", { name: /Làm mới dữ liệu bài/ })).toHaveCount(0);
+
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  let body: Record<string, unknown> | null = null;
+  await page.route("**/api/admin/songs/*", async (route) => {
+    body = route.request().postDataJSON();
+    await route.fulfill({ json: { done: "cache_refreshed" } });
+  });
+  await page.goto("/dev/listen-fixture");
+  await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+  await page.getByRole("button", { name: /Làm mới dữ liệu bài/ }).click();
+  await expect(page.getByText("Đã làm mới. Dữ liệu bài được tải lại.")).toBeVisible();
+  expect(body).toEqual({ action: "refresh_cache" });
+});
+
+test("làm mới dữ liệu bài lỗi thì báo và cho bấm lại", async ({ page }) => {
+  await page.route("**/api/admin/whoami", (route) => route.fulfill({ json: { isAdmin: true } }));
+  await page.route("**/api/admin/songs/*", (route) => route.fulfill({ status: 500, json: { error: "server_error" } }));
+  await page.goto("/dev/listen-fixture");
+  await page.getByRole("button", { name: "Lời bị lệch? Chỉnh lời" }).click();
+  const button = page.getByRole("button", { name: /Làm mới dữ liệu bài/ });
+  await button.click();
+  await expect(page.getByText("Chưa làm mới được. Thử lại nhé.")).toBeVisible();
+  await expect(button).toBeEnabled();
 });

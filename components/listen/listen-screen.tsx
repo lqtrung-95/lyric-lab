@@ -21,6 +21,7 @@ import { PlaybackBar } from "./playback-bar";
 import { ReportSongButton } from "@/components/preview/report-song-button";
 import { SyncPanel } from "./sync-panel";
 import { usePublishDefaultOffset } from "./use-publish-default-offset";
+import { useRefreshSongCache } from "./use-refresh-song-cache";
 import { SongReportBanner } from "@/components/admin/song-report-banner";
 import { ListenTopBar } from "./listen-top-bar";
 import { ListenTour } from "./listen-tour";
@@ -46,6 +47,7 @@ interface ListenScreenProps {
 export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const { offset, setOffset } = useLyricOffset(analysis.videoId, analysis.lyricOffsetSec);
   const publishOffset = usePublishDefaultOffset(analysis.videoId, offset);
+  const refreshCache = useRefreshSongCache(analysis.videoId);
   // Mọi thứ trong màn Nghe (đồng bộ, tô sáng, tua, lặp câu, tiến độ) dùng mốc đã cộng độ lệch người dùng chỉnh.
   const lines = useMemo(() => shiftLines(analysis.lines, offset), [analysis.lines, offset]);
   const syncRisk = useMemo(() => estimateSyncRisk(analysis.lines, song.durationSec ?? 0), [analysis.lines, song.durationSec]);
@@ -236,7 +238,8 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
           {/* Điện thoại: đẩy hai khối phụ (canh lời, báo lỗi) xuống sau danh sách lời để màn đầu thấy được nhiều câu hát hơn; từ lg trở lên giữ nguyên chỗ. */}
           <div className="flex flex-col gap-6 max-lg:order-last">
             <SyncPanel offset={offset} risk={syncRisk} quickSync={quickSync} onOffsetChange={setOffset} onToggleQuickSync={() => setQuickSync((q) => !q)}
-              publish={publishOffset.canPublish ? { state: publishOffset.state, onPublish: publishOffset.publish } : undefined} />
+              publish={publishOffset.canPublish ? { state: publishOffset.state, onPublish: publishOffset.publish } : undefined}
+              refresh={refreshCache.canRefresh ? { state: refreshCache.state, onRefresh: refreshCache.refresh } : undefined} />
             <ReportSongButton videoId={analysis.videoId} prominent />
           </div>
           <LyricList

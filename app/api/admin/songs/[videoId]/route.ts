@@ -1,4 +1,4 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { MAX_LINE_PINYIN, MAX_LINE_TRANSLATION, editSongLine } from "@/lib/analysis/edit-song-line";
@@ -12,6 +12,7 @@ export const runtime = "nodejs";
  * PATCH { action: "hide" | "unhide" | "delete" } → quản trị viên ẩn/hiện lại bài ở Khám phá, hoặc xóa hẳn.
  * PATCH { action: "shift_lyrics", deltaSec } → cộng `deltaSec` vào độ lệch lời mặc định của bài (áp cho mọi người dùng) và
  * đưa độ lệch cá nhân của mọi người cho bài đó về 0 (bản admin lưu là bản chuẩn).
+ * PATCH { action: "refresh_cache" } → làm mới ngay cache dữ liệu bài (bản phân tích và dòng `songs` được Next giữ 1 giờ): dùng sau khi sửa dữ liệu trực tiếp trong DB (ví dụ script thay lời) để mọi người thấy bản mới.
  * PATCH { action: "edit_line", lineIndex, text, pinyin?, translation? } → sửa lời tiếng Trung (và tùy chọn pinyin gõ tay, bản dịch) của một dòng; pinyin tự tính
  * lại từ từ điển khi không gửi. Xóa chỉ thực hiện khi không ai còn thẻ ôn hay tiến độ nghe từ bài đó; ngược lại tự chuyển thành ẩn để không mất dữ liệu người dùng.
  * /api/discover cache theo Cache-Control 5 phút (CDN) nên phải revalidate ngay, không thì bài vừa ẩn/xóa vẫn hiện tới khi cache hết hạn.
@@ -41,6 +42,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
       console.error(JSON.stringify({ event: "edit_line_error", message: (error as Error)?.message }));
       return Response.json({ error: "server_error" }, { status: 500 });
     }
+  }
+
+  if (body?.action === "refresh_cache") {
+    // Tag dùng chung cho mọi bài (cache chỉ là bản sao đọc nhanh nên làm mới cả hai tag chỉ tốn một lượt đọc DB lại cho mỗi bài được mở).
+    revalidateTag("song-analysis", { expire: 0 });
+    revalidateTag("song-row", { expire: 0 });
+    return Response.json({ done: "cache_refreshed" });
   }
 
   if (body?.action === "shift_lyrics") {

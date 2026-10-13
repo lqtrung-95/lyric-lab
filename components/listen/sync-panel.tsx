@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { SyncRisk } from "@/lib/listen/lyric-offset";
+import type { RefreshState } from "./use-refresh-song-cache";
 import type { PublishState } from "./use-publish-default-offset";
 
 interface SyncPanelProps {
@@ -14,6 +15,8 @@ interface SyncPanelProps {
   onToggleQuickSync: () => void;
   /** Chỉ có với quản trị viên: lưu độ lệch đang chỉnh thành mặc định cho mọi người dùng. */
   publish?: { state: PublishState; onPublish: () => void };
+  /** Chỉ có với quản trị viên: làm mới ngay cache dữ liệu bài (sau khi sửa dữ liệu trực tiếp trong DB). */
+  refresh?: { state: RefreshState; onRefresh: () => void };
 }
 
 const fmt = (o: number) => `${o > 0 ? "+" : ""}${Number(o.toFixed(2))} giây`;
@@ -23,7 +26,7 @@ const step = "min-h-11 min-w-16 rounded-full bg-surface-container-high px-3 text
  * Chỉnh lệch lời so với video: nút ±0,1 s và ±0,5 s, "đồng bộ nhanh" bằng cách bấm dòng đang được hát, và đặt lại.
  * Khi lời có dấu hiệu lệch (độ dài không khớp video) hiện gợi ý mở bảng chỉnh.
  */
-export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQuickSync, publish }: SyncPanelProps) {
+export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQuickSync, publish, refresh }: SyncPanelProps) {
   const [open, setOpen] = useState(false);
   const show = open || quickSync;
 
@@ -73,6 +76,20 @@ export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQui
             className="min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container disabled:opacity-50">
             Đặt lại (không lệch)
           </button>
+
+          {refresh && (
+            <div>
+              <button type="button" disabled={refresh.state === "refreshing"} onClick={refresh.onRefresh}
+                className="min-h-11 rounded-full bg-surface-container-high px-4 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest disabled:opacity-50">
+                {refresh.state === "refreshing" ? "Đang làm mới…" : "Làm mới dữ liệu bài (quản trị)"}
+              </button>
+              <p role="status" className={`mt-1 text-label-sm ${refresh.state === "error" ? "text-error" : "text-on-surface-variant"}`}>
+                {refresh.state === "done" ? "Đã làm mới. Dữ liệu bài được tải lại."
+                  : refresh.state === "error" ? "Chưa làm mới được. Thử lại nhé."
+                  : "Dùng sau khi sửa dữ liệu bài trực tiếp trong DB: bỏ bản cache 1 giờ để mọi người thấy ngay."}
+              </p>
+            </div>
+          )}
 
           {publish && (
             <div>
