@@ -887,3 +887,26 @@ test("dịch phần còn lại: chưa đăng nhập (401) thì tự tạo phiên
   await expect(page.getByText("Dịch 2")).toBeVisible();
   expect(calls).toBe(2);
 });
+
+test("mở bài với ?translate=auto (người vừa thêm video): tự dịch bù không cần bấm nút, chỉ một lần", async ({ page }) => {
+  await openUntranslated(page);
+  let calls = 0;
+  await page.route(`**/api/videos/${VIDEO_ID}/translate-missing`, (route) => {
+    calls++;
+    return route.fulfill({ json: { kind: "progress", translated: 3, remaining: 0, filled: [0, 1, 2].map((i) => ({ idx: i, translation: `Tự dịch ${i}` })) } });
+  });
+  await page.goto(`/video/${VIDEO_ID}?translate=auto`);
+  await expect(page.getByText("Tự dịch 1")).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(calls).toBe(1);
+});
+
+test("mở bài bình thường (không ?translate=auto): không tự dịch, chỉ hiện nút", async ({ page }) => {
+  await openUntranslated(page);
+  let calls = 0;
+  await page.route(`**/api/videos/${VIDEO_ID}/translate-missing`, (route) => { calls++; return route.fulfill({ json: { kind: "progress", translated: 0, remaining: 0, filled: [] } }); });
+  await page.goto(`/video/${VIDEO_ID}`);
+  await expect(page.getByRole("button", { name: "Dịch phần còn lại bằng AI" })).toBeVisible();
+  await page.waitForTimeout(500);
+  expect(calls).toBe(0);
+});

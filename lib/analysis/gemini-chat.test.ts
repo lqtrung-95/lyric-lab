@@ -55,6 +55,23 @@ describe("createGeminiChat", () => {
     expect((calls[0].body.generationConfig as Record<string, unknown>).thinkingConfig).toBeUndefined();
   });
 
+  it("Gemini 3 Flash dùng mức suy nghĩ minimal (không có ngân sách suy nghĩ), không gửi thinkingBudget", async () => {
+    const { fetchFn, calls } = fakeFetch([() => ok("{}")]);
+    await createGeminiChat([K1], { random: () => 0, fetchFn })({ ...req, model: "gemini-3-flash-preview" });
+    expect((calls[0].body.generationConfig as Record<string, unknown>).thinkingConfig).toEqual({ thinkingLevel: "minimal" });
+  });
+
+  it("404 \"model không còn cho dự án mới\" chỉ là lỗi của khóa đó: sang khóa kế (không tính lượt thử) và nhớ để khỏi gọi lại khóa này", async () => {
+    const gone = "This model models/gemini-2.5-flash is no longer available to new users.";
+    const { fetchFn, calls } = fakeFetch([(key) => (key === K3 ? ok('{"ok":true}') : status(404, gone))]);
+    const chat = createGeminiChat([K1, K2, K3], { random: () => 0, fetchFn });
+    expect(await chat(req)).toBe('{"ok":true}');
+    expect(calls.map((c) => c.key)).toEqual([K1, K2, K3]);
+    // Lần gọi sau: K1, K2 đang nghỉ nên đi thẳng K3.
+    await chat(req);
+    expect(calls.slice(3).map((c) => c.key)).toEqual([K3]);
+  });
+
   it("xoay vòng các khóa qua các lần gọi liên tiếp", async () => {
     const { fetchFn, calls } = fakeFetch([() => ok("{}")]);
     const chat = createGeminiChat([K1, K2, K3], { random: () => 0, fetchFn });

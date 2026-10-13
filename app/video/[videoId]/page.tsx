@@ -7,7 +7,7 @@ import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
 export const metadata: Metadata = { title: "Xem video", robots: { index: false, follow: false } };
 
-export default async function VideoWatchPage({ params, searchParams }: { params: Promise<{ videoId: string }>; searchParams: Promise<{ t?: string; tab?: string }> }) {
+export default async function VideoWatchPage({ params, searchParams }: { params: Promise<{ videoId: string }>; searchParams: Promise<{ t?: string; tab?: string; translate?: string }> }) {
   const { videoId } = await params;
   if (!isValidVideoId(videoId)) notFound();
   // `?t=84`: mở đúng chỗ (giây), ví dụ từ thẻ ôn. Giá trị sai bị bỏ qua.
@@ -19,7 +19,7 @@ export default async function VideoWatchPage({ params, searchParams }: { params:
       <div className="hidden md:block"><SiteHeader /></div>
       <LearnMobileHeader title="Video" />
       <main id="main" tabIndex={-1} className="pt-16 outline-none">
-        <VideoPage videoId={videoId} startAt={startAt} tab={query.tab} />
+        <VideoPage videoId={videoId} startAt={startAt} tab={query.tab} autoTranslate={query.translate === "auto"} />
       </main>
     </>
   );

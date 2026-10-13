@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { PreparedLine } from "./build-lesson-lines";
-import { modelTimeoutMs, VIDEO_TRANSLATION_MODELS, VIDEO_TRANSLATION_QUALITY_MODELS, translateLines } from "./translate-lines";
+import { modelTimeoutMs, VIDEO_TRANSLATION_CONCURRENCY, VIDEO_TRANSLATION_MODELS, VIDEO_TRANSLATION_QUALITY_MODELS, translateLines } from "./translate-lines";
 
 const line = (text: string, translation: string | null = null): PreparedLine => ({ text, start: 0, end: 1, tokens: [], translation } as unknown as PreparedLine);
 
@@ -19,17 +19,19 @@ describe("translateLines", () => {
 });
 
 describe("VIDEO_TRANSLATION_MODELS", () => {
-  it("Gemini flash-lite đứng đầu, rồi Gemini flash, Groq khóa thứ hai, DeepSeek, OpenRouter làm dự phòng", () => {
-    expect(VIDEO_TRANSLATION_MODELS[0]).toBe("gemini:gemini-flash-lite-latest");
-    expect(VIDEO_TRANSLATION_MODELS[1]).toBe("gemini:gemini-flash-latest");
+  it("Gemini 3 Flash đứng đầu, rồi Gemini 2.5 Flash, Groq khóa thứ hai, DeepSeek, OpenRouter làm dự phòng; không dùng alias -latest", () => {
+    expect(VIDEO_TRANSLATION_MODELS[0]).toBe("gemini:gemini-3-flash-preview");
+    expect(VIDEO_TRANSLATION_MODELS[1]).toBe("gemini:gemini-2.5-flash");
+    expect(VIDEO_TRANSLATION_MODELS.some((m) => m.endsWith("-latest"))).toBe(false);
     expect(VIDEO_TRANSLATION_MODELS[2]).toBe("groq-fallback:openai/gpt-oss-120b");
     expect(VIDEO_TRANSLATION_MODELS[3]).toBe("deepseek:deepseek-chat");
     expect(VIDEO_TRANSLATION_MODELS.at(-1)).toMatch(/^openrouter:/);
   });
-  it("chuỗi chất lượng bắt đầu bằng Gemini flash đầy đủ rồi tới chuỗi nhanh, không lặp flash", () => {
-    expect(VIDEO_TRANSLATION_QUALITY_MODELS[0]).toBe("gemini:gemini-flash-latest");
-    expect(VIDEO_TRANSLATION_QUALITY_MODELS.filter((m) => m === "gemini:gemini-flash-latest")).toHaveLength(1);
-    expect(VIDEO_TRANSLATION_QUALITY_MODELS.slice(1)).toEqual(VIDEO_TRANSLATION_MODELS.filter((m) => m !== "gemini:gemini-flash-latest"));
+  it("chuỗi chất lượng dùng chung chuỗi dịch (mức suy nghĩ do gemini-chat quyết định theo model)", () => {
+    expect(VIDEO_TRANSLATION_QUALITY_MODELS).toEqual(VIDEO_TRANSLATION_MODELS);
+  });
+  it("8 đoạn dịch song song để video vài trăm câu kịp ngân sách thời gian", () => {
+    expect(VIDEO_TRANSLATION_CONCURRENCY).toBe(8);
   });
 });
 
@@ -43,7 +45,7 @@ describe("translateLines với chuỗi model mặc định", () => {
     };
     const out = await translateLines([line("你好")], chat);
     expect(out[0].translation).toBe("Xin chào");
-    expect(seen).toEqual(["gemini:gemini-flash-lite-latest", "gemini:gemini-flash-latest", "groq-fallback:openai/gpt-oss-120b", "deepseek:deepseek-chat"].slice(0, seen.length));
+    expect(seen).toEqual(["gemini:gemini-3-flash-preview", "gemini:gemini-2.5-flash", "groq-fallback:openai/gpt-oss-120b", "deepseek:deepseek-chat"].slice(0, seen.length));
     expect(seen.at(-1)).toBe("deepseek:deepseek-chat");
   });
 
@@ -59,30 +61,30 @@ describe("translateLines với chuỗi model mặc định", () => {
     expect(prompts[0].user).toMatch(/CÁC DÒNG LIỀN SAU[^\n]*\n四/);
   });
 
-  it("chuỗi chất lượng thử Gemini flash trước", async () => {
+  it("chuỗi chất lượng thử Gemini 3 Flash trước", async () => {
     const seen: string[] = [];
     const chat = async ({ model }: { model: string }) => { seen.push(model); return JSON.stringify({ translations: [{ lineIndex: 0, vi: "ok" }] }); };
     await translateLines([line("你好")], chat, VIDEO_TRANSLATION_QUALITY_MODELS);
-    expect(seen).toEqual(["gemini:gemini-flash-latest"]);
+    expect(seen).toEqual(["gemini:gemini-3-flash-preview"]);
   });
 });
 
 describe("thời gian chờ theo model", () => {
-  it("flash-lite chờ ngắn (12 giây) để model quá tải bị bỏ qua sớm, flash đầy đủ chờ lâu hơn", () => {
-    expect(modelTimeoutMs("gemini:gemini-flash-lite-latest")).toBe(12_000);
-    expect(modelTimeoutMs("gemini:gemini-flash-latest")).toBe(20_000);
+  it("model Gemini chờ ngắn (12–15 giây) để model quá tải bị bỏ qua sớm", () => {
+    expect(modelTimeoutMs("gemini:gemini-3-flash-preview")).toBe(15_000);
+    expect(modelTimeoutMs("gemini:gemini-2.5-flash")).toBe(12_000);
     expect(modelTimeoutMs("groq-fallback:openai/gpt-oss-120b")).toBe(15_000);
     expect(modelTimeoutMs("deepseek:deepseek-chat")).toBe(25_000);
   });
-  it("mỗi lần gọi nhận đúng hạn chót của model đó; flash-lite lỗi thì sang flash", async () => {
+  it("mỗi lần gọi nhận đúng hạn chót của model đó; Gemini 3 Flash lỗi thì sang 2.5 Flash", async () => {
     const calls: [string, number | undefined][] = [];
     const chat = async ({ model, timeoutMs }: { model: string; timeoutMs?: number }) => {
       calls.push([model, timeoutMs]);
-      if (model === "gemini:gemini-flash-lite-latest") throw new Error("Gemini 503");
+      if (model === "gemini:gemini-3-flash-preview") throw new Error("Gemini 503");
       return JSON.stringify({ translations: [{ lineIndex: 0, vi: "Xin chào" }] });
     };
     const out = await translateLines([line("你好")], chat);
     expect(out[0].translation).toBe("Xin chào");
-    expect(calls).toEqual([["gemini:gemini-flash-lite-latest", 12_000], ["gemini:gemini-flash-latest", 20_000]]);
+    expect(calls).toEqual([["gemini:gemini-3-flash-preview", 15_000], ["gemini:gemini-2.5-flash", 12_000]]);
   });
 });

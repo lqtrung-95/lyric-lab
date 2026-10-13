@@ -4,39 +4,36 @@ import type { ChatFn } from "@/lib/analysis/groq-chat";
 import { withGroqFallback } from "@/lib/analysis/openrouter-chat";
 import { buildVideoTranslationPrompt, VIDEO_TRANSLATION_SYSTEM } from "./build-translation-prompt";
 
-const GEMINI_LITE = "gemini:gemini-flash-lite-latest";
-const GEMINI_FLASH = "gemini:gemini-flash-latest";
+// Dùng tên model cụ thể, KHÔNG dùng alias `-latest`: ngày 13/10/2026 hai alias flash-lite/flash trỏ vào model quá tải (treo hoặc 503) trong khi gemini-3-flash-preview vẫn chạy.
+const GEMINI_3_FLASH = "gemini:gemini-3-flash-preview";
+const GEMINI_25_FLASH = "gemini:gemini-2.5-flash";
 
 /**
- * Chuỗi model dịch phụ đề video khi cần NHANH (người dùng đang chờ): Gemini flash-lite (khóa Google AI Studio, miễn phí, dịch tiếng Việt tự nhiên hơn hẳn các model mở),
- * rồi Gemini flash đầy đủ (model riêng nên hạn mức và sức chứa tách khỏi flash-lite: đo ngày 13/10/2026 flash-lite gần như không trả lời được trong lúc flash vẫn chạy),
- * Groq khóa THỨ HAI (miễn phí, hạn mức riêng), DeepSeek trả phí (rẻ), cuối cùng OpenRouter. Model lỗi/quá tải/hết hạn mức/thiếu khóa thì tự rớt sang model sau,
- * không làm hỏng việc thêm video.
+ * Chuỗi model dịch phụ đề video: Gemini 3 Flash (mức suy nghĩ "minimal", xem `gemini-chat.ts`), Gemini 2.5 Flash (nhanh nhưng một số dự án Google mới không còn dùng được:
+ * khóa đó tự bị bỏ qua), Groq khóa THỨ HAI (miễn phí, hạn mức riêng), DeepSeek trả phí (rẻ, nhanh, dự phòng đáng tin nhất khi Gemini quá tải: nhớ giữ số dư), cuối cùng
+ * OpenRouter. Model lỗi/quá tải/hết hạn mức/thiếu khóa thì tự rớt sang model sau, không làm hỏng việc thêm video.
  */
 export const VIDEO_TRANSLATION_MODELS = [
-  GEMINI_LITE,
-  GEMINI_FLASH,
+  GEMINI_3_FLASH,
+  GEMINI_25_FLASH,
   ...withGroqFallback([GROQ_MODELS[0]]),
   "deepseek:deepseek-chat",
   "openrouter:google/gemini-2.5-flash",
 ];
 
-/**
- * Chuỗi cho việc admin chủ động dịch lại để lấy chất lượng cao nhất: Gemini flash đầy đủ đứng đầu (suy nghĩ trước khi dịch nên bắt ngữ cảnh và xưng hô tốt hơn nhưng chậm
- * hơn, ~15 giây cho 40 dòng), lỗi thì rơi về chuỗi nhanh ở trên (không lặp lại flash).
- */
-export const VIDEO_TRANSLATION_QUALITY_MODELS = [GEMINI_FLASH, ...VIDEO_TRANSLATION_MODELS.filter((m) => m !== GEMINI_FLASH)];
+/** Chuỗi cho việc admin chủ động dịch lại: hiện dùng chung chuỗi trên (mức suy nghĩ do `gemini-chat.ts` quyết định theo model, không theo từng yêu cầu). */
+export const VIDEO_TRANSLATION_QUALITY_MODELS = VIDEO_TRANSLATION_MODELS;
 
-/** Thời gian chờ tối đa của MỘT lần gọi theo model: model nhanh mà chậm bất thường thường là đang quá tải, bỏ qua sớm để rớt sang model kế thay vì chờ hết ngân sách. */
+/** Thời gian chờ tối đa của MỘT lần gọi theo model: model nghẽn thì bỏ qua sớm để rớt sang model kế thay vì chờ hết ngân sách. */
 export function modelTimeoutMs(model: string): number {
-  if (model === GEMINI_LITE) return 12_000;
-  if (model === GEMINI_FLASH) return 20_000;
+  if (model === GEMINI_3_FLASH) return 15_000;
+  if (model === GEMINI_25_FLASH) return 12_000;
   if (model.startsWith("groq")) return 15_000;
   return CHUNK_DEADLINE_MS;
 }
 
-/** Số đoạn dịch cùng lúc: đủ nhanh nhưng không đẩy cùng lúc cả chục yêu cầu vào hạn mức của gói miễn phí. */
-export const VIDEO_TRANSLATION_CONCURRENCY = 3;
+/** Số đoạn dịch cùng lúc. Mỗi đoạn mất ~3–12 giây nên với 3 luồng, video 365 câu (13 đoạn) không kịp ngân sách 25 giây (đo 13/10/2026: hai đoạn cuối không được bắt đầu); có hàng chục khóa Gemini nên 8 luồng vẫn rải đều các khóa. */
+export const VIDEO_TRANSLATION_CONCURRENCY = 8;
 /** Quá khoảng này kể từ lúc bắt đầu dịch thì ngừng bắt đầu đoạn mới (dòng còn lại để trống). Cộng với hạn chót một lần gọi (`CHUNK_TIMEOUT_MS`) phải còn dưới 60 giây của gói Hobby, nếu không route bị cắt giữa chừng và mất cả kết quả. */
 export const VIDEO_TRANSLATION_TIME_BUDGET_MS = 25_000;
 const CHUNK_SIZE = 30;

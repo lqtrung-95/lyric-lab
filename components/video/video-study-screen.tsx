@@ -20,6 +20,8 @@ interface VideoStudyScreenProps {
   startAt?: number;
   /** Giá trị `?tab=` của địa chỉ (đã có thể sai); tab hợp lệ mới được dùng. */
   initialTab?: string;
+  /** Tự dịch bù các câu còn trống khi mở (vừa thêm video mà lượt thêm chưa dịch hết). */
+  autoTranslate?: boolean;
 }
 
 /**
@@ -27,7 +29,7 @@ interface VideoStudyScreenProps {
  * dùng chung MỘT trình phát nên đổi tab không phải tải lại. Điện thoại xếp dọc: video dính ở trên cùng, tab ngay dưới. Tab đang mở được ghi lên
  * địa chỉ (`?tab=`) để chia sẻ và tải lại đúng chỗ.
  */
-export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScreenProps) {
+export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }: VideoStudyScreenProps) {
   const [tab, setTab] = useState<StudyTab>(() => parseStudyTab(initialTab));
   const { containerRef, controller, failed } = useYouTubePlayer(lesson.videoId);
   const watch = useVideoWatch(lesson, controller, startAt, tab === "subtitles");
@@ -100,7 +102,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab }: VideoStudyScre
             ))}
           </div>
           <div role="tabpanel" id="study-panel" aria-labelledby={`study-tab-${tab}`}>
-            {tab === "subtitles" && <VideoSubtitlesPanel lesson={lesson} watch={watch} />}
+            {tab === "subtitles" && <VideoSubtitlesPanel lesson={lesson} watch={watch} autoTranslate={autoTranslate} />}
             {tab === "dictation" && <VideoDictationPanel lesson={lesson} controller={controller} />}
             {tab === "shadowing" && <VideoShadowingPanel lesson={lesson} controller={controller} />}
           </div>

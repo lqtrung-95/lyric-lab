@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslateMissing, type FilledTranslation } from "./use-translate-missing";
 
@@ -7,8 +8,20 @@ import { useTranslateMissing, type FilledTranslation } from "./use-translate-mis
  * Báo video còn câu chưa có bản dịch tiếng Việt và cho bất kỳ ai bấm "Dịch phần còn lại bằng AI". Tự biến mất khi đã dịch hết.
  * Bấm một lần là dịch lặp tới khi hết (hoặc tới khi hết hạn mức/AI quá tải), hiện số câu còn lại.
  */
-export function TranslateMissingBanner({ videoId, missing, total, onFilled }: { videoId: string; missing: number; total: number; onFilled: (entries: FilledTranslation[]) => void }) {
+export function TranslateMissingBanner({ videoId, missing, total, onFilled, autoStart = false }: { videoId: string; missing: number; total: number; onFilled: (entries: FilledTranslation[]) => void; autoStart?: boolean }) {
   const { state, start } = useTranslateMissing(videoId, onFilled);
+  // `autoStart` (người vừa thêm video): tự chạy đúng một lần khi mở trang. Chạy trong timer (không đặt trạng thái trực tiếp trong effect) và đặt cờ "đã chạy" BÊN TRONG timer:
+  // StrictMode (dev) chạy effect hai lần và dọn timer của lần đầu, đặt cờ ngoài timer thì lần hai bỏ qua và không bao giờ dịch.
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || missing <= 0 || autoStarted.current) return;
+    const t = setTimeout(() => {
+      if (autoStarted.current) return;
+      autoStarted.current = true;
+      void start(missing);
+    }, 0);
+    return () => clearTimeout(t);
+  }, [autoStart, missing, start]);
   if (missing <= 0) return null;
   const running = state.status === "running";
   return (

@@ -147,3 +147,11 @@ test("API thêm video từ chối khi chưa có phiên hoặc dữ liệu sai", 
   expect([400, 401]).toContain(res.status());
   expect((await res.json()).error).toBeTruthy();
 });
+
+test("video vừa thêm còn câu chưa dịch: mở bài kèm ?translate=auto để tự dịch tiếp; đã dịch hết thì không", async ({ page }) => {
+  await mockAdd(page, { json: { kind: "added", videoId: VIDEO_ID, lineCount: 365, translatedLineCount: 330 } });
+  await page.goto("/video/add");
+  await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
+  await page.getByRole("button", { name: "Thêm video" }).click();
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}\\?translate=auto$`));
+});

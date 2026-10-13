@@ -41,6 +41,11 @@ const isPerDayLimit = (body: string) => /per\s*day|PerDay|daily/i.test(body);
 
 /** Chỉ các dòng Gemini 2.5 Flash cho tắt "suy nghĩ" bằng ngân sách 0 (nhanh và rẻ); model khác không nhận trường này nên bỏ qua. */
 const supportsThinkingOff = (model: string) => /^gemini-2\.5-flash/.test(model);
+/** Gemini 3 Flash không nhận ngân sách suy nghĩ 0 mà dùng mức: "minimal" gần như không suy nghĩ (đo 13/10/2026: mặc định tốn ~1200 token suy nghĩ và ~10 giây cho 30 câu dịch). */
+const supportsThinkingLevel = (model: string) => /^gemini-3(\.\d+)?-flash(-preview)?$/.test(model);
+/** Lỗi 404 chỉ của dự án cũ/mới: "model no longer available to new users". Khóa khác (dự án khác) vẫn dùng được nên không phải lỗi chung của model. */
+const isUnavailableToProject = (detail: string) => /no longer available to new users|not available to new users|is not available for this project/i.test(detail);
+const PROJECT_UNAVAILABLE_COOLDOWN_MS = 6 * 60 * 60_000;
 
 export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}): ChatFn {
   const fetchFn = options.fetchFn ?? fetch;
@@ -73,7 +78,7 @@ export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}
               responseMimeType: "application/json",
               maxOutputTokens: req.maxTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
               temperature: 0.3,
-              ...(supportsThinkingOff(req.model) ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+              ...(supportsThinkingOff(req.model) ? { thinkingConfig: { thinkingBudget: 0 } } : supportsThinkingLevel(req.model) ? { thinkingConfig: { thinkingLevel: "minimal" } } : {}),
             },
           }),
           signal: AbortSignal.timeout(req.timeoutMs ?? TIMEOUT_MS),
@@ -88,6 +93,12 @@ export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}
         const detail = (await res.text().catch(() => "")).slice(0, 300);
         lastError = `Gemini ${res.status}`;
         if (res.status === 429) { cooldownUntil.set(slot, now() + (isPerDayLimit(detail) ? DAILY_LIMIT_COOLDOWN_MS : RATE_LIMIT_COOLDOWN_MS)); continue; }
+        if (res.status === 404 && isUnavailableToProject(detail)) {
+          // Model không mở cho dự án của khóa này: nghỉ lâu theo (model, khóa), không tính lượt thử và sang khóa kế (các khóa dự án khác có thể vẫn dùng được).
+          cooldownUntil.set(slot, now() + PROJECT_UNAVAILABLE_COOLDOWN_MS);
+          attempts--;
+          continue;
+        }
         if (res.status === 401 || res.status === 403) { rejectedUntil.set(key, now() + REJECTED_KEY_COOLDOWN_MS); continue; }
         if (res.status >= 500) { cooldownUntil.set(slot, now() + TRANSIENT_COOLDOWN_MS); continue; }
         // Lỗi còn lại (400 sai yêu cầu, 404 sai tên model...) giống nhau với mọi khóa: dừng ngay.

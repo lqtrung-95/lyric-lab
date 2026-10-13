@@ -57,8 +57,13 @@ export function AddVideoScreen() {
       await ensureAnonymousSession();
       let res = await post();
       if (res.status === 401 && (await ensureAnonymousSession())) res = await post();
-      const data = (await res.json().catch(() => ({}))) as { kind?: string; videoId?: string; reason?: string; error?: string };
-      if (res.ok && (data.kind === "added" || data.kind === "exists") && data.videoId) { router.push(`/video/${data.videoId}`); return; }
+      const data = (await res.json().catch(() => ({}))) as { kind?: string; videoId?: string; reason?: string; error?: string; lineCount?: number; translatedLineCount?: number };
+      if (res.ok && (data.kind === "added" || data.kind === "exists") && data.videoId) {
+        // Video vừa thêm mà còn câu chưa dịch (hết thời gian trong lượt thêm): trang xem tự dịch tiếp, người thêm khỏi bấm nút.
+        const partial = data.kind === "added" && (data.translatedLineCount ?? 0) < (data.lineCount ?? 0);
+        router.push(`/video/${data.videoId}${partial ? "?translate=auto" : ""}`);
+        return;
+      }
       setMessage(res.ok ? skipMessage(data.reason ?? "") : (ERRORS[data.error ?? ""] ?? ERRORS.server_error));
     } catch {
       setMessage(ERRORS.server_error);

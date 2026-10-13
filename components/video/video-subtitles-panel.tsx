@@ -15,13 +15,13 @@ import type { useVideoWatch } from "./use-video-watch";
  * Tab Phụ đề: bản chép chạy theo thời gian (cùng thành phần với màn Nghe bài hát) + bấm một từ để tra (từ điển và nghĩa theo ngữ cảnh) rồi lưu vào bộ thẻ
  * ôn. Video không có từ vựng/ngữ pháp được chọn trước, nên không có tô sáng hay panel "Đang hát"; mọi từ chữ Hán đều bấm tra được.
  */
-export function VideoSubtitlesPanel({ lesson, watch }: { lesson: LessonDetail; watch: ReturnType<typeof useVideoWatch> }) {
+export function VideoSubtitlesPanel({ lesson, watch, autoTranslate }: { lesson: LessonDetail; watch: ReturnType<typeof useVideoWatch>; autoTranslate?: boolean }) {
   const { applyFilled, lines, prefs, update, currentIndex, seekToLine, pause, selectWord, word, setWord, lookup, savedKeys, savedTerm, saveWord, confirmReport, setConfirmReport, reportTranslation } = watch;
   const [askIndex, setAskIndex] = useState<number | null>(null);
   const askLine = askIndex !== null ? lines.find((l) => l.index === askIndex) : undefined;
   return (
     <>
-      <TranslateMissingBanner videoId={lesson.videoId} missing={lines.filter((l) => !l.translation).length} total={lines.length} onFilled={applyFilled} />
+      <TranslateMissingBanner videoId={lesson.videoId} missing={lines.filter((l) => !l.translation).length} total={lines.length} onFilled={applyFilled} autoStart={autoTranslate} />
       <LyricList
         videoId={lesson.videoId} promptVersion="video" variant="speech"
         lines={lines} currentIndex={currentIndex} vocab={[]} grammar={[]}
