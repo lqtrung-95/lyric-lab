@@ -1,13 +1,15 @@
+import { ChatBubble } from "@/components/chat/chat-bubble";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { SiteHeader } from "@/components/layout/site-header";
 
-/** Khung các trang chính (trang chủ, ôn tập, thư viện): thanh trên + tab bar mobile. */
+/** Khung các trang chính (trang chủ, ôn tập, thư viện): thanh trên + tab bar mobile + bong bóng chat cộng đồng (chỉ hiện ở vài trang, xem `ChatBubble`). */
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SiteHeader />
       <main id="main" tabIndex={-1} className="mx-auto max-w-page px-gutter pb-28 pt-24 outline-none md:px-6 md:pb-16 lg:px-12">{children}</main>
       <MobileTabBar />
+      <ChatBubble />
     </>
   );
 }
