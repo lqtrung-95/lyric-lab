@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Trò chơi Quán ăn: đọc lời gọi món hiển thị trên màn hình rồi bấm đúng món và số lượng (không phụ thuộc thứ tự ngẫu nhiên).
-const DISHES: Record<string, string> = { 包子: "包子", 馒头: "馒头", 鸡蛋: "鸡蛋", 豆浆: "豆浆", 粥: "粥", 面条: "面条", 油条: "油条", 饺子: "饺子" };
+// Game Quán ăn: nhân vật đi trong quán. Test đọc order trên phiếu rồi bấm món/bàn (nhân vật tự đi tới), nên không phụ thuộc thứ tự ngẫu nhiên.
+test.setTimeout(60_000);
 const NUM: Record<string, number> = { 一: 1, 两: 2, 三: 3 };
 
 async function open(page: Page) {
@@ -10,55 +10,67 @@ async function open(page: Page) {
   await page.getByRole("button", { name: "Mở cửa quán" }).click();
 }
 
-/** Từ câu gọi món suy ra khay đúng: [{món, số lượng}]. */
-async function wanted(page: Page) {
-  const zh = (await page.locator("div[lang='zh'] > p").first().textContent()) ?? "";
-  return [...zh.matchAll(/([一两三])[个杯碗根盘](包子|馒头|鸡蛋|豆浆|粥|面条|油条|饺子)/g)].map((m) => ({ dish: DISHES[m[2]], qty: NUM[m[1]] }));
+const ticket = (page: Page) => page.getByTestId("ticket").first();
+
+async function order(page: Page) {
+  const zh = (await ticket(page).locator("p.font-serif").textContent()) ?? "";
+  const table = Number(await ticket(page).getByLabel(/^Bàn \d/).textContent());
+  return { table, items: [...zh.matchAll(/([一两三])[个杯碗根盘](包子|馒头|鸡蛋|豆浆|粥|面条|油条|饺子)/g)].map((m) => ({ dish: m[2], qty: NUM[m[1]] })) };
 }
 
-async function fill(page: Page, items: { dish: string; qty: number }[]) {
-  for (const { dish, qty } of items) for (let i = 0; i < qty; i++) await page.getByRole("button", { name: new RegExp(`^Thêm ${dish}`) }).click();
-}
-
-test("phục vụ đúng cả ca: mỗi khách đúng lần đầu được ¥10, hết ca hiện kết quả và có thể chơi lại", async ({ page }) => {
-  await open(page);
-  await expect(page.getByText("Khách 1/7")).toBeVisible();
-  for (let i = 0; i < 7; i++) {
-    await fill(page, await wanted(page));
-    await page.getByRole("button", { name: "Phục vụ" }).click();
-    await expect(page.getByText("Đúng rồi! +¥10")).toBeVisible();
-    await page.getByRole("button", { name: i < 6 ? "Khách tiếp theo" : "Xem kết quả" }).click();
+async function takeDishes(page: Page, items: { dish: string; qty: number }[]) {
+  let total = 0;
+  for (const { dish, qty } of items) {
+    for (let i = 0; i < qty; i++) await page.getByRole("button", { name: new RegExp(`^Lấy ${dish}`) }).click();
+    total += qty;
+    await expect(page.getByTestId("tray")).toContainText(`${total}/6`, { timeout: 15_000 });
   }
-  await expect(page.getByRole("heading", { name: /Bạn kiếm được ¥70/ })).toBeVisible();
-  await expect(page.getByText("7/7 khách phục vụ đúng ngay lần đầu.")).toBeVisible();
-  await page.getByRole("button", { name: "Chơi ca mới" }).click();
-  await expect(page.getByText("Khách 1/7")).toBeVisible();
+}
+
+test("lấy đúng món ở quầy rồi mang ra đúng bàn thì được xu và thấy nghĩa tiếng Việt", async ({ page }) => {
+  await open(page);
+  await expect(ticket(page)).toBeVisible();
+  const { table, items } = await order(page);
+  await takeDishes(page, items);
+  await page.getByRole("button", { name: new RegExp(`^Bàn ${table}`) }).click();
+  await expect(page.getByText(/Đúng rồi! \+¥1[05]\. Xin chào! Cho tôi/)).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("tray")).toContainText("trống");
+  await expect(page.getByText(/^¥ 1[05]$/)).toBeVisible();
 });
 
-test("sai lần đầu được thử lại (¥5), sai lần hai thì hiện đáp án và không có xu", async ({ page }) => {
+test("mang sai món thì bị báo, khay được giữ; đổ vào thùng rác thì khay trống", async ({ page }) => {
   await open(page);
-  // Khay sai chắc chắn: món thừa không có trong đơn (lấy món không nằm trong câu gọi).
-  const want = (await wanted(page)).map((w) => w.dish);
-  const wrong = Object.keys(DISHES).find((d) => !want.includes(d))!;
-  await page.getByRole("button", { name: new RegExp(`^Thêm ${wrong}`) }).click();
-  await page.getByRole("button", { name: "Phục vụ" }).click();
-  await expect(page.getByText("Chưa đúng, nghe lại và thử lần nữa nhé.")).toBeVisible();
-  await page.getByRole("button", { name: "Phục vụ" }).click();
-  await expect(page.getByText("Khách gọi:")).toBeVisible();
-  await expect(page.getByText("¥ 0", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Khách tiếp theo" })).toBeVisible();
+  const { table, items } = await order(page);
+  const wrong = ["包子", "馒头", "鸡蛋", "豆浆", "粥", "面条", "油条", "饺子"].find((d) => !items.some((i) => i.dish === d))!;
+  await takeDishes(page, [{ dish: wrong, qty: 1 }]);
+  await page.getByRole("button", { name: new RegExp(`^Bàn ${table}`) }).click();
+  await expect(page.getByText("Chưa đúng món hoặc số lượng")).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByTestId("tray")).toContainText("1/6");
+  await page.getByRole("button", { name: /^Thùng rác/ }).click();
+  await expect(page.getByTestId("tray")).toContainText("trống", { timeout: 15_000 });
 });
 
-test("chế độ chỉ nghe ẩn chữ tới khi phục vụ xong; thực đơn và khay dùng được bằng nút có tên", async ({ page }) => {
+test("đi bằng phím WASD và phím E lấy món ở quầy khi đứng gần", async ({ page }) => {
   await open(page);
+  const player = page.getByTestId("player");
+  const x0 = Number(await player.getAttribute("data-x"));
+  await page.keyboard.down("d");
+  await page.waitForTimeout(400);
+  await page.keyboard.up("d");
+  expect(Number(await player.getAttribute("data-x"))).toBeGreaterThan(x0 + 5);
+  await page.keyboard.down("w");
+  await page.waitForTimeout(500);
+  await page.keyboard.up("w");
+  // Đang gần quầy trên cùng: E lấy món gần nhất.
+  await page.keyboard.press("e");
+  await expect(page.getByTestId("tray")).toContainText("1/6");
+});
+
+test("chế độ chỉ nghe ẩn chữ trên phiếu order", async ({ page }) => {
+  await open(page);
+  await expect(ticket(page)).toBeVisible();
+  await expect(ticket(page).locator("p.font-serif")).toHaveCount(1);
   await page.getByLabel("Chỉ nghe (ẩn chữ)").check();
-  await expect(page.getByText("Bấm nút loa để nghe khách gọi món.")).toBeVisible();
-  const items = await page.locator("div[lang='zh'] > p").count();
-  expect(items).toBe(0);
-  await page.getByLabel("Chỉ nghe (ẩn chữ)").uncheck();
-  const want = await wanted(page);
-  await page.getByRole("button", { name: new RegExp(`^Thêm ${want[0].dish}`) }).click();
-  await expect(page.getByRole("group", { name: "Khay của bạn" })).toContainText("×1");
-  await page.getByRole("button", { name: /^Bớt một/ }).click();
-  await expect(page.getByText("Khay trống")).toBeVisible();
+  await expect(ticket(page).getByText("Bấm loa để nghe.")).toBeVisible();
+  await expect(ticket(page).locator("p.font-serif")).toHaveCount(0);
 });
