@@ -101,6 +101,19 @@ Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice
 - **Cập nhật 2026-10-10:** đã làm bản đầu: người dùng dán link + phụ đề dán vào / dấu trang / Supadata, bài vào kho Video dùng chung (xem PRD VD-01). Chưa làm: nhận dạng giọng nói cho video không có phụ đề (chủ dự án chọn bỏ đợt này; nếu làm sau, chỉ với file audio người dùng tự tải lên vì luật dự án cấm tải audio YouTube ở server), extension thay dấu trang, hỗ trợ điện thoại.
 - **Trả lời công khai đã dùng:** app tập trung vào bài hát trước, đang nghiên cứu tính năng này, hỏi lại loại nội dung họ muốn học.
 
+## Game "Quán ăn" kiểu Wok Rush của SayMei (2026-10-13, tạm hoãn để làm chỉn chu sau)
+Ý tưởng từ app saymei.app (game 3D gọi món). Đã làm thử bản 2D nhìn từ trên xuống, chạy được nhưng chưa đủ hay nên **chưa merge vào `main`**; code nằm ở nhánh `backlog/restaurant-game` (3 commit: `a2456fe`, `284c81f`, `7a9b779`; có test đơn vị và e2e). Muốn làm tiếp thì tạo nhánh mới từ nhánh đó rồi merge `main` vào.
+
+| Hạng mục | Ghi chú |
+|---|---|
+| Bản đã có | Trang `/review/restaurant` (tab Quán ăn của ôn tập): nhân vật đi bằng WASD/mũi tên + E hoặc bấm để tự đi, lấy 8 món ở quầy theo order tiếng Trung của khách, mang ra 4 bàn; 7 khách/ca, khách chờ 80 giây rồi bỏ đi; chế độ "Chỉ nghe". Logic thuần ở `lib/games/`, giao diện DOM + `cqw` ở `components/restaurant/` |
+| Cơ chế chưa hay | Chưa có áp lực và nhịp độ: nên có nhiều bước hơn (nhận order → nấu/hấp theo thời gian → bưng → thu tiền), nhiều khách chờ cùng lúc, combo/chuỗi đúng liên tiếp |
+| Đồ họa | Đang là emoji và hình tròn; bánh bao 🍙 và quẩy 🥖 không đúng hình. Mức B (3D low-poly Three.js, ~4–6 ngày) hoặc đồ họa vẽ riêng; mức giống hẳn Wok Rush cần artist/mô hình 3D (2–4 tuần) |
+| Âm thanh, hiệu ứng | Chưa có tiếng bước chân, tiếng khách vui/giận, xu bay lên khi đúng |
+| Nội dung | Thêm cảnh (tiệm trà sữa, chợ, tính tiền để luyện số lớn), nối từ vựng đã lưu của người dùng, từ điển chọn từ HSK theo cấp |
+| Ghi điểm | Chưa lên bảng xếp hạng (cần kind mới ở `submitRoundScore` + migration) và chưa tính vào chuỗi ngày học |
+| TTS | Mỗi order mới gọi `/api/tts` mất ~1,5 giây lần đầu nên khách tới rồi mới nghe; làm nóng cache sẵn cho mọi order có thể sinh ra bằng một script |
+
 ## Kỹ thuật
 - [Đã sửa 2026-10-02] Dịch lời đổi qua lại giữa "tớ/tôi/mình" trong cùng 1 bài (vd. "Tớ thích cậu" rồi "Tôi không thích cậu"). Thêm quy tắc trong `build-analysis-prompt.ts`: chọn đúng 1 cặp xưng hô theo giọng điệu bài hát rồi dùng thống nhất cho mọi dòng. Bump `PROMPT_VERSION` v3 → v4.
 - Chọn ngôn ngữ giải nghĩa/dịch (vi/en) (2026-10-02): cache đã sẵn `explainLang` theo key, chỉ đang hardcode "vi". Cần thêm bản prompt tiếng Anh (`build-analysis-prompt.ts`, sentence-explain) + param động thay cho `EXPLAIN_LANG` cứng. Riêng i18n cho UI chrome (nhãn, nút…) để sau — app chưa có i18n framework, effort lớn hơn nhiều, ưu tiên thấp vì đối tượng chính vẫn là người Việt.
