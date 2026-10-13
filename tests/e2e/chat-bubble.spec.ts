@@ -5,6 +5,7 @@ const msg = (id: number, nickname: string, body: string) => ({ id, nickname, ava
 
 async function mock(page: Page, opts: { unread?: boolean } = {}) {
   await page.route("**/api/admin/whoami", (r) => r.fulfill({ json: { isAdmin: false } }));
+  await page.route("**/api/chat/me", (r) => r.fulfill({ json: { registered: true } }));
   await page.route("**/api/leaderboard/profile", (r) => r.fulfill({ json: { profile: { nickname: "Lan", optedIn: false, avatarUrl: null } } }));
   await page.route("**/api/chat/status", (r) => r.fulfill({ json: { latestId: opts.unread ? 7 : 0, announcement: null } }));
   await page.route(/\/api\/chat(\?.*)?$/, (r) => r.fulfill({ json: { messages: [msg(7, "Mai", "Chào cả nhà!")], hasMore: false, deletedIds: [] } }));

@@ -31,12 +31,14 @@ export async function GET(req: Request) {
 const bodySchema = z.object({ body: z.string().max(5000), announcement: z.boolean().optional() });
 
 /**
- * POST {body, announcement?} → gửi tin (cần phiên và biệt danh). Huy hiệu Admin và quyền gửi thông báo do SERVER quyết theo tài khoản, không theo client.
- * Lỗi: 400 empty/too_long/has_link/inappropriate/spam/duplicate, 401 auth_required, 403 blocked, 409 nickname_required, 429 rate_limited, 500 server_error.
+ * POST {body, announcement?} → gửi tin (cần tài khoản ĐÃ đăng nhập Google, không phải ẩn danh, và có biệt danh). Huy hiệu Admin và quyền gửi thông báo do SERVER quyết theo tài khoản, không theo client.
+ * Lỗi: 400 empty/too_long/has_link/inappropriate/spam/duplicate, 401 auth_required, 403 account_required (tài khoản ẩn danh) hoặc blocked, 409 nickname_required, 429 rate_limited, 500 server_error.
  */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return fail("auth_required", 401);
+  // Chỉ người đã đăng nhập Google mới nhắn: đọc thì không cần tài khoản, nhưng gắn tin với tài khoản thật giúp chặn người vi phạm có hiệu lực (tài khoản ẩn danh tạo lại không tốn gì).
+  if (user.isAnonymous) return fail("account_required", 403);
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return fail("empty", 400);
   const isAdmin = isAdminAccount(user.email);

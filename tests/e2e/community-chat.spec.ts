@@ -8,9 +8,10 @@ const MESSAGES = [
   msg(3, "Admin", "Tên mình có chữ Admin nhưng KHÔNG có huy hiệu."),
 ];
 
-async function setup(page: Page, opts: { admin?: boolean; nickname?: string | null; messages?: ReturnType<typeof msg>[] } = {}) {
+async function setup(page: Page, opts: { admin?: boolean; nickname?: string | null; registered?: boolean; messages?: ReturnType<typeof msg>[] } = {}) {
   const list = opts.messages ?? MESSAGES;
   await page.route("**/api/admin/whoami", (r) => r.fulfill({ json: { isAdmin: !!opts.admin } }));
+  await page.route("**/api/chat/me", (r) => r.fulfill({ json: { registered: opts.registered !== false } }));
   await page.route("**/api/leaderboard/profile", (r) => r.fulfill({ json: { profile: opts.nickname === null ? null : { nickname: opts.nickname ?? "Lan", optedIn: false, avatarUrl: null } } }));
   await page.route("**/api/chat/status", (r) => r.fulfill({ json: { latestId: list.at(-1)?.id ?? 0, announcement: null } }));
   const sent: Record<string, unknown>[] = [];
@@ -126,6 +127,7 @@ test("chấm tin mới ở thanh trên và banner thông báo ở trang chủ; v
 test("tin mới của người khác tự hiện sau vài giây (hỏi định kỳ) và tin bị admin xóa tự biến mất", async ({ page }) => {
   let round = 0;
   await page.route("**/api/admin/whoami", (r) => r.fulfill({ json: { isAdmin: false } }));
+  await page.route("**/api/chat/me", (r) => r.fulfill({ json: { registered: true } }));
   await page.route("**/api/leaderboard/profile", (r) => r.fulfill({ json: { profile: { nickname: "Lan", optedIn: false, avatarUrl: null } } }));
   await page.route("**/api/chat/status", (r) => r.fulfill({ json: { latestId: 2, announcement: null } }));
   await page.route(/\/api\/chat(\?.*)?$/, (r) => {
@@ -147,4 +149,25 @@ test("nút gửi căn giữa theo chiều dọc với ô soạn tin", async ({ p
   const box = await page.getByRole("textbox", { name: "Tin nhắn" }).boundingBox();
   const button = await page.getByRole("button", { name: "Gửi tin nhắn" }).boundingBox();
   expect(Math.abs(box!.y + box!.height / 2 - (button!.y + button!.height / 2))).toBeLessThanOrEqual(2);
+});
+
+test("chưa đăng nhập Google: đọc được tin nhưng không có ô soạn, chỉ có lời mời đăng nhập; bấm thì chuyển sang Google", async ({ page }) => {
+  await setup(page, { registered: false });
+  const authorize: string[] = [];
+  await page.route("**/auth/v1/authorize**", (r) => { authorize.push(r.request().url()); return r.fulfill({ status: 200, contentType: "text/html", body: "<p>Google</p>" }); });
+  await page.route("**/api/account/merge-token", (r) => r.fulfill({ json: { token: "test-token" } }));
+  await page.goto("/chat");
+  await expect(page.getByTestId("chat-message")).toHaveCount(3); // vẫn đọc được
+  await expect(page.getByRole("textbox", { name: "Tin nhắn" })).toHaveCount(0);
+  await expect(page.getByText(/Muốn nhắn tin trong cộng đồng, hãy đăng nhập Google/)).toBeVisible();
+  await page.getByRole("button", { name: "Đăng nhập bằng Google để nhắn tin" }).click();
+  await expect.poll(() => authorize.length, { timeout: 15_000 }).toBeGreaterThan(0);
+  expect(authorize[0]).toContain("provider=google");
+});
+
+test("đã đăng nhập Google nhưng chưa có biệt danh: vẫn chỉ hiện form biệt danh, không hiện lời mời đăng nhập", async ({ page }) => {
+  await setup(page, { nickname: null });
+  await page.goto("/chat");
+  await expect(page.getByText(/Đặt biệt danh để nhắn tin/)).toBeVisible();
+  await expect(page.getByRole("button", { name: /Đăng nhập bằng Google/ })).toHaveCount(0);
 });

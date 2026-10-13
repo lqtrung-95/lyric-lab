@@ -24,7 +24,7 @@ export function validateChatBody(body: string, isAdmin = false): ChatBodyError |
   return null;
 }
 
-export const CHAT_ERROR_MESSAGES: Record<ChatBodyError | "nickname_required" | "rate_limited" | "blocked" | "duplicate" | "auth_required" | "server_error" | "network", string> = {
+export const CHAT_ERROR_MESSAGES: Record<ChatBodyError | "nickname_required" | "rate_limited" | "blocked" | "duplicate" | "auth_required" | "account_required" | "server_error" | "network", string> = {
   empty: "Hãy nhập nội dung tin nhắn.",
   too_long: `Tin nhắn tối đa ${CHAT_MAX_CHARS} ký tự.`,
   has_link: "Chưa gửi được link hay địa chỉ web trong cộng đồng. Hãy mô tả bằng lời nhé.",
@@ -35,6 +35,7 @@ export const CHAT_ERROR_MESSAGES: Record<ChatBodyError | "nickname_required" | "
   blocked: "Bạn hiện không thể gửi tin trong cộng đồng.",
   duplicate: "Bạn vừa gửi đúng tin này rồi.",
   auth_required: "Chưa tạo được phiên. Tải lại trang rồi thử lại nhé.",
+  account_required: "Bạn cần đăng nhập Google để nhắn tin trong cộng đồng.",
   server_error: "Chưa gửi được, thử lại sau nhé.",
   network: "Chưa gửi được, kiểm tra kết nối rồi thử lại nhé.",
 };

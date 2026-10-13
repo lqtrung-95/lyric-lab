@@ -8,7 +8,7 @@ import { markChatSeen } from "./chat-status-store";
 const POLL_MS = 5000;
 
 interface ListResponse { messages: ChatMessage[]; hasMore: boolean; deletedIds: number[] }
-type SendError = "empty" | "too_long" | "has_link" | "inappropriate" | "spam" | "duplicate" | "nickname_required" | "rate_limited" | "blocked" | "auth_required" | "server_error" | "network";
+type SendError = "empty" | "too_long" | "has_link" | "inappropriate" | "spam" | "duplicate" | "nickname_required" | "rate_limited" | "blocked" | "auth_required" | "account_required" | "server_error" | "network";
 
 /** Gộp tin mới vào danh sách (bỏ trùng theo id, giữ thứ tự id tăng dần) và gỡ các tin đã bị xóa. */
 function merge(current: ChatMessage[], incoming: ChatMessage[], deletedIds: number[] = []): ChatMessage[] {

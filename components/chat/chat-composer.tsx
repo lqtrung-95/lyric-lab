@@ -6,13 +6,16 @@ import { useIsAdmin } from "@/components/library/use-is-admin";
 import { useNickname } from "@/components/profile/use-nickname";
 import { Icon } from "@/components/ui/icon";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ChatSignInPrompt } from "./chat-sign-in-prompt";
+import { useChatAccount } from "./use-chat-account";
 import { CHAT_ERROR_MESSAGES, CHAT_MAX_CHARS } from "@/lib/chat/validate-chat-message";
 
 /**
- * Ô soạn tin. Chưa có biệt danh thì hiện form đặt ngay tại chỗ (biệt danh dùng chung với bảng xếp hạng và phòng thi đấu). Quản trị viên có ô chọn "Gửi dưới dạng thông báo".
+ * Ô soạn tin. Chưa đăng nhập Google thì chỉ có lời mời đăng nhập (nhắn tin cần tài khoản thật). Chưa có biệt danh thì hiện form đặt ngay tại chỗ (biệt danh dùng chung với bảng xếp hạng và phòng thi đấu). Quản trị viên có ô chọn "Gửi dưới dạng thông báo".
  * Enter gửi, Shift+Enter xuống dòng. `onSend` trả mã lỗi hoặc null.
  */
 export function ChatComposer({ onSend }: { onSend: (body: string, announcement: boolean) => Promise<string | null> }) {
+  const registered = useChatAccount();
   const nick = useNickname();
   const isAdmin = useIsAdmin() === true;
   const [text, setText] = useState("");
@@ -21,7 +24,8 @@ export function ChatComposer({ onSend }: { onSend: (body: string, announcement: 
   const [error, setError] = useState<string | null>(null);
   const input = useRef<HTMLTextAreaElement>(null);
 
-  if (nick.nickname === undefined) return <Skeleton className="h-24 w-full" />;
+  if (registered === undefined || nick.nickname === undefined) return <Skeleton className="h-24 w-full" />;
+  if (!registered) return <ChatSignInPrompt />;
   if (nick.nickname === null) {
     return (
       <div className="rounded-2xl bg-surface-container-low p-space-md">
