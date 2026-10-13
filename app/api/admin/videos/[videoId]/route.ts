@@ -69,7 +69,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
       if (result === "not_found") return Response.json({ error: "not_found" }, { status: 404 });
       revalidatePath("/api/videos");
       revalidatePath(`/api/videos/${videoId}`);
-      return Response.json({ done: "translate_missing", ...result });
+      return Response.json({ done: "translate_missing", translated: result.translated, remaining: result.remaining });
     } else if (body?.action === "retranslate_all") {
       const result = await retranslateLessonLines(videoId, body.includeAi === true);
       if (result === "not_found") return Response.json({ error: "not_found" }, { status: 404 });

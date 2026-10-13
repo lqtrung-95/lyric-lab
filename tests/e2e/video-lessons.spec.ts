@@ -833,3 +833,57 @@ test("video dài (từ 80 dòng) cho trình duyệt bỏ qua dựng hình dòng 
   await expect(page.locator("[data-line-index]")).toHaveCount(3);
   expect(await visibility(1)).toBe("visible");
 });
+
+// Nút "Dịch phần còn lại bằng AI" cho mọi người: gọi API lặp tới khi hết, cập nhật câu ngay, báo rõ khi hết hạn mức hoặc AI quá tải.
+async function openUntranslated(page: Page) {
+  await mockVideoApis(page);
+  await page.route(`**/api/videos/${VIDEO_ID}`, (route) => route.fulfill({ json: { ...lesson, translationSource: "none", lines: lesson.lines.map((l) => ({ ...l, translation: null })) } }));
+  await page.setViewportSize({ width: 1280, height: 900 });
+}
+
+test("dịch phần còn lại: bấm một lần, gọi lặp tới khi hết, câu hiện ngay và thông báo tự biến mất", async ({ page }) => {
+  await openUntranslated(page);
+  const bodies = [
+    { kind: "progress", translated: 2, remaining: 1, filled: [{ idx: 0, translation: "Bản dịch AI câu 1." }, { idx: 1, translation: "Bản dịch AI câu 2." }] },
+    { kind: "progress", translated: 1, remaining: 0, filled: [{ idx: 2, translation: "Bản dịch AI câu 3." }] },
+  ];
+  let calls = 0;
+  await page.route(`**/api/videos/${VIDEO_ID}/translate-missing`, (route) => route.fulfill({ json: bodies[Math.min(calls++, 1)] }));
+  await page.goto(`/video/${VIDEO_ID}`);
+  const note = page.getByRole("note").filter({ hasText: "chưa có bản dịch tiếng Việt" });
+  await expect(note).toBeVisible();
+  await page.getByRole("button", { name: "Dịch phần còn lại bằng AI" }).click();
+  await expect(page.getByText("Bản dịch AI câu 1.")).toBeVisible();
+  await expect(page.getByText("Bản dịch AI câu 3.")).toBeVisible();
+  await expect(note).toHaveCount(0);
+  expect(calls).toBe(2);
+});
+
+test("dịch phần còn lại: hết hạn mức thì báo rõ; AI quá tải thì báo không tính lượt và cho bấm lại", async ({ page }) => {
+  await openUntranslated(page);
+  let mode: "limit" | "down" = "limit";
+  await page.route(`**/api/videos/${VIDEO_ID}/translate-missing`, (route) =>
+    mode === "limit" ? route.fulfill({ status: 429, json: { error: "user_limit" } }) : route.fulfill({ status: 503, json: { error: "ai_unavailable", remaining: 3 } }));
+  await page.goto(`/video/${VIDEO_ID}`);
+  const button = page.getByRole("button", { name: "Dịch phần còn lại bằng AI" });
+  await button.click();
+  await expect(page.getByText("Hôm nay bạn đã dùng hết lượt dịch")).toBeVisible();
+  mode = "down";
+  await button.click();
+  await expect(page.getByText(/AI đang quá tải.*không bị tính/)).toBeVisible();
+  await expect(button).toBeEnabled();
+});
+
+test("dịch phần còn lại: chưa đăng nhập (401) thì tự tạo phiên rồi thử lại một lần", async ({ page }) => {
+  await openUntranslated(page);
+  let calls = 0;
+  await page.route(`**/api/videos/${VIDEO_ID}/translate-missing`, (route) => {
+    calls++;
+    return calls === 1 ? route.fulfill({ status: 401, json: { error: "unauthorized" } })
+      : route.fulfill({ json: { kind: "progress", translated: 3, remaining: 0, filled: [0, 1, 2].map((i) => ({ idx: i, translation: `Dịch ${i}` })) } });
+  });
+  await page.goto(`/video/${VIDEO_ID}`);
+  await page.getByRole("button", { name: "Dịch phần còn lại bằng AI" }).click();
+  await expect(page.getByText("Dịch 2")).toBeVisible();
+  expect(calls).toBe(2);
+});

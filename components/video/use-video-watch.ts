@@ -119,9 +119,13 @@ export function useVideoWatch(lesson: LessonDetail, controller: PlayerController
 
 
   const stopLoop = useCallback(() => setLoopIndex(null), []);
+  // Các câu vừa được AI dịch bù: hiện ngay trên màn này mà không cần tải lại bài.
+  const applyFilled = useCallback((entries: { idx: number; translation: string }[]) => {
+    setRetranslated((prev) => ({ ...prev, ...Object.fromEntries(entries.map((e) => [e.idx, e.translation])) }));
+  }, []);
 
   return {
-    stopLoop, lines, prefs, update, currentIndex, playing, loopIndex, repeatConfig, setRepeatConfig, toggleLoop, togglePlay, toggleAutoScroll, seekToLine, pause,
+    stopLoop, applyFilled, lines, prefs, update, currentIndex, playing, loopIndex, repeatConfig, setRepeatConfig, toggleLoop, togglePlay, toggleAutoScroll, seekToLine, pause,
     pinToast, setPinToast, reportToast, setReportToast, confirmReport, setConfirmReport, reportTranslation, word, setWord, selectWord, saveWord, savedTerm, savedKeys, lookup,
   };
 }

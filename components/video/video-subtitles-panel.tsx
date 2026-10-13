@@ -8,6 +8,7 @@ import { WordPopover } from "@/components/listen/word-popover";
 import { itemKey } from "@/lib/user-state/learner-state";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { AskLineSheet } from "./ask-line-sheet";
+import { TranslateMissingBanner } from "./translate-missing-banner";
 import type { useVideoWatch } from "./use-video-watch";
 
 /**
@@ -15,16 +16,12 @@ import type { useVideoWatch } from "./use-video-watch";
  * ôn. Video không có từ vựng/ngữ pháp được chọn trước, nên không có tô sáng hay panel "Đang hát"; mọi từ chữ Hán đều bấm tra được.
  */
 export function VideoSubtitlesPanel({ lesson, watch }: { lesson: LessonDetail; watch: ReturnType<typeof useVideoWatch> }) {
-  const { lines, prefs, update, currentIndex, seekToLine, pause, selectWord, word, setWord, lookup, savedKeys, savedTerm, saveWord, confirmReport, setConfirmReport, reportTranslation } = watch;
+  const { applyFilled, lines, prefs, update, currentIndex, seekToLine, pause, selectWord, word, setWord, lookup, savedKeys, savedTerm, saveWord, confirmReport, setConfirmReport, reportTranslation } = watch;
   const [askIndex, setAskIndex] = useState<number | null>(null);
   const askLine = askIndex !== null ? lines.find((l) => l.index === askIndex) : undefined;
   return (
     <>
-      {lines.every((l) => !l.translation) && (
-        <p role="note" className="mb-space-md rounded-xl bg-surface-container-low p-3 text-label-md text-on-surface-variant">
-          Video này chưa có bản dịch tiếng Việt, sẽ được bổ sung sau. Bạn vẫn luyện chép chính tả và nói theo như bình thường.
-        </p>
-      )}
+      <TranslateMissingBanner videoId={lesson.videoId} missing={lines.filter((l) => !l.translation).length} total={lines.length} onFilled={applyFilled} />
       <LyricList
         videoId={lesson.videoId} promptVersion="video" variant="speech"
         lines={lines} currentIndex={currentIndex} vocab={[]} grammar={[]}

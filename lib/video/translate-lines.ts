@@ -4,23 +4,36 @@ import type { ChatFn } from "@/lib/analysis/groq-chat";
 import { withGroqFallback } from "@/lib/analysis/openrouter-chat";
 import { buildVideoTranslationPrompt, VIDEO_TRANSLATION_SYSTEM } from "./build-translation-prompt";
 
+const GEMINI_LITE = "gemini:gemini-flash-lite-latest";
+const GEMINI_FLASH = "gemini:gemini-flash-latest";
+
 /**
- * Chuỗi model dịch phụ đề video khi cần NHANH (người dùng đang chờ thêm video): Gemini flash-lite (khóa Google AI Studio, miễn phí, dịch tiếng Việt tự nhiên hơn
- * hẳn các model mở), rồi Groq khóa THỨ HAI (miễn phí, hạn mức riêng), DeepSeek trả phí (rẻ), cuối cùng OpenRouter. Model lỗi/hết hạn mức/thiếu khóa thì tự rớt sang model sau,
+ * Chuỗi model dịch phụ đề video khi cần NHANH (người dùng đang chờ): Gemini flash-lite (khóa Google AI Studio, miễn phí, dịch tiếng Việt tự nhiên hơn hẳn các model mở),
+ * rồi Gemini flash đầy đủ (model riêng nên hạn mức và sức chứa tách khỏi flash-lite: đo ngày 13/10/2026 flash-lite gần như không trả lời được trong lúc flash vẫn chạy),
+ * Groq khóa THỨ HAI (miễn phí, hạn mức riêng), DeepSeek trả phí (rẻ), cuối cùng OpenRouter. Model lỗi/quá tải/hết hạn mức/thiếu khóa thì tự rớt sang model sau,
  * không làm hỏng việc thêm video.
  */
 export const VIDEO_TRANSLATION_MODELS = [
-  "gemini:gemini-flash-lite-latest",
+  GEMINI_LITE,
+  GEMINI_FLASH,
   ...withGroqFallback([GROQ_MODELS[0]]),
   "deepseek:deepseek-chat",
   "openrouter:google/gemini-2.5-flash",
 ];
 
 /**
- * Chuỗi cho việc admin chủ động dịch lại để lấy chất lượng cao nhất: Gemini flash đầy đủ (suy nghĩ trước khi dịch nên bắt ngữ cảnh và xưng hô tốt hơn nhưng chậm
- * hơn, ~15 giây cho 40 dòng), lỗi thì rơi về chuỗi nhanh ở trên.
+ * Chuỗi cho việc admin chủ động dịch lại để lấy chất lượng cao nhất: Gemini flash đầy đủ đứng đầu (suy nghĩ trước khi dịch nên bắt ngữ cảnh và xưng hô tốt hơn nhưng chậm
+ * hơn, ~15 giây cho 40 dòng), lỗi thì rơi về chuỗi nhanh ở trên (không lặp lại flash).
  */
-export const VIDEO_TRANSLATION_QUALITY_MODELS = ["gemini:gemini-flash-latest", ...VIDEO_TRANSLATION_MODELS];
+export const VIDEO_TRANSLATION_QUALITY_MODELS = [GEMINI_FLASH, ...VIDEO_TRANSLATION_MODELS.filter((m) => m !== GEMINI_FLASH)];
+
+/** Thời gian chờ tối đa của MỘT lần gọi theo model: model nhanh mà chậm bất thường thường là đang quá tải, bỏ qua sớm để rớt sang model kế thay vì chờ hết ngân sách. */
+export function modelTimeoutMs(model: string): number {
+  if (model === GEMINI_LITE) return 12_000;
+  if (model === GEMINI_FLASH) return 20_000;
+  if (model.startsWith("groq")) return 15_000;
+  return CHUNK_DEADLINE_MS;
+}
 
 /** Số đoạn dịch cùng lúc: đủ nhanh nhưng không đẩy cùng lúc cả chục yêu cầu vào hạn mức của gói miễn phí. */
 export const VIDEO_TRANSLATION_CONCURRENCY = 3;
@@ -31,8 +44,10 @@ const CONTEXT_BEFORE = 3;
 const CONTEXT_AFTER = 2;
 // Model "suy nghĩ" tính cả token suy nghĩ vào giới hạn đầu ra; 30 dòng dịch chỉ cần vài trăm token, chừa dư để không bị cắt cụt JSON.
 const CHUNK_MAX_TOKENS = 5000;
-/** Một lần gọi dịch một đoạn: đủ cho model Gemini flash "suy nghĩ" (~15 giây). Hạn chót bắt đầu đoạn mới + giá trị này = trần ~50 giây, nằm trong 60 giây của route. */
-const CHUNK_TIMEOUT_MS = 25_000;
+/** Tổng thời gian tối đa dành cho MỘT đoạn (qua mọi model thử lần lượt). Hạn chót bắt đầu đoạn mới + giá trị này = trần ~50 giây, nằm trong 60 giây của route. */
+const CHUNK_DEADLINE_MS = 25_000;
+/** Còn ít hơn từng này thì không thử thêm model (không đủ thời gian để trả lời). */
+const MIN_ATTEMPT_MS = 3_000;
 
 interface Translatable {
   text: string;
@@ -56,11 +71,14 @@ async function translateChunk(chat: ChatFn, models: string[], chunk: { index: nu
   const last = chunk[chunk.length - 1].index;
   const before = lines.slice(Math.max(0, first - CONTEXT_BEFORE), first).map((l) => l.text);
   const after = lines.slice(last + 1, last + 1 + CONTEXT_AFTER).map((l) => l.text);
+  const chunkDeadline = Date.now() + CHUNK_DEADLINE_MS;
   for (const model of models) {
     const todo = chunk.filter((l) => !result.has(l.index));
     if (todo.length === 0) break;
+    const remaining = chunkDeadline - Date.now();
+    if (remaining < MIN_ATTEMPT_MS) break;
     try {
-      const raw = await chat({ model, system: VIDEO_TRANSLATION_SYSTEM, user: buildVideoTranslationPrompt({ title, before, after, lines: todo }), maxTokens: CHUNK_MAX_TOKENS, timeoutMs: CHUNK_TIMEOUT_MS });
+      const raw = await chat({ model, system: VIDEO_TRANSLATION_SYSTEM, user: buildVideoTranslationPrompt({ title, before, after, lines: todo }), maxTokens: CHUNK_MAX_TOKENS, timeoutMs: Math.min(modelTimeoutMs(model), remaining) });
       const wanted = new Set(todo.map((l) => l.index));
       for (const t of outputSchema.parse(JSON.parse(raw)).translations) if (wanted.has(t.lineIndex)) result.set(t.lineIndex, t.vi.trim());
     } catch {
