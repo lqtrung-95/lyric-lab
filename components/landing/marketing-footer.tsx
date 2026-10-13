@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/logo-mark";
+import { CONTACT_EMAIL } from "@/lib/site/contact";
 
 /** Chân trang giới thiệu: logo, lối vào app và lưu ý bản quyền. */
 export function MarketingFooter() {
@@ -17,6 +18,7 @@ export function MarketingFooter() {
           <Link href="/app" className="inline-flex min-h-11 items-center text-primary hover:underline">Mở app</Link>
           <Link href="/cong-cu" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Công cụ</Link>
           <Link href="/#faq" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Hỏi đáp</Link>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Liên hệ</a>
           <a href="#top" className="inline-flex min-h-11 items-center text-on-surface-variant hover:text-on-surface">Lên đầu trang</a>
         </nav>
       </div>
@@ -25,7 +27,8 @@ export function MarketingFooter() {
       </p>
       <p className="mx-auto max-w-page px-gutter pb-10 text-label-md text-on-surface-variant md:px-6 lg:px-12">
         Chủ sở hữu quyền tác giả muốn yêu cầu gỡ nội dung: gửi qua trang{" "}
-        <Link href="/feedback" className="text-primary underline underline-offset-2">Góp ý</Link>, chọn mục &quot;Yêu cầu gỡ nội dung (bản quyền)&quot;. Chúng tôi phản hồi trong 72 giờ.
+        <Link href="/feedback" className="text-primary underline underline-offset-2">Góp ý</Link>, chọn mục &quot;Yêu cầu gỡ nội dung (bản quyền)&quot;, hoặc gửi email tới{" "}
+        <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary underline underline-offset-2">{CONTACT_EMAIL}</a>. Chúng tôi phản hồi trong 72 giờ.
       </p>
     </footer>
   );

@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Toast } from "@/components/ui/toast";
 import { FEEDBACK_CATEGORIES, FEEDBACK_CATEGORY_LABELS, type FeedbackCategory } from "@/lib/feedback/feedback-schema";
 import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
+import { CONTACT_EMAIL } from "@/lib/site/contact";
 
 interface MineItem { id: number; category: FeedbackCategory; message: string; status: "pending" | "approved" | "rejected"; createdAt: string }
 interface PublicItem { id: number; category: FeedbackCategory; message: string; createdAt: string; nickname: string | null; avatarUrl: string | null }
@@ -60,7 +61,7 @@ export function FeedbackPageScreen() {
     <div className="mx-auto flex max-w-4xl flex-col gap-space-lg">
       <div>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Góp ý</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">Bạn muốn SongHanzi thêm tính năng gì, hay chỗ nào chưa tiện? Mọi góp ý đều được đọc.</p>
+        <p className="mt-1 text-body-md text-on-surface-variant">Bạn muốn SongHanzi thêm tính năng gì, hay chỗ nào chưa tiện? Mọi góp ý đều được đọc. Cần liên hệ trực tiếp? Gửi email tới <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium text-primary underline underline-offset-2">{CONTACT_EMAIL}</a>.</p>
       </div>
 
       <form onSubmit={submit} className="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">

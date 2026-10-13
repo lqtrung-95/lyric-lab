@@ -64,3 +64,12 @@ test("lối vào Công cụ: thanh trên trang giới thiệu, biểu tượng �
   await page.getByRole("link", { name: "Mở Công cụ" }).click();
   await expect(page).toHaveURL(/\/cong-cu$/);
 });
+
+test("chân trang trang giới thiệu có email liên hệ, trang Góp ý cũng ghi email", async ({ page }) => {
+  await page.goto("/cong-cu");
+  const footer = page.locator("footer");
+  await expect(footer.getByRole("link", { name: "Liên hệ" })).toHaveAttribute("href", "mailto:hello@songhanzi.com");
+  await expect(footer.getByRole("link", { name: "hello@songhanzi.com" })).toHaveAttribute("href", "mailto:hello@songhanzi.com");
+  await page.goto("/feedback");
+  await expect(page.getByRole("link", { name: "hello@songhanzi.com" })).toHaveAttribute("href", "mailto:hello@songhanzi.com");
+});
