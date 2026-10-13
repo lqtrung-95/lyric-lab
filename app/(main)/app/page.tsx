@@ -3,6 +3,7 @@ import { OnboardingBanner } from "@/components/home/onboarding-banner";
 import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
 import { NewcomerSteps } from "@/components/home/newcomer-steps";
+import { PinyinToolLink } from "@/components/home/pinyin-tool-link";
 import { TodayPlan } from "@/components/home/today-plan";
 import { NextActionPanel } from "@/components/home/next-action-panel";
 import { StreakCard } from "@/components/streak/streak-card";
@@ -30,6 +31,7 @@ export default function AppHomePage() {
         <NextActionPanel />
       </div>
       <TodayPlan />
+      <PinyinToolLink />
       <StreakCard />
       <OnboardingBanner />
       <NewcomerSteps />

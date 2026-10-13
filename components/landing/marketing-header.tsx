@@ -8,7 +8,7 @@ const LINKS = [
   { href: "/#faq", label: "Hỏi đáp" },
 ];
 
-/** Thanh trên của trang giới thiệu: neo tới các phần trong trang và nút vào app. */
+/** Thanh trên của trang giới thiệu: neo tới các phần trong trang, công cụ tra pinyin và nút vào app. */
 export function MarketingHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 bg-surface/85 pt-safe backdrop-blur-md">
@@ -21,6 +21,7 @@ export function MarketingHeader() {
           {LINKS.map((l) => (
             <a key={l.href} href={l.href} className="flex min-h-11 items-center rounded-full px-4 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">{l.label}</a>
           ))}
+          <Link href="/chu-han-sang-pinyin" className="flex min-h-11 items-center rounded-full px-4 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">Tra pinyin</Link>
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />
