@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChatAccount } from "@/components/chat/use-chat-account";
 import { Spinner } from "@/components/ui/spinner";
 import { signInGoogle } from "@/lib/auth/account-client";
@@ -36,15 +36,17 @@ async function fetchChunk(video: string, chunk: number) {
 }
 
 /**
- * Gợi ý hiện khi video không có phụ đề tiếng Trung: nhờ AI nghe video (Gemini đọc thẳng link YouTube, máy chủ ta không tải gì) rồi chép lời kèm mốc giờ.
+ * Hiện khi video không có phụ đề tiếng Trung: nhờ AI nghe video (Gemini đọc thẳng link YouTube, máy chủ ta không tải gì) rồi chép lời kèm mốc giờ.
  * Chia video thành các đoạn ~2 phút, gọi từng đoạn (mỗi lượt gọi nằm trong 60 giây của máy chủ). Xong thì trao các dòng cho nơi gọi để gửi sang /api/videos/add.
+ * `autoStart`: tự chạy ngay khi đã biết người dùng đăng nhập Google (người dùng chỉ dán link, không phải tìm nút); chưa đăng nhập thì mời đăng nhập.
  */
-export function AutoTranscribeOffer({ video, disabled, onLines, onExists }: { video: string; disabled: boolean; onLines: (lines: CaptionLine[]) => void; onExists: () => void }) {
+export function AutoTranscribeOffer({ video, disabled, autoStart, onLines, onExists }: { video: string; disabled: boolean; autoStart: boolean; onLines: (lines: CaptionLine[]) => void; onExists: () => void }) {
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const running = progress !== null;
   const registered = useChatAccount();
   const [signingIn, setSigningIn] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function signIn() {
     setSigningIn(true);
@@ -54,6 +56,7 @@ export function AutoTranscribeOffer({ video, disabled, onLines, onExists }: { vi
 
   async function start() {
     setError(null);
+    setFailed(false);
     setProgress({ done: 0, total: 1 });
     try {
       const lines = await collectChunks((i) => fetchChunk(video, i), (done, total) => setProgress({ done, total }), {
@@ -65,28 +68,43 @@ export function AutoTranscribeOffer({ video, disabled, onLines, onExists }: { vi
       const code = e instanceof ChunkError ? e.code : "server_error";
       if (code === "exists") { onExists(); return; }
       setError(ERRORS[code] ?? "Có lỗi ở máy chủ. Thử lại sau nhé.");
+      setFailed(true);
     }
     setProgress(null);
   }
 
+  // Hẹn bằng timer để không đặt state ngay trong effect; `start` đọc props mới nhất qua ref.
+  const startRef = useRef(start);
+  useEffect(() => { startRef.current = start; });
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || registered !== true || autoStarted.current) return;
+    autoStarted.current = true;
+    const timer = setTimeout(() => void startRef.current(), 0);
+    return () => clearTimeout(timer);
+  }, [autoStart, registered]);
+
   return (
     <section aria-label="Nhận dạng giọng nói bằng AI" className="space-y-2 rounded-2xl bg-surface-container-low p-4">
-      <p className="text-label-md font-semibold text-on-surface">Video chưa có phụ đề? Nhờ AI nghe và chép lại</p>
-      <p className="text-label-md text-on-surface-variant">AI nghe giọng nói rồi tạo phụ đề tiếng Trung kèm mốc giờ (video tối đa {MAX_ASR_VIDEO_SECONDS / 60} phút, mất vài phút). Bản chép có thể sai chữ hoặc lệch vài giây và sẽ được gắn nhãn &quot;nhận dạng tự động&quot;.</p>
-      {running && <p role="status" className="text-label-md text-primary">AI đang nghe video… đã xong {progress.done}/{progress.total} đoạn. Bạn đừng đóng trang này nhé.</p>}
+      <p className="text-label-md font-semibold text-on-surface">Video này chưa có phụ đề tiếng Trung</p>
+      <p className="text-label-md text-on-surface-variant">{autoStart ? "Chúng tôi sẽ nhờ AI nghe giọng nói và tạo phụ đề" : "Bạn có thể nhờ AI nghe giọng nói và tạo phụ đề"}: việc này mất thời gian hơn (vài phút), có thể không chính xác, và bản chép sẽ gắn nhãn &quot;nhận dạng tự động&quot;. Video dài tối đa {MAX_ASR_VIDEO_SECONDS / 60} phút.</p>
+      {running && <p role="status" className="flex items-center text-label-md text-primary"><Spinner size={16} className="mr-2 shrink-0" /><span>AI đang nghe video… đã xong {progress.done}/{progress.total} đoạn. Bạn đừng đóng trang này nhé.</span></p>}
       {error && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{error}</p>}
       {registered === false ? (
         <>
-          <p className="text-label-md text-on-surface-variant">Tính năng này tốn tài nguyên AI nên chỉ dành cho tài khoản đăng nhập Google (thẻ ôn và tiến độ học của bạn được giữ nguyên).</p>
+          <p className="text-label-md text-on-surface-variant">Việc này tốn tài nguyên AI nên chỉ dành cho tài khoản đăng nhập Google (thẻ ôn và tiến độ học của bạn được giữ nguyên).</p>
           <button type="button" onClick={() => void signIn()} disabled={signingIn} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
             {signingIn ? "Đang chuyển sang Google…" : "Đăng nhập Google để dùng"}
           </button>
         </>
       ) : (
-      <button type="button" onClick={() => void start()} disabled={disabled || running || registered === undefined}
-        className="inline-flex min-h-11 items-center justify-center rounded-full border border-outline px-6 text-label-md font-semibold text-primary hover:bg-surface-container disabled:opacity-50">
-        {running ? <><Spinner size={16} className="mr-2" />Đang nghe video…</> : "Nhờ AI nghe và tạo phụ đề"}
-      </button>
+        // Đang tự chạy thì không cần nút; chỉ hiện nút khi chạy tay (chưa bấm) hoặc để thử lại sau lỗi.
+        (!autoStart || failed) && !running && (
+          <button type="button" onClick={() => void start()} disabled={disabled || registered === undefined}
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-outline px-6 text-label-md font-semibold text-primary hover:bg-surface-container disabled:opacity-50">
+            {failed ? "Thử lại" : "Nhờ AI nghe và tạo phụ đề"}
+          </button>
+        )
       )}
     </section>
   );

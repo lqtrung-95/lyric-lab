@@ -22,7 +22,7 @@ test("trang luôn hiện sẵn ô dán phụ đề và hướng dẫn dấu tran
   await expect(page.getByRole("heading", { name: "Thêm video của bạn" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Thêm video" })).toBeDisabled();
   await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toBeVisible();
-  await expect(page.getByText(/Video không có phụ đề thì bạn có thể nhờ AI nghe và tạo phụ đề/)).toBeVisible();
+  await expect(page.getByText(/Video không có phụ đề vẫn thêm được: chúng tôi sẽ nhờ AI nghe/)).toBeVisible();
   await expect(page.getByRole("button", { name: /Tự dán phụ đề/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Sao chép mã/ })).toHaveCount(0);
   const bookmarklet = page.getByRole("link", { name: "Gửi sang SongHanzi" });
@@ -51,12 +51,12 @@ test("chỉ dán link, máy chủ tự lấy phụ đề: gửi không kèm ph�
   expect(bodies).toEqual([{ video: VIDEO_ID }]);
 });
 
-test("không lấy tự động được thì báo cần phụ đề, giữ nguyên nội dung đã nhập", async ({ page }) => {
-  await mockAdd(page, { status: 422, json: { error: "captions_required" } });
+test("không lấy tự động được thì báo dán phụ đề, giữ nguyên nội dung đã nhập", async ({ page }) => {
+  await mockAdd(page, { status: 503, json: { error: "fetch_unavailable" } });
   await page.goto("/video/add");
   await page.getByLabel("Link video YouTube").fill(VIDEO_ID);
   await page.getByRole("button", { name: "Thêm video" }).click();
-  await expect(page.getByRole("alert").filter({ hasText: "Cần có phụ đề tiếng Trung" })).toBeVisible();
+  await expect(page.getByRole("alert").filter({ hasText: "Chưa lấy tự động được phụ đề" })).toBeVisible();
   await expect(page.getByLabel("Link video YouTube")).toHaveValue(VIDEO_ID);
   await expect(page.getByRole("button", { name: "Thêm video" })).toBeEnabled();
   await expect(page.getByLabel(/Phụ đề tiếng Trung/)).toBeVisible();

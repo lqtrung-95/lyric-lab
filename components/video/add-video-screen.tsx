@@ -29,8 +29,12 @@ const ERRORS: Record<string, string> = {
   unauthorized: "Cần mở lại trang để có phiên đăng nhập, rồi thử lại.",
   server_error: "Có lỗi ở máy chủ. Thử lại sau nhé.",
 };
-/** Lỗi báo video không có phụ đề dùng được: lúc đó mới gợi ý nhờ AI nghe video. */
-const NO_CAPTION_ERRORS = new Set(["captions_required", "no_chinese_captions", "fetch_unavailable"]);
+/**
+ * Lỗi báo video không có phụ đề dùng được. Thiếu hẳn phụ đề thì tự nhờ AI nghe video (người dùng chỉ dán link, không phải tìm nút);
+ * `fetch_unavailable` (dịch vụ lấy phụ đề tạm lỗi, video có thể CÓ phụ đề) thì chỉ gợi ý, để người dùng chọn dán phụ đề thật hay nhờ AI.
+ */
+const AUTO_AI_ERRORS = new Set(["captions_required", "no_chinese_captions"]);
+const SUGGEST_AI_ERRORS = new Set(["fetch_unavailable"]);
 const skipMessage = (reason: string) => (reason === "not_embeddable" ? "Chủ video không cho nhúng, nên không thêm được." : "Chưa tạo được bài từ phụ đề này.");
 
 /**
@@ -46,7 +50,7 @@ export function AddVideoScreen() {
   const [captions, setCaptions] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [offerAi, setOfferAi] = useState(false);
+  const [aiMode, setAiMode] = useState<"auto" | "suggest" | null>(null);
 
   const videoValue = video ?? received?.v ?? "";
   const captionsValue = captions ?? received?.t ?? "";
@@ -55,6 +59,7 @@ export function AddVideoScreen() {
   async function send(video: string, captionText: string, aiLines?: CaptionLine[]) {
     setBusy(true);
     setMessage(null);
+    setAiMode(null);
     const body = { video, ...(captionText.trim() ? { captions: captionText } : {}), ...(aiLines ? { lines: aiLines, transcript: "auto" } : {}) };
     // Trang này chưa tự tạo phiên như các màn khác; người mở thẳng từ dấu trang có thể chưa có phiên nên bảo đảm có trước khi gửi (và thử lại một lần khi 401).
     const post = () => fetch("/api/videos/add", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -69,8 +74,11 @@ export function AddVideoScreen() {
         router.push(`/video/${data.videoId}${partial ? "?translate=auto" : ""}`);
         return;
       }
-      setOfferAi(!res.ok && !aiLines && !captionText.trim() && NO_CAPTION_ERRORS.has(data.error ?? ""));
-      setMessage(res.ok ? skipMessage(data.reason ?? "") : (ERRORS[data.error ?? ""] ?? ERRORS.server_error));
+      const noPastedCaptions = !res.ok && !aiLines && !captionText.trim();
+      const mode = noPastedCaptions && AUTO_AI_ERRORS.has(data.error ?? "") ? "auto" : noPastedCaptions && SUGGEST_AI_ERRORS.has(data.error ?? "") ? "suggest" : null;
+      setAiMode(mode);
+      // Chế độ tự động đã có khung giải thích riêng: không hiện thêm lỗi "không có phụ đề" gây hiểu nhầm là thất bại.
+      setMessage(mode === "auto" ? null : res.ok ? skipMessage(data.reason ?? "") : (ERRORS[data.error ?? ""] ?? ERRORS.server_error));
     } catch {
       setMessage(ERRORS.server_error);
     }
@@ -99,7 +107,7 @@ export function AddVideoScreen() {
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Thêm video của bạn</h1>
         <p className="mt-1 text-body-lg text-on-surface-variant">Dán link video tiếng Trung (podcast, vlog...) để luyện chép chính tả và nói theo. Video thêm vào sẽ hiện cho mọi người trong mục Video. Mỗi người thêm tối đa {MAX_VIDEOS_PER_USER_PER_DAY} video mỗi ngày, mỗi video dài tối đa {MAX_ADDED_VIDEO_SECONDS / 60} phút.</p>
-        <p className="mt-2 text-label-md font-medium text-on-surface">Lưu ý: video YouTube nên có phụ đề tiếng Trung (CC). Video không có phụ đề thì bạn có thể nhờ AI nghe và tạo phụ đề (bản AI có thể sai chữ).</p>
+        <p className="mt-2 text-label-md font-medium text-on-surface">Lưu ý: video YouTube nên có phụ đề tiếng Trung (CC). Video không có phụ đề vẫn thêm được: chúng tôi sẽ nhờ AI nghe và tạo phụ đề, việc này mất thời gian hơn và có thể không chính xác (cần đăng nhập Google).</p>
       </header>
       <form onSubmit={submit} className="space-y-space-md">
         <label className="block space-y-1">
@@ -119,7 +127,7 @@ export function AddVideoScreen() {
           {busy ? <><Spinner size={16} className="mr-2" />Đang đọc phụ đề và dịch, có thể mất tới một phút…</> : "Thêm video"}
         </button>
       </form>
-      {offerAi && <AutoTranscribeOffer video={videoValue} disabled={busy} onLines={(lines) => void send(videoValue, "", lines)} onExists={() => void send(videoValue, "")} />}
+      {aiMode && <AutoTranscribeOffer video={videoValue} disabled={busy} autoStart={aiMode === "auto"} onLines={(lines) => void send(videoValue, "", lines)} onExists={() => void send(videoValue, "")} />}
       <BookmarkletInstall />
     </div>
   );
