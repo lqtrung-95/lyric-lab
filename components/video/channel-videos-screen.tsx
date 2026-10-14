@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { videosOfChannel } from "@/lib/video/group-by-channel";
+import { countByTag, filterByTag, type VideoTagId } from "@/lib/video/video-tags";
 import { countByBand, filterAndSortVideos, videoBandForLevel, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import { useVideoList } from "./use-video-list";
 import { VideoGrid } from "./video-grid";
@@ -17,8 +18,11 @@ export function ChannelVideosScreen({ channelTitle }: { channelTitle: string }) 
   const [band, setBand] = useState<BandId | null>(null);
   const [sort, setSort] = useState<VideoSort>("new");
   const ofChannel = useMemo(() => (Array.isArray(videos) ? videosOfChannel(videos, channelTitle) : []), [videos, channelTitle]);
-  const counts = useMemo(() => countByBand(ofChannel), [ofChannel]);
-  const shown = useMemo(() => filterAndSortVideos(ofChannel, band, sort), [ofChannel, band, sort]);
+  const [tag, setTag] = useState<VideoTagId | null>(null);
+  const tagCounts = useMemo(() => countByTag(ofChannel), [ofChannel]);
+  const byTag = useMemo(() => filterByTag(ofChannel, tag), [ofChannel, tag]);
+  const counts = useMemo(() => countByBand(byTag), [byTag]);
+  const shown = useMemo(() => filterAndSortVideos(byTag, band, sort), [byTag, band, sort]);
   const name = channelTitle || "Kênh khác";
 
   return (
@@ -40,7 +44,7 @@ export function ChannelVideosScreen({ channelTitle }: { channelTitle: string }) 
         </p>
       ) : (
         <>
-          <VideoListFilters counts={counts} total={ofChannel.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} />
+          <VideoListFilters counts={counts} total={byTag.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} tagCounts={tagCounts} tag={tag} onTag={setTag} />
           {shown.length === 0 ? (
             <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">
               Chưa có video ở mức này. <button type="button" onClick={() => setBand(null)} className="font-semibold text-primary underline">Xem tất cả video của kênh</button>

@@ -21,6 +21,7 @@ import { planAsrChunks } from "@/lib/video/asr/asr-chunks";
 import { cleanAsrLines, type RawAsrSegment } from "@/lib/video/asr/asr-lines";
 import { GROQ_MAX_AUDIO_BYTES, transcribeWithGroq, whisperSegmentsToRaw } from "@/lib/video/asr/groq-whisper";
 import { transcribeChunkWithGemini } from "@/lib/video/asr/transcribe-chunk-gemini";
+import { classifyVideoTags } from "@/lib/video/classify-video-tags";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { translateLines } from "@/lib/video/translate-lines";
@@ -115,7 +116,7 @@ const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPAB
 const chat = createChat(env);
 const outcome = await ingestVideo(
   { sb, provider: new FixedCaptionProvider(lines), lookup: (terms) => lookupWords(sb as never, terms) },
-  { meta, sourceId: null, status, refresh: flag("refresh"), transcriptSource: "auto", translateMissing: (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) },
+  { meta, sourceId: null, status, refresh: flag("refresh"), transcriptSource: "auto", classifyTags: (ctx) => classifyVideoTags(chat, ctx), translateMissing: (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) },
 );
 console.log(outcome);
 process.exit(0);

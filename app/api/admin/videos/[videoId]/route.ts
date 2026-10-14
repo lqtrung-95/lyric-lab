@@ -5,7 +5,7 @@ import { retranslateLessonLines } from "@/lib/video/admin-retranslate-lesson";
 import { translateMissingLessonLines } from "@/lib/video/admin-translate-missing";
 import { listTranslationReports, restoreTranslationFromReport } from "@/lib/video/translation-report-repo";
 import { dismissOpenReports, listVideoReports } from "@/lib/video/video-report-repo";
-import { deleteLesson, editLessonTranslation, getLessonForAdmin, setLessonStatus } from "@/lib/video/video-repo";
+import { deleteLesson, editLessonTranslation, getLessonForAdmin, getLessonTags, setLessonStatus, setLessonTags } from "@/lib/video/video-repo";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 
 export const runtime = "nodejs";
@@ -26,7 +26,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ videoId
   if (!isValidVideoId(videoId)) return Response.json({ error: "not_found" }, { status: 404 });
   try {
     const lesson = await getLessonForAdmin(videoId);
-    return lesson ? Response.json({ ...lesson, reports: await listTranslationReports(videoId), videoReports: await listVideoReports(videoId) }, { headers: { "Cache-Control": "private, no-store" } }) : Response.json({ error: "not_found" }, { status: 404 });
+    return lesson ? Response.json({ ...lesson, tags: await getLessonTags(videoId), reports: await listTranslationReports(videoId), videoReports: await listVideoReports(videoId) }, { headers: { "Cache-Control": "private, no-store" } }) : Response.json({ error: "not_found" }, { status: 404 });
   } catch (error) {
     console.error(JSON.stringify({ event: "admin_video_error", message: (error as Error)?.message }));
     return Response.json({ error: "server_error" }, { status: 500 });
@@ -36,6 +36,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ videoId
 /**
  * PATCH { action: "list" | "hide" | "draft" } → đổi trạng thái (list = hiện cho người dùng, hide = ẩn, draft = về nháp).
  * PATCH { action: "edit_translation", idx, translation } → sửa bản dịch một dòng ("" = xóa bản dịch).
+ * PATCH { action: "set_tags", tags: string[] } → đặt thẻ chủ đề (mã thẻ hợp lệ, tối đa 3; mảng rỗng = bỏ hết thẻ); trả {done}. 500 nếu migration cột `tags` chưa chạy.
  * PATCH { action: "dismiss_reports" } → bỏ qua mọi báo cáo cả video đang mở (admin đã xem, video ổn); trả {done, dismissed}.
  * PATCH { action: "translate_missing" } → dịch bù bằng AI các dòng còn trống của video; trả {done, translated, remaining}.
  * PATCH { action: "retranslate_all", includeAi? } → dịch lại TOÀN BỘ bản dịch bằng AI (khi bản dịch YouTube ghép lệch câu); giữ dòng admin đã sửa; trả {done, replaced, remaining}.
@@ -48,7 +49,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
   if (denied) return denied;
   const { videoId } = await params;
   if (!isValidVideoId(videoId)) return Response.json({ error: "invalid_video" }, { status: 400 });
-  const body = (await req.json().catch(() => null)) as { action?: string; idx?: unknown; translation?: unknown; reportId?: unknown; includeAi?: unknown } | null;
+  const body = (await req.json().catch(() => null)) as { action?: string; idx?: unknown; translation?: unknown; reportId?: unknown; includeAi?: unknown; tags?: unknown } | null;
 
   try {
     let found = true;
@@ -61,6 +62,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ videoI
       const result = await editLessonTranslation(videoId, body.idx as number, body.translation);
       if (result === "invalid") return Response.json({ error: "invalid_translation" }, { status: 400 });
       found = result === "ok";
+    } else if (body?.action === "set_tags") {
+      if (!Array.isArray(body.tags)) return Response.json({ error: "invalid_request" }, { status: 400 });
+      found = await setLessonTags(videoId, body.tags);
     } else if (body?.action === "dismiss_reports") {
       const dismissed = await dismissOpenReports(videoId);
       return Response.json({ done: "dismiss_reports", dismissed });

@@ -6,6 +6,7 @@ import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { getServerEnv } from "@/lib/env/server-env";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { isTransientCaptionError } from "@/lib/video/channel-handle";
+import { classifyVideoTags } from "@/lib/video/classify-video-tags";
 import { ensureSource, ingestVideo } from "@/lib/video/ingest-video";
 import { translateLines } from "@/lib/video/translate-lines";
 import { fetchVideosMeta } from "@/lib/video/youtube-data-api";
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
     const outcome = await ingestVideo(
       { sb, provider: new YoutubeInnertubeCaptionProvider(), lookup: (terms) => lookupWords(sb as never, terms) },
       // Bản dịch luôn do AI (không lấy track tiếng Việt của YouTube). Hạn chót ngắn để cả lần nạp + dịch nằm trong 60 giây; dòng chưa kịp dịch thì admin dịch bù ở màn video.
-      { meta, sourceId, translateMissing: (prepared) => translateLines(prepared, chat, undefined, { title: meta.title, timeBudgetMs: 12_000 }) },
+      { meta, sourceId, classifyTags: (ctx) => classifyVideoTags(chat, ctx), translateMissing: (prepared) => translateLines(prepared, chat, undefined, { title: meta.title, timeBudgetMs: 12_000 }) },
     );
     return Response.json(outcome, { headers: { "Cache-Control": "private, no-store" } });
   } catch (error) {

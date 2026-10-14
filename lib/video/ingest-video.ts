@@ -6,6 +6,7 @@ import { pickBestChineseTrack } from "@/lib/captions/pick-best-chinese-track";
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
 import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines, type PreparedLine } from "./build-lesson-lines";
 import type { LessonStatus, TranscriptSource, TranslationSource } from "./video-lesson-types";
+import { normalizeTags } from "./video-tags";
 import type { VideoMeta } from "./youtube-data-api";
 
 // Nạp MỘT video vào kho video luyện nghe (dùng chung cho script `scripts/ingest-video-source.mts` và API quản trị): chỉ nhận video nhúng được
@@ -55,6 +56,10 @@ export interface IngestInput {
    * tiếng Trung và là bản dịch tự động nên ghép vào ra bản dịch sai); không truyền hàm này thì video vào với `translation_source = none`.
    */
   translateMissing?: (lines: PreparedLine[]) => Promise<PreparedLine[]>;
+  /**
+   * Gán thẻ chủ đề (tên video, kênh, vài câu đầu → mã thẻ) sau khi ghi bài. Lỗi hay cột `tags` chưa có (migration chưa chạy) chỉ bị bỏ qua, KHÔNG làm hỏng việc nạp video.
+   */
+  classifyTags?: (ctx: { title: string; channelTitle: string; lines: string[] }) => Promise<string[]>;
 }
 
 /**
@@ -63,7 +68,7 @@ export interface IngestInput {
  */
 export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise<IngestOutcome> {
   const { sb, provider, lookup } = deps;
-  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, translateMissing, transcriptSource = "captions" } = input;
+  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, translateMissing, classifyTags, transcriptSource = "captions" } = input;
   if (!meta.embeddable) return { kind: "skipped", reason: "not_embeddable" };
   const exists = (await existingVideoIds(sb, [meta.videoId])).has(meta.videoId);
   if (exists && !refresh) return { kind: "skipped", reason: "exists" };
@@ -93,5 +98,18 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
     ? await sb.from("video_lessons").update(row).eq("video_id", meta.videoId)
     : await sb.from("video_lessons").insert({ ...row, status, ...(addedBy ? { added_by: addedBy } : {}) });
   if (error) throw new Error(`Ghi video_lessons lỗi: ${error.message}`);
+  if (classifyTags) await saveTagsBestEffort(sb, meta, lines.map((l) => l.text), classifyTags);
   return { kind: "ingested", lineCount: lines.length, translatedLineCount, levelAvg, refreshed: exists, translationSource };
+}
+
+/** Phân loại rồi ghi thẻ; mọi lỗi (AI, cột chưa có) chỉ ghi log, vì thẻ là thông tin phụ. */
+async function saveTagsBestEffort(sb: SupabaseClient, meta: VideoMeta, lineTexts: string[], classify: NonNullable<IngestInput["classifyTags"]>): Promise<void> {
+  try {
+    const tags = normalizeTags(await classify({ title: meta.title, channelTitle: meta.channelTitle, lines: lineTexts }));
+    if (tags.length === 0) return;
+    const { error } = await sb.from("video_lessons").update({ tags }).eq("video_id", meta.videoId);
+    if (error) console.warn(JSON.stringify({ event: "video_tags_not_saved", videoId: meta.videoId, message: error.message }));
+  } catch (error) {
+    console.warn(JSON.stringify({ event: "video_tags_failed", videoId: meta.videoId, message: (error as Error)?.message }));
+  }
 }

@@ -52,6 +52,18 @@ describe("ingestVideo với phụ đề người dùng", () => {
     expect(plain.written[0]).not.toHaveProperty("transcript_source");
   });
 
+  it("gán thẻ chủ đề sau khi ghi bài; lỗi phân loại hoặc cột chưa có không làm hỏng việc nạp", async () => {
+    const tagUpdates: unknown[] = [];
+    const db = fakeDb();
+    const base = db.sb.from("video_lessons") as unknown as Record<string, unknown>;
+    const sb = { from: () => ({ ...base, update: (row: Record<string, unknown>) => { if ("tags" in row) tagUpdates.push(row.tags); return { eq: async () => ({ error: null }) }; } }) } as unknown as SupabaseClient;
+    const out = await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", classifyTags: async () => ["vlog", "khong-co"] });
+    expect(out.kind).toBe("ingested");
+    expect(tagUpdates).toEqual([["vlog"]]);
+    const failing = await ingestVideo({ sb: fakeDb().sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", classifyTags: async () => { throw new Error("AI lỗi"); } });
+    expect(failing.kind).toBe("ingested");
+  });
+
   it("mặc định video vào trạng thái nháp (đường nạp của admin không đổi)", async () => {
     const { sb, written } = fakeDb();
     await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: "src-1" });

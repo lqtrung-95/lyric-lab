@@ -2,6 +2,7 @@ import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { withLineTranslation } from "./edit-lesson-line";
 import type { LessonLine, LessonStatus, TranscriptSource, TranslationSource } from "./video-lesson-types";
+import { MAX_TAGS_PER_VIDEO, normalizeTags, type VideoTagId } from "./video-tags";
 
 export interface LessonSummary {
   videoId: string;
@@ -10,6 +11,8 @@ export interface LessonSummary {
   durationSec: number;
   levelAvg: number | null;
   lineCount: number;
+  /** Thẻ chủ đề (chỉ có ở danh sách công khai; thiếu khi cột `tags` chưa có trên DB). */
+  tags?: VideoTagId[];
 }
 
 export interface LessonDetail extends LessonSummary {
@@ -29,11 +32,31 @@ const toSummary = (r: SummaryRow): LessonSummary => ({
   levelAvg: r.level_avg === null ? null : Number(r.level_avg), lineCount: r.line_count,
 });
 
-/** Các video đã duyệt (`listed`), mới nhất trước. */
+/**
+ * Các video đã duyệt (`listed`), mới nhất trước, kèm thẻ chủ đề. Cột `tags` do migration thêm sau: chưa có thì đọc lại không kèm thẻ để danh sách video vẫn hiện
+ * (deploy trước migration không làm hỏng trang Video).
+ */
 export async function listListedLessons(): Promise<LessonSummary[]> {
-  const { data, error } = await createSupabaseServiceClient().from("video_lessons").select(SUMMARY_COLUMNS).eq("status", "listed").order("created_at", { ascending: false });
+  const sb = createSupabaseServiceClient();
+  const query = (columns: string) => sb.from("video_lessons").select(columns).eq("status", "listed").order("created_at", { ascending: false });
+  let { data, error } = await query(`${SUMMARY_COLUMNS}, tags`);
+  if (error && /tags/i.test(error.message)) ({ data, error } = await query(SUMMARY_COLUMNS));
   if (error) throw new Error(`listListedLessons: ${error.message}`);
-  return ((data ?? []) as unknown as SummaryRow[]).map(toSummary);
+  return ((data ?? []) as unknown as (SummaryRow & { tags?: unknown })[]).map((r) => ({ ...toSummary(r), ...("tags" in r ? { tags: normalizeTags(r.tags) } : {}) }));
+}
+
+/** Thẻ hiện có của một video (admin); mảng rỗng nếu cột `tags` chưa có hoặc video chưa có thẻ. */
+export async function getLessonTags(videoId: string): Promise<VideoTagId[]> {
+  const { data, error } = await createSupabaseServiceClient().from("video_lessons").select("tags").eq("video_id", videoId).maybeSingle();
+  return error || !data ? [] : normalizeTags((data as { tags?: unknown }).tags);
+}
+
+/** Đặt thẻ của video (đã chuẩn hóa, tối đa `MAX_TAGS_PER_VIDEO`); false nếu không có video. Ném lỗi nếu cột `tags` chưa có (migration chưa chạy). */
+export async function setLessonTags(videoId: string, tags: unknown): Promise<boolean> {
+  const clean = normalizeTags(tags).slice(0, MAX_TAGS_PER_VIDEO);
+  const { data, error } = await createSupabaseServiceClient().from("video_lessons").update({ tags: clean, updated_at: new Date().toISOString() }).eq("video_id", videoId).select("video_id");
+  if (error) throw new Error(`setLessonTags: ${error.message}`);
+  return (data?.length ?? 0) > 0;
 }
 
 /** Một video đã duyệt kèm toàn bộ dòng; null nếu không có hoặc chưa/không còn được hiện. */

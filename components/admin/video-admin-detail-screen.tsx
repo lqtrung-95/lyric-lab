@@ -12,6 +12,8 @@ import type { AdminVideoReport } from "@/lib/video/video-report-repo";
 import { VIDEO_REPORT_LABELS } from "@/lib/video/video-report-reasons";
 import type { AdminLessonDetail } from "@/lib/video/video-repo";
 import type { LessonLine, LessonStatus } from "@/lib/video/video-lesson-types";
+import { normalizeTags } from "@/lib/video/video-tags";
+import { VideoTagsEditor } from "./video-tags-editor";
 import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
 import { STATUS_LABEL, patchVideo } from "./video-admin-actions";
 import { VideoStatusButtons } from "./video-status-buttons";
@@ -194,6 +196,7 @@ export function VideoAdminDetailScreen({ videoId }: { videoId: string }) {
         </div>
       </div>
       <VideoStatusButtons videoId={videoId} status={lesson.status} onStatus={setStatus} onDeleted={() => router.replace("/admin/videos")} />
+      <VideoTagsEditor videoId={videoId} initial={normalizeTags(lesson.tags)} />
       {openVideoReports.length > 0 && (
         <section aria-label="Báo cáo video của người học" className="rounded-xl bg-error-container/40 p-space-sm">
           <p className="text-label-md font-semibold text-on-error-container">{openVideoReports.length} báo cáo chưa xử lý từ người học</p>

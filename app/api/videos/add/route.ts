@@ -9,6 +9,7 @@ import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { decideAddLimit, decideDuration, decideTranslationBudget } from "@/lib/video/add-video-limits";
 import { isMostlyChinese } from "@/lib/video/chinese-ratio";
 import { cleanAsrLines } from "@/lib/video/asr/asr-lines";
+import { classifyVideoTags } from "@/lib/video/classify-video-tags";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { stripNonChineseFromLines } from "@/lib/video/strip-non-chinese";
@@ -106,7 +107,7 @@ export async function POST(req: Request) {
     const chat = createChat(env);
     const outcome = await ingestVideo(
       { sb, provider: new FixedCaptionProvider(lines, "zh-Hans"), lookup: (terms) => lookupWords(sb as never, terms) },
-      { meta, sourceId: null, status: "listed", addedBy: user.id, transcriptSource: auto ? "auto" : "captions", translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
+      { meta, sourceId: null, status: "listed", addedBy: user.id, transcriptSource: auto ? "auto" : "captions", classifyTags: (ctx) => classifyVideoTags(chat, ctx), translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
     );
     if (outcome.kind === "skipped") return ok({ kind: "skipped", reason: outcome.reason });
     return ok({ kind: "added", videoId, lineCount: outcome.lineCount, translatedLineCount: outcome.translatedLineCount, translation: outcome.translationSource, aiBudgetExhausted: !canTranslate });

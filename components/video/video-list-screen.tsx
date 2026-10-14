@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CHANNEL_PREVIEW_COUNT, channelHref, groupByChannel } from "@/lib/video/group-by-channel";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { countByTag, filterByTag, type VideoTagId } from "@/lib/video/video-tags";
 import { countByBand, filterAndSortVideos, videoBandForLevel, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import { ChannelSeeAllCard } from "./channel-see-all-card";
 import { useVideoList } from "./use-video-list";
@@ -22,9 +23,13 @@ export function VideoListScreen() {
   const [band, setBand] = useState<BandId | null>(null);
   const [sort, setSort] = useState<VideoSort>("new");
   const [grouped, setGrouped] = useState(true);
+  const [tag, setTag] = useState<VideoTagId | null>(null);
   const list = Array.isArray(videos) ? videos : null;
-  const counts = useMemo(() => countByBand(list ?? []), [list]);
-  const shown = useMemo(() => filterAndSortVideos(list ?? [], band, sort), [list, band, sort]);
+  // Thẻ chủ đề lọc trước; số video theo cấp HSK tính trên phần đã lọc thẻ, số video theo thẻ tính trên toàn bộ (để biết còn thẻ nào để chọn).
+  const tagCounts = useMemo(() => countByTag(list ?? []), [list]);
+  const byTag = useMemo(() => filterByTag(list ?? [], tag), [list, tag]);
+  const counts = useMemo(() => countByBand(byTag), [byTag]);
+  const shown = useMemo(() => filterAndSortVideos(byTag, band, sort), [byTag, band, sort]);
 
   const groups = useMemo(() => (grouped ? groupByChannel(shown) : []), [grouped, shown]);
 
@@ -45,7 +50,7 @@ export function VideoListScreen() {
         <p className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Chưa có video nào. Quay lại sau nhé.</p>
       ) : (
         <>
-          <VideoListFilters counts={counts} total={videos.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} grouped={grouped} onGrouped={setGrouped} />
+          <VideoListFilters counts={counts} total={byTag.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} grouped={grouped} onGrouped={setGrouped} tagCounts={tagCounts} tag={tag} onTag={setTag} />
           {shown.length === 0 ? (
             <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">
               Chưa có video ở mức này.{" "}
