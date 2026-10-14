@@ -1,11 +1,12 @@
 // Tạo phụ đề tiếng Trung cho video YouTube KHÔNG có phụ đề, chạy trên máy admin, rồi nạp vào kho video với nhãn "nhận dạng tự động".
 // Khác nút trên web: không bị trần 60 giây và 30 phút của server, nên dùng được cho video dài hoặc khi muốn bản chuẩn hơn.
 //   Mặc định chỉ chép và in thử (dry-run), lưu bản chép vào tmp/transcribe/<id>.<engine>.json để xem/sửa; thêm --apply để nạp vào DB:
-//   NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/transcribe-video.mts <link|id> [--engine gemini|groq|local] [--status listed|draft] [--force] [--apply]
+//   NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/transcribe-video.mts <link|id> [--engine gemini|groq|local] [--status listed|draft] [--force] [--refresh] [--apply]
 // --engine gemini (mặc định): Gemini nghe thẳng link YouTube từng đoạn 2 phút (như nút trên web nhưng chạy tuần tự, không cần yt-dlp/ffmpeg). Đo 2026-10-14: chép đúng hơn Whisper turbo, câu mịn hơn.
 // --engine groq: Whisper large-v3-turbo qua Groq (GROQ_API_KEY), ~0,01 USD cho video 20 phút, chạy trong vài chục giây.
 //   Cần `yt-dlp` và `ffmpeg` trong PATH (brew install yt-dlp ffmpeg). Mốc giờ của Whisper thô hơn (cỡ 3 giây) và hay sai từ đồng âm.
 // --engine local: lệnh `whisper` của openai-whisper (pip install openai-whisper), model large-v3, miễn phí nhưng chậm (vài phút đến vài chục phút).
+// --refresh: ghi đè dòng của video ĐÃ có trong kho (giữ nguyên trạng thái duyệt), dùng sau khi sửa tay file JSON.
 // Bản chép đã lưu được dùng lại ở lần chạy sau (đỡ tốn tiền/thời gian); --force để chép lại. Có thể sửa tay file JSON rồi chạy lại với --apply.
 import { createClient } from "@supabase/supabase-js";
 import { execFileSync } from "node:child_process";
@@ -49,7 +50,8 @@ const run = (cmd: string, cmdArgs: string[]) => execFileSync(cmd, cmdArgs, { std
 
 let lines: CaptionLine[];
 if (existsSync(jsonPath) && !flag("force")) {
-  lines = JSON.parse(readFileSync(jsonPath, "utf8")) as CaptionLine[];
+  // Chạy lại cleanAsrLines (idempotent) để bản chép lưu từ trước vẫn nhận các cải tiến mới về thời lượng câu.
+  lines = cleanAsrLines(JSON.parse(readFileSync(jsonPath, "utf8")) as CaptionLine[], meta.durationSec);
   console.log(`Dùng lại bản chép đã lưu ${jsonPath} (${lines.length} dòng; --force để chép lại)`);
 } else {
   let segments: RawAsrSegment[] = [];
@@ -113,7 +115,7 @@ const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPAB
 const chat = createChat(env);
 const outcome = await ingestVideo(
   { sb, provider: new FixedCaptionProvider(lines), lookup: (terms) => lookupWords(sb as never, terms) },
-  { meta, sourceId: null, status, transcriptSource: "auto", translateMissing: (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) },
+  { meta, sourceId: null, status, refresh: flag("refresh"), transcriptSource: "auto", translateMissing: (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) },
 );
 console.log(outcome);
 process.exit(0);
