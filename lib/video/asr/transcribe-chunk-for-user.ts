@@ -16,14 +16,16 @@ export const GLOBAL_ASR_CHUNKS_PER_DAY = 600;
 
 export type ChunkOutcome =
   | { kind: "ok"; lines: CaptionLine[]; chunkCount: number }
-  | { kind: "not_found" | "exists" | "not_embeddable" | "too_short" | "too_long" | "invalid_chunk" | "user_limit" | "global_limit" }
+  | { kind: "account_required" | "not_found" | "exists" | "not_embeddable" | "too_short" | "too_long" | "invalid_chunk" | "user_limit" | "global_limit" }
   | { kind: "ai_unavailable" };
 
 /**
- * Nhận dạng giọng nói MỘT đoạn của video chưa có trong kho, cho người học tự thêm video không có phụ đề. Thứ tự: kiểm tra video (có, nhúng được, độ dài) →
+ * Nhận dạng giọng nói MỘT đoạn của video chưa có trong kho, cho người học tự thêm video không có phụ đề. Chỉ tài khoản đã đăng nhập Google (tài khoản ẩn danh tạo hàng loạt được nên
+ * không dùng được tính năng tốn tiền AI này). Thứ tự: kiểm tra tài khoản → kiểm tra video (có, nhúng được, độ dài) →
  * hạn mức riêng và chung → trừ một lượt `transcribe` → Gemini nghe đoạn → lỗi AI thì hoàn lượt. Admin không bị hai hạn mức.
  */
 export async function transcribeChunkForUser(user: CurrentUser, videoId: string, chunkIndex: number): Promise<ChunkOutcome> {
+  if (user.isAnonymous) return { kind: "account_required" };
   const env = getServerEnv();
   const sb = createSupabaseServiceClient();
   const { data: existing, error: existsError } = await sb.from("video_lessons").select("video_id").eq("video_id", videoId).maybeSingle();

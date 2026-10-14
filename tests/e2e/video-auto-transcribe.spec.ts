@@ -5,9 +5,10 @@ import { expect, test, type Page } from "@playwright/test";
 // rồi gửi cả bản chép sang /api/videos/add với nhãn "auto". Mọi API được giả lập (không gọi Gemini, không ghi dữ liệu thật).
 const VIDEO_ID = "abcdefghijk";
 
-async function setup(page: Page, transcribe: (chunk: number) => { status?: number; json: unknown }) {
+async function setup(page: Page, transcribe: (chunk: number) => { status?: number; json: unknown }, registered = true) {
   const addBodies: Record<string, unknown>[] = [];
   const chunks: number[] = [];
+  await page.route("**/api/chat/me", (route) => route.fulfill({ json: { registered } }));
   await page.route("**/api/videos/*", (route) => route.fulfill({ status: 404, json: { error: "not_found" } }));
   await page.route("**/api/videos/add", (route) => {
     const body = route.request().postDataJSON() as Record<string, unknown>;
@@ -65,4 +66,13 @@ test("AI quá tải ở một đoạn: tự thử lại rồi vẫn thành công
   await page.getByRole("button", { name: "Nhờ AI nghe và tạo phụ đề" }).click();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`), { timeout: 15_000 });
   expect(failedOnce).toBe(true);
+});
+
+test("tài khoản ẩn danh: không có nút nghe, chỉ có lời mời đăng nhập Google", async ({ page }) => {
+  const { chunks } = await setup(page, ok, false);
+  await submitLink(page);
+  const offer = page.getByRole("region", { name: "Nhận dạng giọng nói bằng AI" });
+  await expect(offer.getByRole("button", { name: "Đăng nhập Google để dùng" })).toBeVisible();
+  await expect(offer.getByRole("button", { name: "Nhờ AI nghe và tạo phụ đề" })).toHaveCount(0);
+  expect(chunks).toEqual([]);
 });

@@ -38,6 +38,10 @@ describe("transcribeChunkForUser", () => {
     if (out.kind === "ok") expect(out.lines).toEqual([{ text: "你好", start: 124, end: 127 }]);
     expect(consumed).toEqual(["transcribe"]);
   });
+  it("tài khoản ẩn danh bị chặn ngay: không trừ lượt, không đọc DB", async () => {
+    expect((await run(0, { ...member, isAnonymous: true })).kind).toBe("account_required");
+    expect(consumed).toHaveLength(0);
+  });
   it("video đã có trong kho, không tìm thấy, không nhúng được, quá ngắn/dài: dừng trước khi trừ lượt", async () => {
     existing = { video_id: "abcdefghijk" };
     expect((await run()).kind).toBe("exists");

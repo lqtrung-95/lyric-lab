@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useChatAccount } from "@/components/chat/use-chat-account";
 import { Spinner } from "@/components/ui/spinner";
+import { signInGoogle } from "@/lib/auth/account-client";
 import type { CaptionLine } from "@/lib/captions/caption-provider-types";
 import { MAX_ASR_VIDEO_SECONDS } from "@/lib/video/asr/asr-chunks";
 import { collectChunks } from "@/lib/video/asr/collect-chunks";
@@ -14,6 +16,7 @@ const ERRORS: Record<string, string> = {
   too_short: "Video quá ngắn để luyện (dưới 30 giây).",
   not_embeddable: "Chủ video không cho nhúng, nên không thêm được.",
   not_found: "Không tìm thấy video này (có thể riêng tư hoặc đã bị xóa).",
+  account_required: "Cần đăng nhập Google để nhờ AI nghe video.",
   unauthorized: "Cần mở lại trang để có phiên đăng nhập, rồi thử lại.",
 };
 
@@ -40,6 +43,14 @@ export function AutoTranscribeOffer({ video, disabled, onLines, onExists }: { vi
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const running = progress !== null;
+  const registered = useChatAccount();
+  const [signingIn, setSigningIn] = useState(false);
+
+  async function signIn() {
+    setSigningIn(true);
+    setError(await signInGoogle());
+    setSigningIn(false);
+  }
 
   async function start() {
     setError(null);
@@ -64,10 +75,19 @@ export function AutoTranscribeOffer({ video, disabled, onLines, onExists }: { vi
       <p className="text-label-md text-on-surface-variant">AI nghe giọng nói rồi tạo phụ đề tiếng Trung kèm mốc giờ (video tối đa {MAX_ASR_VIDEO_SECONDS / 60} phút, mất vài phút). Bản chép có thể sai chữ hoặc lệch vài giây và sẽ được gắn nhãn &quot;nhận dạng tự động&quot;.</p>
       {running && <p role="status" className="text-label-md text-primary">AI đang nghe video… đã xong {progress.done}/{progress.total} đoạn. Bạn đừng đóng trang này nhé.</p>}
       {error && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{error}</p>}
-      <button type="button" onClick={() => void start()} disabled={disabled || running}
+      {registered === false ? (
+        <>
+          <p className="text-label-md text-on-surface-variant">Tính năng này tốn tài nguyên AI nên chỉ dành cho tài khoản đăng nhập Google (thẻ ôn và tiến độ học của bạn được giữ nguyên).</p>
+          <button type="button" onClick={() => void signIn()} disabled={signingIn} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+            {signingIn ? "Đang chuyển sang Google…" : "Đăng nhập Google để dùng"}
+          </button>
+        </>
+      ) : (
+      <button type="button" onClick={() => void start()} disabled={disabled || running || registered === undefined}
         className="inline-flex min-h-11 items-center justify-center rounded-full border border-outline px-6 text-label-md font-semibold text-primary hover:bg-surface-container disabled:opacity-50">
         {running ? <><Spinner size={16} className="mr-2" />Đang nghe video…</> : "Nhờ AI nghe và tạo phụ đề"}
       </button>
+      )}
     </section>
   );
 }

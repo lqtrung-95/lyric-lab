@@ -12,13 +12,13 @@ const bodySchema = z.object({ video: z.string().min(1).max(300), chunk: z.number
 const NO_STORE = { "Cache-Control": "private, no-store" };
 const fail = (error: string, status: number) => Response.json({ error }, { status, headers: NO_STORE });
 const STATUS: Record<string, number> = {
-  not_found: 404, exists: 409, not_embeddable: 422, too_short: 422, too_long: 413, invalid_chunk: 400, user_limit: 429, global_limit: 429, ai_unavailable: 503,
+  account_required: 403, not_found: 404, exists: 409, not_embeddable: 422, too_short: 422, too_long: 413, invalid_chunk: 400, user_limit: 429, global_limit: 429, ai_unavailable: 503,
 };
 
 /**
  * POST {video, chunk} → Gemini nghe một đoạn ~2 phút của video YouTube chưa có phụ đề và trả {lines:[{text,start,end}], chunkCount} (giờ tính từ đầu video).
  * Giao diện gọi lần lượt từng đoạn 0..chunkCount-1 rồi gửi cả bản chép sang /api/videos/add. Mỗi đoạn trừ một lượt hạn mức `transcribe` (hoàn lại khi AI lỗi).
- * Lỗi: 400 invalid_video/invalid_chunk, 401 unauthorized, 404 not_found, 409 exists, 413 too_long, 422 not_embeddable/too_short, 429 user_limit/global_limit, 503 ai_unavailable, 500 server_error.
+ * Lỗi: 400 invalid_video/invalid_chunk, 401 unauthorized, 403 account_required (tài khoản ẩn danh), 404 not_found, 409 exists, 413 too_long, 422 not_embeddable/too_short, 429 user_limit/global_limit, 503 ai_unavailable, 500 server_error.
  */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
