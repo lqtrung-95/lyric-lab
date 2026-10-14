@@ -1,12 +1,27 @@
 import { Icon } from "@/components/ui/icon";
+import { SelectField } from "@/components/ui/select-field";
 import { VIDEO_BANDS, VIDEO_SORTS, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import { VIDEO_TAGS, type VideoTagId } from "@/lib/video/video-tags";
 
 const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-label-md font-medium transition-colors";
+const on = "bg-primary text-on-primary";
+const off = "bg-surface-container-high text-on-surface hover:bg-surface-container-highest";
+// Ô chọn đang lọc (khác mặc định) có viền màu để thấy ngay bộ lọc nào đang bật dù đã gập danh sách.
+const active = "ring-2 ring-primary";
 
 /**
- * Bộ lọc danh sách video theo cấp HSK (nút bấm, mặc định "Tất cả") nút "Nhóm theo kênh" (chỉ khi có `onGrouped`, trang một kênh không cần) và ô chọn cách sắp xếp. Dải trống bị ẩn; dải hợp với level của người học được đánh dấu
- * "hợp bạn" nhưng KHÔNG tự chọn, để người mới vẫn thấy toàn bộ video.
+ * Nhãn nhỏ đứng trước một ô chọn; bọc cả ô chọn nên bấm chữ cũng mở ô và trình đọc màn hình đọc đúng tên. Trên điện thoại nhãn chỉ dành cho trình đọc màn hình
+ * (mục đầu của mỗi ô như "Mọi chủ đề", "Tất cả cấp" đã tự giải thích) để hai ô nằm cạnh nhau trên một hàng.
+ */
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="flex min-w-0 items-center gap-2 text-label-md text-on-surface-variant"><span className="sr-only sm:not-sr-only">{label}</span>{children}</label>;
+}
+const fill = { wrapperClassName: "w-full sm:w-auto", className: "w-full sm:w-auto" };
+
+/**
+ * Bộ lọc danh sách video gọn trên MỘT hàng: ô chọn Chủ đề, Cấp độ (HSK) và Sắp xếp, cùng hai nút bật/tắt "Yêu thích" và "Nhóm theo kênh".
+ * Ô chọn chỉ liệt kê mục có video (kèm số), nhưng luôn giữ mục đang chọn. Cấp độ hợp với level người học được đánh dấu "hợp bạn" nhưng KHÔNG tự chọn, để người mới vẫn thấy toàn bộ video.
+ * `onGrouped` chỉ có ở trang Video (trang một kênh không cần nhóm); các bộ lọc thẻ/yêu thích chỉ hiện khi được truyền.
  */
 export function VideoListFilters({ counts, total, band, onBand, sort, onSort, suggested, grouped, onGrouped, tagCounts, tag, onTag, likedCount, onlyLiked, onOnlyLiked }: {
   counts: Record<BandId, number>; total: number; band: BandId | null; onBand: (b: BandId | null) => void;
@@ -16,43 +31,38 @@ export function VideoListFilters({ counts, total, band, onBand, sort, onSort, su
   /** Nút "Yêu thích" (chỉ lấy video đã tim): hiện khi truyền `onOnlyLiked`, kể cả khi chưa thích video nào (để người dùng biết có tính năng này). */
   likedCount?: number; onlyLiked?: boolean; onOnlyLiked?: (v: boolean) => void;
 }) {
-  const on = "bg-primary text-on-primary";
-  const off = "bg-surface-container-high text-on-surface hover:bg-surface-container-highest";
+  const showTags = tagCounts && onTag && (VIDEO_TAGS.some((t) => tagCounts[t.id] > 0) || tag);
   return (
-    <div className="space-y-3">
-      {tagCounts && onTag && VIDEO_TAGS.some((t) => tagCounts[t.id] > 0) && (
-        <div role="group" aria-label="Lọc theo chủ đề" className="flex flex-wrap gap-2">
-          <button type="button" aria-pressed={!tag} onClick={() => onTag(null)} className={`${chip} ${!tag ? on : off}`}>Mọi chủ đề</button>
-          {VIDEO_TAGS.filter((t) => tagCounts[t.id] > 0).map((t) => (
-            <button key={t.id} type="button" aria-pressed={tag === t.id} onClick={() => onTag(tag === t.id ? null : t.id)} className={`${chip} ${tag === t.id ? on : off}`}>{t.label} <span className="opacity-70">{tagCounts[t.id]}</span></button>
+    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-3">
+      {showTags && (
+        <Field label="Chủ đề">
+          <SelectField value={tag ?? ""} onChange={(e) => onTag(e.target.value ? (e.target.value as VideoTagId) : null)} wrapperClassName={fill.wrapperClassName} className={`${fill.className} ${tag ? active : ""}`}>
+            <option value="">Mọi chủ đề</option>
+            {VIDEO_TAGS.filter((t) => tagCounts[t.id] > 0 || t.id === tag).map((t) => <option key={t.id} value={t.id}>{t.label} ({tagCounts[t.id]})</option>)}
+          </SelectField>
+        </Field>
+      )}
+      <Field label="Cấp độ">
+        <SelectField value={band ?? ""} onChange={(e) => onBand(e.target.value ? (e.target.value as BandId) : null)} wrapperClassName={fill.wrapperClassName} className={`${fill.className} ${band ? active : ""}`}>
+          <option value="">Tất cả cấp ({total})</option>
+          {VIDEO_BANDS.filter((b) => counts[b.id] > 0 || b.id === band).map((b) => (
+            <option key={b.id} value={b.id}>{b.label} ({counts[b.id]}){b.id === suggested ? " · hợp bạn" : ""}</option>
           ))}
-        </div>
-      )}
-    <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-      <div role="group" aria-label="Lọc theo cấp HSK" className="flex flex-wrap gap-2">
-        <button type="button" aria-pressed={band === null} onClick={() => onBand(null)} className={`${chip} ${band === null ? on : off}`}>Tất cả <span className="opacity-70">{total}</span></button>
-        {VIDEO_BANDS.filter((b) => counts[b.id] > 0).map((b) => (
-          <button key={b.id} type="button" aria-pressed={band === b.id} onClick={() => onBand(b.id)} className={`${chip} ${band === b.id ? on : off}`}>
-            {b.label} <span className="opacity-70">{counts[b.id]}</span>
-            {b.id === suggested && <span className={`rounded-full px-2 py-0.5 text-label-sm ${band === b.id ? "bg-on-primary/20" : "bg-secondary-container text-on-secondary-container"}`}>hợp bạn</span>}
-          </button>
-        ))}
-      </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
-      {onOnlyLiked && (
-        <button type="button" aria-pressed={onlyLiked} onClick={() => onOnlyLiked(!onlyLiked)} className={`${chip} ${onlyLiked ? on : off}`}>
-          <Icon name={onlyLiked ? "favorite" : "favorite_border"} filled={onlyLiked} size={18} />Yêu thích <span className="opacity-70">{likedCount ?? 0}</span>
-        </button>
-      )}
-      {onGrouped && <button type="button" aria-pressed={grouped} onClick={() => onGrouped(!grouped)} className={`${chip} ${grouped ? on : off}`}>Nhóm theo kênh</button>}
-      <label className="flex items-center gap-2 text-label-md text-on-surface-variant">
-        Sắp xếp
-        <select value={sort} onChange={(e) => onSort(e.target.value as VideoSort)} className="min-h-11 rounded-full bg-surface-container-high px-4 text-label-md text-on-surface">
+        </SelectField>
+      </Field>
+      <Field label="Sắp xếp">
+        <SelectField value={sort} onChange={(e) => onSort(e.target.value as VideoSort)} {...fill}>
           {VIDEO_SORTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
-        </select>
-      </label>
+        </SelectField>
+      </Field>
+      <div className="col-span-2 flex flex-wrap items-center gap-2 sm:ml-auto">
+        {onOnlyLiked && (
+          <button type="button" aria-pressed={onlyLiked} onClick={() => onOnlyLiked(!onlyLiked)} className={`${chip} ${onlyLiked ? on : off}`}>
+            <Icon name={onlyLiked ? "favorite" : "favorite_border"} filled={onlyLiked} size={18} />Yêu thích <span className="opacity-70">{likedCount ?? 0}</span>
+          </button>
+        )}
+        {onGrouped && <button type="button" aria-pressed={grouped} onClick={() => onGrouped(!grouped)} className={`${chip} ${grouped ? on : off}`}>Nhóm theo kênh</button>}
       </div>
-    </div>
     </div>
   );
 }

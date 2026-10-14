@@ -14,26 +14,27 @@ async function open(page: Page) {
   await page.getByRole("button", { name: "Nhóm theo kênh" }).click(); // mặc định đang nhóm theo kênh; các bài kiểm tra này xem danh sách phẳng
 }
 
-test("mặc định hiện tất cả video; nút lọc chỉ gồm các dải có video, dải hợp level được đánh dấu nhưng không tự chọn", async ({ page }) => {
+test("mặc định hiện tất cả video; ô Cấp độ chỉ liệt kê các dải có video, dải hợp level được đánh dấu nhưng không tự chọn", async ({ page }) => {
   await open(page);
   await expect(page.getByRole("link", { name: /Video khó/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Video chưa chấm/ })).toBeVisible();
-  const group = page.getByRole("group", { name: "Lọc theo cấp HSK" });
-  await expect(group.getByRole("button", { name: /^Tất cả/ })).toHaveAttribute("aria-pressed", "true");
-  await expect(group.getByRole("button", { name: /HSK 1–2/ })).toContainText("hợp bạn");
-  await expect(group.getByRole("button", { name: /HSK 4/ })).toHaveCount(0); // dải trống (không có video 3,5–4,5) bị ẩn
-  await expect(group.getByRole("button", { name: /HSK 3/ })).toContainText("1");
+  const level = page.getByLabel("Cấp độ");
+  await expect(level).toHaveValue(""); // mặc định "Tất cả cấp", không tự chọn dải hợp level
+  const options = await level.locator("option").allTextContents();
+  expect(options[0]).toBe("Tất cả cấp (4)");
+  expect(options.find((o) => o.includes("HSK 1–2"))).toContain("hợp bạn");
+  expect(options.some((o) => o.includes("HSK 4"))).toBe(false); // dải trống (không có video 3,5–4,5) bị ẩn
+  expect(options.find((o) => o.includes("HSK 3"))).toContain("(1)");
 });
 
 test("chọn một dải chỉ còn video của dải đó; chọn lại Tất cả thì đủ; video chưa có level chỉ ở Tất cả", async ({ page }) => {
   await open(page);
-  const group = page.getByRole("group", { name: "Lọc theo cấp HSK" });
-  await group.getByRole("button", { name: /HSK 3/ }).click();
+  const level = page.getByLabel("Cấp độ");
+  await level.selectOption({ label: "HSK 3 (1)" });
   await expect(page.getByRole("link", { name: /Video vừa/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Video dễ/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Video chưa chấm/ })).toHaveCount(0);
-  await expect(group.getByRole("button", { name: /HSK 3/ })).toHaveAttribute("aria-pressed", "true");
-  await group.getByRole("button", { name: /^Tất cả/ }).click();
+  await level.selectOption("");
   await expect(page.locator("ul a[href^='/video/']")).toHaveCount(4);
 });
 

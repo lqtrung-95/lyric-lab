@@ -68,6 +68,7 @@ test("lọc Yêu thích chỉ còn video đã tim; nhớ sau khi tải lại; ch
   await page.getByRole("button", { name: /^Yêu thích/ }).click();
   await expect(page.locator("ul a[href^='/video/']")).toHaveCount(1);
   await expect(page.getByRole("link", { name: /Bài bbbbbbbbbb1/ })).toBeVisible();
+  await page.waitForTimeout(500); // đợi nút Yêu thích chuyển màu xong (axe đo màu giữa chừng hoạt ảnh sẽ báo sai tương phản)
   expect((await new AxeBuilder({ page }).analyze()).violations.filter((x) => ["serious", "critical"].includes(x.impact ?? ""))).toEqual([]);
 });
 

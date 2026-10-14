@@ -5,9 +5,9 @@ import { Icon } from "@/components/ui/icon";
  * Ô chọn dạng viên thuốc với mũi tên tự vẽ (bỏ mũi tên gốc của trình duyệt vì mỗi trình duyệt đặt một kiểu, hay dính sát mép).
  * Vẫn là <select> thật nên dùng được bằng bàn phím và trình đọc màn hình.
  */
-export function SelectField({ className = "", children, ...props }: SelectHTMLAttributes<HTMLSelectElement>) {
+export function SelectField({ className = "", wrapperClassName = "", children, ...props }: SelectHTMLAttributes<HTMLSelectElement> & { wrapperClassName?: string }) {
   return (
-    <span className="relative inline-flex items-center">
+    <span className={`relative inline-flex items-center ${wrapperClassName}`}>
       <select
         {...props}
         className={`min-h-11 cursor-pointer appearance-none rounded-full bg-surface-container-high py-0 pl-4 pr-10 text-label-md font-semibold text-secondary ${className}`}

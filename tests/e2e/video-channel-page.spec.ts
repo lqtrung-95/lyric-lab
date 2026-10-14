@@ -36,7 +36,7 @@ test("bấm Xem tất cả: sang trang kênh liệt kê đủ video, có lọc t
   await expect(page.locator("a[href^='/video/aaaaaaaaa']")).toHaveCount(6);
   await expect(page.locator("a[href^='/video/bbbbbbbbbb']")).toHaveCount(0); // không lẫn video kênh khác
   await expect(page.getByRole("button", { name: "Nhóm theo kênh" })).toHaveCount(0);
-  await page.getByRole("group", { name: "Lọc theo cấp HSK" }).getByRole("button", { name: /HSK 4/ }).click();
+  await page.getByLabel("Cấp độ").selectOption({ label: "HSK 4 (2)" });
   await expect(page.locator("a[href^='/video/aaaaaaaaa']")).toHaveCount(2);
   await page.getByRole("link", { name: "← Tất cả video" }).click();
   await expect(page).toHaveURL(/\/video$/);

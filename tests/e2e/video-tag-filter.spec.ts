@@ -13,47 +13,50 @@ async function open(page: Page, videos: unknown[], path = "/video") {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(path);
 }
-const tags = (page: Page) => page.getByRole("group", { name: "Lọc theo chủ đề" });
+const tagSelect = (page: Page) => page.getByLabel("Chủ đề");
+const tagOptions = (page: Page) => tagSelect(page).locator("option").allTextContents();
 const cards = (page: Page) => page.locator("ul a[href^='/video/']");
 
-test("hàng nút chủ đề chỉ gồm thẻ có video, kèm số lượng; chọn thẻ chỉ còn video của thẻ, chọn lại để bỏ lọc", async ({ page }) => {
+test("ô Chủ đề chỉ gồm thẻ có video, kèm số lượng; chọn thẻ chỉ còn video của thẻ, chọn lại Mọi chủ đề để bỏ lọc", async ({ page }) => {
   await open(page, VIDEOS);
-  const group = tags(page);
-  await expect(group.getByRole("button", { name: "Mọi chủ đề" })).toHaveAttribute("aria-pressed", "true");
-  await expect(group.getByRole("button", { name: /Hoạt hình/ })).toContainText("2");
-  await expect(group.getByRole("button", { name: /Vlog/ })).toContainText("2");
-  await expect(group.getByRole("button", { name: /Podcast/ })).toHaveCount(0); // thẻ không có video bị ẩn
+  await expect(tagSelect(page)).toHaveValue("");
+  await expect(page.getByRole("link", { name: /Bài aaaaaaaaaa1/ })).toBeVisible();
+  const options = await tagOptions(page);
+  expect(options).toEqual(expect.arrayContaining(["Mọi chủ đề", "Hoạt hình (2)", "Vlog (2)"]));
+  expect(options.some((o) => o.startsWith("Podcast"))).toBe(false); // thẻ không có video bị ẩn
   expect((await new AxeBuilder({ page }).analyze()).violations.filter((x) => ["serious", "critical"].includes(x.impact ?? ""))).toEqual([]);
 
-  await group.getByRole("button", { name: /Vlog/ }).click();
+  await tagSelect(page).selectOption({ label: "Vlog (2)" });
   await expect(cards(page)).toHaveCount(2);
   await expect(page.getByRole("link", { name: /Bài aaaaaaaaaa1/ })).toHaveCount(0);
   await expect(page.getByRole("link", { name: /Bài cccccccccc1/ })).toHaveCount(0); // video chưa có thẻ chỉ ở "Mọi chủ đề"
-  await group.getByRole("button", { name: /Vlog/ }).click();
+  await tagSelect(page).selectOption("");
   await expect(cards(page)).toHaveCount(5);
 });
 
 test("thẻ kết hợp với cấp HSK: số video theo cấp tính trên phần đã lọc thẻ", async ({ page }) => {
   await open(page, VIDEOS);
-  await tags(page).getByRole("button", { name: /Hoạt hình/ }).click();
-  const level = page.getByRole("group", { name: "Lọc theo cấp HSK" });
-  await expect(level.getByRole("button", { name: /^Tất cả/ })).toContainText("2");
-  await level.getByRole("button", { name: /HSK 3/ }).click();
+  await expect(tagSelect(page)).toBeVisible();
+  await tagSelect(page).selectOption({ label: "Hoạt hình (2)" });
+  const level = page.getByLabel("Cấp độ");
+  expect((await level.locator("option").allTextContents())[0]).toBe("Tất cả cấp (2)");
+  await level.selectOption({ label: "HSK 3 (1)" });
   await expect(cards(page)).toHaveCount(1);
   await expect(page.getByRole("link", { name: /Bài aaaaaaaaaa2/ })).toBeVisible();
 });
 
-test("trang kênh cũng có bộ lọc chủ đề, chỉ tính video của kênh đó", async ({ page }) => {
+test("trang kênh cũng có ô chủ đề, chỉ tính video của kênh đó", async ({ page }) => {
   await open(page, VIDEOS, `/video/kenh/${encodeURIComponent("Kênh B")}`);
-  const group = tags(page);
-  await expect(group.getByRole("button", { name: /Vlog/ })).toContainText("2");
-  await expect(group.getByRole("button", { name: /Hoạt hình/ })).toHaveCount(0); // thẻ của kênh khác không hiện
-  await group.getByRole("button", { name: /Du lịch/ }).click();
+  await expect(tagSelect(page)).toBeVisible(); // đợi danh sách video tải xong rồi mới đọc các lựa chọn
+  const options = await tagOptions(page);
+  expect(options).toEqual(expect.arrayContaining(["Vlog (2)", "Du lịch (1)"]));
+  expect(options.some((o) => o.startsWith("Hoạt hình"))).toBe(false); // thẻ của kênh khác không hiện
+  await tagSelect(page).selectOption({ label: "Du lịch (1)" });
   await expect(cards(page)).toHaveCount(1);
 });
 
-test("API chưa có thẻ (migration chưa chạy): không hiện hàng nút chủ đề, danh sách vẫn bình thường", async ({ page }) => {
+test("API chưa có thẻ (migration chưa chạy): không có ô Chủ đề, danh sách vẫn bình thường", async ({ page }) => {
   await open(page, VIDEOS.map((x) => Object.fromEntries(Object.entries(x).filter(([k]) => k !== "tags"))));
   await expect(page.getByRole("link", { name: /Bài aaaaaaaaaa1/ })).toBeVisible();
-  await expect(tags(page)).toHaveCount(0);
+  await expect(tagSelect(page)).toHaveCount(0);
 });
