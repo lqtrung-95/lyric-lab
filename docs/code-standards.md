@@ -83,6 +83,7 @@ Mọi bảng có khóa ngoại tới `auth.users` phải được xử lý khi n
 ## Nhận dạng giọng nói (ASR)
 - Mốc giờ do LLM nghe video trả về **không tin ngay**: luôn đọc qua `parseAsrJson` (chấp nhận `MM:SS`), kiểm tra `timingLooksBroken`/cửa sổ rồi mới dùng; kết quả hỏng thì rớt sang model kế, không đoán lại. Bắt model dùng đồng hồ của CẢ video (`"MM:SS"`), đừng bắt tính "từ đầu đoạn" (đo thực tế: cả đoạn bị nén vào vài giây).
 - Mỗi lần gọi một model nghe video phải nằm trong 60 giây của route (Hobby): chia đoạn ngắn (2 phút), đo lúc nguội chứ không chỉ lần chạy có cache.
+- Bản chép tự động luôn lưu chữ GIẢN THỂ: `cleanAsrLines` đổi bằng `toSimplifiedChinese`, đừng dựa vào prompt (model vẫn chép phồn thể với video Đài Loan/Hồng Kông).
 - Bản chép tự động luôn mang nhãn `transcript_source = 'auto'` và giao diện phải cảnh báo "có thể sai"; không bao giờ để LLM bịa lời khi không có tiếng nói (prompt dặn bỏ trống, `cleanAsrLines` gom câu lặp).
 - Không tải audio YouTube lên server của app: hướng web để Google tự lấy video qua link, chỉ script chạy trên máy admin được tải audio về máy.
 

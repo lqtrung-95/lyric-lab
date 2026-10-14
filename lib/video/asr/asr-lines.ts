@@ -1,4 +1,5 @@
 import type { CaptionLine } from "@/lib/captions/caption-provider-types";
+import { toSimplifiedChinese } from "@/lib/text/to-simplified-chinese";
 
 // Biến kết quả nhận dạng giọng nói (Gemini nghe video, Whisper nghe file âm thanh) thành các dòng phụ đề sạch để đi qua lõi nạp video như phụ đề thường.
 // Mô hình nhận dạng hay: trả mốc giờ chồng nhau, lặp một câu nhiều lần khi gặp nhạc/im lặng, chèn câu không có chữ Hán; mọi thứ đó được dọn ở đây.
@@ -61,10 +62,10 @@ export function timingLooksBroken(segments: RawAsrSegment[], windowSeconds: numb
   return span < windowSeconds * 0.3;
 }
 
-/** Dọn dòng: bỏ dòng không có chữ Hán/quá dài, gom câu lặp, sắp theo giờ, cắt chồng lấn, ép trong [0, durationSec] và mỗi dòng dài tối thiểu `MIN_LINE_SECONDS`. */
+/** Dọn dòng: đổi sang chữ GIẢN THỂ (bản chép tự động luôn lưu giản thể, kể cả khi người nói/chữ trên hình là phồn thể), bỏ dòng không có chữ Hán/quá dài, gom câu lặp, sắp theo giờ, cắt chồng lấn, ép trong [0, durationSec] và mỗi dòng dài tối thiểu `MIN_LINE_SECONDS`. */
 export function cleanAsrLines(segments: RawAsrSegment[], durationSec: number): CaptionLine[] {
   const sorted = segments
-    .map((s) => ({ start: s.start, end: s.end, text: s.text.replace(/\s+/g, " ").trim() }))
+    .map((s) => ({ start: s.start, end: s.end, text: toSimplifiedChinese(s.text.replace(/\s+/g, " ").trim()) }))
     .filter((s) => s.text.length > 0 && s.text.length <= MAX_LINE_CHARS && HAN.test(s.text))
     .sort((a, b) => a.start - b.start);
   // Một câu lặp liền nhau từ MAX_IDENTICAL_IN_ROW lần trở lên là mô hình "kẹt vòng lặp" (hay gặp ở nhạc nền/im lặng): giữ lần đầu. Lặp ít hơn có thể là người nói thật.

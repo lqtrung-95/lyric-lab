@@ -50,6 +50,10 @@ describe("timingLooksBroken", () => {
 });
 
 describe("cleanAsrLines", () => {
+  it("đổi chữ phồn thể sang giản thể", () => {
+    const out = cleanAsrLines([{ start: 0, end: 3, text: "為什麼還不給我漲工資啊？" }, { start: 4, end: 7, text: "你連智商考核的通不過" }], 60);
+    expect(out.map((l) => l.text)).toEqual(["为什么还不给我涨工资啊？", "你连智商考核的通不过"]);
+  });
   it("bỏ dòng không có chữ Hán, dòng rỗng và dòng quá dài", () => {
     const out = cleanAsrLines([
       { start: 0, end: 2, text: "你好" }, { start: 2, end: 4, text: "(music)" }, { start: 4, end: 5, text: "  " }, { start: 5, end: 6, text: "好".repeat(200) },

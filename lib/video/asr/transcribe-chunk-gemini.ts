@@ -15,7 +15,7 @@ const WINDOW_SLACK_SECONDS = 3;
 // Mốc giờ phải là "MM:SS" trên đồng hồ của CẢ video: đo thực tế model hay đọc số giây từ đầu video (7:57 thành 7.57) và gán sai khi bắt tính từ đầu đoạn
 // (cả đoạn bị nén vào 3 giây), còn khi cho dùng đồng hồ của video thì ổn định.
 const SYSTEM = `You are a speech-transcription engine for Mandarin Chinese learners.
-Transcribe ONLY the words that are spoken aloud in the video clip, in Simplified Chinese characters. Never translate.
+Transcribe ONLY the words that are spoken aloud in the video clip. ALWAYS write Simplified Chinese characters (简体字), never Traditional (繁體字), even when the speaker is from Taiwan/Hong Kong or the on-screen text is Traditional. Never translate.
 Ignore on-screen text, subtitles burned into the picture, music, lyrics of background songs and sound effects. If a stretch has no speech, output nothing for it. Never invent or repeat words.
 Split the speech into short sentences or clauses (about 1-10 seconds each, one line each).
 Timestamps are MM:SS (or H:MM:SS) on the ORIGINAL VIDEO timeline, the same clock as the YouTube player: a clip that starts at 4:00 begins around 04:00. Never restart the clock at 00:00 for a later clip.
