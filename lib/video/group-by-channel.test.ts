@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupByChannel } from "./group-by-channel";
+import { channelFromSlug, channelHref, groupByChannel, videosOfChannel } from "./group-by-channel";
 import type { LessonSummary } from "./video-repo";
 
 const v = (videoId: string, channelTitle: string): LessonSummary => ({ videoId, title: videoId, channelTitle, durationSec: 100, levelAvg: 3, lineCount: 10 });
@@ -19,4 +19,29 @@ describe("groupByChannel", () => {
     expect(groups.map((g) => g.channelTitle)).toEqual(["X", "Kênh khác"]);
   });
   it("danh sách rỗng", () => expect(groupByChannel([])).toEqual([]));
+});
+
+describe("địa chỉ trang kênh", () => {
+  it("mã hóa tên kênh có dấu, chữ Hán, khoảng trắng và ký tự đặc biệt rồi đọc lại đúng", () => {
+    for (const name of ["DaihuaXiyou 呆話西遊", "我的爸爸是條龍", "A/B & C?#", "Kênh 100%"]) {
+      const href = channelHref(name);
+      expect(href.startsWith("/video/kenh/")).toBe(true);
+      expect(href.slice("/video/kenh/".length)).not.toMatch(/[/?#]/);
+      expect(channelFromSlug(href.slice("/video/kenh/".length))).toBe(name);
+    }
+  });
+  it("kênh không có tên dùng '-' và đọc lại thành rỗng; slug hỏng không ném lỗi", () => {
+    expect(channelHref("  ")).toBe("/video/kenh/-");
+    expect(channelFromSlug("-")).toBe("");
+    expect(channelFromSlug("%E0%A4%A")).toBe("%E0%A4%A");
+  });
+});
+
+describe("videosOfChannel", () => {
+  it("lọc đúng kênh, không phân biệt hoa thường/khoảng trắng, giữ thứ tự; kênh không tên khớp video không tên", () => {
+    const all = [v("a", "Alpha"), v("b", "Beta"), v("c", " alpha "), v("d", "")];
+    expect(videosOfChannel(all, "ALPHA").map((x) => x.videoId)).toEqual(["a", "c"]);
+    expect(videosOfChannel(all, "").map((x) => x.videoId)).toEqual(["d"]);
+    expect(videosOfChannel(all, "Không có")).toEqual([]);
+  });
 });

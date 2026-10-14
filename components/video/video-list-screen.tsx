@@ -1,21 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { SongCard } from "@/components/library/song-card";
+import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { groupByChannel } from "@/lib/video/group-by-channel";
+import { CHANNEL_PREVIEW_COUNT, channelHref, groupByChannel } from "@/lib/video/group-by-channel";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { countByBand, filterAndSortVideos, videoBandForLevel, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
-import type { LessonSummary } from "@/lib/video/video-repo";
+import { ChannelSeeAllCard } from "./channel-see-all-card";
+import { useVideoList } from "./use-video-list";
+import { VideoGrid } from "./video-grid";
 import { VideoListFilters } from "./video-list-filters";
 
-const meta = (v: LessonSummary) =>
-  [v.levelAvg !== null ? `HSK ~${v.levelAvg.toFixed(1)}` : null, `${v.lineCount} câu`, `${Math.max(1, Math.round(v.durationSec / 60))} phút`].filter(Boolean).join(" · ");
-
-/** Trang Video: các video luyện nghe đã được tuyển chọn, bấm vào để xem cùng bản chép và tra từ. */
+/**
+ * Trang Video: các video luyện nghe đã được tuyển chọn, bấm vào để xem cùng bản chép và tra từ. Chế độ nhóm theo kênh (mặc định) liệt kê MỌI kênh nhưng mỗi kênh chỉ hiện vài video đầu
+ * (`CHANNEL_PREVIEW_COUNT`) kèm thẻ "Xem tất cả" sang trang riêng của kênh (`/video/kenh/...`).
+ */
 export function VideoListScreen() {
-  const [videos, setVideos] = useState<LessonSummary[] | null | "error">(null);
+  const videos = useVideoList();
   const { state } = useLearnerState();
   // Mặc định hiện TẤT CẢ (người mới không bị giấu video); dải hợp level chỉ được đánh dấu trên nút lọc.
   const [band, setBand] = useState<BandId | null>(null);
@@ -26,15 +27,6 @@ export function VideoListScreen() {
   const shown = useMemo(() => filterAndSortVideos(list ?? [], band, sort), [list, band, sort]);
 
   const groups = useMemo(() => (grouped ? groupByChannel(shown) : []), [grouped, shown]);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/videos")
-      .then(async (r) => (r.ok ? ((await r.json()) as { videos: LessonSummary[] }).videos : Promise.reject(new Error("videos"))))
-      .then((v) => { if (!cancelled) setVideos(v); })
-      .catch(() => { if (!cancelled) setVideos("error"); });
-    return () => { cancelled = true; };
-  }, []);
 
   return (
     <div className="space-y-space-md">
@@ -63,8 +55,15 @@ export function VideoListScreen() {
             <div className="space-y-space-lg">
               {groups.map((g) => (
                 <section key={g.channelTitle} aria-label={`Kênh ${g.channelTitle}`}>
-                  <h2 className="mb-3 font-serif text-headline-md">{g.channelTitle} <span className="text-label-md font-normal text-on-surface-variant">{g.videos.length} video</span></h2>
-                  <VideoGrid videos={g.videos} />
+                  <h2 className="mb-3 font-serif text-headline-md">
+                    {g.videos.length > CHANNEL_PREVIEW_COUNT
+                      ? <Link href={channelHref(g.channelTitle === "Kênh khác" ? "" : g.channelTitle)} className="hover:underline">{g.channelTitle}</Link>
+                      : g.channelTitle} <span className="text-label-md font-normal text-on-surface-variant">{g.videos.length} video</span>
+                  </h2>
+                  {g.videos.length > CHANNEL_PREVIEW_COUNT ? (
+                    <VideoGrid videos={g.videos.slice(0, CHANNEL_PREVIEW_COUNT)} columns="lg:grid-cols-5"
+                      extra={<ChannelSeeAllCard channelTitle={g.channelTitle === "Kênh khác" ? "" : g.channelTitle} total={g.videos.length} />} />
+                  ) : <VideoGrid videos={g.videos} columns="lg:grid-cols-5" />}
                 </section>
               ))}
             </div>
@@ -74,17 +73,5 @@ export function VideoListScreen() {
         </>
       )}
     </div>
-  );
-}
-
-function VideoGrid({ videos }: { videos: LessonSummary[] }) {
-  return (
-    <ul className="grid grid-cols-1 gap-gutter sm:grid-cols-2 lg:grid-cols-4">
-      {videos.map((v) => (
-        <li key={v.videoId}>
-          <SongCard videoId={v.videoId} href={`/video/${v.videoId}`} title={v.title} channelTitle={v.channelTitle} meta={meta(v)} sizes="(min-width:1024px) 25vw, 50vw" />
-        </li>
-      ))}
-    </ul>
   );
 }
