@@ -1,9 +1,12 @@
+import { GEMINI_MODELS } from "@/lib/analysis/gemini-models";
 import type { ChatFn } from "@/lib/analysis/groq-chat";
 import { heuristicTags, normalizeTags, VIDEO_TAGS, type VideoTagId } from "./video-tags";
 
 // Nhờ AI gán 1-3 thẻ chủ đề cho video từ tên, kênh và vài câu thoại đầu. Dùng tên model cụ thể (không `-latest`); lỗi hay kết quả rỗng thì quay về quy tắc từ khóa. Không bao giờ ném lỗi:
 // thẻ chỉ là thông tin phụ, không được làm hỏng việc nạp video.
-const MODELS = ["gemini:gemini-3-flash-preview", "gemini:gemini-2.5-flash"];
+// Model nhẹ đứng đầu: phân loại 8 lựa chọn không cần model mạnh, và hạn mức Gemini tính RIÊNG từng model nên không tranh với việc nghe video (dùng gemini-3-flash-preview, hay cạn hạn mức ngày
+// khi nạp hàng loạt; đo 2026-10-14: 50/50 khóa 429 với model đó trong khi model nhẹ vẫn 200). Model mạnh chỉ là dự phòng.
+const MODELS = [...GEMINI_MODELS, "gemini:gemini-3-flash-preview"];
 const SAMPLE_LINES = 12;
 // Tổng thời gian tối đa cho cả hai model: bước này chạy sau khi ghi bài trong route 60 giây (đã có dịch AI), không được kéo dài quá.
 const DEADLINE_MS = 10_000;
@@ -21,6 +24,7 @@ const tagHint: Record<VideoTagId, string> = {
 
 const SYSTEM = `You label Chinese-language learning videos with topic tags. Choose 1 to 3 tags ONLY from this list (use the ids exactly):
 ${VIDEO_TAGS.map((t) => `- ${t.id}: ${tagHint[t.id]}`).join("\n")}
+The title may be in Vietnamese, Chinese or English. If the video is clearly a cartoon with animated characters, always include hoat-hinh. Return an empty list only when truly no tag fits.
 Reply with JSON only: {"tags": ["id", ...]}. Prefer the most specific tags; never invent new ones.`;
 
 export interface TagContext { title: string; channelTitle: string; lines: string[] }
