@@ -10,6 +10,7 @@ export const VIDEO_TAGS = [
   { id: "thieu-nhi", label: "Thiếu nhi" },
   { id: "phim-ngan", label: "Phim ngắn" },
   { id: "podcast", label: "Podcast" },
+  { id: "bai-hoc", label: "Bài học tiếng Trung" },
 ] as const;
 export type VideoTagId = (typeof VIDEO_TAGS)[number]["id"];
 export const MAX_TAGS_PER_VIDEO = 3;
@@ -33,6 +34,7 @@ const RULES: [VideoTagId, RegExp][] = [
   ["thieu-nhi", /儿歌|兒歌|童谣|童謠|童话|童話|幼儿|幼兒|宝宝|寶寶|kids|nursery|佩奇|peppa/i],
   ["hai", /搞笑|沙雕|爆笑|funny|comedy|幽默|笑死/i],
   ["phim-ngan", /短剧|短劇|微电影|微電影|short film|微剧|微劇/i],
+  ["bai-hoc", /学习中文|學習中文|学中文|學中文|学汉语|學漢語|中文课|中文課|learn (chinese|mandarin)|chinese (lesson|conversation|shadowing)|mandarin (lesson|practice)|speak chinese|可理解|comprehensible|\bhsk ?\d|slow chinese/i],
   ["doi-song", /生活|日常|居家|daily|lifestyle|life /i],
 ];
 
@@ -40,6 +42,16 @@ const RULES: [VideoTagId, RegExp][] = [
 export function heuristicTags(title: string, channelTitle: string): VideoTagId[] {
   const text = `${title} ${channelTitle}`;
   return normalizeTags(RULES.filter(([, re]) => re.test(text)).map(([id]) => id));
+}
+
+/**
+ * Chỉnh kết quả AI: hoạt hình/thiếu nhi KHÔNG đồng thời là "Bài học tiếng Trung" trừ khi tên video/kênh có dấu hiệu bài giảng thật (AI hay nhầm hoạt hình có pinyin/Vietsub trong tên
+ * là bài giảng; đo 2026-10-14 trên kênh DaihuaXiyou).
+ */
+export function refineTags(tags: VideoTagId[], title: string, channelTitle: string): VideoTagId[] {
+  const entertainment = tags.includes("hoat-hinh") || tags.includes("thieu-nhi");
+  if (!entertainment || !tags.includes("bai-hoc") || heuristicTags(title, channelTitle).includes("bai-hoc")) return tags;
+  return tags.filter((t) => t !== "bai-hoc");
 }
 
 /** Giữ video có thẻ `tag` (null = tất cả). Video chưa có thẻ chỉ hiện ở "Tất cả". */

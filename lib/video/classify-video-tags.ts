@@ -1,6 +1,6 @@
 import { GEMINI_MODELS } from "@/lib/analysis/gemini-models";
 import type { ChatFn } from "@/lib/analysis/groq-chat";
-import { heuristicTags, normalizeTags, VIDEO_TAGS, type VideoTagId } from "./video-tags";
+import { heuristicTags, normalizeTags, refineTags, VIDEO_TAGS, type VideoTagId } from "./video-tags";
 
 // Nhờ AI gán 1-3 thẻ chủ đề cho video từ tên, kênh và vài câu thoại đầu. Dùng tên model cụ thể (không `-latest`); lỗi hay kết quả rỗng thì quay về quy tắc từ khóa. Không bao giờ ném lỗi:
 // thẻ chỉ là thông tin phụ, không được làm hỏng việc nạp video.
@@ -20,6 +20,7 @@ const tagHint: Record<VideoTagId, string> = {
   "thieu-nhi": "made for young children (nursery, toddlers, preschool shows)",
   "phim-ngan": "scripted short film or drama with actors/characters and a plot",
   podcast: "talk/interview/podcast, mostly people speaking",
+  "bai-hoc": "made explicitly to teach or practise Chinese: language lessons, 'Learn Chinese while...', comprehensible input, slow-speech practice, HSK-labelled. NOT ordinary cartoons or vlogs",
 };
 
 const SYSTEM = `You label Chinese-language learning videos with topic tags. Choose 1 to 3 tags ONLY from this list (use the ids exactly):
@@ -38,7 +39,7 @@ export async function classifyVideoTags(chat: ChatFn, ctx: TagContext): Promise<
     try {
       const raw = await chat({ model, system: SYSTEM, user, maxTokens: 120, timeoutMs: remaining });
       const tags = normalizeTags((JSON.parse(raw.trim().replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "")) as { tags?: unknown }).tags);
-      if (tags.length > 0) return tags;
+      if (tags.length > 0) return refineTags(tags, ctx.title, ctx.channelTitle);
     } catch {
       // Model này lỗi/trả JSON hỏng: thử model kế, hết thì dùng quy tắc từ khóa.
     }
