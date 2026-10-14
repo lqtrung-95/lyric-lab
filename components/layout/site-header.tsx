@@ -7,10 +7,10 @@ import { Icon } from "@/components/ui/icon";
 import { ChatNavLink } from "@/components/chat/chat-nav-link";
 import { DueBadge } from "@/components/review/due-badge";
 import { isNavActive, NAV_LINKS } from "./nav-links";
-import { MobileHeaderMenu } from "./mobile-header-menu";
+import { HeaderOverflowMenu } from "./header-overflow-menu";
 import { ThemeToggle } from "./theme-toggle";
 
-/** Thanh trên cùng: desktop có 3 mục điều hướng dạng viên thuốc; mobile có logo, icon Cộng đồng (chấm tin mới) và nút Menu gom các lối vào phụ (tab bar ở dưới). */
+/** Thanh trên cùng: từ md có các mục điều hướng dạng viên thuốc (một dòng, không xuống dòng chữ); dưới xl (điện thoại, iPad) chỉ có logo, icon Cộng đồng (chấm tin mới) và nút Menu gom các lối vào phụ; từ xl đủ chỗ cho từng icon. Điện thoại còn có tab bar ở dưới. */
 export function SiteHeader() {
   const pathname = usePathname();
   return (
@@ -29,7 +29,7 @@ export function SiteHeader() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-11 items-center rounded-full px-4 text-label-md transition-colors ${
+                  className={`flex min-h-11 items-center whitespace-nowrap rounded-full px-4 text-label-md transition-colors ${
                     active
                       ? "bg-surface-container-high font-medium text-on-surface"
                       : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"
@@ -44,18 +44,18 @@ export function SiteHeader() {
         </div>
         <div className="flex items-center gap-1">
           <ChatNavLink />
-          <Link href="/cong-cu" aria-label="Công cụ" title="Công cụ" className="hidden md:flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+          <Link href="/cong-cu" aria-label="Công cụ" title="Công cụ" className="hidden xl:flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="build" size={20} />
           </Link>
-          <Link href="/review/leaderboard" aria-label="Bảng xếp hạng" title="Bảng xếp hạng" className="hidden md:flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+          <Link href="/review/leaderboard" aria-label="Bảng xếp hạng" title="Bảng xếp hạng" className="hidden xl:flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="leaderboard" size={20} />
           </Link>
-          <Link href="/feedback" aria-label="Góp ý cho SongHanzi" title="Góp ý" className="hidden md:flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
+          <Link href="/feedback" aria-label="Góp ý cho SongHanzi" title="Góp ý" className="hidden xl:flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface">
             <Icon name="feedback" size={20} />
           </Link>
-          <MobileHeaderMenu />
-          <span className="hidden md:inline-flex"><ThemeToggle /></span>
-          <Link href="/settings" aria-label="Cài đặt và tài khoản" className="hidden md:flex h-11 w-11 items-center justify-center">
+          <HeaderOverflowMenu />
+          <span className="hidden xl:inline-flex"><ThemeToggle /></span>
+          <Link href="/settings" aria-label="Cài đặt và tài khoản" className="hidden xl:flex h-11 w-11 items-center justify-center">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
               <Icon name="person" size={18} />
             </span>

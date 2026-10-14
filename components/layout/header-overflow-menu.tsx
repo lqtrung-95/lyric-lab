@@ -15,11 +15,11 @@ const ITEMS: { href: string; label: string; icon: IconName }[] = [
 const ROW = "flex min-h-12 w-full items-center gap-3 rounded-xl px-3 text-body-md text-on-surface hover:bg-surface-container-high";
 
 /**
- * Nút "Menu" (⋯) ở thanh trên của điện thoại: gom các lối vào phụ (Công cụ, Xếp hạng, Góp ý, Cài đặt, đổi giao diện) thành một bảng có chữ,
+ * Nút "Menu" (⋯) ở thanh trên của điện thoại và máy tính bảng (dưới 1280px, kể cả iPad Pro 13 dọc rộng 1032px): gom các lối vào phụ (Công cụ, Xếp hạng, Góp ý, Cài đặt, đổi giao diện) thành một bảng có chữ,
  * thay cho một hàng icon trần khó đoán và tràn màn hình hẹp. Dùng <dialog> gốc: có sẵn khóa focus, đóng bằng Esc và trình đọc màn hình hiểu đây là hộp thoại.
- * Chỉ hiện dưới md; từ md trở lên thanh trên có đủ chỗ cho từng icon.
+ * Chỉ hiện dưới xl; từ xl (1280px) trở lên thanh trên có đủ chỗ cho từng icon.
  */
-export function MobileHeaderMenu() {
+export function HeaderOverflowMenu() {
   const ref = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const dark = useIsDark();
@@ -34,11 +34,11 @@ export function MobileHeaderMenu() {
   return (
     <>
       <button type="button" aria-label="Menu" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(true)}
-        className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface md:hidden">
+        className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface xl:hidden">
         <Icon name="more_horiz" size={24} />
       </button>
       <dialog ref={ref} aria-label="Menu" onClose={() => setOpen(false)} onClick={(e) => { if (e.target === ref.current) setOpen(false); }}
-        className="m-0 mt-auto w-full max-w-none rounded-t-3xl bg-surface p-space-sm pb-safe text-on-surface backdrop:bg-black/40 md:hidden">
+        className="m-0 mt-auto w-full max-w-none rounded-t-3xl bg-surface p-space-sm pb-safe text-on-surface backdrop:bg-black/40 md:mx-auto md:mb-4 md:max-w-md md:rounded-3xl xl:hidden">
         <div className="flex items-center justify-between px-3 pb-1 pt-2">
           <p className="text-label-md font-semibold text-on-surface-variant">Menu</p>
           <button type="button" aria-label="Đóng menu" onClick={() => setOpen(false)} className="flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-high">
