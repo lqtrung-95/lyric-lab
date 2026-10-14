@@ -5,7 +5,7 @@ import type { CaptionProvider } from "@/lib/captions/caption-provider-types";
 import { pickBestChineseTrack } from "@/lib/captions/pick-best-chinese-track";
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
 import { averageLessonLevel, prepareLessonLines, termsToLookUp, toLessonLines, type PreparedLine } from "./build-lesson-lines";
-import type { LessonStatus, TranslationSource } from "./video-lesson-types";
+import type { LessonStatus, TranscriptSource, TranslationSource } from "./video-lesson-types";
 import type { VideoMeta } from "./youtube-data-api";
 
 // Nạp MỘT video vào kho video luyện nghe (dùng chung cho script `scripts/ingest-video-source.mts` và API quản trị): chỉ nhận video nhúng được
@@ -48,6 +48,8 @@ export interface IngestInput {
   status?: LessonStatus;
   /** Người thêm (video người dùng tự thêm); null với video admin nạp. */
   addedBy?: string | null;
+  /** `auto` khi bản chép do AI nhận dạng giọng nói (giao diện hiện cảnh báo "có thể sai"); mặc định phụ đề có sẵn. */
+  transcriptSource?: TranscriptSource;
   /**
    * Dịch các dòng chưa có bản dịch bằng LLM; trả cùng số dòng, dòng dịch không được thì để null. Bản dịch KHÔNG lấy từ phụ đề tiếng Việt của YouTube (hay chia câu lệch với
    * tiếng Trung và là bản dịch tự động nên ghép vào ra bản dịch sai); không truyền hàm này thì video vào với `translation_source = none`.
@@ -61,7 +63,7 @@ export interface IngestInput {
  */
 export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise<IngestOutcome> {
   const { sb, provider, lookup } = deps;
-  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, translateMissing } = input;
+  const { meta, sourceId, refresh = false, status = "draft", addedBy = null, translateMissing, transcriptSource = "captions" } = input;
   if (!meta.embeddable) return { kind: "skipped", reason: "not_embeddable" };
   const exists = (await existingVideoIds(sb, [meta.videoId])).has(meta.videoId);
   if (exists && !refresh) return { kind: "skipped", reason: "exists" };
@@ -84,6 +86,8 @@ export async function ingestVideo(deps: IngestDeps, input: IngestInput): Promise
   const row = {
     video_id: meta.videoId, source_id: sourceId, title: meta.title, channel_title: meta.channelTitle, duration_sec: meta.durationSec, level_avg: levelAvg,
     translation_source: translationSource, line_count: lines.length, translated_line_count: translatedLineCount, lines, updated_at: new Date().toISOString(),
+    // Chỉ ghi cột khi là bản nhận dạng tự động, để đường nạp phụ đề thường vẫn chạy được trước khi migration cột này được áp dụng.
+    ...(transcriptSource === "auto" ? { transcript_source: "auto" } : {}),
   };
   const { error } = exists
     ? await sb.from("video_lessons").update(row).eq("video_id", meta.videoId)

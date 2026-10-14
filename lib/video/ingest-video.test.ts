@@ -43,6 +43,15 @@ describe("ingestVideo với phụ đề người dùng", () => {
     expect(written[0]).toMatchObject({ translation_source: "none", translated_line_count: 0 });
   });
 
+  it("bản nhận dạng giọng nói được ghi nhãn auto; phụ đề thường không ghi cột transcript_source", async () => {
+    const auto = fakeDb();
+    await ingestVideo({ sb: auto.sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1", transcriptSource: "auto" });
+    expect(auto.written[0]).toMatchObject({ transcript_source: "auto" });
+    const plain = fakeDb();
+    await ingestVideo({ sb: plain.sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: null, status: "listed", addedBy: "user-1" });
+    expect(plain.written[0]).not.toHaveProperty("transcript_source");
+  });
+
   it("mặc định video vào trạng thái nháp (đường nạp của admin không đổi)", async () => {
     const { sb, written } = fakeDb();
     await ingestVideo({ sb, provider: new FixedCaptionProvider(lines), lookup }, { meta, sourceId: "src-1" });

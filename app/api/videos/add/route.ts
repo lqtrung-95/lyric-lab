@@ -8,6 +8,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { isAdminAccount } from "@/lib/admin/admin-accounts";
 import { decideAddLimit, decideDuration, decideTranslationBudget } from "@/lib/video/add-video-limits";
 import { isMostlyChinese } from "@/lib/video/chinese-ratio";
+import { cleanAsrLines } from "@/lib/video/asr/asr-lines";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
 import { stripNonChineseFromLines } from "@/lib/video/strip-non-chinese";
@@ -32,6 +33,8 @@ const bodySchema = z.object({
   // Dấu trang cũ (đã kéo lên thanh dấu trang của người dùng) còn gửi kèm phụ đề tiếng Việt: nhận nhưng BỎ QUA, bản dịch luôn do AI.
   viCaptions: z.string().max(400_000).optional(),
   lines: z.array(lineSchema).max(MAX_TRANSCRIPT_LINES).optional(),
+  // "auto": `lines` là bản AI nghe video (qua /api/videos/transcribe); lưu nhãn "nhận dạng tự động" và dọn dòng lặp/chồng giờ. Chỉ có nghĩa khi đi cùng `lines`.
+  transcript: z.literal("auto").optional(),
 });
 
 const fail = (error: string, status: number) => Response.json({ error }, { status, headers: { "Cache-Control": "private, no-store" } });
@@ -90,6 +93,9 @@ export async function POST(req: Request) {
       if (lines.length === 0) return fail("no_chinese_captions", 422);
     }
 
+    const auto = parsed.data.transcript === "auto" && parsed.data.lines !== undefined;
+    if (auto) lines = cleanAsrLines(lines, meta.durationSec);
+
     // Phụ đề nhiều tầng (pinyin, tiếng Anh chen cùng dòng hoặc ở dòng riêng): chỉ giữ chữ Hán trước khi đo tỉ lệ chữ Hán (pinyin/tiếng Anh dài làm tỉ lệ tụt oan).
     lines = stripNonChineseFromLines(lines);
     if (lines.length === 0) return fail("invalid_captions", 400);
@@ -100,7 +106,7 @@ export async function POST(req: Request) {
     const chat = createChat(env);
     const outcome = await ingestVideo(
       { sb, provider: new FixedCaptionProvider(lines, "zh-Hans"), lookup: (terms) => lookupWords(sb as never, terms) },
-      { meta, sourceId: null, status: "listed", addedBy: user.id, translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
+      { meta, sourceId: null, status: "listed", addedBy: user.id, transcriptSource: auto ? "auto" : "captions", translateMissing: canTranslate ? (prepared) => translateLines(prepared, chat, undefined, { title: meta.title }) : undefined },
     );
     if (outcome.kind === "skipped") return ok({ kind: "skipped", reason: outcome.reason });
     return ok({ kind: "added", videoId, lineCount: outcome.lineCount, translatedLineCount: outcome.translatedLineCount, translation: outcome.translationSource, aiBudgetExhausted: !canTranslate });

@@ -1,4 +1,4 @@
-export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice" | "translate" | "chat";
+export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice" | "translate" | "chat" | "transcribe";
 
 // Hạn mức trong 24 giờ theo tài khoản. Phân tích bài mới theo PRD §7; giải nghĩa từ bằng LLM tốn ít hơn nên cho nhiều hơn.
 const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
@@ -18,9 +18,11 @@ const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
   translate: { anonymous: 20, member: 60 },
   // Tin nhắn cộng đồng, đếm trong 1 GIỜ (chống spam; trò chuyện bình thường ít khi vượt).
   chat: { anonymous: 20, member: 60 },
+  // Mỗi đoạn 2 phút Gemini nghe tính 1 lượt (video 30 phút tối đa 15 đoạn): khách ~1 video/ngày, thành viên ~6 video/ngày (số video thêm mỗi ngày còn bị giới hạn riêng).
+  transcribe: { anonymous: 16, member: 90 },
 };
 
-const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24, translate: 24, chat: 1 };
+const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24, translate: 24, chat: 1, transcribe: 24 };
 
 /** Cửa sổ đếm (giờ) của từng loại: điểm luyện tập tính theo giờ, còn lại theo 24 giờ. */
 export const usageWindowHours = (kind: UsageKind): number => WINDOW_HOURS[kind];

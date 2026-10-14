@@ -21,6 +21,11 @@ export function VideoSubtitlesPanel({ lesson, watch, autoTranslate }: { lesson: 
   const askLine = askIndex !== null ? lines.find((l) => l.index === askIndex) : undefined;
   return (
     <>
+      {lesson.transcriptSource === "auto" && (
+        <p role="note" className="mb-space-sm rounded-xl bg-tertiary-container p-3 text-label-md text-on-tertiary-container">
+          Phụ đề này do AI nghe giọng nói rồi chép lại, có thể sai chữ hoặc lệch vài giây, nên đối chiếu với giọng nói khi học.
+        </p>
+      )}
       <TranslateMissingBanner videoId={lesson.videoId} missing={lines.filter((l) => !l.translation).length} total={lines.length} onFilled={applyFilled} autoStart={autoTranslate} />
       <LyricList
         videoId={lesson.videoId} promptVersion="video" variant="speech"

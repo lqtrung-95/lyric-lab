@@ -37,6 +37,12 @@ interface GeminiResponse {
   promptFeedback?: { blockReason?: string };
 }
 
+/** Phần "video YouTube" của một yêu cầu: Google tự lấy video từ link, cắt theo mốc giờ. Video phải công khai hoặc không công khai (unlisted). */
+const videoPart = (v: NonNullable<ChatRequest["video"]>) => ({
+  fileData: { fileUri: v.url },
+  videoMetadata: { startOffset: `${Math.max(0, Math.floor(v.startSec))}s`, endOffset: `${Math.ceil(v.endSec)}s` },
+});
+
 const isPerDayLimit = (body: string) => /per\s*day|PerDay|daily/i.test(body);
 
 /** Chỉ các dòng Gemini 2.5 Flash cho tắt "suy nghĩ" bằng ngân sách 0 (nhanh và rẻ); model khác không nhận trường này nên bỏ qua. */
@@ -73,11 +79,13 @@ export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}
           headers: { "Content-Type": "application/json", "x-goog-api-key": key },
           body: JSON.stringify({
             systemInstruction: { parts: [{ text: req.system }] },
-            contents: [{ role: "user", parts: [...(req.audio ? [{ inlineData: { mimeType: req.audio.mimeType, data: req.audio.data } }] : []), { text: req.user }] }],
+            contents: [{ role: "user", parts: [...(req.audio ? [{ inlineData: { mimeType: req.audio.mimeType, data: req.audio.data } }] : []), ...(req.video ? [videoPart(req.video)] : []), { text: req.user }] }],
             generationConfig: {
               responseMimeType: "application/json",
               maxOutputTokens: req.maxTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
               temperature: 0.3,
+              // Độ phân giải thấp: ~91 token/giây thay vì ~300, đủ để nghe lời nói (không cần xem chữ trên hình).
+              ...(req.video ? { mediaResolution: "MEDIA_RESOLUTION_LOW" } : {}),
               ...(supportsThinkingOff(req.model) ? { thinkingConfig: { thinkingBudget: 0 } } : supportsThinkingLevel(req.model) ? { thinkingConfig: { thinkingLevel: "minimal" } } : {}),
             },
           }),

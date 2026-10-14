@@ -19,3 +19,5 @@ export interface LessonLine {
 
 export type LessonStatus = "draft" | "listed" | "hidden";
 export type TranslationSource = "youtube" | "ai" | "none";
+/** Nguồn bản chép tiếng Trung: `captions` = phụ đề có sẵn (người làm hoặc người dùng dán), `auto` = AI nhận dạng giọng nói (có thể sai chữ, lệch giờ). */
+export type TranscriptSource = "captions" | "auto";

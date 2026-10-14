@@ -49,6 +49,17 @@ describe("createGeminiChat", () => {
     expect(parts).toEqual([{ inlineData: { mimeType: "audio/wav", data: "QUJD" } }, { text: "USER" }]);
   });
 
+  it("đính kèm đoạn video YouTube (fileData + mốc giờ) đứng trước văn bản và hạ độ phân giải", async () => {
+    const f = fakeFetch([() => ok("[]")]);
+    await createGeminiChat([K1], f)({ ...req, video: { url: "https://www.youtube.com/watch?v=abcdefghijk", startSec: 234.4, endSec: 485.2 } });
+    const body = f.calls[0].body as { contents: { parts: unknown[] }[]; generationConfig: Record<string, unknown> };
+    expect(body.contents[0].parts).toEqual([
+      { fileData: { fileUri: "https://www.youtube.com/watch?v=abcdefghijk" }, videoMetadata: { startOffset: "234s", endOffset: "486s" } },
+      { text: "USER" },
+    ]);
+    expect(body.generationConfig.mediaResolution).toBe("MEDIA_RESOLUTION_LOW");
+  });
+
   it("model không thuộc Gemini 2.5 Flash thì không gửi cấu hình tắt suy nghĩ", async () => {
     const { fetchFn, calls } = fakeFetch([() => ok("{}")]);
     await createGeminiChat([K1], { random: () => 0, fetchFn })({ ...req, model: "gemini-3-pro" });

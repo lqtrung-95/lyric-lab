@@ -1,7 +1,7 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { withLineTranslation } from "./edit-lesson-line";
-import type { LessonLine, LessonStatus, TranslationSource } from "./video-lesson-types";
+import type { LessonLine, LessonStatus, TranscriptSource, TranslationSource } from "./video-lesson-types";
 
 export interface LessonSummary {
   videoId: string;
@@ -14,6 +14,7 @@ export interface LessonSummary {
 
 export interface LessonDetail extends LessonSummary {
   translationSource: TranslationSource;
+  transcriptSource: TranscriptSource;
   lines: LessonLine[];
 }
 
@@ -38,11 +39,11 @@ export async function listListedLessons(): Promise<LessonSummary[]> {
 /** Một video đã duyệt kèm toàn bộ dòng; null nếu không có hoặc chưa/không còn được hiện. */
 export async function getListedLesson(videoId: string): Promise<LessonDetail | null> {
   const { data, error } = await createSupabaseServiceClient().from("video_lessons")
-    .select(`${SUMMARY_COLUMNS}, translation_source, lines`).eq("video_id", videoId).eq("status", "listed").maybeSingle();
+    .select(`${SUMMARY_COLUMNS}, translation_source, transcript_source, lines`).eq("video_id", videoId).eq("status", "listed").maybeSingle();
   if (error) throw new Error(`getListedLesson: ${error.message}`);
   if (!data) return null;
-  const row = data as unknown as SummaryRow & { translation_source: TranslationSource; lines: LessonLine[] };
-  return { ...toSummary(row), translationSource: row.translation_source, lines: row.lines };
+  const row = data as unknown as SummaryRow & { translation_source: TranslationSource; transcript_source: TranscriptSource; lines: LessonLine[] };
+  return { ...toSummary(row), translationSource: row.translation_source, transcriptSource: row.transcript_source, lines: row.lines };
 }
 
 /** Dòng của video để giải nghĩa từ (ngoài video đã ẩn): null nếu không có video hoặc video bị ẩn. */

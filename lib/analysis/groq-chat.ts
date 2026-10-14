@@ -9,6 +9,8 @@ export interface ChatRequest {
   timeoutMs?: number;
   /** Đoạn âm thanh đính kèm cho model nghe được (hiện chỉ Gemini; `data` là base64, định dạng WAV/MP3/AAC/OGG/FLAC). */
   audio?: { mimeType: string; data: string };
+  /** Một đoạn của video YouTube công khai để Gemini tự lấy về nghe/xem (hiện chỉ Gemini; máy chủ ta không tải gì). `startSec`/`endSec` tính từ đầu video. */
+  video?: { url: string; startSec: number; endSec: number };
 }
 export type ChatFn = (req: ChatRequest) => Promise<string>;
 
