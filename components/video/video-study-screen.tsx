@@ -4,12 +4,16 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
+import { Toast } from "@/components/ui/toast";
+import { toggleVideoLike } from "@/lib/user-data/video-likes-repo";
 import { PlaybackBar } from "@/components/listen/playback-bar";
+import { ListenLikeButton } from "@/components/listen/listen-like-button";
 import { ShortcutsHelpButton } from "@/components/listen/shortcuts-help-button";
 import { ViewToggles } from "@/components/listen/view-toggles";
 import { parseStudyTab, STUDY_TABS, studyTabHref, type StudyTab } from "@/lib/video/study-tab";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { ReportVideoButton } from "./report-video-button";
+import { useLikedVideos } from "./use-liked-videos";
 import { useVideoWatch } from "./use-video-watch";
 import { VideoDictationPanel } from "./video-dictation-panel";
 import { VideoShadowingPanel } from "./video-shadowing-panel";
@@ -33,6 +37,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
   const [tab, setTab] = useState<StudyTab>(() => parseStudyTab(initialTab));
   const { containerRef, controller, failed } = useYouTubePlayer(lesson.videoId);
   const watch = useVideoWatch(lesson, controller, startAt, tab === "subtitles");
+  const likes = useLikedVideos();
   const { prefs, update, stopLoop } = watch;
 
   const changeTab = useCallback((next: StudyTab) => {
@@ -64,6 +69,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
               onTogglePinyin={() => update({ showPinyin: !prefs.showPinyin })} onToggleTranslation={() => update({ showTranslation: !prefs.showTranslation })}
             />
           )}
+          <ListenLikeButton videoId={lesson.videoId} liked={likes.liked.has(lesson.videoId)} onChange={(v) => likes.setLiked(lesson.videoId, v)} toggle={toggleVideoLike} noun="video" />
           <ShortcutsHelpButton />
           <ReportVideoButton videoId={lesson.videoId} />
         </div>
@@ -108,6 +114,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
           </div>
         </div>
       </div>
+      {likes.nudge && <Toast message={likes.nudge} onDismiss={likes.clearNudge} />}
     </>
   );
 }

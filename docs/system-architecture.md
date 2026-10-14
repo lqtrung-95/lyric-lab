@@ -78,7 +78,7 @@ Prompt: `lib/analysis/build-analysis-prompt.ts`, hằng `PROMPT_VERSION`. LLM ch
 |---|---|
 | Từ điển | `dict_words`, `dict_hanzi_sino_viet` |
 | Bài + phân tích | `songs`, `song_analyses`, `term_explanations`, `line_explanations` |
-| Người dùng | `user_profiles`, `user_cards`, `review_logs`, `user_known_terms`, `user_song_progress`, `user_song_likes`, `practice_scores`, `leaderboard_profiles`, `streak_shares`, `account_merge_tokens` |
+| Người dùng | `user_profiles`, `user_cards`, `review_logs`, `user_known_terms`, `user_song_progress`, `user_song_likes`, `user_video_likes`, `practice_scores`, `leaderboard_profiles`, `streak_shares`, `account_merge_tokens` |
 | Chống lạm dụng | `usage_events` (hạn mức 24h/1h theo tài khoản) |
 | Phản hồi | `feedback`, `item_reports`, `song_reports`, `translation_suggestions` |
 

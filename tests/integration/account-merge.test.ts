@@ -18,6 +18,7 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
   let anonId = "";
   let memberId = "";
   let videoId = "";
+  let lessonId = "";
   const nickname = `mt${Date.now()}`.slice(0, 20);
   const created: string[] = [];
 
@@ -42,6 +43,10 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
     const { data: song } = await service.from("songs").select("video_id").limit(1).single();
     videoId = song!.video_id;
     await service.from("user_song_likes").insert({ user_id: anonId, video_id: videoId });
+    // Video luyện nghe đã thích cũng phải đi theo khi gộp (bảng user_video_likes, cần migration yêu thích video).
+    const { data: lesson } = await service.from("video_lessons").select("video_id").limit(1).single();
+    lessonId = lesson!.video_id;
+    await service.from("user_video_likes").insert({ user_id: anonId, video_id: lessonId });
     await service.from("practice_scores").insert({ user_id: anonId, mode: "cloze", points: 120, correct: 4, total: 5, duration_sec: 60 });
     await service.from("leaderboard_profiles").insert({ user_id: anonId, nickname });
   });
@@ -75,6 +80,7 @@ describe.skipIf(!enabled)("gộp tài khoản và xóa dữ liệu", () => {
     await executeMerge(service, token, memberId);
     expect(await isAccountEmpty(service, memberId)).toBe(false);
     expect((await service.from("user_song_likes").select("video_id").eq("user_id", memberId)).data).toEqual([{ video_id: videoId }]);
+    expect((await service.from("user_video_likes").select("video_id").eq("user_id", memberId)).data).toEqual([{ video_id: lessonId }]);
     expect((await service.from("practice_scores").select("points").eq("user_id", memberId)).data).toEqual([{ points: 120 }]);
     expect((await service.from("leaderboard_profiles").select("nickname").eq("user_id", memberId)).data).toEqual([{ nickname }]);
     expect((await service.from("user_cards").select("reps").eq("user_id", memberId)).data).toEqual([{ reps: 3 }]);

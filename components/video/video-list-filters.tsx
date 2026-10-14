@@ -1,3 +1,4 @@
+import { Icon } from "@/components/ui/icon";
 import { VIDEO_BANDS, VIDEO_SORTS, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import { VIDEO_TAGS, type VideoTagId } from "@/lib/video/video-tags";
 
@@ -7,11 +8,13 @@ const chip = "inline-flex min-h-11 items-center gap-1.5 rounded-full px-4 text-l
  * Bộ lọc danh sách video theo cấp HSK (nút bấm, mặc định "Tất cả") nút "Nhóm theo kênh" (chỉ khi có `onGrouped`, trang một kênh không cần) và ô chọn cách sắp xếp. Dải trống bị ẩn; dải hợp với level của người học được đánh dấu
  * "hợp bạn" nhưng KHÔNG tự chọn, để người mới vẫn thấy toàn bộ video.
  */
-export function VideoListFilters({ counts, total, band, onBand, sort, onSort, suggested, grouped, onGrouped, tagCounts, tag, onTag }: {
+export function VideoListFilters({ counts, total, band, onBand, sort, onSort, suggested, grouped, onGrouped, tagCounts, tag, onTag, likedCount, onlyLiked, onOnlyLiked }: {
   counts: Record<BandId, number>; total: number; band: BandId | null; onBand: (b: BandId | null) => void;
   sort: VideoSort; onSort: (s: VideoSort) => void; suggested: BandId; grouped?: boolean; onGrouped?: (g: boolean) => void;
   /** Lọc theo thẻ chủ đề (hoạt hình, vlog...): chỉ hiện khi truyền đủ ba giá trị và có thẻ nào đó có video. */
   tagCounts?: Record<VideoTagId, number>; tag?: VideoTagId | null; onTag?: (t: VideoTagId | null) => void;
+  /** Nút "Yêu thích" (chỉ lấy video đã tim): hiện khi truyền `onOnlyLiked`, kể cả khi chưa thích video nào (để người dùng biết có tính năng này). */
+  likedCount?: number; onlyLiked?: boolean; onOnlyLiked?: (v: boolean) => void;
 }) {
   const on = "bg-primary text-on-primary";
   const off = "bg-surface-container-high text-on-surface hover:bg-surface-container-highest";
@@ -36,6 +39,11 @@ export function VideoListFilters({ counts, total, band, onBand, sort, onSort, su
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+      {onOnlyLiked && (
+        <button type="button" aria-pressed={onlyLiked} onClick={() => onOnlyLiked(!onlyLiked)} className={`${chip} ${onlyLiked ? on : off}`}>
+          <Icon name={onlyLiked ? "favorite" : "favorite_border"} filled={onlyLiked} size={18} />Yêu thích <span className="opacity-70">{likedCount ?? 0}</span>
+        </button>
+      )}
       {onGrouped && <button type="button" aria-pressed={grouped} onClick={() => onGrouped(!grouped)} className={`${chip} ${grouped ? on : off}`}>Nhóm theo kênh</button>}
       <label className="flex items-center gap-2 text-label-md text-on-surface-variant">
         Sắp xếp

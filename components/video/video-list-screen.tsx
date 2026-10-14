@@ -3,11 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CHANNEL_PREVIEW_COUNT, channelHref, groupByChannel } from "@/lib/video/group-by-channel";
+import { Toast } from "@/components/ui/toast";
+import { CHANNEL_PREVIEW_COUNT, channelHref, groupByChannel, videosOfChannel } from "@/lib/video/group-by-channel";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { countByTag, filterByTag, type VideoTagId } from "@/lib/video/video-tags";
 import { countByBand, filterAndSortVideos, videoBandForLevel, type BandId, type VideoSort } from "@/lib/video/video-level-filter";
 import { ChannelSeeAllCard } from "./channel-see-all-card";
+import { useLikedVideos } from "./use-liked-videos";
 import { useVideoList } from "./use-video-list";
 import { VideoGrid } from "./video-grid";
 import { VideoListFilters } from "./video-list-filters";
@@ -24,14 +26,19 @@ export function VideoListScreen() {
   const [sort, setSort] = useState<VideoSort>("new");
   const [grouped, setGrouped] = useState(true);
   const [tag, setTag] = useState<VideoTagId | null>(null);
+  const [onlyLiked, setOnlyLiked] = useState(false);
+  const { liked, setLiked, nudge, clearNudge } = useLikedVideos();
   const list = Array.isArray(videos) ? videos : null;
-  // Thẻ chủ đề lọc trước; số video theo cấp HSK tính trên phần đã lọc thẻ, số video theo thẻ tính trên toàn bộ (để biết còn thẻ nào để chọn).
-  const tagCounts = useMemo(() => countByTag(list ?? []), [list]);
-  const byTag = useMemo(() => filterByTag(list ?? [], tag), [list, tag]);
+  // Lọc "Yêu thích" trước, rồi thẻ chủ đề, rồi cấp HSK: số video của thẻ/cấp luôn tính trên phần đã qua các bước lọc trước nó (nút nào cũng khớp với kết quả bấm vào).
+  const likedCount = useMemo(() => (list ?? []).filter((v) => liked.has(v.videoId)).length, [list, liked]);
+  const base = useMemo(() => (onlyLiked ? (list ?? []).filter((v) => liked.has(v.videoId)) : (list ?? [])), [list, onlyLiked, liked]);
+  const tagCounts = useMemo(() => countByTag(base), [base]);
+  const byTag = useMemo(() => filterByTag(base, tag), [base, tag]);
   const counts = useMemo(() => countByBand(byTag), [byTag]);
   const shown = useMemo(() => filterAndSortVideos(byTag, band, sort), [byTag, band, sort]);
 
   const groups = useMemo(() => (grouped ? groupByChannel(shown) : []), [grouped, shown]);
+  const likes = useMemo(() => ({ liked, setLiked }), [liked, setLiked]);
 
   return (
     <div className="space-y-space-md">
@@ -50,11 +57,11 @@ export function VideoListScreen() {
         <p className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">Chưa có video nào. Quay lại sau nhé.</p>
       ) : (
         <>
-          <VideoListFilters counts={counts} total={byTag.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} grouped={grouped} onGrouped={setGrouped} tagCounts={tagCounts} tag={tag} onTag={setTag} />
+          <VideoListFilters counts={counts} total={byTag.length} band={band} onBand={setBand} sort={sort} onSort={setSort} suggested={videoBandForLevel(state.level)} grouped={grouped} onGrouped={setGrouped} tagCounts={tagCounts} tag={tag} onTag={setTag} likedCount={likedCount} onlyLiked={onlyLiked} onOnlyLiked={setOnlyLiked} />
           {shown.length === 0 ? (
             <p role="status" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-lg text-on-surface-variant">
-              Chưa có video ở mức này.{" "}
-              <button type="button" onClick={() => setBand(null)} className="font-semibold text-primary underline">Xem tất cả video</button>
+              {onlyLiked && likedCount === 0 ? "Bạn chưa thích video nào. Bấm biểu tượng tim trên video để lưu lại ở đây." : "Chưa có video ở mức này."}{" "}
+              <button type="button" onClick={() => { setBand(null); setTag(null); setOnlyLiked(false); }} className="font-semibold text-primary underline">Xem tất cả video</button>
             </p>
           ) : grouped ? (
             <div className="space-y-space-lg">
@@ -66,17 +73,18 @@ export function VideoListScreen() {
                       : g.channelTitle} <span className="text-label-md font-normal text-on-surface-variant">{g.videos.length} video</span>
                   </h2>
                   {g.videos.length > CHANNEL_PREVIEW_COUNT ? (
-                    <VideoGrid videos={g.videos.slice(0, CHANNEL_PREVIEW_COUNT)} columns="lg:grid-cols-5"
-                      extra={<ChannelSeeAllCard channelTitle={g.channelTitle === "Kênh khác" ? "" : g.channelTitle} total={g.videos.length} />} />
-                  ) : <VideoGrid videos={g.videos} columns="lg:grid-cols-5" />}
+                    <VideoGrid videos={g.videos.slice(0, CHANNEL_PREVIEW_COUNT)} columns="lg:grid-cols-5" likes={likes}
+                      extra={<ChannelSeeAllCard channelTitle={g.channelTitle === "Kênh khác" ? "" : g.channelTitle} total={videosOfChannel(list ?? [], g.channelTitle === "Kênh khác" ? "" : g.channelTitle).length} />} />
+                  ) : <VideoGrid videos={g.videos} columns="lg:grid-cols-5" likes={likes} />}
                 </section>
               ))}
             </div>
           ) : (
-            <VideoGrid videos={shown} />
+            <VideoGrid videos={shown} likes={likes} />
           )}
         </>
       )}
+      {nudge && <Toast message={nudge} onDismiss={clearNudge} />}
     </div>
   );
 }
