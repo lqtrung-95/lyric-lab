@@ -21,6 +21,8 @@ interface Opts {
   uiLang?: string;
   /** Video có nhiều ngôn ngữ: bảng mở bằng ngôn ngữ khác, cần chọn tiếng Trung ở ô chọn ngôn ngữ ở cuối bảng. */
   langSwitch?: { triggerLabel: string; menuLabels: string[]; zhLabel: string; zhText: string; viLabel?: string; viText?: string };
+  /** Video hoàn toàn không có phụ đề: trình phát trả thông tin video không có mục `captions`. */
+  noCaptions?: boolean;
   /** Các track phụ đề của video theo trình phát: mã ngôn ngữ, hoặc {code, kind} (kind "asr" là phụ đề tự động). */
   trackCodes?: (string | { code: string; kind?: string })[];
   /** Liên kết tên kênh (vd. "Chinese with HuanYu") luôn hiện trong trang, đứng TRƯỚC các mục menu trong DOM: bấm nhầm vào nó là chuyển sang trang kênh. */
@@ -72,7 +74,7 @@ function run(opts: Opts) {
       return opts.hasTranscriptButton && !opts.foreignUi ? [button] : []; // quét theo chữ chỉ tìm thấy nút khi giao diện là ngôn ngữ đã biết
     },
     documentElement: { lang: opts.uiLang ?? "en" },
-    getElementById: () => (opts.trackCodes ? { getPlayerResponse: () => ({ captions: { playerCaptionsTracklistRenderer: { captionTracks: opts.trackCodes!.map((t) => (typeof t === "string" ? { languageCode: t } : { languageCode: t.code, kind: t.kind })) } } }) } : null),
+    getElementById: () => (opts.noCaptions ? { getPlayerResponse: () => ({}) } : opts.trackCodes ? { getPlayerResponse: () => ({ captions: { playerCaptionsTracklistRenderer: { captionTracks: opts.trackCodes!.map((t) => (typeof t === "string" ? { languageCode: t } : { languageCode: t.code, kind: t.kind })) } } }) } : null),
     querySelector: (sel: string) => (sel.includes("transcript-section") ? (opts.hasTranscriptButton ? button : null) : { click: () => { clicks.push("expand"); } }),
   };
   const win = { open: (u: string) => { opened.push(u); return opts.popupBlocked ? null : {}; } };
@@ -82,6 +84,15 @@ function run(opts: Opts) {
 }
 const payloadOf = (url: string) => decodeBookmarkletHash(url.split("/video/add")[1]);
 const PANEL = "0:00\n大家好\n0:05\n欢迎收听我们的节目";
+
+describe("decodeBookmarkletHash với cờ ai", () => {
+  const hashOf = (p: unknown) => `#d=${Buffer.from(JSON.stringify(p)).toString("base64url")}`;
+  it("giữ cờ ai khi đúng là true, bỏ cờ lạ; dấu trang cũ (không có ai) vẫn đọc được", () => {
+    expect(decodeBookmarkletHash(hashOf({ v: "abcdefghijk", t: "", ai: true }))).toEqual({ v: "abcdefghijk", t: "", ai: true });
+    expect(decodeBookmarkletHash(hashOf({ v: "abcdefghijk", t: "x", ai: "yes" }))).toEqual({ v: "abcdefghijk", t: "x" });
+    expect(decodeBookmarkletHash(hashOf({ v: "abcdefghijk", t: "x" }))).toEqual({ v: "abcdefghijk", t: "x" });
+  });
+});
 
 describe("bookmarklet", () => {
   beforeEach(() => { vi.useFakeTimers(); });
@@ -230,11 +241,24 @@ describe("bookmarklet", () => {
     }
   });
 
-  it("video không có track tiếng Trung thì báo ngay, không mở bảng", () => {
-    const { alerts, opened, clicks } = run({ trackCodes: ["en", "vi"], panelText: "0:00\nHello\n0:05\nWorld" });
-    expect(alerts[0]).toContain("không có phụ đề tiếng Trung");
-    expect(opened).toEqual([]);
-    expect(clicks).toEqual([]);
+  it("video không có track tiếng Trung: không đọc bảng, chuyển sang trang Thêm video kèm cờ AI nghe (không báo lỗi)", () => {
+    const { alerts, opened, clicks, messages } = run({ trackCodes: ["en", "vi"], panelText: "0:00\nHello\n0:05\nWorld" });
+    expect(alerts).toEqual([]);
+    expect(clicks).toEqual([]); // không mở bảng bản chép lời
+    expect(opened).toHaveLength(1);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: "", ai: true });
+    expect(messages.some((m) => m.includes("AI nghe"))).toBe(true);
+  });
+
+  it("video hoàn toàn không có phụ đề: cũng chuyển sang AI nghe", () => {
+    const { alerts, opened } = run({ noCaptions: true });
+    expect(alerts).toEqual([]);
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: "", ai: true });
+  });
+
+  it("không đọc được thông tin trình phát (không biết video có phụ đề không): KHÔNG tự chuyển sang AI, giữ cách cũ là thử đọc bảng", () => {
+    const { opened } = run({ panelText: PANEL }); // không có trackCodes và không noCaptions: getPlayerResponse không dùng được
+    expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
   });
 
   it("video có track tiếng Trung (kể cả zh-TW) thì không bị chặn", () => {

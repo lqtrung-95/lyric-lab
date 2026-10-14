@@ -96,3 +96,24 @@ test("dịch vụ lấy phụ đề tạm lỗi (video có thể CÓ phụ đề
   await page.getByRole("button", { name: "Nhờ AI nghe và tạo phụ đề" }).click();
   await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
 });
+
+test("dấu trang báo video không có phụ đề (cờ ai): trang tự chạy AI nghe luôn, không gửi phụ đề rỗng sang bước thêm", async ({ page }) => {
+  const { addBodies, chunks } = await setup(page, ok);
+  const hash = `#d=${Buffer.from(JSON.stringify({ v: VIDEO_ID, t: "", ai: true })).toString("base64url")}`;
+  await page.goto(`/video/add${hash}`);
+  await expect(page.getByRole("region", { name: "Nhận dạng giọng nói bằng AI" })).toBeVisible();
+  await expect(page).toHaveURL(new RegExp(`/video/${VIDEO_ID}$`));
+  expect(chunks.sort()).toEqual([0, 1, 2]);
+  // Chỉ có MỘT lần gọi thêm video, mang theo các dòng AI chép; không có lần gửi phụ đề rỗng nào trước đó.
+  expect(addBodies).toHaveLength(1);
+  expect(addBodies[0]).toMatchObject({ video: VIDEO_ID, transcript: "auto" });
+  await expect(page.getByText("Đã nhận phụ đề từ YouTube")).toHaveCount(0);
+});
+
+test("dấu trang cờ ai nhưng chưa đăng nhập Google: không tự chạy, chỉ mời đăng nhập", async ({ page }) => {
+  const { addBodies, chunks } = await setup(page, ok, false);
+  await page.goto(`/video/add#d=${Buffer.from(JSON.stringify({ v: VIDEO_ID, t: "", ai: true })).toString("base64url")}`);
+  await expect(page.getByRole("button", { name: "Đăng nhập Google để dùng" })).toBeVisible();
+  expect(chunks).toEqual([]);
+  expect(addBodies).toEqual([]);
+});

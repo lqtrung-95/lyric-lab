@@ -11,6 +11,11 @@
 export interface BookmarkletPayload {
   v: string;
   t: string;
+  /**
+   * Video không có phụ đề tiếng Trung (không có phụ đề nào, hoặc chỉ có ngôn ngữ khác): `t` rỗng và trang Thêm video tự nhờ AI nghe giọng nói để tạo phụ đề
+   * thay vì báo lỗi. Chỉ dấu trang bản mới gửi cờ này; dấu trang cũ vẫn báo "chưa thêm được".
+   */
+  ai?: true;
 }
 
 // ES5 thuần để chạy được ở mọi trình duyệt; mỗi lệnh kết thúc bằng dấu chấm phẩy vì mã bị nén về một dòng. Chỉ dùng textContent/createElement (YouTube
@@ -35,7 +40,7 @@ function hide(){stop();if(box){box.remove();box=null;}}
 function fail(msg){hide();alert(msg);}
 function dbg(){var p=document.querySelectorAll(OPEN),ids=[];for(var i=0;i<p.length;i++){ids.push(p[i].getAttribute('target-id'));}var tr=null;try{tr=langTrigger();}catch(e){}return ' (mã lỗi: '+document.querySelectorAll(SEG).length+' dòng; '+ids.join(',')+'; ngôn ngữ: '+(tr?norm(tr.innerText):'?')+')';}
 var help='Video này có thể không có phụ đề. Bạn thử bấm nút hiện phụ đề dạng văn bản (Show transcript) dưới phần mô tả rồi bấm lại, hoặc dán phụ đề vào trang Thêm video.';
-function go(p){var b=btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');var url=O+'/video/add#d='+b;stop();say('Đã đọc xong, đang mở SongHanzi…');var w=window.open(url,'_blank');if(w){setTimeout(hide,2500);}else{say('Trình duyệt chặn cửa sổ mới.',url);}}
+function go(p){var b=btoa(unescape(encodeURIComponent(JSON.stringify(p)))).replace(/\\+/g,'-').replace(/\\//g,'_').replace(/=+$/,'');var url=O+'/video/add#d='+b;stop();say(p.ai?'Video này chưa có phụ đề tiếng Trung, đang mở SongHanzi để AI nghe và tạo phụ đề…':'Đã đọc xong, đang mở SongHanzi…');var w=window.open(url,'_blank');if(w){setTimeout(hide,2500);}else{say('Trình duyệt chặn cửa sổ mới.',url);}}
 function ok(t){return /(^|\\n)(\\d{1,2}:)?\\d{1,2}:\\d{2}(\\n|\\s)/.test(t);}
 function visibleSegs(){var all=document.querySelectorAll(SEG),vis=[],i;for(i=0;i<all.length;i++){if(shown(all[i])){vis.push(all[i]);}}
 if(!vis.length){return all;}var roots=[],groups=[];for(i=0;i<vis.length;i++){var r=vis[i].closest('ytd-engagement-panel-section-list-renderer')||document,k=roots.indexOf(r);if(k<0){roots.push(r);groups.push([]);k=roots.length-1;}groups[k].push(vis[i]);}
@@ -93,8 +98,9 @@ return;
 }
 go({v:id,t:t});
 }
-function noZh(){try{var tr=document.getElementById('movie_player').getPlayerResponse().captions.playerCaptionsTracklistRenderer.captionTracks;if(tr&&tr.length){for(var i=0;i<tr.length;i++){if(/^(zh|yue)/i.test(tr[i].languageCode)){return false;}}return true;}}catch(e){}return false;}
-if(noZh()){alert('Video này không có phụ đề tiếng Trung nên chưa thêm được. Hãy thử video khác.');return;}
+function tracks(){var pr=null;try{pr=document.getElementById('movie_player').getPlayerResponse();}catch(e){}if(!pr){return null;}var c=pr.captions&&pr.captions.playerCaptionsTracklistRenderer;return (c&&c.captionTracks)||[];}
+function noZh(){var tr=tracks();if(tr===null){return false;}for(var i=0;i<tr.length;i++){if(/^(zh|yue)/i.test(tr[i].languageCode)){return false;}}return true;}
+if(noZh()){go({v:id,t:'',ai:true});return;}
 var now=readPanel();
 if(now){send(now);return;}
 var base='SongHanzi: đang đọc phụ đề';
@@ -143,7 +149,7 @@ export function decodeBookmarkletHash(hash: string): BookmarkletPayload | null {
     const bytes = Uint8Array.from(atob(b64 + "=".repeat((4 - (b64.length % 4)) % 4)), (c) => c.charCodeAt(0));
     const p = JSON.parse(new TextDecoder().decode(bytes)) as BookmarkletPayload;
     if (typeof p?.v !== "string" || !/^[A-Za-z0-9_-]{11}$/.test(p.v) || typeof p.t !== "string") return null;
-    return { v: p.v, t: p.t };
+    return { v: p.v, t: p.t, ...(p.ai === true ? { ai: true as const } : {}) };
   } catch {
     return null;
   }

@@ -14,8 +14,8 @@ export function BookmarkletInstall() {
     <div className="space-y-3 rounded-2xl bg-surface-container-low p-space-md">
       <p className="text-label-md font-semibold text-on-surface">Tiện lợi hơn nè: Dấu trang trên máy tính</p>
       <ol className="list-decimal space-y-1 pl-5 text-body-md text-on-surface-variant">
-        <li>Kéo nút dưới đây lên thanh dấu trang của trình duyệt (một lần duy nhất).</li>
-        <li>Mở video trên youtube.com và bấm dấu trang <b>Gửi sang SongHanzi</b>: giúp bạn tự mở phụ đề và gửi sang SongHanzi.</li>
+        <li>Kéo nút dưới đây lên thanh dấu trang của trình duyệt (một lần duy nhất; đã kéo từ trước thì kéo lại bản mới này để có phần AI nghe).</li>
+        <li>Mở video trên youtube.com và bấm dấu trang <b>Gửi sang SongHanzi</b>: giúp bạn tự mở phụ đề và gửi sang SongHanzi. Video chưa có phụ đề tiếng Trung thì dấu trang sẽ chuyển sang để AI nghe và tạo phụ đề (cần đăng nhập Google).</li>
       </ol>
       <div className="flex flex-wrap items-center gap-2">
         <a
