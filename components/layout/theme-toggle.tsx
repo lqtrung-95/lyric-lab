@@ -13,19 +13,26 @@ function subscribe(onChange: () => void) {
 }
 const isDark = () => document.documentElement.classList.contains("dark");
 
+/** Đang ở giao diện tối không (theo class `dark` trên <html>). Dùng chung cho nút trên thanh trên và dòng trong menu điện thoại. */
+export function useIsDark(): boolean {
+  return useSyncExternalStore(subscribe, isDark, () => false);
+}
+
+/** Đảo sáng/tối và nhớ lựa chọn. */
+export function toggleTheme() {
+  const next = !isDark();
+  document.documentElement.classList.toggle("dark", next);
+  try {
+    localStorage.setItem(STORAGE_KEY, next ? "dark" : "light");
+  } catch {
+    // Chế độ riêng tư có thể chặn localStorage: vẫn đổi được trong phiên hiện tại.
+  }
+}
+
 /** Đổi sáng/tối. Mặc định theo hệ thống; lựa chọn của người dùng được nhớ. */
 export function ThemeToggle() {
-  const dark = useSyncExternalStore(subscribe, isDark, () => false);
-
-  function toggle() {
-    const next = !dark;
-    document.documentElement.classList.toggle("dark", next);
-    try {
-      localStorage.setItem(STORAGE_KEY, next ? "dark" : "light");
-    } catch {
-      // Chế độ riêng tư có thể chặn localStorage: vẫn đổi được trong phiên hiện tại.
-    }
-  }
+  const dark = useIsDark();
+  const toggle = toggleTheme;
 
   return (
     <button
