@@ -103,6 +103,9 @@ Khung nội dung chính của mọi trang (header, `main`, chân trang, màn h�
 ## Phân tích âm thanh phía client
 Ngưỡng của bộ dò cao độ (`pitch.ts`) đã chỉnh bằng dữ liệu thật; đổi hằng số nào phải chạy lại phép đo trên các file giọng thật, không chỉ test tổng hợp. Dữ liệu nội dung phát âm (`pinyin-chart-data.ts`, `tone-data.ts`) tách khỏi component để test và để dùng lại ở các đợt sau.
 
+## Chấm phát âm
+Không để LLM "giải thích" điểm số khi nguồn không cho biết nguyên nhân; dùng bảng tĩnh có nguồn (`pinyin-chart-data.ts`). Chuẩn hóa phản hồi Azure ở file thuần (`assessment-normalize.ts`) để test bằng fixture, file gọi mạng (`azure-assessment.ts`, `server-only`) chỉ lo HTTP.
+
 ## Vẽ canvas với font chữ Hán
 - Font chữ Hán của trang (Noto Serif SC qua Google Fonts) chia thành nhiều mảnh theo unicode-range và theo độ đậm; trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở đúng độ đậm. `document.fonts.ready` KHÔNG đợi các mảnh này nên vẽ canvas ngay sẽ có chữ rơi về font hệ thống, nét đậm nhạt khác nhau trong cùng một câu. Trước khi `fillText` chữ Hán, gọi `await document.fonts.load(font, đoạnChữSắpVẽ)` (xem `lib/share/line-card.ts`).
 

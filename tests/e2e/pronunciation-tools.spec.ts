@@ -41,7 +41,7 @@ test("nghe đoán thanh: chơi hết 8 câu ra kết quả", async ({ page }) =>
   await expect(page.getByText(/Câu 1\/8/)).toBeVisible();
 });
 
-for (const path of ["/phat-am", "/phat-am/bang-pinyin", "/phat-am/luyen-thanh-dieu", "/phat-am/nghe-doan-thanh"]) {
+for (const path of ["/phat-am", "/phat-am/bang-pinyin", "/phat-am/luyen-thanh-dieu", "/phat-am/doc-to-cham-diem", "/phat-am/nghe-doan-thanh"]) {
   test(`a11y ${path}`, async ({ page }) => {
     await page.goto(path);
     await page.waitForTimeout(500);

@@ -5,7 +5,7 @@ import type { IconName } from "@/components/ui/icon-names";
 
 const PATH = "/phat-am";
 const TITLE = "Luyện phát âm tiếng Trung cho người Việt | SongHanzi";
-const DESCRIPTION = "Bảng pinyin có giọng chuẩn, luyện thanh điệu có chấm cao độ, trò nghe đoán thanh. Công cụ luyện phát âm tiếng Trung miễn phí cho người Việt.";
+const DESCRIPTION = "Bảng pinyin có giọng chuẩn, luyện thanh điệu, đọc to chấm điểm từng chữ, trò nghe đoán thanh. Công cụ luyện phát âm tiếng Trung miễn phí cho người Việt.";
 const FAQ = [
   { q: "Người Việt học phát âm tiếng Trung khó ở đâu?", a: "Thường ở ba chỗ: âm bật hơi (p, t, k), nhóm âm uốn lưỡi (zh, ch, sh) và phân biệt thanh 2 với thanh 3." },
   { q: "Cần chuẩn bị gì?", a: "Một trình duyệt hiện đại, loa hoặc tai nghe; thêm micro nếu muốn luyện thanh điệu. Không cần tài khoản." },
@@ -13,6 +13,7 @@ const FAQ = [
 const ITEMS: { href: string; title: string; body: string; icon: IconName }[] = [
   { href: "/phat-am/bang-pinyin", title: "Bảng pinyin có giọng đọc", body: "Phụ âm đầu và vần, mẹo so với tiếng Việt, lỗi hay gặp.", icon: "dictionary" },
   { href: "/phat-am/luyen-thanh-dieu", title: "Luyện thanh điệu", body: "Ghi âm và xem đường cao độ giọng bạn so với thanh mẫu.", icon: "mic" },
+  { href: "/phat-am/doc-to-cham-diem", title: "Đọc to, chấm từng chữ", body: "Đọc một câu, nhận điểm từng chữ và gợi ý sửa.", icon: "graphic_eq" },
   { href: "/phat-am/nghe-doan-thanh", title: "Nghe đoán thanh", body: "Trò 8 câu luyện tai nghe thanh 1–4.", icon: "headphones" },
 ];
 
