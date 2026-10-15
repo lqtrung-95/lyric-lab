@@ -136,6 +136,13 @@ NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-fi
 ```
 Mặc định dry-run: chép và lưu `tmp/transcribe/<id>.<engine>.json` (thư mục git bỏ qua), in 12 dòng đầu. Xem/sửa file JSON rồi chạy lại cùng lệnh thêm `--apply` để nạp (chạy lại dùng bản chép đã lưu, `--force` để chép lại). Engine `gemini` (mặc định) không cần cài gì; `groq` cần `yt-dlp` + `ffmpeg` (`brew install yt-dlp ffmpeg`) và `GROQ_API_KEY`, ~0,01 USD cho video 20 phút; `local` cần `pip install openai-whisper`, miễn phí nhưng chậm (chưa chạy thử). Gỡ video nhận dạng sai: `/admin/videos` (ẩn/xóa). Nếu hàng loạt đoạn báo "ai_unavailable": xem log `video_transcribe_error` (Gemini hết hạn mức hoặc đổi tên model preview `gemini-3-flash-preview`; sửa `ASR_MODELS` ở `lib/video/asr/transcribe-chunk-gemini.ts`).
 
+### Nạp nhiều video bằng AI nghe, theo đợt (`scripts/transcribe-batch.mts`)
+Gemini miễn phí có hạn mức NGÀY cho yêu cầu nghe video (đo 2026-10-14/15: nạp hơn 100 video một lượt làm 50/50 khóa trả 429 cho yêu cầu video dù yêu cầu chỉ có chữ vẫn 200; reset khoảng 14-15 giờ Việt Nam). Nên nạp theo đợt ~40 video/ngày:
+```
+NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/transcribe-batch.mts --file tmp/<danh-sach>.txt [--limit 40] [--status listed|draft] [--apply]
+```
+File danh sách là mã video cách nhau bằng khoảng trắng/xuống dòng (`tmp/` bị git bỏ qua, chỉ nằm trên máy). Mặc định dry-run (in số video còn lại); `--apply` mới nạp. Mỗi lần chạy bỏ qua video đã có trong kho, thử một yêu cầu video nhỏ để biết còn hạn mức không (hết thì thoát ngay, mã thoát 2), nạp tối đa `--limit` video và dừng sớm nếu 3 video liên tiếp lỗi; chạy lại hôm sau để nạp tiếp. Mỗi video chạy `transcribe-video.mts` (nghe, đổi giản thể, dịch, gán thẻ chủ đề). Khóa Gemini trả 403 "project has been denied access" là dự án bị Google từ chối: nên gỡ khỏi `GEMINI_API_KEYS`.
+
 ### Người dùng tự thêm video (`/video/add`)
 Chạy migration `20261010000001_video_lessons_added_by.sql` (cột `added_by`) **trước khi deploy**: thiếu cột thì `POST /api/videos/add` trả 500 (đếm giới hạn lỗi nên không bỏ qua giới hạn), việc nạp video của admin vẫn chạy bình thường. Video người dùng thêm vào `listed` ngay; gỡ ở `/admin/videos` (ẩn/xóa) hoặc SQL `delete from video_lessons where video_id = '...'`. Xem ai thêm nhiều: `select added_by, count(*) from video_lessons where added_by is not null group by 1 order by 2 desc`. Chi phí mỗi video: một lượt dịch LLM (chia đoạn 30 dòng chạy song song, vài đoạn lỗi thì dòng đó trống bản dịch) và tùy chọn một credit Supadata. Giới hạn nằm ở `lib/video/add-video-limits.ts`.
 
