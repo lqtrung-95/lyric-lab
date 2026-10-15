@@ -139,6 +139,7 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 - Script `reanalyze-songs.mts`, `reanalyze-reuse-old-lyrics.mts`, `backfill-pinyin.mts`.
 - Logo ảnh thật (sáng/tối), tab Thư viện có URL riêng (`?tab=`), tự cuộn theo câu hát khi không ghim, sửa pinyin 读, bỏ hạn mức phân tích/ngày khi chạy `next dev`.
 
+- **Luyện phát âm, đợt 1 (`/phat-am`, công khai, trong `TOOLS`):** bảng pinyin có giọng TTS (`lib/pronunciation/pinyin-chart-data.ts`), luyện thanh điệu (ghi âm → dò cao độ YIN ngay trên máy `pitch.ts` → so 4 đường mẫu `tone-data.ts`, lời khuyên `tone-feedback.ts`), trò nghe đoán thanh (`tone-quiz.ts`). Kiểm chứng bộ nhận dạng thanh: 94/96 trên giọng TTS macOS (4 giọng); CHƯA thử với giọng người học thật, nên giữ lời lẽ "gần đúng". Mẹo so sánh Hán–Việt là bản nháp, nên nhờ người có chuyên môn rà. Chưa có script làm nóng TTS cho chữ mẫu (lần phát đầu mỗi chữ tốn 1 lượt `tts`). Đợt 2 (Azure Pronunciation Assessment chấm từng âm tiết) và đợt 3 (lộ trình, bài tập hằng ngày, thử thách 绕口令) chưa làm.
 ## Liên hệ / quyền truy cập cần có
 
 Người tiếp quản cần được cấp: repo GitHub, project Vercel, project Supabase, khóa API (Groq ×2, DeepSeek, BytePlus ModelArk, OpenRouter, YouTube Data API, Azure Speech tùy chọn), Sentry. Không có khóa nào được lưu trong repo; xem [`operations-runbook.md`](operations-runbook.md).

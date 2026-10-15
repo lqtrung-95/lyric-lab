@@ -25,4 +25,10 @@ export const TOOLS: readonly ToolEntry[] = [
     description: "Danh sách từ HSK 1–6 kèm pinyin, âm Hán Việt và nghĩa. Tìm nhanh, tải CSV để nạp vào Anki.",
     icon: "list_alt",
   },
+  {
+    href: "/phat-am",
+    title: "Luyện phát âm tiếng Trung",
+    description: "Bảng pinyin có giọng đọc, luyện thanh điệu có chấm cao độ giọng bạn và trò nghe đoán thanh.",
+    icon: "mic",
+  },
 ];

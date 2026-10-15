@@ -141,6 +141,9 @@ Kho video tiếng Trung do admin tuyển chọn, **tách khỏi bài hát**: ng�
 
 Cuối bài chép chính tả có tổng kết và các câu nên xem lại (link về bản chép tại đúng mốc `?t=`); chưa có nút lưu hàng loạt từ sai (lưu từng từ ở màn xem).
 
+## Luyện phát âm (`/phat-am`)
+Trang công khai trong `app/(marketing)/phat-am/*`, không cần DB. Phân tích thanh điệu chạy hoàn toàn ở client: `decode-recording.ts` (Blob → mono 16 kHz) → `pitch.ts` (YIN 30 ms/10 ms, đường cao độ nửa cung, `classifyTone`: biên độ < 1,8 nửa cung = thanh 1, còn lại so hình dạng với `TONE_TEMPLATES`) → `tone-feedback.ts`. Âm thanh không rời khỏi máy. Giọng mẫu dùng `/api/tts` như chỗ khác.
+
 ## Biệt danh dùng chung
 
 Mỗi tài khoản có MỘT biệt danh (`leaderboard_profiles.nickname`, duy nhất không phân biệt hoa thường), dùng cho phòng thi đấu và bảng xếp hạng. **Ảnh đại diện** (`leaderboard_profiles.avatar_url`, bucket `avatars`, upload qua `POST /api/leaderboard/avatar`, chỉ khi đã có biệt danh) cũng dùng chung: chỉ đổi ở Cài đặt (`components/profile/avatar-uploader.tsx`), bảng xếp hạng và phòng thi đấu chỉ hiển thị (`AvatarCircle`); `getRoomView` gắn `avatarUrl` cho từng người chơi từ hồ sơ, không lưu bản chụp trong `room_players`. Đặt ở Cài đặt → "Biệt danh và ảnh đại diện" (`components/settings/nickname-section.tsx`) hoặc ngay lúc cần ở phòng thi đấu (`components/profile/nickname-gate.tsx`); hook `useNickname` và API `GET/POST /api/leaderboard/profile` (logic ở `lib/leaderboard/profile-repo.ts`, `saveProfile`). **Có biệt danh không có nghĩa là công khai điểm**: chỉ đặt tên thì hồ sơ ở trạng thái chưa tham gia bảng xếp hạng (`opted_in = false`); tham gia là lựa chọn riêng ở trang Bảng xếp hạng (dùng biệt danh sẵn có, không cần nhập lại), rời bảng vẫn giữ biệt danh. API phòng (`POST /api/rooms`, `.../join`) không nhận tên từ client mà lấy biệt danh của tài khoản ở server (chưa có thì 409 `nickname_required`); `room_players.display_name` là bản chụp lúc vào phòng.
