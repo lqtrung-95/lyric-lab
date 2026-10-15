@@ -11,6 +11,9 @@ const FAQ = [
   { q: "Cần chuẩn bị gì?", a: "Một trình duyệt hiện đại, loa hoặc tai nghe; thêm micro nếu muốn luyện thanh điệu. Không cần tài khoản." },
 ];
 const ITEMS: { href: string; title: string; body: string; icon: IconName }[] = [
+  { href: "/phat-am/luyen-moi-ngay", title: "Luyện 5 phút mỗi ngày", body: "Nghe thanh, đọc câu, 绕口令; giữ chuỗi ngày luyện.", icon: "local_fire_department" },
+  { href: "/phat-am/lo-trinh", title: "Lộ trình 6 bước", body: "Từ phụ âm, vần, thanh điệu đến đọc cả câu.", icon: "list_alt" },
+  { href: "/phat-am/rao-khau-lenh", title: "Thử thách 绕口令", body: "Câu thách đọc nhanh, chấm điểm và chia sẻ.", icon: "emoji_events" },
   { href: "/phat-am/bang-pinyin", title: "Bảng pinyin có giọng đọc", body: "Phụ âm đầu và vần, mẹo so với tiếng Việt, lỗi hay gặp.", icon: "dictionary" },
   { href: "/phat-am/luyen-thanh-dieu", title: "Luyện thanh điệu", body: "Ghi âm và xem đường cao độ giọng bạn so với thanh mẫu.", icon: "mic" },
   { href: "/phat-am/doc-to-cham-diem", title: "Đọc to, chấm từng chữ", body: "Đọc một câu, nhận điểm từng chữ và gợi ý sửa.", icon: "graphic_eq" },

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("trang chủ hiển thị tiêu đề và điều hướng chính", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("nhớ cả trăm chữ Hán");
-  await expect(page.getByRole("link", { name: "SongHanzi" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "SongHanzi", exact: true })).toBeVisible();
 });
 
 test("giao diện tối bật được và được nhớ sau khi tải lại", async ({ page }) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { TONES, type ToneId } from "@/lib/pronunciation/tone-data";
 import { buildToneQuiz, type ToneQuestion } from "@/lib/pronunciation/tone-quiz";
@@ -9,14 +9,15 @@ import { playChinese } from "@/lib/speech/play-chinese";
 const TONE_IDS: ToneId[] = [1, 2, 3, 4];
 const ROUNDS = 8;
 
-/** Trò nghe đoán thanh: nghe một âm tiết rồi chọn thanh 1–4. Chỉ cần loa, không cần micro. */
-export function ToneQuizGame() {
-  const [questions, setQuestions] = useState<ToneQuestion[]>(() => buildToneQuiz(ROUNDS));
+/** Trò nghe đoán thanh: nghe một âm tiết rồi chọn thanh 1–4. Chỉ cần loa, không cần micro. `onFinish` được gọi khi làm hết các câu. */
+export function ToneQuizGame({ rounds = ROUNDS, onFinish }: { rounds?: number; onFinish?: (score: number, total: number) => void } = {}) {
+  const [questions, setQuestions] = useState<ToneQuestion[]>(() => buildToneQuiz(rounds));
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<ToneId | null>(null);
   const [score, setScore] = useState(0);
   const done = i >= questions.length;
   const q = questions[i];
+  useEffect(() => { if (done) onFinish?.(score, questions.length); }, [done]); // eslint-disable-line react-hooks/exhaustive-deps -- báo đúng một lần khi xong
 
   function answer(t: ToneId) {
     if (picked !== null) return;
@@ -24,7 +25,7 @@ export function ToneQuizGame() {
     if (t === q.answer) setScore((s) => s + 1);
   }
   function next() { setI((n) => n + 1); setPicked(null); }
-  function restart() { setQuestions(buildToneQuiz(ROUNDS)); setI(0); setPicked(null); setScore(0); }
+  function restart() { setQuestions(buildToneQuiz(rounds)); setI(0); setPicked(null); setScore(0); }
 
   if (done) {
     return (

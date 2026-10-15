@@ -175,3 +175,19 @@ test("chưa có thẻ nào: mỗi chế độ hướng dẫn cách lưu từ và
   }
   await expect(page.getByRole("navigation", { name: "Chế độ ôn tập" }).getByRole("link", { name: "Ghép cặp" })).toHaveAttribute("aria-current", "page");
 });
+
+test.describe("Đọc to từ đã lưu", () => {
+  let userId = "";
+  const sb = serviceClientForTests();
+  test.beforeEach(async ({ page }) => { await page.route("**/api/tts**", (r) => r.fulfill({ status: 500, json: {} })); userId = await seedCards(page); });
+  test.afterEach(async () => { if (userId) await sb.auth.admin.deleteUser(userId); userId = ""; });
+
+  test("liệt kê từ vựng đã lưu để chọn đọc; đạt axe", async ({ page }) => {
+    await page.goto("/review/doc-to");
+    await expect(page.getByRole("heading", { name: "Đọc to từ đã lưu", level: 1 })).toBeVisible();
+    const options = page.getByLabel("Chọn câu để đọc").locator("option");
+    await expect(options.first()).toBeAttached();
+    expect(await options.count()).toBeGreaterThanOrEqual(2);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  });
+});

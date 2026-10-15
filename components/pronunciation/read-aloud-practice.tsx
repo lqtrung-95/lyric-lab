@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
-import { READ_ALOUD_SENTENCES } from "@/lib/pronunciation/read-aloud-sentences";
+import type { AssessmentResult } from "@/lib/pronunciation/assessment-normalize";
+import { READ_ALOUD_SENTENCES, type ReadAloudSentence } from "@/lib/pronunciation/read-aloud-sentences";
 import { toReferenceText, MAX_ASSESS_CHARS } from "@/lib/pronunciation/assess-request-schema";
 import { startMicRecording, type MicRecording } from "@/lib/practice/mic-recording";
 import { playChinese } from "@/lib/speech/play-chinese";
@@ -16,8 +17,17 @@ const ERROR_TEXT = {
   error: "Chưa chấm được, thử lại sau nhé.",
 } as const;
 
+interface ReadAloudPracticeProps {
+  /** Danh sách câu để chọn (mặc định: câu mẫu thông dụng). */
+  sentences?: ReadAloudSentence[];
+  /** Cho tự nhập câu riêng (tắt khi bài chỉ định sẵn câu, ví dụ thử thách 绕口令). */
+  allowCustom?: boolean;
+  /** Gọi mỗi khi có kết quả chấm mới, kèm câu đã đọc. */
+  onScored?: (result: AssessmentResult, sentence: ReadAloudSentence) => void;
+}
+
 /** Luyện đọc to: chọn (hoặc tự nhập) một câu, nghe mẫu, ghi âm rồi nhận điểm từng chữ từ Azure Pronunciation Assessment. */
-export function ReadAloudPractice() {
+export function ReadAloudPractice({ sentences = READ_ALOUD_SENTENCES, allowCustom = true, onScored }: ReadAloudPracticeProps = {}) {
   const [index, setIndex] = useState(0);
   const [custom, setCustom] = useState("");
   const [recording, setRecording] = useState(false);
@@ -25,11 +35,16 @@ export function ReadAloudPractice() {
   const mic = useRef<MicRecording | null>(null);
   const { state, assess, reset } = usePronunciationAssess();
 
-  const preset = READ_ALOUD_SENTENCES[index];
+  const preset = sentences[Math.min(index, sentences.length - 1)];
   const customText = toReferenceText(custom);
-  const useCustom = custom.trim().length > 0;
+  const useCustom = allowCustom && custom.trim().length > 0;
   const target = useCustom ? customText : toReferenceText(preset.han);
   const canRecord = target.length > 0 && target.length <= MAX_ASSESS_CHARS;
+
+  useEffect(() => {
+    if (state.status === "ok") onScored?.(state.value, useCustom ? { han: customText, pinyin: "", meaning: "" } : preset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ báo khi có kết quả mới.
+  }, [state]);
 
   async function toggle() {
     setMicError(null);
@@ -45,14 +60,16 @@ export function ReadAloudPractice() {
   return (
     <div className="space-y-space-md">
       <div>
-        <label htmlFor="sentence" className="text-label-md font-medium">Chọn câu để đọc</label>
-        <select id="sentence" value={index} disabled={useCustom} onChange={(e) => { setIndex(Number(e.target.value)); reset(); }}
+        {sentences.length > 1 && <label htmlFor="sentence" className="text-label-md font-medium">Chọn câu để đọc</label>}
+        {sentences.length > 1 && <select id="sentence" value={index} disabled={useCustom} onChange={(e) => { setIndex(Number(e.target.value)); reset(); }}
           className="mt-1 min-h-11 w-full rounded-xl border border-outline-variant bg-surface px-3 text-body-md disabled:opacity-50">
-          {READ_ALOUD_SENTENCES.map((s, i) => <option key={s.han} value={i}>{s.han} — {s.meaning}</option>)}
-        </select>
-        <label htmlFor="custom" className="mt-space-sm block text-label-md font-medium">Hoặc tự nhập câu (tối đa {MAX_ASSESS_CHARS} chữ Hán)</label>
-        <input id="custom" lang="zh-Hans" value={custom} onChange={(e) => { setCustom(e.target.value); reset(); }} placeholder="例如：我爱学中文"
-          className="mt-1 min-h-11 w-full rounded-xl border border-outline-variant bg-surface px-3 text-body-md" />
+          {sentences.map((s, i) => <option key={s.han} value={i}>{s.han} — {s.meaning}</option>)}
+        </select>}
+        {allowCustom && (<>
+          <label htmlFor="custom" className="mt-space-sm block text-label-md font-medium">Hoặc tự nhập câu (tối đa {MAX_ASSESS_CHARS} chữ Hán)</label>
+          <input id="custom" lang="zh-Hans" value={custom} onChange={(e) => { setCustom(e.target.value); reset(); }} placeholder="例如：我爱学中文"
+            className="mt-1 min-h-11 w-full rounded-xl border border-outline-variant bg-surface px-3 text-body-md" />
+        </>)}
         {useCustom && customText.length === 0 && <p role="alert" className="mt-1 text-body-sm text-error">Hãy nhập ít nhất một chữ Hán.</p>}
         {customText.length > MAX_ASSESS_CHARS && <p role="alert" className="mt-1 text-body-sm text-error">Câu dài quá {MAX_ASSESS_CHARS} chữ, hãy rút ngắn.</p>}
       </div>
