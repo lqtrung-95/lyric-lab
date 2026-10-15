@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AnnouncementBanner } from "@/components/chat/announcement-banner";
 import { OnboardingBanner } from "@/components/home/onboarding-banner";
+import { InstallBanner } from "@/components/pwa/install-banner";
 import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
 import { NewcomerSteps } from "@/components/home/newcomer-steps";
@@ -36,6 +37,7 @@ export default function AppHomePage() {
       <TodayPlan />
       <StreakCard />
       <OnboardingBanner />
+      <InstallBanner />
       <NewcomerSteps />
       <RecentSongsSection />
       <RecommendedSongs />

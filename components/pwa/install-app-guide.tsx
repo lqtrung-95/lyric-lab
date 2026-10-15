@@ -4,20 +4,21 @@ import { useState, useSyncExternalStore } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
 import { detectInstallPlatform, isInAppBrowser, isStandaloneDisplay, type InstallPlatform } from "@/lib/pwa/install-platform";
+import { AndroidStep1Art, AndroidStep2Art, AndroidStep3Art, IosStep1Art, IosStep2Art, IosStep3Art } from "./install-step-art";
 import { useInstallPrompt } from "./install-prompt-store";
 
 type Tab = "ios" | "android";
-interface Step { icon: IconName; text: React.ReactNode }
+interface Step { icon: IconName; text: React.ReactNode; art: React.ReactNode }
 
 const IOS_STEPS: Step[] = [
-  { icon: "ios_share", text: <>Mở SongHanzi bằng <b>Safari</b>, rồi bấm nút <b>Chia sẻ</b> (hình ô vuông có mũi tên hướng lên) ở thanh dưới cùng của iPhone, hoặc ở góc trên của iPad.</> },
-  { icon: "add_box", text: <>Kéo danh sách xuống và chọn <b>Thêm vào Màn hình chính</b> (Add to Home Screen).</> },
-  { icon: "check_circle", text: <>Bấm <b>Thêm</b> ở góc trên bên phải. Biểu tượng SongHanzi hiện ra ở màn hình chính, bấm vào là mở như một app.</> },
+  { icon: "ios_share", text: <>Mở SongHanzi bằng <b>Safari</b>, rồi bấm nút <b>Chia sẻ</b> (hình ô vuông có mũi tên hướng lên) ở thanh dưới cùng của iPhone, hoặc ở góc trên của iPad.</>, art: <IosStep1Art /> },
+  { icon: "add_box", text: <>Kéo danh sách xuống và chọn <b>Thêm vào Màn hình chính</b> (Add to Home Screen).</>, art: <IosStep2Art /> },
+  { icon: "check_circle", text: <>Bấm <b>Thêm</b> ở góc trên bên phải. Biểu tượng SongHanzi hiện ra ở màn hình chính, bấm vào là mở như một app.</>, art: <IosStep3Art /> },
 ];
 const ANDROID_STEPS: Step[] = [
-  { icon: "more_vert", text: <>Mở SongHanzi bằng <b>Chrome</b>, bấm nút menu <b>⋮</b> (ba chấm dọc) ở góc trên bên phải.</> },
-  { icon: "install_mobile", text: <>Chọn <b>Cài đặt ứng dụng</b> (hoặc <b>Thêm vào màn hình chính</b>).</> },
-  { icon: "check_circle", text: <>Bấm <b>Cài đặt</b> để xác nhận. Biểu tượng SongHanzi hiện ở màn hình chính và trong danh sách ứng dụng.</> },
+  { icon: "more_vert", text: <>Mở SongHanzi bằng <b>Chrome</b>, bấm nút menu <b>⋮</b> (ba chấm dọc) ở góc trên bên phải.</>, art: <AndroidStep1Art /> },
+  { icon: "install_mobile", text: <>Chọn <b>Cài đặt ứng dụng</b> (hoặc <b>Thêm vào màn hình chính</b>).</>, art: <AndroidStep2Art /> },
+  { icon: "check_circle", text: <>Bấm <b>Cài đặt</b> để xác nhận. Biểu tượng SongHanzi hiện ở màn hình chính và trong danh sách ứng dụng.</>, art: <AndroidStep3Art /> },
 ];
 
 const noop = () => () => undefined;
@@ -30,9 +31,12 @@ function StepList({ steps }: { steps: Step[] }) {
   return (
     <ol className="space-y-space-sm">
       {steps.map((s, i) => (
-        <li key={i} className="flex gap-3 rounded-2xl bg-surface-container-low p-space-sm">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container"><Icon name={s.icon} size={22} /></span>
-          <p className="min-w-0 self-center text-body-md text-on-surface"><span className="mr-1 font-semibold text-primary">Bước {i + 1}.</span>{s.text}</p>
+        <li key={i} className="space-y-space-sm rounded-2xl bg-surface-container-low p-space-sm">
+          <div className="flex gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container"><Icon name={s.icon} size={22} /></span>
+            <p className="min-w-0 self-center text-body-md text-on-surface"><span className="mr-1 font-semibold text-primary">Bước {i + 1}.</span>{s.text}</p>
+          </div>
+          <div className="flex justify-center">{s.art}</div>
         </li>
       ))}
     </ol>
