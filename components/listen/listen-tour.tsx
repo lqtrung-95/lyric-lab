@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { LISTEN_TOUR_STEPS, placeTourCard, unionBox, type Box } from "@/lib/listen/listen-tour";
+import { LISTEN_TOUR_STEPS, placeTourCard, unionBox, type Box, type ListenTourStep } from "@/lib/listen/listen-tour";
 
 /** Khung (toạ độ cửa sổ) của các phần tử đang hiển thị khớp các bộ chọn; phần tử ẩn (rộng/cao 0) bị bỏ qua. */
 function measure(targets: string[]): Box | null {
@@ -18,11 +18,11 @@ function measure(targets: string[]): Box | null {
 const PAD = 6;
 
 /**
- * Hướng dẫn màn Nghe từng bước: khung sáng quanh nút/khu vực đang nói tới và thẻ mô tả bên cạnh. Không chặn thao tác (lớp tối chỉ để nhìn, không bắt chạm)
+ * Hướng dẫn từng bước (mặc định cho màn Nghe bài hát; trang xem video truyền bộ bước riêng qua `steps`): khung sáng quanh nút/khu vực đang nói tới và thẻ mô tả bên cạnh. Không chặn thao tác (lớp tối chỉ để nhìn, không bắt chạm)
  * nên người dùng vẫn bấm được mọi thứ; Esc hoặc "Bỏ qua" đóng. Bước nào không có đích hiển thị (ví dụ nút ẩn ở cỡ màn hình này) thì bị bỏ qua.
  */
-export function ListenTour({ onClose }: { onClose: () => void }) {
-  const [steps] = useState(() => LISTEN_TOUR_STEPS.filter((s) => measure(s.targets) !== null));
+export function ListenTour({ onClose, steps: allSteps = LISTEN_TOUR_STEPS }: { onClose: () => void; steps?: ListenTourStep[] }) {
+  const [steps] = useState(() => allSteps.filter((s) => measure(s.targets) !== null));
   const [index, setIndex] = useState(0);
   const [box, setBox] = useState<Box | null>(null);
   const [card, setCard] = useState<{ top: number; left: number } | null>(null);

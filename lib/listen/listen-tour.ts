@@ -39,29 +39,31 @@ export const LISTEN_TOUR_STEPS: ListenTourStep[] = [
   },
 ];
 
-const KEY = "lyric-lab-listen-tour";
-
 /**
- * Có nên TỰ mở hướng dẫn không: chưa xem hoặc bỏ qua trên trình duyệt này, và không phải trình duyệt tự động hoá (người dùng thật không bao giờ có
- * `navigator.webdriver`; bài test e2e bật `window.__forceListenTour` khi cần kiểm tra chính hướng dẫn, còn lại không bị khung hướng dẫn che khi bấm).
- * Không đọc được bộ nhớ (chế độ riêng tư) thì coi như đã xem để khỏi hiện lặp lại. Nút "Hướng dẫn" ở thanh trên luôn mở được.
+ * Có nên TỰ mở một hướng dẫn không (`key` là khóa localStorage riêng của hướng dẫn đó, `forceFlag` là tên biến `window` để test e2e bật): chưa xem hoặc bỏ qua trên trình duyệt này,
+ * và không phải trình duyệt tự động hoá (người dùng thật không bao giờ có `navigator.webdriver`; bài test e2e bật cờ khi cần kiểm tra chính hướng dẫn, còn lại không bị khung
+ * hướng dẫn che khi bấm). Không đọc được bộ nhớ (chế độ riêng tư) thì coi như đã xem để khỏi hiện lặp lại. Nút "Hướng dẫn" ở thanh trên luôn mở được.
  */
-export function isListenTourDone(): boolean {
+export function isTourDone(key: string, forceFlag: string): boolean {
   try {
-    if (navigator.webdriver && !(window as unknown as { __forceListenTour?: boolean }).__forceListenTour) return true;
-    return localStorage.getItem(KEY) !== null;
+    if (navigator.webdriver && !(window as unknown as Record<string, boolean | undefined>)[forceFlag]) return true;
+    return localStorage.getItem(key) !== null;
   } catch {
     return true;
   }
 }
 
-export function markListenTourDone(): void {
+export function markTourDone(key: string): void {
   try {
-    localStorage.setItem(KEY, "done");
+    localStorage.setItem(key, "done");
   } catch {
     /* không lưu được thì thôi */
   }
 }
+
+const KEY = "lyric-lab-listen-tour";
+export const isListenTourDone = (): boolean => isTourDone(KEY, "__forceListenTour");
+export const markListenTourDone = (): void => markTourDone(KEY);
 
 export interface Box { top: number; left: number; width: number; height: number }
 

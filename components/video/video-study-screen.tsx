@@ -1,15 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
 import { Icon } from "@/components/ui/icon";
 import { Toast } from "@/components/ui/toast";
 import { toggleVideoLike } from "@/lib/user-data/video-likes-repo";
 import { PlaybackBar } from "@/components/listen/playback-bar";
 import { ListenLikeButton } from "@/components/listen/listen-like-button";
+import { ListenTour } from "@/components/listen/listen-tour";
 import { ShortcutsHelpButton } from "@/components/listen/shortcuts-help-button";
 import { ViewToggles } from "@/components/listen/view-toggles";
+import { isVideoTourDone, markVideoTourDone, VIDEO_TOUR_STEPS } from "@/lib/video/video-tour";
 import { parseStudyTab, STUDY_TABS, studyTabHref, type StudyTab } from "@/lib/video/study-tab";
 import type { LessonDetail } from "@/lib/video/video-repo";
 import { ReportVideoButton } from "./report-video-button";
@@ -38,7 +40,19 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
   const { containerRef, controller, failed } = useYouTubePlayer(lesson.videoId);
   const watch = useVideoWatch(lesson, controller, startAt, tab === "subtitles");
   const likes = useLikedVideos();
+  const [tourOpen, setTourOpen] = useState(false);
   const { prefs, update, stopLoop } = watch;
+
+  // Hướng dẫn tự hiện MỘT lần cho người mới, khi video đã sẵn sàng và đang ở tab Phụ đề (có đủ thứ để chỉ vào). Người mở từ link chia sẻ một câu (startAt có sẵn)
+  // chờ tới khi họ bấm phát lần đầu để không che câu họ vừa được mời nghe. Nút "Hướng dẫn" ở thanh tiêu đề luôn mở lại được.
+  const arrivedMidVideo = startAt !== undefined;
+  const ready = Boolean(controller) && tab === "subtitles" && watch.lines.length > 0;
+  useEffect(() => {
+    if (!ready || isVideoTourDone() || (arrivedMidVideo && !watch.playing)) return;
+    const timer = setTimeout(() => setTourOpen(true), 1500);
+    return () => clearTimeout(timer);
+  }, [ready, arrivedMidVideo, watch.playing]);
+  const closeTour = useCallback(() => { markVideoTourDone(); setTourOpen(false); }, []);
 
   const changeTab = useCallback((next: StudyTab) => {
     if (next === tab) return;
@@ -70,6 +84,10 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
             />
           )}
           <ListenLikeButton videoId={lesson.videoId} liked={likes.liked.has(lesson.videoId)} onChange={(v) => likes.setLiked(lesson.videoId, v)} toggle={toggleVideoLike} noun="video" />
+          <button type="button" onClick={() => setTourOpen(true)} aria-label="Xem hướng dẫn trang xem video" title="Hướng dẫn"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container">
+            <Icon name="lightbulb" size={20} />
+          </button>
           <ShortcutsHelpButton />
           <ReportVideoButton videoId={lesson.videoId} />
         </div>
@@ -99,7 +117,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
         </div>
 
         <div className="min-w-0">
-          <div role="tablist" aria-label="Cách học video này" className="mb-space-md flex gap-1 border-b border-outline-variant/40">
+          <div role="tablist" aria-label="Cách học video này" data-tour="study-tabs" className="mb-space-md flex gap-1 border-b border-outline-variant/40">
             {STUDY_TABS.map((t) => (
               <button
                 key={t.id} type="button" role="tab" id={`study-tab-${t.id}`} aria-selected={tab === t.id} aria-controls="study-panel" onClick={() => changeTab(t.id)}
@@ -114,6 +132,7 @@ export function VideoStudyScreen({ lesson, startAt, initialTab, autoTranslate }:
           </div>
         </div>
       </div>
+      {tourOpen && <ListenTour steps={VIDEO_TOUR_STEPS} onClose={closeTour} />}
       {likes.nudge && <Toast message={likes.nudge} onDismiss={likes.clearNudge} />}
     </>
   );
