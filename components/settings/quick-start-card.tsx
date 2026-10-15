@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { SettingsCard } from "./settings-card";
 
@@ -24,7 +25,7 @@ export function QuickStartCard() {
         <p><strong className="font-medium text-on-surface">Nút trên thanh dấu trang (máy tính):</strong> kéo nút này lên thanh dấu trang, rồi bấm khi đang xem video YouTube.{" "}
           <a ref={linkRef} onClick={(e) => e.preventDefault()} draggable className="mt-1 inline-flex min-h-11 items-center rounded-full bg-primary-container px-4 text-label-md font-semibold text-on-primary-container">Học trên SongHanzi</a>
         </p>
-        <p><strong className="font-medium text-on-surface">Điện thoại Android:</strong> cài SongHanzi vào màn hình chính (menu trình duyệt → Cài đặt ứng dụng). Sau đó ở app YouTube bấm Chia sẻ → SongHanzi là mở thẳng bài. iPhone chưa hỗ trợ cách này.</p>
+        <p><strong className="font-medium text-on-surface">Điện thoại:</strong> cài SongHanzi vào màn hình chính. Trên Android, sau đó ở app YouTube bấm Chia sẻ → SongHanzi là mở thẳng bài (iPhone chưa hỗ trợ cách này). <Link href="/cai-app" className="font-semibold text-primary underline">Xem hướng dẫn cài app</Link></p>
       </div>
     </SettingsCard>
   );

@@ -9,6 +9,7 @@ import { toggleTheme, useIsDark } from "./theme-toggle";
 const ITEMS: { href: string; label: string; icon: IconName }[] = [
   { href: "/cong-cu", label: "Công cụ", icon: "build" },
   { href: "/review/leaderboard", label: "Bảng xếp hạng", icon: "leaderboard" },
+  { href: "/cai-app", label: "Cài app lên điện thoại", icon: "install_mobile" },
   { href: "/feedback", label: "Góp ý cho SongHanzi", icon: "feedback" },
   { href: "/settings", label: "Cài đặt và tài khoản", icon: "person" },
 ];
