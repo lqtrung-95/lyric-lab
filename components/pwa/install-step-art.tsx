@@ -78,10 +78,10 @@ export function IosStep3Art() {
   return (
     <Art>
       <rect x="60" y="22" width="140" height="106" rx="12" className="fill-surface-container-low stroke-outline-variant" />
-      <text x="70" y="42" className={TEXT}>Hủy</text>
-      <text x="118" y="42" textAnchor="middle" className="fill-on-surface text-[8.5px] font-semibold">Màn hình chính</text>
-      <rect x="158" y="30" width="34" height="16" rx="8" className={HI} strokeWidth="2" />
-      <text x="175" y="41" textAnchor="middle" className="fill-primary text-[9px] font-semibold">Thêm</text>
+      <text x="66" y="42" className={TEXT}>Hủy</text>
+      <text x="124" y="42" textAnchor="middle" className="fill-on-surface text-[8px] font-semibold">Màn hình chính</text>
+      <rect x="162" y="30" width="34" height="16" rx="8" className={HI} strokeWidth="2" />
+      <text x="179" y="41" textAnchor="middle" className="fill-primary text-[9px] font-semibold">Thêm</text>
       <line x1="60" y1="52" x2="200" y2="52" className="stroke-outline-variant" />
       <AppIcon x={70} y={62} size={34} />
       <rect x="108" y="64" width="84" height="16" rx="5" className="fill-surface-container-lowest stroke-outline-variant" />
