@@ -36,7 +36,7 @@ export async function giveFeedback(lines: AnalyzedLine[], req: FeedbackRequest, 
   for (const model of deps.models) {
     try {
       const raw = await deps.chat({
-        model, system: FEEDBACK_SYSTEM_PROMPT, user: buildFeedbackPrompt(line.text),
+        model, system: FEEDBACK_SYSTEM_PROMPT, user: buildFeedbackPrompt(line.text, line.pinyin),
         maxTokens: MAX_FEEDBACK_TOKENS, timeoutMs: FEEDBACK_TIMEOUT_MS, audio: { mimeType: req.mimeType, data: req.audio },
       });
       const parsed = feedbackOutputSchema.parse(JSON.parse(raw));
