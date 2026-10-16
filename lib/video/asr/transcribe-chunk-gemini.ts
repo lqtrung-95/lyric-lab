@@ -6,6 +6,11 @@ import { parseAsrJson, timingLooksBroken } from "./asr-lines";
 // Nhờ Gemini nghe MỘT đoạn của video YouTube công khai (Google tự lấy video, máy chủ ta không tải gì) và chép lời nói tiếng Trung kèm mốc giờ.
 // Chỉ Gemini nghe được video; model đứng sau là dự phòng khi model đầu hết hạn mức/quá tải/trả mốc giờ hỏng. Dùng tên model cụ thể, không dùng bí danh `-latest`.
 export const ASR_MODELS = ["gemini:gemini-3-flash-preview", "gemini:gemini-2.5-flash"];
+/**
+ * Danh sách cho SCRIPT nạp hàng loạt: thêm 3.5 Flash Lite ở cuối vì hạn mức ngày của nó (500 yêu cầu/khóa) lớn gấp 25 lần hai model trên (20/khóa).
+ * Đo 2026-10-17: mốc giờ khớp nhưng câu dài hơn, có vài lỗi tên riêng, nên chỉ làm dự phòng; nút trên web vẫn dùng `ASR_MODELS` (người dùng cần chất lượng đều).
+ */
+export const ASR_BATCH_MODELS = [...ASR_MODELS, "gemini:gemini-3.5-flash-lite"];
 /** Một lần gọi nghe 2 phút (+12 giây dư) đo 15-25 giây; hạn chót này vẫn chừa chỗ để route kịp trả lỗi trong 60 giây. */
 export const ASR_CALL_TIMEOUT_MS = 50_000;
 const MAX_OUTPUT_TOKENS = 8192;
@@ -22,9 +27,9 @@ Timestamps are MM:SS (or H:MM:SS) on the ORIGINAL VIDEO timeline, the same clock
 Reply with a JSON array only: [{"start": "MM:SS", "end": "MM:SS", "text": string}]. If there is no speech at all, reply [].`;
 
 /** Nghe một đoạn và trả các dòng phụ đề theo giờ tuyệt đối của video (đã lọc theo phần sở hữu của đoạn). Ném lỗi khi mọi model đều hỏng. */
-export async function transcribeChunkWithGemini(chat: ChatFn, videoId: string, chunk: AsrChunk, durationSec: number): Promise<CaptionLine[]> {
+export async function transcribeChunkWithGemini(chat: ChatFn, videoId: string, chunk: AsrChunk, durationSec: number, models: readonly string[] = ASR_MODELS): Promise<CaptionLine[]> {
   let lastError: unknown = new Error("không có model nhận dạng");
-  for (const model of ASR_MODELS) {
+  for (const model of models) {
     try {
       const raw = await chat({
         model, system: SYSTEM, maxTokens: MAX_OUTPUT_TOKENS, timeoutMs: ASR_CALL_TIMEOUT_MS,

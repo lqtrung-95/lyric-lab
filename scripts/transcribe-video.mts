@@ -5,7 +5,8 @@
 // --engine gemini (mặc định): Gemini nghe thẳng link YouTube từng đoạn 2 phút (như nút trên web nhưng chạy tuần tự, không cần yt-dlp/ffmpeg). Đo 2026-10-14: chép đúng hơn Whisper turbo, câu mịn hơn.
 // --engine groq: Whisper large-v3-turbo qua Groq (GROQ_API_KEY), ~0,01 USD cho video 20 phút, chạy trong vài chục giây.
 //   Cần `yt-dlp` và `ffmpeg` trong PATH (brew install yt-dlp ffmpeg). Mốc giờ của Whisper thô hơn (cỡ 3 giây) và hay sai từ đồng âm.
-// --engine local: lệnh `whisper` của openai-whisper (pip install openai-whisper), model large-v3, miễn phí nhưng chậm (vài phút đến vài chục phút).
+// --engine local: lệnh `whisper` của openai-whisper (pip install openai-whisper), mặc định model large-v3, miễn phí nhưng chậm (vài phút đến vài chục phút); --whisper-model turbo (hoặc medium, small) để chạy nhanh hơn.
+// Engine gemini dùng thêm 3.5 Flash Lite làm model dự phòng cuối (hạn mức ngày lớn hơn nhiều, chất lượng thấp hơn một bậc: câu dài hơn, có thể sai tên riêng).
 // --refresh: ghi đè dòng của video ĐÃ có trong kho (giữ nguyên trạng thái duyệt), dùng sau khi sửa tay file JSON.
 // Bản chép đã lưu được dùng lại ở lần chạy sau (đỡ tốn tiền/thời gian); --force để chép lại. Có thể sửa tay file JSON rồi chạy lại với --apply.
 import { createClient } from "@supabase/supabase-js";
@@ -20,7 +21,7 @@ import { getServerEnv } from "@/lib/env/server-env";
 import { planAsrChunks } from "@/lib/video/asr/asr-chunks";
 import { cleanAsrLines, type RawAsrSegment } from "@/lib/video/asr/asr-lines";
 import { GROQ_MAX_AUDIO_BYTES, transcribeWithGroq, whisperSegmentsToRaw } from "@/lib/video/asr/groq-whisper";
-import { transcribeChunkWithGemini } from "@/lib/video/asr/transcribe-chunk-gemini";
+import { ASR_BATCH_MODELS, transcribeChunkWithGemini } from "@/lib/video/asr/transcribe-chunk-gemini";
 import { classifyVideoTags } from "@/lib/video/classify-video-tags";
 import { FixedCaptionProvider } from "@/lib/video/fixed-caption-provider";
 import { ingestVideo } from "@/lib/video/ingest-video";
@@ -32,7 +33,7 @@ import { toSimplifiedChinese } from "@/lib/text/to-simplified-chinese";
 const args = process.argv.slice(2);
 const flag = (name: string) => args.includes(`--${name}`);
 const opt = (name: string) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
-const videoId = parseVideoId(args.find((a) => !a.startsWith("--") && a !== opt("engine") && a !== opt("status")) ?? "");
+const videoId = parseVideoId(args.find((a) => !a.startsWith("--") && a !== opt("engine") && a !== opt("status") && a !== opt("whisper-model")) ?? "");
 if (!videoId) throw new Error("Cần link hoặc mã video YouTube");
 const engine = opt("engine") ?? "gemini";
 if (engine !== "gemini" && engine !== "groq" && engine !== "local") throw new Error("--engine chỉ nhận gemini, groq hoặc local");
@@ -64,7 +65,7 @@ if (existsSync(jsonPath) && !flag("force")) {
       for (let attempt = 1; ; attempt++) {
         try {
           console.log(`Gemini nghe đoạn ${chunk.index + 1}/${chunks.length} (${chunk.ownStart}–${chunk.ownEnd}s)`);
-          segments.push(...(await transcribeChunkWithGemini(chat, videoId, chunk, meta.durationSec)));
+          segments.push(...(await transcribeChunkWithGemini(chat, videoId, chunk, meta.durationSec, ASR_BATCH_MODELS)));
           break;
         } catch (e) {
           if (attempt >= 3) throw e;
@@ -97,7 +98,7 @@ if (existsSync(jsonPath) && !flag("force")) {
         segments.push(...whisperSegmentsToRaw(await transcribeWithGroq(readFileSync(p.file), p.file.split("/").pop()!, key), p.offset));
       }
     } else {
-      run("whisper", [mp3, "--language", "zh", "--model", "large-v3", "--initial_prompt", "以下是普通话的句子。", "--output_format", "json", "--output_dir", dir]);
+      run("whisper", [mp3, "--language", "zh", "--model", opt("whisper-model") ?? "large-v3", "--initial_prompt", "以下是普通话的句子。", "--output_format", "json", "--output_dir", dir]);
       const out = JSON.parse(readFileSync(join(dir, `${videoId}.audio.json`), "utf8")) as { segments: { start: number; end: number; text: string }[] };
       segments = out.segments.map((s) => ({ start: s.start, end: s.end, text: toSimplifiedChinese(s.text) }));
     }

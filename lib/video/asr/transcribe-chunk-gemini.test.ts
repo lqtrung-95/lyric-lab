@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ChatRequest } from "@/lib/analysis/groq-chat";
 import { planAsrChunks } from "./asr-chunks";
-import { transcribeChunkWithGemini } from "./transcribe-chunk-gemini";
+import { ASR_BATCH_MODELS, ASR_MODELS, transcribeChunkWithGemini } from "./transcribe-chunk-gemini";
 
 const chunk = planAsrChunks(600)[2]; // sở hữu 240–360, cửa sổ 234–366
 const reply = (rows: [string, string, string][]) => JSON.stringify(rows.map(([start, end, text]) => ({ start, end, text })));
@@ -35,5 +35,16 @@ describe("transcribeChunkWithGemini", () => {
     await expect(transcribeChunkWithGemini(async () => "hỏng", "bR01vpXyItA", chunk, 600)).rejects.toThrow();
     await expect(transcribeChunkWithGemini(async () => { throw new Error("Gemini 503"); }, "bR01vpXyItA", chunk, 600)).rejects.toThrow("Gemini 503");
     expect(await transcribeChunkWithGemini(async () => "[]", "bR01vpXyItA", chunk, 600)).toEqual([]);
+  });
+  it("danh sách cho script nạp có 3.5 Flash Lite ở cuối; nút trên web không có; model dự phòng cuối được dùng khi các model trước lỗi", async () => {
+    expect(ASR_BATCH_MODELS.at(-1)).toBe("gemini:gemini-3.5-flash-lite");
+    expect(ASR_MODELS).not.toContain("gemini:gemini-3.5-flash-lite");
+    const tried: string[] = [];
+    const chat = async (req: ChatRequest) => { tried.push(req.model); if (!req.model.includes("flash-lite")) throw new Error("Gemini 429"); return reply([["04:14", "04:18", "备用"]]); };
+    expect(await transcribeChunkWithGemini(chat, "bR01vpXyItA", chunk, 600, ASR_BATCH_MODELS)).toEqual([{ text: "备用", start: 254, end: 258 }]);
+    expect(tried).toEqual(ASR_BATCH_MODELS);
+    tried.length = 0;
+    await expect(transcribeChunkWithGemini(chat, "bR01vpXyItA", chunk, 600)).rejects.toThrow("429");
+    expect(tried).toEqual(ASR_MODELS);
   });
 });

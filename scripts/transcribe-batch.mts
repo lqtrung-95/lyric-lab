@@ -10,6 +10,7 @@ import { readFileSync } from "node:fs";
 import ws from "ws";
 import { existingVideoIds } from "@/lib/video/ingest-video";
 import { parseGeminiKeys } from "@/lib/analysis/gemini-chat";
+import { ASR_BATCH_MODELS } from "@/lib/video/asr/transcribe-chunk-gemini";
 
 const args = process.argv.slice(2);
 const opt = (name: string) => { const i = args.indexOf(`--${name}`); return i >= 0 ? args[i + 1] : undefined; };
@@ -30,11 +31,14 @@ if (!apply || pending.length === 0) process.exit(0);
 // Kiểm tra hạn mức bằng đúng loại yêu cầu sẽ dùng (nghe một đoạn video 6 giây): yêu cầu chỉ có chữ vẫn thành công dù hạn mức video đã cạn.
 async function videoQuotaAvailable(): Promise<boolean> {
   const body = JSON.stringify({ contents: [{ role: "user", parts: [{ fileData: { fileUri: "https://www.youtube.com/watch?v=bR01vpXyItA" }, videoMetadata: { startOffset: "60s", endOffset: "66s" } }, { text: "Transcribe in one short line." }] }], generationConfig: { maxOutputTokens: 40, mediaResolution: "MEDIA_RESOLUTION_LOW" } });
-  for (const key of parseGeminiKeys(process.env.GEMINI_API_KEYS)) {
-    try {
-      const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent", { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body, signal: AbortSignal.timeout(40_000) });
-      if (res.ok) return true;
-    } catch { /* khóa lỗi mạng: thử khóa kế */ }
+  // Còn hạn mức nếu BẤT KỲ model nào trong chuỗi nạp (3 Flash, 2.5 Flash, 3.5 Flash Lite) còn: script nạp tự rơi xuống model sau.
+  for (const model of ASR_BATCH_MODELS.map((m) => m.replace(/^gemini:/, ""))) {
+    for (const key of parseGeminiKeys(process.env.GEMINI_API_KEYS)) {
+      try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": key }, body, signal: AbortSignal.timeout(40_000) });
+        if (res.ok) return true;
+      } catch { /* khóa lỗi mạng: thử khóa kế */ }
+    }
   }
   return false;
 }
