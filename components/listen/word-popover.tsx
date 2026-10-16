@@ -34,8 +34,8 @@ export function WordPopover({ word, item, lookup, saved, onClose, onPlayLine, on
 
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    ref.current?.focus();
-    return () => previous?.focus?.();
+    ref.current?.focus({ preventScroll: true });
+    return () => previous?.focus?.({ preventScroll: true });
   }, [word]);
 
   const entry = lookup.entry?.ok ? lookup.entry.value : undefined;

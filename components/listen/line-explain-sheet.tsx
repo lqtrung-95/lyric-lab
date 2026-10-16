@@ -17,8 +17,8 @@ export function LineExplainSheet({ videoId, lineIndex, lineText, linePinyin, res
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
-    ref.current?.focus();
-    return () => previous?.focus?.();
+    ref.current?.focus({ preventScroll: true });
+    return () => previous?.focus?.({ preventScroll: true });
   }, []);
 
   return (

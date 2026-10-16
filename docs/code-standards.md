@@ -109,6 +109,9 @@ Không để LLM "giải thích" điểm số khi nguồn không cho biết nguy
 ## Tiến độ lưu cục bộ
 Dữ liệu chỉ có giá trị với một thiết bị (chuỗi ngày luyện phát âm, điểm cao nhất) đọc/ghi qua `learning-progress.ts` với try/catch và kiểm tra dạng dữ liệu; hook đọc localStorage sau hydrate để HTML server và client khớp.
 
+## Focus trong dialog/sheet
+Mọi lời gọi `focus()` khi mở hoặc trả focus lúc đóng popup/sheet phải có `{ preventScroll: true }`, nếu không trình duyệt cuộn trang tới phần tử được focus.
+
 ## Vẽ canvas với font chữ Hán
 - Font chữ Hán của trang (Noto Serif SC qua Google Fonts) chia thành nhiều mảnh theo unicode-range và theo độ đậm; trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở đúng độ đậm. `document.fonts.ready` KHÔNG đợi các mảnh này nên vẽ canvas ngay sẽ có chữ rơi về font hệ thống, nét đậm nhạt khác nhau trong cùng một câu. Trước khi `fillText` chữ Hán, gọi `await document.fonts.load(font, đoạnChữSắpVẽ)` (xem `lib/share/line-card.ts`).
 

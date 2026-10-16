@@ -162,6 +162,24 @@ test("xem video: bản chép chạy theo thời gian, bấm từ tra được v�
   expect(await page.evaluate(() => (window as unknown as { __yt: string[] }).__yt)).toContain("seek:8");
 });
 
+test("xem video: đóng popup tra từ không làm trang cuộn về từ vừa bấm", async ({ page }) => {
+  await mockVideoApis(page);
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await page.goto(`/video/${VIDEO_ID}`);
+  await expect(page.locator('[data-line-index="0"]')).toBeVisible();
+  await page.evaluate(() => { const pad = document.createElement("div"); pad.style.height = "4000px"; document.body.append(pad); });
+  await page.locator('[data-line-index="0"]').getByRole("button", { name: "朋友" }).click();
+  const dialog = page.getByRole("dialog", { name: "Tra từ 朋友" });
+  await expect(dialog).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, 1500)); // người học cuộn đi chỗ khác khi popup đang mở
+  const before = await page.evaluate(() => window.scrollY);
+  expect(before).toBeGreaterThan(1000);
+  await dialog.getByRole("button", { name: "Đóng" }).click();
+  await expect(dialog).toBeHidden();
+  await page.waitForTimeout(300);
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(5);
+});
+
 test.describe("báo bản dịch một dòng sai", () => {
   async function openAndReport(page: Page, respond: { status?: number; json: unknown }) {
     await mockVideoApis(page);
