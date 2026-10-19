@@ -4,6 +4,18 @@ Cập nhật: 2026-10-19 · Trạng thái: bản hiện hành (thay thế `PRD.m
 
 Cách đọc: mục 1-4 là bối cảnh và nguyên tắc (không đổi khi thiết kế lại); mục 5-6 là cấu trúc thông tin và hành trình; mục 7 là yêu cầu theo module kèm trạng thái; mục 8 là danh sách màn hình cần thiết kế; mục 9-12 là dữ liệu, phi chức năng, hiện trạng thiết kế và vấn đề đã biết; mục 13-14 là lộ trình và câu hỏi mở. Trạng thái mỗi yêu cầu: **Đã có**, **Một phần**, **Kế hoạch** (đã có kế hoạch được duyệt), **Backlog** (cân nhắc, chưa duyệt).
 
+## 0. Quyết định đã chốt cho đợt thiết kế lại (chủ sản phẩm, 2026-10-19)
+
+| # | Câu hỏi | Quyết định |
+|---|---|---|
+| 1 | Ưu tiên người mới hay người đang dùng | **Cả hai**: nhập môn mượt cho người mới, đồng thời đủ chiều sâu và phần thưởng cho người dùng lâu |
+| 2 | Thương hiệu | **Làm lại**: hiện đại, trẻ trung, **phong cách game**; không còn bắt buộc giữ nhận diện "thi ca/thư pháp" (tên sản phẩm giữ hay đổi: thiết kế được đề xuất, xem mục 14) |
+| 3 | Điểm vào mặc định của người mới | **Bài hát/video** (không phải lộ trình); lộ trình vẫn là trụ cột nhưng được giới thiệu sau hoạt động đầu tiên |
+| 4 | Bố cục tablet/desktop | **Cần bố cục riêng** (không chỉ co giãn từ mobile) |
+| 5 | Số liệu sử dụng | **Rất ít người dùng**: thiết kế dựa trên nguyên tắc và kiểm thử nhỏ, không dựa số liệu; phải bổ sung đo lường (mục 10) |
+| 6 | Mức gamification | **Mạnh hơn hiện tại**: mô-đun game hóa riêng (mục 7.P) |
+| 7 | Giao diện tiếng Anh | **Chưa làm bây giờ, có thể có sau**: thiết kế và code phải **sẵn sàng đa ngôn ngữ** (không nhúng chữ vào hình, chừa chỗ cho chuỗi dài hơn) |
+
 ## 1. Tổng quan sản phẩm
 
 **SongHanzi** giúp người Việt học tiếng Trung bằng nội dung thật: bài hát C-pop và video đời sống trên YouTube. Người học thấy lời có mốc thời gian, pinyin, âm Hán Việt, nghĩa tiếng Việt; bấm từ để tra; lưu từ thành thẻ ôn (FSRS); luyện nghe-chép, luyện nói, thi đấu; và nay có **lộ trình HSK** dẫn dắt từng bước.
@@ -18,6 +30,8 @@ Cách đọc: mục 1-4 là bối cảnh và nguyên tắc (không đổi khi th
 **Giai đoạn hiện tại:** đã deploy production (Vercel + Supabase), một nhóm người dùng thử, chưa quảng bá rộng. Đang chuyển từ "kho nội dung + công cụ" sang "có đường học rõ ràng" (lộ trình HSK). Thiết kế hiện tại tích lũy dần theo từng tính năng, nên nhu cầu thiết kế lại là **thống nhất toàn bộ trải nghiệm quanh hành trình học**, không chỉ làm đẹp.
 
 ### Mục tiêu của đợt thiết kế lại
+- **Phục vụ cả người mới (kích hoạt) và người đang dùng (giữ chân)**: nhập môn nhanh, vòng lặp hằng ngày hấp dẫn, phần thưởng có chiều sâu.
+- **Nhận diện mới, trẻ trung, kiểu game**, nhưng chữ Hán và nội dung học vẫn là trung tâm, dễ đọc, không bị trang trí át mất.
 - Người mới hiểu app dùng để làm gì và biết **bước tiếp theo** trong ≤ 10 giây.
 - Một **mô hình tư duy duy nhất**: Học (lộ trình) – Nghe (nội dung thật) – Ôn (thẻ, trò chơi) – Nói (phát âm) – Chơi (thi đấu, cộng đồng).
 - Thống nhất thành phần giao diện (thẻ từ, danh sách lời, bước học, popup tra từ) giữa bài hát, video, lộ trình và ôn tập.
@@ -88,11 +102,11 @@ Năm trụ cột theo vòng học, mỗi trụ cột là một khu vực điều
 | **Ôn & Nói** | Thẻ ôn FSRS, mini-game, luyện phát âm | "Nhớ lâu và nói đúng" |
 | **Chơi** | Thi đấu, thử thách, bảng xếp hạng, chat | "Học cùng người khác" |
 
-Gợi ý: gộp "Học" và "Hôm nay" thành điểm vào thống nhất; đưa "Thư viện" vào "Nghe"; đưa công cụ phát âm công khai vào "Ôn & Nói" để người đã đăng nhập dùng không rời app. Quyết định cuối thuộc về thiết kế, nhưng phải giữ **tối đa 5 mục điều hướng chính** trên mobile.
+Điểm vào mặc định của người mới là **Nghe** (bài hát/video): màn đầu tiên cho chọn ngay một bài hoặc video mẫu hợp level để học trong ≤ 60 giây; lộ trình và phần thưởng được giới thiệu SAU hoạt động đầu tiên (xem mục 6). Gợi ý: gộp "Học" và "Hôm nay" thành điểm vào thống nhất; đưa "Thư viện" vào "Nghe"; đưa công cụ phát âm công khai vào "Ôn & Nói" để người đã đăng nhập dùng không rời app. Quyết định cuối thuộc về thiết kế, nhưng phải giữ **tối đa 5 mục điều hướng chính** trên mobile.
 
 ## 6. Hành trình người dùng chính
 
-1. **Người mới (phiên đầu):** vào `/` hoặc `/app` → thiết lập nhanh (level, mục tiêu ngày; có thể bỏ qua) → "Bắt đầu chặng 1" hoặc "Dán link bài hát" → hoàn thành hoạt động đầu tiên → được mời lưu tiến độ (đăng nhập Google) và đặt nhắc học.
+1. **Người mới (phiên đầu):** vào `/` hoặc `/app` → chọn nhanh level (hoặc bỏ qua) → **chọn một bài hát/video mẫu hợp level và học ngay** (nghe, tra vài từ, lưu thẻ đầu tiên) → màn thưởng đầu tiên (XP, huy hiệu "Khởi đầu", mở chuỗi ngày) → giới thiệu lộ trình ("Học có hệ thống?") → được mời lưu tiến độ (Google) và đặt nhắc học.
 2. **Vòng học hằng ngày:** mở app → "Hôm nay" cho một việc nổi bật (ôn thẻ đến hạn / tiếp chặng / bài nghe dở) → làm → thấy chuỗi ngày và mục tiêu cập nhật → chia sẻ (tùy chọn).
 3. **Bài hát:** dán link hoặc chọn từ thư viện → đang phân tích (tiến trình) → xem trước (từ vựng, ngữ pháp, "bạn hiểu x%") → nghe (lời chạy theo nhạc, tra từ, lặp, tốc độ, sửa lệch lời) → tổng kết → ôn/nghe lại.
 4. **Video luyện nghe:** chọn video (lọc theo cấp, chủ đề, kênh, yêu thích) → tab Phụ đề (xem, tra từ) → Nghe-chép (gõ pinyin/chữ Hán từng câu) → Luyện nói (ghi âm, nhận xét). Video không có phụ đề: nhờ AI nghe (cần đăng nhập Google).
@@ -162,7 +176,7 @@ Gợi ý: gộp "Học" và "Hôm nay" thành điểm vào thống nhất; đưa
 | PT-05 | Bài học theo 10 tình huống đời sống (chào hỏi, giới thiệu, gọi món, mua sắm, hỏi đường, taxi, khách sạn, bệnh viện, điện thoại/WeChat, đi làm): hội thoại, đọc theo vai có chấm, ôn nhanh; nội dung do người dùng duyệt | Kế hoạch |
 | PT-06 | Tập viết chữ Hán (thứ tự nét, chấm nét), bắt đầu HSK 1-3; cần xác nhận giấy phép dữ liệu nét | Kế hoạch |
 | PT-07 | Trò chơi mới gắn vào chặng và vào Ôn tập: xếp từ thành câu, đoán từ qua Hán Việt, nghe và chép từ | Kế hoạch |
-| PT-08 | XP và huy hiệu (chỉ cộng cho hoạt động thật, chống lặp), kiểm tra xếp lớp | Kế hoạch |
+| PT-08 | Kiểm tra xếp lớp; XP và huy hiệu do mô-đun game hóa (7.P) cung cấp | Kế hoạch |
 
 ### G. Ôn tập
 | ID | Yêu cầu | Trạng thái |
@@ -201,7 +215,25 @@ Gợi ý: gộp "Học" và "Hôm nay" thành điểm vào thống nhất; đưa
 | MT-01 | Chuỗi ngày học, mục tiêu ngày (5/10/20/30 mục), cột mốc, tính cả thẻ, trò chơi, bài nghe, video | Đã có |
 | MT-02 | Thẻ chia sẻ chuỗi ngày (ảnh + trang chia sẻ), thẻ chia sẻ câu hát, thẻ 绕口令 | Đã có |
 | MT-03 | Nhắc học bằng thông báo đẩy và email (múi giờ người dùng), hủy đăng ký | Đã có |
-| MT-04 | XP/huy hiệu (xem PT-08), thử thách hằng ngày thống nhất | Kế hoạch |
+| MT-04 | Hệ thống game hóa đầy đủ (xem 7.P) thay thế mục này | Kế hoạch |
+
+### P. Game hóa (mô-đun mới, mức "mạnh")
+Mục tiêu: biến học thành vòng lặp có phần thưởng thấy được, nhưng **XP và phần thưởng chỉ gắn với học thật** (không lặp một bài để cày, không thưởng cho thao tác rỗng).
+
+| ID | Yêu cầu | Trạng thái |
+|---|---|---|
+| GM-01 | **XP** cho mọi hoạt động học thật (hoàn thành chặng, phiên ôn, bài nghe, chép, luyện nói, ván thi đấu), công thức minh bạch, trần mỗi hoạt động mỗi ngày để chống cày | Kế hoạch |
+| GM-02 | **Cấp độ người chơi** (từ XP tích lũy) với tên cấp và mốc thưởng; hiện thanh XP ở "Hôm nay" và hồ sơ | Kế hoạch |
+| GM-03 | **Huy hiệu/thành tích** (mốc đầu tiên, chuỗi ngày, số từ đã học, độ chính xác, hoàn thành chặng/khóa, thi đấu, phát âm); có huy hiệu ẩn; màn bộ sưu tập | Kế hoạch |
+| GM-04 | **Nhiệm vụ hằng ngày và hằng tuần** (ví dụ ôn 10 thẻ, nghe 1 bài, đọc 1 câu) với rương/thưởng; làm mới theo múi giờ | Kế hoạch |
+| GM-05 | **Chuỗi ngày nâng cấp**: đóng băng chuỗi (kiếm được bằng nhiệm vụ, không mua), cảnh báo sắp mất, khôi phục có điều kiện | Kế hoạch |
+| GM-06 | **Giải đấu tuần theo nhóm trình độ** (đóng mùa, lên/xuống hạng), tái dùng bảng xếp hạng và thi đấu hiện có | Kế hoạch |
+| GM-07 | **Tùy biến nhân vật/ảnh đại diện** và vật phẩm mở khóa bằng thành tích (chỉ trang trí, không ảnh hưởng nội dung học) | Kế hoạch |
+| GM-08 | **Phản hồi giác quan**: hiệu ứng, chuyển động và (tùy chọn) âm thanh khi đúng/sai/lên cấp; **tôn trọng giảm chuyển động** và có nút tắt âm | Kế hoạch |
+| GM-09 | Chia sẻ thành tích (thẻ ảnh) cho cấp mới, huy hiệu, chuỗi ngày | Một phần (đã có thẻ chuỗi ngày) |
+| GM-10 | Chống gian lận: tính XP ở máy chủ, giới hạn tần suất, không thưởng cho kết quả không chấm được | Kế hoạch |
+
+Ràng buộc thiết kế cho game hóa: không dùng cơ chế gây lo âu/ép buộc (không phạt nặng khi nghỉ, không đếm ngược gây áp lực quá mức); phần thưởng phải giải thích được "vì sao tôi nhận". Cần quyết định về kinh tế vật phẩm (có tiền tệ ảo hay không) ở mục 14.
 
 ### L. Công khai và SEO
 | ID | Yêu cầu | Trạng thái |
@@ -256,6 +288,7 @@ Mỗi màn cần đủ trạng thái: tải, rỗng, lỗi, hết hạn mức, c
 | Chơi | Hub thi đấu; tạo/nhập mã; phòng chờ; ván chơi; kết quả; lịch sử; thử thách (tạo, chơi, bảng điểm) |
 | Cộng đồng | Chat; góp ý và tường góp ý |
 | Cài đặt | Học, nghe, giọng đọc, nhắc học, tài khoản, biệt danh/ảnh, xóa dữ liệu; hướng dẫn cài app |
+| Game hóa | Hồ sơ người chơi (cấp, XP, huy hiệu, chuỗi); bộ sưu tập thành tích; nhiệm vụ hằng ngày/tuần; giải đấu tuần; màn thưởng (hoàn thành chặng, lên cấp, huy hiệu mới); tùy biến nhân vật |
 | Chia sẻ | Thẻ chia sẻ (chuỗi ngày, câu hát, 绕口令, thử thách); trang chia sẻ chuỗi ngày |
 | Quản trị | Video (danh sách, chi tiết, dòng), báo cáo, dịch, góp ý |
 
@@ -277,9 +310,16 @@ Khi gộp tài khoản, mọi bảng có `user_id` đều được hợp nhất 
 - **Riêng tư:** ghi âm không lưu; có xóa toàn bộ dữ liệu; nhắc học tôn trọng múi giờ và có hủy đăng ký.
 - **Bảo mật:** khóa chỉ ở server, RLS theo người dùng, chống lạm dụng theo IP và theo tài khoản, lọc từ tục biệt danh.
 - **Chi phí:** hạn mức AI, cache toàn cục, giọng đọc lưu dùng chung.
+- **Đo lường (bắt buộc vì ít số liệu):** gắn sự kiện cho các bước kích hoạt (vào app → chọn bài → hoạt động học đầu tiên → màn thưởng → đăng nhập), vòng lặp hằng ngày, từng bước của chặng và nhiệm vụ; bảng chỉ số tổng hợp tối thiểu (AD-03 nâng lên ưu tiên). Với ít người dùng, bổ sung **kiểm thử khả dụng nhỏ (5-8 người học thật)** trên bản thiết kế trước khi code.
+- **Đa ngôn ngữ:** chưa có tiếng Anh nhưng thiết kế phải sẵn sàng: không đưa chữ vào hình, cho phép chuỗi dài hơn 30-40%, tách nội dung do AI sinh theo ngôn ngữ giải thích (đã có `explainLang` ở cache).
+- **Bố cục đáp ứng:** ba bố cục riêng (mobile ≤ 600, tablet 600-1024, desktop ≥ 1024) cho các màn có nhiều thông tin (nghe, video, lộ trình, ôn tập, thi đấu); desktop tận dụng nhiều cột và phím tắt.
 - **Trình duyệt:** Chrome, Safari (iOS), Edge, Firefox gần nhất; thiết bị tối thiểu 360 px chiều rộng.
 
-## 11. Hệ thống thiết kế hiện tại (làm điểm xuất phát, được phép thay)
+## 11. Hệ thống thiết kế: hiện tại và hướng mới
+
+**Hướng mới (đã chốt):** thương hiệu hiện đại, trẻ trung, phong cách game. Yêu cầu cho thiết kế: bảng màu sống động nhưng chữ Hán và nội dung học luôn dễ đọc (tương phản AA); hệ thống thành phần có "cá tính game" (thanh XP, huy hiệu, nút lớn bo tròn, minh họa/nhân vật) nhưng không làm rối màn học; sáng/tối; chuyển động có mục đích; tùy chọn giảm chuyển động. Cân nhắc linh vật/nhân vật đồng hành để dẫn dắt người mới và làm phần thưởng.
+
+### Hiện tại (điểm xuất phát, được phép thay hoàn toàn)
 
 - Nền tảng: Next.js + Tailwind v4, token ngữ nghĩa kiểu Material (`primary`, `surface-container-*`, `on-*`, `error`, `tertiary`), icon Material Symbols (danh sách icon cố định), sáng/tối.
 - Chữ: **Be Vietnam Pro** (giao diện), **Lora** (tiêu đề serif), **Noto Serif SC** (chữ Hán, tải theo mảnh).
@@ -288,7 +328,7 @@ Khi gộp tài khoản, mọi bảng có `user_id` đều được hợp nhất 
 
 ## 12. Vấn đề trải nghiệm đã biết (giả thuyết, cần xác nhận bằng quan sát người dùng)
 
-Các điểm dưới đây rút ra từ cấu trúc sản phẩm và phản hồi trong quá trình phát triển, **chưa có dữ liệu đo chính thức**:
+Các điểm dưới đây rút ra từ cấu trúc sản phẩm và phản hồi trong quá trình phát triển, **chưa có dữ liệu đo chính thức** (hiện rất ít người dùng, nên cần kiểm thử khả dụng nhỏ để xác nhận):
 1. **Quá nhiều cửa vào** (bài hát, video, lộ trình, ôn tập, thi đấu, công cụ phát âm) nhưng thiếu một câu trả lời "bắt đầu từ đâu"; trang chủ dày đặc.
 2. **Hai mô hình học song song** (học theo nội dung và học theo lộ trình) chưa được kể thành một câu chuyện; người dùng có thể không biết lộ trình dùng chung thẻ với phần Ôn tập.
 3. **Phát âm nằm ở khu công khai** (đăng nhập hay không đều dùng được nhưng tiến độ lưu cục bộ), tách khỏi chuỗi ngày chính.
@@ -317,11 +357,11 @@ Các điểm dưới đây rút ra từ cấu trúc sản phẩm và phản hồ
 
 **Rủi ro:** (1) Bản quyền lời bài hát và nội dung video: giữ `noindex`, chỉ hiển thị cho người học, gỡ theo yêu cầu. (2) Chất lượng nội dung AI sinh (nghĩa Việt, hội thoại, bản dịch): bắt buộc người duyệt và đường báo sai. (3) Hạn mức/chi phí AI. (4) Phụ thuộc YouTube (nhúng, phụ đề không chính thức). (5) Độ chính xác chấm phát âm trên giọng thật chưa kiểm chứng. (6) Thiết kế lại làm gián đoạn người dùng hiện tại: giữ nguyên đường dẫn quen thuộc hoặc có chuyển hướng.
 
-**Câu hỏi mở cho đợt thiết kế lại:**
-1. Ưu tiên của đợt này: **kéo người mới** hay **giữ người đang dùng**? (ảnh hưởng nhịp độ nhập môn và trang chủ)
-2. Giữ tên **SongHanzi** và nhận diện "thi ca/thư pháp", hay làm lại thương hiệu?
-3. Điểm vào mặc định của người dùng mới là **lộ trình** hay **bài hát/video**?
-4. Có cần phiên bản máy tính bảng/desktop riêng (bố cục nhiều cột) hay chỉ tối ưu mobile?
-5. Có số liệu sử dụng thực tế (màn nào dùng nhiều, bỏ ở đâu) để thiết kế dựa vào, hay cần phỏng vấn/kiểm thử người dùng trước?
-6. Mức độ gamification mong muốn (XP, huy hiệu, cấp độ, bảng xếp hạng): nhẹ hay mạnh?
-7. Có thêm ngôn ngữ giao diện (tiếng Anh) trong lần thiết kế lại này không?
+**Câu hỏi mở còn lại cho đợt thiết kế lại:**
+1. **Tên sản phẩm:** giữ "SongHanzi" (gắn với bài hát/chữ Hán) hay đổi tên theo nhận diện game mới? Nếu đổi, cần tên miền, SEO và tài khoản liên kết (Google OAuth, kho PWA).
+2. **Linh vật/nhân vật đồng hành:** có làm không (ảnh hưởng mạnh tới nhận diện và game hóa)? Ai thiết kế minh họa?
+3. **Kinh tế game:** chỉ XP/huy hiệu (không tiền ảo) hay có tiền tệ ảo và vật phẩm? (đề xuất: bắt đầu không có tiền ảo.)
+4. **Giải đấu tuần:** làm ngay hay chờ đủ người dùng? (hiện rất ít người, giải đấu theo nhóm có thể trống.)
+5. **Ngân sách và công cụ thiết kế:** thiết kế bằng công cụ nào (Stitch, Figma, thuê ngoài) và dựng giao diện mới theo từng đợt hay một lần?
+6. **Đường dẫn cũ:** giữ hay chuyển hướng khi đổi cấu trúc điều hướng (ảnh hưởng người đang dùng)?
+7. **Kiểm thử người dùng:** ai là 5-8 người học thật để thử trước khi code?
