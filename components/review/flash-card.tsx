@@ -17,10 +17,10 @@ interface FlashCardProps {
 export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: FlashCardProps) {
   const kind = card.kind === "grammar" ? "Ngữ pháp" : "Từ vựng";
   return (
-    <div className="w-full max-w-[720px] overflow-hidden rounded-xl bg-surface-container-lowest shadow-[0_8px_30px_rgb(32,27,21,0.06)]">
-      <div className="flex items-center justify-between gap-3 bg-surface-container-low/50 px-6 py-4">
+    <div className="w-full max-w-[720px] card-ink overflow-hidden">
+      <div className="flex items-center justify-between gap-3 border-b-2 border-ink/20 bg-surface-container-low px-6 py-4">
         <div className="flex flex-wrap items-center gap-2 text-label-sm">
-          <span className="rounded-full bg-surface-container px-3 py-1 text-on-surface-variant">{kind}</span>
+          <span className="rounded-full border-2 border-ink/30 bg-surface-container px-3 py-1 text-on-surface-variant">{kind}</span>
           <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-on-surface-variant">{levelLabel(card.hsk_level)}</span>
         </div>
         <button
