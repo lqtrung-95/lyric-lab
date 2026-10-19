@@ -225,6 +225,9 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 1. Chạy `supabase/migrations/20261019000001_courses_and_term_sentences.sql` trong Supabase SQL Editor (chạy lại được; thay hàm gộp tài khoản bằng bản đầy đủ và khôi phục việc mang theo `daily_goal`).
 2. Dựng chỉ mục câu: `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/build-term-sentences.mts` (dry-run, in số từ có câu theo cấp) rồi thêm `--apply` để ghi. Script xóa và nạp lại toàn bộ bảng `term_sentences` (vài giây, ~20 nghìn dòng); CHẠY LẠI sau mỗi đợt nạp video mới hoặc khi video bị ẩn/sửa lời. Chưa chạy migration thì ứng dụng vẫn hoạt động bình thường (phần lộ trình đọc/ghi tiến độ bỏ qua lỗi).
 
+## Lộ trình HSK: sinh chặng
+`scripts/generate-hsk-course.mts --level 1` (dry-run, in toàn bộ chặng để duyệt) rồi thêm `--apply` để ghi khóa `hsk-1` và các chặng (`status listed` mặc định, `--status draft` để ẩn). Chủ đề và thứ tự học soạn tay ở `lib/courses/hsk1-themes.ts`: sửa file rồi chạy lại, chặng được ghi theo (khóa, số thứ tự) nên mã chặng ổn định và tiến độ người học không mất; chặng thừa ở cuối bị xóa. Cẩn thận: đổi thứ tự/chia lại chủ đề làm nội dung của một số thứ tự chặng đổi theo, người đã học dở sẽ thấy tiến độ nằm ở chặng khác.
+
 ## Sao lưu cơ sở dữ liệu (GitHub Action hằng tuần)
 
 `.github/workflows/db-backup.yml` chạy 02:00 sáng thứ Hai (giờ Việt Nam), hoặc bấm tay ở tab Actions → "Sao lưu cơ sở dữ liệu" → Run workflow: `pg_dump` (client 17) → kiểm tra file đọc lại được (`pg_restore --list`) → mã hóa gpg AES256 → đẩy vào **một kho riêng tư khác**, giữ 12 bản gần nhất (mỗi loại). Hai file mỗi lần: `public-YYYY-MM-DD.dump.gpg` (cấu trúc và dữ liệu schema `public`) và `auth-YYYY-MM-DD.dump.gpg` (chỉ dữ liệu tài khoản người dùng; bước này lỗi thì chỉ cảnh báo, bản public vẫn lưu).
