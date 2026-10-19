@@ -11,6 +11,8 @@ export interface ChatRequest {
   audio?: { mimeType: string; data: string };
   /** Một đoạn của video YouTube công khai để Gemini tự lấy về nghe/xem (hiện chỉ Gemini; máy chủ ta không tải gì). `startSec`/`endSec` tính từ đầu video. */
   video?: { url: string; startSec: number; endSec: number };
+  /** Số khóa còn sống tối đa thử trong một lần gọi (hiện chỉ Gemini; mặc định 5). Tác vụ cần thành công cho cả chuỗi yêu cầu (nghe video nhiều đoạn) nên nâng lên vì 429 trả về trong dưới 1 giây. */
+  maxAttempts?: number;
 }
 export type ChatFn = (req: ChatRequest) => Promise<string>;
 

@@ -157,6 +157,13 @@ describe("createGeminiChat", () => {
     expect(calls).toHaveLength(5);
   });
 
+  it("yêu cầu có maxAttempts thì thử nhiều khóa hơn mặc định", async () => {
+    const { fetchFn, calls } = fakeFetch([() => status(429)]);
+    const keys = Array.from({ length: 46 }, (_, i) => `AIzaSy${String(i).padStart(2, "0")}${"X".repeat(33)}`);
+    await expect(createGeminiChat(keys, { random: () => 0, fetchFn })({ ...req, maxAttempts: 15 })).rejects.toThrow("đã thử 15 khóa");
+    expect(calls).toHaveLength(15);
+  });
+
   it("46 khóa: các lần gọi liên tiếp dùng 46 khóa khác nhau, rồi quay lại khóa đầu", async () => {
     const { fetchFn, calls } = fakeFetch([() => ok("{}")]);
     const keys = Array.from({ length: 46 }, (_, i) => `AIzaSy${String(i).padStart(2, "0")}${"X".repeat(33)}`);

@@ -68,7 +68,7 @@ export function createGeminiChat(keys: string[], options: GeminiChatOptions = {}
     const start = cursor++ % keys.length;
     let lastError = "Gemini: không có khóa nào dùng được";
     let attempts = 0;
-    for (let i = 0; i < keys.length && attempts < MAX_ATTEMPTS && now() - startedAt <= ATTEMPT_WINDOW_MS; i++) {
+    for (let i = 0; i < keys.length && attempts < (req.maxAttempts ?? MAX_ATTEMPTS) && now() - startedAt <= ATTEMPT_WINDOW_MS; i++) {
       const key = keys[(start + i) % keys.length];
       const slot = `${req.model}|${key}`;
       if ((cooldownUntil.get(slot) ?? 0) > now() || (rejectedUntil.get(key) ?? 0) > now()) continue;

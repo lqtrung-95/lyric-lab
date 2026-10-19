@@ -13,6 +13,8 @@ export const ASR_BATCH_MODELS = ASR_MODELS;
 /** Một lần gọi nghe 2 phút (+12 giây dư) đo 15-25 giây; hạn chót này vẫn chừa chỗ để route kịp trả lỗi trong 60 giây. */
 export const ASR_CALL_TIMEOUT_MS = 50_000;
 const MAX_OUTPUT_TOKENS = 8192;
+/** Video nhiều đoạn phải đủ MỌI đoạn nên thử nhiều khóa hơn mặc định (5): đo 2026-10-19 trên video 28 phút, 3/14 đoạn vẫn 429 sau 5 khóa vì hạn mức theo phút của từng dự án. Lần 429 trả về trong dưới 1 giây nên thử nhiều khóa gần như không tốn thời gian. */
+const ASR_MAX_KEY_ATTEMPTS = 15;
 /** Mốc giờ lệch khỏi cửa sổ được nghe quá mức này là mô hình tưởng tượng, loại dòng đó. */
 const WINDOW_SLACK_SECONDS = 3;
 
@@ -31,7 +33,7 @@ export async function transcribeChunkWithGemini(chat: ChatFn, videoId: string, c
   for (const model of models) {
     try {
       const raw = await chat({
-        model, system: SYSTEM, maxTokens: MAX_OUTPUT_TOKENS, timeoutMs: ASR_CALL_TIMEOUT_MS,
+        model, system: SYSTEM, maxTokens: MAX_OUTPUT_TOKENS, timeoutMs: ASR_CALL_TIMEOUT_MS, maxAttempts: ASR_MAX_KEY_ATTEMPTS,
         user: `Transcribe the speech in this clip. The clip covers ${formatClock(chunk.windowStart)} to ${formatClock(chunk.windowEnd)} of the video.`,
         video: { url: `https://www.youtube.com/watch?v=${videoId}`, startSec: chunk.windowStart, endSec: chunk.windowEnd },
       });
