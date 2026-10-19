@@ -1,6 +1,8 @@
 # Design Brief — SongHanzi
 
 Cập nhật: 2026-09-24 · Tác giả: Le Trung
+> **Bản hiện hành: [`design-brief-v2.md`](design-brief-v2.md) (2026-10-19).** Tài liệu này là brief v1 (lịch sử); mục 6 (dữ liệu mẫu hư cấu) vẫn dùng chung.
+
 Bản gốc (Claude Docs): https://claude.ai/code/artifact/44714360-9f15-4784-84be-26d45b1aba34
 
 Tài liệu này dành cho designer (người hoặc AI) thiết kế giao diện SongHanzi từ đầu. Mọi thông tin cần thiết đều nằm trong tài liệu, không cần tham khảo sản phẩm nào khác.
