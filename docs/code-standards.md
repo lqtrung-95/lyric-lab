@@ -112,6 +112,9 @@ Dữ liệu chỉ có giá trị với một thiết bị (chuỗi ngày luyện
 ## Focus trong dialog/sheet
 Mọi lời gọi `focus()` khi mở hoặc trả focus lúc đóng popup/sheet phải có `{ preventScroll: true }`, nếu không trình duyệt cuộn trang tới phần tử được focus.
 
+## Migration thay hàm gộp tài khoản
+Mỗi migration `create or replace function public.merge_user_data` phải sao ĐẦY ĐỦ bản mới nhất rồi thêm phần của mình, và đối chiếu từng cột/bảng với bản trước (đã từng rơi `daily_goal` khi chép thiếu). Thêm bảng theo người dùng nào thì thêm cả đoạn hợp nhất và đoạn xóa dữ liệu nguồn.
+
 ## Vẽ canvas với font chữ Hán
 - Font chữ Hán của trang (Noto Serif SC qua Google Fonts) chia thành nhiều mảnh theo unicode-range và theo độ đậm; trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở đúng độ đậm. `document.fonts.ready` KHÔNG đợi các mảnh này nên vẽ canvas ngay sẽ có chữ rơi về font hệ thống, nét đậm nhạt khác nhau trong cùng một câu. Trước khi `fillText` chữ Hán, gọi `await document.fonts.load(font, đoạnChữSắpVẽ)` (xem `lib/share/line-card.ts`).
 

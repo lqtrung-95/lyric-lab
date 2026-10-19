@@ -1,6 +1,6 @@
 # Lộ trình học, bài học theo tình huống và trò chơi mới
 
-Trạng thái: CHỜ DUYỆT, chưa code. Ngày: 2026-10-19. Dữ liệu nền: [research/findings.md](research/findings.md). Tiện ích trình duyệt chuyển sang BACKLOG.
+Trạng thái: ĐÃ DUYỆT 2026-10-19, đang làm giai đoạn 1. Dữ liệu nền: [research/findings.md](research/findings.md). Tiện ích trình duyệt chuyển sang BACKLOG.
 
 ## Mục tiêu
 Từ "thư viện nội dung và công cụ" thành "có đường đi rõ": người học luôn biết hôm nay học gì tiếp, và học bằng nội dung thật (video, bài hát) chứ không chỉ câu ví dụ do máy viết.
@@ -33,9 +33,6 @@ Thứ tự đề xuất: 1 → 2 (HSK 1) → phát hành → 4 (vài trò) → 6
 - Quá nhiều thứ cùng lúc làm app rối: mọi thứ vào qua một cửa "Học" (phase 6), không thêm mục menu mới cho mỗi loại.
 - Bản quyền nội dung video: giữ nguyên chính sách hiện có (nguồn đã duyệt, gỡ theo yêu cầu).
 
-## Câu hỏi mở (cần người dùng)
-1. Phạm vi làm đầu tiên: **HSK 1 kỹ** (đề xuất) hay khung cả 6 cấp ngay?
-2. Ai duyệt nội dung hội thoại tình huống (người bản ngữ/giáo viên hay bạn tự duyệt)?
-3. Danh sách tình huống ưu tiên (đề xuất 10 đầu: chào hỏi, giới thiệu bản thân, gọi món, mua sắm/trả giá, hỏi đường, đi taxi/xe, khách sạn, bệnh viện, điện thoại/WeChat, đi làm/văn phòng)?
-4. Có muốn có "bài kiểm tra xếp lớp" để đưa người mới vào đúng chặng?
-5. Kiểu thưởng: chỉ tiến độ/chuỗi ngày hiện có, hay thêm huy hiệu/XP?
+## Quyết định đã chốt (người dùng trả lời 2026-10-19)
+1. Làm HSK 1 kỹ trước rồi nhân ra các cấp. 2. Người dùng tự duyệt nội dung tình huống. 3. 10 tình huống theo đề xuất (chào hỏi, giới thiệu bản thân, gọi món, mua sắm/trả giá, hỏi đường, taxi/xe, khách sạn, bệnh viện, điện thoại/WeChat, đi làm/văn phòng).
+4. CÓ bài kiểm tra xếp lớp (giai đoạn 6). 5. CÓ huy hiệu và XP (thêm vào giai đoạn 6: `user_xp_events` hoặc suy ra từ tiến độ, bộ huy hiệu cố định; quy tắc XP chốt khi làm, XP chỉ cộng cho hoạt động thật, chống lặp một bài nhiều lần).
