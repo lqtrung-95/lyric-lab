@@ -171,6 +171,7 @@
   --shelf-tertiary: #00415f;
   --shelf-neutral: #b9a58f;
   --shadow-ink: rgba(74, 46, 27, 0.25);
+  --ink-soft: rgba(74, 46, 27, 0.55);
   color-scheme: light;
 }
 
@@ -228,6 +229,7 @@
   --shelf-tertiary: #00324d;
   --shelf-neutral: #17130c;
   --shadow-ink: rgba(0, 0, 0, 0.4);
+  --ink-soft: #564337;
   color-scheme: dark;
 }
 
@@ -404,47 +406,84 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
 }
 
 
-/* Thành phần "game": nút 3D dày và thẻ viền mực (thiết kế Cozy Fantasy). Màu chữ trên nút luôn đạt AA (xem chú thích bảng màu).
-   Dùng: <button class="btn-3d btn-3d-primary">…</button>. Nhấn xuống 4px khi :active; người bật giảm chuyển động không có hiệu ứng dịch chuyển. */
-.btn-3d {
-  --btn-bg: var(--primary);
-  --btn-fg: var(--on-primary);
-  --btn-shelf: var(--shelf-primary);
-  display: inline-flex;
-  min-height: 2.75rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 2.5px solid var(--ink);
-  border-radius: 0.75rem;
-  background: var(--btn-bg);
-  color: var(--btn-fg);
-  padding: 0.5rem 1.25rem;
-  font-weight: 800;
-  line-height: 1.25;
-  box-shadow: 0 4px 0 var(--btn-shelf);
-  transition: transform 80ms ease-out, box-shadow 80ms ease-out, filter 120ms;
-  cursor: pointer;
-}
-.btn-3d:hover:not(:disabled) { filter: brightness(1.06); }
-.btn-3d:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--btn-shelf); }
-.btn-3d:disabled { cursor: not-allowed; opacity: 0.55; box-shadow: 0 2px 0 var(--btn-shelf); }
-.btn-3d-primary { --btn-bg: var(--primary); --btn-fg: var(--on-primary); --btn-shelf: var(--shelf-primary); }
-.btn-3d-secondary { --btn-bg: var(--secondary); --btn-fg: var(--on-secondary); --btn-shelf: var(--shelf-secondary); }
-.btn-3d-tertiary { --btn-bg: var(--tertiary); --btn-fg: var(--on-tertiary); --btn-shelf: var(--shelf-tertiary); }
-.btn-3d-neutral { --btn-bg: var(--surface-container-lowest); --btn-fg: var(--on-surface); --btn-shelf: var(--shelf-neutral); }
-/* Nền cam sáng nổi bật (tô sáng, thưởng): chữ nâu đậm thay vì trắng để đạt AA. */
-.btn-3d-bright { --btn-bg: var(--primary-container); --btn-fg: var(--on-primary-container); --btn-shelf: var(--shelf-primary); }
+@layer components {
+  /* Thành phần "game": nút 3D dày và thẻ viền mực (thiết kế Cozy Fantasy). Màu chữ trên nút luôn đạt AA (xem chú thích bảng màu).
+     Dùng: <button class="btn-3d btn-3d-primary">…</button>. Nhấn xuống 4px khi :active; người bật giảm chuyển động không có hiệu ứng dịch chuyển. */
+  .btn-3d {
+    --btn-bg: var(--primary);
+    --btn-fg: var(--on-primary);
+    --btn-shelf: var(--shelf-primary);
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 2.5px solid var(--ink);
+    border-radius: 0.75rem;
+    background: var(--btn-bg);
+    color: var(--btn-fg);
+    padding: 0.5rem 1.25rem;
+    font-weight: 800;
+    line-height: 1.25;
+    box-shadow: 0 4px 0 var(--btn-shelf);
+    transition: transform 80ms ease-out, box-shadow 80ms ease-out, filter 120ms;
+    cursor: pointer;
+  }
+  .btn-3d:hover:not(:disabled) { filter: brightness(1.06); }
+  .btn-3d:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--btn-shelf); }
+  .btn-3d:disabled { cursor: not-allowed; opacity: 0.55; box-shadow: 0 2px 0 var(--btn-shelf); }
+  .btn-3d-primary { --btn-bg: var(--primary); --btn-fg: var(--on-primary); --btn-shelf: var(--shelf-primary); }
+  .btn-3d-secondary { --btn-bg: var(--secondary); --btn-fg: var(--on-secondary); --btn-shelf: var(--shelf-secondary); }
+  .btn-3d-tertiary { --btn-bg: var(--tertiary); --btn-fg: var(--on-tertiary); --btn-shelf: var(--shelf-tertiary); }
+  .btn-3d-neutral { --btn-bg: var(--surface-container-lowest); --btn-fg: var(--on-surface); --btn-shelf: var(--shelf-neutral); }
+  /* Nền cam sáng nổi bật (tô sáng, thưởng): chữ nâu đậm thay vì trắng để đạt AA. */
+  .btn-3d-bright { --btn-bg: var(--primary-container); --btn-fg: var(--on-primary-container); --btn-shelf: var(--shelf-primary); }
 
-.card-ink {
-  border: 2.5px solid var(--ink);
-  border-radius: 1rem;
-  background: var(--surface-container-lowest);
-  color: var(--on-surface);
-  box-shadow: 0 4px 0 var(--shadow-ink);
+  .card-ink {
+    border: 2.5px solid var(--ink);
+    border-radius: 1rem;
+    background: var(--surface-container-lowest);
+    color: var(--on-surface);
+    box-shadow: 0 4px 0 var(--shadow-ink);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .btn-3d { transition: none; }
   .btn-3d:active:not(:disabled) { transform: none; }
+}
+
+/* ===== "Thay da" game cho các kiểu nút và thẻ ĐÃ CÓ (không phải sửa từng thành phần) =====
+   Cố ý đặt NGOÀI @layer để thắng các lớp tiện ích Tailwind (viền, đổ bóng) của từng chỗ dùng. Chỉ nhắm vào đúng mẫu lớp phổ biến:
+   - nút đặc chính (button/a có bg-primary + text-on-primary): viền mực, đáy nổi, nhấn xuống 4px;
+   - nút viền phụ (button/a bo tròn có viền outline-variant và cao ≥ 44px): viền đậm hơn + đáy nhẹ;
+   - thẻ (khối bo 2xl/xl có viền outline-variant): viền mực mềm + đáy nhẹ.
+   Gỡ bằng cách xóa khối này. Không đổi bố cục, chỉ đổi viền/đổ bóng/hiệu ứng nhấn. */
+:is(button, a).bg-primary.text-on-primary {
+  border: 2.5px solid var(--ink);
+  box-shadow: 0 4px 0 var(--shelf-primary);
+  font-weight: 800;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out, filter 120ms;
+}
+:is(button, a).bg-primary.text-on-primary:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--shelf-primary); }
+:is(button, a).bg-primary.text-on-primary:disabled { box-shadow: 0 2px 0 var(--shelf-primary); }
+
+:is(button, a).rounded-full.border.border-outline-variant:is([class*="min-h-11"], [class*="min-h-12"], [class*="min-h-14"]) {
+  border-width: 2px;
+  border-color: var(--ink-soft);
+  box-shadow: 0 3px 0 var(--shadow-ink);
+  font-weight: 700;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out, background-color 120ms;
+}
+:is(button, a).rounded-full.border.border-outline-variant:is([class*="min-h-11"], [class*="min-h-12"], [class*="min-h-14"]):active:not(:disabled) { transform: translateY(3px); box-shadow: 0 0 0 var(--shadow-ink); }
+
+:is(div, section, article, li, aside).border.border-outline-variant:is(.rounded-2xl, .rounded-xl):not([class*="border-dashed"]) {
+  border-width: 2px;
+  border-color: var(--ink-soft);
+  box-shadow: 0 3px 0 var(--shadow-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(button, a).bg-primary.text-on-primary, :is(button, a).rounded-full.border.border-outline-variant { transition: none; }
+  :is(button, a).bg-primary.text-on-primary:active:not(:disabled), :is(button, a).rounded-full.border.border-outline-variant:active:not(:disabled) { transform: none; }
 }

@@ -38,9 +38,9 @@ export function NextActionPanel() {
   const action = chooseNextAction({ due: summary?.total ?? 0, continueSong: continueSong ?? null });
 
   return (
-    <section aria-labelledby="today-heading" aria-busy={!ready} className="flex flex-col justify-between rounded-3xl bg-surface-container-lowest p-space-lg shadow-[0_1px_10px_rgba(30,26,22,0.06)]">
+    <section aria-labelledby="today-heading" aria-busy={!ready} className="card-ink flex flex-col justify-between p-space-lg">
       <div className="min-h-[12.5rem]">
-        <h2 id="today-heading" className="text-label-md font-semibold uppercase tracking-widest text-secondary">Hôm nay</h2>
+        <h2 id="today-heading" className="inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-sm font-extrabold uppercase tracking-widest text-on-primary-container">Việc tiếp theo</h2>
         {!ready && <ActionSkeleton />}
         {ready && action.kind === "review" && (
           <>

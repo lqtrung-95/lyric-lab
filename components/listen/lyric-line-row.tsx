@@ -59,7 +59,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
       aria-current={active ? "true" : undefined}
       onClick={() => onSeek(line.index)}
       className={`group/line relative flex cursor-pointer items-start gap-2 rounded-xl p-2.5 transition-colors md:gap-3 md:p-3.5 ${lazyRender ? "[content-visibility:auto] [contain-intrinsic-size:auto_110px]" : ""} ${
-        active ? "bg-surface-container p-3 shadow-md md:p-5" : state === "past" ? "opacity-60 hover:bg-surface-container-low/50" : "hover:bg-surface-container-low/50"
+        active ? "card-ink bg-surface-container-lowest p-3 md:p-5" : state === "past" ? "opacity-60 hover:bg-surface-container-low/50" : "hover:bg-surface-container-low/50"
       }`}
     >
       {active && <div aria-hidden="true" className="absolute -left-1 bottom-4 top-4 w-2 rounded-full bg-primary" />}
@@ -102,7 +102,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 onClick={(e) => { e.stopPropagation(); onWord({ lineIndex: line.index, term: g.text, itemId: g.vocabId }); }}
                 className={
                   g.vocabId
-                    ? "mx-0 inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary/15 px-1 py-0.5 font-bold text-primary ring-2 ring-primary/20 md:mx-0.5 md:px-2"
+                    ? "mx-0 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-primary-container px-1 py-0.5 font-bold text-on-primary-container ring-2 ring-[var(--ink-soft)] md:mx-0.5 md:px-2 [&_rt]:!text-on-primary-container"
                     : "cursor-pointer rounded px-0.5 hover:bg-primary/10 hover:text-primary"
                 }
               >

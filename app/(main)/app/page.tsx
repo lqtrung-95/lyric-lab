@@ -8,6 +8,9 @@ import { NewcomerSteps } from "@/components/home/newcomer-steps";
 import { TodayPlan } from "@/components/home/today-plan";
 import { ToolsHint } from "@/components/home/tools-hint";
 import { NextActionPanel } from "@/components/home/next-action-panel";
+import { HomePathCard } from "@/components/home/home-path-card";
+import { HomeQuests } from "@/components/home/home-quests";
+import { HomeVersusCard } from "@/components/home/home-versus-card";
 import { StreakCard } from "@/components/streak/streak-card";
 import { RecommendedSongs } from "@/components/home/recommended-songs";
 
@@ -19,20 +22,24 @@ export default function AppHomePage() {
   return (
     <>
       <AnnouncementBanner />
-      <div className="grid gap-space-md lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-        <section className="relative isolate overflow-hidden rounded-3xl bg-surface-container-low px-space-md py-space-xl md:px-space-xl">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_70%_at_95%_0%,color-mix(in_srgb,var(--primary-container)_18%,transparent),transparent)]" />
-          <span aria-hidden="true" lang="zh" className="pointer-events-none absolute -bottom-12 -right-2 -z-10 font-serif text-[15rem] leading-none text-primary/[0.05]">歌</span>
-          <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Hôm nay bạn muốn học bài hát nào?</h1>
-          <p className="mt-space-sm max-w-xl text-body-lg text-on-surface-variant">
-            Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.
-          </p>
-          <div className="mt-space-lg">
-            <PasteLinkForm />
-            <ToolsHint />
-          </div>
-        </section>
-        <NextActionPanel />
+      <div className="grid gap-space-md lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="space-y-space-md">
+          <NextActionPanel />
+          <section aria-labelledby="paste-heading" className="card-ink relative isolate overflow-hidden px-space-md py-space-lg md:px-space-lg">
+            <span aria-hidden="true" lang="zh" className="pointer-events-none absolute -bottom-10 -right-2 -z-10 text-[12rem] font-black leading-none text-primary/[0.06]">歌</span>
+            <h1 id="paste-heading" className="text-headline-lg-mobile md:text-headline-lg">Học từ bất kỳ bài hát nào</h1>
+            <p className="mt-space-sm max-w-xl text-body-lg text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
+            <div className="mt-space-md">
+              <PasteLinkForm />
+              <ToolsHint />
+            </div>
+          </section>
+        </div>
+        <div className="space-y-space-md">
+          <HomeQuests />
+          <HomePathCard />
+          <HomeVersusCard />
+        </div>
       </div>
       <TodayPlan />
       <StreakCard />

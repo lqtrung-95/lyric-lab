@@ -40,7 +40,7 @@ interface PlaybackBarProps {
   practiceDisabled?: boolean;
 }
 
-const tile = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-on-surface transition-colors hover:bg-surface-container-high disabled:opacity-50 lg:h-14 lg:w-14";
+const tile = "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-2 border-[var(--ink-soft)] bg-surface-container-lowest text-on-surface shadow-[0_3px_0_var(--shadow-ink)] transition hover:bg-surface-container-high active:translate-y-[3px] active:shadow-none disabled:opacity-50 lg:h-14 lg:w-14";
 const iconSize = "text-[20px] lg:text-[26px]";
 
 /**
@@ -69,10 +69,10 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
   const pinLabel = pinned ? "Bỏ ghim, tự cuộn theo câu đang hát" : "Ghim, không tự cuộn theo câu đang hát";
   const offsetLabel = `Canh lời lệch (đang lệch ${Number(offset.toFixed(2))} giây)`;
 
-  const pinButton = (<button type="button" data-tour="pin" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary/15 text-primary" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>);
+  const pinButton = (<button type="button" data-tour="pin" onClick={onToggleAutoScroll} aria-pressed={pinned} aria-label={pinLabel} className={`${tile} ${pinned ? "!bg-primary-container !text-on-primary-container" : ""}`}><Icon name="push_pin" size={null} className={iconSize} /></button>);
   const playButton = (
     <button type="button" disabled={!ready} onClick={onTogglePlay} aria-label={playing ? "Tạm dừng" : "Phát"}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-transform hover:bg-primary hover:text-on-primary active:scale-95 disabled:opacity-50 lg:h-14 lg:w-14">
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary transition-transform hover:brightness-110 disabled:opacity-50 lg:h-14 lg:w-14">
             <Icon name={playing ? "pause" : "play_arrow"} filled size={null} className="text-[22px] lg:text-[28px]" />
           </button>
   );
@@ -95,17 +95,17 @@ export function PlaybackBar({ controller, durationSec, playing, onTogglePlay, on
         <div role="group" aria-label="Điều khiển nhanh" className="flex items-center justify-between gap-1">
           {/* Khung `relative` bọc nút để bảng tốc độ mọc ngay phía trên nút. */}
           <div className="relative shrink-0">
-            <button type="button" data-tour="rate" onClick={() => setPanel((p) => (p === "rate" ? null : "rate"))} aria-expanded={panel === "rate"} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px] ${panel === "rate" || rate !== 1 ? "!bg-primary/15 text-primary" : ""}`}>{formatRate(rate)}</button>
+            <button type="button" data-tour="rate" onClick={() => setPanel((p) => (p === "rate" ? null : "rate"))} aria-expanded={panel === "rate"} aria-label={rateLabel} className={`${tile} text-label-sm font-semibold lg:text-[15px] ${panel === "rate" || rate !== 1 ? "!bg-primary-container !text-on-primary-container" : ""}`}>{formatRate(rate)}</button>
             {panel === "rate" && <PlaybackRatePopover rate={rate} onChange={onRate} className="absolute bottom-full left-0 z-40 mb-1" />}
           </div>
-          <button type="button" disabled={!ready} data-tour="loop" onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary/15 text-primary" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
+          <button type="button" disabled={!ready} data-tour="loop" onClick={onToggleLoop} aria-pressed={looping} aria-label="Lặp câu đang hát" className={`${tile} ${looping ? "!bg-primary-container !text-on-primary-container" : ""}`}><Icon name="repeat_one" size={null} className={iconSize} /></button>
           {!onReplayLine && pinButton}
           {playButton}
           {onReplayLine && <button type="button" disabled={!ready} onClick={onReplayLine} aria-label="Phát lại câu đang hát" className={tile}><Icon name="replay" size={null} className={iconSize} /></button>}
           {onReplayLine && pinButton}
           {onExplain && <button type="button" disabled={explainDisabled} data-tour="explain" onClick={onExplain} aria-label="Giải thích câu đang hát bằng AI" className={tile}><Icon name="auto_awesome" size={null} className={iconSize} /></button>}
           {onPractice && <button type="button" disabled={practiceDisabled} data-tour="practice" onClick={onPractice} aria-label="Luyện phát âm câu đang hát" className={tile}><Icon name="mic" size={null} className={iconSize} /></button>}
-          {onOffsetChange && <button type="button" data-tour="offset" onClick={() => setPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={panel === "sync"} aria-label={offsetLabel} className={`${tile} ${panel === "sync" || offset !== 0 ? "!bg-primary/15 text-primary" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>}
+          {onOffsetChange && <button type="button" data-tour="offset" onClick={() => setPanel((p) => (p === "sync" ? null : "sync"))} aria-expanded={panel === "sync"} aria-label={offsetLabel} className={`${tile} ${panel === "sync" || offset !== 0 ? "!bg-primary-container !text-on-primary-container" : ""}`}><Icon name="tune" size={null} className={iconSize} /></button>}
         </div>
       </div>
       {panel === "sync" && onOffsetChange && <LyricOffsetPopover offset={offset} onChange={onOffsetChange} className="absolute right-2 bottom-full z-40 mb-1" />}

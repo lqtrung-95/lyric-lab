@@ -31,6 +31,6 @@ test("có bài đang nghe dở thì chỉ bảng Hôm nay nhắc tiếp tục ng
 test("không có video và bài gợi ý nào thì không hiện mục gợi ý, không lỗi", async ({ page }) => {
   await mock(page, {});
   await page.goto("/app");
-  await expect(page.getByRole("heading", { name: "Hôm nay bạn muốn học bài hát nào?" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Học từ bất kỳ bài hát nào" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Gợi ý học hôm nay" })).toHaveCount(0);
 });
