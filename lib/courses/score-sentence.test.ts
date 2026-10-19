@@ -16,6 +16,11 @@ describe("scoreSentence", () => {
     expect(scoreSentence(cand("我喜欢苹果。", ["我", "喜", "欢", "苹", "果"]), ctx("苹果"))).toBeNull();
     expect(scoreSentence(cand("他妈的我很好", ["他妈的", "我", "很", "好"]), ctx("好"))).toBeNull();
   });
+  it("loại câu lẫn chữ Latin và câu chỉ là một cụm lặp lại", () => {
+    expect(scoreSentence(cand("textbooks早上我还会吃鸡蛋", ["textbooks", "早上", "我", "还会", "吃", "鸡蛋"]), ctx("吃"))).toBeNull();
+    expect(scoreSentence(cand("我是老师我是老师", ["我", "是", "老师", "我", "是", "老师"]), ctx("老师"))).toBeNull();
+    expect(scoreSentence(cand("我是老师，你呢？", ["我", "是", "老师", "，", "你", "呢", "？"]), ctx("老师"))).not.toBeNull();
+  });
   it("từ khó hơn cấp đích làm giảm điểm; từ ngoài danh sách bị phạt nhẹ hơn", () => {
     const easy = scoreSentence(cand("我很喜欢学习。", ["我", "很", "喜欢", "学习", "。"]), ctx("学习"))!;
     const hard = scoreSentence(cand("全球化经济学习好", ["全球化", "经济", "学习", "好"]), ctx("学习"))!;

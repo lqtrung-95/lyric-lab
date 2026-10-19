@@ -16,6 +16,9 @@ export interface ScoreContext {
 
 const HAN_GLOBAL = /\p{Script=Han}/gu;
 const HAS_HAN = /\p{Script=Han}/u;
+const LATIN = /[A-Za-z]/;
+/** Câu chỉ là một cụm lặp lại ("我是老师我是老师"): sau khi bỏ dấu câu và khoảng trắng, toàn bộ là một đoạn lặp từ 2 lần trở lên. */
+const REPEATED = /^(.{2,}?)\1+$/u;
 export const MIN_SENTENCE_CHARS = 4;
 export const MAX_SENTENCE_CHARS = 16;
 const IDEAL_CHARS = 8;
@@ -33,6 +36,9 @@ export function scoreSentence(c: SentenceCandidate, ctx: ScoreContext): number |
   if (length < MIN_SENTENCE_CHARS || length > MAX_SENTENCE_CHARS) return null;
   if (!c.tokens.some((t) => t.text === ctx.term)) return null;
   if (BLOCKED.some((w) => c.text.includes(w))) return null;
+  // Chữ Latin lẫn trong câu (tên thương hiệu, chữ viết tắt, chú thích trên màn hình) làm câu khó dùng làm ví dụ học.
+  if (LATIN.test(c.text)) return null;
+  if (REPEATED.test(c.text.replace(/[\s\p{P}]/gu, ""))) return null;
 
   const others = c.tokens.filter((t) => t.text !== ctx.term && HAS_HAN.test(t.text));
   // Từ ngoài danh sách HSK (tên riêng, từ hiếm) bị phạt nửa mức so với từ chắc chắn khó.
