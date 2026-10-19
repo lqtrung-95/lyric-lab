@@ -36,15 +36,12 @@ describe("transcribeChunkWithGemini", () => {
     await expect(transcribeChunkWithGemini(async () => { throw new Error("Gemini 503"); }, "bR01vpXyItA", chunk, 600)).rejects.toThrow("Gemini 503");
     expect(await transcribeChunkWithGemini(async () => "[]", "bR01vpXyItA", chunk, 600)).toEqual([]);
   });
-  it("danh sách cho script nạp có 3.5 Flash Lite ở cuối; nút trên web không có; model dự phòng cuối được dùng khi các model trước lỗi", async () => {
-    expect(ASR_BATCH_MODELS.at(-1)).toBe("gemini:gemini-3.5-flash-lite");
-    expect(ASR_MODELS).not.toContain("gemini:gemini-3.5-flash-lite");
+  it("3.5 Flash Lite là model dự phòng cuối (dùng chung cho web và script nạp); được dùng khi các model trước lỗi", async () => {
+    expect(ASR_MODELS.at(-1)).toBe("gemini:gemini-3.5-flash-lite");
+    expect(ASR_BATCH_MODELS).toEqual(ASR_MODELS);
     const tried: string[] = [];
     const chat = async (req: ChatRequest) => { tried.push(req.model); if (!req.model.includes("flash-lite")) throw new Error("Gemini 429"); return reply([["04:14", "04:18", "备用"]]); };
-    expect(await transcribeChunkWithGemini(chat, "bR01vpXyItA", chunk, 600, ASR_BATCH_MODELS)).toEqual([{ text: "备用", start: 254, end: 258 }]);
-    expect(tried).toEqual(ASR_BATCH_MODELS);
-    tried.length = 0;
-    await expect(transcribeChunkWithGemini(chat, "bR01vpXyItA", chunk, 600)).rejects.toThrow("429");
+    expect(await transcribeChunkWithGemini(chat, "bR01vpXyItA", chunk, 600)).toEqual([{ text: "备用", start: 254, end: 258 }]);
     expect(tried).toEqual(ASR_MODELS);
   });
 });

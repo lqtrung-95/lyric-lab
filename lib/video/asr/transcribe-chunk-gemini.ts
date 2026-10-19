@@ -5,12 +5,11 @@ import { parseAsrJson, timingLooksBroken } from "./asr-lines";
 
 // Nhờ Gemini nghe MỘT đoạn của video YouTube công khai (Google tự lấy video, máy chủ ta không tải gì) và chép lời nói tiếng Trung kèm mốc giờ.
 // Chỉ Gemini nghe được video; model đứng sau là dự phòng khi model đầu hết hạn mức/quá tải/trả mốc giờ hỏng. Dùng tên model cụ thể, không dùng bí danh `-latest`.
-export const ASR_MODELS = ["gemini:gemini-3-flash-preview", "gemini:gemini-2.5-flash"];
-/**
- * Danh sách cho SCRIPT nạp hàng loạt: thêm 3.5 Flash Lite ở cuối vì hạn mức ngày của nó (500 yêu cầu/khóa) lớn gấp 25 lần hai model trên (20/khóa).
- * Đo 2026-10-17: mốc giờ khớp nhưng câu dài hơn, có vài lỗi tên riêng, nên chỉ làm dự phòng; nút trên web vẫn dùng `ASR_MODELS` (người dùng cần chất lượng đều).
- */
-export const ASR_BATCH_MODELS = [...ASR_MODELS, "gemini:gemini-3.5-flash-lite"];
+export const ASR_MODELS = ["gemini:gemini-3-flash-preview", "gemini:gemini-2.5-flash", "gemini:gemini-3.5-flash-lite"];
+// 3.5 Flash Lite đứng cuối vì hạn mức ngày lớn gấp 25 lần hai model trên (500 so với 20 yêu cầu/khóa) nhưng chép kém hơn một bậc (đo 2026-10-17: câu dài hơn, vài lỗi tên riêng; mốc giờ khớp).
+// Cần có nó cả ở nút trên web: video 28 phút (14 đoạn, phải đủ cả 14) đo 2026-10-19 chỉ với hai model đầu thì 3/14 đoạn bị 429 nên cả video thất bại.
+/** Cùng chuỗi model cho script nạp hàng loạt. */
+export const ASR_BATCH_MODELS = ASR_MODELS;
 /** Một lần gọi nghe 2 phút (+12 giây dư) đo 15-25 giây; hạn chót này vẫn chừa chỗ để route kịp trả lỗi trong 60 giây. */
 export const ASR_CALL_TIMEOUT_MS = 50_000;
 const MAX_OUTPUT_TOKENS = 8192;
