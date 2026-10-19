@@ -5,7 +5,7 @@ import { unitContentSchema, type UnitProgress } from "@/lib/courses/course-types
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { listUnitProgress } from "@/lib/user-data/unit-progress-repo";
 
-export interface MapUnit { id: string; idx: number; title: string; summary: string; termCount: number; progress?: UnitProgress }
+export interface MapUnit { id: string; idx: number; title: string; summary: string; termCount: number; /** Tên chủ đề (nhóm chặng cùng chủ đề), null nếu không có. */ topic: string | null; progress?: UnitProgress }
 export type CourseMapState =
   | { status: "loading" }
   | { status: "error" }
@@ -29,7 +29,7 @@ export function useCourseMap(slug: string): CourseMapState {
         const byUnit = new Map(progress.map((p) => [p.unitId, p]));
         const mapped: MapUnit[] = (units.data ?? []).map((u) => {
           const content = unitContentSchema.safeParse(u.content);
-          return { id: u.id as string, idx: u.idx as number, title: u.title as string, summary: u.summary as string, termCount: content.success ? content.data.terms.length : 0, progress: byUnit.get(u.id as string) };
+          return { id: u.id as string, idx: u.idx as number, title: u.title as string, summary: u.summary as string, termCount: content.success ? content.data.terms.length : 0, topic: content.success ? content.data.topic ?? null : null, progress: byUnit.get(u.id as string) };
         });
         if (!cancelled) setState({ status: "ready", title: course.data.title as string, units: mapped });
       } catch {

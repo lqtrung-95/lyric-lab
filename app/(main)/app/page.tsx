@@ -22,7 +22,7 @@ export default function AppHomePage() {
   return (
     <>
       <AnnouncementBanner />
-      <div className="grid gap-space-md lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="space-y-space-md">
           <NextActionPanel />
           <section aria-labelledby="paste-heading" className="card-ink relative isolate overflow-hidden px-space-md py-space-lg md:px-space-lg">
