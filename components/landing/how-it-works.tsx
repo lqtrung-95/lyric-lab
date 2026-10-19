@@ -16,7 +16,7 @@ export function HowItWorks() {
       <h2 id="how-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Từ một bài hát yêu thích đến vốn từ của bạn</h2>
       <ol className="mt-space-lg grid gap-space-md sm:grid-cols-2 lg:grid-cols-4">
         {STEPS.map((s, i) => (
-          <li key={s.title} className="relative rounded-3xl bg-surface-container-lowest p-space-md shadow-[0_1px_10px_rgba(30,26,22,0.06)]">
+          <li key={s.title} className="relative card-ink p-space-md">
             <span aria-hidden="true" className="absolute right-5 top-4 font-serif text-[56px] font-semibold leading-none text-primary/10">{i + 1}</span>
             <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-container text-on-primary-container"><Icon name={s.icon} size={26} /></span>
             <h3 className="mt-space-md font-serif text-headline-md text-on-surface"><span className="sr-only">Bước {i + 1}: </span>{s.title}</h3>

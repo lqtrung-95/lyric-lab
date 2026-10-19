@@ -38,7 +38,8 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
     return route.fulfill({ status: 201, body: "" });
   });
   await page.goto("/hoc/hsk-1/1");
-  await expect(page.getByRole("heading", { level: 1, name: "Đại từ cơ bản" })).toBeVisible();
+  // Lần đầu vào trang chặng, dev server còn biên dịch tuyến này: chờ lâu hơn mặc định 5 giây.
+  await expect(page.getByRole("heading", { level: 1, name: "Đại từ cơ bản" })).toBeVisible({ timeout: 20_000 });
 
   // Bước 1: có đủ 17 từ với pinyin, nghĩa Việt và nút nghe.
   await expect(page.getByRole("button", { name: /^Nghe \p{Script=Han}/u })).toHaveCount(17);

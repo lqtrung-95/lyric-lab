@@ -68,7 +68,7 @@ export function LiveDemo() {
         </div>
 
         {card && (
-          <article aria-live="polite" className="rounded-3xl bg-surface-container-lowest p-space-md shadow-[0_1px_10px_rgba(30,26,22,0.08)]">
+          <article aria-live="polite" className="card-ink p-space-md">
             <div className="flex items-start justify-between">
               <div>
                 <h3 lang="zh" className="font-serif text-[52px] font-medium leading-none text-on-surface">{card.term}</h3>

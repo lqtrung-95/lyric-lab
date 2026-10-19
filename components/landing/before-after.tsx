@@ -5,12 +5,12 @@ export function BeforeAfter() {
       <p className="text-label-md font-semibold uppercase tracking-widest text-secondary">Một câu hát, hai cách nghe</p>
       <h2 id="ba-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Từ “nghe không hiểu” đến “hiểu từng chữ”</h2>
       <div className="mt-space-lg grid gap-space-md md:grid-cols-2">
-        <figure className="rounded-3xl bg-surface-container-low p-space-lg">
+        <figure className="card-ink p-space-lg">
           <figcaption className="text-label-md font-semibold uppercase tracking-widest text-on-surface-variant">Chỉ có lời gốc</figcaption>
           <p lang="zh" className="mt-space-md font-serif text-[30px] leading-snug text-on-surface">我从来没想过会离开</p>
           <p className="mt-space-md text-body-md text-on-surface-variant">Chữ nào là từ, chữ nào là ngữ pháp? Đọc thế nào? Nghĩa là gì? Bạn phải tự tra từng chữ.</p>
         </figure>
-        <figure className="rounded-3xl bg-surface-container-lowest p-space-lg shadow-[0_1px_10px_rgba(30,26,22,0.08)] ring-1 ring-primary/15">
+        <figure className="card-ink p-space-lg">
           <figcaption className="text-label-md font-semibold uppercase tracking-widest text-primary">Qua Song Hanzi</figcaption>
           <p className="mt-space-md text-pinyin-reading text-on-surface-variant">wǒ <span className="text-primary">cónglái méi</span> xiǎng <span className="text-primary">guò</span> huì <span className="text-primary">líkāi</span></p>
           <p lang="zh" className="font-serif text-[30px] leading-snug text-on-surface">

@@ -32,7 +32,7 @@ export default function ToolsIndexPage() {
       <ul className="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
         {TOOLS.map((t) => (
           <li key={t.href}>
-            <Link href={t.href} className="flex h-full min-h-28 flex-col gap-2 rounded-2xl bg-surface-container-low p-space-md transition-colors hover:bg-surface-container-high">
+            <Link href={t.href} className="flex h-full min-h-28 flex-col gap-2 card-ink p-space-md transition-colors hover:bg-surface-container-high">
               <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-primary"><Icon name={t.icon} size={22} /></span>
               <span className="text-body-lg font-semibold text-on-surface">{t.title}</span>
               <span className="text-label-md text-on-surface-variant">{t.description}</span>

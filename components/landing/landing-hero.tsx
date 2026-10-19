@@ -12,13 +12,13 @@ export function LandingHero() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_88%_8%,color-mix(in_srgb,var(--primary-container)_20%,transparent),transparent),radial-gradient(50%_50%_at_5%_100%,color-mix(in_srgb,var(--secondary-container)_25%,transparent),transparent)]" />
       <span aria-hidden="true" lang="zh" className="anim-drift pointer-events-none absolute -bottom-16 right-2 -z-10 font-serif text-[22rem] leading-none text-primary/[0.05] md:text-[30rem]">歌</span>
 
-      <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <p className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-primary-container px-3 py-1.5 text-label-md font-bold text-on-primary-container">
             <Icon name="music_note" size={16} filled />
             Học tiếng Trung qua bài hát và video
           </p>
-          <h1 id="hero-heading" className="mt-space-md text-[38px] font-extrabold leading-[1.15] tracking-tight text-on-surface md:text-[54px]">
+          <h1 id="hero-heading" className="mt-space-md text-[34px] font-extrabold leading-[1.15] tracking-tight text-on-surface md:text-[54px]">
             Nghe một bài hát,<br />
             <span className="text-primary">nhớ cả trăm chữ Hán.</span>
           </h1>

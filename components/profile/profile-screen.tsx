@@ -30,7 +30,7 @@ export function ProfileScreen() {
         <p className="text-label-md font-bold">Cấp {level.n}</p>
         <h1 className="text-headline-lg-mobile md:text-headline-lg">{level.name}</h1>
         <div className="mt-space-sm">
-          <ProgressBar value={level.maxed ? level.nextXp : level.progressXp} max={level.nextXp || 1} label="Tiến độ lên cấp" />
+          <ProgressBar value={level.maxed ? level.nextXp : level.progressXp} max={level.nextXp || 1} label="Tiến độ lên cấp" tone="ink" />
           <p className="mt-1 text-label-md font-bold">{level.maxed ? "Bạn đã đạt cấp cao nhất" : `${level.progressXp}/${level.nextXp} XP để lên cấp ${level.n + 1}`}</p>
         </div>
       </header>

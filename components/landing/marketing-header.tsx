@@ -19,13 +19,13 @@ export function MarketingHeader() {
         </Link>
         <nav aria-label="Các phần của trang" className="hidden items-center gap-1 md:flex">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="flex min-h-11 items-center rounded-full px-4 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">{l.label}</a>
+            <a key={l.href} href={l.href} className="flex min-h-11 items-center whitespace-nowrap rounded-full px-3 text-label-md lg:px-4 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">{l.label}</a>
           ))}
-          <Link href="/cong-cu" className="flex min-h-11 items-center rounded-full px-4 text-label-md text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">Công cụ</Link>
+          <Link href="/cong-cu" className="flex min-h-11 items-center whitespace-nowrap rounded-full px-3 text-label-md lg:px-4 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">Công cụ</Link>
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <Link href="/app" className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">Mở app</Link>
+          <Link href="/app" className="inline-flex min-h-11 items-center whitespace-nowrap rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">Mở app</Link>
         </div>
       </div>
     </header>

@@ -30,14 +30,12 @@ export function CourseMap({ slug }: { slug: string }) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-ink bg-surface-container-lowest text-on-surface"><Icon name="school" size={26} /></span>
-            <div className="min-w-0">
-              <h1 className="text-headline-lg-mobile md:text-headline-lg">Lộ trình {state.title}</h1>
-              <p className="text-body-md">Học từng chặng nhỏ: làm quen từ, nghe câu thật, rồi kiểm tra.</p>
-            </div>
+            <h1 className="text-headline-lg-mobile md:text-headline-lg">Lộ trình {state.title}</h1>
           </div>
           <p className="shrink-0 text-right text-label-md font-bold">Chặng xong<span className="block text-headline-lg-mobile font-black leading-none">{done}<span className="text-body-md font-bold">/{state.units.length}</span></span></p>
         </div>
-        <div className="mt-space-sm"><ProgressBar value={done} max={state.units.length} label="Tiến độ lộ trình" /></div>
+        <p className="mt-2 text-body-md">Học từng chặng nhỏ: làm quen từ, nghe câu thật, rồi kiểm tra.</p>
+        <div className="mt-space-sm"><ProgressBar value={done} max={state.units.length} label="Tiến độ lộ trình" tone="ink" /></div>
         <div className="mt-space-sm flex flex-wrap items-center justify-between gap-2">
           <p className="text-label-md font-bold">{percent}% hoàn thành</p>
           {next ? (

@@ -19,7 +19,7 @@ export function ProblemSolution() {
         Bạn thích nhạc Hoa, nhưng lời bài hát vẫn là một bức tường chữ Hán
       </h2>
       <div className="mt-space-lg grid gap-space-md md:grid-cols-2">
-        <div className="rounded-3xl bg-surface-container-low p-space-lg">
+        <div className="card-ink p-space-lg">
           <p className="text-label-md font-semibold uppercase tracking-widest text-on-surface-variant">Trước đây</p>
           <ul className="mt-space-md space-y-space-md">
             {PAIN.map((t) => (
