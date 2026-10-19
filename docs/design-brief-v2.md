@@ -180,5 +180,5 @@ Luôn thêm: "Use only fictional sample lyrics; no real song lyrics or artist ph
 ## 13. Ngoài phạm vi đợt này
 Trang giới thiệu marketing và SEO, trang quản trị, thanh toán/gói trả phí, logo chính thức (dùng wordmark tạm "SongHanzi" cho tới khi chốt tên), giao diện tiếng Anh (chỉ chừa chỗ).
 
-## 14. Câu hỏi mở cần chốt cùng chủ sản phẩm
-Tên sản phẩm (giữ hay đổi); có linh vật hay không và ai vẽ; kinh tế game (chỉ XP/huy hiệu hay có tiền ảo; đề xuất không có tiền ảo lúc đầu); giải đấu tuần làm ngay hay chờ đủ người; công cụ thiết kế và ngân sách; giữ hay chuyển hướng đường dẫn cũ; danh sách 5-8 người kiểm thử.
+## 14. Quyết định đã chốt thêm (2026-10-19) và câu hỏi còn mở
+Đã chốt: giữ tên **SongHanzi**; **chưa có linh vật** (bỏ phần nhân vật ở mục 3.2 và 8 cho tới khi bổ sung; thay bằng minh họa/biểu tượng); **chưa có tiền ảo**; **giải đấu tuần làm sau** (chỉ nhãn "Sắp có"); công cụ thiết kế **Stitch**, **dựng giao diện một lần** sau khi duyệt toàn bộ thiết kế; **giữ đường dẫn cũ**. Còn mở: tìm 5-8 người kiểm thử. Bản mô tả luồng dùng trực tiếp cho Stitch: [`app-flows-for-stitch.md`](app-flows-for-stitch.md).

@@ -14,6 +14,13 @@ Cách đọc: mục 1-4 là bối cảnh và nguyên tắc (không đổi khi th
 | 4 | Bố cục tablet/desktop | **Cần bố cục riêng** (không chỉ co giãn từ mobile) |
 | 5 | Số liệu sử dụng | **Rất ít người dùng**: thiết kế dựa trên nguyên tắc và kiểm thử nhỏ, không dựa số liệu; phải bổ sung đo lường (mục 10) |
 | 6 | Mức gamification | **Mạnh hơn hiện tại**: mô-đun game hóa riêng (mục 7.P) |
+| 8 | Tên sản phẩm | **Giữ "SongHanzi"** |
+| 9 | Linh vật | **Chưa có** (tạm thời, có thể bổ sung sau) |
+| 10 | Kinh tế game | **Chưa có tiền ảo**; chỉ XP, cấp, huy hiệu, nhiệm vụ, chuỗi ngày |
+| 11 | Giải đấu tuần | **Làm sau** (khi đủ người dùng); trước mắt chỉ có nhãn "Sắp có" |
+| 12 | Công cụ thiết kế / cách dựng | **Stitch**, dựng giao diện **một lần** sau khi thiết kế xong |
+| 13 | Đường dẫn cũ | **Giữ nguyên** các đường dẫn hiện có khi đổi điều hướng |
+| 14 | Người kiểm thử | Chưa có danh sách 5-8 người (cần tìm) |
 | 7 | Giao diện tiếng Anh | **Chưa làm bây giờ, có thể có sau**: thiết kế và code phải **sẵn sàng đa ngôn ngữ** (không nhúng chữ vào hình, chừa chỗ cho chuỗi dài hơn) |
 
 ## 1. Tổng quan sản phẩm
@@ -357,11 +364,4 @@ Các điểm dưới đây rút ra từ cấu trúc sản phẩm và phản hồ
 
 **Rủi ro:** (1) Bản quyền lời bài hát và nội dung video: giữ `noindex`, chỉ hiển thị cho người học, gỡ theo yêu cầu. (2) Chất lượng nội dung AI sinh (nghĩa Việt, hội thoại, bản dịch): bắt buộc người duyệt và đường báo sai. (3) Hạn mức/chi phí AI. (4) Phụ thuộc YouTube (nhúng, phụ đề không chính thức). (5) Độ chính xác chấm phát âm trên giọng thật chưa kiểm chứng. (6) Thiết kế lại làm gián đoạn người dùng hiện tại: giữ nguyên đường dẫn quen thuộc hoặc có chuyển hướng.
 
-**Câu hỏi mở còn lại cho đợt thiết kế lại:**
-1. **Tên sản phẩm:** giữ "SongHanzi" (gắn với bài hát/chữ Hán) hay đổi tên theo nhận diện game mới? Nếu đổi, cần tên miền, SEO và tài khoản liên kết (Google OAuth, kho PWA).
-2. **Linh vật/nhân vật đồng hành:** có làm không (ảnh hưởng mạnh tới nhận diện và game hóa)? Ai thiết kế minh họa?
-3. **Kinh tế game:** chỉ XP/huy hiệu (không tiền ảo) hay có tiền tệ ảo và vật phẩm? (đề xuất: bắt đầu không có tiền ảo.)
-4. **Giải đấu tuần:** làm ngay hay chờ đủ người dùng? (hiện rất ít người, giải đấu theo nhóm có thể trống.)
-5. **Ngân sách và công cụ thiết kế:** thiết kế bằng công cụ nào (Stitch, Figma, thuê ngoài) và dựng giao diện mới theo từng đợt hay một lần?
-6. **Đường dẫn cũ:** giữ hay chuyển hướng khi đổi cấu trúc điều hướng (ảnh hưởng người đang dùng)?
-7. **Kiểm thử người dùng:** ai là 5-8 người học thật để thử trước khi code?
+**Câu hỏi mở còn lại:** (1) Tìm 5-8 người học thật để kiểm thử trước khi dựng giao diện. (2) Linh vật có bổ sung sau không. (3) Khi nào bật giải đấu tuần (cần đủ người dùng).
