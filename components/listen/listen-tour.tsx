@@ -100,7 +100,7 @@ export function ListenTour({ onClose, steps: allSteps = LISTEN_TOUR_STEPS }: { o
           <button type="button" onClick={onClose} className={`${button} -ml-2 text-on-surface-variant hover:bg-surface-container`}>Bỏ qua</button>
           <div className="flex gap-2">
             {index > 0 && <button type="button" onClick={() => setIndex((i) => i - 1)} className={`${button} bg-surface-container-high text-on-surface`}>Quay lại</button>}
-            <button type="button" onClick={() => (last ? onClose() : setIndex((i) => i + 1))} className={`${button} bg-primary text-on-primary hover:bg-primary-container`}>{last ? "Xong" : "Tiếp"}</button>
+            <button type="button" onClick={() => (last ? onClose() : setIndex((i) => i + 1))} className={`${button} bg-primary text-on-primary hover:brightness-110`}>{last ? "Xong" : "Tiếp"}</button>
           </div>
         </div>
       </div>

@@ -83,7 +83,7 @@ export function CreateRoomDialog({ open, onClose }: { open: boolean; onClose: ()
         {error && <p role="alert" className="text-label-md text-error">{error}</p>}
         <div className="flex flex-col-reverse gap-space-sm sm:flex-row sm:justify-end">
           <button type="button" onClick={onClose} className="min-h-11 rounded-full px-5 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Hủy</button>
-          <button type="button" onClick={create} disabled={busy || !nick.nickname} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+          <button type="button" onClick={create} disabled={busy || !nick.nickname} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
             {busy ? "Đang tạo…" : "Tạo phòng"}
           </button>
         </div>

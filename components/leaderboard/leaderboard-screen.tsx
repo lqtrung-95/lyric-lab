@@ -98,7 +98,7 @@ export function LeaderboardScreen() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-body-md text-on-surface">Biệt danh của bạn là <strong>{data.profile!.nickname}</strong>. Tham gia để điểm của bạn hiện trên bảng; bạn rời đi bất cứ lúc nào.</p>
               <div className="flex gap-1">
-                <button type="button" onClick={() => void saveProfile({ optedIn: true })} className="min-h-11 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container">Tham gia bảng xếp hạng</button>
+                <button type="button" onClick={() => void saveProfile({ optedIn: true })} className="min-h-11 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">Tham gia bảng xếp hạng</button>
                 <button type="button" onClick={() => setEditing(true)} className="min-h-11 rounded-full px-4 text-label-md font-medium text-primary hover:bg-surface-container">Đổi biệt danh</button>
               </div>
             </div>

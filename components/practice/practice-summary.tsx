@@ -51,7 +51,7 @@ export function PracticeSummary({ title, stats, missed, scheduled, onAgain }: Pr
         </div>
       )}
       <div className="mt-space-lg flex flex-col justify-center gap-space-sm sm:flex-row">
-        <button type="button" onClick={onAgain} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">Chơi lại</button>
+        <button type="button" onClick={onAgain} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">Chơi lại</button>
         <Link href="/review" className="inline-flex min-h-12 items-center justify-center rounded-full bg-surface-container-high px-6 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest">Về ôn tập</Link>
       </div>
     </section>

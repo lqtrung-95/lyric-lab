@@ -93,7 +93,7 @@ export function AutoTranscribeOffer({ video, disabled, autoStart, onLines, onExi
       {registered === false ? (
         <>
           <p className="text-label-md text-on-surface-variant">Việc này tốn tài nguyên AI nên chỉ dành cho tài khoản đăng nhập Google (thẻ ôn và tiến độ học của bạn được giữ nguyên).</p>
-          <button type="button" onClick={() => void signIn()} disabled={signingIn} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+          <button type="button" onClick={() => void signIn()} disabled={signingIn} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
             {signingIn ? "Đang chuyển sang Google…" : "Đăng nhập Google để dùng"}
           </button>
         </>

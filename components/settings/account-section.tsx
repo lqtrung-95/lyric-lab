@@ -41,7 +41,7 @@ export function AccountSection() {
             Bạn đang dùng không cần tài khoản. Nếu xóa dữ liệu trình duyệt hoặc đổi thiết bị, thẻ ôn sẽ mất. Đăng nhập Google để giữ thẻ và dùng trên mọi thiết bị.
           </p>
           {link === "error" && <p role="alert" className="mt-space-sm text-label-md text-error">Đăng nhập Google chưa thành công. Thử lại nhé.</p>}
-          <button type="button" disabled={busy} onClick={() => run(signInGoogle)} className={`${btn} mt-space-md bg-primary text-on-primary hover:bg-primary-container disabled:opacity-60`}>
+          <button type="button" disabled={busy} onClick={() => run(signInGoogle)} className={`${btn} mt-space-md bg-primary text-on-primary hover:brightness-110 disabled:opacity-60`}>
             Đăng nhập bằng Google
           </button>
         </div>

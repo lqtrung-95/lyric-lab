@@ -140,7 +140,7 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, showHints,
       {phase === "idle" && (
         <div className="mt-space-md text-center">
           <button type="button" disabled={!controller} onClick={() => { startedAt.current = Date.now(); beginStep(0); }}
-            className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">{controller ? `Bắt đầu (${steps.length} câu)` : "Đang tải video…"}</button>
+            className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">{controller ? `Bắt đầu (${steps.length} câu)` : "Đang tải video…"}</button>
           <button type="button" onClick={onExit} className="ml-2 min-h-11 rounded-full px-5 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Chọn bài khác</button>
         </div>
       )}
@@ -165,7 +165,7 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, showHints,
                 {step.card.pinyin && <span className="text-pinyin-reading text-primary">{step.card.pinyin}</span>}
                 <PronounceButton text={step.card.term} />
               </p>
-              <button type="button" onClick={next} className="mt-space-sm inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+              <button type="button" onClick={next} className="mt-space-sm inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">
                 {index + 1 >= steps.length ? "Xem kết quả" : "Câu tiếp theo"}
                 <kbd aria-hidden="true" className="rounded bg-on-primary/20 px-1.5 font-mono text-[10px]">Space</kbd>
               </button>

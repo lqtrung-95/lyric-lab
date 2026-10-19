@@ -56,7 +56,7 @@ export function KaraokePractice() {
               {songs.map((s) => (
                 <li key={s.videoId} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">
                   <div className="min-w-0"><p className="line-clamp-2 text-body-md font-medium text-on-surface">{s.title}</p><p className="text-label-md text-on-surface-variant">{s.questions} câu để điền</p></div>
-                  <button type="button" onClick={() => setSongId(s.videoId)} aria-label={`Chơi bài ${s.title}`} className="min-h-11 shrink-0 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">Chơi bài này</button>
+                  <button type="button" onClick={() => setSongId(s.videoId)} aria-label={`Chơi bài ${s.title}`} className="min-h-11 shrink-0 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">Chơi bài này</button>
                 </li>
               ))}
             </ul>

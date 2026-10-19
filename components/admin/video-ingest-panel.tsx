@@ -56,7 +56,7 @@ export function VideoIngestPanel({ onIngested }: { onIngested: () => void }) {
           {items.length > 0 && (
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {summary.waiting > 0 && !ingest.running && (
-                <button type="button" onClick={() => void ingest.run(owned)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+                <button type="button" onClick={() => void ingest.run(owned)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">
                   <Icon name="add" size={18} />Nạp {summary.waiting} video
                 </button>
               )}

@@ -99,7 +99,7 @@ export function ChallengeScreen({ code }: { code: string }) {
           <div className="mt-space-md space-y-space-sm">
             <NicknameGate state={nick}>
               {() => (
-                <button type="button" onClick={() => void start()} disabled={starting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+                <button type="button" onClick={() => void start()} disabled={starting} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
                   <Icon name="play_arrow" filled size={20} />{info.mine ? `Tiếp tục (đã trả lời ${info.mine.answered}/${info.questionCount})` : "Bắt đầu chơi"}
                 </button>
               )}

@@ -129,7 +129,7 @@ export function PinyinGame({ cards, grade, onRoundEnd }: Props) {
         <div className="mt-1 flex flex-wrap gap-2">
           <input ref={inputRef} id="pinyin-input" value={input} onChange={(e) => setInput(e.target.value)} disabled={!!feedback} autoComplete="off" autoCapitalize="off" spellCheck={false}
             className="min-h-12 min-w-0 flex-1 rounded-2xl bg-surface-container px-4 font-mono text-body-lg text-on-surface outline-none ring-2 ring-transparent focus:ring-secondary disabled:opacity-70" />
-          <button type="submit" disabled={!!feedback || !input.trim()} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">Kiểm tra</button>
+          <button type="submit" disabled={!!feedback || !input.trim()} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">Kiểm tra</button>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2" role="group" aria-label="Thêm số thanh điệu">
           {[1, 2, 3, 4].map((t) => (
@@ -145,7 +145,7 @@ export function PinyinGame({ cards, grade, onRoundEnd }: Props) {
         <div role="status" className="sticky bottom-3 z-10 mt-space-md rounded-2xl bg-surface-container-low p-space-md shadow-lg ring-1 ring-outline-variant">
           <p className="text-body-lg font-semibold text-on-surface">{FEEDBACK[feedback.result]}{feedback.points > 0 && <span className="ml-2 text-secondary">+{feedback.points}</span>}</p>
           <p className="mt-1 text-body-md text-on-surface-variant">Đáp án: <span className="font-semibold text-primary">{card.pinyin}</span>{card.han_viet && <> · <span className="uppercase tracking-wider text-secondary">{card.han_viet}</span></>}</p>
-          <button ref={nextRef} type="button" onClick={next} className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">{index + 1 >= deck.length || (challenge && lives <= 0) ? "Xem kết quả" : "Từ tiếp theo"}</button>
+          <button ref={nextRef} type="button" onClick={next} className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">{index + 1 >= deck.length || (challenge && lives <= 0) ? "Xem kết quả" : "Từ tiếp theo"}</button>
         </div>
       )}
     </div>

@@ -5,7 +5,7 @@ const STYLE: Record<Grade, string> = {
   1: "bg-error-container/60 text-on-error-container hover:bg-error-container",
   2: "bg-surface-container-high text-on-surface hover:bg-surface-container-highest",
   3: "bg-secondary-container/60 text-on-secondary-container hover:bg-secondary-container",
-  4: "bg-primary text-on-primary hover:bg-primary-container",
+  4: "bg-primary text-on-primary hover:brightness-110",
 };
 
 /** Bốn nút chấm (phím 1–4). Dưới mỗi nút là khoảng thời gian tới lần ôn kế do FSRS tính cho đúng thẻ này. */

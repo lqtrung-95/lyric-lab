@@ -19,7 +19,7 @@ export function ShareChallengeButton({ code, points }: { code: string; points: n
 
   return (
     <>
-      <button type="button" onClick={() => void share()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+      <button type="button" onClick={() => void share()} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110">
         <Icon name="share" size={20} />Thách bạn bè
       </button>
       {dialog && <ChallengeShareDialog code={code} text={text} onClose={() => setDialog(false)} />}

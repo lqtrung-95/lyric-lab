@@ -73,7 +73,7 @@ export function LinePracticeCard({ line, onListenLine, onPauseSong, variant = "s
         {active === "listen" && (
           <div className="flex items-center gap-2">
             <button type="button" onClick={handleListen}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:brightness-110">
               <Icon name="headphones" size={18} />Nghe bản gốc
             </button>
             <p className="text-label-md text-on-surface-variant">Nghe kỹ cách phát âm trước khi {verb} theo.</p>
@@ -84,7 +84,7 @@ export function LinePracticeCard({ line, onListenLine, onPauseSong, variant = "s
           <div>
             <p className="text-body-md text-on-surface-variant">{line.translation ?? "Câu này chưa có bản dịch."}</p>
             <button type="button" onClick={() => { unlock("speak"); setActive("speak"); }}
-              className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+              className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:brightness-110">
               Đã nhớ nghĩa, {verb} thôi
             </button>
           </div>
@@ -102,7 +102,7 @@ export function LinePracticeCard({ line, onListenLine, onPauseSong, variant = "s
               <p role="status" className="text-label-md text-on-surface-variant">Đang xin quyền dùng micro…</p>
             ) : (
               <button type="button" onClick={handleRecordStart}
-                className="inline-flex min-h-11 items-center gap-2 self-start rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+                className="inline-flex min-h-11 items-center gap-2 self-start rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:brightness-110">
                 <Icon name="mic" size={18} />Bắt đầu ghi âm
               </button>
             )}

@@ -61,7 +61,7 @@ export function RoomResult({ room }: { room: ReturnType<typeof useRoom> }) {
       {error && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{error}</p>}
       {opponent && <p className="flex items-center justify-center gap-1 text-label-md text-on-surface-variant">Có vấn đề với {opponent.displayName}? <ReportPlayerButton context="room" code={view.code} name={opponent.displayName} /></p>}
       <div className="flex flex-col gap-space-sm sm:flex-row sm:justify-center">
-        <button type="button" onClick={again} disabled={busy} className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+        <button type="button" onClick={again} disabled={busy} className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
           {busy ? "Đang tạo phòng…" : "Chơi lại cùng bài"}
         </button>
         <button type="button" onClick={() => router.push("/room")} className="min-h-12 rounded-full bg-surface-container-high px-8 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest">

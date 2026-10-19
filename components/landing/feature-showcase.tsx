@@ -30,7 +30,7 @@ const ROWS: Row[] = [
     visual: (
       <div className="rounded-3xl bg-inverse-surface p-5 text-inverse-on-surface">
         <p className="text-label-sm uppercase tracking-wider opacity-80">Đang hát · 0:05 · 0.75x</p>
-        <p className="mt-3 text-label-sm opacity-70">chuāng wài de chéngshì mànmàn shuì le</p><p lang="zh" className="font-serif text-[20px] opacity-70">窗外的城市慢慢睡了</p>
+        <p className="mt-3 text-label-sm opacity-80">chuāng wài de chéngshì mànmàn shuì le</p><p lang="zh" className="font-serif text-[20px] opacity-80">窗外的城市慢慢睡了</p>
         <p className="mt-3 text-label-sm">wǒ cónglái méi xiǎng guò huì líkāi</p><p lang="zh" className="font-serif text-[26px]">我从来没想过会离开</p>
         <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-inverse-on-surface/15 px-3 py-1.5 text-label-md"><Icon name="repeat_one" size={16} />Đang lặp câu 2</p>
       </div>

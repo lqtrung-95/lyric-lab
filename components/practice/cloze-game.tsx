@@ -129,7 +129,7 @@ export function ClozeGame({ candidates, poolTerms, grade, onRoundEnd }: Props) {
             if (index + 1 >= questions.length) onRoundEnd?.({ points: score, correct, total: questions.length, durationSec: Math.round((Date.now() - startedAt.current) / 1000) });
             setPicked(null); setSnippet(null); setIndex((i) => i + 1);
           }}
-            className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">{index + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp theo"}</button>
+            className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">{index + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp theo"}</button>
         </div>
       )}
       {snippet && <SnippetPlayer key={q.videoId} videoId={q.videoId} request={snippet} />}

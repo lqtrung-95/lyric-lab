@@ -83,7 +83,7 @@ export function InstallAppGuide() {
         <div className="space-y-2 rounded-2xl bg-primary-container/40 p-space-md">
           <p className="text-body-md text-on-surface">Trình duyệt của bạn cho cài ngay bằng một chạm:</p>
           <button type="button" onClick={() => void install().then((ok) => setResult(ok ? "accepted" : "dismissed"))}
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container hover:text-on-primary-container">
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">
             <Icon name="install_mobile" size={20} />Cài app ngay
           </button>
         </div>

@@ -47,7 +47,7 @@ export function HanConverter() {
           className="w-full rounded-2xl border border-outline-variant bg-surface-container-lowest p-4 font-serif text-body-lg text-on-surface focus:border-primary focus:outline-none"
         />
         <div className="flex flex-wrap items-center gap-3">
-          <button type="submit" disabled={busy || !text.trim()} className="inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+          <button type="submit" disabled={busy || !text.trim()} className="inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">
             {busy ? "Đang chuyển…" : "Chuyển đổi"}
           </button>
           <button type="button" onClick={() => { setText(EXAMPLE); void convert(EXAMPLE); }} className="inline-flex min-h-11 items-center rounded-full px-4 text-label-md font-medium text-primary hover:bg-surface-container-high">Thử với ví dụ</button>

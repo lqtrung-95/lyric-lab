@@ -85,7 +85,7 @@ function ContextBlock({ card, line, context, onReplay }: { card: ReviewCard; lin
       <button
         type="button"
         onClick={onReplay}
-        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-medium text-on-primary hover:bg-primary-container"
+        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-primary px-4 text-label-md font-medium text-on-primary hover:brightness-110"
       >
         <Icon name="play_arrow" size={18} />
         Nghe lại câu hát

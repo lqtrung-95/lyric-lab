@@ -49,7 +49,7 @@ export function NextActionPanel() {
               <span className="text-body-lg text-on-surface-variant">thẻ cần ôn</span>
             </p>
             <p className="mt-2 text-body-md text-on-surface-variant">Ôn ngắn mỗi ngày giúp bạn nhớ lâu hơn.</p>
-            <Link href="/review" className={`${cta} bg-primary text-on-primary hover:bg-primary-container`}><Icon name="style" size={20} />Bắt đầu ôn</Link>
+            <Link href="/review" className={`${cta} bg-primary text-on-primary hover:brightness-110`}><Icon name="style" size={20} />Bắt đầu ôn</Link>
           </>
         )}
         {ready && action.kind === "continue" && (
@@ -57,7 +57,7 @@ export function NextActionPanel() {
             <p className="mt-space-sm text-body-md text-on-surface-variant">Bạn đang nghe dở</p>
             <p className="line-clamp-2 font-serif text-headline-md text-on-surface">{action.song.title}</p>
             <p className="mt-1 text-label-md text-on-surface-variant">Dừng ở {formatPosition(action.song.positionSec)}</p>
-            <Link href={`/learn/${action.song.videoId}/listen?t=${action.song.positionSec}`} className={`${cta} bg-primary text-on-primary hover:bg-primary-container`}>
+            <Link href={`/learn/${action.song.videoId}/listen?t=${action.song.positionSec}`} className={`${cta} bg-primary text-on-primary hover:brightness-110`}>
               <Icon name="play_arrow" filled size={20} />Tiếp tục nghe
             </Link>
           </>

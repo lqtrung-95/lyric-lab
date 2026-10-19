@@ -126,7 +126,7 @@
   --surface-container-high: #ede8dc;
   --surface-container-highest: #e7e2d6;
   --surface-variant: #e7e2d6;
-  --surface-tint: #a35000;
+  --surface-tint: #944a00;
   --background: #fef9ed;
   --on-surface: #1d1c15;
   --on-background: #1d1c15;
@@ -136,7 +136,7 @@
   --inverse-primary: #ffb783;
   --outline: #76604f;
   --outline-variant: #dcc1b1;
-  --primary: #a35000;
+  --primary: #944a00;
   --on-primary: #ffffff;
   --primary-container: #e67e22;
   --on-primary-container: #2c1d11;
@@ -166,7 +166,7 @@
   --on-error-container: #93000a;
   /* Nét viền mực nâu đậm và "đáy" của nút 3D (xem .btn-3d, .card-ink). */
   --ink: #4a2e1b;
-  --shelf-primary: #6b3300;
+  --shelf-primary: #5e2d00;
   --shelf-secondary: #1f4a17;
   --shelf-tertiary: #00415f;
   --shelf-neutral: #b9a58f;
@@ -191,7 +191,7 @@
   --on-surface-variant: #d9c3b0;
   --inverse-surface: #ece1d1;
   --inverse-on-surface: #323029;
-  --inverse-primary: #a35000;
+  --inverse-primary: #944a00;
   --outline: #a08c79;
   --outline-variant: #564337;
   --primary: #ffb783;

@@ -146,7 +146,7 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
           </div>
           <DictationProgressGrid idxs={lineIdxs} scores={progress.scores} position={position} onJump={jump} />
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" onClick={listen} disabled={!controller} className="inline-flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+            <button type="button" onClick={listen} disabled={!controller} className="inline-flex min-h-12 items-center gap-2 rounded-2xl bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">
               <Icon name="play_arrow" filled size={20} /> Nghe{plays > 0 && <span className="font-normal opacity-80"> ×{plays}</span>}
             </button>
             <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface"><input type="checkbox" checked={slow} onChange={(e) => setSlow(e.target.checked)} className="h-4 w-4 accent-primary" />Chậm 0,75×</label>
@@ -179,7 +179,7 @@ export function VideoDictationPanel({ lesson, controller }: { lesson: LessonDeta
               <div className="flex gap-2">
                 {!checked && <button type="button" onClick={() => check()} className={secondary}>Xem đáp án</button>}
                 {/* Một nút gửi duy nhất, chỉ đổi nhãn: thay nút khác vào đúng chỗ con trỏ đang bấm thì cú bấm "Xem đáp án" kích hoạt luôn nút mới và nhảy sang câu kế. */}
-                <button type="submit" className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+                <button type="submit" className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110">
                   {checked ? (position + 1 >= lines.length ? "Xem tổng kết" : "Câu tiếp") : "Kiểm tra"}
                 </button>
               </div>

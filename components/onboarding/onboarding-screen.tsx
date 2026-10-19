@@ -58,7 +58,7 @@ export function OnboardingScreen() {
         </div>
       </fieldset>
 
-      <button type="button" disabled={busy} onClick={start} className="mt-space-xl min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+      <button type="button" disabled={busy} onClick={start} className="mt-space-xl min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
         Bắt đầu học
       </button>
     </div>

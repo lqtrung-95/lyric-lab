@@ -71,7 +71,7 @@ export function AnalysisErrorView({ code, onRetry }: { code: AnalysisErrorCode; 
           <button
             type="button"
             onClick={onRetry}
-            className="min-h-11 cursor-pointer rounded-full bg-primary-container px-6 text-label-md font-semibold text-on-primary-container hover:bg-primary-container/80"
+            className="min-h-11 cursor-pointer rounded-full bg-primary-container px-6 text-label-md font-semibold text-on-primary-container hover:brightness-110/80"
           >
             Thử lại
           </button>

@@ -57,7 +57,7 @@ export function AskLineBox({ videoId, lineIndex }: { videoId: string; lineIndex:
           autoComplete="off" placeholder="Hỏi thêm, ví dụ: vì sao dùng 了 ở đây?"
           className="min-h-11 min-w-0 flex-1 rounded-full bg-surface-container-high px-4 text-label-md text-on-surface outline-none ring-2 ring-transparent focus:ring-primary"
         />
-        <button type="submit" disabled={loading || question.trim().length < 2} className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">Hỏi</button>
+        <button type="submit" disabled={loading || question.trim().length < 2} className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">Hỏi</button>
       </form>
     </section>
   );

@@ -94,7 +94,7 @@ export function SyncPanel({ offset, risk, quickSync, onOffsetChange, onToggleQui
           {publish && (
             <div>
               <button type="button" disabled={offset === 0 || publish.state === "saving"} onClick={publish.onPublish}
-                className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+                className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">
                 {publish.state === "saving" ? "Đang lưu…" : "Lưu làm mặc định cho mọi người"}
               </button>
               <p role="status" className={`mt-1 text-label-sm ${publish.state === "error" ? "text-error" : "text-on-surface-variant"}`}>

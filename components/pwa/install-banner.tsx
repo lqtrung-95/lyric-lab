@@ -59,8 +59,8 @@ export function InstallBanner() {
         <p className="text-label-md text-on-surface-variant">Mở nhanh bằng một chạm, toàn màn hình như một app thật.</p>
         <div className="mt-2 flex flex-wrap gap-2">
           {canInstall
-            ? <button type="button" onClick={() => void install().then((ok) => { if (ok) dismiss(); })} className={`${button} bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container`}>Cài app</button>
-            : <Link href="/cai-app" className={`${button} bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container`}>Xem cách cài</Link>}
+            ? <button type="button" onClick={() => void install().then((ok) => { if (ok) dismiss(); })} className={`${button} bg-primary text-on-primary hover:brightness-110`}>Cài app</button>
+            : <Link href="/cai-app" className={`${button} bg-primary text-on-primary hover:brightness-110`}>Xem cách cài</Link>}
           <button type="button" onClick={dismiss} className={`${button} text-on-surface-variant hover:bg-surface-container`}>Để sau</button>
         </div>
       </div>

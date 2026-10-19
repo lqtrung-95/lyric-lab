@@ -125,7 +125,7 @@ export function AddVideoScreen() {
         </label>
         {busy && <p role="status" className="text-label-md text-on-surface-variant">Đang xử lý video, bạn đừng đóng trang này nhé.</p>}
         {message && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{message}</p>}
-        <button type="submit" disabled={!canSubmit} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+        <button type="submit" disabled={!canSubmit} className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">
           {busy ? <><Spinner size={16} className="mr-2" />Đang đọc phụ đề và dịch, có thể mất tới một phút…</> : "Thêm video"}
         </button>
       </form>

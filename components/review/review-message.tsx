@@ -12,7 +12,7 @@ export function ReviewMessage({ icon, title, body, action, children }: { icon: I
       <h1 className="mt-space-md font-serif text-headline-md text-on-surface">{title}</h1>
       <p className="mx-auto mt-space-sm max-w-md text-body-md text-on-surface-variant">{body}</p>
       {action && (
-        <Link href={action.href} className="mt-space-lg inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">
+        <Link href={action.href} className="mt-space-lg inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">
           {action.label}
         </Link>
       )}

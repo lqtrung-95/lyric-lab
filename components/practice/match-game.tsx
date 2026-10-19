@@ -121,7 +121,7 @@ export function MatchGame({ cards, onRoundEnd }: { cards: ReviewCard[]; onRoundE
         <div role="status" className="mt-space-lg rounded-3xl bg-surface-container-lowest p-space-lg text-center shadow-[0_1px_10px_rgba(30,26,22,0.08)]">
           <h2 className="font-serif text-headline-md">Ghép xong trong {fmt(seconds)}{mistakes === 0 ? ", không nhầm lần nào!" : `, nhầm ${mistakes} lần.`}</h2>
           {newRecord && <p className="mt-1 text-body-md font-semibold text-secondary">Kỷ lục mới!</p>}
-          <button type="button" onClick={again} className="mt-space-md min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">Vòng tiếp theo</button>
+          <button type="button" onClick={again} className="mt-space-md min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">Vòng tiếp theo</button>
         </div>
       )}
     </div>

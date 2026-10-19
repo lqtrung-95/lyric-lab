@@ -63,7 +63,7 @@ export function ReviewScreen() {
           >
             <div className="mt-space-lg flex flex-col justify-center gap-space-sm sm:flex-row">
               <button type="button" onClick={() => void s.learnMore(Math.min(10, s.waitingNew))}
-                className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Học thêm {Math.min(10, s.waitingNew)} thẻ mới</button>
+                className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">Học thêm {Math.min(10, s.waitingNew)} thẻ mới</button>
               <Link href="/settings" className="inline-flex min-h-11 items-center justify-center rounded-full px-6 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Đổi hạn mức mỗi ngày</Link>
             </div>
           </ReviewMessage>

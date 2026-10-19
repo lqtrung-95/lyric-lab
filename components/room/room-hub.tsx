@@ -43,7 +43,7 @@ export function RoomHub() {
               <li key={line} className="flex items-start gap-2"><Icon name="check_circle" filled size={18} className="mt-0.5 shrink-0 text-secondary" />{line}</li>
             ))}
           </ul>
-          <button type="button" onClick={() => setCreating(true)} className="mt-space-md min-h-11 w-full rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+          <button type="button" onClick={() => setCreating(true)} className="mt-space-md min-h-11 w-full rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">
             Tạo phòng
           </button>
         </section>
@@ -68,7 +68,7 @@ export function RoomHub() {
               <h2 id="challenge-heading" className="font-serif text-headline-md text-on-surface">Thử thách không cần cùng lúc</h2>
               <p className="text-label-md text-on-surface-variant">Bạn chơi trước đặt điểm chuẩn, gửi link cho bạn bè. Họ chơi lúc nào cũng được rồi so điểm.</p>
             </div>
-            <button type="button" onClick={() => setChallenging(true)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">Tạo thử thách</button>
+            <button type="button" onClick={() => setChallenging(true)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">Tạo thử thách</button>
           </div>
         </section>
 

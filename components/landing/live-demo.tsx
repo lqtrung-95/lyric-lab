@@ -50,7 +50,7 @@ export function LiveDemo() {
           </div>
           <ol className="space-y-3">
             {lines.map((line, i) => (
-              <li key={line.index} aria-current={i === current ? "true" : undefined} className={`rounded-xl px-3 py-2 transition-all ${i === current ? "bg-inverse-on-surface/10" : "opacity-70"}`}>
+              <li key={line.index} aria-current={i === current ? "true" : undefined} className={`rounded-xl px-3 py-2 transition-all ${i === current ? "bg-inverse-on-surface/10" : "opacity-80"}`}>
                 <p className="text-label-sm">{line.pinyin}</p>
                 <p lang="zh" className={`font-serif ${i === current ? "text-[26px]" : "text-[20px]"}`}>
                   {line.tokens.map((t, k) => {

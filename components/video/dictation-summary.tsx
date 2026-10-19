@@ -35,7 +35,7 @@ export function DictationSummary({ lesson, lines, progress, onRestart }: { lesso
         </div>
       )}
       <div className="flex flex-col justify-center gap-space-sm sm:flex-row">
-        <button type="button" onClick={onRestart} className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">Làm lại từ đầu</button>
+        <button type="button" onClick={onRestart} className="min-h-12 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110">Làm lại từ đầu</button>
         <Link href={`/video/${lesson.videoId}`} className="inline-flex min-h-12 items-center justify-center rounded-full bg-surface-container-high px-8 text-label-md font-semibold text-on-surface hover:bg-surface-container-highest">Về video</Link>
       </div>
     </section>

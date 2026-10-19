@@ -32,7 +32,7 @@ export function VideoTagsEditor({ videoId, initial }: { videoId: string; initial
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" disabled={state === "saving"} onClick={() => void save()} className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">{state === "saving" ? "Đang lưu…" : "Lưu thẻ"}</button>
+        <button type="button" disabled={state === "saving"} onClick={() => void save()} className="min-h-11 rounded-full bg-primary px-4 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">{state === "saving" ? "Đang lưu…" : "Lưu thẻ"}</button>
         <p role="status" className={`text-label-sm ${state === "error" ? "text-error" : "text-on-surface-variant"}`}>
           {state === "saved" ? "Đã lưu." : state === "error" ? "Chưa lưu được (đã chạy migration cột tags chưa?)." : ""}
         </p>

@@ -60,7 +60,7 @@ export function ChatComposer({ onSend }: { onSend: (body: string, announcement: 
             className="block w-full resize-none rounded-2xl border border-outline-variant bg-surface-container-lowest p-3 text-body-md text-on-surface focus:border-primary focus:outline-none"
           />
         </label>
-        <button type="submit" disabled={busy || !text.trim()} aria-label="Gửi tin nhắn" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary hover:bg-primary-container disabled:opacity-50">
+        <button type="submit" disabled={busy || !text.trim()} aria-label="Gửi tin nhắn" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary hover:brightness-110 disabled:opacity-50">
           <Icon name="send" size={22} />
         </button>
       </div>

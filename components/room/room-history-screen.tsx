@@ -75,7 +75,7 @@ export function RoomHistoryScreen() {
       ) : data.entries.length === 0 ? (
         <div className="rounded-2xl bg-surface-container-low p-space-lg text-center">
           <p className="text-body-lg text-on-surface">Bạn chưa có ván thi đấu nào.</p>
-          <Link href="/room" className="mt-space-sm inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">Thi đấu ngay</Link>
+          <Link href="/room" className="mt-space-sm inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">Thi đấu ngay</Link>
         </div>
       ) : (
         <>

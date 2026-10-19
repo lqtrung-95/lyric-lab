@@ -23,7 +23,7 @@ export default async function StreakSharePage({ params }: { params: Promise<{ to
       <p className="font-serif text-headline-xl text-primary">{share.currentStreak}</p>
       <p className="text-headline-md text-on-surface">ngày liên tiếp học tiếng Trung qua bài hát</p>
       <p className="text-body-md text-on-surface-variant">{share.learnedWords} từ đã ôn · {share.weekCount} ngày học tuần này</p>
-      <Link href="/app" className="mt-space-md inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+      <Link href="/app" className="mt-space-md inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">
         Học cùng SongHanzi
       </Link>
     </main>

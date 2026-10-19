@@ -67,7 +67,7 @@ export function VideoShadowingPanel({ lesson, controller }: { lesson: LessonDeta
       </section>
 
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" onClick={turn.runTurn} disabled={busy || !controller} className="min-h-14 rounded-2xl bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+        <button type="button" onClick={turn.runTurn} disabled={busy || !controller} className="min-h-14 rounded-2xl bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
           {turn.phase === "listening" ? "Đang phát mẫu…" : turn.phase === "recording" ? "Đang ghi…" : "Bắt đầu lượt"}
         </button>
         <button type="button" onClick={() => turn.listen()} disabled={turn.phase === "recording" || !controller} className={secondary}>Nghe mẫu</button>

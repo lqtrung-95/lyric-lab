@@ -77,7 +77,7 @@ export function MergeConfirm() {
         Thẻ trùng giữ bản bạn đã ôn nhiều hơn; thiết lập của tài khoản Google được giữ nguyên.
       </p>
       <div className="mt-space-md flex flex-wrap justify-center gap-space-sm">
-        <button type="button" onClick={() => merge(token!)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Gộp dữ liệu</button>
+        <button type="button" onClick={() => merge(token!)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">Gộp dữ liệu</button>
         <Link href="/app" className="inline-flex min-h-11 items-center rounded-full px-6 text-label-md font-medium text-on-surface hover:bg-surface-container-high">Bỏ qua</Link>
       </div>
     </div>

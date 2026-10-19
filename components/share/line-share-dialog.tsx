@@ -116,7 +116,7 @@ export function LineShareDialog({ card, shareUrl, onClose }: { card: Omit<LineCa
           </>
         ) : (
           <div className="flex flex-wrap gap-2">
-            {canShareFile && <button type="button" onClick={() => void share()} className={`${btn} basis-full bg-primary text-on-primary hover:bg-primary-container`}><Icon name="share" size={18} />Chia sẻ</button>}
+            {canShareFile && <button type="button" onClick={() => void share()} className={`${btn} basis-full bg-primary text-on-primary hover:brightness-110`}><Icon name="share" size={18} />Chia sẻ</button>}
             {previewUrl && <button type="button" onClick={download} className={`${btn} ${canShareFile ? "bg-surface-container-high text-on-surface" : "bg-primary text-on-primary"}`}>Tải ảnh</button>}
             <button type="button" onClick={onClose} className={`${btn} bg-surface-container-high text-on-surface`}>Đóng</button>
           </div>

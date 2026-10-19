@@ -81,7 +81,7 @@ export function FeedbackPageScreen() {
             <SelectField value={category} onChange={(e) => setCategory(e.target.value as FeedbackCategory)}>
               {FEEDBACK_CATEGORIES.map((c) => <option key={c} value={c}>{FEEDBACK_CATEGORY_LABELS[c]}</option>)}
             </SelectField>
-            <button type="submit" disabled={sendStatus === "sending"} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-60">
+            <button type="submit" disabled={sendStatus === "sending"} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-60">
               {sendStatus === "sending" ? "Đang gửi…" : "Gửi góp ý"}
             </button>
           </div>

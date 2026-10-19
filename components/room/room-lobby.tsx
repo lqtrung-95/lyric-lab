@@ -132,11 +132,11 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
       {error && <p role="alert" className="rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{error}</p>}
       <div className="flex flex-col gap-space-sm">
         {me?.isHost ? (
-          <button type="button" disabled={busy || !allReady} onClick={() => run(room.start)} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+          <button type="button" disabled={busy || !allReady} onClick={() => run(room.start)} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">
             {busy ? "Đang bắt đầu…" : allReady ? "Bắt đầu thi đấu" : "Bắt đầu thi đấu (chờ đối thủ)"}
           </button>
         ) : (
-          <button type="button" aria-pressed={me?.ready} disabled={busy} onClick={() => run(() => room.setReady(!me?.ready))} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container disabled:opacity-50">
+          <button type="button" aria-pressed={me?.ready} disabled={busy} onClick={() => run(() => room.setReady(!me?.ready))} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">
             {me?.ready ? "Bỏ sẵn sàng" : "Sẵn sàng"}
           </button>
         )}

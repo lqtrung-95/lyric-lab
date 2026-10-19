@@ -46,7 +46,7 @@ export function HeroMock() {
         <ul className="space-y-2.5">
           {LYRICS.map((l, i) => (
             // Ba dòng lần lượt sáng lên như đang hát (chu kỳ 9 giây, lệch 3 giây mỗi dòng).
-            <li key={l.zh} className="anim-line opacity-70" style={{ animationDelay: `${(i - 1) * 3}s` }}>
+            <li key={l.zh} className="anim-line opacity-80" style={{ animationDelay: `${(i - 1) * 3}s` }}>
               <p className="text-label-sm">{l.py}</p>
               <p lang="zh" className="font-serif text-[22px]">{l.zh}</p>
             </li>

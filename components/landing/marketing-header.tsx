@@ -25,7 +25,7 @@ export function MarketingHeader() {
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />
-          <Link href="/app" className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:bg-primary-container">Mở app</Link>
+          <Link href="/app" className="inline-flex min-h-11 items-center rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">Mở app</Link>
         </div>
       </div>
     </header>

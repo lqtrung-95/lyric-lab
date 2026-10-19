@@ -16,7 +16,7 @@ async function audit(page: Page, label: string) {
   // thành vùng bấm quá nhỏ — không phải lỗi thật, chỉ xảy ra ở đúng vị trí cuộn dở dang này. Cuộn về đầu cho chắc.
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   const results = await new AxeBuilder({ page }).withTags(TAGS).analyze();
-  const summary = results.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length} phần tử, vd. ${v.nodes[0]?.target.join(" ")}`);
+  const summary = results.violations.map((v) => `${v.id} (${v.impact}): ${v.nodes.length} phần tử, vd. ${v.nodes[0]?.target.join(" ")} — ${(v.nodes[0]?.any[0]?.message ?? "").slice(0, 160)}`);
   expect(summary, `${label}: vi phạm truy cập`).toEqual([]);
 }
 

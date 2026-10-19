@@ -98,7 +98,7 @@ export function ListenGame({ cards, grade, onRoundEnd }: Props) {
           ))}
         </fieldset>
         <button type="button" onClick={() => { startedAt.current = Date.now(); setStarted(true); }}
-          className="mt-space-md inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:bg-primary-container">
+          className="mt-space-md inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-8 text-label-md font-semibold text-on-primary hover:brightness-110">
           <Icon name="headphones" size={22} />Bắt đầu nghe ({questions.length} câu)
         </button>
       </div>
@@ -151,7 +151,7 @@ export function ListenGame({ cards, grade, onRoundEnd }: Props) {
             {q.card.pinyin && <span className="text-pinyin-reading text-primary">{q.card.pinyin}</span>}
             <span>{q.card.meaning}</span>
           </p>
-          <button ref={nextRef} type="button" onClick={next} className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:bg-primary-container">{index + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp theo"}</button>
+          <button ref={nextRef} type="button" onClick={next} className="mt-space-sm min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">{index + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp theo"}</button>
         </div>
       )}
     </div>

@@ -7,7 +7,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useRecentSongs } from "./use-recent-songs";
 import { useRecommendedSongs } from "./use-home-data";
 
-const cta = "mt-space-md inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-label-md font-semibold bg-primary text-on-primary hover:bg-primary-container";
+const cta = "mt-space-md inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-label-md font-semibold bg-primary text-on-primary hover:brightness-110";
 
 /**
  * Hành động "Hôm nay" khi người dùng chưa có thẻ đến hạn hay bài nghe dở: đề xuất sẵn một bài hợp level, bấm "Học ngay" là vào học,

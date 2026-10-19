@@ -24,7 +24,7 @@ export function PracticeFrame({ title, intro, status, blocked, children }: Pract
           <div className="rounded-2xl bg-surface-container-low p-space-lg text-center">
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-container-high text-primary"><Icon name="style" size={28} /></span>
             <p className="mt-space-md text-body-md text-on-surface-variant">{blocked}</p>
-            <Link href="/app" className="mt-space-md inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:bg-primary-container">Chọn bài hát để lưu từ</Link>
+            <Link href="/app" className="mt-space-md inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">Chọn bài hát để lưu từ</Link>
           </div>
         )}
         {status === "ready" && !blocked && children}
