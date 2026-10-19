@@ -7,6 +7,8 @@ export const hskUnitContentSchema = z.object({
   terms: z.array(z.string().min(1).max(8)).min(1).max(30),
   /** Tên chủ đề ngắn bằng tiếng Việt (tùy chọn, hiện ở bản đồ lộ trình). */
   topic: z.string().max(40).optional(),
+  /** Nghĩa tiếng Việt ngắn của từng từ (từ điển chỉ có nghĩa tiếng Anh); sinh bằng `scripts/gloss-hsk-course.mts`, người dùng duyệt trước khi ghi. */
+  glosses: z.record(z.string(), z.string().min(1).max(80)).optional(),
 });
 export const unitContentSchema = hskUnitContentSchema;
 export type UnitContent = z.infer<typeof unitContentSchema>;

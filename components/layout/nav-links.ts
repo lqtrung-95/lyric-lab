@@ -9,6 +9,7 @@ export interface NavLink {
 // Các mục điều hướng chính (design-brief §3), thêm "Thi đấu" (phòng luyện tập 1v1) và "Video" (video luyện nghe).
 export const NAV_LINKS: NavLink[] = [
   { href: "/app", label: "Trang chủ", icon: "home" },
+  { href: "/hoc", label: "Học", icon: "school" },
   { href: "/room", label: "Thi đấu", icon: "group" },
   { href: "/video", label: "Video", icon: "smart_display" },
   { href: "/review", label: "Ôn tập", icon: "style" },

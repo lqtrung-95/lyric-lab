@@ -7,7 +7,7 @@ export const ICON_NAMES = [
   "group", "headphones", "history", "history_edu", "home", "hourglass_top", "install_mobile", "ios_share", "keyboard", "laps", "leaderboard",
   "library_music", "light_mode", "lightbulb", "link", "list_alt", "local_fire_department", "logout", "menu_book", "mic", "more_horiz", "more_vert",
   "music_note", "open_in_full", "pause", "person", "person_add", "photo_camera", "play_arrow", "play_circle", "psychology", "push_pin", "quiz",
-  "repeat_one", "replay", "replay_5", "schedule", "search", "send", "share", "shuffle", "skip_next", "smart_display", "star", "star_border", "stop",
+  "repeat_one", "replay", "replay_5", "schedule", "school", "search", "send", "share", "shuffle", "skip_next", "smart_display", "star", "star_border", "stop",
   "style", "subtitles", "sync", "timer", "translate", "tune", "undo", "verified", "visibility", "visibility_off", "volume_up", "warning",
 ] as const;
 
