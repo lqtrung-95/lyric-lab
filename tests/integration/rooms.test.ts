@@ -433,6 +433,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "user_song_progress.user_id", "user_song_likes.user_id", "practice_scores.user_id", "leaderboard_profiles.user_id",
       "song_reports.user_id", "room_players.user_id", "room_answers.user_id", "rooms.host_id", "rooms.winner_id",
       "chat_messages.user_id", "chat_blocked_users.user_id", "user_video_likes.user_id", "user_unit_progress.user_id",
+      "user_badges.user_id", "user_quest_claims.user_id", "user_streak_freezes.user_id",
     ]);
     const ignored = new Set([
       "account_merge_tokens.from_user", // mã gộp của chính tài khoản nguồn, xóa theo tài khoản
