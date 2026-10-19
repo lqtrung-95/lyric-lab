@@ -231,6 +231,9 @@ Dựng video dọc 9:16 từ site thật: `node scripts/pr-video/build.mjs [thư
 ## Lộ trình HSK: nghĩa tiếng Việt
 `scripts/gloss-hsk-course.mts --course hsk-1` sinh nghĩa Việt cho từ CHƯA có nghĩa (in thử; `--apply` để ghi; `--force` sinh lại hết; `--unit n` một chặng). Sinh xong luôn rà lại: sửa các lỗi lặp lại vào `lib/courses/hsk1-gloss-overrides.ts` rồi `--overrides-only --apply` (không gọi AI) để áp. Chuỗi model dùng chung với dịch phụ đề video (`VIDEO_TRANSLATION_MODELS`), nên 429 thì tự rớt sang model sau.
 
+## Game hóa: migration
+Chạy `supabase/migrations/20261020000001_game_system.sql` trong Supabase SQL Editor (chạy lại được; tạo `user_badges`, `user_quest_claims`, `user_streak_freezes` với RLS chỉ-đọc cho chủ sở hữu, và thay hàm gộp tài khoản bằng bản đầy đủ có mang theo ba bảng). Không cần biến môi trường hay script mới. Chưa chạy thì `GET /api/game/*` vẫn trả 200 (XP/cấp/nhiệm vụ tính từ bảng sẵn có, huy hiệu không lưu được ngày nhận) và `POST .../claim` trả 503. Sau khi chạy: `npx vitest run tests/integration/rooms.test.ts` (cần `.env.local`) để test canh gác gộp tài khoản xác nhận ba bảng đã được phân loại. Đổi công thức/trần XP hay danh mục huy hiệu/nhiệm vụ chỉ cần deploy code (XP tính lại từ dữ liệu, không có số liệu lưu sẵn để sửa); đổi id huy hiệu thì huy hiệu cũ đã lưu bị bỏ qua khi đọc.
+
 ## Sao lưu cơ sở dữ liệu (GitHub Action hằng tuần)
 
 `.github/workflows/db-backup.yml` chạy 02:00 sáng thứ Hai (giờ Việt Nam), hoặc bấm tay ở tab Actions → "Sao lưu cơ sở dữ liệu" → Run workflow: `pg_dump` (client 17) → kiểm tra file đọc lại được (`pg_restore --list`) → mã hóa gpg AES256 → đẩy vào **một kho riêng tư khác**, giữ 12 bản gần nhất (mỗi loại). Hai file mỗi lần: `public-YYYY-MM-DD.dump.gpg` (cấu trúc và dữ liệu schema `public`) và `auth-YYYY-MM-DD.dump.gpg` (chỉ dữ liệu tài khoản người dùng; bước này lỗi thì chỉ cảnh báo, bản public vẫn lưu).
