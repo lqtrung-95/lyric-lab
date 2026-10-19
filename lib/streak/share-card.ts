@@ -3,10 +3,10 @@ import type { StreakData } from "./load-streak";
 
 const W = 1080;
 const H = 1350;
-const PRIMARY = "#b03a2e";
-const SECONDARY = "#2e6b5e";
-const INK = "#1c1611";
-const MUTED = "#5c5147";
+const PRIMARY = "#a35000";
+const SECONDARY = "#3b6931";
+const INK = "#2c1d11";
+const MUTED = "#564337";
 
 function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   c.beginPath();
@@ -20,29 +20,29 @@ function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number,
 export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWords" | "weekCount">): Promise<Blob> {
   await document.fonts.ready;
   // Chữ 歌 trang trí dùng font chữ Hán đã chia mảnh: yêu cầu tải đúng mảnh trước khi vẽ (xem ghi chú ở lib/share/line-card.ts).
-  await document.fonts.load('700 760px "Noto Serif SC"', "歌").catch(() => undefined);
+  await document.fonts.load('700 760px "Noto Sans SC"', "歌").catch(() => undefined);
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
   const c = canvas.getContext("2d")!;
-  const sans = "'Be Vietnam Pro', system-ui, sans-serif";
-  const serif = "Lora, Georgia, serif";
+  const sans = "'Plus Jakarta Sans', system-ui, sans-serif";
+  const serif = "'Plus Jakarta Sans', system-ui, sans-serif";
 
   // Khung bo góc cho cả thẻ, bên ngoài khung giữ trong suốt (đẹp hơn khi xem trước trong popup/khi tải về).
   const radius = 48;
   roundRect(c, 0, 0, W, H, radius);
   c.clip();
 
-  c.fillStyle = "#fff8f4";
+  c.fillStyle = "#fef9ed";
   c.fillRect(0, 0, W, H);
   const glowTop = c.createRadialGradient(W, 0, 0, W, 0, 900);
-  glowTop.addColorStop(0, "rgba(176, 58, 46, 0.2)");
-  glowTop.addColorStop(1, "rgba(176, 58, 46, 0)");
+  glowTop.addColorStop(0, "rgba(163, 80, 0, 0.2)");
+  glowTop.addColorStop(1, "rgba(163, 80, 0, 0)");
   c.fillStyle = glowTop;
   c.fillRect(0, 0, W, H);
   const glowBottom = c.createRadialGradient(0, H, 0, 0, H, 700);
-  glowBottom.addColorStop(0, "rgba(46, 107, 94, 0.12)");
-  glowBottom.addColorStop(1, "rgba(46, 107, 94, 0)");
+  glowBottom.addColorStop(0, "rgba(59, 105, 49, 0.12)");
+  glowBottom.addColorStop(1, "rgba(59, 105, 49, 0)");
   c.fillStyle = glowBottom;
   c.fillRect(0, 0, W, H);
 
@@ -53,8 +53,8 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
   c.fillStyle = topBar;
   c.fillRect(0, 0, W, 14);
 
-  c.fillStyle = "rgba(176, 58, 46, 0.06)";
-  c.font = `700 760px "Noto Serif SC", serif`;
+  c.fillStyle = "rgba(163, 80, 0, 0.06)";
+  c.font = `700 760px "Noto Sans SC", serif`;
   c.textAlign = "right";
   c.fillText("歌", W + 40, H - 120);
 

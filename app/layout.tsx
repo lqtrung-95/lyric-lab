@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Be_Vietnam_Pro, Lora } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { SITE_URL } from "@/lib/seo/site-url";
@@ -8,12 +8,10 @@ import { iconFontUrl } from "@/lib/ui/google-fonts-url";
 import "./globals.css";
 
 // Font tự host (tải lúc build, phục vụ cùng domain): không phụ thuộc CDN lúc chạy và luôn có bộ glyph tiếng Việt.
-// Lora cho tiêu đề (dấu tiếng Việt vẽ chuẩn), Be Vietnam Pro cho nội dung. Chữ Hán (Noto Serif SC) nạp qua link Google Fonts:
+// Plus Jakarta Sans cho toàn bộ giao diện và tiêu đề (đủ dấu tiếng Việt, nét tròn đậm hợp phong cách game). Chữ Hán (Noto Sans SC) nạp qua link Google Fonts:
 // next/font phải tải hàng trăm mảnh CJK lúc build nên làm hỏng build, còn Google tự cắt theo unicode-range.
-// Chỉ nạp (và preload) đúng các biến thể đang dùng: mỗi kiểu × đậm × bộ ký tự là một file ~5–40 KB được preload, nên thừa là chặn băng thông của tài nguyên quan trọng
-// hơn trên mạng chậm. Tiếng Việt chỉ cần latin + vietnamese (không cần latin-ext); không dùng chữ mảnh (300); Lora không có in nghiêng ở đâu trong app.
-const sans = Be_Vietnam_Pro({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal", "italic"], display: "swap", variable: "--font-be-vietnam-pro" });
-const serif = Lora({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "600", "700"], style: ["normal"], display: "swap", variable: "--font-lora" });
+// Chỉ nạp đúng các độ đậm đang dùng (400-800) và bộ ký tự latin + vietnamese; mỗi tổ hợp là một file được preload nên thừa là chặn băng thông.
+const sans = Plus_Jakarta_Sans({ subsets: ["latin", "vietnamese"], weight: ["400", "500", "600", "700", "800"], style: ["normal"], display: "swap", variable: "--font-plus-jakarta" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -23,8 +21,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fff8f4" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1611" },
+    { media: "(prefers-color-scheme: light)", color: "#fef9ed" },
+    { media: "(prefers-color-scheme: dark)", color: "#1f1a12" },
   ],
 };
 
@@ -37,7 +35,7 @@ const ICONS_READY_INIT = `try{document.fonts.ready.then(function(){document.docu
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${sans.variable} ${serif.variable}`} suppressHydrationWarning>
+    <html lang="vi" className={sans.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <script dangerouslySetInnerHTML={{ __html: ICONS_READY_INIT }} />

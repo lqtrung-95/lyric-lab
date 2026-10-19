@@ -20,10 +20,10 @@ function loadThumbnail(videoId: string | undefined): Promise<HTMLImageElement | 
 
 const W = 1080;
 const H = 1350;
-const PRIMARY = "#b03a2e";
-const SECONDARY = "#2e6b5e";
-const INK = "#1c1611";
-const MUTED = "#5c5147";
+const PRIMARY = "#a35000";
+const SECONDARY = "#3b6931";
+const INK = "#2c1d11";
+const MUTED = "#564337";
 const MAX_LINES = 4;
 
 export interface LineCardData {
@@ -49,9 +49,9 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
   canvas.width = W;
   canvas.height = H;
   const c = canvas.getContext("2d")!;
-  const sans = "'Be Vietnam Pro', system-ui, sans-serif";
-  const serif = "Lora, Georgia, serif";
-  const hanFont = `600 96px "Noto Serif SC", ${serif}`;
+  const sans = "'Plus Jakarta Sans', system-ui, sans-serif";
+  const serif = "'Plus Jakarta Sans', system-ui, sans-serif";
+  const hanFont = `600 96px "Noto Sans SC", ${serif}`;
   // Font chữ Hán của trang chia thành hàng chục mảnh theo unicode-range và theo từng độ đậm, trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở ĐÚNG độ đậm
   // ấy. `fonts.ready` không đợi các mảnh này nên canvas vẽ ngay: chữ nào có sẵn mảnh (vd. từ vựng in đậm trên trang) dùng Noto, chữ còn lại rơi về font hệ
   // thống với nét đậm nhạt khác. Yêu cầu tải đúng chữ, đúng độ đậm sắp vẽ rồi mới vẽ.
@@ -69,11 +69,11 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
   c.beginPath();
   c.roundRect(0, 0, W, H, 48);
   c.clip();
-  c.fillStyle = "#fff8f4";
+  c.fillStyle = "#fef9ed";
   c.fillRect(0, 0, W, H);
   const glow = c.createRadialGradient(W, 0, 0, W, 0, 900);
-  glow.addColorStop(0, "rgba(176, 58, 46, 0.2)");
-  glow.addColorStop(1, "rgba(176, 58, 46, 0)");
+  glow.addColorStop(0, "rgba(163, 80, 0, 0.2)");
+  glow.addColorStop(1, "rgba(163, 80, 0, 0)");
   c.fillStyle = glow;
   c.fillRect(0, 0, W, H);
   const bar = c.createLinearGradient(0, 0, W, 0);

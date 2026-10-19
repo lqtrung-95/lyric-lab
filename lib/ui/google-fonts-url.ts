@@ -1,12 +1,12 @@
 import { ICON_NAMES } from "@/components/ui/icon-names";
 
 /**
- * URL Google Fonts cho chữ Hán (Noto Serif SC, Google cắt theo unicode-range nên chỉ tải glyph cần dùng). Chữ
+ * URL Google Fonts cho chữ Hán (Noto Sans SC, Google cắt theo unicode-range nên chỉ tải glyph cần dùng). Chữ
  * Latin/tiếng Việt được tự host bằng `next/font` trong layout. `display=swap`: thấy chữ dự phòng ngay, đỡ phải
  * chờ, chữ Hán dự phòng vẫn đọc được nên không sao.
  */
 export function googleFontsUrl(): string {
-  return "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap";
+  return "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
 }
 
 /**

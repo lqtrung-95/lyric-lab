@@ -3,7 +3,7 @@
 /* Chế độ tối bật bằng class `dark` trên <html> (xem app/layout.tsx). */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Token lấy từ thiết kế Stitch "Warm Literary Paper" (design/*.html). Màu đi qua biến CSS để đổi được sáng/tối. */
+/* Token màu đi qua biến CSS để đổi được sáng/tối (giá trị ở :root và .dark bên dưới). */
 @theme inline {
   /* Bề rộng tối đa của khung nội dung toàn app (header, trang, chân trang): dùng `max-w-page`. Rộng hơn max-w-page (1280px) để màn lớn đỡ thừa lề hai bên. */
   --container-page: 100rem;
@@ -58,9 +58,9 @@
   --font-serif: var(--font-serif-stack);
   --font-sans: var(--font-sans-stack);
 
-  --radius: 0.25rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 
   --spacing-space-xs: 0.25rem;
   --spacing-space-sm: 0.5rem;
@@ -74,25 +74,25 @@
 
   --text-headline-xl: 40px;
   --text-headline-xl--line-height: 52px;
-  --text-headline-xl--font-weight: 600;
+  --text-headline-xl--font-weight: 800;
   --text-headline-xl-mobile: 30px;
   --text-headline-xl-mobile--line-height: 40px;
-  --text-headline-xl-mobile--font-weight: 600;
+  --text-headline-xl-mobile--font-weight: 800;
   --text-headline-lg: 32px;
   --text-headline-lg--line-height: 42px;
-  --text-headline-lg--font-weight: 500;
+  --text-headline-lg--font-weight: 800;
   --text-headline-lg-mobile: 24px;
   --text-headline-lg-mobile--line-height: 34px;
-  --text-headline-lg-mobile--font-weight: 500;
+  --text-headline-lg-mobile--font-weight: 800;
   --text-headline-md: 22px;
   --text-headline-md--line-height: 30px;
-  --text-headline-md--font-weight: 500;
+  --text-headline-md--font-weight: 700;
   --text-hanzi-display: 36px;
   --text-hanzi-display--line-height: 48px;
-  --text-hanzi-display--font-weight: 500;
+  --text-hanzi-display--font-weight: 700;
   --text-hanzi-body: 22px;
   --text-hanzi-body--line-height: 36px;
-  --text-hanzi-body--font-weight: 400;
+  --text-hanzi-body--font-weight: 500;
   --text-body-lg: 17px;
   --text-body-lg--line-height: 28px;
   --text-body-lg--font-weight: 400;
@@ -107,118 +107,136 @@
   --text-hanviet-reading--font-weight: 600;
   --text-label-md: 13px;
   --text-label-md--line-height: 18px;
-  --text-label-md--font-weight: 500;
+  --text-label-md--font-weight: 700;
   --text-label-sm: 11px;
   --text-label-sm--line-height: 14px;
-  --text-label-sm--font-weight: 600;
+  --text-label-sm--font-weight: 800;
 }
 
+/* Bảng màu "Cozy Fantasy Hanzi Quest" (thiết kế Stitch 2026-10, dự án 5421078878758074124): giấy da ấm, cam hổ phách, xanh rêu, xanh dương.
+   ĐÃ CHỈNH để đạt WCAG AA: chữ trắng trên cam #E67E22 của bản gốc chỉ ~2,9:1, nên nút đặc dùng cam đậm `--primary` (trắng 5,7:1, và là chữ trên nền kem 4,6-6,2:1),
+   còn cam sáng `--primary-container` chỉ dùng làm nền nổi/tô sáng với chữ nâu đậm `--on-primary-container` (5,7:1). */
 :root {
-  --surface: #fff8f4;
-  --surface-dim: #e3d8cf;
-  --surface-bright: #fff8f4;
+  --surface: #fef9ed;
+  --surface-dim: #dedace;
+  --surface-bright: #fef9ed;
   --surface-container-lowest: #ffffff;
-  --surface-container-low: #fdf2e8;
-  --surface-container: #f7ece3;
-  --surface-container-high: #f1e6dd;
-  --surface-container-highest: #ebe1d7;
-  --surface-variant: #ebe1d7;
-  --surface-tint: #ab3521;
-  --background: #fff8f4;
-  --on-surface: #201b15;
-  --on-background: #201b15;
-  --on-surface-variant: #58413d;
-  --inverse-surface: #352f29;
-  --inverse-on-surface: #faefe5;
-  --inverse-primary: #ffb4a6;
-  --outline: #8c716c;
-  --outline-variant: #e0bfb9;
-  --primary: #912211;
+  --surface-container-low: #f8f3e7;
+  --surface-container: #f2eee2;
+  --surface-container-high: #ede8dc;
+  --surface-container-highest: #e7e2d6;
+  --surface-variant: #e7e2d6;
+  --surface-tint: #a35000;
+  --background: #fef9ed;
+  --on-surface: #1d1c15;
+  --on-background: #1d1c15;
+  --on-surface-variant: #564337;
+  --inverse-surface: #323029;
+  --inverse-on-surface: #f5f0e4;
+  --inverse-primary: #ffb783;
+  --outline: #76604f;
+  --outline-variant: #dcc1b1;
+  --primary: #a35000;
   --on-primary: #ffffff;
-  --primary-container: #b23a26;
-  --on-primary-container: #ffd8d1;
-  --primary-fixed: #ffdad3;
-  --primary-fixed-dim: #ffb4a6;
-  --on-primary-fixed: #3f0300;
-  --on-primary-fixed-variant: #891d0c;
-  --secondary: #2f6767;
+  --primary-container: #e67e22;
+  --on-primary-container: #2c1d11;
+  --primary-fixed: #ffdcc5;
+  --primary-fixed-dim: #ffb783;
+  --on-primary-fixed: #301400;
+  --on-primary-fixed-variant: #713700;
+  --secondary: #3b6931;
   --on-secondary: #ffffff;
-  --secondary-container: #b4edec;
-  --on-secondary-container: #366d6d;
-  --secondary-fixed: #b4edec;
-  --secondary-fixed-dim: #99d1d0;
-  --on-secondary-fixed: #002020;
-  --on-secondary-fixed-variant: #114f4f;
-  --tertiary: #941d0d;
+  --secondary-container: #bcf1a9;
+  --on-secondary-container: #23501b;
+  --secondary-fixed: #bcf1a9;
+  --secondary-fixed-dim: #a0d490;
+  --on-secondary-fixed: #002200;
+  --on-secondary-fixed-variant: #23501b;
+  --tertiary: #006497;
   --on-tertiary: #ffffff;
-  --tertiary-container: #b63623;
-  --on-tertiary-container: #ffd9d2;
-  --tertiary-fixed: #ffdad4;
-  --tertiary-fixed-dim: #ffb4a6;
-  --on-tertiary-fixed: #3f0300;
-  --on-tertiary-fixed-variant: #8c1708;
+  --tertiary-container: #51a0db;
+  --on-tertiary-container: #003552;
+  --tertiary-fixed: #cce5ff;
+  --tertiary-fixed-dim: #92ccff;
+  --on-tertiary-fixed: #001e31;
+  --on-tertiary-fixed-variant: #004b73;
   --error: #ba1a1a;
   --on-error: #ffffff;
   --error-container: #ffdad6;
   --on-error-container: #93000a;
+  /* Nét viền mực nâu đậm và "đáy" của nút 3D (xem .btn-3d, .card-ink). */
+  --ink: #4a2e1b;
+  --shelf-primary: #6b3300;
+  --shelf-secondary: #1f4a17;
+  --shelf-tertiary: #00415f;
+  --shelf-neutral: #b9a58f;
+  --shadow-ink: rgba(74, 46, 27, 0.25);
   color-scheme: light;
 }
 
 .dark {
-  --surface: #1c1611;
-  --surface-dim: #1c1611;
-  --surface-bright: #433a33;
-  --surface-container-lowest: #160f0b;
-  --surface-container-low: #241d17;
-  --surface-container: #292119;
-  --surface-container-high: #342b24;
-  --surface-container-highest: #3f352d;
-  --surface-variant: #58413d;
-  --surface-tint: #ffb4a6;
-  --background: #1c1611;
-  --on-surface: #f2e6da;
-  --on-background: #f2e6da;
-  --on-surface-variant: #dbc1bb;
-  --inverse-surface: #f2e6da;
-  --inverse-on-surface: #352f29;
-  --inverse-primary: #912211;
-  --outline: #a38b86;
-  --outline-variant: #58413d;
-  --primary: #ffb4a6;
-  --on-primary: #561105;
-  --primary-container: #b23a26;
-  --on-primary-container: #ffd8d1;
-  --primary-fixed: #ffdad3;
-  --primary-fixed-dim: #ffb4a6;
-  --on-primary-fixed: #3f0300;
-  --on-primary-fixed-variant: #891d0c;
-  --secondary: #99d1d0;
-  --on-secondary: #003737;
-  --secondary-container: #114f4f;
-  --on-secondary-container: #b4edec;
-  --secondary-fixed: #b4edec;
-  --secondary-fixed-dim: #99d1d0;
-  --on-secondary-fixed: #002020;
-  --on-secondary-fixed-variant: #114f4f;
-  --tertiary: #ffb4a6;
-  --on-tertiary: #561105;
-  --tertiary-container: #8c1708;
-  --on-tertiary-container: #ffd9d2;
-  --tertiary-fixed: #ffdad4;
-  --tertiary-fixed-dim: #ffb4a6;
-  --on-tertiary-fixed: #3f0300;
-  --on-tertiary-fixed-variant: #8c1708;
+  --surface: #1f1a12;
+  --surface-dim: #1f1a12;
+  --surface-bright: #463f35;
+  --surface-container-lowest: #17130c;
+  --surface-container-low: #271f15;
+  --surface-container: #2d251a;
+  --surface-container-high: #382f23;
+  --surface-container-highest: #43392d;
+  --surface-variant: #564337;
+  --surface-tint: #ffb783;
+  --background: #1f1a12;
+  --on-surface: #ece1d1;
+  --on-background: #ece1d1;
+  --on-surface-variant: #d9c3b0;
+  --inverse-surface: #ece1d1;
+  --inverse-on-surface: #323029;
+  --inverse-primary: #a35000;
+  --outline: #a08c79;
+  --outline-variant: #564337;
+  --primary: #ffb783;
+  --on-primary: #502600;
+  --primary-container: #8a4400;
+  --on-primary-container: #ffdcc5;
+  --primary-fixed: #ffdcc5;
+  --primary-fixed-dim: #ffb783;
+  --on-primary-fixed: #301400;
+  --on-primary-fixed-variant: #713700;
+  --secondary: #a0d490;
+  --on-secondary: #0f3a09;
+  --secondary-container: #23501b;
+  --on-secondary-container: #bcf1a9;
+  --secondary-fixed: #bcf1a9;
+  --secondary-fixed-dim: #a0d490;
+  --on-secondary-fixed: #002200;
+  --on-secondary-fixed-variant: #23501b;
+  --tertiary: #92ccff;
+  --on-tertiary: #003352;
+  --tertiary-container: #004b73;
+  --on-tertiary-container: #cce5ff;
+  --tertiary-fixed: #cce5ff;
+  --tertiary-fixed-dim: #92ccff;
+  --on-tertiary-fixed: #001e31;
+  --on-tertiary-fixed-variant: #004b73;
   --error: #ffb4ab;
   --on-error: #690005;
   --error-container: #93000a;
   --on-error-container: #ffdad6;
+  --ink: #120d08;
+  --shelf-primary: #5a2c00;
+  --shelf-secondary: #153a0f;
+  --shelf-tertiary: #00324d;
+  --shelf-neutral: #17130c;
+  --shadow-ink: rgba(0, 0, 0, 0.4);
   color-scheme: dark;
 }
 
 :root {
-  /* Biến --font-* do next/font đặt trên <html>. Chữ Hán rơi về Noto Serif SC (link Google Fonts) khi Lora không có glyph. */
-  --font-serif-stack: var(--font-lora), "Noto Serif SC", "Songti SC", "Noto Serif CJK SC", serif;
-  --font-sans-stack: var(--font-be-vietnam-pro), system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Biến --font-* do next/font đặt trên <html>. Chữ Hán rơi về Noto Sans SC (link Google Fonts) khi Plus Jakarta Sans không có glyph. */
+  /* Thiết kế mới dùng MỘT họ chữ: Plus Jakarta Sans (đủ dấu tiếng Việt) cho giao diện và tiêu đề, Noto Sans SC cho chữ Hán. `font-serif` được giữ làm tên lớp cũ
+     nhưng giờ cùng họ sans (tiêu đề đậm). */
+  --font-sans-stack: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-serif-stack: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 /* Giữ thanh cuộn của panel nghe gọn và cùng tông với bảng màu sáng/tối. */
@@ -383,4 +401,50 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
 .anim-chip-in { animation: chip-in 0.18s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @media (prefers-reduced-motion: reduce) {
   .anim-chip-in { animation: none; }
+}
+
+
+/* Thành phần "game": nút 3D dày và thẻ viền mực (thiết kế Cozy Fantasy). Màu chữ trên nút luôn đạt AA (xem chú thích bảng màu).
+   Dùng: <button class="btn-3d btn-3d-primary">…</button>. Nhấn xuống 4px khi :active; người bật giảm chuyển động không có hiệu ứng dịch chuyển. */
+.btn-3d {
+  --btn-bg: var(--primary);
+  --btn-fg: var(--on-primary);
+  --btn-shelf: var(--shelf-primary);
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 2.5px solid var(--ink);
+  border-radius: 0.75rem;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  padding: 0.5rem 1.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  box-shadow: 0 4px 0 var(--btn-shelf);
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out, filter 120ms;
+  cursor: pointer;
+}
+.btn-3d:hover:not(:disabled) { filter: brightness(1.06); }
+.btn-3d:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 0 0 var(--btn-shelf); }
+.btn-3d:disabled { cursor: not-allowed; opacity: 0.55; box-shadow: 0 2px 0 var(--btn-shelf); }
+.btn-3d-primary { --btn-bg: var(--primary); --btn-fg: var(--on-primary); --btn-shelf: var(--shelf-primary); }
+.btn-3d-secondary { --btn-bg: var(--secondary); --btn-fg: var(--on-secondary); --btn-shelf: var(--shelf-secondary); }
+.btn-3d-tertiary { --btn-bg: var(--tertiary); --btn-fg: var(--on-tertiary); --btn-shelf: var(--shelf-tertiary); }
+.btn-3d-neutral { --btn-bg: var(--surface-container-lowest); --btn-fg: var(--on-surface); --btn-shelf: var(--shelf-neutral); }
+/* Nền cam sáng nổi bật (tô sáng, thưởng): chữ nâu đậm thay vì trắng để đạt AA. */
+.btn-3d-bright { --btn-bg: var(--primary-container); --btn-fg: var(--on-primary-container); --btn-shelf: var(--shelf-primary); }
+
+.card-ink {
+  border: 2.5px solid var(--ink);
+  border-radius: 1rem;
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  box-shadow: 0 4px 0 var(--shadow-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-3d { transition: none; }
+  .btn-3d:active:not(:disabled) { transform: none; }
 }
