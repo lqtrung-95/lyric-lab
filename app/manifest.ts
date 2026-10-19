@@ -15,8 +15,8 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#fef9ed",
     theme_color: "#fef9ed",
     icons: [
-      { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { src: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { src: "/icon-192-v2.png", sizes: "192x192", type: "image/png" },
+      { src: "/icon-512-v2.png", sizes: "512x512", type: "image/png" },
     ],
     share_target: { action: "/share-target", method: "GET", params: { title: "title", text: "text", url: "url" } },
   } as MetadataRoute.Manifest;

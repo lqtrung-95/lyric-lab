@@ -4,6 +4,7 @@ import { BeforeAfter } from "@/components/landing/before-after";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FeatureShowcase } from "@/components/landing/feature-showcase";
 import { FeaturesGrid } from "@/components/landing/features-grid";
+import { GameLoop } from "@/components/landing/game-loop";
 import { FinalCta } from "@/components/landing/final-cta";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { LandingHero } from "@/components/landing/landing-hero";
@@ -34,6 +35,7 @@ export default function LandingPage() {
       <Reveal><LiveDemo /></Reveal>
       <Reveal><BeforeAfter /></Reveal>
       <Reveal><HowItWorks /></Reveal>
+      <Reveal><GameLoop /></Reveal>
       <Reveal><FeatureShowcase /></Reveal>
       <Reveal><AudienceLevels /></Reveal>
       <Reveal><FeaturesGrid /></Reveal>

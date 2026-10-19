@@ -24,8 +24,8 @@ export function FeaturesGrid() {
       <h2 id="features-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Học chậm mà chắc, bằng thứ bạn vốn đã thích nghe</h2>
       <ul className="mt-space-lg grid gap-space-md md:grid-cols-2 lg:grid-cols-3">
         {FEATURES.map((f) => (
-          <li key={f.title} className={`rounded-3xl p-space-md ${f.accent ? "bg-secondary-container/60" : "bg-surface-container-low"}`}>
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-lowest text-primary shadow-sm"><Icon name={f.icon} size={24} /></span>
+          <li key={f.title} className={`card-ink p-space-md ${f.accent ? "!bg-secondary-container text-on-secondary-container" : ""}`}>
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl border-2 border-ink bg-primary-container text-on-primary-container"><Icon name={f.icon} size={24} /></span>
             <h3 className="mt-space-md font-serif text-headline-md text-on-surface">{f.title}</h3>
             <p className="mt-2 max-w-xl text-body-md text-on-surface-variant">{f.body}</p>
           </li>

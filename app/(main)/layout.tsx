@@ -14,7 +14,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <SideNav />
       <HudBar />
       <div className="md:pl-20 lg:pl-64">
-        <main id="main" tabIndex={-1} className="mx-auto max-w-page px-gutter pb-28 pt-24 outline-none md:px-6 md:pb-16 lg:px-10">{children}</main>
+        <main id="main" tabIndex={-1} className="mx-auto max-w-page px-gutter pb-28 pt-24 outline-none md:px-6 md:pb-24 lg:px-10">{children}</main>
       </div>
       <MobileTabBar />
       <ChatBubble />

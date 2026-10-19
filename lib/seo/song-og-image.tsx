@@ -5,9 +5,9 @@ import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
 import { MARKETING_OG_SIZE } from "./marketing-og-image";
 import { fetchOgThumbnail } from "./og-thumbnail";
 
-const PRIMARY = "#b03a2e";
-const INK = "#1c1611";
-const MUTED = "#5c5147";
+const PRIMARY = "#944a00";
+const INK = "#2c1d11";
+const MUTED = "#5c4a3a";
 const HAN = /[㐀-鿿]/g;
 
 const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
@@ -24,23 +24,23 @@ export async function renderSongOgImage({ videoId, title, artist }: { videoId: s
     loadOgFonts().catch(() => []),
     hanChars ? loadCjkGlyphFont(hanChars).then((f) => [f]).catch(() => []) : Promise.resolve([]),
     fetchOgThumbnail(videoId, "hqdefault"),
-    readFile(path.join(process.cwd(), "public", "songhanzi-mark-light.png")),
+    readFile(path.join(process.cwd(), "public", "songhanzi-mark.png")),
   ]);
   const markUrl = `data:image/png;base64,${mark.toString("base64")}`;
   const titleSize = shownTitle.length > 36 ? 44 : shownTitle.length > 20 ? 54 : 66;
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", background: "linear-gradient(135deg, #fff8f4 0%, #fbe4dc 55%, #d6eceb 100%)", padding: 56 }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", background: "linear-gradient(135deg, #fef9ed 0%, #fbe3c8 55%, #f4c58f 100%)", padding: 56 }}>
         {thumb && (
           <div style={{ display: "flex", alignItems: "center", marginRight: 48 }}>
             {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
-            <img src={thumb} width={460} height={259} alt="" style={{ borderRadius: 28, objectFit: "cover", boxShadow: "0 12px 40px rgba(28, 22, 17, 0.28)" }} />
+            <img src={thumb} width={460} height={259} alt="" style={{ borderRadius: 28, objectFit: "cover", boxShadow: "0 12px 40px rgba(44, 29, 17, 0.28)" }} />
           </div>
         )}
         <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: 18, background: "#ffffff", boxShadow: "0 4px 14px rgba(176, 58, 46, 0.18)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 64, height: 64, borderRadius: 18, background: "transparent" }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
               <img src={markUrl} width={50} height={50} alt="" />
             </div>

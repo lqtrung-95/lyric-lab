@@ -7,18 +7,18 @@ const TRUST = ["Miễn phí", "Không cần đăng ký", "Chữ giản thể + �
 /** Hero trang chủ: lời hứa của sản phẩm, ô dán link (hành động chính) và hình minh họa. */
 export function LandingHero() {
   return (
-    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden rounded-[2rem] bg-surface-container-low px-space-md py-space-xl md:px-space-xl lg:py-16">
+    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden card-ink !bg-surface-container-low px-space-md py-space-xl md:px-space-xl lg:py-16">
       {/* Nền: vệt sáng đỏ mực và chữ Hán mờ làm điểm nhấn văn chương. */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_60%_at_88%_8%,color-mix(in_srgb,var(--primary-container)_20%,transparent),transparent),radial-gradient(50%_50%_at_5%_100%,color-mix(in_srgb,var(--secondary-container)_25%,transparent),transparent)]" />
       <span aria-hidden="true" lang="zh" className="anim-drift pointer-events-none absolute -bottom-16 right-2 -z-10 font-serif text-[22rem] leading-none text-primary/[0.05] md:text-[30rem]">歌</span>
 
       <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full bg-surface-container-lowest/80 px-3 py-1.5 text-label-md font-semibold text-primary ring-1 ring-outline-variant/50">
+          <p className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-primary-container px-3 py-1.5 text-label-md font-bold text-on-primary-container">
             <Icon name="music_note" size={16} filled />
             Học tiếng Trung qua bài hát và video
           </p>
-          <h1 id="hero-heading" className="mt-space-md font-serif text-[38px] font-semibold leading-[1.15] tracking-tight text-on-surface md:text-[54px]">
+          <h1 id="hero-heading" className="mt-space-md text-[38px] font-extrabold leading-[1.15] tracking-tight text-on-surface md:text-[54px]">
             Nghe một bài hát,<br />
             <span className="text-primary">nhớ cả trăm chữ Hán.</span>
           </h1>

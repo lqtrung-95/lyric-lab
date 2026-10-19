@@ -6,9 +6,9 @@ import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
 export const MARKETING_OG_SIZE = { width: 1200, height: 630 };
 export const MARKETING_OG_ALT = "SongHanzi: học tiếng Trung qua bài hát và video, dành cho người Việt";
 
-const PRIMARY = "#b03a2e";
-const INK = "#1c1611";
-const MUTED = "#5c5147";
+const PRIMARY = "#944a00";
+const INK = "#2c1d11";
+const MUTED = "#5c4a3a";
 
 /**
  * Ảnh xem trước (og:image và twitter:image) của trang giới thiệu: logo và tên SongHanzi, lời hứa của sản phẩm và chữ 歌 làm nền, cùng tông màu
@@ -19,19 +19,19 @@ export async function renderMarketingOgImage(): Promise<ImageResponse> {
   const [fonts, cjk, mark] = await Promise.all([
     loadOgFonts().catch(() => []),
     loadCjkGlyphFont("歌").then((f) => [f]).catch(() => []),
-    readFile(path.join(process.cwd(), "public", "songhanzi-mark-light.png")),
+    readFile(path.join(process.cwd(), "public", "songhanzi-mark.png")),
   ]);
   const markUrl = `data:image/png;base64,${mark.toString("base64")}`;
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", position: "relative", background: "linear-gradient(135deg, #fff8f4 0%, #fbe4dc 55%, #d6eceb 100%)" }}>
-        <div style={{ position: "absolute", right: 40, bottom: -70, display: "flex", fontSize: 520, fontWeight: 700, color: "rgba(176, 58, 46, 0.08)", fontFamily: "serif-cjk", lineHeight: 1 }}>歌</div>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", position: "relative", background: "linear-gradient(135deg, #fef9ed 0%, #fbe3c8 60%, #f4c58f 100%)" }}>
+        <div style={{ position: "absolute", right: 40, bottom: -70, display: "flex", fontSize: 520, fontWeight: 700, color: "rgba(148, 74, 0, 0.10)", fontFamily: "serif-cjk", lineHeight: 1 }}>歌</div>
         <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "56px 72px", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 84, height: 84, borderRadius: 24, background: "#ffffff", boxShadow: "0 4px 18px rgba(176, 58, 46, 0.18)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 84, height: 84 }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
-              <img src={markUrl} width={68} height={68} alt="" />
+              <img src={markUrl} width={84} height={84} alt="" />
             </div>
             <div style={{ display: "flex", marginLeft: 22, fontSize: 52, fontWeight: 700, fontFamily: "serif-bold", color: INK }}>
               Song<span style={{ color: PRIMARY }}>Hanzi</span>

@@ -1,7 +1,7 @@
 // Mẫu email (hàm thuần: nhận dữ liệu, trả {subject, html, text}). Giao diện dùng bảng và style nội tuyến vì các ứng dụng email không hỗ trợ CSS hiện đại.
-const PRIMARY = "#b03a2e";
-const INK = "#1c1611";
-const MUTED = "#5c5147";
+const PRIMARY = "#944a00";
+const INK = "#2c1d11";
+const MUTED = "#5c4a3a";
 
 export interface RenderedEmail {
   subject: string;
@@ -23,10 +23,10 @@ interface Layout {
 }
 
 function layout({ siteUrl, heading, body, cta, unsubscribeUrl, why }: Layout): string {
-  return `<!doctype html><html lang="vi"><body style="margin:0;background:#fff8f4;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:${INK}">
+  return `<!doctype html><html lang="vi"><body style="margin:0;background:#fef9ed;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;color:${INK}">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">
 <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:20px;overflow:hidden" cellpadding="0" cellspacing="0">
-<tr><td style="height:6px;background:linear-gradient(90deg,${PRIMARY},#2e6b5e)"></td></tr>
+<tr><td style="height:6px;background:linear-gradient(90deg,${PRIMARY},#3b6931)"></td></tr>
 <tr><td style="padding:28px 28px 8px;font-family:Georgia,serif;font-size:22px;font-weight:700">SongHanzi</td></tr>
 <tr><td style="padding:8px 28px 0;font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.3">${esc(heading)}</td></tr>
 <tr><td style="padding:12px 28px 4px;font-size:16px;line-height:1.6;color:${MUTED}">${body}</td></tr>

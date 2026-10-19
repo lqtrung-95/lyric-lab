@@ -1,4 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 204 44" fill="none">
-  <image href="/songhanzi-mark-light.png" x="2" y="2" width="40" height="40" />
-  <text x="52" y="29" font-family="Lora, 'Noto Serif', serif" font-weight="600" font-size="22" fill="#201b15" letter-spacing="-0.3">Song<tspan fill="#912211">Hanzi</tspan></text>
+  <image href="/songhanzi-mark.png" x="2" y="2" width="40" height="40" />
+  <text x="52" y="29" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="800" font-size="22" fill="#4a2e1b" letter-spacing="-0.3">Song<tspan fill="#944a00">Hanzi</tspan></text>
 </svg>

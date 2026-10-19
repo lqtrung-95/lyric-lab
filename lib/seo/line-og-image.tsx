@@ -4,10 +4,10 @@ import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
 import { MARKETING_OG_SIZE } from "./marketing-og-image";
 import { fetchOgThumbnail } from "./og-thumbnail";
 
-const PRIMARY = "#b03a2e";
-const SECONDARY = "#2e6b5e";
-const INK = "#1c1611";
-const MUTED = "#5c5147";
+const PRIMARY = "#944a00";
+const SECONDARY = "#3b6931";
+const INK = "#2c1d11";
+const MUTED = "#5c4a3a";
 const MAX_LINES = 3;
 const CONTENT_WIDTH = 1200 - 2 * 88;
 /** Mọi ký tự ngoài Latin/Việt (chữ Hán, dấu câu CJK): cần font chữ Hán con. */
@@ -68,7 +68,7 @@ export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
 
   return new ImageResponse(
     (
-      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", position: "relative", background: "linear-gradient(135deg, #fff8f4 0%, #fbe4dc 55%, #d6eceb 100%)" }}>
+      <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", position: "relative", background: "linear-gradient(135deg, #fef9ed 0%, #fbe3c8 55%, #f4c58f 100%)" }}>
         <div style={{ display: "flex", width: "100%", height: 12, background: `linear-gradient(90deg, ${PRIMARY}, ${SECONDARY})` }} />
         <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "40px 88px 44px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -83,7 +83,7 @@ export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
           {thumb ? (
             <div style={{ display: "flex", alignItems: "center" }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
-              <img src={thumb} width={208} height={117} alt="" style={{ borderRadius: 16, objectFit: "cover", boxShadow: "0 8px 24px rgba(28, 22, 17, 0.25)" }} />
+              <img src={thumb} width={208} height={117} alt="" style={{ borderRadius: 16, objectFit: "cover", boxShadow: "0 8px 24px rgba(44, 29, 17, 0.25)" }} />
               <div style={{ display: "flex", flexDirection: "column", marginLeft: 28, flex: 1 }}>
                 <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: INK, fontFamily: "sans, serif-cjk", lineHeight: 1.3 }}>{meta}</div>
                 <div style={{ display: "flex", marginTop: 6, fontSize: 26, color: MUTED, fontFamily: "sans" }}>Học tiếng Trung qua bài hát · songhanzi.com</div>

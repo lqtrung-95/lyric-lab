@@ -53,19 +53,19 @@ export function SingingPanel({ line, items, savedKeys, onToggleSave }: SingingPa
   return (
     <aside
       aria-label="Từ và ngữ pháp trong câu đang hát"
-      className="fixed inset-x-0 bottom-0 z-30 rounded-t-2xl bg-surface-container-low shadow-[0_-4px_24px_rgba(30,26,22,0.15)] lg:static lg:rounded-2xl lg:bg-transparent lg:shadow-none"
+      className="fixed inset-x-0 bottom-0 z-30 rounded-t-2xl bg-surface-container-low shadow-[0_-4px_24px_rgba(30,26,22,0.15)] min-[900px]:static min-[900px]:rounded-2xl min-[900px]:bg-transparent min-[900px]:shadow-none"
     >
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-14 w-full items-center justify-between px-4 lg:hidden"
+        className="flex min-h-14 w-full items-center justify-between px-4 min-[900px]:hidden"
       >
         <span className="text-label-md font-semibold text-on-surface">Đang hát · {title} · {items.length} mục</span>
         <Icon name={open ? "expand_more" : "expand_less"} size={22} />
       </button>
-      <div className={`${open ? "block" : "hidden"} max-h-[55vh] overflow-y-auto px-4 pb-4 lg:block lg:max-h-none lg:overflow-visible lg:px-0 lg:pt-4 lg:pb-6`}>
-        <div className="sticky top-0 z-10 mb-3 hidden items-center justify-between gap-2 border-b border-outline-variant/40 bg-surface py-2 lg:flex">
+      <div className={`${open ? "block" : "hidden"} max-h-[55vh] overflow-y-auto px-4 pb-4 min-[900px]:block min-[900px]:max-h-none min-[900px]:overflow-visible min-[900px]:px-0 min-[900px]:pt-4 min-[900px]:pb-6`}>
+        <div className="sticky top-0 z-10 mb-3 hidden items-center justify-between gap-2 border-b border-outline-variant/40 bg-surface py-2 min-[900px]:flex">
           <h2 className="flex items-center gap-2 font-serif text-headline-md text-on-surface">
             <Icon name="menu_book" size={20} className="text-secondary" />
             Từ & Ngữ pháp trong bài
