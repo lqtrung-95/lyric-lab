@@ -45,7 +45,8 @@ test("danh sách video: hiện thẻ video đã duyệt, mục Video có trên t
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/video");
   await expect(page.getByRole("heading", { name: "Video luyện nghe" })).toBeVisible();
-  await expect(page.getByRole("navigation").getByRole("link", { name: "Video" }).first()).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Loại nội dung để nghe" }).getByRole("link", { name: "Video" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("navigation", { name: "Điều hướng chính" }).first().getByRole("link", { name: "Nghe" })).toBeVisible();
   const card = page.getByRole("link", { name: /Cuộc trò chuyện mẫu/ });
   await expect(card).toBeVisible();
   await expect(page.getByText(/HSK ~1\.5 · 3 câu · 2 phút/)).toBeVisible();

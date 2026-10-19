@@ -44,32 +44,40 @@ test.describe("điện thoại 375px", () => {
   });
 });
 
-test("máy tính: đủ icon trên thanh trên, không có nút Menu", async ({ page }) => {
+test("máy tính: thanh bên có đủ điều hướng chính và lối vào phụ, thanh trên không có nút Menu", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   await page.goto("/app");
   const header = page.getByRole("banner");
-  for (const name of ["Công cụ", "Bảng xếp hạng", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(header.getByRole("link", { name })).toBeVisible();
+  const side = page.getByRole("complementary");
+  for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"]) await expect(side.getByRole("link", { name, exact: true })).toBeVisible();
+  for (const name of ["Công cụ", "Bảng xếp hạng", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(side.getByRole("link", { name })).toBeVisible();
   await expect(header.getByRole("button", { name: "Menu" })).toBeHidden();
+  await expect(header.getByRole("link", { name: /Cộng đồng/ })).toBeVisible();
 });
 
 test.describe("máy tính bảng", () => {
-  for (const [width, height] of [[1032, 1376], [820, 1180], [1180, 820]]) {
-    test(`iPad ${width}px: thanh điều hướng không xuống dòng chữ, icon phụ gom vào Menu, bảng Menu mở được`, async ({ page }) => {
+  for (const [width, height, side] of [[1032, 1376, "đầy đủ"], [1180, 820, "đầy đủ"], [820, 1180, "icon"]] as const) {
+    test(`iPad ${width}px: thanh bên ${side}, mục điều hướng gọn một dòng, không tràn ngang`, async ({ page }) => {
       await page.setViewportSize({ width, height });
       await page.goto("/app");
-      const header = page.getByRole("banner");
-      // Mỗi mục điều hướng nằm gọn một dòng (chiều cao = vùng bấm tối thiểu, không bị chữ xuống dòng làm cao lên).
-      for (const name of ["Trang chủ", "Thi đấu", "Video", "Thư viện"]) {
-        const box = (await header.getByRole("link", { name, exact: true }).boundingBox())!;
-        expect(box.height, `${name} bị xuống dòng`).toBeLessThanOrEqual(48);
+      const aside = page.getByRole("complementary");
+      for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"]) {
+        const box = (await aside.getByRole("link", { name, exact: true }).boundingBox())!;
+        expect(box.height, `${name} bị xuống dòng`).toBeLessThanOrEqual(64);
       }
-      for (const name of ["Công cụ", "Bảng xếp hạng", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(header.getByRole("link", { name })).toBeHidden();
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-      await header.getByRole("button", { name: "Menu" }).click();
-      const sheet = page.getByRole("dialog", { name: "Menu" });
-      await expect(sheet.getByRole("link", { name: "Cài đặt và tài khoản" })).toBeVisible();
-      const sheetBox = (await sheet.boundingBox())!;
-      expect(sheetBox.width).toBeLessThan(width); // trên iPad bảng không trải hết bề ngang
+      const header = page.getByRole("banner");
+      if (side === "đầy đủ") {
+        await expect(aside.getByRole("link", { name: "Cài đặt và tài khoản" })).toBeVisible();
+        await expect(header.getByRole("button", { name: "Menu" })).toBeHidden();
+      } else {
+        // Thanh icon hẹp không có lối vào phụ: chúng nằm trong bảng Menu ở thanh trên.
+        await expect(aside.getByRole("link", { name: "Cài đặt và tài khoản" })).toBeHidden();
+        await header.getByRole("button", { name: "Menu" }).click();
+        const sheet = page.getByRole("dialog", { name: "Menu" });
+        await expect(sheet.getByRole("link", { name: "Cài đặt và tài khoản" })).toBeVisible();
+        expect((await sheet.boundingBox())!.width).toBeLessThan(width);
+      }
     });
   }
 });

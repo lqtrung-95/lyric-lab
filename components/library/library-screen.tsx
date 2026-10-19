@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { ListenSwitch } from "@/components/layout/listen-switch";
 import { DiscoverTab } from "./discover-tab";
 import { SavedWordsTab } from "./saved-words-tab";
 import { SongsTab } from "./songs-tab";
@@ -30,6 +31,7 @@ export function LibraryScreen({ initialTab = "songs" }: { initialTab?: LibraryTa
 
   return (
     <div>
+      <ListenSwitch current="songs" />
       <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Thư viện</h1>
       <div role="tablist" aria-label="Thư viện" className="mt-space-md inline-flex gap-1 rounded-full bg-surface-container-low p-1">
         {TABS.map((t) => (

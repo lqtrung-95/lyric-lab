@@ -23,7 +23,7 @@ export function SiteHeader() {
           </Link>
           <nav aria-label="Điều hướng chính" className="hidden items-center gap-1 rounded-full bg-surface-container-low/70 p-1 md:flex">
             {NAV_LINKS.map((link) => {
-              const active = isNavActive(link.href, pathname);
+              const active = isNavActive(link, pathname);
               return (
                 <Link
                   key={link.href}

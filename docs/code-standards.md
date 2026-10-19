@@ -115,6 +115,9 @@ Mọi lời gọi `focus()` khi mở hoặc trả focus lúc đóng popup/sheet 
 ## Migration thay hàm gộp tài khoản
 Mỗi migration `create or replace function public.merge_user_data` phải sao ĐẦY ĐỦ bản mới nhất rồi thêm phần của mình, và đối chiếu từng cột/bảng với bản trước (đã từng rơi `daily_goal` khi chép thiếu). Thêm bảng theo người dùng nào thì thêm cả đoạn hợp nhất và đoạn xóa dữ liệu nguồn.
 
+## Màu trên nền cam và tương phản
+`--primary` (cam đậm) đi với `text-on-primary`; `--primary-container` (cam sáng) đi với `text-on-primary-container` (nâu đậm). KHÔNG ghép `bg-primary-container` với `text-on-primary`, và hover của nút `bg-primary` dùng `hover:brightness-110` chứ không đổi sang `bg-primary-container` (chữ trắng trên cam sáng chỉ ~2,9:1). Mọi trang chính có kiểm tra axe sáng/tối trong `tests/e2e/accessibility.spec.ts`.
+
 ## Vẽ canvas với font chữ Hán
 - Font chữ Hán của trang (Noto Serif SC qua Google Fonts) chia thành nhiều mảnh theo unicode-range và theo độ đậm; trình duyệt chỉ tải mảnh khi trang cần vẽ chữ đó ở đúng độ đậm. `document.fonts.ready` KHÔNG đợi các mảnh này nên vẽ canvas ngay sẽ có chữ rơi về font hệ thống, nét đậm nhạt khác nhau trong cùng một câu. Trước khi `fillText` chữ Hán, gọi `await document.fonts.load(font, đoạnChữSắpVẽ)` (xem `lib/share/line-card.ts`).
 

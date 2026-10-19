@@ -1,5 +1,6 @@
 "use client";
 
+import { ListenSwitch } from "@/components/layout/listen-switch";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,6 +43,7 @@ export function VideoListScreen() {
 
   return (
     <div className="space-y-space-md">
+      <ListenSwitch current="videos" />
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Video luyện nghe</h1>
         <p className="mt-1 text-body-lg text-on-surface-variant">Xem video tiếng Trung có phụ đề từng câu kèm pinyin và bản dịch. Bấm vào một từ để tra nghĩa và lưu vào bộ thẻ ôn.</p>

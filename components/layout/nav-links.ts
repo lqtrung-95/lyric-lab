@@ -4,18 +4,32 @@ export interface NavLink {
   href: string;
   label: string;
   icon: IconName;
+  /** Tiền tố đường dẫn khác cũng tính là đang ở mục này (ví dụ mục "Nghe" gồm cả thư viện, video và màn nghe). */
+  matches?: string[];
 }
 
-// Các mục điều hướng chính (design-brief §3), thêm "Thi đấu" (phòng luyện tập 1v1) và "Video" (video luyện nghe).
+// Năm mục điều hướng chính theo vòng học (PRD v2 mục 5.3): Hôm nay · Học · Nghe · Ôn & Nói · Chơi. Đường dẫn cũ giữ nguyên, chỉ đổi cách gom.
 export const NAV_LINKS: NavLink[] = [
-  { href: "/app", label: "Trang chủ", icon: "home" },
+  { href: "/app", label: "Hôm nay", icon: "home" },
   { href: "/hoc", label: "Học", icon: "school" },
-  { href: "/room", label: "Thi đấu", icon: "group" },
-  { href: "/video", label: "Video", icon: "smart_display" },
-  { href: "/review", label: "Ôn tập", icon: "style" },
-  { href: "/library", label: "Thư viện", icon: "library_music" },
+  { href: "/library", label: "Nghe", icon: "headphones", matches: ["/library", "/video", "/learn", "/watch"] },
+  { href: "/review", label: "Ôn & Nói", icon: "style", matches: ["/review", "/phat-am"] },
+  { href: "/room", label: "Chơi", icon: "emoji_events", matches: ["/room", "/challenge", "/chat"] },
 ];
 
-export function isNavActive(href: string, pathname: string): boolean {
-  return pathname === href || pathname.startsWith(`${href}/`);
+/** Lối vào phụ: hiện ở thanh bên (desktop) và trong bảng Menu (điện thoại, máy tính bảng). */
+export const SECONDARY_LINKS: { href: string; label: string; icon: IconName }[] = [
+  { href: "/cong-cu", label: "Công cụ", icon: "build" },
+  { href: "/review/leaderboard", label: "Bảng xếp hạng", icon: "leaderboard" },
+  { href: "/cai-app", label: "Cài app lên điện thoại", icon: "install_mobile" },
+  { href: "/feedback", label: "Góp ý cho SongHanzi", icon: "feedback" },
+  { href: "/settings", label: "Cài đặt và tài khoản", icon: "person" },
+];
+
+const within = (prefix: string, pathname: string) => pathname === prefix || pathname.startsWith(`${prefix}/`);
+
+/** Mục điều hướng đang được chọn: đúng đường dẫn chính hoặc trang con, hoặc một trong các tiền tố `matches`. Nhận cả chuỗi đường dẫn (kiểm tra một mục đơn). */
+export function isNavActive(target: string | NavLink, pathname: string): boolean {
+  const link = typeof target === "string" ? { href: target } : target;
+  return [link.href, ...(("matches" in link && link.matches) || [])].some((p) => within(p, pathname));
 }
