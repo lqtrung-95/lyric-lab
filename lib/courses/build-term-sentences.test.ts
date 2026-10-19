@@ -23,4 +23,9 @@ describe("buildTermSentences", () => {
     expect(stats.byLevel[1].atLeast1).toBeGreaterThanOrEqual(3);
     expect(stats.byLevel[5]).toEqual({ words: 1, atLeast1: 0, atLeast3: 0 });
   });
+  it("video xuất hiện hai lần ở đầu vào không sinh dòng trùng khóa", () => {
+    const { rows } = buildTermSentences([...videos, videos[0]], levels, 5);
+    const keys = rows.map((r) => `${r.term}|${r.video_id}|${r.line_idx}`);
+    expect(new Set(keys).size).toBe(keys.length);
+  });
 });

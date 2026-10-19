@@ -12,10 +12,11 @@ const apply = args.includes("--apply");
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false }, realtime: { transport: ws as never } });
 
+// Phân trang PHẢI có order cố định: thiếu order thì các trang chồng/hụt nhau (video bị đọc hai lần, một số video bị bỏ sót).
 // Cấp HSK của từ: nếu một chữ có nhiều mục từ điển (nhiều âm đọc) thì lấy cấp thấp nhất.
 const levels = new Map<string, number>();
 for (let from = 0; ; from += 1000) {
-  const { data, error } = await sb.from("dict_words").select("simplified,hsk_level").not("hsk_level", "is", null).range(from, from + 999);
+  const { data, error } = await sb.from("dict_words").select("simplified,hsk_level").not("hsk_level", "is", null).order("id").range(from, from + 999);
   if (error) throw error;
   if (!data?.length) break;
   for (const w of data as { simplified: string; hsk_level: number }[]) levels.set(w.simplified, Math.min(w.hsk_level, levels.get(w.simplified) ?? 99));
@@ -23,7 +24,7 @@ for (let from = 0; ; from += 1000) {
 
 const videos: VideoLines[] = [];
 for (let from = 0; ; from += 20) {
-  const { data, error } = await sb.from("video_lessons").select("video_id,lines").eq("status", "listed").range(from, from + 19);
+  const { data, error } = await sb.from("video_lessons").select("video_id,lines").eq("status", "listed").order("video_id").range(from, from + 19);
   if (error) throw error;
   if (!data?.length) break;
   for (const v of data as { video_id: string; lines: VideoLines["lines"] }[]) videos.push({ videoId: v.video_id, lines: v.lines });

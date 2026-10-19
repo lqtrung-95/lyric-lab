@@ -24,7 +24,10 @@ export const DEFAULT_PER_TERM = 5;
 export function buildTermSentences(videos: VideoLines[], levels: Map<string, number>, perTerm = DEFAULT_PER_TERM): { rows: TermSentenceRow[]; stats: BuildStats } {
   const levelOf = (w: string) => levels.get(w);
   const byTerm = new Map<string, ScoredLine[]>();
+  const seenVideos = new Set<string>();
   for (const v of videos) {
+    if (seenVideos.has(v.videoId)) continue; // phòng đầu vào lặp video: khóa chính (từ, video, dòng) không cho trùng
+    seenVideos.add(v.videoId);
     for (const line of v.lines) {
       const seen = new Set<string>();
       for (const tok of line.tokens) {
