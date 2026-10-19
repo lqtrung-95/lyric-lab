@@ -1,6 +1,8 @@
 # PRD — SongHanzi: Học ngoại ngữ qua bài hát
 
 Cập nhật: 2026-09-24 · Tác giả: Le Trung · Trạng thái: Draft v1
+> **Bản hiện hành: [`PRD-v2.md`](PRD-v2.md) (2026-10-19).** Tài liệu này là PRD v1 (lịch sử, phạm vi MVP ban đầu).
+
 Bản gốc (Claude Docs): https://claude.ai/code/artifact/51cadc8e-fa2d-4628-81f9-822e610e9e07
 
 ## 1. Tổng quan
