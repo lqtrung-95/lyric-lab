@@ -1,6 +1,6 @@
 # Tiện ích trình duyệt SongHanzi (Chrome, Edge, Firefox)
 
-Trạng thái: CHỜ DUYỆT, chưa code. Ngày: 2026-10-19. Nghiên cứu: [research/findings.md](research/findings.md).
+Trạng thái: BACKLOG (2026-10-19: người dùng quyết định để sau, ưu tiên [lộ trình học](../261019-2035-learning-paths-and-lessons/plan.md)). Kế hoạch giữ nguyên để làm lại khi cần. Nghiên cứu: [research/findings.md](research/findings.md).
 
 ## Quyết định đã chốt với người dùng
 - Làm tiện ích để có người dùng (web khó thu hút). Cả 3 trình duyệt (WXT), nếu Firefox phát sinh nhiều việc thì Chrome + Edge trước.
