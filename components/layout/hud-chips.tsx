@@ -32,10 +32,10 @@ export function HudChips() {
         </Link>
       )}
       {game && (
-        <span className={`${CHIP} max-sm:hidden`} title={`Cấp ${game.level.n}: ${game.level.name}`}>
+        <Link href="/profile" className={`${CHIP} max-sm:hidden`} title={`Cấp ${game.level.n}: ${game.level.name}. Xem hồ sơ và huy hiệu`}>
           <Icon name="star" size={18} filled className="text-primary" />
           Lv {game.level.n}
-        </span>
+        </Link>
       )}
     </div>
   );

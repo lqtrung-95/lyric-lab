@@ -16,7 +16,7 @@ interface SingingPanelProps {
 function ItemCard({ item, saved, onToggleSave }: { item: PreviewItem; saved: boolean; onToggleSave: (i: PreviewItem) => void }) {
   const isVocab = item.type === "vocab";
   return (
-    <li className={`relative shrink-0 overflow-hidden rounded-2xl border border-outline-variant/25 bg-surface-container-lowest p-3 shadow-sm ${isVocab ? "" : "pl-5"}`}>
+    <li className={`card-ink relative shrink-0 overflow-hidden p-3 ${isVocab ? "" : "pl-5"}`}>
       {!isVocab && <div aria-hidden="true" className="absolute inset-y-0 left-0 w-1.5 bg-secondary" />}
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -28,13 +28,13 @@ function ItemCard({ item, saved, onToggleSave }: { item: PreviewItem; saved: boo
             </p>
           )}
         </div>
-        <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm text-on-surface-variant">{levelLabel(item.level)}</span>
+        <span className="rounded-full border-2 border-ink/30 bg-surface-container-high px-2 py-0.5 text-label-sm font-bold text-on-surface-variant">{levelLabel(item.level)}</span>
       </div>
       <p className="mt-2 text-body-md text-on-surface">{item.meaningInContext}</p>
       {item.explanation && <p className="mt-1 text-label-md text-on-surface-variant">{item.explanation}</p>}
       {item.example && <p className="mt-2 text-label-md text-on-surface-variant"><span lang="zh" className="font-serif text-body-md text-on-surface">{item.example.zh}</span> — {item.example.vi}</p>}
       <button type="button" aria-pressed={saved} onClick={() => onToggleSave(item)}
-        className={`mt-2 inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-label-md hover:bg-surface-container ${saved ? "font-semibold text-primary" : "text-on-surface-variant"}`}>
+        className={`btn-3d mt-2 ${saved ? "btn-3d-neutral" : "btn-3d-bright"}`}>
         <Icon name={saved ? "star" : "star_border"} filled={saved} size={18} />
         {saved ? "Đã lưu" : "Lưu"}
       </button>
