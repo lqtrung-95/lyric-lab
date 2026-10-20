@@ -10,7 +10,7 @@ test.describe("điện thoại 375px", () => {
     const header = page.getByRole("banner");
     await expect(header.getByRole("link", { name: /Cộng đồng/ })).toBeVisible();
     await expect(header.getByRole("link", { name: "Công cụ" })).toBeHidden();
-    await expect(header.getByRole("link", { name: "Bảng xếp hạng" })).toBeHidden();
+    await expect(header.getByRole("link", { name: "Hồ sơ và huy hiệu" })).toBeHidden();
     await expect(header.getByRole("link", { name: "Góp ý cho SongHanzi" })).toBeHidden();
     // Không tràn ngang: nút cuối nằm trong màn hình.
     const menu = header.getByRole("button", { name: "Menu" });
@@ -21,7 +21,7 @@ test.describe("điện thoại 375px", () => {
     await menu.click();
     const sheet = page.getByRole("dialog", { name: "Menu" });
     await expect(sheet).toBeVisible();
-    for (const name of ["Công cụ", "Bảng xếp hạng", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(sheet.getByRole("link", { name })).toBeVisible();
+    for (const name of ["Công cụ", "Hồ sơ và huy hiệu", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(sheet.getByRole("link", { name })).toBeVisible();
     expect((await new AxeBuilder({ page }).include("dialog").analyze()).violations).toEqual([]);
 
     await sheet.getByRole("link", { name: "Công cụ" }).click();
@@ -50,7 +50,7 @@ test("máy tính: thanh bên có đủ điều hướng chính và lối vào ph
   const header = page.getByRole("banner");
   const side = page.getByRole("complementary");
   for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"]) await expect(side.getByRole("link", { name, exact: true })).toBeVisible();
-  for (const name of ["Công cụ", "Bảng xếp hạng", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(side.getByRole("link", { name })).toBeVisible();
+  for (const name of ["Công cụ", "Hồ sơ và huy hiệu", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(side.getByRole("link", { name })).toBeVisible();
   await expect(header.getByRole("button", { name: "Menu" })).toBeHidden();
   await expect(header.getByRole("link", { name: /Cộng đồng/ })).toBeVisible();
 });

@@ -34,10 +34,10 @@ export default function AppHomePage() {
               <ToolsHint />
             </div>
           </section>
-        </div>
-        <div className="grid gap-space-md md:grid-cols-2 lg:grid-cols-1 md:[&>:first-child]:col-span-2 lg:[&>:first-child]:col-span-1">
-          <HomeQuests />
           <HomePathCard />
+        </div>
+        <div className="grid gap-space-md md:grid-cols-2 lg:grid-cols-1">
+          <HomeQuests />
           <HomeVersusCard />
         </div>
       </div>
