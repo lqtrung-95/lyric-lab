@@ -43,7 +43,7 @@ export function NextActionPanel() {
     <section aria-labelledby="today-heading" aria-busy={!ready} className="card-ink flex h-full flex-col justify-between gap-space-md p-space-md">
       {/* Trái: việc nên làm ngay; phải: vòng mục tiêu ngày (lấp chỗ trống khi thẻ bị kéo cao bằng khối Nhiệm vụ bên cạnh). */}
       <div className="flex flex-wrap items-start justify-between gap-x-space-lg gap-y-space-md">
-        <div className="min-h-[9rem] min-w-[14rem] flex-1">
+        <div className="min-h-[11rem] min-w-[14rem] flex-1">
           <h2 id="today-heading" className="inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-sm font-extrabold uppercase tracking-widest text-on-primary-container">Việc tiếp theo</h2>
           {!ready && <ActionSkeleton />}
           {ready && action.kind === "review" && (
