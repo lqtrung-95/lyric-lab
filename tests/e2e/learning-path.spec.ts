@@ -35,8 +35,13 @@ test("chọn cấp: HSK 1–6, mở HSK 2 qua liên kết có thể chia sẻ", 
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 2" })).toBeVisible({ timeout: 30_000 });
   await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).not.toHaveCount(0);
   expect(await page.getByRole("list", { name: "Các chặng" }).getByRole("listitem").count()).toBeGreaterThan(90);
+  // HSK 6 còn đang phát triển: chip có nhãn và có lời nhắn góp ý; cấp khác thì không.
+  await expect(chips.getByRole("link", { name: /HSK 6.*Đang phát triển/ })).toBeVisible();
+  await page.goto("/hoc?khoa=hsk-6");
+  await expect(page.getByRole("note")).toContainText("vẫn đang được phát triển");
   await page.goto("/hoc?khoa=hsk-5");
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 5" })).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByRole("note")).toHaveCount(0);
 });
 
 test("mục Học có trên thanh điều hướng", async ({ page }) => {

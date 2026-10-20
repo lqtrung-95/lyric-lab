@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
+import { Icon } from "@/components/ui/icon";
+import { isCourseInDevelopment } from "@/lib/courses/course-maturity";
 import { writeLastCourse } from "@/lib/courses/last-course";
 import { CourseMap } from "./course-map";
 import { useCourseList } from "./use-course-list";
@@ -25,9 +27,16 @@ export function CourseHub({ slugParam }: { slugParam: string | null }) {
             <Link key={c.slug} href={`/hoc?khoa=${c.slug}`} replace aria-current={c.slug === slug ? "page" : undefined}
               className={`inline-flex min-h-11 shrink-0 items-center rounded-full border-2 border-ink px-4 text-label-md font-extrabold ${c.slug === slug ? "bg-primary-container text-on-primary-container shadow-[0_3px_0_var(--shadow-ink)]" : "bg-surface-container-lowest text-on-surface"}`}>
               {c.title}
+              {isCourseInDevelopment(c.slug) && <span className="ml-2 rounded-full border-2 border-ink/40 bg-surface-container-high px-2 text-label-sm font-bold text-on-surface-variant">Đang phát triển</span>}
             </Link>
           ))}
         </nav>
+      )}
+      {isCourseInDevelopment(slug) && (
+        <p role="note" className="card-ink flex items-start gap-2 bg-tertiary-container p-space-sm text-body-md text-on-tertiary-container">
+          <Icon name="build" size={20} className="mt-0.5 shrink-0" />
+          <span>{courses.find((c) => c.slug === slug)?.title ?? "Khóa này"} vẫn đang được phát triển: nghĩa tiếng Việt do AI sinh và chưa được rà soát, nhiều từ chưa có câu thật làm ví dụ. Bạn gặp lỗi hay chỗ chưa ổn, <Link href="/feedback" className="font-bold underline">góp ý giúp SongHanzi</Link> nhé.</span>
+        </p>
       )}
       <CourseMap key={slug} slug={slug} />
     </div>

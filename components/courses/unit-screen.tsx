@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { isCourseInDevelopment } from "@/lib/courses/course-maturity";
 import { PASS_PERCENT, REVIEW_QUIZ_KINDS, UNIT_QUIZ_KINDS } from "@/lib/courses/build-unit-quiz";
 import type { UnitProgress } from "@/lib/courses/course-types";
 import { listUnitProgress, saveUnitProgress } from "@/lib/user-data/unit-progress-repo";
@@ -64,6 +65,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
       <header>
         <p className="text-label-md text-on-surface-variant">{detail.unit.kind === "final" ? "Kiểm tra cuối cấp" : detail.unit.kind === "checkpoint" ? "Ôn tập" : "Chặng"} {detail.unit.idx}/{detail.unit.total}</p>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">{detail.unit.title}</h1>
+        {isCourseInDevelopment(slug) && <p className="mt-1 inline-block rounded-full border-2 border-ink/40 bg-surface-container-high px-2 text-label-sm font-bold text-on-surface-variant">Khóa đang phát triển: nghĩa tiếng Việt chưa được rà soát</p>}
       </header>
       {isReview && step === "learn" && (
         <div className="card-ink p-space-md">
