@@ -20,7 +20,7 @@ const max = Number(opt("max") ?? 18);
 const reviewEvery = Number(opt("review-every") ?? 0);
 const withFinal = !args.includes("--no-final");
 // HSK 1: chủ đề soạn tay (`hsk1-themes.ts`). HSK 2–5: chủ đề do AI phân loại rồi người duyệt (`scripts/theme-hsk-words.mts` → `hsk-themed-words.json`).
-if (level < 1 || level > 5) throw new Error("--level 1..5");
+if (level < 1 || level > 6) throw new Error("--level 1..6");
 const THEMES = level === 1 ? HSK1_THEMES : themesFromAssignment((JSON.parse(readFileSync("lib/courses/hsk-themed-words.json", "utf8")) as Record<string, ThemeAssignment>)[String(level)] ?? {});
 if (THEMES.length === 0) throw new Error(`Chưa có chủ đề cho HSK ${level}: chạy scripts/theme-hsk-words.mts --level ${level} trước`);
 
