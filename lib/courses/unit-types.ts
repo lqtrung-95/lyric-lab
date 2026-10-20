@@ -9,6 +9,9 @@ export interface UnitWord {
   gloss: string | null;
   /** Nghĩa tiếng Anh từ từ điển, dùng khi chưa có gloss. */
   meanings: string[];
+  /** Emoji minh họa (chỉ từ cụ thể) và mẹo nhớ ngắn do AI gợi ý; có thể vắng. */
+  emoji?: string;
+  tip?: string;
   examples: ExampleSentence[];
 }
 

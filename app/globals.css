@@ -355,6 +355,12 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
   0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
   50% { transform: translate3d(-14px, -10px, 0) rotate(2deg); }
 }
+.celebrate-piece { opacity: 0; animation: celebrate-rise 1.6s ease-out forwards; }
+@keyframes celebrate-rise {
+  0% { opacity: 0; transform: translateY(40px) scale(0.6); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-30px) scale(1.15) rotate(14deg); }
+}
 .anim-float { animation: float-slow 7s ease-in-out infinite; }
 .anim-float-late { animation: float-slow 7s ease-in-out 1.6s infinite; }
 .anim-drift { animation: drift 24s ease-in-out infinite; }

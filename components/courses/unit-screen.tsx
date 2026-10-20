@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { refreshGameSummary } from "@/components/layout/use-game-summary";
+import { unitXp } from "@/lib/game/xp-rules";
 import { isCourseInDevelopment } from "@/lib/courses/course-maturity";
 import { PASS_PERCENT, REVIEW_QUIZ_KINDS, UNIT_QUIZ_KINDS } from "@/lib/courses/build-unit-quiz";
 import type { UnitProgress } from "@/lib/courses/course-types";
 import { listUnitProgress, saveUnitProgress } from "@/lib/user-data/unit-progress-repo";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { CelebrationBurst } from "./celebration-burst";
 import { savedItemFor, UnitLearnStep } from "./unit-learn-step";
 import { UnitListenStep } from "./unit-listen-step";
 import { UnitQuizStep } from "./unit-quiz-step";
@@ -27,7 +30,7 @@ const STEPS: { id: Exclude<Step, "result">; label: string }[] = [
 export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
   const unit = useUnit(slug, idx);
   const [step, setStep] = useState<Step>("learn");
-  const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; added: number; missed: number } | null>(null);
+  const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; first: boolean; added: number; missed: number } | null>(null);
   const { state: learner, toggleSaved } = useLearnerState();
   const [prev, setPrev] = useState<UnitProgress | undefined>();
   const unitId = unit.status === "ready" ? unit.detail.unit.id : null;
@@ -55,7 +58,8 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
     const items = wrongTerms.map((t) => detail.words.find((w) => w.term === t)).map((w) => (w ? savedItemFor(w) : null));
     const fresh = items.filter((x): x is NonNullable<typeof x> => x !== null && !have.has(x.key));
     fresh.forEach((x) => toggleSaved(x));
-    setResult({ percent, passed, saved, added: fresh.length, missed: items.filter((x) => x === null).length });
+    if (saved && passed) refreshGameSummary(); // cập nhật cấp/XP ở thanh trên
+    setResult({ percent, passed, saved, first: prev?.status !== "completed", added: fresh.length, missed: items.filter((x) => x === null).length });
     setStep("result");
   }
 
@@ -83,9 +87,11 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
       {step === "listen" && <UnitListenStep words={detail.words} onNext={() => setStep("quiz")} />}
       {step === "quiz" && <UnitQuizStep words={detail.words} length={detail.unit.quizLength} kinds={isReview ? REVIEW_QUIZ_KINDS : UNIT_QUIZ_KINDS} onFinish={(p, ok, wrong) => void finish(p, ok, wrong)} />}
       {step === "result" && result && (
-        <div className="rounded-2xl border border-outline-variant bg-surface-container-low p-space-lg text-center" data-testid="unit-result">
+        <div className="card-ink relative overflow-hidden p-space-lg text-center" data-testid="unit-result">
+          {result.passed && <CelebrationBurst />}
           <p className="font-serif text-headline-lg">{result.percent}%</p>
           <p className="mt-1 text-body-lg">{result.passed ? (detail.unit.kind === "final" ? `Hoàn thành ${detail.course.title}! Giỏi lắm.` : isReview ? "Ôn tập xong! Giỏi lắm." : "Hoàn thành chặng! Giỏi lắm.") : `Chưa đạt ${PASS_PERCENT}%. Ôn lại các từ rồi thử lần nữa nhé.`}</p>
+          {result.passed && result.saved && result.first && <p className="mt-2 inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-md font-extrabold text-on-primary-container" data-testid="unit-result-xp">+{unitXp(result.percent)} XP <span className="font-medium">(lần hoàn thành đầu, có hạn mức mỗi ngày)</span></p>}
           {result.added > 0 && <p className="mt-1 text-body-md text-on-surface-variant" data-testid="unit-result-added">Đã thêm {result.added} từ làm sai vào bộ ôn.</p>}
           {result.missed > 0 && <p className="mt-1 text-body-sm text-on-surface-variant">{result.missed} từ làm sai chưa có câu thật trong video nên chưa lưu được thẻ.</p>}
           {!result.saved && <p className="mt-1 text-body-sm text-on-surface-variant">Chưa ghi nhớ được tiến độ lần này (mất kết nối?).</p>}

@@ -9,6 +9,10 @@ export const hskUnitContentSchema = z.object({
   topic: z.string().max(40).optional(),
   /** Nghĩa tiếng Việt ngắn của từng từ (từ điển chỉ có nghĩa tiếng Anh); sinh bằng `scripts/gloss-hsk-course.mts`, người dùng duyệt trước khi ghi. */
   glosses: z.record(z.string(), z.string().min(1).max(80)).optional(),
+  /** Emoji minh họa cho từ cụ thể (một emoji mỗi từ; từ trừu tượng không có). Sinh bằng `scripts/enrich-hsk-course.mts`. */
+  emojis: z.record(z.string(), z.string().min(1).max(16)).optional(),
+  /** Mẹo nhớ ngắn bằng tiếng Việt (thường nối với âm Hán Việt). AI sinh, CHƯA rà soát: giao diện gắn nhãn "gợi ý". */
+  tips: z.record(z.string(), z.string().min(1).max(160)).optional(),
 });
 /**
  * Chặng ôn tổng hợp: không có từ riêng mà ôn lại các chặng đã học của cùng khóa. `checkpoint` ôn các chặng học có số thứ tự từ `from` đến `to`

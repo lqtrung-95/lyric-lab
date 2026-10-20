@@ -49,16 +49,24 @@ const courseId = course.data.id as string;
 // Giữ nghĩa tiếng Việt đã có (kể cả bản sửa tay) theo từng từ: chia lại chặng không làm mất công sinh/rà nghĩa.
 const existing = await sb.from("course_units").select("content").eq("course_id", courseId);
 const keptGlosses = new Map<string, string>();
-for (const r of (existing.data ?? []) as { content: { kind?: string; glosses?: Record<string, string> } }[]) if (r.content.kind === "hsk") for (const [t, g] of Object.entries(r.content.glosses ?? {})) keptGlosses.set(t, g);
+const keptEmojis = new Map<string, string>();
+const keptTips = new Map<string, string>();
+for (const r of (existing.data ?? []) as { content: { kind?: string; glosses?: Record<string, string>; emojis?: Record<string, string>; tips?: Record<string, string> } }[]) {
+  if (r.content.kind !== "hsk") continue;
+  for (const [t, g] of Object.entries(r.content.glosses ?? {})) keptGlosses.set(t, g);
+  for (const [t, g] of Object.entries(r.content.emojis ?? {})) keptEmojis.set(t, g);
+  for (const [t, g] of Object.entries(r.content.tips ?? {})) keptTips.set(t, g);
+}
+const pick = (u: string[], from: Map<string, string>) => Object.fromEntries(u.filter((t) => from.has(t)).map((t) => [t, from.get(t)!]));
 const rows = units.map((u, i) => {
   const base = { course_id: courseId, idx: i + 1, title: u.title, summary: u.summary, status };
   if (u.kind === "review") return { ...base, content: { kind: "review", variant: u.variant, topic: u.topic, ...(u.from ? { from: u.from, to: u.to } : {}) } };
-  const glosses = Object.fromEntries(u.terms.filter((t) => keptGlosses.has(t)).map((t) => [t, keptGlosses.get(t)!]));
-  return { ...base, content: { kind: "hsk", terms: u.terms, topic: u.topic, ...(Object.keys(glosses).length ? { glosses } : {}) } };
+  const extra = { glosses: pick(u.terms, keptGlosses), emojis: pick(u.terms, keptEmojis), tips: pick(u.terms, keptTips) };
+  return { ...base, content: { kind: "hsk", terms: u.terms, topic: u.topic, ...Object.fromEntries(Object.entries(extra).filter(([, v]) => Object.keys(v).length > 0)) } };
 });
 const up = await sb.from("course_units").upsert(rows, { onConflict: "course_id,idx" });
 if (up.error) throw new Error(`ghi chặng: ${up.error.message}`);
 const del = await sb.from("course_units").delete().eq("course_id", courseId).gt("idx", units.length);
 if (del.error) throw new Error(`xóa chặng thừa: ${del.error.message}`);
-console.log(`Đã ghi khóa học hsk-${level} với ${units.length} chặng (${status}); giữ lại ${keptGlosses.size} nghĩa tiếng Việt đã có.`);
+console.log(`Đã ghi khóa học hsk-${level} với ${units.length} chặng (${status}); giữ lại ${keptGlosses.size} nghĩa tiếng Việt, ${keptEmojis.size} emoji, ${keptTips.size} mẹo nhớ đã có.`);
 process.exit(0);

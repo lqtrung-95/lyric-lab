@@ -22,7 +22,7 @@ export async function loadUnit(slug: string, idx: number): Promise<UnitDetail | 
   const total = await sb.from("course_units").select("id", { count: "exact", head: true }).eq("course_id", course.data.id).eq("status", "listed");
   const pool = await termPool(sb, course.data.id as string, content.data);
   if (!pool) return null;
-  const { terms, glosses } = pool;
+  const { terms, glosses, emojis, tips } = pool;
   const [entries, examples] = await Promise.all([Promise.all(terms.map((t) => lookupTermEntry(t))), loadTermSentences(terms, EXAMPLES_PER_WORD)]);
   const words: UnitWord[] = terms.map((term, i) => ({
     term,
@@ -30,6 +30,8 @@ export async function loadUnit(slug: string, idx: number): Promise<UnitDetail | 
     sinoViet: entries[i]?.sinoViet ?? null,
     hskLevel: entries[i]?.hskLevel ?? null,
     gloss: glosses?.[term] ?? null,
+    emoji: emojis?.[term],
+    tip: tips?.[term],
     meanings: entries[i]?.meanings ?? [],
     examples: examples[term] ?? [],
   }));
@@ -39,8 +41,8 @@ export async function loadUnit(slug: string, idx: number): Promise<UnitDetail | 
 }
 
 /** Từ của chặng: chặng học dùng danh sách riêng; chặng ôn lấy mẫu từ các chặng học nguồn của cùng khóa (nhóm `from`–`to`, hoặc cả khóa với bài cuối cấp). */
-async function termPool(sb: ReturnType<typeof createSupabaseServiceClient>, courseId: string, content: UnitContent): Promise<{ terms: string[]; glosses?: Record<string, string> } | null> {
-  if (content.kind === "hsk") return { terms: content.terms, glosses: content.glosses };
+async function termPool(sb: ReturnType<typeof createSupabaseServiceClient>, courseId: string, content: UnitContent): Promise<{ terms: string[]; glosses?: Record<string, string>; emojis?: Record<string, string>; tips?: Record<string, string> } | null> {
+  if (content.kind === "hsk") return { terms: content.terms, glosses: content.glosses, emojis: content.emojis, tips: content.tips };
   const rows = await sb.from("course_units").select("idx,content").eq("course_id", courseId).eq("status", "listed").order("idx");
   if (rows.error) return null;
   const sources: ReviewSource[] = [];

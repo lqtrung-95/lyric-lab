@@ -62,24 +62,40 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
   // Lần đầu vào trang chặng, dev server còn biên dịch tuyến này: chờ lâu hơn mặc định 5 giây.
   await expect(page.getByRole("heading", { level: 1, name: "Đại từ cơ bản" })).toBeVisible({ timeout: 45_000 });
 
-  // Bước 1: có các từ của chặng (khoảng 10) với pinyin, nghĩa Việt và nút nghe.
-  await expect(page.getByRole("button", { name: /^Nghe \p{Script=Han}/u }).first()).toBeVisible();
-  expect(await page.getByRole("button", { name: /^Nghe \p{Script=Han}/u }).count()).toBeGreaterThanOrEqual(5);
-  await expect(page.getByText("tôi", { exact: false }).first()).toBeVisible();
+  // Bước 1: học từng thẻ. Mặt trước chỉ có chữ Hán; "Xem nghĩa" mới hiện pinyin và nghĩa Việt; tự đánh giá Nhớ rồi/Chưa nhớ.
+  await expect(page.getByTestId("focus-card")).toBeVisible();
+  await expect(page.getByText("Thử đoán nghĩa trong đầu trước nhé.")).toBeVisible();
+  await page.getByRole("button", { name: /Xem nghĩa/ }).click();
+  await expect(page.getByText(/Mẹo nhớ|Hán Việt:/).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Đọc to" })).toBeVisible();
+  await noViolations(page);
+  // Từ đầu: chưa nhớ → sẽ có trong danh sách học lại; các từ còn lại: nhớ rồi.
+  await page.getByRole("button", { name: "Chưa nhớ" }).click();
+  for (let guard = 0; guard < 30 && (await page.getByTestId("focus-recap").count()) === 0; guard++) {
+    await page.getByRole("button", { name: /Xem nghĩa/ }).click();
+    await page.getByRole("button", { name: "Nhớ rồi" }).click();
+  }
+  await expect(page.getByTestId("focus-recap")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Học lại 1 từ chưa nhớ/ })).toBeVisible();
   await noViolations(page);
   await page.getByRole("button", { name: /Nghe trong câu thật/ }).click();
 
-  // Bước 2: câu thật từ video, có bản dịch và liên kết xem video.
-  await expect(page.getByRole("link", { name: /Xem trong video/ }).first()).toBeVisible();
+  // Bước 2: câu thật từ video, có bản dịch và nút xem đoạn video ngay trong trang.
+  await expect(page.getByRole("button", { name: /Xem đoạn video/ }).first()).toBeVisible();
+  await page.getByRole("button", { name: "Pinyin" }).click(); // tắt pinyin để tự thử nghe hiểu
+  await expect(page.getByRole("button", { name: "Pinyin" })).toHaveAttribute("aria-pressed", "false");
   await noViolations(page);
   await page.getByRole("button", { name: /Làm bài kiểm tra/ }).click();
 
-  // Bước 3: chọn đáp án đầu tiên cho cả 10 câu.
+  // Bước 3: chọn đáp án đầu tiên cho cả 10 câu; câu sai hiện thẻ đáp án đúng.
+  let answerCards = 0;
   for (let i = 0; i < 10; i++) {
     await expect(page.getByText(new RegExp(`Câu ${i + 1}/10`))).toBeVisible();
     await page.getByRole("group", { name: "Các lựa chọn" }).getByRole("button").first().click();
+    answerCards += await page.getByTestId("answer-card").count();
     await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
   }
+  expect(answerCards).toBeGreaterThan(0);
   const result = page.getByTestId("unit-result");
   await expect(result).toBeVisible();
   await expect(result).toContainText("%");
