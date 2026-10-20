@@ -97,7 +97,7 @@ export function PasteLinkForm() {
           type="submit"
           disabled={pending}
           aria-busy={pending}
-          className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary-container px-6 text-label-md font-semibold text-on-primary-container transition-opacity hover:opacity-90 disabled:opacity-70"
+          className="flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-primary-container px-6 text-label-md font-semibold text-on-primary-container transition-opacity hover:opacity-90 disabled:opacity-70"
         >
           {pending ? "Đang mở bài hát…" : "Phân tích bài hát"}
           {pending ? <Spinner size={16} /> : <Icon name="arrow_forward" size={18} />}

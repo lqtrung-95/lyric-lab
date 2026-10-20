@@ -45,7 +45,7 @@ export function StreakCard() {
   }
 
   return (
-    <section aria-label="Chuỗi ngày học" className="mt-space-md flex flex-col gap-2 rounded-2xl bg-surface-container-low px-space-md py-3 md:grid md:py-4 md:grid-cols-[auto_1fr_auto] md:items-center md:gap-space-lg">
+    <section aria-label="Chuỗi ngày học" className="mt-space-md flex flex-col gap-2 card-ink px-space-md py-3 lg:grid lg:py-4 lg:grid-cols-[auto_1fr_auto] lg:items-center lg:gap-space-lg">
       <div className="flex items-center gap-4">
         <span aria-hidden="true" className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${streak.current > 0 ? "bg-tertiary-fixed text-on-tertiary-fixed" : "bg-surface-container-high text-on-surface-variant"}`}>
           <Icon name="local_fire_department" filled />
@@ -58,11 +58,11 @@ export function StreakCard() {
           </p>
         </div>
         {/* Điện thoại: nút chia sẻ nằm cùng hàng với số chuỗi (chỉ icon) để thẻ không dài ra. */}
-        <ShareButton onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0} className="md:hidden" />
+        <ShareButton onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0} className="lg:hidden" />
       </div>
 
-      <div className="min-w-0 md:justify-self-center">
-        <ol aria-label={`Tuần này: học ${streak.weekCount} trên ${WEEKLY_GOAL_DAYS} ngày mục tiêu`} className="flex justify-between gap-1 md:justify-start md:gap-4">
+      <div className="min-w-0 lg:justify-self-center">
+        <ol aria-label={`Tuần này: học ${streak.weekCount} trên ${WEEKLY_GOAL_DAYS} ngày mục tiêu`} className="flex justify-between gap-1 lg:justify-start lg:gap-4">
           {streak.week.map((d, i) => (
             <li key={d.day} className="flex flex-col items-center gap-2">
               <span className={`flex h-9 w-9 items-center justify-center rounded-full text-label-sm ${d.studied ? "bg-secondary text-on-secondary" : "bg-surface-container-high text-on-surface-variant"} ${d.isToday ? "ring-2 ring-primary ring-offset-1 ring-offset-surface-container-low" : ""}`}>
@@ -73,15 +73,15 @@ export function StreakCard() {
             </li>
           ))}
         </ol>
-        <p className="mt-2 text-label-md font-normal md:mt-3 text-on-surface-variant md:text-center">{goalDone ? "Đã đạt mục tiêu tuần!" : `Mục tiêu tuần: ${streak.weekCount}/${WEEKLY_GOAL_DAYS} ngày`}</p>
+        <p className="mt-2 text-label-md font-normal lg:mt-3 text-on-surface-variant lg:text-center">{goalDone ? "Đã đạt mục tiêu tuần!" : `Mục tiêu tuần: ${streak.weekCount}/${WEEKLY_GOAL_DAYS} ngày`}</p>
       </div>
 
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <ShareButton onClick={() => void share()} disabled={streak.current === 0 && streak.learnedWords === 0} withLabel />
         {note && <p role="status" className="text-label-sm text-on-surface-variant">{note}</p>}
       </div>
-      {note && <p role="status" className="text-label-sm text-on-surface-variant md:hidden">{note}</p>}
-      <div className="space-y-3 border-t border-outline-variant/40 pt-3 md:col-span-3">
+      {note && <p role="status" className="text-label-sm text-on-surface-variant lg:hidden">{note}</p>}
+      <div className="space-y-3 border-t border-outline-variant/40 pt-3 lg:col-span-3">
         <DailyGoalBar items={streak.todayItems ?? 0} goal={streak.dailyGoal ?? 0} />
         <MilestonesRow stats={{ longest: streak.longest, learnedWords: streak.learnedWords, videoLines: streak.videoLines ?? 0 }} />
       </div>

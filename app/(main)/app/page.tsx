@@ -22,24 +22,23 @@ export default function AppHomePage() {
   return (
     <>
       <AnnouncementBanner />
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <div className="space-y-space-md">
-          <NextActionPanel />
-          <section aria-labelledby="paste-heading" className="card-ink px-space-md py-space-md">
+      {/* Hai hàng hai ô cao bằng nhau: hàng trên là việc cần làm (hành động + nhiệm vụ), hàng dưới là việc mới (dán bài + lộ trình). Điện thoại xếp một cột theo thứ tự đọc. */}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-2">
+        <div className="lg:col-start-1 lg:row-start-1"><NextActionPanel /></div>
+        <div className="lg:col-start-2 lg:row-start-1 max-lg:order-3"><HomeQuests /></div>
+        <div className="lg:col-start-1 lg:row-start-2">
+          <section aria-labelledby="paste-heading" className="card-ink flex h-full flex-col px-space-md py-space-md">
             <h1 id="paste-heading" className="text-headline-md">Học từ bất kỳ bài hát nào</h1>
             <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
-            <div className="mt-space-sm">
+            <div className="mt-auto pt-space-sm">
               <PasteLinkForm />
               <ToolsHint />
             </div>
           </section>
-          <HomePathCard />
         </div>
-        <div className="grid gap-space-md md:grid-cols-2 lg:grid-cols-1">
-          <HomeQuests />
-          <HomeVersusCard />
-        </div>
+        <div className="lg:col-start-2 lg:row-start-2 max-lg:order-4"><HomePathCard /></div>
       </div>
+      <div className="mt-space-md"><HomeVersusCard /></div>
       <TodayPlan />
       <StreakCard />
       <OnboardingBanner />

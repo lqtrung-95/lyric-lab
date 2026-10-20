@@ -92,6 +92,7 @@ test.describe("tiếp tục nghe tại vị trí đã dừng", () => {
 
 test("bảng 'Hôm nay' hiện khung chờ cùng kích thước rồi mới hiện nội dung, không nhảy bố cục", async ({ page }) => {
   await page.route("https://i.ytimg.com/**", (r) => r.fulfill({ status: 204 }));
+  await page.route("**/api/game/summary", (r) => r.fulfill({ status: 401, json: { error: "auth_required" } })); // không có khối nhiệm vụ: chiều cao hàng chỉ do bảng Hôm nay quyết định
   await page.route("**/api/discover**", (r) => r.fulfill({ json: { songs: [], hasMore: false } }));
   await page.route("**/api/library/songs", async (r) => { await new Promise((res) => setTimeout(res, 1200)); return r.fulfill({ json: { songs: [] } }); });
   await page.setViewportSize({ width: 1440, height: 900 });

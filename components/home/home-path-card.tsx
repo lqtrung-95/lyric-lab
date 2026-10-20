@@ -30,7 +30,7 @@ export function HomePathCard() {
   const start = Math.max(0, Math.min(state.units.length - WINDOW, current.idx - 1 - Math.floor(WINDOW / 2)));
   const shown = state.units.slice(start, start + WINDOW);
   return (
-    <section aria-labelledby="path-heading" className="card-ink p-space-md">
+    <section aria-labelledby="path-heading" className="card-ink flex h-full flex-col p-space-md">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <h2 id="path-heading" className="text-headline-md">Lộ trình {state.title}</h2>
@@ -38,8 +38,8 @@ export function HomePathCard() {
         </div>
         <Link href={`/hoc?khoa=${slug}`} className="inline-flex min-h-11 shrink-0 items-center gap-1 text-label-md font-extrabold text-primary hover:underline">Bản đồ <Icon name="chevron_right" size={18} /></Link>
       </div>
-      <ol className="mt-space-sm flex items-start justify-between gap-1" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} slug={slug} unit={u} current={u.idx === current.idx} />)}</ol>
-      <Link href={`/hoc/${slug}/${current.idx}`} className="btn-3d btn-3d-bright mt-space-sm w-full">{done === 0 && !current.progress ? "Bắt đầu chặng " : "Tiếp tục chặng "}{current.idx}</Link>
+      <ol className="my-auto flex items-start justify-between gap-1 py-space-sm" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} slug={slug} unit={u} current={u.idx === current.idx} />)}</ol>
+      <Link href={`/hoc/${slug}/${current.idx}`} className="btn-3d btn-3d-bright mt-auto w-full">{done === 0 && !current.progress ? "Bắt đầu chặng " : "Tiếp tục chặng "}{current.idx}</Link>
     </section>
   );
 }

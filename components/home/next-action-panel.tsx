@@ -38,7 +38,7 @@ export function NextActionPanel() {
   const action = chooseNextAction({ due: summary?.total ?? 0, continueSong: continueSong ?? null });
 
   return (
-    <section aria-labelledby="today-heading" aria-busy={!ready} className="card-ink flex flex-col justify-between p-space-md">
+    <section aria-labelledby="today-heading" aria-busy={!ready} className="card-ink flex h-full flex-col justify-between p-space-md">
       <div className="min-h-[9.5rem]">
         <h2 id="today-heading" className="inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-sm font-extrabold uppercase tracking-widest text-on-primary-container">Việc tiếp theo</h2>
         {!ready && <ActionSkeleton />}

@@ -62,7 +62,7 @@ export function HomeQuests() {
   }
 
   return (
-    <section aria-labelledby="quests-heading" className="card-ink p-space-md">
+    <section aria-labelledby="quests-heading" className="card-ink h-full p-space-md">
       <div className="flex items-center justify-between gap-2">
         <h2 id="quests-heading" className="text-headline-md">Nhiệm vụ</h2>
         <p className="text-label-md font-bold text-on-surface-variant">{game.xp.today} XP hôm nay</p>
