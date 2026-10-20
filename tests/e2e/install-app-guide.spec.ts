@@ -81,11 +81,11 @@ test.describe("iPhone", () => {
   });
 });
 
-test("từ menu ⋯ trên điện thoại có lối vào trang cài app", async ({ page }) => {
+test("từ Cài đặt → Mẹo có lối vào trang hướng dẫn cài app", async ({ page }) => {
+  // Lối vào "Cài app lên điện thoại" đã rút khỏi menu ⋯ (menu còn 4 mục); hướng dẫn nằm ở thẻ Mẹo của Cài đặt.
   await page.setViewportSize({ width: 390, height: 780 });
-  await page.goto("/app");
-  await page.getByRole("button", { name: "Menu" }).click();
-  await page.getByRole("dialog", { name: "Menu" }).getByRole("link", { name: "Cài app lên điện thoại" }).click();
+  await page.goto("/settings?tab=tips");
+  await page.getByRole("link", { name: "Xem hướng dẫn cài app" }).click();
   await expect(page).toHaveURL(/\/cai-app$/);
 });
 

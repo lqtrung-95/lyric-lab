@@ -150,7 +150,7 @@ test("bài kiểm tra cuối cấp HSK 1: 40 câu", async ({ page }) => {
   // Không giả lập phiên: bản đồ đọc thẳng Supabase bằng khóa công khai, token giả sẽ làm truy vấn lỗi.
   await page.goto("/hoc?khoa=hsk-1");
   await page.getByRole("button", { name: /Kiểm tra cuối cấp HSK 1/ }).click();
-  await page.getByRole("link", { name: /Làm bài/ }).click();
+  await page.getByRole("link", { name: "Làm bài", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Kiểm tra cuối cấp HSK 1" })).toBeVisible({ timeout: 45_000 });
   await page.getByRole("button", { name: /Bắt đầu làm bài/ }).click();
   await expect(page.getByText(/Câu 1\/40/)).toBeVisible();
