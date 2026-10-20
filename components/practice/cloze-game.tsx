@@ -14,6 +14,7 @@ import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import type { ClozeCandidate } from "./cloze-questions";
 import { ClozeLine } from "./cloze-line";
 import { PracticeSummary } from "./practice-summary";
+import { playSfx } from "@/lib/feedback/sfx";
 
 const ROUND = 8;
 
@@ -66,6 +67,7 @@ export function ClozeGame({ candidates, poolTerms, grade, onRoundEnd }: Props) {
   function choose(term: string) {
     if (!q || picked) return;
     const ok = term === q.card.term;
+    playSfx(ok ? "correct" : "wrong");
     if (grade(q.card, ok ? "correct" : "wrong")) setScheduled((n) => n + 1);
     setScore((sc) => sc + answerPoints(ok ? "correct" : "wrong", combo));
     setCombo(ok ? combo + 1 : 0);
@@ -104,7 +106,7 @@ export function ClozeGame({ candidates, poolTerms, grade, onRoundEnd }: Props) {
       <div role="group" aria-label="Chọn từ điền vào chỗ trống" className="mt-space-md grid grid-cols-2 gap-space-sm">
         {q.choices.map((term, i) => {
           const isAnswer = term === q.card.term;
-          const state = !answered ? "" : isAnswer ? "ring-2 ring-secondary bg-secondary-container/60" : term === picked ? "ring-2 ring-error bg-error-container/50" : "opacity-60";
+          const state = !answered ? "" : isAnswer ? "ring-2 ring-secondary bg-secondary-container/60 anim-note-pop" : term === picked ? "ring-2 ring-error bg-error-container/50 anim-note-shake" : "opacity-60";
           return (
             <button key={term} type="button" disabled={answered} onClick={() => choose(term)}
               className={`flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-surface-container-lowest px-3 text-on-surface shadow-sm hover:bg-surface-container disabled:cursor-default ${state}`}>

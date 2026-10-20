@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { wordLabel, buildUnitQuiz, gradeQuiz, QUIZ_LENGTH, UNIT_QUIZ_KINDS, type QuizKind } from "@/lib/courses/build-unit-quiz";
 import type { UnitWord } from "@/lib/courses/unit-types";
+import { playSfx } from "@/lib/feedback/sfx";
 import { playChinese } from "@/lib/speech/play-chinese";
 
 const PROMPTS = {
@@ -31,6 +32,7 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
   function choose(term: string) {
     if (picked !== null) return;
     setPicked(term);
+    playSfx(term === q.answer ? "correct" : "wrong");
     if (term === q.answer) { setCorrect((c) => c + 1); setStreak((n) => n + 1); }
     else { setStreak(0); setWrong((w) => (w.includes(q.answer) ? w : [...w, q.answer])); }
   }
@@ -44,7 +46,7 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
     <div className="space-y-space-md">
       <p className="flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant" aria-live="polite">
         <span>Câu {i + 1}/{questions.length} · đúng {correct}</span>
-        {streak >= 2 && <span className="rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">🔥 {streak} câu liên tiếp</span>}
+        {streak >= 2 && <span key={streak} className="anim-note-pop rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">🔥 {streak} câu liên tiếp</span>}
       </p>
       <p className="text-body-lg font-medium">{PROMPTS[q.kind]}</p>
       {q.kind === "listen" ? (
@@ -62,7 +64,7 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
       <div role="group" aria-label="Các lựa chọn" className="grid gap-2 sm:grid-cols-2">
         {q.options.map((o) => {
           const isAnswer = o.term === q.answer;
-          const state = picked === null ? "" : isAnswer ? "border-primary bg-primary-container text-on-primary-container" : o.term === picked ? "border-error bg-error-container text-on-error-container" : "opacity-60";
+          const state = picked === null ? "" : isAnswer ? "border-primary bg-primary-container text-on-primary-container anim-note-pop" : o.term === picked ? "border-error bg-error-container text-on-error-container anim-note-shake" : "opacity-60";
           return (
             <button key={o.term} type="button" disabled={picked !== null} onClick={() => choose(o.term)} lang={HAN_OPTIONS.includes(q.kind) ? "zh-Hans" : undefined}
               className={`min-h-14 rounded-xl border border-outline-variant px-3 text-left ${HAN_OPTIONS.includes(q.kind) ? "font-serif text-2xl" : "text-body-lg"} ${state}`}>

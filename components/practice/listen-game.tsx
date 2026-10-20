@@ -10,6 +10,7 @@ import { answerPoints } from "@/lib/practice/scoring";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { PracticeSummary } from "./practice-summary";
+import { playSfx } from "@/lib/feedback/sfx";
 
 const ROUND = 10;
 type AnswerKind = "hanzi" | "meaning";
@@ -65,6 +66,7 @@ export function ListenGame({ cards, grade, onRoundEnd }: Props) {
   function choose(key: string) {
     if (!q || picked) return;
     const ok = key === correctKey;
+    playSfx(ok ? "correct" : "wrong");
     const points = answerPoints(ok ? "correct" : "wrong", combo);
     if (grade(q.card, ok ? "correct" : "wrong")) setScheduled((n) => n + 1);
     setScore((s) => s + points);
@@ -131,7 +133,7 @@ export function ListenGame({ cards, grade, onRoundEnd }: Props) {
       <div role="group" aria-label="Các đáp án" className="mt-space-md grid grid-cols-2 gap-space-sm">
         {choices.map((c, i) => {
           const isAnswer = c.key === correctKey;
-          const state = !picked ? "" : isAnswer ? "ring-2 ring-secondary bg-secondary-container/60" : c.key === picked ? "ring-2 ring-error bg-error-container/50" : "opacity-60";
+          const state = !picked ? "" : isAnswer ? "ring-2 ring-secondary bg-secondary-container/60 anim-note-pop" : c.key === picked ? "ring-2 ring-error bg-error-container/50 anim-note-shake" : "opacity-60";
           return (
             <button key={c.key} type="button" disabled={!!picked} onClick={() => choose(c.key)}
               className={`flex min-h-16 items-center justify-center gap-2 rounded-2xl bg-surface-container-lowest px-3 py-2 text-center text-on-surface shadow-sm hover:bg-surface-container disabled:cursor-default ${state}`}>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { playSfx } from "@/lib/feedback/sfx";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { unitXp } from "@/lib/game/xp-rules";
 import { isCourseInDevelopment } from "@/lib/courses/course-maturity";
@@ -58,6 +59,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
     const items = wrongTerms.map((t) => detail.words.find((w) => w.term === t)).map((w) => (w ? savedItemFor(w) : null));
     const fresh = items.filter((x): x is NonNullable<typeof x> => x !== null && !have.has(x.key));
     fresh.forEach((x) => toggleSaved(x));
+    if (passed) playSfx("complete");
     if (saved && passed) refreshGameSummary(); // cập nhật cấp/XP ở thanh trên
     setResult({ percent, passed, saved, first: prev?.status !== "completed", added: fresh.length, missed: items.filter((x) => x === null).length });
     setStep("result");

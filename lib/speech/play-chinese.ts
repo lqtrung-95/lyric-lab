@@ -36,3 +36,10 @@ export async function playChinese(text: string): Promise<void> {
     speakChinese(text);
   }
 }
+
+/** Đang có giọng đọc tiếng Trung phát (file giọng AI hoặc giọng thiết bị)? Dùng để không phát hiệu ứng âm thanh đè lên giọng mẫu. */
+export function isChineseAudioBusy(): boolean {
+  const audioPlaying = !!current && !current.paused && !current.ended;
+  const speaking = typeof window !== "undefined" && !!window.speechSynthesis && window.speechSynthesis.speaking;
+  return audioPlaying || speaking;
+}

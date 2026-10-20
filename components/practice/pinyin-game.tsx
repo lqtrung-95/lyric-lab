@@ -8,6 +8,7 @@ import { outcomeFromPinyin, pinyinPoints, type PracticeOutcome } from "@/lib/pra
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { NoteStaff, type NoteState } from "./note-staff";
 import { PracticeSummary } from "./practice-summary";
+import { playSfx } from "@/lib/feedback/sfx";
 
 const ROUND = 10;
 const LIVES = 3;
@@ -64,6 +65,7 @@ export function PinyinGame({ cards, grade, onRoundEnd }: Props) {
     const points = pinyinPoints(outcome, hints, combo);
     if (grade(card, outcome)) setScheduled((n) => n + 1);
     setScore((s) => s + points);
+    playSfx(outcome === "correct" ? "correct" : "wrong");
     if (outcome === "correct") {
       setCorrect((n) => n + 1);
       setCombo(combo + 1);

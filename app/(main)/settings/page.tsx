@@ -11,6 +11,7 @@ import { ReminderRow } from "@/components/reminders/reminder-row";
 import { QuickStartCard } from "@/components/settings/quick-start-card";
 import { SettingsCard } from "@/components/settings/settings-card";
 import { SettingsTabs, type SettingsTab } from "@/components/settings/settings-tabs";
+import { SfxRow } from "@/components/settings/sfx-row";
 import { VoiceRows } from "@/components/settings/voice-rows";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -42,6 +43,7 @@ export default function SettingsPage() {
           <LearningRows />
           <ListenRows />
           <VoiceRows />
+          <SfxRow />
         </SettingsCard>
       ),
     },

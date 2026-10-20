@@ -7,6 +7,7 @@ import { Icon } from "@/components/ui/icon";
 import { SnippetPlayer, type SnippetRequest } from "@/components/player/snippet-player";
 import { shiftLines } from "@/lib/listen/lyric-offset";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
+import { playSfx } from "@/lib/feedback/sfx";
 import { snippetRange } from "@/lib/preview/preview-format";
 import { previewIntervals } from "@/lib/srs/fsrs-scheduler";
 import { FlashCard } from "./flash-card";
@@ -25,6 +26,8 @@ export function ReviewScreen() {
   const intervals = useMemo(() => (card && flipped ? previewIntervals(card, new Date()) : null), [card, flipped]);
 
   const grade = (rating: Grade) => {
+    if (rating === 1) playSfx("wrong");
+    else if (rating >= 3) playSfx("correct");
     setFlipped(false);
     setSnippet(null);
     s.grade(rating);

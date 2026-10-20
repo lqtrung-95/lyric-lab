@@ -5,6 +5,7 @@ import { buildMatchRound, type MatchCard } from "@/lib/practice/match-round";
 import { pickPracticeCards } from "@/lib/practice/pick-practice-cards";
 import { matchPoints } from "@/lib/practice/scoring";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
+import { playSfx } from "@/lib/feedback/sfx";
 
 const PAIRS = 6;
 const BEST_KEY = "lyric-lab-match-best";
@@ -55,10 +56,11 @@ export function MatchGame({ cards, onRoundEnd }: { cards: ReviewCard[]; onRoundE
   }
 
   function attempt(l: string, r: string) {
+    playSfx(l === r ? "correct" : "wrong");
     if (l === r) {
       const next = new Set(matched).add(l);
       setMatched(next);
-      if (next.size === total) finishRound(seconds, mistakes);
+      if (next.size === total) { playSfx("complete"); finishRound(seconds, mistakes); }
     } else {
       setMistakes((n) => n + 1);
       setWrongPair([l, r]);

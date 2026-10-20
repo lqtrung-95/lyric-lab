@@ -10,6 +10,7 @@ import { answerPoints } from "@/lib/practice/scoring";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { ClozeLine } from "./cloze-line";
 import { PracticeSummary } from "./practice-summary";
+import { playSfx } from "@/lib/feedback/sfx";
 
 type Phase = "idle" | "approach" | "asking" | "answered";
 
@@ -60,6 +61,7 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, showHints,
   function settle(term: string | null) {
     if (!step || phase !== "asking") return;
     const ok = term === step.card.term;
+    playSfx(ok ? "correct" : "wrong");
     if (grade(step.card, ok ? "correct" : "wrong")) setScheduled((n) => n + 1);
     setScore((s) => s + answerPoints(ok ? "correct" : "wrong", combo));
     setCombo(ok ? combo + 1 : 0);
