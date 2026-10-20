@@ -24,12 +24,25 @@ test("bản đồ lộ trình: 36 chặng, nút bắt đầu chặng 1, đạt a
   await noViolations(page);
 });
 
+test("chọn cấp: HSK 1–5, mở HSK 2 qua liên kết có thể chia sẻ", async ({ page }) => {
+  await page.goto("/hoc");
+  const chips = page.getByRole("navigation", { name: "Chọn cấp HSK" });
+  await expect(chips.getByRole("link")).toHaveCount(5, { timeout: 15_000 });
+  await chips.getByRole("link", { name: "HSK 2" }).click();
+  await expect(page).toHaveURL(/\/hoc\?khoa=hsk-2/);
+  await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 2" })).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).toHaveCount(51);
+  await page.goto("/hoc?khoa=hsk-5");
+  await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 5" })).toBeVisible({ timeout: 15_000 });
+});
+
 test("mục Học có trên thanh điều hướng", async ({ page }) => {
   await page.goto("/app");
   await expect(page.getByRole("navigation", { name: "Điều hướng chính" }).first().getByRole("link", { name: "Học" })).toBeVisible();
 });
 
 test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết quả và lưu tiến độ", async ({ page }) => {
+  test.setTimeout(90_000); // luồng dài (ba lần axe, 10 câu) và lần đầu dev server còn biên dịch tuyến API
   await stubAnonymousSession(page);
   let saved: Record<string, unknown> | null = null;
   await page.route("**/rest/v1/user_unit_progress*", async (route) => {
@@ -39,7 +52,7 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
   });
   await page.goto("/hoc/hsk-1/1");
   // Lần đầu vào trang chặng, dev server còn biên dịch tuyến này: chờ lâu hơn mặc định 5 giây.
-  await expect(page.getByRole("heading", { level: 1, name: "Đại từ cơ bản" })).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole("heading", { level: 1, name: "Đại từ cơ bản" })).toBeVisible({ timeout: 45_000 });
 
   // Bước 1: có đủ 17 từ với pinyin, nghĩa Việt và nút nghe.
   await expect(page.getByRole("button", { name: /^Nghe \p{Script=Han}/u })).toHaveCount(17);

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { CourseMap } from "@/components/courses/course-map";
+import { CourseHub } from "@/components/courses/course-hub";
 
 export const metadata: Metadata = { title: "Lộ trình học HSK", robots: { index: false } };
 
-// Hiện mới có khóa HSK 1; khi thêm các cấp khác thì trang này thành danh sách khóa.
-export default function LearnPage() {
-  return <CourseMap slug="hsk-1" />;
+/** `?khoa=hsk-3` chọn cấp; không hợp lệ hoặc vắng thì để trang tự chọn (khóa xem gần nhất, rồi HSK 1). */
+export default async function LearnPage({ searchParams }: { searchParams: Promise<{ khoa?: string | string[] }> }) {
+  const { khoa } = await searchParams;
+  const slug = typeof khoa === "string" && /^[a-z0-9-]{1,40}$/.test(khoa) ? khoa : null;
+  return <CourseHub slugParam={slug} />;
 }

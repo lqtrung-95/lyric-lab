@@ -5,6 +5,8 @@
 import { createClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { generateHskUnits } from "@/lib/courses/generate-hsk-units";
+import { readFileSync } from "node:fs";
+import { themesFromAssignment, type ThemeAssignment } from "@/lib/courses/hsk-theme-taxonomy";
 import { HSK1_THEMES } from "@/lib/courses/hsk1-themes";
 
 const args = process.argv.slice(2);
@@ -12,7 +14,10 @@ const opt = (name: string) => { const i = args.indexOf(`--${name}`); return i >=
 const level = Number(opt("level") ?? 1);
 const status = opt("status") === "draft" ? "draft" : "listed";
 const apply = args.includes("--apply");
-if (level !== 1) throw new Error("Hiện mới có chủ đề soạn tay cho HSK 1 (--level 1)");
+// HSK 1: chủ đề soạn tay (`hsk1-themes.ts`). HSK 2–5: chủ đề do AI phân loại rồi người duyệt (`scripts/theme-hsk-words.mts` → `hsk-themed-words.json`).
+if (level < 1 || level > 5) throw new Error("--level 1..5");
+const THEMES = level === 1 ? HSK1_THEMES : themesFromAssignment((JSON.parse(readFileSync("lib/courses/hsk-themed-words.json", "utf8")) as Record<string, ThemeAssignment>)[String(level)] ?? {});
+if (THEMES.length === 0) throw new Error(`Chưa có chủ đề cho HSK ${level}: chạy scripts/theme-hsk-words.mts --level ${level} trước`);
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false }, realtime: { transport: ws as never } });
 const byWord = new Map<string, number>();
@@ -23,9 +28,9 @@ for (let from = 0; ; from += 1000) {
   for (const w of data as { simplified: string; frequency: number | null }[]) byWord.set(w.simplified, Math.max(w.frequency ?? 0, byWord.get(w.simplified) ?? 0));
 }
 const words = [...byWord].map(([simplified, frequency]) => ({ simplified, frequency }));
-const units = generateHskUnits(words, HSK1_THEMES, `HSK ${level}`);
+const units = generateHskUnits(words, THEMES, `HSK ${level}`);
 
-const themed = new Set(HSK1_THEMES.flatMap((t) => t.words));
+const themed = new Set(THEMES.flatMap((t) => t.words));
 const typos = [...themed].filter((t) => !byWord.has(t));
 console.log(`HSK ${level}: ${words.length} từ → ${units.length} chặng (${units.map((u) => u.terms.length).reduce((a, b) => a + b, 0)} từ được xếp)`);
 units.forEach((u, i) => console.log(`${String(i + 1).padStart(2)}. ${u.title} [${u.terms.length}]: ${u.terms.join(" ")}`));

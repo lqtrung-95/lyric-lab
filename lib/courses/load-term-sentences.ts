@@ -4,6 +4,7 @@ import type { ExampleSentence } from "./course-types";
 import { assembleSentences, type IndexRow, type LessonLines } from "./assemble-sentences";
 
 const MAX_TERMS = 60;
+const ROWS_PER_WANTED = 3;
 
 /**
  * Câu ví dụ thật (từ video đã duyệt) cho một nhóm từ. Trả `{}` khi chưa có chỉ mục (migration/script chưa chạy) để màn học vẫn hiện, chỉ không có phần nghe câu thật.
@@ -15,7 +16,14 @@ export async function loadTermSentences(terms: string[], perTerm = 2): Promise<R
   const sb = createSupabaseServiceClient();
   const index = await sb.from("term_sentences").select("term,video_id,line_idx,quality").in("term", unique);
   if (index.error || !index.data?.length) return {};
-  const rows = index.data as IndexRow[];
+  // Chỉ lấy lời của các video chứa vài câu tốt nhất mỗi từ (dư ra để bù dòng mất bản dịch): lời cả video rất nặng nên đọc hết mọi video của chỉ mục làm chặng tải chậm hàng giây.
+  const keep = perTerm * ROWS_PER_WANTED;
+  const seen = new Map<string, number>();
+  const rows = (index.data as IndexRow[]).sort((a, b) => b.quality - a.quality).filter((r) => {
+    const n = (seen.get(r.term) ?? 0) + 1;
+    seen.set(r.term, n);
+    return n <= keep;
+  });
   const videoIds = [...new Set(rows.map((r) => r.video_id))];
   const lessons = await sb.from("video_lessons").select("video_id,lines").eq("status", "listed").in("video_id", videoIds);
   if (lessons.error) return {};

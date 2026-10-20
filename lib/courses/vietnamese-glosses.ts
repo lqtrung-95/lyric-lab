@@ -12,7 +12,7 @@ ${lines}
 
 Trả về JSON: {"glosses": {"<từ>": "<nghĩa tiếng Việt>", ...}} với ĐÚNG các từ ở trên.
 Quy tắc:
-- Mỗi nghĩa tối đa 6 từ tiếng Việt, ưu tiên nghĩa THÔNG DỤNG NHẤT trong tiếng Trung hiện đại (người học HSK 1-2), bỏ nghĩa cổ/hiếm/nghĩa họ người.
+- Mỗi nghĩa tối đa 6 từ tiếng Việt, ưu tiên nghĩa THÔNG DỤNG NHẤT trong tiếng Trung hiện đại (người học HSK), bỏ nghĩa cổ/hiếm/nghĩa họ người.
 - Từ ngữ pháp (trợ từ, giới từ, lượng từ) ghi loại từ trong ngoặc rồi nghĩa/cách dùng ngắn, ví dụ "(trợ từ) đã, rồi", "(lượng từ) cái".
 - Từ nhiều nghĩa: tối đa hai nghĩa phổ biến, ngăn bằng dấu phẩy.
 - Không dịch máy móc từng chữ; không thêm pinyin hay chữ Hán vào nghĩa.`;
