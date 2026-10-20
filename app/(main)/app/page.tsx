@@ -25,11 +25,10 @@ export default function AppHomePage() {
       <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="space-y-space-md">
           <NextActionPanel />
-          <section aria-labelledby="paste-heading" className="card-ink relative isolate overflow-hidden px-space-md py-space-lg md:px-space-lg">
-            <span aria-hidden="true" lang="zh" className="pointer-events-none absolute -bottom-10 -right-2 -z-10 text-[12rem] font-black leading-none text-primary/[0.06]">歌</span>
-            <h1 id="paste-heading" className="text-headline-lg-mobile md:text-headline-lg">Học từ bất kỳ bài hát nào</h1>
-            <p className="mt-space-sm max-w-xl text-body-lg text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
-            <div className="mt-space-md">
+          <section aria-labelledby="paste-heading" className="card-ink px-space-md py-space-md">
+            <h1 id="paste-heading" className="text-headline-md">Học từ bất kỳ bài hát nào</h1>
+            <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
+            <div className="mt-space-sm">
               <PasteLinkForm />
               <ToolsHint />
             </div>

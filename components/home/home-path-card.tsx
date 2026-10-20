@@ -11,7 +11,7 @@ function Step({ unit, current }: { unit: MapUnit; current: boolean }) {
   return (
     <li className="flex flex-1 flex-col items-center gap-1">
       <Link href={`/hoc/hsk-1/${unit.idx}`} aria-label={`Chặng ${unit.idx}: ${unit.title}${done ? " (đã xong)" : current ? " (đang học)" : ""}`} aria-current={current ? "step" : undefined}
-        className={`flex size-12 items-center justify-center rounded-full border-2 border-ink text-label-md font-extrabold shadow-[0_3px_0_var(--shadow-ink)] ${done ? "bg-secondary text-on-secondary" : current ? "bg-primary-container text-on-primary-container" : "bg-surface-container-lowest text-on-surface"}`}>
+        className={`flex size-11 items-center justify-center rounded-full border-2 border-ink text-label-md font-extrabold shadow-[0_3px_0_var(--shadow-ink)] ${done ? "bg-secondary text-on-secondary" : current ? "bg-primary-container text-on-primary-container" : "bg-surface-container-lowest text-on-surface"}`}>
         {done ? <Icon name="check" size={22} /> : current ? <Icon name="star" size={22} filled /> : unit.idx}
       </Link>
       <span className={`text-label-sm ${current ? "font-extrabold text-on-surface" : "text-on-surface-variant"}`}>Chặng {unit.idx}</span>
@@ -36,8 +36,8 @@ export function HomePathCard() {
         </div>
         <Link href="/hoc" className="inline-flex min-h-11 shrink-0 items-center gap-1 text-label-md font-extrabold text-primary hover:underline">Bản đồ <Icon name="chevron_right" size={18} /></Link>
       </div>
-      <ol className="mt-space-md flex items-start justify-between gap-1" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} unit={u} current={u.idx === current.idx} />)}</ol>
-      <Link href={`/hoc/hsk-1/${current.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full">{done === 0 && !current.progress ? "Bắt đầu chặng " : "Tiếp tục chặng "}{current.idx}</Link>
+      <ol className="mt-space-sm flex items-start justify-between gap-1" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} unit={u} current={u.idx === current.idx} />)}</ol>
+      <Link href={`/hoc/hsk-1/${current.idx}`} className="btn-3d btn-3d-bright mt-space-sm w-full">{done === 0 && !current.progress ? "Bắt đầu chặng " : "Tiếp tục chặng "}{current.idx}</Link>
     </section>
   );
 }

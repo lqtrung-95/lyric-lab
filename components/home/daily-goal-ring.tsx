@@ -8,7 +8,7 @@ export function DailyGoalRing({ started, perDay }: { started: number; perDay: nu
   const done = perDay > 0 && started >= perDay;
   return (
     <div className="flex items-center gap-3">
-      <svg viewBox="0 0 80 80" role="img" aria-label={`Mục tiêu hôm nay: đã học ${started} trên ${perDay} thẻ mới`} className="h-16 w-16 shrink-0 -rotate-90">
+      <svg viewBox="0 0 80 80" role="img" aria-label={`Mục tiêu hôm nay: đã học ${started} trên ${perDay} thẻ mới`} className="size-12 shrink-0 -rotate-90">
         <circle cx="40" cy="40" r={R} fill="none" strokeWidth="8" className="stroke-surface-container-highest" />
         <circle cx="40" cy="40" r={R} fill="none" strokeWidth="8" strokeLinecap="round" strokeDasharray={C}
           strokeDashoffset={C * (1 - goalFraction(started, perDay))} className={`${done ? "stroke-secondary" : "stroke-primary"} transition-[stroke-dashoffset] duration-700`} />
