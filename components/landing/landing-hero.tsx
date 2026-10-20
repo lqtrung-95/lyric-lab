@@ -2,7 +2,7 @@ import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { Icon } from "@/components/ui/icon";
 import { HeroMock } from "./hero-mock";
 
-const TRUST = ["Miễn phí", "Không cần đăng ký", "Chữ giản thể + âm Hán Việt"];
+const TRUST = ["Miễn phí", "Không cần đăng ký", "Lộ trình HSK 1–6", "Chữ giản thể + âm Hán Việt"];
 
 /** Hero trang chủ: lời hứa của sản phẩm, ô dán link (hành động chính) và hình minh họa. */
 export function LandingHero() {

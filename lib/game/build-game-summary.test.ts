@@ -6,7 +6,7 @@ import { currentQuestSlots } from "./build-quests";
 const NOW = new Date("2026-10-20T05:00:00Z"); // 12:00 ngày 20 ở Việt Nam
 const empty: RawActivity = { reviews: [], rounds: [], songs: [], units: [], rooms: [] };
 const base = (over: Partial<GameInputs> = {}): GameInputs => ({
-  userId: "u1", now: NOW, timeZone: "Asia/Ho_Chi_Minh", raw: empty, learnedWords: 0, claims: [], storedBadges: [], frozenDays: [], ...over,
+  userId: "u1", now: NOW, timeZone: "Asia/Ho_Chi_Minh", raw: empty, learnedWords: 0, levelsCompleted: 0, claims: [], storedBadges: [], frozenDays: [], ...over,
 });
 const reviewsOn = (day: string, n: number) => Array.from({ length: n }, (_, i) => ({ at: `${day}T0${i % 9}:00:00Z` }));
 

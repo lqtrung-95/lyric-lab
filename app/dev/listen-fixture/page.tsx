@@ -8,7 +8,7 @@ import { yeCheAnalysis, yeCheSong } from "@/lib/preview/fixtures/ye-che-analysis
 export const metadata = { robots: { index: false, follow: false } };
 
 export default async function ListenFixturePage({ searchParams }: { searchParams: Promise<{ t?: string }> }) {
-  if (process.env.NODE_ENV === "production") notFound();
+  if (process.env.NODE_ENV === "production" && process.env.ENABLE_DEV_FIXTURES !== "1") notFound(); // ENABLE_DEV_FIXTURES=1 chỉ đặt khi chạy e2e trên bản production
   // `?t=<giây>` giống trang Nghe thật: mở giữa bài (để thử luồng người nhận link chia sẻ một câu).
   const t = Number((await searchParams).t);
   const startAt = Number.isFinite(t) && t > 0 ? t : undefined;

@@ -33,7 +33,7 @@ import { weekStart } from "./aggregate-activity";
 const TZ = "Asia/Ho_Chi_Minh";
 const today = dayKey(new Date(), TZ);
 const slots = () => currentQuestSlots("u1", today, weekStart(today));
-const fresh = (over: Partial<typeof db.data> = {}) => ({ timeZone: TZ, raw: { reviews: [], rounds: [], songs: [], units: [], rooms: [] }, learnedWords: 0, claims: [], storedBadges: [], frozenDays: [], ...over });
+const fresh = (over: Partial<typeof db.data> = {}) => ({ timeZone: TZ, raw: { reviews: [], rounds: [], songs: [], units: [], rooms: [] }, learnedWords: 0, levelsCompleted: 0, claims: [], storedBadges: [], frozenDays: [], ...over });
 const call = (id: string) => claim(new Request("http://x", { method: "POST" }), { params: Promise.resolve({ id: encodeURIComponent(id) }) });
 
 beforeEach(() => {

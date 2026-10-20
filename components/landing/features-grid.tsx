@@ -12,7 +12,7 @@ const FEATURES: { icon: IconName; title: string; body: string; accent?: boolean 
   { icon: "library_music", title: "Khám phá bài đã có sẵn", body: "Chọn bài người khác đã phân tích theo level HSK: mở là học ngay, không phải chờ AI." },
   { icon: "mic", title: "AI nghe giọng, nhận xét thanh điệu", body: "Luyện nói theo mẫu rồi nhờ AI nghe lại: điểm, chỗ sai thanh điệu và cách sửa, bằng tiếng Việt. Bản thử nghiệm, chỉ gửi khi bạn bấm." },
   { icon: "lightbulb", title: "Hỏi AI về từng câu", body: "Không hiểu vì sao dùng 了 ở đây? Hỏi thẳng về câu đang học: nghĩa, ngữ pháp, cách dùng ngoài đời, trả lời ngắn bằng tiếng Việt." },
-  { icon: "local_fire_department", title: "Chuỗi ngày và mục tiêu mỗi ngày", body: "Đặt số mục học mỗi ngày, giữ chuỗi, nhận nhắc nhẹ trước khi chuỗi đứt. Có cột mốc và bảng xếp hạng nếu bạn thích thi đua." },
+  { icon: "school", title: "Lộ trình HSK 1–6 theo chặng", body: "Học có thứ tự từ HSK 1 đến HSK 6, mỗi chặng vài từ cùng chủ đề, có nghĩa tiếng Việt, đoạn video thật và bài kiểm tra. Bài xếp lớp giúp chọn đúng cấp để bắt đầu." },
   { icon: "group", title: "Thi đấu 1v1 với bạn bè", body: "Tạo phòng, gửi mã 6 số, cùng chơi một bộ câu điền lời từ bài hát. Hoặc thách đấu để bạn bè chơi lúc nào cũng được." },
 ];
 

@@ -2,13 +2,13 @@ import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
-  { icon: "school", title: "Lộ trình HSK 1: 36 chặng", body: "Từng chặng nhỏ: làm quen từ, nghe câu thật từ video, rồi kiểm tra 10 câu. Chạm chặng nào cũng vào được, không bị khóa." },
-  { icon: "star", title: "XP và cấp độ", body: "Ôn thẻ, luyện tập, nghe xong bài đều tích XP. Có trần mỗi ngày để học đều thay vì cày một lần." },
-  { icon: "emoji_events", title: "Huy hiệu nhiều bậc", body: "Đồng, bạc, vàng, kim cương cho từ đã học, chuỗi ngày, nghe và nói. Vài huy hiệu ẩn chờ bạn tự gặp." },
-  { icon: "local_fire_department", title: "Nhiệm vụ và chuỗi ngày", body: "Nhiệm vụ nhỏ mỗi ngày và mỗi tuần, nhận thưởng khi xong. Có lượt đóng băng chuỗi phòng hôm bận." },
+  { icon: "school", title: "Lộ trình HSK 1–6, hơn 700 chặng", body: "Khoảng 5.300 từ chia thành chặng ≤ 10 từ theo chủ đề, có chặng ôn tập và bài kiểm tra cuối cấp. Chưa biết bắt đầu từ đâu? Làm bài xếp lớp 3 phút (HSK 6 vẫn đang phát triển)." },
+  { icon: "smart_display", title: "Mỗi chặng học bằng nhiều giác quan", body: "Học từng thẻ và tự đoán nghĩa trước khi lật, xem đúng đoạn video thật có từ đó, đọc to cho máy chấm từng chữ, rồi làm quiz có phản hồi ngay." },
+  { icon: "emoji_events", title: "XP, cấp độ và huy hiệu", body: "Ôn thẻ, luyện tập, qua chặng đều tích XP (có trần mỗi ngày để học đều). Huy hiệu bốn bậc đồng, bạc, vàng, kim cương; vài huy hiệu ẩn chờ bạn tự gặp." },
+  { icon: "local_fire_department", title: "Nhiệm vụ, chuỗi ngày, thi đấu", body: "Nhiệm vụ nhỏ mỗi ngày và mỗi tuần, lượt đóng băng chuỗi phòng hôm bận, thi đấu 1v1 với bạn bè. Âm thanh hiệu ứng có thể tắt trong Cài đặt." },
 ];
 
-/** Dải "học như chơi game": giới thiệu vòng lặp lộ trình, XP, huy hiệu, nhiệm vụ (đúng với tính năng đang có trong app). */
+/** Dải "học như chơi game": giới thiệu lộ trình HSK 1–6, cách học mỗi chặng, XP và huy hiệu, nhiệm vụ (đúng với tính năng đang có trong app). */
 export function GameLoop() {
   return (
     <section aria-labelledby="game-loop-heading" className="mt-24">

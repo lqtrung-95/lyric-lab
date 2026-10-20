@@ -32,6 +32,7 @@ export function CourseHub({ slugParam }: { slugParam: string | null }) {
           ))}
         </nav>
       )}
+      <p className="text-body-md text-on-surface-variant">Chưa biết nên bắt đầu từ cấp nào? <Link href="/hoc/xep-lop" className="font-bold text-primary underline">Làm bài xếp lớp 3 phút</Link>.</p>
       {isCourseInDevelopment(slug) && (
         <p role="note" className="card-ink flex items-start gap-2 bg-tertiary-container p-space-sm text-body-md text-on-tertiary-container">
           <Icon name="build" size={20} className="mt-0.5 shrink-0" />

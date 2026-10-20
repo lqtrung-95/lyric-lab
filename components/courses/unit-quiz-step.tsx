@@ -18,10 +18,11 @@ const HAN_OPTIONS: QuizKind[] = ["term", "listen", "cloze"];
  * Bài kiểm tra của chặng: chặng học 10 câu (chữ→nghĩa, nghĩa→chữ, nghe→chữ); chặng ôn thêm "chọn pinyin" và "điền chỗ trống từ câu thật" với 20 hoặc 40 câu.
  * Báo điểm và danh sách từ làm sai khi xong (để màn chặng tự thêm các từ đó vào bộ ôn).
  */
-export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KINDS, onFinish }: { words: UnitWord[]; length?: number; kinds?: QuizKind[]; onFinish: (percent: number, passed: boolean, wrongTerms: string[]) => void }) {
+export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KINDS, onFinish }: { words: UnitWord[]; length?: number; kinds?: QuizKind[]; onFinish: (percent: number, passed: boolean, wrongTerms: string[], rightTerms: string[]) => void }) {
   const questions = useMemo(() => buildUnitQuiz(words, Math.random, length, kinds), [words, length, kinds]);
   const [wrong, setWrong] = useState<string[]>([]);
   const [streak, setStreak] = useState(0);
+  const [right, setRight] = useState<string[]>([]);
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [correct, setCorrect] = useState(0);
@@ -33,11 +34,11 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
     if (picked !== null) return;
     setPicked(term);
     playSfx(term === q.answer ? "correct" : "wrong");
-    if (term === q.answer) { setCorrect((c) => c + 1); setStreak((n) => n + 1); }
+    if (term === q.answer) { setCorrect((c) => c + 1); setStreak((n) => n + 1); setRight((r) => (r.includes(q.answer) ? r : [...r, q.answer])); }
     else { setStreak(0); setWrong((w) => (w.includes(q.answer) ? w : [...w, q.answer])); }
   }
   function next() {
-    if (i + 1 >= questions.length) { const g = gradeQuiz(correct, questions.length); onFinish(g.percent, g.passed, wrong); return; }
+    if (i + 1 >= questions.length) { const g = gradeQuiz(correct, questions.length); onFinish(g.percent, g.passed, wrong, right); return; }
     setI(i + 1);
     setPicked(null);
   }

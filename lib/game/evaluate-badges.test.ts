@@ -4,7 +4,7 @@ import type { BadgeFacts } from "./badge-catalog";
 import { buildBadgeCatalog, evaluateBadges, highestTiers, mergeBadges } from "./evaluate-badges";
 
 const zero: BadgeFacts = {
-  learnedWords: 0, totalReviews: 0, unitsCompleted: 0, level: 1, longestStreak: 0, songsCompleted: 0, dictationGood: 0, shadowingGood: 0,
+  learnedWords: 0, levelsCompleted: 0, totalReviews: 0, unitsCompleted: 0, level: 1, longestStreak: 0, songsCompleted: 0, dictationGood: 0, shadowingGood: 0,
   roomsPlayed: 0, roomsWon: 0, perfectRounds: 0, nightReviews: 0, earlyReviews: 0,
 };
 
@@ -21,6 +21,10 @@ describe("danh mục huy hiệu", () => {
 });
 
 describe("evaluateBadges", () => {
+  it("qua bài kiểm tra cuối cấp: huy hiệu Hoàn thành cấp HSK theo số cấp", () => {
+    expect(evaluateBadges({ ...zero, levelsCompleted: 1 })).toContainEqual({ id: "learn-hsk", tier: "bronze" });
+    expect(evaluateBadges({ ...zero, levelsCompleted: 4 }).filter((b) => b.id === "learn-hsk").map((b) => b.tier)).toEqual(["bronze", "silver", "gold"]);
+  });
   it("chưa làm gì thì chưa có huy hiệu (cấp 1 chưa đủ mốc)", () => {
     expect(evaluateBadges(zero)).toEqual([]);
   });

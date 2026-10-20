@@ -18,6 +18,12 @@ describe("pickReviewTerms", () => {
     expect(pickReviewTerms(sources, 50, seeded()).terms).toHaveLength(9);
     expect(pickReviewTerms([{ terms: ["x"] }, { terms: ["x", "y"] }], 10, seeded()).terms.sort()).toEqual(["x", "y"]);
   });
+  it("từ ưu tiên (hay sai) vào đề trước, chỉ nếu thuộc chặng nguồn, tối đa nửa đề", () => {
+    const { terms } = pickReviewTerms(sources, 4, seeded(), ["c4", "zzz", "b1", "a3"]);
+    expect(terms.slice(0, 2)).toEqual(["c4", "b1"]);
+    expect(terms).not.toContain("zzz");
+    expect(terms).toHaveLength(4);
+  });
   it("chỉ trả nghĩa của các từ được chọn", () => {
     const { terms, glosses } = pickReviewTerms(sources, 9, seeded());
     expect(terms).toContain("a1");

@@ -14,7 +14,7 @@ const levelByTerm = new Map(yeCheAnalysis.items.map((i) => [i.term, i.level]));
 const wordStats = collectWordStats(yeCheAnalysis.lines, (term) => levelByTerm.get(term) ?? null);
 
 export default function PreviewFixturePage() {
-  if (process.env.NODE_ENV === "production") notFound();
+  if (process.env.NODE_ENV === "production" && process.env.ENABLE_DEV_FIXTURES !== "1") notFound(); // ENABLE_DEV_FIXTURES=1 chỉ đặt khi chạy e2e trên bản production
   return (
     <>
       <div className="hidden md:block"><SiteHeader /></div>

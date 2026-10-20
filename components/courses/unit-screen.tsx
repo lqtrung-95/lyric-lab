@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/icon";
 import { playSfx } from "@/lib/feedback/sfx";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { unitXp } from "@/lib/game/xp-rules";
+import { recordQuizOutcome } from "@/lib/courses/weak-terms";
 import { isCourseInDevelopment } from "@/lib/courses/course-maturity";
 import { PASS_PERCENT, REVIEW_QUIZ_KINDS, UNIT_QUIZ_KINDS } from "@/lib/courses/build-unit-quiz";
 import type { UnitProgress } from "@/lib/courses/course-types";
@@ -43,6 +44,14 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
     return () => { cancelled = true; };
   }, [unitId]);
 
+  // Tải trước chặng kế tiếp (độ ưu tiên thấp) để bấm "Chặng tiếp theo" mở gần như tức thì nhờ bộ nhớ đệm trình duyệt/CDN.
+  const nextIdx = unit.status === "ready" ? unit.detail.unit.idx + 1 : null;
+  const nextTotal = unit.status === "ready" ? unit.detail.unit.total : 0;
+  useEffect(() => {
+    if (nextIdx === null || nextIdx > nextTotal) return;
+    void fetch(`/api/courses/${slug}/${nextIdx}`, { priority: "low" } as RequestInit).catch(() => undefined);
+  }, [slug, nextIdx, nextTotal]);
+
   if (unit.status === "loading") return <p role="status" className="py-space-lg text-body-md text-on-surface-variant">Đang tải chặng…</p>;
   if (unit.status === "not_found") return <p className="py-space-lg text-body-md">Không có chặng này. <Link href={`/hoc?khoa=${slug}`} className="text-primary underline">Về lộ trình</Link></p>;
   if (unit.status === "error") return <p role="alert" className="py-space-lg text-body-md text-error">Chưa tải được chặng. Kiểm tra kết nối rồi tải lại trang nhé.</p>;
@@ -52,7 +61,8 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
 
   const isReview = detail.unit.kind !== "hsk";
 
-  async function finish(percent: number, passed: boolean, wrongTerms: string[]) {
+  async function finish(percent: number, passed: boolean, wrongTerms: string[], rightTerms: string[]) {
+    recordQuizOutcome(wrongTerms, rightTerms.filter((t) => !wrongTerms.includes(t))); // từ hay sai được ưu tiên ở chặng ôn tổng hợp
     const saved = await saveUnitProgress(detail.unit.id, prev, { status: passed ? "completed" : "in_progress", score: percent });
     // Từ làm sai vào bộ ôn (thẻ ôn cần câu thật làm nguồn nên từ chưa có câu thì chỉ đếm là "chưa lưu được").
     const have = new Set(learner.saved.map((x) => x.key));
@@ -87,7 +97,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
       )}
       {!isReview && step === "learn" && <UnitLearnStep words={detail.words} onNext={() => setStep("listen")} />}
       {step === "listen" && <UnitListenStep words={detail.words} onNext={() => setStep("quiz")} />}
-      {step === "quiz" && <UnitQuizStep words={detail.words} length={detail.unit.quizLength} kinds={isReview ? REVIEW_QUIZ_KINDS : UNIT_QUIZ_KINDS} onFinish={(p, ok, wrong) => void finish(p, ok, wrong)} />}
+      {step === "quiz" && <UnitQuizStep words={detail.words} length={detail.unit.quizLength} kinds={isReview ? REVIEW_QUIZ_KINDS : UNIT_QUIZ_KINDS} onFinish={(p, ok, wrong, right) => void finish(p, ok, wrong, right)} />}
       {step === "result" && result && (
         <div className="card-ink relative overflow-hidden p-space-lg text-center" data-testid="unit-result">
           {result.passed && <CelebrationBurst />}

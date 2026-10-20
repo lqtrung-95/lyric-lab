@@ -3,6 +3,8 @@ import type { BadgeTier } from "./game-types";
 /** Số liệu gộp toàn thời gian dùng để đánh giá huy hiệu. */
 export interface BadgeFacts {
   learnedWords: number;
+  /** Số bài kiểm tra cuối cấp HSK đã đạt (mỗi cấp tối đa một). */
+  levelsCompleted: number;
   totalReviews: number;
   unitsCompleted: number;
   level: number;
@@ -39,6 +41,7 @@ export const BADGES: BadgeDef[] = [
   { id: "learn-words", group: "learn", title: "Kho từ", hint: "Học {n} từ (ôn ít nhất một lần)", metric: "learnedWords", thresholds: [10, 50, 200, 1000] },
   { id: "learn-reviews", group: "learn", title: "Chăm ôn", hint: "Chấm {n} lượt ôn thẻ", metric: "totalReviews", thresholds: [50, 300, 1500, 6000] },
   { id: "learn-units", group: "learn", title: "Chinh phục chặng", hint: "Hoàn thành {n} chặng lộ trình", metric: "unitsCompleted", thresholds: [1, 10, 36, 100] },
+  { id: "learn-hsk", group: "learn", title: "Hoàn thành cấp HSK", hint: "Qua bài kiểm tra cuối cấp của {n} cấp HSK", metric: "levelsCompleted", thresholds: [1, 2, 4, 6] },
   { id: "learn-level", group: "learn", title: "Thăng cấp", hint: "Đạt cấp {n}", metric: "level", thresholds: [5, 10, 20, 30] },
   { id: "streak-days", group: "streak", title: "Giữ lửa", hint: "Chuỗi học dài nhất {n} ngày", metric: "longestStreak", thresholds: [3, 7, 30, 100] },
   { id: "listen-songs", group: "listen", title: "Thính giả", hint: "Nghe hết {n} bài hát", metric: "songsCompleted", thresholds: [1, 5, 20, 60] },

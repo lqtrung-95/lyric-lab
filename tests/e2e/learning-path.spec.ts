@@ -44,6 +44,20 @@ test("chọn cấp: HSK 1–6, mở HSK 2 qua liên kết có thể chia sẻ", 
   await expect(page.getByRole("note")).toHaveCount(0);
 });
 
+test("bài xếp lớp: 30 câu có lựa chọn Chưa biết, kết quả gợi ý cấp và mở đúng lộ trình", async ({ page }) => {
+  test.setTimeout(120_000);
+  await page.goto("/hoc/xep-lop");
+  await page.getByRole("button", { name: /Bắt đầu/ }).click();
+  for (let i = 0; i < 30; i++) {
+    await expect(page.getByText(new RegExp(`Câu ${i + 1}/30`))).toBeVisible({ timeout: 30_000 });
+    await page.getByRole("button", { name: "Chưa biết" }).click();
+  }
+  // Chọn "Chưa biết" cho mọi câu thì chưa nắm cấp nào: gợi ý bắt đầu từ HSK 1.
+  await expect(page.getByTestId("placement-result")).toContainText("Bắt đầu từ HSK 1");
+  await page.getByRole("link", { name: /Mở lộ trình HSK 1/ }).click();
+  await expect(page).toHaveURL(/\/hoc\?khoa=hsk-1/);
+});
+
 test("mục Học có trên thanh điều hướng", async ({ page }) => {
   await page.goto("/app");
   await expect(page.getByRole("navigation", { name: "Điều hướng chính" }).first().getByRole("link", { name: "Học" })).toBeVisible();

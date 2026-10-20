@@ -8,7 +8,7 @@ export const metadata = { robots: { index: false, follow: false } };
 const SWATCHES = ["primary", "primary-container", "secondary", "secondary-container", "tertiary", "tertiary-container", "error", "surface-container-high"] as const;
 
 export default function UiKitPage() {
-  if (process.env.NODE_ENV === "production") notFound();
+  if (process.env.NODE_ENV === "production" && process.env.ENABLE_DEV_FIXTURES !== "1") notFound(); // ENABLE_DEV_FIXTURES=1 chỉ đặt khi chạy e2e trên bản production
   return (
     <main id="main" tabIndex={-1} className="mx-auto max-w-3xl space-y-space-lg p-space-md outline-none">
       <header>

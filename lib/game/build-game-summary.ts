@@ -22,6 +22,7 @@ export interface GameInputs {
   raw: RawActivity;
   /** Số thẻ đã ôn ít nhất một lần. */
   learnedWords: number;
+  levelsCompleted: number;
   claims: QuestClaimRow[];
   storedBadges: EarnedBadge[];
   /** Ngày đã được đóng băng (đã lưu). */
@@ -72,7 +73,7 @@ export function computeGame(input: GameInputs): GameComputation {
   // Huy hiệu.
   const all = sumDays(days, "0000-00-00", "9999-99-99");
   const facts: BadgeFacts = {
-    learnedWords: input.learnedWords, totalReviews: all.reviews, unitsCompleted: all.unitsCompleted, level: level.n, longestStreak: streak.longest,
+    learnedWords: input.learnedWords, levelsCompleted: input.levelsCompleted, totalReviews: all.reviews, unitsCompleted: all.unitsCompleted, level: level.n, longestStreak: streak.longest,
     songsCompleted: all.songsCompleted, dictationGood: all.dictationGood, shadowingGood: all.shadowingGood, roomsPlayed: all.roomsPlayed,
     roomsWon: all.roomsWon, perfectRounds: all.perfectRounds, nightReviews: all.nightReviews, earlyReviews: all.earlyReviews,
   };

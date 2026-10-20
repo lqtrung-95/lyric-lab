@@ -15,9 +15,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
   const n = Number(idx);
   if (!SLUG.test(slug) || !Number.isInteger(n) || n < 1 || n > 500) return Response.json({ error: "invalid_request" }, { status: 400 });
   try {
-    const unit = await loadUnit(slug, n);
+    // `weak` (từ hay làm sai, cách nhau bởi dấu phẩy) chỉ có tác dụng với chặng ôn tổng hợp; bỏ mọi giá trị không phải chữ Hán ngắn.
+    const weak = (new URL(req.url).searchParams.get("weak") ?? "").split(",").filter((t) => /^\p{Script=Han}{1,8}$/u.test(t)).slice(0, 20);
+    const unit = await loadUnit(slug, n, weak);
     if (!unit) return Response.json({ error: "not_found" }, { status: 404 });
-    return Response.json(unit, { headers: { "Cache-Control": "public, max-age=300" } });
+    return Response.json(unit, { headers: { "Cache-Control": weak.length ? "private, no-store" : "public, max-age=300, s-maxage=600, stale-while-revalidate=86400" } });
   } catch (error) {
     console.error(JSON.stringify({ event: "course_unit_error", message: (error as Error).message }));
     return Response.json({ error: "server_error" }, { status: 500 });

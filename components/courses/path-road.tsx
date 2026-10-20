@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Icon } from "@/components/ui/icon";
 import { mapHeight, nodePositions, roadPath } from "@/lib/courses/path-geometry";
 import type { MapUnit } from "./use-course-map";
@@ -12,6 +13,11 @@ const reviewIcon = (u: MapUnit) => (u.kind === "final" ? "emoji_events" : "quiz"
  * các chặng còn lại là số (KHÔNG khóa: chạm chặng nào cũng xem được). Chạm một nút để xem chi tiết chặng; tên chủ đề hiện ở chặng đầu của mỗi nhóm.
  */
 export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: MapUnit[]; currentIdx: number; selectedIdx: number; onSelect: (idx: number) => void }) {
+  const currentRef = useRef<HTMLLIElement | null>(null);
+  // Mở bản đồ là cuộn tới chặng đang học (bản đồ HSK 4–6 dài hơn 15.000 px): chỉ một lần và chỉ khi chặng đó ở xa đầu trang; bỏ qua khi người dùng bật giảm chuyển động thì vẫn nhảy thẳng (không hoạt ảnh).
+  useEffect(() => {
+    if (currentIdx > 4) currentRef.current?.scrollIntoView({ block: "center" });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- chỉ lúc mở bản đồ lần đầu
   const points = nodePositions(units.length);
   const height = mapHeight(units.length);
   return (
@@ -31,7 +37,7 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
           const showTopic = u.topic && u.topic !== units[i - 1]?.topic;
           const labelRight = p.x < 50;
           return (
-            <li key={u.id} className="absolute" style={{ left: `${p.x}%`, top: p.y, transform: "translate(-50%, -50%)" }}>
+            <li key={u.id} ref={current ? currentRef : undefined} className="absolute" style={{ left: `${p.x}%`, top: p.y, transform: "translate(-50%, -50%)" }}>
               <button type="button" onClick={() => onSelect(u.idx)} aria-pressed={selected}
                 aria-label={`${review ? "" : "Chặng "}${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}`}
                 style={{ width: size, height: size }}

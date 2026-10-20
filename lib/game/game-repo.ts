@@ -16,6 +16,8 @@ export interface GameData {
   timeZone: string;
   raw: RawActivity;
   learnedWords: number;
+  /** Số bài kiểm tra cuối cấp HSK đã hoàn thành. */
+  levelsCompleted: number;
   claims: QuestClaimRow[];
   storedBadges: EarnedBadge[];
   frozenDays: string[];
@@ -37,7 +39,7 @@ async function loadRoomRows(sb: Sb, userId: string): Promise<RawActivity["rooms"
 /** Đọc mọi dữ liệu game của một người dùng. Mỗi bảng đọc độc lập và chịu được thiếu bảng. */
 export async function loadGameData(userId: string): Promise<GameData> {
   const sb = createSupabaseServiceClient();
-  const [profile, logs, scores, songs, units, learned, claims, badges, freezes, rooms] = await Promise.all([
+  const [profile, logs, scores, songs, units, learned, claims, badges, freezes, rooms, finals] = await Promise.all([
     sb.from("user_profiles").select("timezone").eq("user_id", userId).maybeSingle(),
     sb.from("review_logs").select("reviewed_at").eq("user_id", userId).order("reviewed_at", { ascending: false }).limit(MAX_ROWS),
     sb.from("practice_scores").select("played_at,mode,correct,total").eq("user_id", userId).order("played_at", { ascending: false }).limit(MAX_ROWS),
@@ -48,6 +50,8 @@ export async function loadGameData(userId: string): Promise<GameData> {
     sb.from("user_badges").select("badge_id,tier,earned_at").eq("user_id", userId).limit(1000),
     sb.from("user_streak_freezes").select("day").eq("user_id", userId).limit(1000),
     loadRoomRows(sb, userId),
+    // Bài kiểm tra cuối cấp = chặng loại ôn tập `final` đã hoàn thành (nối sang course_units để đọc loại chặng).
+    sb.from("user_unit_progress").select("unit_id,course_units!inner(content)", { count: "exact", head: true }).eq("user_id", userId).eq("status", "completed").eq("course_units.content->>variant", "final"),
   ]);
   return {
     timeZone: profile.data?.timezone ?? DEFAULT_TIMEZONE,
@@ -59,6 +63,7 @@ export async function loadGameData(userId: string): Promise<GameData> {
       rooms,
     },
     learnedWords: learned.count ?? 0,
+    levelsCompleted: finals.count ?? 0,
     claims: rows(claims).map((r) => ({ questId: r.quest_id as string, rewardXp: r.reward_xp as number, freezeGranted: r.freeze_granted === true, claimedAt: r.claimed_at as string })),
     storedBadges: rows(badges).map((r) => ({ id: r.badge_id as string, tier: r.tier as BadgeTier, earnedAt: r.earned_at as string })),
     frozenDays: rows(freezes).map((r) => r.day as string),
