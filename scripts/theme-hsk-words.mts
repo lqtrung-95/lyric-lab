@@ -30,7 +30,7 @@ const words = [...byWord].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])
 const all: Record<string, ThemeAssignment> = existsSync(FILE) ? JSON.parse(readFileSync(FILE, "utf8")) : {};
 const mine: ThemeAssignment = all[String(level)] ?? {};
 const done = new Set(Object.values(mine).flat());
-let todo = words.filter((w) => !done.has(w));
+const todo = words.filter((w) => !done.has(w));
 console.log(`HSK ${level}: ${words.length} từ, đã phân loại ${done.size}, còn ${todo.length}`);
 
 for (let i = 0; i < todo.length; i += BATCH) {
