@@ -22,7 +22,7 @@ const readRecent = () => {
 };
 const DEFAULT_PER_DAY = 15;
 const pulse = "animate-pulse bg-surface-container-high motion-reduce:animate-none";
-const cta = "mt-space-sm inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 text-label-md font-semibold";
+const cta = "mt-space-md inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 text-label-md font-semibold";
 
 /**
  * Bảng "Hôm nay": một hành động nổi bật duy nhất (ôn thẻ đến hạn → tiếp tục nghe bài dở → xem bài gợi ý),
@@ -41,23 +41,24 @@ export function NextActionPanel() {
 
   return (
     <section aria-labelledby="today-heading" aria-busy={!ready} className="card-ink flex h-full flex-col justify-between gap-space-md p-space-md">
-      {/* Trái: việc nên làm ngay; phải: vòng mục tiêu ngày (lấp chỗ trống khi thẻ bị kéo cao bằng khối Nhiệm vụ bên cạnh). */}
-      <div className="flex flex-wrap items-start justify-between gap-x-space-lg gap-y-space-md">
-        <div className="min-h-[11rem] min-w-[14rem] flex-1">
-          <h2 id="today-heading" className="inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-sm font-extrabold uppercase tracking-widest text-on-primary-container">Việc tiếp theo</h2>
+      <h2 id="today-heading" className="self-start rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-sm font-extrabold uppercase tracking-widest text-on-primary-container">Việc tiếp theo</h2>
+      {/* Giữa: việc nên làm ngay (trái) và vòng mục tiêu ngày (phải). Khối này căn giữa phần còn lại giữa tiêu đề và hàng số liệu, nên khi thẻ bị kéo cao bằng ô Nhiệm vụ, khoảng trống chia đều hai phía thay vì dồn một chỗ. */}
+      <div className="flex flex-1 flex-wrap items-center justify-between gap-x-space-lg gap-y-space-md">
+        <div className="min-h-[10rem] min-w-[14rem] flex-1">
           {!ready && <ActionSkeleton />}
           {ready && action.kind === "review" && (
             <>
-              <p className="mt-space-sm flex items-baseline gap-2">
-                <span className="font-serif text-[44px] font-semibold leading-none text-primary">{action.due}</span>
+              <p className="flex items-baseline gap-2">
+                <span className="font-serif text-[56px] font-semibold leading-none text-primary">{action.due}</span>
                 <span className="text-body-lg text-on-surface-variant">thẻ cần ôn</span>
               </p>
+              <p className="mt-1 text-body-md text-on-surface-variant">Ôn ngắn mỗi ngày giúp bạn nhớ lâu hơn.</p>
               <Link href="/review" className={`${cta} bg-primary text-on-primary hover:brightness-110`}><Icon name="style" size={20} />Bắt đầu ôn</Link>
             </>
           )}
           {ready && action.kind === "continue" && (
             <>
-              <p className="mt-space-sm text-body-md text-on-surface-variant">Bạn đang nghe dở</p>
+              <p className="text-body-md text-on-surface-variant">Bạn đang nghe dở</p>
               <p className="line-clamp-2 font-serif text-headline-md text-on-surface">{action.song.title}</p>
               <p className="mt-1 text-label-md text-on-surface-variant">Dừng ở {formatPosition(action.song.positionSec)}</p>
               <Link href={`/learn/${action.song.videoId}/listen?t=${action.song.positionSec}`} className={`${cta} bg-primary text-on-primary hover:brightness-110`}>
