@@ -32,6 +32,7 @@ let total = 0;
 for (const unit of units.data as { id: string; idx: number; title: string; content: unknown }[]) {
   if (onlyUnit && unit.idx !== onlyUnit) continue;
   const content = unitContentSchema.parse(unit.content);
+  if (content.kind !== "hsk") continue; // chặng ôn không có từ riêng
   const glosses = { ...(content.glosses ?? {}) };
   const todo = overridesOnly ? [] : content.terms.filter((t) => force || !glosses[t]);
   if (todo.length === 0 && !overridesOnly) continue;

@@ -15,10 +15,10 @@ test.beforeEach(async ({ page }) => {
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 500, json: {} })); // không gọi Azure
 });
 
-test("bản đồ lộ trình: 36 chặng, nút bắt đầu chặng 1, đạt axe", async ({ page }) => {
+test("bản đồ lộ trình: 36 chặng học và bài kiểm tra cuối cấp, nút bắt đầu chặng 1, đạt axe", async ({ page }) => {
   await page.goto("/hoc");
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 1" })).toBeVisible();
-  await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).toHaveCount(36);
+  await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).toHaveCount(37); // 36 chặng học + kiểm tra cuối cấp
   await expect(page.getByRole("link", { name: /Bắt đầu chặng 1: Đại từ cơ bản/ })).toBeVisible();
   await expect(page.getByRole("progressbar", { name: "Tiến độ lộ trình" })).toHaveAttribute("aria-valuenow", "0");
   await noViolations(page);
@@ -31,7 +31,7 @@ test("chọn cấp: HSK 1–5, mở HSK 2 qua liên kết có thể chia sẻ", 
   await chips.getByRole("link", { name: "HSK 2" }).click();
   await expect(page).toHaveURL(/\/hoc\?khoa=hsk-2/);
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 2" })).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).toHaveCount(51);
+  await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).toHaveCount(62); // 51 chặng học + 10 chặng ôn + kiểm tra cuối cấp
   await page.goto("/hoc?khoa=hsk-5");
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 5" })).toBeVisible({ timeout: 15_000 });
 });
@@ -76,6 +76,44 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
   await expect(result).toContainText("%");
   expect(saved).toMatchObject({ unit_id: expect.any(String), best_score: expect.any(Number) });
   await noViolations(page);
+});
+
+/** Làm hết một bài kiểm tra bằng cách luôn chọn đáp án đầu tiên (đúng hay sai không quan trọng với luồng này). */
+async function answerAll(page: Page, total: number) {
+  for (let i = 0; i < total; i++) {
+    await expect(page.getByText(new RegExp(`Câu ${i + 1}/${total}`))).toBeVisible();
+    await page.getByRole("group", { name: "Các lựa chọn" }).getByRole("button").first().click();
+    await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
+  }
+}
+
+test("chặng ôn tổng hợp (ôn tập chặng 1–5 của HSK 2): 20 câu nhiều kiểu, từ làm sai tự vào bộ ôn, ghi tiến độ", async ({ page }) => {
+  test.setTimeout(120_000);
+  await stubAnonymousSession(page);
+  let saved: Record<string, unknown> | null = null;
+  await page.route("**/rest/v1/user_unit_progress*", async (route) => {
+    if (route.request().method() === "GET") return route.fulfill({ json: [] });
+    saved = route.request().postDataJSON();
+    return route.fulfill({ status: 201, body: "" });
+  });
+  await page.goto("/hoc/hsk-2/6");
+  await expect(page.getByRole("heading", { level: 1, name: "Ôn tập chặng 1–5" })).toBeVisible({ timeout: 45_000 });
+  await expect(page.getByRole("button", { name: /Nghe \p{Script=Han}/u })).toHaveCount(0); // không có bước làm quen từ
+  await page.getByRole("button", { name: /Bắt đầu làm bài/ }).click();
+  await answerAll(page, 20);
+  await expect(page.getByTestId("unit-result")).toBeVisible();
+  expect(saved).toMatchObject({ unit_id: expect.any(String), best_score: expect.any(Number) });
+  // Luôn chọn đáp án đầu thì gần như chắc chắn có câu sai; từ sai có câu thật làm nguồn được thêm vào bộ ôn.
+  await expect(page.getByTestId("unit-result-added")).toBeVisible();
+});
+
+test("bài kiểm tra cuối cấp HSK 1: 40 câu", async ({ page }) => {
+  await stubAnonymousSession(page);
+  await page.route("**/rest/v1/user_unit_progress*", (route) => route.fulfill({ json: [] }));
+  await page.goto("/hoc/hsk-1/37");
+  await expect(page.getByRole("heading", { level: 1, name: "Kiểm tra cuối cấp HSK 1" })).toBeVisible({ timeout: 45_000 });
+  await page.getByRole("button", { name: /Bắt đầu làm bài/ }).click();
+  await expect(page.getByText(/Câu 1\/40/)).toBeVisible();
 });
 
 test("chặng không tồn tại: báo rõ và có đường về lộ trình", async ({ page }) => {

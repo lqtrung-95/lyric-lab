@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// Nội dung một bài (cột `course_units.content`). Hiện chỉ có bài HSK (danh sách từ); các loại khác (tình huống, tập viết) thêm vào đây khi làm tới.
+// Nội dung một bài (cột `course_units.content`): bài HSK (danh sách từ) và chặng ôn tổng hợp; các loại khác (tình huống, tập viết) thêm vào đây khi làm tới.
 export const hskUnitContentSchema = z.object({
   kind: z.literal("hsk"),
   /** Từ của bài (chữ giản thể), theo thứ tự học. */
@@ -10,7 +10,18 @@ export const hskUnitContentSchema = z.object({
   /** Nghĩa tiếng Việt ngắn của từng từ (từ điển chỉ có nghĩa tiếng Anh); sinh bằng `scripts/gloss-hsk-course.mts`, người dùng duyệt trước khi ghi. */
   glosses: z.record(z.string(), z.string().min(1).max(80)).optional(),
 });
-export const unitContentSchema = hskUnitContentSchema;
+/**
+ * Chặng ôn tổng hợp: không có từ riêng mà ôn lại các chặng đã học của cùng khóa. `checkpoint` ôn các chặng học có số thứ tự từ `from` đến `to`
+ * (số thứ tự của khóa); `final` là bài kiểm tra cuối cấp trên toàn bộ khóa. Máy chủ lấy mẫu từ khi người học mở chặng (xem `load-unit.ts`).
+ */
+export const reviewUnitContentSchema = z.object({
+  kind: z.literal("review"),
+  variant: z.enum(["checkpoint", "final"]),
+  from: z.number().int().min(1).optional(),
+  to: z.number().int().min(1).optional(),
+  topic: z.string().max(40).optional(),
+});
+export const unitContentSchema = z.discriminatedUnion("kind", [hskUnitContentSchema, reviewUnitContentSchema]);
 export type UnitContent = z.infer<typeof unitContentSchema>;
 
 export type CourseKind = "hsk" | "situation" | "writing";

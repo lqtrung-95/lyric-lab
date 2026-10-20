@@ -38,7 +38,7 @@ export interface BadgeDef {
 export const BADGES: BadgeDef[] = [
   { id: "learn-words", group: "learn", title: "Kho từ", hint: "Học {n} từ (ôn ít nhất một lần)", metric: "learnedWords", thresholds: [10, 50, 200, 1000] },
   { id: "learn-reviews", group: "learn", title: "Chăm ôn", hint: "Chấm {n} lượt ôn thẻ", metric: "totalReviews", thresholds: [50, 300, 1500, 6000] },
-  { id: "learn-units", group: "learn", title: "Chinh phục chặng", hint: "Hoàn thành {n} chặng lộ trình", metric: "unitsCompleted", thresholds: [1, 5, 15, 36] },
+  { id: "learn-units", group: "learn", title: "Chinh phục chặng", hint: "Hoàn thành {n} chặng lộ trình", metric: "unitsCompleted", thresholds: [1, 10, 36, 100] },
   { id: "learn-level", group: "learn", title: "Thăng cấp", hint: "Đạt cấp {n}", metric: "level", thresholds: [5, 10, 20, 30] },
   { id: "streak-days", group: "streak", title: "Giữ lửa", hint: "Chuỗi học dài nhất {n} ngày", metric: "longestStreak", thresholds: [3, 7, 30, 100] },
   { id: "listen-songs", group: "listen", title: "Thính giả", hint: "Nghe hết {n} bài hát", metric: "songsCompleted", thresholds: [1, 5, 20, 60] },

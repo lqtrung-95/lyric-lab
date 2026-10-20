@@ -50,3 +50,33 @@ export function generateHskUnits(words: HskWord[], themes: HskTheme[], levelLabe
   chunks.forEach((c, i) => units.push({ title: `Từ thông dụng khác ${chunks.length > 1 ? i + 1 : ""}`.trim(), topic: `${levelLabel}: từ khác`, terms: c, summary: summaryOf(c) }));
   return units;
 }
+
+export type PlannedUnit =
+  | ({ kind: "hsk" } & GeneratedUnit)
+  | { kind: "review"; variant: "checkpoint" | "final"; title: string; topic: string; summary: string; from?: number; to?: number };
+
+/**
+ * Chèn chặng ôn tổng hợp vào dãy chặng học: sau mỗi `every` chặng học (0 = không chèn) có một "Ôn tập chặng a–b", cuối dãy có "Kiểm tra cuối cấp".
+ * `from`/`to` là số thứ tự (trong cả khóa, đã tính chặng ôn đã chèn) của chặng học đầu và cuối trong nhóm. Chặng học cuối còn lẻ dưới nửa nhóm
+ * thì gộp vào lượt ôn cuối thay vì có một lượt ôn riêng cho 1–2 chặng.
+ */
+export function withReviewUnits(units: GeneratedUnit[], levelLabel: string, every: number, final = true): PlannedUnit[] {
+  const out: PlannedUnit[] = [];
+  let groupStart = 1; // số thứ tự (trong khóa) của chặng học đầu nhóm hiện tại
+  let inGroup = 0;
+  const flush = () => {
+    const to = out.length;
+    out.push({ kind: "review", variant: "checkpoint", title: `Ôn tập chặng ${groupStart}–${to}`, topic: "Ôn tập", summary: `Ôn lại các từ của ${inGroup} chặng vừa học`, from: groupStart, to });
+    groupStart = out.length + 1;
+    inGroup = 0;
+  };
+  units.forEach((u, i) => {
+    out.push({ kind: "hsk", ...u });
+    inGroup++;
+    const remaining = units.length - 1 - i;
+    if (every > 0 && inGroup >= every && remaining >= Math.ceil(every / 2)) flush();
+  });
+  if (every > 0 && inGroup > 0) flush();
+  if (final) out.push({ kind: "review", variant: "final", title: `Kiểm tra cuối cấp ${levelLabel}`, topic: "Kiểm tra", summary: `Bài kiểm tra tổng hợp toàn bộ từ ${levelLabel}` });
+  return out;
+}

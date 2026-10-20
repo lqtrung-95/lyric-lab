@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateHskUnits, splitEvenly } from "./generate-hsk-units";
+import { generateHskUnits, splitEvenly, withReviewUnits } from "./generate-hsk-units";
 import { HSK1_THEMES } from "./hsk1-themes";
 
 const word = (simplified: string, frequency: number) => ({ simplified, frequency });
@@ -42,5 +42,27 @@ describe("HSK1_THEMES", () => {
   it("không có id trùng; mỗi chủ đề có từ", () => {
     expect(new Set(HSK1_THEMES.map((t) => t.id)).size).toBe(HSK1_THEMES.length);
     expect(HSK1_THEMES.every((t) => t.words.length > 0)).toBe(true);
+  });
+});
+
+describe("withReviewUnits", () => {
+  const unit = (n: number) => ({ title: `Chặng ${n}`, topic: "t", terms: [`w${n}`], summary: "s" });
+  const plan = (n: number, every: number, final = true) => withReviewUnits(Array.from({ length: n }, (_, i) => unit(i + 1)), "HSK 2", every, final);
+
+  it("chèn một chặng ôn sau mỗi nhóm, đánh số theo cả khóa, và kiểm tra cuối cấp ở cuối", () => {
+    const out = plan(10, 5);
+    expect(out.map((u) => u.kind === "hsk" ? "h" : u.kind === "review" && u.variant === "final" ? "F" : "C").join("")).toBe("hhhhhChhhhhCF");
+    expect(out[5]).toMatchObject({ kind: "review", variant: "checkpoint", from: 1, to: 5, title: "Ôn tập chặng 1–5" });
+    expect(out[11]).toMatchObject({ from: 7, to: 11 });
+    expect(out.at(-1)).toMatchObject({ variant: "final", title: "Kiểm tra cuối cấp HSK 2" });
+  });
+  it("chặng lẻ cuối dưới nửa nhóm thì gộp vào lượt ôn cuối, không có lượt ôn riêng", () => {
+    const out = plan(11, 5); // 5 + 6: chặng 11 gộp vào nhóm hai
+    expect(out.filter((u) => u.kind === "review" && u.variant === "checkpoint")).toHaveLength(2);
+    expect(out.at(-2)).toMatchObject({ variant: "checkpoint", from: 7, to: 12 });
+  });
+  it("every = 0: không có chặng ôn giữa khóa; final = false: không có bài cuối cấp", () => {
+    expect(plan(4, 0, false).every((u) => u.kind === "hsk")).toBe(true);
+    expect(plan(4, 0).at(-1)).toMatchObject({ variant: "final" });
   });
 });

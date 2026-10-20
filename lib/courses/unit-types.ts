@@ -12,8 +12,11 @@ export interface UnitWord {
   examples: ExampleSentence[];
 }
 
+/** `hsk`: chặng học từ mới; `checkpoint`/`final`: chặng ôn tổng hợp (chỉ có bài kiểm tra). */
+export type UnitKind = "hsk" | "checkpoint" | "final";
+
 export interface UnitDetail {
   course: { slug: string; title: string };
-  unit: { id: string; idx: number; title: string; topic: string | null; total: number };
+  unit: { id: string; idx: number; title: string; topic: string | null; total: number; kind: UnitKind; /** Số câu của bài kiểm tra chặng. */ quizLength: number };
   words: UnitWord[];
 }

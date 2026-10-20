@@ -1,9 +1,11 @@
 import "server-only";
 import { lookupTermEntry } from "@/lib/lookup/server-lookup";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
-import { unitContentSchema } from "./course-types";
+import { QUIZ_LENGTH } from "./build-unit-quiz";
+import { unitContentSchema, type UnitContent } from "./course-types";
+import { CHECKPOINT_POOL, CHECKPOINT_QUIZ_LENGTH, FINAL_POOL, FINAL_QUIZ_LENGTH, pickReviewTerms, type ReviewSource } from "./review-pool";
 import { loadTermSentences } from "./load-term-sentences";
-import type { UnitDetail, UnitWord } from "./unit-types";
+import type { UnitDetail, UnitKind, UnitWord } from "./unit-types";
 
 const EXAMPLES_PER_WORD = 2;
 
@@ -16,9 +18,11 @@ export async function loadUnit(slug: string, idx: number): Promise<UnitDetail | 
   if (!unit.data) return null;
   const content = unitContentSchema.safeParse(unit.data.content);
   if (!content.success) return null;
-  const { terms, glosses, topic } = content.data;
 
   const total = await sb.from("course_units").select("id", { count: "exact", head: true }).eq("course_id", course.data.id).eq("status", "listed");
+  const pool = await termPool(sb, course.data.id as string, content.data);
+  if (!pool) return null;
+  const { terms, glosses } = pool;
   const [entries, examples] = await Promise.all([Promise.all(terms.map((t) => lookupTermEntry(t))), loadTermSentences(terms, EXAMPLES_PER_WORD)]);
   const words: UnitWord[] = terms.map((term, i) => ({
     term,
@@ -29,5 +33,23 @@ export async function loadUnit(slug: string, idx: number): Promise<UnitDetail | 
     meanings: entries[i]?.meanings ?? [],
     examples: examples[term] ?? [],
   }));
-  return { course: { slug: course.data.slug as string, title: course.data.title as string }, unit: { id: unit.data.id as string, idx: unit.data.idx as number, title: unit.data.title as string, topic: topic ?? null, total: total.count ?? 0 }, words };
+  const kind: UnitKind = content.data.kind === "hsk" ? "hsk" : content.data.variant;
+  const quizLength = kind === "final" ? FINAL_QUIZ_LENGTH : kind === "checkpoint" ? CHECKPOINT_QUIZ_LENGTH : QUIZ_LENGTH;
+  return { course: { slug: course.data.slug as string, title: course.data.title as string }, unit: { id: unit.data.id as string, idx: unit.data.idx as number, title: unit.data.title as string, topic: content.data.topic ?? null, total: total.count ?? 0, kind, quizLength }, words };
+}
+
+/** Từ của chặng: chặng học dùng danh sách riêng; chặng ôn lấy mẫu từ các chặng học nguồn của cùng khóa (nhóm `from`–`to`, hoặc cả khóa với bài cuối cấp). */
+async function termPool(sb: ReturnType<typeof createSupabaseServiceClient>, courseId: string, content: UnitContent): Promise<{ terms: string[]; glosses?: Record<string, string> } | null> {
+  if (content.kind === "hsk") return { terms: content.terms, glosses: content.glosses };
+  const rows = await sb.from("course_units").select("idx,content").eq("course_id", courseId).eq("status", "listed").order("idx");
+  if (rows.error) return null;
+  const sources: ReviewSource[] = [];
+  for (const r of rows.data as { idx: number; content: unknown }[]) {
+    const c = unitContentSchema.safeParse(r.content);
+    if (!c.success || c.data.kind !== "hsk") continue;
+    if (content.variant === "checkpoint" && (r.idx < (content.from ?? 1) || r.idx > (content.to ?? Infinity))) continue;
+    sources.push({ terms: c.data.terms, glosses: c.data.glosses });
+  }
+  if (sources.length === 0) return null;
+  return pickReviewTerms(sources, content.variant === "final" ? FINAL_POOL : CHECKPOINT_POOL);
 }

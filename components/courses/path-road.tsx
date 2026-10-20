@@ -5,6 +5,7 @@ import { mapHeight, nodePositions, roadPath } from "@/lib/courses/path-geometry"
 import type { MapUnit } from "./use-course-map";
 
 const isDone = (u: MapUnit) => u.progress?.status === "completed";
+const reviewIcon = (u: MapUnit) => (u.kind === "final" ? "emoji_events" : "quiz");
 
 /**
  * Bản đồ dạng đường đi: các chặng nằm trên con đường uốn lượn dọc xuống (đường vẽ bằng SVG, nét đứt). Chặng đã xong màu xanh rêu có dấu ✓, chặng tiếp theo to hơn có sao,
@@ -25,16 +26,17 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
           const done = isDone(u);
           const current = u.idx === currentIdx;
           const selected = u.idx === selectedIdx;
-          const size = current ? 72 : 56;
+          const review = u.kind !== "hsk";
+          const size = current ? 72 : u.kind === "final" ? 68 : 56;
           const showTopic = u.topic && u.topic !== units[i - 1]?.topic;
           const labelRight = p.x < 50;
           return (
             <li key={u.id} className="absolute" style={{ left: `${p.x}%`, top: p.y, transform: "translate(-50%, -50%)" }}>
               <button type="button" onClick={() => onSelect(u.idx)} aria-pressed={selected}
-                aria-label={`Chặng ${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}`}
+                aria-label={`${review ? "" : "Chặng "}${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}`}
                 style={{ width: size, height: size }}
-                className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-ink text-body-lg font-black shadow-[0_4px_0_var(--shadow-ink)] transition-transform active:translate-y-1 active:shadow-none motion-reduce:transition-none ${done ? "bg-secondary text-on-secondary" : current ? "bg-primary-container text-on-primary-container" : "bg-surface-container-lowest text-on-surface"} ${selected ? "ring-4 ring-primary/60 ring-offset-2 ring-offset-surface" : ""}`}>
-                {done ? <Icon name="check" size={28} /> : current ? <Icon name="star" size={32} filled /> : u.idx}
+                className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-ink text-body-lg font-black shadow-[0_4px_0_var(--shadow-ink)] transition-transform active:translate-y-1 active:shadow-none motion-reduce:transition-none ${done ? "bg-secondary text-on-secondary" : current ? "bg-primary-container text-on-primary-container" : review ? "bg-tertiary-container text-on-tertiary-container" : "bg-surface-container-lowest text-on-surface"} ${selected ? "ring-4 ring-primary/60 ring-offset-2 ring-offset-surface" : ""}`}>
+                {done ? <Icon name="check" size={28} /> : current ? <Icon name="star" size={32} filled /> : review ? <Icon name={reviewIcon(u)} size={28} filled /> : u.idx}
                 {current && <span aria-hidden="true" className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-sm font-black">Đang học</span>}
               </button>
               {showTopic && <span aria-hidden="true" className={`pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full border-2 border-[var(--ink-soft)] bg-surface-container-lowest px-3 py-1 text-label-md font-extrabold text-on-surface-variant sm:block ${labelRight ? "left-full ml-3" : "right-full mr-3"}`}>{u.topic}</span>}
