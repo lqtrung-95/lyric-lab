@@ -30,7 +30,7 @@ export default function AppHomePage() {
           <section aria-labelledby="paste-heading" className="card-ink flex h-full flex-col px-space-md py-space-md">
             <h1 id="paste-heading" className="text-headline-md">Học từ bất kỳ bài hát nào</h1>
             <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
-            <div className="mt-auto pt-space-sm">
+            <div className="mt-space-sm">
               <PasteLinkForm />
               <ToolsHint />
             </div>

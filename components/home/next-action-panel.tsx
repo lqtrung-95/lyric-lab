@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useSyncExternalStore } from "react";
 import { Icon } from "@/components/ui/icon";
+import { useStreak } from "@/components/streak/use-streak";
 import { useReviewSummaryState } from "@/components/review/use-review-summary";
 import { chooseNextAction, formatPosition } from "@/lib/home/home-logic";
 import { RECENT_SONGS_KEY, parseRecentSongs } from "@/lib/user-state/recent-songs";
@@ -31,6 +32,7 @@ export function NextActionPanel() {
   const { summary, loaded } = useReviewSummaryState();
   const continueSong = useContinueSong();
   const { state } = useLearnerState();
+  const streak = useStreak();
   const recentRaw = useSyncExternalStore(noop, readRecent, () => null);
   const openedSongs = useMemo(() => parseRecentSongs(recentRaw).length, [recentRaw]);
   // Chờ cả hai nguồn (số thẻ đến hạn và bài đang nghe dở) rồi mới chọn hành động: hiện khung chờ cùng kích thước thay vì nhảy nội dung.
@@ -40,8 +42,8 @@ export function NextActionPanel() {
   return (
     <section aria-labelledby="today-heading" aria-busy={!ready} className="card-ink flex h-full flex-col justify-between gap-space-md p-space-md">
       {/* Trái: việc nên làm ngay; phải: vòng mục tiêu ngày (lấp chỗ trống khi thẻ bị kéo cao bằng khối Nhiệm vụ bên cạnh). */}
-      <div className="flex flex-1 flex-wrap items-center justify-between gap-x-space-lg gap-y-space-md">
-        <div className="min-h-[11rem] min-w-[14rem] flex-1">
+      <div className="flex flex-wrap items-start justify-between gap-x-space-lg gap-y-space-md">
+        <div className="min-h-[9rem] min-w-[14rem] flex-1">
           <h2 id="today-heading" className="inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-sm font-extrabold uppercase tracking-widest text-on-primary-container">Việc tiếp theo</h2>
           {!ready && <ActionSkeleton />}
           {ready && action.kind === "review" && (
@@ -72,9 +74,10 @@ export function NextActionPanel() {
         )}
       </div>
 
-      <dl className="flex gap-space-lg border-t border-outline-variant/40 pt-space-sm text-label-md text-on-surface-variant">
-        <div><dt>Từ đã lưu</dt><dd className="font-serif text-headline-md text-on-surface">{state.saved.length}</dd></div>
-        <div><dt>Bài đã mở</dt><dd className="font-serif text-headline-md text-on-surface">{openedSongs}</dd></div>
+      <dl className="grid grid-cols-3 gap-space-sm">
+        <Tile label="Từ đã lưu" value={state.saved.length} />
+        <Tile label="Bài đã mở" value={openedSongs} />
+        <Tile label="Chuỗi ngày" value={streak?.current ?? 0} />
       </dl>
     </section>
   );
@@ -90,6 +93,16 @@ function ActionSkeleton() {
         <div className={`mt-2 h-4 w-full rounded-full ${pulse}`} />
         <div className={`mt-space-sm h-11 w-44 rounded-full ${pulse}`} />
       </div>
+    </div>
+  );
+}
+
+/** Ô số liệu nhỏ ở đáy bảng Hôm nay: ba ô cùng rộng nên bảng đầy bề ngang thay vì dồn về một bên. */
+function Tile({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-xl bg-surface-container-low px-space-sm py-2">
+      <dt className="text-label-md text-on-surface-variant">{label}</dt>
+      <dd className="font-serif text-headline-md leading-tight text-on-surface">{value}</dd>
     </div>
   );
 }
