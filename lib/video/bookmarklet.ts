@@ -1,8 +1,10 @@
 // Bookmarklet "Gửi sang SongHanzi": dấu trang chạy ngay trên trang video youtube.com của người dùng (IP và phiên của họ nên không bị YouTube chặn như
 // server của ta). Nó tự mở bảng "Bản chép lời" nếu chưa mở, đọc chữ trong bảng rồi mở trang Thêm video của app kèm dữ liệu trong phần `#` của địa chỉ.
 // Dữ liệu nằm sau dấu `#` nên không bao giờ gửi lên server qua địa chỉ, và không phụ thuộc cửa sổ mở ra còn liên kết với cửa sổ gốc hay không.
-// Không đọc track phụ đề (`fmt=json3`) hay gọi API bản chép lời nội bộ: trên YouTube thật cả hai đều bị từ chối (trả rỗng / FAILED_PRECONDITION)
-// vì thiếu mã xác thực mà chỉ trình phát của YouTube có.
+// Không tự gọi URL phụ đề (`fmt=json3`) hay API bản chép lời nội bộ: trên YouTube thật cả hai đều bị từ chối (trả rỗng / FAILED_PRECONDITION)
+// vì thiếu mã xác thực `pot` mà chỉ request của chính trình phát có (dùng lại URL có `pot` cũng rỗng). Thay vào đó `viaPlayer` bảo trình phát bật phụ đề
+// tiếng Trung rồi CHẶN response của request mà trình phát tự gửi (json3 có mốc mili giây), đổi sang VTT cho `parsePastedTranscript`. Cách này chạy cả khi
+// bảng Transcript không có ô chọn ngôn ngữ; đọc bảng Transcript là phương án dự phòng. Chỉ dùng track do người đăng tải (không phải `asr`).
 
 /**
  * Dữ liệu bookmarklet gửi: `t` là văn bản bản chép lời tiếng Trung đọc từ bảng của YouTube (mốc giờ và lời, parse bằng `parsePastedTranscript`).
@@ -100,7 +102,29 @@ go({v:id,t:t});
 }
 function tracks(){var pr=null;try{pr=document.getElementById('movie_player').getPlayerResponse();}catch(e){}if(!pr){return null;}var c=pr.captions&&pr.captions.playerCaptionsTracklistRenderer;return (c&&c.captionTracks)||[];}
 function noZh(){var tr=tracks();if(tr===null){return false;}for(var i=0;i<tr.length;i++){if(/^(zh|yue)/i.test(tr[i].languageCode)){return false;}}return true;}
+function capTrack(){var tr=tracks();if(!tr){return null;}for(var i=0;i<tr.length;i++){if(/^(zh|yue)/i.test(tr[i].languageCode)&&tr[i].kind!=='asr'){return tr[i];}}return null;}
+function pad(n,w){var s=String(n);while(s.length<w){s='0'+s;}return s;}
+function stamp(ms){ms=Math.max(0,Math.round(ms));return pad(Math.floor(ms/3600000),2)+':'+pad(Math.floor(ms/60000)%60,2)+':'+pad(Math.floor(ms/1000)%60,2)+'.'+pad(ms%1000,3);}
+function toVtt(body){var j;try{j=JSON.parse(body);}catch(e){return '';}var ev=(j&&j.events)||[],out=['WEBVTT',''];for(var i=0;i<ev.length;i++){var e=ev[i];if(!e.segs){continue;}var s='';for(var k=0;k<e.segs.length;k++){s+=e.segs[k].utf8||'';}s=s.replace(/\\s+/g,' ').trim();if(!s){continue;}var a=e.tStartMs||0;out.push(stamp(a)+' --> '+stamp(a+(e.dDurationMs||2000)));out.push(s);out.push('');}return out.join('\\n');}
+function viaPlayer(done){
+var mp=document.getElementById('movie_player'),trk=capTrack();
+if(!mp||!trk||typeof mp.setOption!=='function'){done(null);return;}
+var code=trk.languageCode,prev=null,finished=false,tm=null,xo=XMLHttpRequest.prototype.open,xs=XMLHttpRequest.prototype.send,of=window.fetch;
+try{prev=mp.getOption('captions','track');}catch(e){}
+function restore(){XMLHttpRequest.prototype.open=xo;XMLHttpRequest.prototype.send=xs;if(of){window.fetch=of;}try{if(prev&&prev.languageCode){mp.setOption('captions','track',prev);}else{mp.setOption('captions','track',{});if(mp.unloadModule){mp.unloadModule('captions');}}}catch(e){}}
+function end(v){if(finished){return;}finished=true;clearTimeout(tm);restore();done(v);}
+function take(u,body){if(finished||u.indexOf('/api/timedtext')<0||u.indexOf('lang='+code)<0||/[?&]tlang=/.test(u)){return;}var v=toVtt(body);if(han(v)>=10){end(v);}}
+XMLHttpRequest.prototype.open=function(m,u){this.__sh=String(u);return xo.apply(this,arguments);};
+XMLHttpRequest.prototype.send=function(){var x=this;if(/timedtext/.test(x.__sh||'')){x.addEventListener('load',function(){try{take(x.__sh,x.responseText);}catch(e){}});}return xs.apply(this,arguments);};
+if(of){window.fetch=function(a){var u=String((a&&a.url)||a),p=of.apply(this,arguments);if(/timedtext/.test(u)){p.then(function(r){return r.clone().text();}).then(function(t){take(u,t);})['catch'](function(){});}return p;};}
+function pick(c){try{mp.loadModule('captions');}catch(e){}try{mp.setOption('captions','track',c);}catch(e){}}
+say('SongHanzi: đang lấy phụ đề tiếng Trung…');
+tm=setTimeout(function(){end(null);},9000);
+var all=tracks()||[],other=null;for(var i=0;i<all.length;i++){if(all[i].languageCode!==code){other=all[i];break;}}
+if(prev&&prev.languageCode===code){pick(other?{languageCode:other.languageCode}:{});setTimeout(function(){pick({languageCode:code});},1200);}else{pick({languageCode:code});}
+}
 if(noZh()){go({v:id,t:'',ai:true});return;}
+function panel(){
 var now=readPanel();
 if(now){send(now);return;}
 var base='SongHanzi: đang đọc phụ đề';
@@ -130,6 +154,8 @@ if(tries%2===0&&!document.querySelectorAll(SEG).length){tryTab();}
 setTimeout(wait,500);
 })();
 },700);
+}
+viaPlayer(function(v){if(v){go({v:id,t:v});return;}hide();panel();});
 })`;
 
 /** Mã `javascript:` để gắn vào dấu trang; `origin` là địa chỉ gốc của app (cùng nơi trang Thêm video chạy). */

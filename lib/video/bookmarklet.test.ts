@@ -27,6 +27,8 @@ interface Opts {
   trackCodes?: (string | { code: string; kind?: string })[];
   /** Liên kết tên kênh (vd. "Chinese with HuanYu") luôn hiện trong trang, đứng TRƯỚC các mục menu trong DOM: bấm nhầm vào nó là chuyển sang trang kênh. */
   channelLink?: boolean;
+  /** Trình phát giả có `setOption`: bật track thì giả lập request timedtext của trình phát (qua XHR giả) trả `body`; `body` null = không có request nào. */
+  player?: { tracks: { languageCode: string; kind?: string }[]; current?: string; body: string | null };
 }
 
 function run(opts: Opts) {
@@ -78,9 +80,39 @@ function run(opts: Opts) {
     querySelector: (sel: string) => (sel.includes("transcript-section") ? (opts.hasTranscriptButton ? button : null) : { click: () => { clicks.push("expand"); } }),
   };
   const win = { open: (u: string) => { opened.push(u); return opts.popupBlocked ? null : {}; } };
-  const fn = new Function("location", "document", "window", "alert", "btoa", "unescape", `return ${BOOKMARKLET_SOURCE}("https://songhanzi.test");`);
-  fn({ search: opts.search ?? "?v=abcdefghijk", hostname: opts.hostname ?? "www.youtube.com" }, doc, win, (m: string) => alerts.push(m), (s: string) => Buffer.from(s, "binary").toString("base64"), unescape);
-  return { opened, alerts, clicks, messages };
+  const setCalls: unknown[] = [];
+  class FakeXhr {
+    static listeners: Record<string, (() => void)[]> = {};
+    responseText = "";
+    open(_m: string, _u: string) { void _m; void _u; }
+    send() {}
+  }
+  const xhrOpen = FakeXhr.prototype.open;
+  const xhrSend = FakeXhr.prototype.send;
+  const makeRequest = (url: string, body: string) => {
+    const x = new FakeXhr() as FakeXhr & { addEventListener: (e: string, f: () => void) => void; __l?: (() => void)[] };
+    x.addEventListener = (_e, f) => { (x.__l ??= []).push(f); };
+    x.open("GET", url);
+    x.responseText = body;
+    x.send();
+    x.__l?.forEach((f) => f());
+  };
+  if (opts.player) {
+    const pl = opts.player;
+    doc.getElementById = () => ({
+      getPlayerResponse: () => ({ captions: { playerCaptionsTracklistRenderer: { captionTracks: pl.tracks } } }),
+      getOption: () => (pl.current ? { languageCode: pl.current } : {}),
+      loadModule: () => undefined,
+      unloadModule: () => undefined,
+      setOption: (_m: string, _k: string, v: { languageCode?: string }) => {
+        setCalls.push(v);
+        if (v.languageCode && pl.body != null) makeRequest(`https://www.youtube.com/api/timedtext?v=abc&lang=${v.languageCode}&potc=1&pot=zzz`, pl.body);
+      },
+    }) as never;
+  }
+  const fn = new Function("location", "document", "window", "alert", "btoa", "unescape", "XMLHttpRequest", `return ${BOOKMARKLET_SOURCE}("https://songhanzi.test");`);
+  fn({ search: opts.search ?? "?v=abcdefghijk", hostname: opts.hostname ?? "www.youtube.com" }, doc, win, (m: string) => alerts.push(m), (s: string) => Buffer.from(s, "binary").toString("base64"), unescape, FakeXhr);
+  return { opened, alerts, clicks, messages, setCalls, xhrRestored: () => FakeXhr.prototype.open === xhrOpen && FakeXhr.prototype.send === xhrSend };
 }
 const payloadOf = (url: string) => decodeBookmarkletHash(url.split("/video/add")[1]);
 const PANEL = "0:00\n大家好\n0:05\n欢迎收听我们的节目";
@@ -239,6 +271,56 @@ describe("bookmarklet", () => {
       expect(clicks).toEqual([]); // không mở ô chọn ngôn ngữ, không bấm mục Vietnamese
       expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
     }
+  });
+
+  describe("lấy phụ đề bằng cách chặn response của trình phát", () => {
+    const J3 = JSON.stringify({ events: [{ tStartMs: 19100, dDurationMs: 933, segs: [{ utf8: "接上回" }] }, { tStartMs: 20033, dDurationMs: 2533, segs: [{ utf8: "我们来到了这个与世隔绝的小木屋" }] }, { tStartMs: 3723004, segs: [{ utf8: "\n" }] }, { tStartMs: 25166, dDurationMs: 2134, segs: [{ utf8: "距离最近的小镇也要" }, { utf8: "四十三分钟" }] }] });
+    const tracks = [{ languageCode: "zh-Hans" }, { languageCode: "en-US" }];
+
+    it("bảng Transcript không có ô chọn ngôn ngữ: bật track tiếng Trung, chặn response, gửi VTT có mili giây và trả lại hook", () => {
+      const { opened, alerts, clicks, setCalls, xhrRestored } = run({ player: { tracks, body: J3 }, panelText: "0:00\nHello\n0:05\nWorld" });
+      expect(alerts).toEqual([]);
+      expect(clicks).toEqual([]); // không động tới bảng Transcript
+      const t = payloadOf(opened[0])!.t;
+      expect(t.startsWith("WEBVTT")).toBe(true);
+      expect(t).toContain("00:00:19.100 --> 00:00:20.033\n接上回");
+      expect(t).toContain("00:00:25.166 --> 00:00:27.300\n距离最近的小镇也要四十三分钟"); // ghép các đoạn của một sự kiện
+      expect(t).not.toContain("01:02:03"); // sự kiện chỉ có xuống dòng bị bỏ
+      expect(setCalls[0]).toEqual({ languageCode: "zh-Hans" });
+      expect(xhrRestored()).toBe(true);
+    });
+
+    it("kết quả đọc được bằng đúng bộ phân tích của trang Thêm video (mốc mili giây, không làm tròn giây)", async () => {
+      const { parsePastedTranscript } = await import("./parse-pasted-transcript");
+      const { opened } = run({ player: { tracks, body: J3 }, panelText: null });
+      const lines = parsePastedTranscript(payloadOf(opened[0])!.t);
+      expect(lines[0]).toMatchObject({ text: "接上回", start: 19.1, end: 20.033 });
+      expect(lines).toHaveLength(3);
+    });
+
+    it("track tiếng Trung đang bật sẵn: chuyển sang track khác rồi bật lại để trình phát gửi lại request", () => {
+      vi.useFakeTimers();
+      const { opened, setCalls } = run({ player: { tracks, current: "zh-Hans", body: J3 } });
+      expect(opened).toHaveLength(0);
+      vi.advanceTimersByTime(1300);
+      expect(setCalls[0]).toEqual({ languageCode: "en-US" });
+      expect(opened).toHaveLength(1);
+    });
+
+    it("trình phát không gửi request (quá 9 giây): rơi về đọc bảng Transcript, trả lại hook", () => {
+      vi.useFakeTimers();
+      const { opened, xhrRestored } = run({ player: { tracks, body: null }, panelText: PANEL });
+      expect(opened).toHaveLength(0);
+      vi.advanceTimersByTime(9100);
+      expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
+      expect(xhrRestored()).toBe(true);
+    });
+
+    it("chỉ có phụ đề tự tạo (asr): không dùng đường này, vẫn đọc bảng như cũ", () => {
+      const { opened, setCalls } = run({ player: { tracks: [{ languageCode: "zh-Hans", kind: "asr" }], body: J3 }, panelText: PANEL });
+      expect(setCalls).toEqual([]);
+      expect(payloadOf(opened[0])).toEqual({ v: "abcdefghijk", t: PANEL });
+    });
   });
 
   it("video không có track tiếng Trung: không đọc bảng, chuyển sang trang Thêm video kèm cờ AI nghe (không báo lỗi)", () => {

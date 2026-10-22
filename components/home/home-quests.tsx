@@ -4,6 +4,7 @@ import { useState } from "react";
 import { refreshGameSummary, useGameSummary } from "@/components/layout/use-game-summary";
 import { Button3d } from "@/components/ui/button-3d";
 import { Icon } from "@/components/ui/icon";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import type { QuestView } from "@/lib/game/game-types";
 
@@ -34,12 +35,34 @@ function QuestRow({ quest, onClaim, busy }: { quest: QuestView; onClaim: (q: Que
   );
 }
 
+/** Giữ chỗ khi đang tải: cùng khung thẻ và 3 dòng nhiệm vụ để không giật layout lúc dữ liệu về. */
+function QuestsSkeleton() {
+  return (
+    <section aria-label="Đang tải nhiệm vụ" aria-busy="true" className="card-ink h-full p-space-md">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-headline-md">Nhiệm vụ</h2>
+        <Skeleton className="h-4 w-20" />
+      </div>
+      <ul className="mt-space-sm space-y-1.5">
+        {[0, 1, 2].map((i) => (
+          <li key={i} className="flex items-center gap-space-sm rounded-xl bg-surface-container-low px-space-sm py-2">
+            <Skeleton className="size-8 shrink-0" />
+            <div className="min-w-0 flex-1 space-y-1.5"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-3 w-1/2" /></div>
+            <Skeleton className="h-4 w-12" />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** Nhiệm vụ ngày và tuần từ API game hóa: chỉ hiện khi có dữ liệu thật (không có phiên, chưa chạy migration hoặc lỗi thì ẩn cả khối). Nhận thưởng gọi API rồi tải lại tóm tắt. */
 export function HomeQuests() {
   const game = useGameSummary();
   const [busy, setBusy] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  if (game === undefined) return <QuestsSkeleton />;
   if (!game || game.quests.length === 0) return null;
 
   // Gọn trước: nhiệm vụ nhận được thưởng và đang dở lên đầu, tối đa 3 dòng; còn lại gập sau nút "Xem thêm".
