@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CompoundWords } from "@/components/tra-tu/compound-words";
 import { ExampleSentences } from "@/components/tra-tu/example-sentences";
 import { SaveCardButton } from "@/components/tra-tu/save-card-button";
+import { StrokeSection } from "@/components/tra-tu/stroke-section";
 import { WordHeader } from "@/components/tra-tu/word-header";
 import { WordMeanings } from "@/components/tra-tu/word-meanings";
 import { WordNoteCard } from "@/components/tra-tu/word-note-card";
@@ -42,6 +43,7 @@ export default async function WordPage({ params }: { params: Params }) {
       <WordHeader detail={detail}><SaveCardButton term={detail.simplified} item={cardItem} /></WordHeader>
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
       <WordMeanings readings={detail.readings} />
+      <StrokeSection term={detail.simplified} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
       <CompoundWords term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} words={compounds} />
     </div>
