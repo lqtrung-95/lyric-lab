@@ -24,6 +24,13 @@ Chưa làm trước khi công khai rộng (từ README cũ): thử tay đăng nh
 
 Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video" trên menu đã mở công khai (2026-10-10)**: bỏ cờ ẩn `previewOnly`/`NEXT_PUBLIC_VIDEO_PUBLIC` khỏi code, mục nào cũng nằm trong `NAV_LINKS`; lúc mở production có 14 video `listed`. Quyết định: chức năng riêng khỏi bài hát, nguồn do admin tuyển chọn (người dùng không dán link), dùng phụ đề YouTube có sẵn, chỉ phân tích khi bấm từ. Nguồn đầu: kênh của chủ dự án @ChineseGlow (13 video có phụ đề tiếng Trung + Việt do người làm). DaihuaXiyou không dùng được (không có phụ đề tiếng Trung). Giai đoạn 1 (migration `20261006000003_video_lessons.sql` + script nạp) và 2 (trang `/video`, màn xem, bấm từ lưu thẻ; migration `20261006000004_video_term_explanations.sql`) và 3 (chép chính tả), 4 (luyện nói theo/shadowing), 5 (trang quản trị `/admin/videos`) đã code. **Còn lại**: nạp video bằng nút "Nạp video từ kênh" ở `/admin/videos` (chạy trên server; script cục bộ bị YouTube chặn 429 theo IP), duyệt video ở cùng trang, rồi mở mục Video cho mọi người bằng `NEXT_PUBLIC_VIDEO_PUBLIC=1`. Chưa làm: lọc video theo level/kênh, đồng bộ tiến độ chép chính tả theo tài khoản, nút lưu hàng loạt từ sai, giao diện quản lý nguồn (`video_sources`). Nút "Nghe lại đúng đoạn" ở thẻ ôn và "tiếp tục nghe" ở trang chủ hiện chỉ biết bài hát, chưa biết video.
 
+## Tra từ (`/tra-tu`, nhánh `claude/tra-tu-d1dd19`)
+
+Từ điển đầy đủ trong app: ô tìm có gợi ý, trang chi tiết từng từ. Làm theo giai đoạn nhỏ, mỗi giai đoạn một commit; **chưa push, chưa merge** (chờ chủ dự án duyệt).
+- Giai đoạn 1 (xong): tìm kiếm. Gõ chữ Hán (giản/phồn), pinyin (có/không dấu, có/không cách, số thanh), âm Hán Việt (có/không dấu), nghĩa tiếng Anh, nghĩa tiếng Việt đã duyệt. Lịch sử tra lưu localStorage. Lối vào ở mục phụ của thanh điều hướng.
+- **Việc người dùng phải làm:** chạy migration `20261026000010_dict_search_columns.sql` (cột `pinyin_plain`, `meanings_text` + chỉ mục). Chưa chạy thì tìm vẫn đúng nhưng chậm hơn và tìm nghĩa tiếng Anh yếu (chỉ khớp trọn một ý của CC-CEDICT, ví dụ "love" không ra 爱 vì ý của nó là "to love; to be fond of").
+- Nghĩa tiếng Việt chỉ có cho từ đã có `glosses` trong bài HSK của khóa học (+ `HSK1_GLOSS_OVERRIDES`); không có nguồn từ điển Việt khác.
+
 ## Việc dở / quyết định đang treo
 
 - **Biệt danh và ảnh đại diện**: một biệt danh và một ảnh đại diện dùng chung cho phòng thi đấu và bảng xếp hạng (xem `docs/system-architecture.md` mục "Biệt danh dùng chung"); đặt tên không tự công khai điểm.
