@@ -25,6 +25,8 @@ export const HOP_GO_CASE: StoryDef = {
   },
   solution: { suspectId: "fox", keyClues: ["pen", "pens_jar", "sign_sheet", "witness"], needed: 3 },
   solvedFlag: "case:solved",
+  accuseWhen: { all: ["met:chef", "met:cat", "met:rabbit", "met:fox", "clue:witness"] },
   startScene: "phong",
   accuseScene: "phong",
+  epilogueNode: "o_epi1",
 };

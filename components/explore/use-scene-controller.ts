@@ -29,7 +29,16 @@ export type Panel = { kind: "word"; word: SceneWord } | { kind: "npc" } | null;
  * nhấn E khi đứng gần vật, hoặc bấm/chạm vào vật (nhân vật tự đi tới rồi mới tương tác). Ngoài nhiệm vụ: học từ (nghe + ghi sổ tay + thẻ từ);
  * trong nhiệm vụ: là câu trả lời; với NPC: nói chuyện/nhận nhiệm vụ.
  */
-export function useSceneController(scene: SceneDetail) {
+export interface SceneControllerOptions {
+  /** Nơi tương tác thêm của cốt truyện (NPC phụ, vật chứng) để nhân vật tự đi tới. */
+  extraInteractables?: Interactable[];
+  /** Cốt truyện xử lý lần tương tác này chưa (true = đã xử lý, bỏ qua phần học từ/nhiệm vụ). */
+  storyInteract?: (id: string) => boolean;
+  /** Đường dẫn gốc của các cảnh khi đi qua lối sang cảnh khác (mặc định chế độ tự do). */
+  basePath?: string;
+}
+
+export function useSceneController(scene: SceneDetail, opts: SceneControllerOptions = {}) {
   const router = useRouter();
   const sceneId = scene.id;
   const { progress, ready, now, discover, answer, resetScene } = useExploreProgress();
@@ -48,7 +57,8 @@ export function useSceneController(scene: SceneDetail) {
     ...scene.objects.map((o) => ({ id: o.id, at: standPoint(o) })),
     { id: scene.npc.id, at: standPoint(scene.npc) },
     ...scene.exits.map((e) => ({ id: exitId(e), at: standPoint(e) })),
-  ], [scene]);
+    ...(opts.extraInteractables ?? []),
+  ], [scene, opts.extraInteractables]);
   const player = usePlayerMovement(interactables, scene.start);
 
   const later = useCallback((ms: number, fn: () => void) => { timers.current.push(setTimeout(fn, ms)); }, []);
@@ -74,9 +84,10 @@ export function useSceneController(scene: SceneDetail) {
   function interact(id: string) {
     const exit = scene.exits.find((e) => exitId(e) === id);
     if (exit) {
-      if (!quest.active) router.push(`/kham-pha/${exit.to}`);
+      if (!quest.active) router.push(`${opts.basePath ?? "/kham-pha"}/${exit.to}`);
       return;
     }
+    if (opts.storyInteract?.(id)) return;
     if (quest.active) {
       // Trong nhiệm vụ mọi tương tác (kể cả với NPC để giao đồ) là một lần trả lời; chỉ vật hoặc NPC của cảnh mới hợp lệ.
       if (id !== scene.npc.id && !words[id]) return;

@@ -36,12 +36,12 @@ export const SUSPECTS: Suspect[] = [
 
 /** Các mục tiêu nối tiếp nhau; mục tiêu hiện tại hiện trên đầu cảnh để người chơi không bị lạc. */
 export const OBJECTIVES: Objective[] = [
-  { id: "talk-owl", text: "Nói chuyện với Cú Thầy ở Phòng của bạn để nhận vụ án.", done: { all: ["met:owl"] } },
-  { id: "inspect-room", text: "Xem xét căn phòng: đọc lá thư và tìm manh mối quanh cửa sổ.", when: { all: ["met:owl"] }, done: { all: ["clue:letter", "clue:pen"] } },
-  { id: "chef", text: "Đến Quán ăn: hỏi Bếp trưởng Gấu ba giờ chiều hôm qua ông ở đâu, rồi xem tờ hóa đơn.", when: { all: ["clue:letter", "clue:pen"] }, done: { all: ["met:chef", "clue:receipt"] } },
-  { id: "cat", text: "Ra Chợ: hỏi Cô Mèo bán hàng và tìm tờ giấy ghi giá.", when: { all: ["met:chef", "clue:receipt"] }, done: { all: ["met:cat", "clue:price_note"] } },
-  { id: "rabbit", text: "Đến Nhà ga: hỏi Trưởng ga Thỏ và xem sổ ghi vé.", when: { all: ["met:cat", "clue:price_note"] }, done: { all: ["met:rabbit", "clue:ticket_log"] } },
-  { id: "fox", text: "Đến Bệnh viện: hỏi Bác sĩ Cáo, xem bảng ký tên và ống bút trên bàn.", when: { all: ["met:rabbit", "clue:ticket_log"] }, done: { all: ["met:fox", "clue:sign_sheet", "clue:pens_jar"] } },
-  { id: "witness", text: "Ra Công viên: nghe Ông Rùa kể chuyện hôm qua.", when: { all: ["met:fox", "clue:sign_sheet", "clue:pens_jar"] }, done: { all: ["clue:witness"] } },
-  { id: "accuse", text: "Về Phòng của bạn, nói với Cú Thầy bạn biết ai đã lấy hộp gỗ.", when: { all: ["clue:witness"] }, done: { all: ["case:solved"] } },
+  { id: "talk-owl", sceneId: "phong", text: "Nói chuyện với Cú Thầy ở Phòng của bạn để nhận vụ án.", done: { all: ["met:owl"] } },
+  { id: "inspect-room", sceneId: "phong", text: "Xem xét căn phòng: đọc lá thư và tìm manh mối quanh cửa sổ.", when: { all: ["met:owl"] }, done: { all: ["clue:letter", "clue:pen"] } },
+  { id: "chef", sceneId: "quan-an", text: "Đến Quán ăn: hỏi Bếp trưởng Gấu ba giờ chiều hôm qua ông ở đâu, rồi xem tờ hóa đơn.", when: { all: ["clue:letter", "clue:pen"] }, done: { all: ["met:chef", "clue:receipt"] } },
+  { id: "cat", sceneId: "cho", text: "Ra Chợ: hỏi Cô Mèo bán hàng và tìm tờ giấy ghi giá.", when: { all: ["met:chef", "clue:receipt"] }, done: { all: ["met:cat", "clue:price_note"] } },
+  { id: "rabbit", sceneId: "nha-ga", text: "Đến Nhà ga: hỏi Trưởng ga Thỏ và xem sổ ghi vé.", when: { all: ["met:cat", "clue:price_note"] }, done: { all: ["met:rabbit", "clue:ticket_log"] } },
+  { id: "fox", sceneId: "benh-vien", text: "Đến Bệnh viện: hỏi Bác sĩ Cáo, xem bảng ký tên và ống bút trên bàn.", when: { all: ["met:rabbit", "clue:ticket_log"] }, done: { all: ["met:fox", "clue:sign_sheet", "clue:pens_jar"] } },
+  { id: "witness", sceneId: "cong-vien", text: "Ra Công viên: nghe Ông Rùa kể chuyện hôm qua.", when: { all: ["met:fox", "clue:sign_sheet", "clue:pens_jar"] }, done: { all: ["clue:witness"] } },
+  { id: "accuse", sceneId: "phong", text: "Về Phòng của bạn, nói với Cú Thầy bạn biết ai đã lấy hộp gỗ.", when: { all: ["clue:witness"] }, done: { all: ["case:solved"] } },
 ];

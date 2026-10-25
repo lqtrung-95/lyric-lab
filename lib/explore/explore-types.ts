@@ -55,12 +55,15 @@ export interface SceneExit {
   w: number;
 }
 
+/** Kiểu nền và nhạc của cảnh. */
+export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park";
+
 export interface SceneDef {
   id: string;
   title: string;
   subtitle: string;
   /** Kiểu nền (tường, sàn, đèn lồng...). */
-  theme: "room" | "eatery";
+  theme: SceneTheme;
   /** Chỗ nhân vật xuất hiện khi vào cảnh (mặc định giữa phía dưới). */
   start?: Vec;
   npc: SceneNpc;

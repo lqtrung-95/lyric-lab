@@ -4,17 +4,29 @@ import type { ReactNode } from "react";
 import { ArtSprite } from "./art/art-sprite";
 import { FLAT_SPRITES } from "./art/flat/flat-sprites";
 import { SceneBackdrop } from "./art/scene-backdrop";
-import type { SceneDecor, SceneExit, SceneNpc, SceneWord } from "@/lib/explore/explore-types";
+import type { SceneDecor, SceneExit, SceneNpc, SceneTheme, SceneWord } from "@/lib/explore/explore-types";
 import type { Vec } from "@/lib/explore/player-movement";
 
 export type ObjectMark = "new" | "learned" | "faded";
 
+/** Thứ vẽ thêm trong cảnh ngoài vật từ vựng: NPC hoặc vật chứng của cốt truyện (bấm/chạm hay đứng gần nhấn E để tương tác). */
+export interface CanvasExtra {
+  id: string;
+  kind: "npc" | "spot";
+  sprite: string;
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+}
+
 interface Props {
-  theme: "room" | "eatery";
+  theme: SceneTheme;
   objects: SceneWord[];
   npc: SceneNpc;
   decor: SceneDecor[];
   exits: SceneExit[];
+  extras?: CanvasExtra[];
   marks: Record<string, ObjectMark>;
   /** Đang làm nhiệm vụ: ẩn nhãn chữ Hán và tên đọc cho trình đọc màn hình (không lộ đáp án). */
   hideLabels: boolean;
@@ -45,7 +57,7 @@ function KeyChip() {
  * Khung cảnh 4:3: nền + các vật đặt theo % (giữa-đáy) + NPC + nhân vật người chơi, xếp lớp theo y (vật gần người xem vẽ sau). Mỗi vật là một nút thật
  * (bàn phím và trình đọc màn hình dùng được); vùng bấm = kích thước vật nới 6 px mỗi cạnh (trên điện thoại vài vật nhỏ vẫn nhỏ hơn 44 px, đã ghi trong tài liệu bàn giao).
  */
-export function SceneCanvas({ theme, objects, npc, decor, exits, marks, hideLabels, highlightId, shakeId, nearId, onActivate, onFloorPoint, children }: Props) {
+export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], marks, hideLabels, highlightId, shakeId, nearId, onActivate, onFloorPoint, children }: Props) {
   const ordered = [...objects].sort((a, b) => Number(!!a.above) - Number(!!b.above) || a.y - b.y);
   const npcSprite = FLAT_SPRITES[npc.id];
   return (
@@ -119,6 +131,21 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, marks, hideLabe
           <span className={`block ${nearId === exitId(e) ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
           {nearId === exitId(e) && <KeyChip />}
           <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-md font-extrabold leading-5 text-on-surface">{e.label}</span>
+        </button>
+      ))}
+      {extras.map((e) => FLAT_SPRITES[e.sprite] && (
+        <button
+          key={e.id}
+          type="button"
+          onClick={() => onActivate(e.id)}
+          aria-label={e.kind === "npc" ? `Nói chuyện với ${e.label}` : `Xem xét: ${e.label}`}
+          className="group absolute cursor-pointer rounded-lg outline-offset-2 transition-transform after:absolute after:-inset-1.5 after:content-[''] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary"
+          style={{ left: `${e.x}%`, top: `${e.y}%`, width: `${e.w}%`, transform: "translate(-50%, -100%)", zIndex: zOf(e.y, e.kind === "spot") }}
+        >
+          {e.kind === "npc" && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[12%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
+          <span className={`block ${nearId === e.id ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : e.kind === "spot" ? "drop-shadow-[0_0_6px_rgba(80,160,220,0.95)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
+          {nearId === e.id && <KeyChip />}
+          <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-tertiary-container px-2 text-label-md font-extrabold leading-5 text-on-tertiary-container">{e.label}</span>
         </button>
       ))}
       {children}

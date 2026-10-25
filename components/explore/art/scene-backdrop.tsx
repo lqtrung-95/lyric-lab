@@ -1,9 +1,12 @@
+import type { SceneTheme } from "@/lib/explore/explore-types";
+
 /** Phần tường chiếm bao nhiêu % chiều cao khung (sàn là phần còn lại). */
 export const WALL_PERCENT = 33;
 
 /** Nền phòng: tường kem có chấm nhỏ, len chân tường gỗ, sàn ván có đường kẻ, thảm xanh viền mực; nét viền mực nâu như thẻ của app. */
-export function SceneBackdrop({ theme }: { theme: "room" | "eatery" }) {
+export function SceneBackdrop({ theme }: { theme: SceneTheme }) {
   if (theme === "eatery") return <EateryBackdrop />;
+  if (theme !== "room") return <GenericBackdrop theme={theme} />;
   return (
     <div aria-hidden="true" className="absolute inset-0">
       <div className="absolute inset-x-0 top-0" style={{ height: `${WALL_PERCENT}%`, backgroundColor: "#fff1d3", backgroundImage: "radial-gradient(rgba(74,46,27,.10) 2px, transparent 2.5px)", backgroundSize: "24px 24px", borderBottom: "3px solid #4a2e1b" }} />
@@ -30,6 +33,27 @@ function EateryBackdrop() {
       <div className="absolute inset-x-0 bottom-0" style={{ top: `${WALL_PERCENT}%`, backgroundColor: "#f3d19a", backgroundImage: "repeating-conic-gradient(#f6d9a0 0% 25%, #ebc182 0% 50%)", backgroundSize: "64px 64px" }} />
       {lantern("12%")}
       {lantern("88%")}
+    </div>
+  );
+}
+
+/** Màu và hoạ tiết riêng cho các cảnh còn lại: tường (hoặc trời), chân tường, sàn (hoặc cỏ). */
+const GENERIC: Record<Exclude<SceneTheme, "room" | "eatery">, { wall: string; wallDots: boolean; base: string; floor: string; floorImage: string; floorSize?: string }> = {
+  market: { wall: "#fff0c9", wallDots: true, base: "#6fae5a", floor: "#e9cf9a", floorImage: "repeating-linear-gradient(90deg, transparent 0 70px, rgba(74,46,27,.18) 70px 72px)" },
+  station: { wall: "#dfeaf3", wallDots: false, base: "#51a0db", floor: "#e5ddd0", floorImage: "repeating-conic-gradient(#ece5d8 0% 25%, #d9d0c1 0% 50%)", floorSize: "72px 72px" },
+  hospital: { wall: "#eef7f4", wallDots: false, base: "#7fc9b9", floor: "#f4f1e8", floorImage: "repeating-conic-gradient(#f6f3ea 0% 25%, #e7e3d6 0% 50%)", floorSize: "56px 56px" },
+  park: { wall: "#cfe9f8", wallDots: false, base: "#7fc468", floor: "#a8dd8f", floorImage: "radial-gradient(rgba(59,105,49,.25) 2px, transparent 2.5px)", floorSize: "30px 30px" },
+};
+
+/** Nền chung: tường có chấm nhẹ, dải chân tường, sàn có hoạ tiết; công viên có mây trên trời. */
+function GenericBackdrop({ theme }: { theme: Exclude<SceneTheme, "room" | "eatery"> }) {
+  const g = GENERIC[theme];
+  return (
+    <div aria-hidden="true" className="absolute inset-0">
+      <div className="absolute inset-x-0 top-0" style={{ height: `${WALL_PERCENT}%`, backgroundColor: g.wall, backgroundImage: g.wallDots ? "radial-gradient(rgba(74,46,27,.10) 2px, transparent 2.5px)" : undefined, backgroundSize: "24px 24px", borderBottom: "3px solid #4a2e1b" }} />
+      <div className="absolute inset-x-0" style={{ top: `${WALL_PERCENT - 5}%`, height: "5%", background: g.base, borderTop: "3px solid #4a2e1b" }} />
+      <div className="absolute inset-x-0 bottom-0" style={{ top: `${WALL_PERCENT}%`, backgroundColor: g.floor, backgroundImage: g.floorImage, backgroundSize: g.floorSize }} />
+      {theme === "park" && [["12%", 6, 12], ["58%", 10, 9]].map(([left, top, w]) => <div key={String(left)} className="absolute rounded-full" style={{ left, top: `${top}%`, width: `${w}%`, height: "5%", background: "#ffffff", border: "3px solid #4a2e1b" }} />)}
     </div>
   );
 }

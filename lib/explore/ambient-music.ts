@@ -2,7 +2,9 @@
 // Gam ngũ cung (nghe êm, hợp không khí Trung Hoa, ghép nốt nào cũng không "chói"): giai điệu đi ngẫu nhiên từng bước nhỏ, thưa thớt, kèm một nốt trầm đều.
 // Phần này là hàm thuần (dễ test); phát âm thanh nằm ở `components/explore/ambient-engine.ts`.
 
-export type Mood = "room" | "eatery";
+import type { SceneTheme } from "./explore-types";
+
+export type Mood = SceneTheme;
 
 export interface MoodConfig {
   /** Nốt gốc (số MIDI). */
@@ -18,6 +20,10 @@ export interface MoodConfig {
 export const MOODS: Record<Mood, MoodConfig> = {
   room: { rootMidi: 62, scale: [0, 2, 4, 7, 9], bpm: 60, density: 0.42 },
   eatery: { rootMidi: 60, scale: [0, 2, 4, 7, 9], bpm: 84, density: 0.6 },
+  market: { rootMidi: 67, scale: [0, 2, 4, 7, 9], bpm: 92, density: 0.62 },
+  station: { rootMidi: 57, scale: [0, 2, 4, 7, 9], bpm: 72, density: 0.38 },
+  hospital: { rootMidi: 65, scale: [0, 2, 4, 7, 9], bpm: 52, density: 0.28 },
+  park: { rootMidi: 64, scale: [0, 2, 4, 7, 9], bpm: 66, density: 0.5 },
 };
 
 export interface MusicNote {

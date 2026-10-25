@@ -103,6 +103,8 @@ export interface Objective {
   text: string;
   /** Mục tiêu hiện khi điều kiện đúng; mục tiêu đầu tiên chưa xong và đang hiện là mục tiêu hiện tại. */
   when?: Condition;
+  /** Cảnh cần đến để làm mục tiêu này (bản đồ đánh dấu); bỏ trống nếu ở đâu cũng được. */
+  sceneId?: string;
   /** Xong khi điều kiện đúng. */
   done: Condition;
 }
@@ -132,9 +134,13 @@ export interface StoryDef {
   solution: { suspectId: string; keyClues: string[]; needed: number };
   /** Cờ đặt khi vụ án được giải. */
   solvedFlag: string;
+  /** Khi nào được buộc tội (mở nút trong sổ vụ án). */
+  accuseWhen: Condition;
   /** Cảnh bắt đầu và cảnh buộc tội. */
   startScene: string;
   accuseScene: string;
+  /** Câu thoại (trong `accuseScene`) mở đầu đoạn kết khi phá án xong. */
+  epilogueNode: string;
 }
 
 /** Tiến độ cốt truyện của người chơi (lưu trong trình duyệt). */

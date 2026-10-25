@@ -10,7 +10,10 @@ export const EATERY_SCENE: SceneDef = {
   subtitle: "Đi quanh quán ăn Trung Hoa, học tên đồ ăn thức uống rồi làm nhiệm vụ cho Bếp trưởng Gấu.",
   theme: "eatery",
   start: { x: 50, y: 94 },
-  exits: [{ sprite: "exitLeft", label: "Về Phòng của bạn", to: "phong", x: 11, y: 56, w: 6 }],
+  exits: [
+    { sprite: "exitLeft", label: "Về Phòng của bạn", to: "phong", x: 11, y: 56, w: 6 },
+    { sprite: "exit", label: "Sang Chợ", to: "cho", x: 90, y: 56, w: 6 },
+  ],
   npc: {
     id: "chef", name: "Bếp trưởng Gấu", x: 90, y: 92, w: 10,
     greeting: "Chào mừng đến quán của mình! Hãy đi quanh quán, lại gần đồ ăn thức uống rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",
