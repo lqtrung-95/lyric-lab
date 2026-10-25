@@ -20,8 +20,8 @@ test("chạm vật học từ, mở nhiệm vụ sau 3 vật, đổi bộ tranh 
   await page.getByRole("button", { name: /^灯, / }).click();
   await expect(start).toBeEnabled();
 
-  await page.getByRole("radio", { name: /Tranh B/ }).click();
-  await expect(page.getByRole("radio", { name: /Tranh B/ })).toHaveAttribute("aria-checked", "true");
+  await page.getByRole("radio", { name: /B · Pixel code/ }).click();
+  await expect(page.getByRole("radio", { name: /B · Pixel code/ })).toHaveAttribute("aria-checked", "true");
 
   await page.reload();
   await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("3/14");

@@ -3,11 +3,12 @@
 import type { ArtStyle } from "./art/scene-art";
 
 const OPTIONS: { value: ArtStyle; label: string }[] = [
-  { value: "ai", label: "Tranh A · AI vẽ" },
-  { value: "pixel", label: "Tranh B · Pixel (code)" },
+  { value: "flat", label: "C · Vẽ theo app" },
+  { value: "ai", label: "A · Pixel AI" },
+  { value: "pixel", label: "B · Pixel code" },
 ];
 
-/** Chuyển giữa hai bộ tranh để so sánh trên cùng một bố cục. */
+/** Chuyển giữa ba bộ tranh để so sánh trên cùng một bố cục. */
 export function ArtToggle({ value, onChange }: { value: ArtStyle; onChange: (v: ArtStyle) => void }) {
   return (
     <div role="radiogroup" aria-label="Bộ tranh" className="inline-flex rounded-full border-2 border-ink bg-surface-container-low p-0.5">

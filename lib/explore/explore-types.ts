@@ -11,6 +11,8 @@ export interface SceneObjectDef {
   w: number;
   /** Vật đặt trên mặt đồ khác (sách trên bàn...): luôn vẽ phía trên các vật khác dù y nhỏ hơn. */
   above?: boolean;
+  /** Vật gắn trên tường (cửa sổ): không đổ bóng xuống sàn. */
+  wall?: boolean;
 }
 
 export interface SceneDef {

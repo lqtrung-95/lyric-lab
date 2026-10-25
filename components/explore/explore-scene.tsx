@@ -22,7 +22,7 @@ const MIN_WORDS_FOR_QUEST = 3;
 /** Màn khám phá một cảnh: chạm vật để học (nghe, ghi sổ tay) rồi nhận nhiệm vụ của Gấu Trúc để dùng lại từ. Tiến độ lưu trong trình duyệt. */
 export function ExploreScene({ scene }: { scene: SceneDetail }) {
   const { progress, ready, now, discover, answer, reset } = useExploreProgress();
-  const [art, setArt] = useState<ArtStyle>("ai");
+  const [art, setArt] = useState<ArtStyle>("flat");
   const [selected, setSelected] = useState<SceneWord | null>(null);
   const [shakeId, setShakeId] = useState<string | null>(null);
   const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);

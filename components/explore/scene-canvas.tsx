@@ -2,7 +2,7 @@
 
 import { ArtSprite } from "./art/art-sprite";
 import { SceneBackdrop } from "./art/scene-backdrop";
-import { resolveArt, type ArtStyle } from "./art/scene-art";
+import { FLAT_SCALES, resolveArt, type ArtStyle } from "./art/scene-art";
 import type { SceneWord } from "@/lib/explore/explore-types";
 
 export type ObjectMark = "new" | "learned" | "faded";
@@ -18,7 +18,7 @@ interface Props {
   onTap: (o: SceneWord) => void;
 }
 
-/** Khung cảnh 4:3: nền + các vật đặt theo % (giữa-đáy), mỗi vật là một nút thật (vùng bấm theo kích thước vật, tối thiểu 44 px). Vật xa hơn (y nhỏ) vẽ trước; vật đặt trên đồ khác (`above`) vẽ sau cùng. */
+/** Khung cảnh 4:3: nền + các vật đặt theo % (giữa-đáy), mỗi vật là một nút thật (vùng bấm = kích thước vật nới thêm 6 px mỗi cạnh; trên điện thoại vài vật nhỏ vẫn nhỏ hơn 44 px, đã ghi trong tài liệu bàn giao). Vật xa hơn (y nhỏ) vẽ trước; vật đặt trên đồ khác (`above`) vẽ sau cùng. */
 export function SceneCanvas({ objects, art, marks, hideLabels, highlightId, shakeId, onTap }: Props) {
   const ordered = [...objects].sort((a, b) => Number(!!a.above) - Number(!!b.above) || a.y - b.y);
   return (
@@ -27,7 +27,7 @@ export function SceneCanvas({ objects, art, marks, hideLabels, highlightId, shak
       {ordered.map((o, i) => {
         const resolved = resolveArt(o.id, art);
         if (!resolved) return null;
-        const scale = resolved.kind === "img" ? resolved.ai.scale : 1;
+        const scale = resolved.kind === "img" ? resolved.ai.scale : resolved.kind === "flat" ? FLAT_SCALES[o.id] ?? 1 : 1;
         const mark = marks[o.id] ?? "new";
         const hit = highlightId === o.id;
         return (
@@ -36,9 +36,10 @@ export function SceneCanvas({ objects, art, marks, hideLabels, highlightId, shak
             type="button"
             onClick={() => onTap(o)}
             aria-label={hideLabels ? "Vật trong phòng" : `${o.term}, ${o.gloss}`}
-            className={`group absolute min-h-11 min-w-11 cursor-pointer rounded-lg outline-offset-2 transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary ${shakeId === o.id ? "anim-note-shake" : ""} ${hit ? "anim-note-pop" : ""}`}
+            className={`group absolute cursor-pointer rounded-lg outline-offset-2 transition-transform after:absolute after:-inset-1.5 after:content-[''] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary ${shakeId === o.id ? "anim-note-shake" : ""} ${hit ? "anim-note-pop" : ""}`}
             style={{ left: `${o.x}%`, top: `${o.y}%`, width: `${o.w * scale}%`, transform: "translate(-50%, -100%)", zIndex: 10 + i }}
           >
+            {art === "flat" && !o.wall && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[14%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
             <span className={`block transition-all ${mark === "faded" ? "opacity-60 saturate-50" : ""} ${mark === "new" && !hideLabels ? "drop-shadow-[0_0_6px_rgba(255,200,60,0.95)]" : ""} ${hit ? "drop-shadow-[0_0_10px_rgba(60,200,90,1)]" : ""}`}>
               <ArtSprite art={resolved} />
             </span>
