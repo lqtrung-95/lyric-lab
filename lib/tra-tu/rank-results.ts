@@ -16,7 +16,8 @@ export interface Candidate {
 const GLOSS_SCORE: Record<number, number> = { 3: 700, 2: 540, 1: 400 };
 
 const VARIANT = /^(old |archaic |erhua |japanese |korean )?(variant|see |used in )/i;
-const SURNAME = /^[A-ZÀ-Ỹ]/;
+// Chữ hoa đầu (\p{Lu}), KHÔNG dùng khoảng À–Ỹ: khoảng đó cũng chứa chữ thường có dấu ("ài", "é") nên coi nhầm mọi âm tiết bắt đầu bằng nguyên âm có dấu là họ người.
+const SURNAME = /^\p{Lu}/u;
 
 /** Điểm "phổ biến": cấp HSK thấp và tần suất cao lên trước. Nhỏ hơn mọi chênh lệch giữa các kiểu khớp để chỉ phân thắng bại trong cùng kiểu. */
 export function popularityBonus(hsk: number | null, frequency: number | null): number {

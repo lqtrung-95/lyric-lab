@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { CompoundWords } from "@/components/tra-tu/compound-words";
 import { ExampleSentences } from "@/components/tra-tu/example-sentences";
 import { SaveCardButton } from "@/components/tra-tu/save-card-button";
 import { WordHeader } from "@/components/tra-tu/word-header";
@@ -7,6 +8,7 @@ import { WordMeanings } from "@/components/tra-tu/word-meanings";
 import { WordNoteCard } from "@/components/tra-tu/word-note-card";
 import type { ExampleSentence } from "@/lib/courses/course-types";
 import { loadTermSentences } from "@/lib/courses/load-term-sentences";
+import { loadCompounds } from "@/lib/tra-tu/load-compounds";
 import { loadWordDetail } from "@/lib/tra-tu/load-word-detail";
 import { savedItemForDetail } from "@/lib/tra-tu/saved-item-for-detail";
 import { readWordNote } from "@/lib/tra-tu/word-note-store";
@@ -27,9 +29,10 @@ export default async function WordPage({ params }: { params: Params }) {
   const detail = HAN_TERM.test(term) ? await loadWordDetail(term) : null;
   if (!detail) redirect(`/tra-tu?q=${encodeURIComponent(term.slice(0, 80))}`);
 
-  const [note, sentences] = await Promise.all([
+  const [note, sentences, compounds] = await Promise.all([
     readWordNote(detail.simplified).catch(() => ({ stored: null, tableReady: false })),
     loadTermSentences([detail.simplified], 6).catch(() => ({})),
+    loadCompounds(detail.simplified),
   ]);
   const examples = (sentences as Record<string, ExampleSentence[]>)[detail.simplified] ?? [];
   const cardItem = savedItemForDetail(detail, examples[0], note.stored?.note.gloss ?? null);
@@ -40,6 +43,7 @@ export default async function WordPage({ params }: { params: Params }) {
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
       <WordMeanings readings={detail.readings} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
+      <CompoundWords term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} words={compounds} />
     </div>
   );
 }

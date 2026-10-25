@@ -67,3 +67,18 @@ test("câu ví dụ thật: tô đậm từ, bật/tắt pinyin và bản dịch
   await items.first().getByRole("button", { name: "Đọc to câu này" }).click();
   await expect(items.first().getByRole("button", { name: "Đọc to", exact: true })).toBeVisible();
 });
+
+test("từ ghép: liệt kê từ chứa chữ, xếp phổ biến trước, bấm để tra tiếp, nghe lần lượt bật/dừng được", async ({ page }) => {
+  await page.route("**/api/tts**", (r) => r.fulfill({ status: 500, body: "" }));
+  await page.goto("/tra-tu/" + encodeURIComponent("爱"));
+  await page.waitForLoadState("networkidle");
+  const section = page.getByRole("region", { name: "Từ ghép" });
+  await expect(section.getByRole("link").first()).toContainText("爱好");
+  const seq = section.getByRole("button", { name: "Nghe lần lượt" });
+  await seq.click();
+  await expect(section.getByRole("button", { name: "Dừng" })).toBeVisible();
+  await section.getByRole("button", { name: "Dừng" }).click();
+  await expect(section.getByRole("button", { name: "Nghe lần lượt" })).toBeVisible({ timeout: 15_000 });
+  await section.getByRole("link", { name: /爱好/ }).first().click();
+  await expect(page.getByRole("heading", { level: 1, name: "爱好" })).toBeVisible();
+});
