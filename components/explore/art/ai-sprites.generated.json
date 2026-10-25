@@ -1,0 +1,22 @@
+{
+  "bed": {
+    "src": "/explore/ai/bed.png",
+    "ratio": 0.9351
+  },
+  "table": {
+    "src": "/explore/ai/table.png",
+    "ratio": 1.1842
+  },
+  "chair": {
+    "src": "/explore/ai/chair.png",
+    "ratio": 0.6278
+  },
+  "book": {
+    "src": "/explore/ai/book.png",
+    "ratio": 1.1132
+  },
+  "door": {
+    "src": "/explore/ai/door.png",
+    "ratio": 0.5805
+  }
+}

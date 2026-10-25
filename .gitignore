@@ -37,3 +37,6 @@ scripts/pr-video/voice/
 
 # bản chép/audio tạm của scripts/transcribe-video.mts
 /tmp/
+
+# ảnh thô/đã tách nền do scripts/generate-explore-art.mts tạo
+/.explore-art/

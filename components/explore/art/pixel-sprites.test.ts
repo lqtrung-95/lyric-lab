@@ -29,6 +29,6 @@ describe("resolveArt", () => {
     expect(resolveArt("bed", "ai")?.kind).toBe("img");
     expect(resolveArt("cat", "ai")).toMatchObject({ kind: "pixel", fallback: true });
     expect(resolveArt("bed", "pixel")).toMatchObject({ kind: "pixel", fallback: false });
-    expect(Object.keys(AI_SPRITES).every((id) => id in PIXEL_SPRITES)).toBe(true);
+    expect(Object.keys(AI_SPRITES).every((id) => id === "guide" || id in PIXEL_SPRITES)).toBe(true);
   });
 });

@@ -283,3 +283,11 @@ NODE_OPTIONS=--experimental-websocket npx tsx scripts/backfill-video-levels.mts 
 NODE_OPTIONS=--experimental-websocket npx tsx scripts/backfill-video-levels.mts --apply    # ghi vào DB
 ```
 Cần `.env.local` có khóa service role. Chạy xem trước rồi mới `--apply`.
+
+## Tạo tranh cho cảnh Khám phá bằng ComfyUI (máy cá nhân)
+
+`scripts/generate-explore-art.mts` tạo cả bộ tranh vật của cảnh Khám phá bằng ComfyUI chạy trên CHÍNH MÁY NÀY (mặc định `http://127.0.0.1:8188`, từ chối địa chỉ khác nếu không có `--allow-remote`; prompt không gửi ra ngoài). Không cần khóa API hay biến môi trường.
+1. Cài ComfyUI, bỏ một checkpoint SDXL dạng `.safetensors` vào `models/checkpoints` (và tùy chọn một LoRA pixel/phong cách vào `models/loras`), chạy ComfyUI. Chỉ tải `.safetensors` từ nguồn uy tín (`.ckpt` có thể chứa mã độc); kiểm tra giấy phép thương mại của mô hình và LoRA.
+2. `npx tsx scripts/generate-explore-art.mts --list-models` xem tên mô hình; `--checkpoint <tên> --dry-run` in thử prompt; bỏ `--dry-run` để tạo. Tùy chọn: `--lora`, `--lora-strength`, `--extra "<từ khóa>"`, `--only bed,cat`, `--variants N` (ứng viên đầu tiên được dùng, các bản còn lại ở `.explore-art/cut/`), `--seed`, `--steps`, `--cfg`, `--hole-fuzz` (0–20, xóa vùng trắng kẹt giữa chi tiết; mặc định 0 vì nó đục thủng điểm sáng/mắt/cốc sứ), `--force` (đè tranh đã có).
+3. Cần ImageMagick (`magick`) để tách nền trắng. Kết quả vào `public/explore/ai/` và `components/explore/art/ai-sprites.generated.json`; chỉnh `SCALES` ở `components/explore/art/scene-art.ts` nếu vật to/nhỏ chưa vừa. Prompt và phong cách chung nằm ở `lib/explore/art-generation/art-prompts.ts`; thêm vật mới thì thêm cả mục trong cảnh lẫn `ROOM_ART_ITEMS`.
+

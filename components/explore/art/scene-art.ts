@@ -1,5 +1,7 @@
 import { PIXEL_SPRITES } from "./pixel-sprites";
 import type { PixelSprite } from "./pixel-canvas";
+import aiManifest from "./ai-sprites.generated.json";
+import { GUIDE_PIXEL } from "./pixel-sprites";
 
 /** Hai bộ tranh để so sánh: `ai` = tranh do AI sinh (tách nền thành PNG), `pixel` = vẽ bằng code. */
 export type ArtStyle = "ai" | "pixel";
@@ -12,14 +14,11 @@ export interface AiSprite {
   scale: number;
 }
 
-// Tranh AI hiện có: giường, bàn, ghế, sách, cửa (hạn mức tạo ảnh của dịch vụ đã hết). Vật khác ở chế độ AI rơi về sprite pixel.
-export const AI_SPRITES: Record<string, AiSprite> = {
-  bed: { src: "/explore/ai/bed.png", ratio: 173 / 185, scale: 0.85 },
-  table: { src: "/explore/ai/table.png", ratio: 180 / 152, scale: 1 },
-  chair: { src: "/explore/ai/chair.png", ratio: 113 / 180, scale: 0.55 },
-  book: { src: "/explore/ai/book.png", ratio: 177 / 159, scale: 1.05 },
-  door: { src: "/explore/ai/door.png", ratio: 101 / 174, scale: 1 },
-};
+// Danh sách tranh AI hiện có do script `scripts/generate-explore-art.mts` ghi (tên file và tỉ lệ); `SCALES` là chỉnh tay độ to nhỏ theo từng vật để vừa bố cục.
+// Vật chưa có tranh AI ở chế độ AI rơi về sprite pixel (xem `resolveArt`).
+const SCALES: Record<string, number> = { bed: 0.85, chair: 0.55, book: 1.05 };
+const GENERATED = aiManifest as Record<string, { src: string; ratio: number }>;
+export const AI_SPRITES: Record<string, AiSprite> = Object.fromEntries(Object.entries(GENERATED).map(([id, m]) => [id, { ...m, scale: SCALES[id] ?? 1 }]));
 
 export type ResolvedArt = { kind: "img"; ai: AiSprite } | { kind: "pixel"; sprite: PixelSprite; fallback: boolean };
 
@@ -29,4 +28,10 @@ export function resolveArt(id: string, style: ArtStyle): ResolvedArt | null {
   if (ai) return { kind: "img", ai };
   const sprite = PIXEL_SPRITES[id];
   return sprite ? { kind: "pixel", sprite, fallback: style === "ai" } : null;
+}
+
+/** Nhân vật dẫn đường: tranh AI nếu có (`guide` trong danh sách), không thì sprite pixel. */
+export function resolveGuideArt(style: ArtStyle): ResolvedArt {
+  const ai = style === "ai" ? AI_SPRITES.guide : undefined;
+  return ai ? { kind: "img", ai } : { kind: "pixel", sprite: GUIDE_PIXEL, fallback: style === "ai" };
 }

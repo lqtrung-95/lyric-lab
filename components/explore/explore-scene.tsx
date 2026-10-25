@@ -8,8 +8,7 @@ import type { SceneDetail, SceneWord } from "@/lib/explore/explore-types";
 import { playSfx } from "@/lib/feedback/sfx";
 import { playChinese } from "@/lib/speech/play-chinese";
 import { ArtSprite } from "./art/art-sprite";
-import { AI_SPRITES, type ArtStyle } from "./art/scene-art";
-import { GUIDE_PIXEL } from "./art/pixel-sprites";
+import { AI_SPRITES, resolveGuideArt, type ArtStyle } from "./art/scene-art";
 import { ArtToggle } from "./art-toggle";
 import { NotebookChips } from "./notebook-chips";
 import { QuestPanel, QuestSummary } from "./quest-panel";
@@ -59,7 +58,7 @@ export function ExploreScene({ scene }: { scene: SceneDetail }) {
 
   const highlightId = quest.active && (quest.phase === "correct" || quest.phase === "reveal") ? quest.round?.targetId ?? null : null;
   const canQuest = learnedWords.length >= MIN_WORDS_FOR_QUEST;
-  const missingAi = art === "ai" ? scene.objects.length - Object.keys(AI_SPRITES).length : 0;
+  const missingAi = art === "ai" ? scene.objects.filter((o) => !(o.id in AI_SPRITES)).length : 0;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
@@ -70,7 +69,7 @@ export function ExploreScene({ scene }: { scene: SceneDetail }) {
         </div>
         <ArtToggle value={art} onChange={setArt} />
       </header>
-      {missingAi > 0 && <p className="rounded-xl bg-surface-container-low px-space-sm py-2 text-label-md text-on-surface-variant">Tranh AI hiện mới có {Object.keys(AI_SPRITES).length} vật (giường, bàn, ghế, sách, cửa); {missingAi} vật còn lại tạm dùng sprite pixel vì dịch vụ tạo ảnh đã hết hạn mức.</p>}
+      {missingAi > 0 && <p className="rounded-xl bg-surface-container-low px-space-sm py-2 text-label-md text-on-surface-variant">Tranh AI chưa đủ bộ: {missingAi} vật chưa có tranh AI nên tạm dùng sprite pixel (tạo thêm bằng scripts/generate-explore-art.mts).</p>}
       <SceneCanvas objects={scene.objects} art={art} marks={marks} hideLabels={quest.active} highlightId={highlightId} shakeId={shakeId} onTap={onTap} />
 
       {quest.active ? (
@@ -81,7 +80,7 @@ export function ExploreScene({ scene }: { scene: SceneDetail }) {
         <WordCard word={selected} onClose={() => setSelected(null)} />
       ) : (
         <section aria-label={scene.guide.name} className="card-ink flex items-center gap-space-sm p-space-md">
-          <div className="w-14 shrink-0"><ArtSprite art={{ kind: "pixel", sprite: GUIDE_PIXEL, fallback: false }} /></div>
+          <div className="w-14 shrink-0"><ArtSprite art={resolveGuideArt(art)} /></div>
           <p className="text-body-md font-bold">{scene.guide.greeting}</p>
         </section>
       )}
