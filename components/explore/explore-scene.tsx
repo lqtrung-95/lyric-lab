@@ -4,11 +4,13 @@ import type { SceneDetail } from "@/lib/explore/explore-types";
 import { Button3d } from "@/components/ui/button-3d";
 import { ArtSprite } from "./art/art-sprite";
 import { FLAT_SPRITES } from "./art/flat/flat-sprites";
+import { MusicToggle } from "./music-toggle";
 import { NotebookChips } from "./notebook-chips";
 import { NpcCard } from "./npc-card";
 import { PlayerAvatar } from "./player-avatar";
 import { QuestPanel, QuestSummary } from "./quest-panel";
 import { SceneCanvas } from "./scene-canvas";
+import { useAmbientMusic } from "./use-ambient-music";
 import { MIN_WORDS_FOR_QUEST, useSceneController } from "./use-scene-controller";
 import { WordCard } from "./word-card";
 
@@ -18,25 +20,29 @@ import { WordCard } from "./word-card";
  */
 export function ExploreScene({ scene }: { scene: SceneDetail }) {
   const c = useSceneController(scene);
+  const music = useAmbientMusic(scene.theme);
   const { quest, player } = c;
   const inSummary = !quest.active && quest.rounds.length > 0;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
-      <header>
-        <h1 className="text-headline-lg">{scene.title}</h1>
-        <p className="text-body-md text-on-surface-variant">{scene.subtitle}</p>
+      <header className="flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h1 className="text-headline-lg">{scene.title}</h1>
+          <p className="text-body-md text-on-surface-variant">{scene.subtitle}</p>
+        </div>
+        <MusicToggle enabled={music.enabled} onToggle={music.toggle} />
       </header>
 
       <div {...c.stageProps} onPointerDown={(e) => e.currentTarget.focus({ preventScroll: true })} className="rounded-2xl outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary">
-        <SceneCanvas objects={scene.objects} npc={scene.npc} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>
+        <SceneCanvas theme={scene.theme} objects={scene.objects} npc={scene.npc} decor={scene.decor ?? []} exits={scene.exits} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>
           <PlayerAvatar elRef={player.elRef} walking={player.walking} facing={player.facing} fx={c.fx} carrying={quest.carrying} />
         </SceneCanvas>
       </div>
       <p className="-mt-2 text-label-md text-on-surface-variant">Phím mũi tên hoặc WASD để đi · E để tương tác · hoặc chạm vào sàn/đồ vật để nhân vật tự đi tới.</p>
 
       {quest.active ? (
-        <QuestPanel rounds={quest.rounds} index={quest.index} phase={quest.phase} wrong={quest.wrong} words={c.words} carrying={quest.carrying} onQuit={quest.stop} />
+        <QuestPanel rounds={quest.rounds} index={quest.index} phase={quest.phase} wrong={quest.wrong} words={c.words} carrying={quest.carrying} npcName={scene.npc.name} onQuit={quest.stop} />
       ) : inSummary ? (
         <QuestSummary results={quest.results} words={c.words} xp={c.xpEarned} onAgain={c.startQuest} onBack={quest.stop} />
       ) : c.panel?.kind === "word" ? (

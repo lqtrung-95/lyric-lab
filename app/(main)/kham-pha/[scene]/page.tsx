@@ -9,5 +9,5 @@ export default async function ExploreScenePage({ params }: { params: Promise<{ s
   const { scene: id } = await params;
   const scene = /^[a-z0-9-]{1,40}$/.test(id) ? await loadScene(id) : null;
   if (!scene) notFound();
-  return <ExploreScene scene={scene} />;
+  return <ExploreScene key={scene.id} scene={scene} />;
 }

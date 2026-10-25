@@ -12,6 +12,11 @@ export interface ExploreProgress {
 }
 
 export const STORAGE_KEY = "songhanzi-explore-v1";
+
+/** Khóa tiến độ của một vật: theo cảnh để hai cảnh có vật trùng id không dẫm lên nhau. */
+export const progressKey = (sceneId: string, objectId: string): string => `${sceneId}:${objectId}`;
+/** Cảnh đầu tiên: tiến độ lưu trước khi có khóa theo cảnh (chỉ là id vật, không có dấu `:`) thuộc cảnh này. */
+export const LEGACY_SCENE_ID = "phong";
 /** Quá thời gian này không gặp lại thì vật bị "mờ" và cần ôn. */
 export const FADE_AFTER_MS = 24 * 60 * 60 * 1000;
 
@@ -28,6 +33,11 @@ export function recordAnswer(p: ExploreProgress, id: string, ok: boolean, now: n
   return { terms: { ...p.terms, [id]: { ...base, lastSeenAt: ok ? now : base.lastSeenAt, correct: base.correct + (ok ? 1 : 0), wrong: base.wrong + (ok ? 0 : 1) } } };
 }
 
+/** Xóa tiến độ của riêng một cảnh ("Học lại từ đầu" ở cảnh đó), giữ nguyên các cảnh khác. */
+export const clearScene = (p: ExploreProgress, sceneId: string): ExploreProgress => ({
+  terms: Object.fromEntries(Object.entries(p.terms).filter(([k]) => !k.startsWith(`${sceneId}:`))),
+});
+
 export const isDiscovered = (p: ExploreProgress, id: string): boolean => id in p.terms;
 export const isFaded = (p: ExploreProgress, id: string, now: number): boolean => {
   const t = p.terms[id];
@@ -40,7 +50,10 @@ export function loadProgress(storage: Pick<Storage, "getItem"> | null): ExploreP
     const raw = storage?.getItem(STORAGE_KEY);
     if (!raw) return emptyProgress();
     const data = JSON.parse(raw) as ExploreProgress;
-    return data && typeof data.terms === "object" && data.terms ? { terms: data.terms } : emptyProgress();
+    if (!data || typeof data.terms !== "object" || !data.terms) return emptyProgress();
+    // Dữ liệu cũ khóa theo id vật trần: chuyển sang khóa theo cảnh (cảnh đầu tiên).
+    const terms = Object.fromEntries(Object.entries(data.terms).map(([k, v]) => [k.includes(":") ? k : progressKey(LEGACY_SCENE_ID, k), v]));
+    return { terms };
   } catch {
     return emptyProgress();
   }

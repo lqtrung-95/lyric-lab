@@ -1,9 +1,10 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { buildQuestRounds } from "@/lib/explore/build-explore-quests";
-import { isDiscovered, isFaded } from "@/lib/explore/explore-progress";
+import { isDiscovered, isFaded, progressKey } from "@/lib/explore/explore-progress";
 import type { SceneDetail, SceneWord } from "@/lib/explore/explore-types";
 import { keyToDir, standPoint, type Interactable } from "@/lib/explore/player-movement";
 import { playSfx } from "@/lib/feedback/sfx";
@@ -14,7 +15,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { AvatarFx } from "./player-avatar";
-import type { ObjectMark } from "./scene-canvas";
+import { exitId, type ObjectMark } from "./scene-canvas";
 import type { CardState } from "./word-card";
 import { useExploreProgress } from "./use-explore-progress";
 import { usePlayerMovement } from "./use-player-movement";
@@ -29,7 +30,9 @@ export type Panel = { kind: "word"; word: SceneWord } | { kind: "npc" } | null;
  * trong nhiệm vụ: là câu trả lời; với NPC: nói chuyện/nhận nhiệm vụ.
  */
 export function useSceneController(scene: SceneDetail) {
-  const { progress, ready, now, discover, answer, reset } = useExploreProgress();
+  const router = useRouter();
+  const sceneId = scene.id;
+  const { progress, ready, now, discover, answer, resetScene } = useExploreProgress();
   const { state: learner, toggleSaved } = useLearnerState();
   const [panel, setPanel] = useState<Panel>(null);
   const [shakeId, setShakeId] = useState<string | null>(null);
@@ -37,18 +40,22 @@ export function useSceneController(scene: SceneDetail) {
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const words = useMemo(() => Object.fromEntries(scene.objects.map((o) => [o.id, o])) as Record<string, SceneWord>, [scene.objects]);
-  const marks = useMemo(() => Object.fromEntries(scene.objects.map((o): [string, ObjectMark] => [o.id, !isDiscovered(progress, o.id) ? "new" : isFaded(progress, o.id, now) ? "faded" : "learned"])), [scene.objects, progress, now]);
+  const marks = useMemo(() => Object.fromEntries(scene.objects.map((o): [string, ObjectMark] => [o.id, !isDiscovered(progress, progressKey(sceneId, o.id)) ? "new" : isFaded(progress, progressKey(sceneId, o.id), now) ? "faded" : "learned"])), [scene.objects, sceneId, progress, now]);
   const learnedWords = scene.objects.filter((o) => marks[o.id] !== "new");
   const canQuest = learnedWords.length >= MIN_WORDS_FOR_QUEST;
 
-  const interactables = useMemo<Interactable[]>(() => [...scene.objects.map((o) => ({ id: o.id, at: standPoint(o) })), { id: scene.npc.id, at: standPoint(scene.npc) }], [scene]);
-  const player = usePlayerMovement(interactables);
+  const interactables = useMemo<Interactable[]>(() => [
+    ...scene.objects.map((o) => ({ id: o.id, at: standPoint(o) })),
+    { id: scene.npc.id, at: standPoint(scene.npc) },
+    ...scene.exits.map((e) => ({ id: exitId(e), at: standPoint(e) })),
+  ], [scene]);
+  const player = usePlayerMovement(interactables, scene.start);
 
   const later = useCallback((ms: number, fn: () => void) => { timers.current.push(setTimeout(fn, ms)); }, []);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
   const flash = useCallback((kind: "hop" | "oops") => { setFx(kind); later(600, () => setFx(null)); }, [later]);
 
-  const onResult = useCallback((id: string, ok: boolean) => { answer(id, ok); playSfx(ok ? "correct" : "wrong"); flash(ok ? "hop" : "oops"); }, [answer, flash]);
+  const onResult = useCallback((id: string, ok: boolean) => { answer(progressKey(sceneId, id), ok); playSfx(ok ? "correct" : "wrong"); flash(ok ? "hop" : "oops"); }, [answer, flash, sceneId]);
   const isPortable = useCallback((id: string) => words[id]?.portable === true, [words]);
   const quest = useQuestRun(onResult, scene.npc.id, isPortable);
 
@@ -59,12 +66,17 @@ export function useSceneController(scene: SceneDetail) {
   function startQuest() {
     runNo.current += 1;
     runStartedAt.current = Date.now();
-    const priority = new Set(learnedWords.filter((o) => marks[o.id] === "faded" || (progress.terms[o.id]?.wrong ?? 0) > (progress.terms[o.id]?.correct ?? 0)).map((o) => o.id));
+    const priority = new Set(learnedWords.filter((o) => marks[o.id] === "faded" || (progress.terms[progressKey(sceneId, o.id)]?.wrong ?? 0) > (progress.terms[progressKey(sceneId, o.id)]?.correct ?? 0)).map((o) => o.id));
     setPanel(null);
     quest.start(buildQuestRounds(learnedWords, priority));
   }
 
   function interact(id: string) {
+    const exit = scene.exits.find((e) => exitId(e) === id);
+    if (exit) {
+      if (!quest.active) router.push(`/kham-pha/${exit.to}`);
+      return;
+    }
     if (quest.active) {
       // Trong nhiệm vụ mọi tương tác (kể cả với NPC để giao đồ) là một lần trả lời; chỉ vật hoặc NPC của cảnh mới hợp lệ.
       if (id !== scene.npc.id && !words[id]) return;
@@ -76,7 +88,7 @@ export function useSceneController(scene: SceneDetail) {
     if (id === scene.npc.id) { setPanel({ kind: "npc" }); return; }
     const o = words[id];
     if (!o) return;
-    discover(id);
+    discover(progressKey(sceneId, id));
     // Từ học ở đây vào bộ ôn (thẻ FSRS) nếu có câu thật làm nguồn; đã lưu rồi thì thôi (toggleSaved sẽ bỏ lưu nếu gọi lại).
     const card = savedItemForWord(o);
     if (card && !learner.saved.some((x) => x.key === card.key)) toggleSaved(card);
@@ -128,7 +140,7 @@ export function useSceneController(scene: SceneDetail) {
 
   return {
     ready, marks, words, cardStateOf, learnedWords, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
-    startQuest, activate, reset, learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
+    startQuest, activate, reset: () => resetScene(sceneId), learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
     highlightId: quest.active && (quest.phase === "correct" || quest.phase === "reveal") ? quest.round?.targetId ?? null : null,
     openWord: (w: SceneWord) => { setPanel({ kind: "word", word: w }); void playChinese(w.term); },
   };

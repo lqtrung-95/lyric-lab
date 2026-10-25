@@ -82,4 +82,26 @@ const owl: FlatSprite = {
   ),
 };
 
-export const CHARACTER_SPRITES: Record<string, FlatSprite> = { cat, guide, owl };
+/** Bếp trưởng Gấu: NPC của cảnh Quán ăn, đội mũ đầu bếp, đeo tạp dề. */
+const chef: FlatSprite = {
+  w: 88, h: 100,
+  node: (
+    <g {...LINE}>
+      <ellipse cx="44" cy="72" rx="28" ry="26" fill={C.brown} />
+      <path d="M26 54h36v38q0 4-4 4H30q-4 0-4-4Z" fill={C.white} />
+      <path d="M36 54v-4h16v4" fill="none" strokeWidth={2.500} />
+      <circle cx="20" cy="32" r="9" fill={C.brown} /><circle cx="68" cy="32" r="9" fill={C.brown} />
+      <circle cx="20" cy="33" r="4" fill={C.woodL} stroke="none" /><circle cx="68" cy="33" r="4" fill={C.woodL} stroke="none" />
+      <ellipse cx="44" cy="42" rx="26" ry="22" fill={C.brown} />
+      <ellipse cx="44" cy="50" rx="13" ry="10" fill={C.woodL} strokeWidth={2.500} />
+      <ellipse cx="34" cy="40" rx="3.200" ry="4.600" fill={INK} stroke="none" /><ellipse cx="54" cy="40" rx="3.200" ry="4.600" fill={INK} stroke="none" />
+      <ellipse cx="44" cy="47" rx="4.500" ry="3.500" fill={INK} stroke="none" />
+      <path d="M44 51q-3 4-6 2M44 51q3 4 6 2" strokeWidth={2} fill="none" />
+      <path d="M26 20q-8-4-4-12 6-6 14-2 4-8 12-6 8 0 10 8 8-2 10 6 2 8-6 10Z" fill={C.white} />
+      <rect x="26" y="18" width="36" height="8" rx="2" fill={C.white} />
+      <ellipse cx="32" cy="97" rx="9" ry="4" fill={C.woodD} strokeWidth={2.500} /><ellipse cx="56" cy="97" rx="9" ry="4" fill={C.woodD} strokeWidth={2.500} />
+    </g>
+  ),
+};
+
+export const CHARACTER_SPRITES: Record<string, FlatSprite> = { cat, guide, owl, chef };

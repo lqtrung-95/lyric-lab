@@ -12,9 +12,9 @@ const LATCH_MS = 130;
  * Vị trí cập nhật thẳng vào phần tử DOM mỗi khung hình (không render lại React 60 lần/giây); React chỉ nhận thay đổi hiếm:
  * đang đi hay đứng, quay mặt trái/phải, vật nào đang ở gần. Vòng lặp chỉ chạy khi nhân vật đang di chuyển.
  */
-export function usePlayerMovement(interactables: readonly Interactable[]) {
+export function usePlayerMovement(interactables: readonly Interactable[], start: Vec = START) {
   const el = useRef<HTMLDivElement | null>(null);
-  const pos = useRef<Vec>(START);
+  const pos = useRef<Vec>(start);
   const target = useRef<Target | null>(null);
   const held = useRef(new Set<Dir>());
   // Mỗi lần nhấn giữ hướng đi thêm ít nhất LATCH_MS: gõ phím rất nhanh (nhấn rồi nhả trong chưa đầy một khung hình) vẫn đi một đoạn thấy được.

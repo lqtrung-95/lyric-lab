@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildQuestRounds, roundNeedsDelivery } from "./build-explore-quests";
 import { ROOM_SCENE } from "./scenes/room-scene";
+import { SCENES } from "./scenes";
 
 const seeded = (seed: number) => () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 
@@ -45,17 +46,24 @@ describe("buildQuestRounds", () => {
   });
 });
 
-describe("dữ liệu cảnh", () => {
-  it("id và chữ Hán không trùng, vị trí nằm trong khung", () => {
-    const ids = ROOM_SCENE.objects.map((o) => o.id);
-    expect(new Set(ids).size).toBe(ids.length);
-    expect(new Set(ROOM_SCENE.objects.map((o) => o.term)).size).toBe(ids.length);
-    for (const o of ROOM_SCENE.objects) {
-      expect(o.x).toBeGreaterThan(0); expect(o.x).toBeLessThan(100);
-      expect(o.y).toBeGreaterThan(0); expect(o.y).toBeLessThanOrEqual(100);
-      expect(o.example.zh).toContain(o.term);
-      if (o.stand) { expect(o.stand.x).toBeGreaterThan(0); expect(o.stand.y).toBeGreaterThanOrEqual(38); }
-    }
-    expect(ids).not.toContain(ROOM_SCENE.npc.id);
+describe("dữ liệu các cảnh", () => {
+  for (const scene of Object.values(SCENES)) {
+    it(`${scene.id}: id và chữ Hán không trùng, vị trí trong khung, câu ví dụ chứa từ, lối đi trỏ tới cảnh có thật`, () => {
+      const ids = scene.objects.map((o) => o.id);
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(new Set(scene.objects.map((o) => o.term)).size).toBe(ids.length);
+      for (const o of scene.objects) {
+        expect(o.x, o.id).toBeGreaterThan(0); expect(o.x, o.id).toBeLessThan(100);
+        expect(o.y, o.id).toBeGreaterThan(0); expect(o.y, o.id).toBeLessThanOrEqual(100);
+        expect(o.example.zh, o.id).toContain(o.term);
+        if (o.stand) { expect(o.stand.x).toBeGreaterThan(0); expect(o.stand.y).toBeGreaterThanOrEqual(38); }
+      }
+      expect(ids).not.toContain(scene.npc.id);
+      for (const e of scene.exits) expect(SCENES[e.to], e.to).toBeDefined();
+    });
+  }
+
+  it("có ít nhất 8 vật mang được để lượt nhiệm vụ có đủ câu mang đồ; từ không trùng giữa hai cảnh ở các vật mới", () => {
+    for (const scene of Object.values(SCENES)) expect(scene.objects.filter((o) => o.portable).length).toBeGreaterThanOrEqual(7);
   });
 });

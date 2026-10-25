@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SCENES } from "@/lib/explore/scenes/room-scene";
+import { SCENES } from "@/lib/explore/scenes";
 
 export const metadata: Metadata = { title: "Khám phá", robots: { index: false } };
 

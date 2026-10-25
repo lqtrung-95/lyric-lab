@@ -19,11 +19,13 @@ interface Props {
   words: Record<string, SceneWord>;
   /** Vật nhân vật đang cầm (câu "mang đồ"). */
   carrying: string | null;
+  /** Tên NPC giao nhiệm vụ của cảnh (Cú Thầy, Bếp trưởng Gấu...). */
+  npcName: string;
   onQuit: () => void;
 }
 
 /** Lời của Gấu Trúc cho câu hiện tại. Câu "nghe" tự phát giọng đọc khi vào câu (sau thao tác bấm của người học nên trình duyệt cho phát). */
-export function QuestPanel({ rounds, index, phase, wrong, words, carrying, onQuit }: Props) {
+export function QuestPanel({ rounds, index, phase, wrong, words, carrying, npcName, onQuit }: Props) {
   const round = rounds[index];
   const word = round ? words[round.targetId] : null;
   const portable = word?.portable === true;
@@ -52,10 +54,10 @@ export function QuestPanel({ rounds, index, phase, wrong, words, carrying, onQui
         {phase === "asking" && round.kind === "command" && (
           <div className="flex items-center gap-3">
             <PronounceButton text={commandText(word.term, portable)} className="size-14" />
-            <p className="text-body-lg font-bold">Cú Thầy ra lệnh bằng tiếng Trung (không có phụ đề). Nghe và làm theo!</p>
+            <p className="text-body-lg font-bold">{npcName} ra lệnh bằng tiếng Trung (không có phụ đề). Nghe và làm theo!</p>
           </div>
         )}
-        {phase === "asking" && round.kind === "bring" && <p className="text-body-lg font-bold">Mang cho Cú Thầy: <span className="text-headline-md text-primary">{word.gloss}</span></p>}
+        {phase === "asking" && round.kind === "bring" && <p className="text-body-lg font-bold">Mang cho {npcName}: <span className="text-headline-md text-primary">{word.gloss}</span></p>}
         {phase === "asking" && round.kind === "meaning" && <p className="text-body-lg font-bold">Đi tới: <span className="text-headline-md text-primary">{word.gloss}</span></p>}
         {phase === "asking" && round.kind === "hanzi" && (
           <div className="flex items-center gap-3">
@@ -65,8 +67,8 @@ export function QuestPanel({ rounds, index, phase, wrong, words, carrying, onQui
         )}
         {phase === "asking" && (
           <p className="mt-1 text-label-md text-on-surface-variant">
-            {carrying ? "Bạn đang cầm vật rồi. Mang tới Cú Thầy và nhấn E (hoặc chạm vào Cú) để giao."
-              : delivery ? "Lại gần đúng vật, nhấn E (hoặc chạm vào vật) để nhặt, rồi mang tới Cú Thầy."
+            {carrying ? `Bạn đang cầm vật rồi. Mang tới ${npcName} và nhấn E (hoặc chạm vào ${npcName}) để giao.`
+              : delivery ? `Lại gần đúng vật, nhấn E (hoặc chạm vào vật) để nhặt, rồi mang tới ${npcName}.`
               : "Lại gần vật rồi nhấn E (hoặc chạm vào vật) để chọn."}
           </p>
         )}
@@ -75,7 +77,7 @@ export function QuestPanel({ rounds, index, phase, wrong, words, carrying, onQui
           <p role="status" className="flex items-center gap-2 text-body-lg font-extrabold text-secondary"><Icon name="check_circle" size={26} filled />Đúng rồi! <span lang="zh-Hans">{word.term}</span> ({word.pinyin}) là {word.gloss}.</p>
         )}
         {(phase === "correct" || phase === "reveal") && round.kind === "command" && (
-          <p className="mt-1 text-body-md text-on-surface-variant">Cú Thầy nói: <span lang="zh-Hans" className="font-bold text-on-surface">{commandText(word.term, portable)}</span> {commandMeaning(word.gloss, portable)}</p>
+          <p className="mt-1 text-body-md text-on-surface-variant">{npcName} nói: <span lang="zh-Hans" className="font-bold text-on-surface">{commandText(word.term, portable)}</span> {commandMeaning(word.gloss, portable)}</p>
         )}
         {phase === "reveal" && (
           <p role="status" className="text-body-lg font-bold">Đáp án là <b lang="zh-Hans" className="text-primary">{word.term}</b> ({word.pinyin}): {word.gloss}. Mình sẽ gặp lại từ này sau.</p>

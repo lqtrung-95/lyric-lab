@@ -118,6 +118,30 @@ test("nhiệm vụ: câu mang đồ cần nhặt đúng vật rồi giao cho Cú
   await expect(page.getByRole("region", { name: "Kết quả nhiệm vụ" })).toBeVisible();
 });
 
+test("đi sang Quán ăn bằng biển chỉ đường, học một từ, quay lại: tiến độ hai cảnh tách riêng", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 1300 });
+  await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
+  await page.goto("/kham-pha/phong");
+  await page.getByRole("button", { name: "Sang Quán ăn" }).click();
+  await expect(page.getByRole("heading", { name: "Quán ăn" })).toBeVisible();
+  await page.getByRole("button", { name: /^茶, / }).click();
+  await expect(page.getByRole("region", { name: "Từ 茶" })).toContainText("chá");
+  await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("1/14");
+  await page.getByRole("button", { name: "Về Phòng của bạn" }).click();
+  await expect(page.getByRole("heading", { name: "Phòng của bạn" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("0/14"); // từ học ở quán không tính vào phòng
+});
+
+test("nhạc nền: bật mặc định, tắt được và nhớ lựa chọn sau khi tải lại", async ({ page }) => {
+  await page.goto("/kham-pha/phong");
+  const music = page.getByRole("button", { name: /Nhạc nền/ });
+  await expect(music).toHaveAttribute("aria-pressed", "true");
+  await music.click();
+  await expect(music).toHaveAttribute("aria-pressed", "false");
+  await page.reload();
+  await expect(page.getByRole("button", { name: /Nhạc nền/ })).toHaveAttribute("aria-pressed", "false");
+});
+
 test("cảnh không tồn tại trả 404", async ({ page }) => {
   const res = await page.goto("/kham-pha/khong-co");
   expect(res?.status()).toBe(404);

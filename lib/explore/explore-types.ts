@@ -36,11 +36,36 @@ export interface SceneNpc {
   stand?: Vec;
 }
 
+/** Đồ trang trí không chạm học được (bàn, quầy, kệ...): vẽ trong cảnh để đặt đồ vật lên trên. `sprite` là khóa trong bộ sprite phẳng. */
+export interface SceneDecor {
+  sprite: string;
+  x: number;
+  y: number;
+  w: number;
+}
+
+/** Lối sang cảnh khác: biển chỉ đường; đứng gần rồi nhấn E (hoặc chạm vào) để đi. */
+export interface SceneExit {
+  /** Khóa sprite của biển (vd. `exit` mũi tên phải, `exitLeft` mũi tên trái). */
+  sprite: string;
+  label: string;
+  to: string;
+  x: number;
+  y: number;
+  w: number;
+}
+
 export interface SceneDef {
   id: string;
   title: string;
   subtitle: string;
+  /** Kiểu nền (tường, sàn, đèn lồng...). */
+  theme: "room" | "eatery";
+  /** Chỗ nhân vật xuất hiện khi vào cảnh (mặc định giữa phía dưới). */
+  start?: Vec;
   npc: SceneNpc;
+  decor?: SceneDecor[];
+  exits: SceneExit[];
   objects: SceneObjectDef[];
 }
 

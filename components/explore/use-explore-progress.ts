@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { emptyProgress, loadProgress, markDiscovered, recordAnswer, saveProgress, type ExploreProgress } from "@/lib/explore/explore-progress";
+import { clearScene, emptyProgress, loadProgress, markDiscovered, recordAnswer, saveProgress, type ExploreProgress } from "@/lib/explore/explore-progress";
 
 /** Tiến độ khám phá trong localStorage. `ready` = đã đọc xong (tránh nháy trạng thái "chưa học" lúc mới vào). */
 export function useExploreProgress() {
@@ -27,7 +27,7 @@ export function useExploreProgress() {
 
   const discover = useCallback((id: string) => update((p) => markDiscovered(p, id, Date.now())), [update]);
   const answer = useCallback((id: string, ok: boolean) => update((p) => recordAnswer(p, id, ok, Date.now())), [update]);
-  const reset = useCallback(() => update(() => emptyProgress()), [update]);
+  const resetScene = useCallback((sceneId: string) => update((p) => clearScene(p, sceneId)), [update]);
 
-  return { progress, ready, now, discover, answer, reset };
+  return { progress, ready, now, discover, answer, resetScene };
 }

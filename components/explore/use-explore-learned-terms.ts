@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { loadProgress } from "@/lib/explore/explore-progress";
 import { learnedTerms } from "@/lib/explore/learned-terms";
-import { SCENES } from "@/lib/explore/scenes/room-scene";
+import { SCENES } from "@/lib/explore/scenes";
 
 const NONE: ReadonlySet<string> = new Set();
 

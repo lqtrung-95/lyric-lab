@@ -4,7 +4,7 @@ import { lookupTermEntry } from "@/lib/lookup/server-lookup";
 import type { SceneDetail, SceneWord } from "./explore-types";
 
 const EXAMPLES_PER_WORD = 2;
-import { SCENES } from "./scenes/room-scene";
+import { SCENES } from "./scenes";
 
 /** Đọc cảnh và bổ sung pinyin, Hán Việt, cấp HSK từ từ điển cho từng vật (không viết tay các trường này). Null nếu không có cảnh. */
 export async function loadScene(id: string): Promise<SceneDetail | null> {
