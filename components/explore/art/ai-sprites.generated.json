@@ -1,22 +1,62 @@
 {
   "bed": {
     "src": "/explore/ai/bed.png",
-    "ratio": 0.9351
+    "ratio": 0.7951
   },
   "table": {
     "src": "/explore/ai/table.png",
-    "ratio": 1.1842
+    "ratio": 1.8007
   },
   "chair": {
     "src": "/explore/ai/chair.png",
-    "ratio": 0.6278
+    "ratio": 0.543
   },
   "book": {
     "src": "/explore/ai/book.png",
-    "ratio": 1.1132
+    "ratio": 1.2449
   },
   "door": {
     "src": "/explore/ai/door.png",
-    "ratio": 0.5805
+    "ratio": 0.6578
+  },
+  "window": {
+    "src": "/explore/ai/window.png",
+    "ratio": 0.9365
+  },
+  "cup": {
+    "src": "/explore/ai/cup.png",
+    "ratio": 0.8484
+  },
+  "water": {
+    "src": "/explore/ai/water.png",
+    "ratio": 0.3463
+  },
+  "laptop": {
+    "src": "/explore/ai/laptop.png",
+    "ratio": 0.832
+  },
+  "tv": {
+    "src": "/explore/ai/tv.png",
+    "ratio": 0.8873
+  },
+  "cat": {
+    "src": "/explore/ai/cat.png",
+    "ratio": 0.6537
+  },
+  "flower": {
+    "src": "/explore/ai/flower.png",
+    "ratio": 0.8138
+  },
+  "apple": {
+    "src": "/explore/ai/apple.png",
+    "ratio": 0.8627
+  },
+  "lamp": {
+    "src": "/explore/ai/lamp.png",
+    "ratio": 0.2848
+  },
+  "guide": {
+    "src": "/explore/ai/guide.png",
+    "ratio": 0.7029
   }
 }

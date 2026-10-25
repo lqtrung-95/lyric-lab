@@ -16,15 +16,15 @@ export interface AiSprite {
 
 // Danh sách tranh AI hiện có do script `scripts/generate-explore-art.mts` ghi (tên file và tỉ lệ); `SCALES` là chỉnh tay độ to nhỏ theo từng vật để vừa bố cục.
 // Vật chưa có tranh AI ở chế độ AI rơi về sprite pixel (xem `resolveArt`).
-const SCALES: Record<string, number> = { bed: 0.85, chair: 0.55, book: 1.05 };
+const SCALES: Record<string, number> = {};
 const GENERATED = aiManifest as Record<string, { src: string; ratio: number }>;
 export const AI_SPRITES: Record<string, AiSprite> = Object.fromEntries(Object.entries(GENERATED).map(([id, m]) => [id, { ...m, scale: SCALES[id] ?? 1 }]));
 
 export type ResolvedArt = { kind: "img"; ai: AiSprite } | { kind: "pixel"; sprite: PixelSprite; fallback: boolean };
 
 /** Chọn tranh cho một vật theo bộ tranh; `fallback` = đang ở chế độ AI nhưng vật này chưa có tranh AI nên dùng sprite pixel. */
-export function resolveArt(id: string, style: ArtStyle): ResolvedArt | null {
-  const ai = style === "ai" ? AI_SPRITES[id] : undefined;
+export function resolveArt(id: string, style: ArtStyle, aiSprites: Record<string, AiSprite> = AI_SPRITES): ResolvedArt | null {
+  const ai = style === "ai" ? aiSprites[id] : undefined;
   if (ai) return { kind: "img", ai };
   const sprite = PIXEL_SPRITES[id];
   return sprite ? { kind: "pixel", sprite, fallback: style === "ai" } : null;

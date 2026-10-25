@@ -25,10 +25,21 @@ describe("sprite pixel", () => {
 });
 
 describe("resolveArt", () => {
+  const bedAi = { src: "/x.png", ratio: 1, scale: 1 };
+
   it("chế độ AI dùng tranh AI nếu có, không thì rơi về pixel kèm cờ fallback; chế độ pixel luôn pixel", () => {
-    expect(resolveArt("bed", "ai")?.kind).toBe("img");
-    expect(resolveArt("cat", "ai")).toMatchObject({ kind: "pixel", fallback: true });
-    expect(resolveArt("bed", "pixel")).toMatchObject({ kind: "pixel", fallback: false });
+    expect(resolveArt("bed", "ai", { bed: bedAi })?.kind).toBe("img");
+    expect(resolveArt("cat", "ai", { bed: bedAi })).toMatchObject({ kind: "pixel", fallback: true });
+    expect(resolveArt("bed", "pixel", { bed: bedAi })).toMatchObject({ kind: "pixel", fallback: false });
+    expect(resolveArt("khong-co", "ai", {})).toBeNull();
+  });
+
+  it("danh sách tranh AI thật: mọi vật trong cảnh đều có tranh AI và có sprite pixel dự phòng", () => {
+    for (const o of ROOM_SCENE.objects) {
+      expect(AI_SPRITES[o.id], o.id).toBeDefined();
+      expect(resolveArt(o.id, "ai")?.kind).toBe("img");
+      expect(resolveArt(o.id, "pixel")?.kind).toBe("pixel");
+    }
     expect(Object.keys(AI_SPRITES).every((id) => id === "guide" || id in PIXEL_SPRITES)).toBe(true);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ROOM_SCENE } from "../scenes/room-scene";
-import { ASPECT_SIZE, buildPrompt, NEGATIVE, ROOM_ART_ITEMS, STYLE } from "./art-prompts";
+import { ASPECT_SIZE, buildNegative, buildPrompt, NEGATIVE, ROOM_ART_ITEMS, STYLE } from "./art-prompts";
 import { assertLoopback, ComfyClient, type FetchLike } from "./comfy-client";
 import { buildWorkflow } from "./comfy-workflow";
 import { parseArtArgs } from "./parse-art-args";
@@ -22,6 +22,11 @@ describe("art-prompts", () => {
     expect(buildPrompt(item)).not.toContain(",,");
     expect(ASPECT_SIZE[item.aspect]).toEqual({ width: 832, height: 1216 });
     expect(NEGATIVE).toContain("watermark");
+    // phủ định chỉ ở prompt âm: prompt dương mà có "no shadow" sẽ vô tình vẽ ra bóng
+    expect(STYLE).not.toMatch(/\bno\b|without/i);
+    expect(NEGATIVE).toContain("shadow");
+    expect(buildNegative(ROOM_ART_ITEMS.find((i) => i.id === "table")!)).toContain("chairs");
+    expect(buildNegative(ROOM_ART_ITEMS.find((i) => i.id === "bed")!)).toBe(NEGATIVE);
   });
 });
 
@@ -48,7 +53,7 @@ describe("buildWorkflow", () => {
 describe("parseArtArgs", () => {
   it("giá trị mặc định và các cờ", () => {
     const a = parseArtArgs(["--checkpoint", "a.safetensors", "--only", "bed, cat", "--variants", "3", "--force", "--dry-run"]);
-    expect(a).toMatchObject({ comfy: "http://127.0.0.1:8188", checkpoint: "a.safetensors", only: ["bed", "cat"], variants: 3, force: true, dryRun: true, loraStrength: 0.9, holeFuzz: 0, out: ".explore-art" });
+    expect(a).toMatchObject({ comfy: "http://127.0.0.1:8188", checkpoint: "a.safetensors", only: ["bed", "cat"], variants: 3, force: true, dryRun: true, loraStrength: 0.9, holeFuzz: 0, bgFuzz: 28, recut: false, out: ".explore-art" });
   });
 
   it("từ chối tham số lạ, thiếu giá trị, số sai", () => {
@@ -58,6 +63,10 @@ describe("parseArtArgs", () => {
     expect(() => parseArtArgs(["--variants", "0"])).toThrow(/từ 1 đến 8/);
     expect(() => parseArtArgs(["bed"])).toThrow(/Tham số lạ/);
     expect(() => parseArtArgs(["--hole-fuzz", "50"])).toThrow(/0 đến 20/);
+    expect(() => parseArtArgs(["--bg-fuzz", "80"])).toThrow(/0 đến 50/);
+    expect(() => parseArtArgs(["--promote", "bed"])).toThrow(/id-vN/);
+    expect(parseArtArgs(["--recut", "--bg-fuzz", "20"])).toMatchObject({ recut: true, bgFuzz: 20 });
+    expect(parseArtArgs(["--promote", "bed-v3"]).promote).toBe("bed-v3");
   });
 });
 

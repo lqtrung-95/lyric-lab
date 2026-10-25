@@ -2,13 +2,15 @@
 // `public/explore/ai/` và cập nhật `components/explore/art/ai-sprites.generated.json`.
 //   Xem mô hình đang có:  npx tsx scripts/generate-explore-art.mts --list-models
 //   In thử prompt:        npx tsx scripts/generate-explore-art.mts --checkpoint sd_xl_base_1.0.safetensors --dry-run
+//   Tách nền lại ảnh thô:  npx tsx scripts/generate-explore-art.mts --recut [--bg-fuzz 28] [--only bed]
+//   Chọn ứng viên:        npx tsx scripts/generate-explore-art.mts --promote bed-v3   (chép .explore-art/cut/bed-v3.png vào tranh chính thức)
 //   Tạo cả bộ:            npx tsx scripts/generate-explore-art.mts --checkpoint <ckpt> [--lora <lora> --lora-strength 0.9 --extra "pixel art"] [--only bed,cat] [--variants 3] [--force]
 // Ảnh thô và ảnh đã tách nền lưu ở `--out` (mặc định `.explore-art/`, không commit). Mặc định không đè tranh đã có (cần --force); ứng viên đầu tiên của mỗi vật được dùng.
 import { execFile } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { promisify } from "node:util";
-import { ASPECT_SIZE, buildPrompt, NEGATIVE, ROOM_ART_ITEMS } from "@/lib/explore/art-generation/art-prompts";
+import { ASPECT_SIZE, buildNegative, buildPrompt, ROOM_ART_ITEMS } from "@/lib/explore/art-generation/art-prompts";
 import { assertLoopback, ComfyClient, type FetchLike } from "@/lib/explore/art-generation/comfy-client";
 import { buildWorkflow } from "@/lib/explore/art-generation/comfy-workflow";
 import { parseArtArgs } from "@/lib/explore/art-generation/parse-art-args";
@@ -17,17 +19,18 @@ const run = promisify(execFile);
 const PUBLIC_DIR = "public/explore/ai";
 const MANIFEST = "components/explore/art/ai-sprites.generated.json";
 const MAX_SIDE = 480; // đủ nét cho màn retina vì vật hiển thị chỉ ~100–250 px
-const FUZZ = "9%";
 
 /**
- * Tách nền trắng: tô trong suốt từ bốn góc (không đụng phần trắng bên trong vật) rồi cắt sát viền và thu nhỏ. `holeFuzz` > 0 xóa thêm mọi vùng gần trắng
- * còn lại, kể cả vùng kẹt giữa chân ghế, nhưng cũng đục thủng điểm sáng, lòng trắng mắt, cốc sứ nên mặc định tắt.
+ * Tách nền: loang trong suốt từ bốn góc theo MÀU THẬT của từng góc (mô hình hay vẽ nền xám nhạt hoặc có sọc, không phải trắng tinh) với dung sai `bgFuzz`;
+ * viền đậm của vật ngăn không cho loang vào trong. Rồi cắt sát viền và thu nhỏ. `holeFuzz` > 0 xóa thêm mọi vùng gần trắng còn lại, kể cả vùng kẹt giữa chân ghế,
+ * nhưng cũng đục thủng điểm sáng, lòng trắng mắt, cốc sứ nên mặc định tắt.
  */
-async function cutout(input: string, output: string, width: number, height: number, holeFuzz: number): Promise<{ w: number; h: number }> {
+async function cutout(input: string, output: string, width: number, height: number, holeFuzz: number, bgFuzz: number): Promise<{ w: number; h: number }> {
   const holes = holeFuzz > 0 ? ["-fuzz", `${holeFuzz}%`, "-transparent", "white"] : [];
   const corners = [[0, 0], [width - 1, 0], [0, height - 1], [width - 1, height - 1]];
-  const floods = corners.flatMap(([x, y]) => ["-floodfill", `+${x}+${y}`, "white"]);
-  await run("magick", [input, "-alpha", "set", "-fuzz", FUZZ, "-fill", "none", ...floods, ...holes, "-trim", "+repage", "-resize", `${MAX_SIDE}x${MAX_SIDE}>`, "-bordercolor", "none", "-border", "4", output]);
+  const colors = await Promise.all(corners.map(async ([x, y]) => (await run("magick", [input, "-format", `%[pixel:p{${x},${y}}]`, "info:"])).stdout.trim()));
+  const floods = corners.flatMap(([x, y], i) => ["-floodfill", `+${x}+${y}`, colors[i]]);
+  await run("magick", [input, "-alpha", "set", "-fuzz", `${bgFuzz}%`, "-fill", "none", ...floods, ...holes, "-trim", "+repage", "-resize", `${MAX_SIDE}x${MAX_SIDE}>`, "-bordercolor", "none", "-border", "4", output]);
   const { stdout } = await run("magick", ["identify", "-format", "%w %h", output]);
   const [w, h] = stdout.trim().split(" ").map(Number);
   return { w, h };
@@ -38,6 +41,31 @@ async function main(): Promise<void> {
   assertLoopback(args.comfy, args.allowRemote);
   const client = new ComfyClient(args.comfy, fetch as unknown as FetchLike);
 
+  if (args.recut) {
+    const files = readdirSync(join(args.out, "raw")).filter((f) => /^[a-z0-9]+-v[1-8]\.png$/.test(f) && (!args.only || args.only.includes(f.split("-v")[0])));
+    for (const f of files) {
+      const raw = join(args.out, "raw", f);
+      const { stdout } = await run("magick", ["identify", "-format", "%w %h", raw]);
+      const [rw, rh] = stdout.trim().split(" ").map(Number);
+      const size = await cutout(raw, join(args.out, "cut", f), rw, rh, args.holeFuzz, args.bgFuzz);
+      console.log(`✓ ${f} (${size.w}x${size.h})`);
+    }
+    return;
+  }
+  if (args.promote) {
+    const [id] = args.promote.split("-v");
+    const cut = join(args.out, "cut", `${args.promote}.png`);
+    if (!existsSync(cut)) throw new Error(`Không thấy ${cut}. Hãy tạo ảnh trước.`);
+    mkdirSync(PUBLIC_DIR, { recursive: true });
+    copyFileSync(cut, join(PUBLIC_DIR, `${id}.png`));
+    const { stdout } = await run("magick", ["identify", "-format", "%w %h", cut]);
+    const [w, h] = stdout.trim().split(" ").map(Number);
+    const manifest: Record<string, { src: string; ratio: number }> = JSON.parse(readFileSync(MANIFEST, "utf8"));
+    manifest[id] = { src: `/explore/ai/${id}.png`, ratio: Math.round((w / h) * 10000) / 10000 };
+    writeFileSync(MANIFEST, `${JSON.stringify(manifest, null, 2)}\n`);
+    console.log(`✓ ${args.promote} → ${join(PUBLIC_DIR, `${id}.png`)}`);
+    return;
+  }
   if (args.listModels) {
     console.log("Checkpoint:", (await client.listCheckpoints()).join("\n  ") || "(không có: bỏ file .safetensors vào ComfyUI/models/checkpoints)");
     console.log("LoRA:", (await client.listLoras()).join("\n  ") || "(không có)");
@@ -67,13 +95,13 @@ async function main(): Promise<void> {
       try {
         const wf = buildWorkflow({
           checkpoint: args.checkpoint, lora: args.lora ? { name: args.lora, strength: args.loraStrength } : undefined,
-          prompt, negative: NEGATIVE, width, height, seed: args.seed + v - 1, steps: args.steps, cfg: args.cfg, filenamePrefix: `songhanzi/${tag}`,
+          prompt, negative: buildNegative(item), width, height, seed: args.seed + v - 1, steps: args.steps, cfg: args.cfg, filenamePrefix: `songhanzi/${tag}`,
         });
         const [img] = await client.waitForImages(await client.queue(wf, clientId));
         const raw = join(args.out, "raw", `${tag}.png`);
         writeFileSync(raw, await client.download(img));
         const cut = join(args.out, "cut", `${tag}.png`);
-        const size = await cutout(raw, cut, width, height, args.holeFuzz);
+        const size = await cutout(raw, cut, width, height, args.holeFuzz, args.bgFuzz);
         console.log(`✓ ${tag} → ${cut} (${size.w}x${size.h})`);
         if (v === 1) {
           copyFileSync(cut, target);
