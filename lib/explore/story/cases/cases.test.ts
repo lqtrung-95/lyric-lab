@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { judge, readyToAccuse } from "../deduction";
 import { enterNode, pickEntry, step } from "../dialogue";
-import { currentObjective } from "../objectives";
+import { currentObjective, sceneUnlocked } from "../objectives";
 import { applyEffects, emptyStory, holds } from "../story-state";
 import type { Condition, Effect, StoryDef, StoryProgress } from "../story-types";
 import { CASES } from ".";
@@ -103,5 +103,22 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
     const wrong = story.suspects.find((s) => s.id !== story.solution.suspectId)!;
     expect(judge(story, wrong.id, story.solution.keyClues).type).toBe("wrong_suspect");
     expect(judge(story, story.solution.suspectId, []).type).toBe("weak_evidence");
+  });
+});
+
+describe("khóa cảnh theo thứ tự mục tiêu", () => {
+  const story = CASES["hop-go"];
+  const open = (flags: string[], scene: string) => sceneUnlocked(story.objectives, story.startScene, flags, scene);
+
+  it("chưa gặp Cú Thầy thì chỉ có cảnh xuất phát", () => {
+    expect(open([], "phong")).toBe(true);
+    for (const id of ["quan-an", "cho", "nha-ga", "benh-vien", "cong-vien"]) expect(open([], id), id).toBe(false);
+  });
+
+  it("mỗi cảnh mở đúng khi làm xong việc liền trước, và chơi đủ thì mở hết", () => {
+    expect(open(["met:owl"], "quan-an")).toBe(false);
+    expect(open(["met:owl", "clue:letter", "clue:pen"], "quan-an")).toBe(true);
+    const all = [...new Set(story.objectives.flatMap((o) => [...(o.done?.all ?? [])]))];
+    for (const id of ["phong", "quan-an", "cho", "nha-ga", "benh-vien", "cong-vien"]) expect(open(all, id), id).toBe(true);
   });
 });

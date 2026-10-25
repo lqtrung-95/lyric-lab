@@ -120,9 +120,15 @@ export interface Suspect {
   metFlag: string;
 }
 
+export type StoryDifficulty = "easy" | "medium" | "hard";
+
+export const DIFFICULTY_LABEL: Record<StoryDifficulty, string> = { easy: "Dễ", medium: "Vừa", hard: "Khó" };
+
 export interface StoryDef {
   id: string;
   title: string;
+  /** Độ khó của vụ án: số nghi phạm, độ dài lời thoại, độ gián tiếp của chứng cứ. */
+  difficulty: StoryDifficulty;
   /** Mở đầu (tiếng Việt). */
   intro: string;
   speakers: Record<string, Speaker>;

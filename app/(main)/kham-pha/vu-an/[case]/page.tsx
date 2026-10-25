@@ -9,5 +9,5 @@ export default async function StoryIntroPage({ params }: { params: Promise<{ cas
   const { case: caseId } = await params;
   const story = /^[a-z0-9-]{1,40}$/.test(caseId) ? CASES[caseId] : undefined;
   if (!story) notFound();
-  return <StoryIntro story={{ title: story.title, intro: story.intro, objectives: story.objectives, startScene: story.startScene, solvedFlag: story.solvedFlag }} basePath={`/kham-pha/vu-an/${caseId}`} />;
+  return <StoryIntro story={{ title: story.title, difficulty: story.difficulty, intro: story.intro, objectives: story.objectives, startScene: story.startScene, solvedFlag: story.solvedFlag }} basePath={`/kham-pha/vu-an/${caseId}`} />;
 }

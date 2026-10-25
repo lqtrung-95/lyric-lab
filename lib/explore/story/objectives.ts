@@ -10,3 +10,10 @@ export function currentObjective(objectives: readonly Objective[], flags: readon
 export function objectiveProgress(objectives: readonly Objective[], flags: readonly string[]): { done: number; total: number } {
   return { done: objectives.filter((o) => holds(o.done, flags)).length, total: objectives.length };
 }
+
+/** Cảnh đã mở chưa: cảnh xuất phát luôn mở; cảnh khác mở khi mục tiêu đầu tiên ở đó đã hiện ra (nghĩa là đã làm xong các việc trước nó). Cảnh không có mục tiêu nào thì không mở. */
+export function sceneUnlocked(objectives: readonly Objective[], startScene: string, flags: readonly string[], sceneId: string): boolean {
+  if (sceneId === startScene) return true;
+  const first = objectives.find((o) => o.sceneId === sceneId);
+  return !!first && holds(first.when, flags);
+}
