@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { stubYouTube } from "./helpers/youtube-stub";
 
 // Trang chi tiết từ trên từ điển thật; chỉ dùng từ cơ bản ổn định (爱, 的).
 test("đầu trang chi tiết: chữ Hán lớn, pinyin, phồn thể, Hán Việt, HSK, nghĩa tiếng Việt đã duyệt và nghĩa Anh", async ({ page }) => {
@@ -38,4 +39,31 @@ test("đường dẫn không phải từ trong từ điển chuyển sang tìm k
   await page.goto("/tra-tu/xihuan");
   await expect(page).toHaveURL(/\/tra-tu\?q=xihuan/);
   await expect(page.getByRole("region", { name: "Kết quả tra" })).toContainText("喜欢");
+});
+
+test("câu ví dụ thật: tô đậm từ, bật/tắt pinyin và bản dịch, xem thêm, xem đúng đoạn video", async ({ page }) => {
+  await stubYouTube(page);
+  await page.goto("/tra-tu/" + encodeURIComponent("爱"));
+  await page.waitForLoadState("networkidle");
+  const section = page.getByRole("region", { name: "Câu ví dụ" });
+  const items = section.getByRole("listitem");
+  await expect(items.first()).toBeVisible();
+  await expect(items.first().locator("mark").first()).toHaveText("爱");
+
+  await section.getByRole("button", { name: "Pinyin" }).click();
+  await expect(section.getByRole("button", { name: "Pinyin" })).toHaveAttribute("aria-pressed", "false");
+  await section.getByRole("button", { name: "Bản dịch" }).click();
+  await expect(section.getByRole("button", { name: "Bản dịch" })).toHaveAttribute("aria-pressed", "false");
+
+  const more = section.getByRole("button", { name: /Xem thêm \d+ câu/ });
+  if (await more.count()) {
+    const before = await items.count();
+    await more.click();
+    expect(await items.count()).toBeGreaterThan(before);
+  }
+
+  await items.first().getByRole("button", { name: "Xem đoạn video" }).click();
+  await expect(page.getByRole("region", { name: "Nghe thử đoạn" })).toBeVisible();
+  await items.first().getByRole("button", { name: "Đọc to câu này" }).click();
+  await expect(items.first().getByRole("button", { name: "Đọc to", exact: true })).toBeVisible();
 });
