@@ -236,7 +236,7 @@ Chạy `supabase/migrations/20261020000001_game_system.sql` trong Supabase SQL E
 
 ## Tra từ: migration chỉ mục tìm kiếm
 
-Chạy `supabase/migrations/20261026000010_dict_search_columns.sql` trong SQL Editor (thêm 2 cột sinh sẵn vào `dict_words` ~125 nghìn dòng + 4 chỉ mục, bật `pg_trgm`; vài chục giây). Không cần deploy lại: code tự phát hiện cột (kết quả được nhớ trong bộ nhớ instance, instance cũ nhận ra sau khi khởi động lại). Hàm `dict_pinyin_plain` phải khớp `plainPinyin` ở `lib/tra-tu/pinyin-plain.ts` (có test đối chiếu bảng ký tự).
+Chạy `supabase/migrations/20261026000010_dict_search_columns.sql` trong SQL Editor (thêm 2 cột sinh sẵn vào `dict_words` ~125 nghìn dòng + 4 chỉ mục, bật `pg_trgm`; vài chục giây). Không cần deploy lại: code tự phát hiện cột (kết quả được nhớ trong bộ nhớ instance, instance cũ nhận ra sau khi khởi động lại). Migration `20261026000011_dict_word_ai_notes.sql` tạo bảng `dict_word_ai_notes` (RLS bật, không policy: chỉ service role). Đổi nội dung prompt giải nghĩa thì bump `WORD_NOTE_PROMPT_VERSION` ở `lib/tra-tu/build-word-note-prompt.ts` (bản cũ nằm lại trong bảng, không cần xóa). Hàm `dict_pinyin_plain` phải khớp `plainPinyin` ở `lib/tra-tu/pinyin-plain.ts` (có test đối chiếu bảng ký tự).
 
 ## Sao lưu cơ sở dữ liệu (GitHub Action hằng tuần)
 

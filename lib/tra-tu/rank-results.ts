@@ -1,5 +1,5 @@
 import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
-import { pickPrimaryEntry } from "@/lib/dictionary/lookup-words";
+import { COMMON_READING } from "@/lib/dictionary/lookup-words";
 import type { ClassifiedQuery } from "./classify-query";
 import { plainPinyin, toneKey } from "./pinyin-plain";
 import type { MatchKind, WordReading, WordResult } from "./types";
@@ -65,12 +65,16 @@ function scoreCandidate(c: Candidate, q: ClassifiedQuery, simplifiedHan: string)
   return { score: e.match + pop, kind: "english" };
 }
 
-/** Thứ tự các cách đọc trong một từ: cách đọc chính (thông dụng) trước, mục họ người/biến thể sau cùng. */
-function sortReadings(rows: DictWordRow[]): WordReading[] {
-  const primary = pickPrimaryEntry(rows);
-  const weight = (r: DictWordRow) => (r === primary ? 0 : VARIANT.test(r.meanings[0] ?? "") || SURNAME.test(r.pinyin) ? 3 : r.hsk_level ? 1 : 2);
+/**
+ * Thứ tự các cách đọc trong một từ: cách đọc ghi đè thủ công (`COMMON_READING`) trước, mục họ người/biến thể sau cùng; còn lại theo cấp HSK, tần suất,
+ * rồi số ý nghĩa nhiều hơn (cách đọc thông dụng có nhiều nghĩa hơn: 的 "de" 5 nghĩa so với "dī" 1 nghĩa dù cùng cấp HSK 1).
+ */
+export function sortReadings(rows: DictWordRow[]): WordReading[] {
+  const forced = COMMON_READING[rows[0]?.simplified ?? ""];
+  const weight = (r: DictWordRow) => (forced && toneKey(r.pinyin) === toneKey(forced) ? 0
+    : VARIANT.test(r.meanings[0] ?? "") || SURNAME.test(r.pinyin) ? 3 : r.hsk_level ? 1 : 2);
   return [...rows]
-    .sort((a, b) => weight(a) - weight(b) || (a.hsk_level ?? 99) - (b.hsk_level ?? 99) || (a.frequency ?? 1e9) - (b.frequency ?? 1e9))
+    .sort((a, b) => weight(a) - weight(b) || (a.hsk_level ?? 99) - (b.hsk_level ?? 99) || (a.frequency ?? 1e9) - (b.frequency ?? 1e9) || b.meanings.length - a.meanings.length)
     .map((r) => ({ pinyin: r.pinyin, meanings: r.meanings, hskLevel: r.hsk_level, frequency: r.frequency }));
 }
 

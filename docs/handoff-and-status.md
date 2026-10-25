@@ -28,7 +28,8 @@ Kế hoạch ở `plans/261006-1810-video-shadowing-dictation/`. **Mục "Video"
 
 Từ điển đầy đủ trong app: ô tìm có gợi ý, trang chi tiết từng từ. Làm theo giai đoạn nhỏ, mỗi giai đoạn một commit; **chưa push, chưa merge** (chờ chủ dự án duyệt).
 - Giai đoạn 1 (xong): tìm kiếm. Gõ chữ Hán (giản/phồn), pinyin (có/không dấu, có/không cách, số thanh), âm Hán Việt (có/không dấu), nghĩa tiếng Anh, nghĩa tiếng Việt đã duyệt. Lịch sử tra lưu localStorage. Lối vào ở mục phụ của thanh điều hướng.
-- **Việc người dùng phải làm:** chạy migration `20261026000010_dict_search_columns.sql` (cột `pinyin_plain`, `meanings_text` + chỉ mục). Chưa chạy thì tìm vẫn đúng nhưng chậm hơn và tìm nghĩa tiếng Anh yếu (chỉ khớp trọn một ý của CC-CEDICT, ví dụ "love" không ra 爱 vì ý của nó là "to love; to be fond of").
+- Giai đoạn 2 (xong): trang `/tra-tu/[từ]`: chữ Hán lớn (giản + phồn), pinyin mọi cách đọc (cách đọc thông dụng đứng đầu), cấp HSK, Hán Việt, nghe, nút Lưu thẻ ôn (cần câu thật làm nguồn thẻ nên từ chưa có câu thì nút khóa), nghĩa tiếng Anh theo từng cách đọc + lượng từ, nghĩa tiếng Việt: bản đã duyệt (glosses khóa học) + giải nghĩa chi tiết do AI khi người dùng bấm nút (gắn nhãn "do AI dịch, có thể chưa chính xác", lưu đệm). Không có loại từ chuẩn trong CC-CEDICT nên loại từ chỉ xuất hiện trong phần AI. Từ không có trong từ điển chuyển về tìm kiếm.
+- **Việc người dùng phải làm:** chạy migration `20261026000011_dict_word_ai_notes.sql` (bảng lưu đệm giải nghĩa AI; chưa chạy thì nút "Nhờ AI giải nghĩa" ẩn) và migration `20261026000010_dict_search_columns.sql` (cột `pinyin_plain`, `meanings_text` + chỉ mục). Chưa chạy thì tìm vẫn đúng nhưng chậm hơn và tìm nghĩa tiếng Anh yếu (chỉ khớp trọn một ý của CC-CEDICT, ví dụ "love" không ra 爱 vì ý của nó là "to love; to be fond of").
 - Nghĩa tiếng Việt chỉ có cho từ đã có `glosses` trong bài HSK của khóa học (+ `HSK1_GLOSS_OVERRIDES`); không có nguồn từ điển Việt khác.
 
 ## Việc dở / quyết định đang treo

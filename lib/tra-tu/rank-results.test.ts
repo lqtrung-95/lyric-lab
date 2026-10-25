@@ -45,6 +45,15 @@ describe("rankCandidates", () => {
     expect(rankCandidates(c, q, "的", 10)).toHaveLength(1);
     expect(r.readings.at(-1)?.pinyin).toBe("Dí");
   });
+  it("cùng cấp HSK: cách đọc nhiều nghĩa hơn lên trước (的 de trước dī); ghi đè thủ công (说 shuō) thắng", () => {
+    const q = classifyQuery("的");
+    const de = row("的", "de", ["of", "used after attribute", "emphasis"], 1, 1);
+    const di = row("的", "dī", ["taxi"], 1, 1);
+    expect(rankCandidates([{ row: di, source: "han" }, { row: de, source: "han" }], q, "的", 5)[0].readings.map((r) => r.pinyin)).toEqual(["de", "dī"]);
+    const shui = row("说", "shuì", ["to persuade", "to try to persuade", "x"], 1, 5);
+    const shuo = row("说", "shuō", ["to say"], 1, 5);
+    expect(rankCandidates([{ row: shui, source: "han" }, { row: shuo, source: "han" }], classifyQuery("说"), "说", 5)[0].readings[0].pinyin).toBe("shuō");
+  });
   it("pinyin: khớp đúng âm tiết trước tiền tố; gõ có dấu thì thưởng đúng thanh", () => {
     const q = classifyQuery("ma");
     const c: Candidate[] = [
