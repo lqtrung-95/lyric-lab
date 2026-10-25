@@ -35,6 +35,8 @@ describe("dữ liệu cảnh", () => {
       expect(o.x).toBeGreaterThan(0); expect(o.x).toBeLessThan(100);
       expect(o.y).toBeGreaterThan(0); expect(o.y).toBeLessThanOrEqual(100);
       expect(o.example.zh).toContain(o.term);
+      if (o.stand) { expect(o.stand.x).toBeGreaterThan(0); expect(o.stand.y).toBeGreaterThanOrEqual(38); }
     }
+    expect(ids).not.toContain(ROOM_SCENE.npc.id);
   });
 });

@@ -401,6 +401,21 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
   .anim-note-in, .anim-note-pop, .anim-note-shake { animation: none; }
 }
 
+/* Nhân vật trong cảnh Khám phá: nhún khi đi, nhảy khi đúng, lắc đầu khi sai. Tắt khi giảm chuyển động. */
+@keyframes walk-bob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6%) rotate(2deg); }
+}
+@keyframes avatar-hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-22%); }
+}
+.anim-walk-bob { animation: walk-bob 0.32s ease-in-out infinite; }
+.anim-avatar-hop { animation: avatar-hop 0.5s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-walk-bob, .anim-avatar-hop { animation: none; }
+}
+
 /* Chip cấu hình lặp câu nhô nhẹ lên khi xuất hiện (xem repeat-config-chips.tsx). Tắt khi giảm chuyển động. */
 @keyframes chip-in {
   from { opacity: 0; transform: translateY(4px) scale(0.92); }

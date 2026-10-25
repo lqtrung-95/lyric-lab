@@ -39,16 +39,17 @@ export function QuestPanel({ rounds, index, phase, wrong, words, onQuit }: Props
         {phase === "asking" && round.kind === "listen" && (
           <div className="flex items-center gap-3">
             <PronounceButton text={word.term} className="size-14" />
-            <p className="text-body-lg font-bold">Nghe và chạm vào vật bạn nghe thấy.</p>
+            <p className="text-body-lg font-bold">Nghe và đi tới vật bạn nghe thấy.</p>
           </div>
         )}
-        {phase === "asking" && round.kind === "meaning" && <p className="text-body-lg font-bold">Chạm vào: <span className="text-headline-md text-primary">{word.gloss}</span></p>}
+        {phase === "asking" && round.kind === "meaning" && <p className="text-body-lg font-bold">Đi tới: <span className="text-headline-md text-primary">{word.gloss}</span></p>}
         {phase === "asking" && round.kind === "hanzi" && (
           <div className="flex items-center gap-3">
             <p lang="zh-Hans" className="text-5xl font-extrabold">{word.term}</p>
-            <p className="text-body-lg font-bold">Chạm vào vật có tên này.</p>
+            <p className="text-body-lg font-bold">Đi tới vật có tên này.</p>
           </div>
         )}
+        {phase === "asking" && <p className="mt-1 text-label-md text-on-surface-variant">Lại gần vật rồi nhấn E (hoặc chạm vào vật) để chọn.</p>}
         {phase === "asking" && wrong > 0 && <p role="status" className="mt-1 text-label-md font-bold text-error">Chưa đúng, thử lại nhé (còn 1 lần).</p>}
         {phase === "correct" && (
           <p role="status" className="flex items-center gap-2 text-body-lg font-extrabold text-secondary"><Icon name="check_circle" size={26} filled />Đúng rồi! <span lang="zh-Hans">{word.term}</span> ({word.pinyin}) là {word.gloss}.</p>

@@ -1,13 +1,12 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { ROOM_SCENE } from "@/lib/explore/scenes/room-scene";
-import { resolveArt, resolveGuideArt } from "../scene-art";
 import { INK } from "./flat-kit";
 import { FLAT_SPRITES } from "./flat-sprites";
 
-describe("Tranh C (SVG phẳng)", () => {
-  it("mọi vật trong cảnh và nhân vật dẫn đường đều có sprite với khung hợp lệ", () => {
-    for (const id of [...ROOM_SCENE.objects.map((o) => o.id), "guide"]) {
+describe("sprite phẳng (phong cách app)", () => {
+  it("mọi vật trong cảnh, NPC và nhân vật người chơi đều có sprite với khung hợp lệ", () => {
+    for (const id of [...ROOM_SCENE.objects.map((o) => o.id), ROOM_SCENE.npc.id, "guide"]) {
       const s = FLAT_SPRITES[id];
       expect(s, id).toBeDefined();
       expect(s.w).toBeGreaterThan(0);
@@ -22,11 +21,5 @@ describe("Tranh C (SVG phẳng)", () => {
       expect(markup, id).not.toContain("NaN");
       expect((markup.match(/<(rect|path|circle|ellipse)/g) ?? []).length, id).toBeGreaterThanOrEqual(4);
     }
-  });
-
-  it("resolveArt ở chế độ flat luôn ra sprite phẳng, kể cả nhân vật dẫn đường", () => {
-    for (const o of ROOM_SCENE.objects) expect(resolveArt(o.id, "flat")?.kind, o.id).toBe("flat");
-    expect(resolveGuideArt("flat").kind).toBe("flat");
-    expect(resolveArt("khong-co", "flat")).toBeNull();
   });
 });

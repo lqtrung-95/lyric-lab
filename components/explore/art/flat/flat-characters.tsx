@@ -55,4 +55,31 @@ const guide: FlatSprite = {
   ),
 };
 
-export const CHARACTER_SPRITES: Record<string, FlatSprite> = { cat, guide };
+/** Cú Thầy: NPC giao nhiệm vụ, đội mũ cử nhân, mắt to. */
+const owl: FlatSprite = {
+  w: 80, h: 100,
+  node: (
+    <g {...LINE}>
+      <ellipse cx="40" cy="64" rx="27" ry="30" fill={C.woodD} />
+      <ellipse cx="40" cy="72" rx="16" ry="20" fill={C.cream} strokeWidth={2.500} />
+      <path d="M32 66q4 4 8 0t8 0M32 76q4 4 8 0t8 0M32 86q4 4 8 0t8 0" fill="none" strokeWidth={2} />
+      <ellipse cx="13" cy="64" rx="8" ry="19" fill={C.brown} />
+      <ellipse cx="67" cy="64" rx="8" ry="19" fill={C.brown} />
+      <path d="M16 26L12 8l16 8ZM64 26l4-18-16 8Z" fill={C.woodD} />
+      <ellipse cx="40" cy="34" rx="29" ry="25" fill={C.woodD} />
+      <circle cx="28" cy="35" r="11" fill={C.white} />
+      <circle cx="52" cy="35" r="11" fill={C.white} />
+      <circle cx="29" cy="36" r="5" fill={INK} stroke="none" />
+      <circle cx="51" cy="36" r="5" fill={INK} stroke="none" />
+      <circle cx="31" cy="34" r="1.800" fill={C.white} stroke="none" />
+      <circle cx="53" cy="34" r="1.800" fill={C.white} stroke="none" />
+      <path d="M35 44h10l-5 8Z" fill={C.orange} strokeWidth={2.500} />
+      <path d="M8 18L40 6l32 12-32 12Z" fill={C.blue} />
+      <path d="M62 21v14" strokeWidth={2.500} fill="none" />
+      <circle cx="62" cy="37" r="3" fill={C.yellow} strokeWidth={2} />
+      <path d="M30 92h6M44 92h6" stroke={C.orangeD} strokeWidth={5} />
+    </g>
+  ),
+};
+
+export const CHARACTER_SPRITES: Record<string, FlatSprite> = { cat, guide, owl };

@@ -1,3 +1,5 @@
+import type { Vec } from "./player-movement";
+
 /** Một vật chạm được trong cảnh. Vị trí tính theo % khung cảnh: (x, y) là điểm giữa-đáy của vật, w là chiều rộng. */
 export interface SceneObjectDef {
   id: string;
@@ -13,14 +15,29 @@ export interface SceneObjectDef {
   above?: boolean;
   /** Vật gắn trên tường (cửa sổ): không đổ bóng xuống sàn. */
   wall?: boolean;
+  /** Chỗ nhân vật đứng để tương tác (mặc định ngay trước chân vật). Đồ đặt trên bàn thì đứng trước bàn. */
+  stand?: Vec;
+}
+
+/** Nhân vật không chơi (NPC) giao nhiệm vụ: đứng yên trong cảnh, người chơi lại gần và nhấn E (hoặc chạm vào) để nói chuyện. */
+export interface SceneNpc {
+  id: string;
+  name: string;
+  /** Lời chào mặc định, nói về cách chơi. */
+  greeting: string;
+  /** Lời khi người chơi chưa học đủ từ để nhận nhiệm vụ. */
+  notReady: string;
+  x: number;
+  y: number;
+  w: number;
+  stand?: Vec;
 }
 
 export interface SceneDef {
   id: string;
   title: string;
   subtitle: string;
-  /** Nhân vật dẫn đường: lời chào ở đầu cảnh. */
-  guide: { name: string; greeting: string };
+  npc: SceneNpc;
   objects: SceneObjectDef[];
 }
 
