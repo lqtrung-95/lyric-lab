@@ -23,6 +23,8 @@ interface LyricLineRowProps {
   showPinyin: boolean;
   showTranslation: boolean;
   highlights: HighlightSets;
+  /** Từ (chữ Hán) người học đã học ở cảnh Khám phá: đánh dấu bằng một chấm xanh cạnh từ. */
+  gameTerms?: ReadonlySet<string>;
   onSeek: (index: number) => void;
   onWord: (word: WordSelection) => void;
   onPauseSong: () => void;
@@ -44,7 +46,7 @@ interface LyricLineRowProps {
  * Một dòng lời. Từ vựng được tô nền + đậm (kèm nhãn ẩn cho trình đọc màn hình), ngữ pháp được gạch chân:
  * hai kiểu khác nhau về hình dạng chứ không chỉ về màu (LS-04). Bấm dòng để nhảy tới đó (LS-07).
  */
-function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onReportTranslation, onAsk, onEdit, lazyRender = false }: LyricLineRowProps) {
+function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, showTranslation, highlights, gameTerms, onSeek, onWord, onPauseSong, allowTranslationSuggestion = true, onShare, onReportTranslation, onAsk, onEdit, lazyRender = false }: LyricLineRowProps) {
   const active = state === "active";
   const groups = buildLineSegments(line, highlights);
   // Nút của dòng nằm ở cột biểu tượng bên phải. Máy tính: hiện khi rê chuột. Điện thoại: chỉ ở câu đang hát (để không bóp hẹp các dòng còn lại)
@@ -98,7 +100,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 // Đặt tên tường minh thay vì để trình duyệt tự tính từ nội dung: chữ Hán lồng trong <ruby>/<rt> khiến
                 // vài trình duyệt tính accessible-name-từ-nội-dung ra rỗng rồi rơi về title ("Bấm để tra từ" cho mọi
                 // nút), hoặc lẫn cả pinyin vào tên nếu không kiểm soát — đặt aria-label giữ tên nút luôn đúng = g.text.
-                aria-label={g.vocabId ? `Từ vựng: ${g.text}` : g.text}
+                aria-label={`${g.vocabId ? `Từ vựng: ${g.text}` : g.text}${gameTerms?.has(g.text) ? " (đã học ở Khám phá)" : ""}`}
                 onClick={(e) => { e.stopPropagation(); onWord({ lineIndex: line.index, term: g.text, itemId: g.vocabId }); }}
                 className={
                   g.vocabId
@@ -107,6 +109,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
                 }
               >
                 {content}
+                {gameTerms?.has(g.text) && <span aria-hidden="true" title="Bạn đã học từ này ở Khám phá" className="ml-0.5 inline-block size-2 shrink-0 self-start rounded-full border border-[var(--ink)] bg-secondary" />}
               </button>
             );
           })}

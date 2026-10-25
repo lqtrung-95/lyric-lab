@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
+import { useExploreLearnedTerms } from "@/components/explore/use-explore-learned-terms";
 import { LyricLineRow, type LineState, type WordSelection } from "./lyric-line-row";
 import { useIsAdmin } from "@/components/library/use-is-admin";
 import { LineEditDialog } from "./line-edit-dialog";
@@ -61,6 +62,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
   const listRef = useRef<HTMLOListElement>(null);
   const lastManualScroll = useRef(0);
 
+  const gameTerms = useExploreLearnedTerms();
   const vocabIds = useMemo(() => new Set(vocab.map((v) => v.id)), [vocab]);
   // Ngữ pháp của từng dòng (id + vị trí ký tự), tính một lần thay vì mỗi lần vẽ.
   const grammarByLine = useMemo(() => {
@@ -151,6 +153,7 @@ export function LyricList({ videoId, promptVersion, lines, currentIndex, vocab, 
               showPinyin={showPinyin}
               showTranslation={showTranslation}
               highlights={highlightsByLine.get(line.index)!}
+              gameTerms={gameTerms}
               onSeek={onSeek}
               onWord={onWord}
               onPauseSong={onPauseSong}

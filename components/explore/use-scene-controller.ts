@@ -49,7 +49,8 @@ export function useSceneController(scene: SceneDetail) {
   const flash = useCallback((kind: "hop" | "oops") => { setFx(kind); later(600, () => setFx(null)); }, [later]);
 
   const onResult = useCallback((id: string, ok: boolean) => { answer(id, ok); playSfx(ok ? "correct" : "wrong"); flash(ok ? "hop" : "oops"); }, [answer, flash]);
-  const quest = useQuestRun(onResult);
+  const isPortable = useCallback((id: string) => words[id]?.portable === true, [words]);
+  const quest = useQuestRun(onResult, scene.npc.id, isPortable);
 
   const runStartedAt = useRef(0);
   const submittedRun = useRef(-1);
@@ -64,17 +65,17 @@ export function useSceneController(scene: SceneDetail) {
   }
 
   function interact(id: string) {
-    if (id === scene.npc.id) { if (!quest.active) setPanel({ kind: "npc" }); return; }
-    const o = words[id];
-    if (!o) return;
     if (quest.active) {
-      if (quest.phase === "asking" && quest.round && id !== quest.round.targetId) {
-        setShakeId(id);
-        later(450, () => setShakeId(null));
-      }
-      quest.tap(id);
+      // Trong nhiệm vụ mọi tương tác (kể cả với NPC để giao đồ) là một lần trả lời; chỉ vật hoặc NPC của cảnh mới hợp lệ.
+      if (id !== scene.npc.id && !words[id]) return;
+      const outcome = quest.tap(id);
+      if (outcome.type === "wrong") { setShakeId(id); later(450, () => setShakeId(null)); }
+      else if (outcome.type === "pickup") playSfx("correct");
       return;
     }
+    if (id === scene.npc.id) { setPanel({ kind: "npc" }); return; }
+    const o = words[id];
+    if (!o) return;
     discover(id);
     // Từ học ở đây vào bộ ôn (thẻ FSRS) nếu có câu thật làm nguồn; đã lưu rồi thì thôi (toggleSaved sẽ bỏ lưu nếu gọi lại).
     const card = savedItemForWord(o);

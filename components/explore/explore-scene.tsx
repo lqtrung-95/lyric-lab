@@ -30,13 +30,13 @@ export function ExploreScene({ scene }: { scene: SceneDetail }) {
 
       <div {...c.stageProps} onPointerDown={(e) => e.currentTarget.focus({ preventScroll: true })} className="rounded-2xl outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary">
         <SceneCanvas objects={scene.objects} npc={scene.npc} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>
-          <PlayerAvatar elRef={player.elRef} walking={player.walking} facing={player.facing} fx={c.fx} />
+          <PlayerAvatar elRef={player.elRef} walking={player.walking} facing={player.facing} fx={c.fx} carrying={quest.carrying} />
         </SceneCanvas>
       </div>
       <p className="-mt-2 text-label-md text-on-surface-variant">Phím mũi tên hoặc WASD để đi · E để tương tác · hoặc chạm vào sàn/đồ vật để nhân vật tự đi tới.</p>
 
       {quest.active ? (
-        <QuestPanel rounds={quest.rounds} index={quest.index} phase={quest.phase} wrong={quest.wrong} words={c.words} onQuit={quest.stop} />
+        <QuestPanel rounds={quest.rounds} index={quest.index} phase={quest.phase} wrong={quest.wrong} words={c.words} carrying={quest.carrying} onQuit={quest.stop} />
       ) : inSummary ? (
         <QuestSummary results={quest.results} words={c.words} xp={c.xpEarned} onAgain={c.startQuest} onBack={quest.stop} />
       ) : c.panel?.kind === "word" ? (

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { ROOM_SCENE } from "../../lib/explore/scenes/room-scene";
 
 // Khám phá (bản thử): điều khiển nhân vật (phím, chạm sàn, chạm vật), học từ khi lại gần vật (thẻ từ với pinyin và Hán Việt từ từ điển),
 // nhận nhiệm vụ từ NPC sau khi học đủ 3 từ, và tiến độ nhớ sau khi tải lại.
@@ -77,6 +78,44 @@ test("Cú Thầy: chưa học đủ từ thì nhắc, nhận được nhiệm v�
   await expect(owl).toContainText("3/14");
   await owl.getByRole("button", { name: "Nhận nhiệm vụ" }).click();
   await expect(page.getByRole("region", { name: "Nhiệm vụ của Gấu Trúc" })).toContainText("Câu 1/3");
+});
+
+test("nhiệm vụ: câu mang đồ cần nhặt đúng vật rồi giao cho Cú Thầy; câu lệnh hiện nghĩa sau khi trả lời", async ({ page }) => {
+  test.setTimeout(150_000);
+  await page.setViewportSize({ width: 1100, height: 1300 });
+  await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
+  await page.goto("/kham-pha/phong");
+  const obj = (id: string) => { const o = ROOM_SCENE.objects.find((x) => x.id === id)!; return page.locator(`button[style*="left:${o.x}%;top:${o.y}%"]`); };
+  const portable = ROOM_SCENE.objects.filter((o) => ["cup", "cat", "book", "apple", "water"].includes(o.id));
+  for (const o of portable) {
+    await page.getByRole("button", { name: new RegExp(`^${o.term}, `) }).click();
+    await expect(page.getByRole("region", { name: `Từ ${o.term}` })).toBeVisible();
+  }
+  await page.getByRole("button", { name: "Nhận nhiệm vụ" }).click();
+  const quest = page.getByRole("region", { name: "Nhiệm vụ của Gấu Trúc" });
+  let sawBring = false;
+  for (let i = 0; i < portable.length; i++) {
+    await expect(quest).toContainText(`Câu ${i + 1}/${portable.length}`);
+    const text = await quest.innerText();
+    const bring = portable.find((o) => text.includes("Mang cho Cú Thầy") && text.includes(o.gloss));
+    if (bring) {
+      sawBring = true;
+      await obj(bring.id).click();
+      await expect(quest).toContainText("đang cầm"); // nhặt rồi nhưng chưa tính đúng
+      await expect(quest).not.toContainText("Đúng rồi");
+      await page.getByRole("button", { name: /Nói chuyện với Cú Thầy/ }).click();
+      await expect(quest).toContainText("Đúng rồi");
+    } else {
+      const door = obj("door"); // cửa không bao giờ là đáp án (chưa học): trả lời sai hai lần để sang câu sau
+      await door.click();
+      await expect(quest).toContainText("Chưa đúng");
+      await door.click();
+      await expect(quest).toContainText("Đáp án là");
+      if (text.includes("ra lệnh")) await expect(quest).toContainText("Cú Thầy nói");
+    }
+  }
+  expect(sawBring).toBe(true);
+  await expect(page.getByRole("region", { name: "Kết quả nhiệm vụ" })).toBeVisible();
 });
 
 test("cảnh không tồn tại trả 404", async ({ page }) => {

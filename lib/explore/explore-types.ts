@@ -14,6 +14,8 @@ export interface SceneObjectDef {
   w: number;
   /** Vật đặt trên mặt đồ khác (sách trên bàn...): luôn vẽ phía trên các vật khác dù y nhỏ hơn. */
   above?: boolean;
+  /** Mang đi được (cốc, sách, mèo...): nhiệm vụ "mang cho Cú Thầy" chỉ ra với vật loại này; bàn, giường, cửa... thì không. */
+  portable?: boolean;
   /** Vật gắn trên tường (cửa sổ): không đổ bóng xuống sàn. */
   wall?: boolean;
   /** Chỗ nhân vật đứng để tương tác (mặc định ngay trước chân vật). Đồ đặt trên bàn thì đứng trước bàn. */
