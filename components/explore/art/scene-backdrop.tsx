@@ -42,6 +42,10 @@ const GENERIC: Record<Exclude<SceneTheme, "room" | "eatery">, { wall: string; wa
   market: { wall: "#fff0c9", wallDots: true, base: "#6fae5a", floor: "#e9cf9a", floorImage: "repeating-linear-gradient(90deg, transparent 0 70px, rgba(74,46,27,.18) 70px 72px)" },
   station: { wall: "#dfeaf3", wallDots: false, base: "#51a0db", floor: "#e5ddd0", floorImage: "repeating-conic-gradient(#ece5d8 0% 25%, #d9d0c1 0% 50%)", floorSize: "72px 72px" },
   hospital: { wall: "#eef7f4", wallDots: false, base: "#7fc9b9", floor: "#f4f1e8", floorImage: "repeating-conic-gradient(#f6f3ea 0% 25%, #e7e3d6 0% 50%)", floorSize: "56px 56px" },
+  school: { wall: "#fff4c2", wallDots: true, base: "#7fc468", floor: "#f1cf94", floorImage: "repeating-linear-gradient(90deg, transparent 0 90px, rgba(74,46,27,.2) 90px 92px)" },
+  shop: { wall: "#ffe3ec", wallDots: true, base: "#f2a0a0", floor: "#f7dcae", floorImage: "repeating-linear-gradient(0deg, transparent 0 44px, rgba(74,46,27,.18) 44px 46px)" },
+  hotel: { wall: "#f8e8d0", wallDots: true, base: "#b83a2a", floor: "#d98a7a", floorImage: "repeating-conic-gradient(#e19484 0% 25%, #d38172 0% 50%)", floorSize: "60px 60px" },
+  airport: { wall: "#e3f0fb", wallDots: false, base: "#7fa8d6", floor: "#dcdfe6", floorImage: "repeating-linear-gradient(90deg, transparent 0 110px, rgba(74,46,27,.14) 110px 112px)" },
   park: { wall: "#cfe9f8", wallDots: false, base: "#7fc468", floor: "#a8dd8f", floorImage: "radial-gradient(rgba(59,105,49,.25) 2px, transparent 2.5px)", floorSize: "30px 30px" },
 };
 

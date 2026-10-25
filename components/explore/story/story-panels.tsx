@@ -41,7 +41,7 @@ function PanelBody({ payload, sc, basePath, sceneId }: { payload: StoryPayload; 
 }
 
 /** Các cảnh có tham gia cốt truyện: mục tiêu, nghi phạm, manh mối nhắc tới chúng. */
-function payloadScenes(story: StoryPayload["story"]): Record<string, true> {
+export function payloadScenes(story: StoryPayload["story"]): Record<string, true> {
   const ids = new Set<string>([story.startScene, story.accuseScene, ...story.clues.map((c) => c.sceneId), ...story.suspects.map((s) => s.sceneId), ...story.objectives.flatMap((o) => (o.sceneId ? [o.sceneId] : []))]);
   return Object.fromEntries([...ids].map((i) => [i, true as const]));
 }

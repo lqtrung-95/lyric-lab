@@ -30,13 +30,17 @@ export function recordCheck(p: StoryProgress, right: boolean): StoryProgress {
   return { ...p, checks: { right: p.checks.right + (right ? 1 : 0), total: p.checks.total + 1 } };
 }
 
+/** Chuẩn hóa dữ liệu lấy từ bất kỳ đâu (localStorage, tài khoản); hỏng thì bắt đầu mới. */
+export function parseStory(data: unknown): StoryProgress {
+  const d = data as Partial<StoryProgress> | null;
+  if (!d || !Array.isArray(d.flags) || !Array.isArray(d.clues)) return emptyStory();
+  return { flags: d.flags.filter((x) => typeof x === "string"), clues: d.clues.filter((x) => typeof x === "string"), checks: { right: Number(d.checks?.right) || 0, total: Number(d.checks?.total) || 0 }, scored: d.scored === true };
+}
+
 export function loadStory(storage: Pick<Storage, "getItem"> | null): StoryProgress {
   try {
     const raw = storage?.getItem(STORY_KEY);
-    if (!raw) return emptyStory();
-    const d = JSON.parse(raw) as Partial<StoryProgress>;
-    if (!d || !Array.isArray(d.flags) || !Array.isArray(d.clues)) return emptyStory();
-    return { flags: d.flags.filter((x) => typeof x === "string"), clues: d.clues.filter((x) => typeof x === "string"), checks: { right: Number(d.checks?.right) || 0, total: Number(d.checks?.total) || 0 }, scored: d.scored === true };
+    return raw ? parseStory(JSON.parse(raw)) : emptyStory();
   } catch {
     return emptyStory();
   }

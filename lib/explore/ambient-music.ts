@@ -23,6 +23,10 @@ export const MOODS: Record<Mood, MoodConfig> = {
   market: { rootMidi: 67, scale: [0, 2, 4, 7, 9], bpm: 92, density: 0.62 },
   station: { rootMidi: 57, scale: [0, 2, 4, 7, 9], bpm: 72, density: 0.38 },
   hospital: { rootMidi: 65, scale: [0, 2, 4, 7, 9], bpm: 52, density: 0.28 },
+  school: { rootMidi: 62, scale: [0, 2, 4, 7, 9], bpm: 76, density: 0.5 },
+  shop: { rootMidi: 69, scale: [0, 2, 4, 7, 9], bpm: 88, density: 0.6 },
+  hotel: { rootMidi: 64, scale: [0, 2, 4, 7, 9], bpm: 56, density: 0.3 },
+  airport: { rootMidi: 59, scale: [0, 2, 4, 7, 9], bpm: 80, density: 0.45 },
   park: { rootMidi: 64, scale: [0, 2, 4, 7, 9], bpm: 66, density: 0.5 },
 };
 

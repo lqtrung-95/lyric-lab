@@ -44,16 +44,24 @@ export const isFaded = (p: ExploreProgress, id: string, now: number): boolean =>
   return !!t && now - t.lastSeenAt > FADE_AFTER_MS;
 };
 
+/** Chuẩn hóa dữ liệu lấy từ bất kỳ đâu (localStorage, tài khoản); hỏng thì bắt đầu mới. */
+export function parseProgress(data: unknown): ExploreProgress {
+  const raw = (data as { terms?: unknown } | null)?.terms;
+  if (!raw || typeof raw !== "object") return emptyProgress();
+  const terms: Record<string, TermProgress> = {};
+  for (const [k, v] of Object.entries(raw as Record<string, Partial<TermProgress>>)) {
+    if (!v || typeof v !== "object") continue;
+    // Dữ liệu cũ khóa theo id vật trần: chuyển sang khóa theo cảnh (cảnh đầu tiên).
+    terms[k.includes(":") ? k : progressKey(LEGACY_SCENE_ID, k)] = { discoveredAt: Number(v.discoveredAt) || 0, lastSeenAt: Number(v.lastSeenAt) || 0, correct: Number(v.correct) || 0, wrong: Number(v.wrong) || 0 };
+  }
+  return { terms };
+}
+
 /** Đọc từ localStorage; dữ liệu hỏng hoặc không đọc được thì bắt đầu mới. */
 export function loadProgress(storage: Pick<Storage, "getItem"> | null): ExploreProgress {
   try {
     const raw = storage?.getItem(STORAGE_KEY);
-    if (!raw) return emptyProgress();
-    const data = JSON.parse(raw) as ExploreProgress;
-    if (!data || typeof data.terms !== "object" || !data.terms) return emptyProgress();
-    // Dữ liệu cũ khóa theo id vật trần: chuyển sang khóa theo cảnh (cảnh đầu tiên).
-    const terms = Object.fromEntries(Object.entries(data.terms).map(([k, v]) => [k.includes(":") ? k : progressKey(LEGACY_SCENE_ID, k), v]));
-    return { terms };
+    return raw ? parseProgress(JSON.parse(raw)) : emptyProgress();
   } catch {
     return emptyProgress();
   }

@@ -7,7 +7,10 @@ export const HOSPITAL_SCENE: SceneDef = {
   subtitle: "Đi quanh phòng khám, học từ về thuốc và đồ y tế rồi làm nhiệm vụ cho Bác sĩ Cáo.",
   theme: "hospital",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Công viên", to: "cong-vien", x: 7, y: 58, w: 6 }],
+  exits: [
+    { sprite: "exitLeft", label: "Về Công viên", to: "cong-vien", x: 7, y: 58, w: 6 },
+    { sprite: "exit", label: "Sang Trường học", to: "truong-hoc", x: 90, y: 66, w: 6 },
+  ],
   npc: {
     id: "fox", name: "Bác sĩ Cáo", x: 90, y: 93, w: 9,
     greeting: "Chào mừng đến phòng khám! Hãy đi quanh phòng, lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",
