@@ -1,6 +1,6 @@
 import type { SceneDef } from "../explore-types";
 import { AIRPORT_SCENE } from "./airport-scene";
-import { EATERY_SCENE } from "./eatery-scene";
+import { EATERY_SCENE } from "./restaurant-scene";
 import { HOSPITAL_SCENE } from "./hospital-scene";
 import { HOTEL_SCENE } from "./hotel-scene";
 import { MARKET_SCENE } from "./market-scene";

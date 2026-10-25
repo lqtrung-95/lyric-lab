@@ -43,9 +43,9 @@ test("bấm Xem tất cả: sang trang kênh liệt kê đủ video, có lọc t
 });
 
 test("mở thẳng địa chỉ kênh (tên có chữ Hán và khoảng trắng); kênh không tồn tại báo rõ", async ({ page }) => {
-  await open(page, `/video/kenh/${encodeURIComponent(BIG)}`);
+  await open(page, `/video/channel/${encodeURIComponent(BIG)}`);
   await expect(page.getByRole("heading", { level: 1, name: BIG })).toBeVisible();
   await expect(page.locator("a[href^='/video/aaaaaaaaa']")).toHaveCount(6);
-  await page.goto(`/video/kenh/${encodeURIComponent("Kênh không có")}`);
+  await page.goto(`/video/channel/${encodeURIComponent("Kênh không có")}`);
   await expect(page.getByText("Không có video nào của kênh này")).toBeVisible();
 });

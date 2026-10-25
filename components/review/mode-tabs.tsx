@@ -9,7 +9,7 @@ const MODES = [
   { href: "/review/cloze", label: "Điền lời" },
   { href: "/review/match", label: "Ghép cặp" },
   { href: "/review/listen", label: "Nghe và chọn" },
-  { href: "/review/doc-to", label: "Đọc to" },
+  { href: "/review/read-aloud", label: "Đọc to" },
   { href: "/review/karaoke", label: "Karaoke" },
   { href: "/review/leaderboard", label: "Xếp hạng" },
 ];

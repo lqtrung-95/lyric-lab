@@ -2,14 +2,14 @@ import type { SceneDef } from "../explore-types";
 
 /** Công viên: cây, ghế dài, chim, chó và đồ chơi ngoài trời. Câu ví dụ tự viết, đơn giản. */
 export const PARK_SCENE: SceneDef = {
-  id: "cong-vien",
+  id: "park",
   title: "Công viên",
   subtitle: "Đi dạo công viên, học từ về cây cối, thú cưng và đồ chơi rồi làm nhiệm vụ cho Cụ Rùa.",
   theme: "park",
   start: { x: 50, y: 95 },
   exits: [
-    { sprite: "exitLeft", label: "Về Nhà ga", to: "nha-ga", x: 7, y: 60, w: 6 },
-    { sprite: "exit", label: "Sang Bệnh viện", to: "benh-vien", x: 90, y: 60, w: 6 },
+    { sprite: "exitLeft", label: "Về Nhà ga", to: "station", x: 7, y: 60, w: 6 },
+    { sprite: "exit", label: "Sang Bệnh viện", to: "hospital", x: 90, y: 60, w: 6 },
   ],
   npc: {
     id: "turtle", name: "Cụ Rùa", x: 88, y: 92, w: 9,

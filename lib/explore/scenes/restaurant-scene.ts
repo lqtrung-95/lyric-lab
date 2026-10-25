@@ -5,14 +5,14 @@ import type { SceneDef } from "../explore-types";
  * Đồ đặt trên đồ khác (`above`) có điểm đứng `stand` ngay trước bàn/quầy/kệ.
  */
 export const EATERY_SCENE: SceneDef = {
-  id: "quan-an",
+  id: "restaurant",
   title: "Quán ăn",
   subtitle: "Đi quanh quán ăn Trung Hoa, học tên đồ ăn thức uống rồi làm nhiệm vụ cho Bếp trưởng Gấu.",
   theme: "eatery",
   start: { x: 50, y: 94 },
   exits: [
-    { sprite: "exitLeft", label: "Về Phòng của bạn", to: "phong", x: 11, y: 56, w: 6 },
-    { sprite: "exit", label: "Sang Chợ", to: "cho", x: 90, y: 56, w: 6 },
+    { sprite: "exitLeft", label: "Về Phòng của bạn", to: "room", x: 11, y: 56, w: 6 },
+    { sprite: "exit", label: "Sang Chợ", to: "market", x: 90, y: 56, w: 6 },
   ],
   npc: {
     id: "chef", name: "Bếp trưởng Gấu", x: 90, y: 92, w: 10,

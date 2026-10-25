@@ -84,7 +84,7 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
   function interact(id: string) {
     const exit = scene.exits.find((e) => exitId(e) === id);
     if (exit) {
-      if (!quest.active) router.push(`${opts.basePath ?? "/kham-pha"}/${exit.to}`);
+      if (!quest.active) router.push(`${opts.basePath ?? "/explore"}/${exit.to}`);
       return;
     }
     if (opts.storyInteract?.(id)) return;

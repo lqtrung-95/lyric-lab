@@ -39,7 +39,7 @@ export function CourseMap({ slug }: { slug: string }) {
         <div className="mt-space-sm flex flex-wrap items-center justify-between gap-2">
           <p className="text-label-md font-bold">{percent}% hoàn thành</p>
           {next ? (
-            <Link href={`/hoc/${slug}/${next.idx}`} className="btn-3d">{done === 0 && !next.progress ? "Bắt đầu" : "Tiếp tục"} chặng {next.idx}: {next.title} <Icon name="arrow_forward" size={20} /></Link>
+            <Link href={`/courses/${slug}/${next.idx}`} className="btn-3d">{done === 0 && !next.progress ? "Bắt đầu" : "Tiếp tục"} chặng {next.idx}: {next.title} <Icon name="arrow_forward" size={20} /></Link>
           ) : (
             <p className="text-body-lg font-extrabold">Bạn đã hoàn thành cả lộ trình!</p>
           )}

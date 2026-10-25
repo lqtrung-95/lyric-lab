@@ -23,7 +23,7 @@ function ReviewUnitCard({ slug, unit, total }: { slug: string; unit: MapUnit; to
       <p className="inline-block rounded-full border-2 border-ink bg-tertiary-container px-3 py-0.5 text-label-sm font-black uppercase tracking-wide text-on-tertiary-container">{final ? "Kiểm tra cuối cấp" : "Ôn tập"} · {unit.idx}/{total}</p>
       <h2 id="unit-detail-heading" className="mt-2 text-headline-md">{unit.title}</h2>
       <p className="mt-1 text-body-md text-on-surface-variant">{final ? "40 câu tổng hợp từ toàn bộ khóa: chữ→nghĩa, nghe chọn chữ, chọn pinyin, điền chỗ trống từ câu thật." : "20 câu ôn lại các từ của nhóm chặng vừa học, trộn nhiều kiểu câu hỏi."} Đạt từ 70% là hoàn thành. Từ làm sai tự vào bộ thẻ ôn.</p>
-      <Link href={`/hoc/${slug}/${unit.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg">
+      <Link href={`/courses/${slug}/${unit.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg">
         <Icon name={done ? "replay" : "play_arrow"} filled size={22} />{done ? "Làm lại bài" : "Làm bài"}
       </Link>
       {unit.progress && <p className="mt-2 text-center text-label-md font-bold text-on-surface-variant">{done ? "Đã hoàn thành" : "Đang làm"} · điểm cao nhất {unit.progress.bestScore}%</p>}
@@ -59,7 +59,7 @@ function HskUnitCard({ slug, unit, total }: { slug: string; unit: MapUnit; total
           </li>
         ))}
       </ul>
-      <Link href={`/hoc/${slug}/${unit.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg">
+      <Link href={`/courses/${slug}/${unit.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg">
         <Icon name={done ? "replay" : "play_arrow"} filled size={22} />{done ? `Học lại chặng ${unit.idx}` : unit.progress ? `Tiếp tục chặng ${unit.idx}` : `Vào chặng ${unit.idx}`}
       </Link>
       {unit.progress && <p className="mt-2 text-center text-label-md font-bold text-on-surface-variant">{done ? "Đã hoàn thành" : "Đang học"} · điểm cao nhất {unit.progress.bestScore}%</p>}

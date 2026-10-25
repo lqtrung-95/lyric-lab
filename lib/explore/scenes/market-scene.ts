@@ -2,14 +2,14 @@ import type { SceneDef } from "../explore-types";
 
 /** Chợ: ba sạp trái cây, rau, thịt cá và hai món để dưới đất. Câu ví dụ tự viết, đơn giản, dùng ngay khi đi chợ. */
 export const MARKET_SCENE: SceneDef = {
-  id: "cho",
+  id: "market",
   title: "Chợ",
   subtitle: "Đi quanh chợ, học tên trái cây, rau, thịt cá rồi làm nhiệm vụ cho Cô Mèo bán hàng.",
   theme: "market",
   start: { x: 50, y: 95 },
   exits: [
-    { sprite: "exitLeft", label: "Về Quán ăn", to: "quan-an", x: 7, y: 58, w: 6 },
-    { sprite: "exit", label: "Sang Nhà ga", to: "nha-ga", x: 90, y: 58, w: 6 },
+    { sprite: "exitLeft", label: "Về Quán ăn", to: "restaurant", x: 7, y: 58, w: 6 },
+    { sprite: "exit", label: "Sang Nhà ga", to: "station", x: 90, y: 58, w: 6 },
   ],
   npc: {
     id: "cat", name: "Cô Mèo", x: 88, y: 93, w: 9,

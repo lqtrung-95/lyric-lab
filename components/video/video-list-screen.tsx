@@ -17,7 +17,7 @@ import { VideoListFilters } from "./video-list-filters";
 
 /**
  * Trang Video: các video luyện nghe đã được tuyển chọn, bấm vào để xem cùng bản chép và tra từ. Chế độ nhóm theo kênh (mặc định) liệt kê MỌI kênh nhưng mỗi kênh chỉ hiện vài video đầu
- * (`CHANNEL_PREVIEW_COUNT`) kèm thẻ "Xem tất cả" sang trang riêng của kênh (`/video/kenh/...`).
+ * (`CHANNEL_PREVIEW_COUNT`) kèm thẻ "Xem tất cả" sang trang riêng của kênh (`/video/channel/...`).
  */
 export function VideoListScreen() {
   const videos = useVideoList();

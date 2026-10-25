@@ -5,16 +5,16 @@ import { isProgressEmpty, isStoryEmpty, mergeProgress, mergeStory } from "./merg
 
 describe("gộp tiến độ Khám phá giữa máy và tài khoản", () => {
   it("hợp các từ và gộp từ trùng theo mốc sớm/muộn, số lớn nhất", () => {
-    const a = { terms: { "phong:bed": { discoveredAt: 10, lastSeenAt: 50, correct: 2, wrong: 1 } } };
-    const b = { terms: { "phong:bed": { discoveredAt: 5, lastSeenAt: 40, correct: 3, wrong: 0 }, "cho:fish": { discoveredAt: 7, lastSeenAt: 7, correct: 0, wrong: 0 } } };
+    const a = { terms: { "room:bed": { discoveredAt: 10, lastSeenAt: 50, correct: 2, wrong: 1 } } };
+    const b = { terms: { "room:bed": { discoveredAt: 5, lastSeenAt: 40, correct: 3, wrong: 0 }, "market:fish": { discoveredAt: 7, lastSeenAt: 7, correct: 0, wrong: 0 } } };
     const m = mergeProgress(a, b);
-    expect(m.terms["phong:bed"]).toEqual({ discoveredAt: 5, lastSeenAt: 50, correct: 3, wrong: 1 });
-    expect(Object.keys(m.terms).sort()).toEqual(["cho:fish", "phong:bed"]);
+    expect(m.terms["room:bed"]).toEqual({ discoveredAt: 5, lastSeenAt: 50, correct: 3, wrong: 1 });
+    expect(Object.keys(m.terms).sort()).toEqual(["market:fish", "room:bed"]);
     expect(isProgressEmpty(emptyProgress())).toBe(true);
   });
 
   it("gộp với tiến độ rỗng giữ nguyên bản kia", () => {
-    const a = { terms: { "phong:bed": { discoveredAt: 1, lastSeenAt: 2, correct: 0, wrong: 0 } } };
+    const a = { terms: { "room:bed": { discoveredAt: 1, lastSeenAt: 2, correct: 0, wrong: 0 } } };
     expect(mergeProgress(a, emptyProgress())).toEqual(a);
     expect(mergeProgress(emptyProgress(), a)).toEqual(a);
   });
@@ -33,7 +33,15 @@ describe("gộp tiến độ Khám phá giữa máy và tài khoản", () => {
 
   it("dữ liệu từ tài khoản hỏng thì thành tiến độ rỗng, không làm vỡ", () => {
     expect(parseProgress(null)).toEqual(emptyProgress());
-    expect(parseProgress({ terms: { x: "bậy", "phong:a": { correct: "z" } } }).terms).toEqual({ "phong:a": { discoveredAt: 0, lastSeenAt: 0, correct: 0, wrong: 0 } });
+    expect(parseProgress({ terms: { x: "bậy", "room:a": { correct: "z" } } }).terms).toEqual({ "room:a": { discoveredAt: 0, lastSeenAt: 0, correct: 0, wrong: 0 } });
     expect(parseStory({ flags: 5 })).toEqual(emptyStory());
+  });
+});
+
+describe("khóa tiến độ cũ (id cảnh tiếng Việt)", () => {
+  it("đổi sang id cảnh tiếng Anh, id vật trần thuộc cảnh đầu tiên", () => {
+    const t = { discoveredAt: 1, lastSeenAt: 2, correct: 0, wrong: 0 };
+    const p = parseProgress({ terms: { "phong:bed": t, "quan-an:tea": t, "cua-hang:hat": t, cup: t, "park:bird": t } });
+    expect(Object.keys(p.terms).sort()).toEqual(["clothing-store:hat", "park:bird", "restaurant:tea", "room:bed", "room:cup"]);
   });
 });

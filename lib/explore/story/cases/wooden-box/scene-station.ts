@@ -17,8 +17,8 @@ const rabbit = buildInterview({
 });
 
 /** Nhà ga: Trưởng ga Thỏ khai làm việc ở ga; sổ ghi vé xác nhận anh đang bán vé lúc ba giờ. */
-export const NHA_GA_STORY: StorySceneDef = {
-  sceneId: "nha-ga",
+export const STATION_STORY: StorySceneDef = {
+  sceneId: "station",
   sceneNpcEntries: rabbit.entries,
   spots: [{ id: "ticket_log", clue: "ticket_log", label: "Sổ ghi vé tàu", sprite: "clipboard", x: 64, y: 29, w: 5, when: { all: ["met:rabbit"] }, stand: { x: 64, y: 42 } }],
   dialogues: rabbit.nodes,

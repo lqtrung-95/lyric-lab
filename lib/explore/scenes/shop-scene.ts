@@ -2,14 +2,14 @@ import type { SceneDef } from "../explore-types";
 
 /** Cửa hàng quần áo: quần áo, giày mũ trên bàn trưng bày, quầy thanh toán. Câu ví dụ tự viết, dùng được khi đi mua sắm. */
 export const SHOP_SCENE: SceneDef = {
-  id: "cua-hang",
+  id: "clothing-store",
   title: "Cửa hàng quần áo",
   subtitle: "Đi mua sắm, học tên quần áo, giày mũ rồi làm nhiệm vụ cho Chú Chó bán hàng.",
   theme: "shop",
   start: { x: 50, y: 95 },
   exits: [
-    { sprite: "exitLeft", label: "Về Trường học", to: "truong-hoc", x: 7, y: 58, w: 6 },
-    { sprite: "exit", label: "Sang Khách sạn", to: "khach-san", x: 92, y: 54, w: 6 },
+    { sprite: "exitLeft", label: "Về Trường học", to: "school", x: 7, y: 58, w: 6 },
+    { sprite: "exit", label: "Sang Khách sạn", to: "hotel", x: 92, y: 54, w: 6 },
   ],
   npc: {
     id: "dog", name: "Chú Chó", x: 88, y: 93, w: 11,

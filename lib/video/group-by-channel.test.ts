@@ -25,13 +25,13 @@ describe("địa chỉ trang kênh", () => {
   it("mã hóa tên kênh có dấu, chữ Hán, khoảng trắng và ký tự đặc biệt rồi đọc lại đúng", () => {
     for (const name of ["DaihuaXiyou 呆話西遊", "我的爸爸是條龍", "A/B & C?#", "Kênh 100%"]) {
       const href = channelHref(name);
-      expect(href.startsWith("/video/kenh/")).toBe(true);
-      expect(href.slice("/video/kenh/".length)).not.toMatch(/[/?#]/);
-      expect(channelFromSlug(href.slice("/video/kenh/".length))).toBe(name);
+      expect(href.startsWith("/video/channel/")).toBe(true);
+      expect(href.slice("/video/channel/".length)).not.toMatch(/[/?#]/);
+      expect(channelFromSlug(href.slice("/video/channel/".length))).toBe(name);
     }
   });
   it("kênh không có tên dùng '-' và đọc lại thành rỗng; slug hỏng không ném lỗi", () => {
-    expect(channelHref("  ")).toBe("/video/kenh/-");
+    expect(channelHref("  ")).toBe("/video/channel/-");
     expect(channelFromSlug("-")).toBe("");
     expect(channelFromSlug("%E0%A4%A")).toBe("%E0%A4%A");
   });

@@ -38,7 +38,7 @@ export function PlacementScreen() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-space-md">
-      <Link href="/hoc" className="inline-flex min-h-11 items-center gap-1 text-label-md font-medium text-primary hover:underline"><Icon name="arrow_back" size={18} /> Lộ trình</Link>
+      <Link href="/courses" className="inline-flex min-h-11 items-center gap-1 text-label-md font-medium text-primary hover:underline"><Icon name="arrow_back" size={18} /> Lộ trình</Link>
       <h1 className="text-headline-lg-mobile md:text-headline-lg">Bài xếp lớp HSK</h1>
 
       {phase.name === "intro" && (
@@ -88,7 +88,7 @@ function Result({ questions, answers, onRetry }: { questions: PlacementQuestion[
       <div className="card-ink bg-primary-container p-space-md text-on-primary-container">
         <p className="text-label-md font-bold">Gợi ý cho bạn</p>
         <p className="text-headline-lg-mobile md:text-headline-lg">Bắt đầu từ HSK {r.startLevel}</p>
-        <Link href={`/hoc?khoa=hsk-${r.startLevel}`} onClick={() => writeLastCourse(`hsk-${r.startLevel}`)} className="btn-3d mt-space-sm">Mở lộ trình HSK {r.startLevel} <Icon name="arrow_forward" size={20} /></Link>
+        <Link href={`/courses?course=hsk-${r.startLevel}`} onClick={() => writeLastCourse(`hsk-${r.startLevel}`)} className="btn-3d mt-space-sm">Mở lộ trình HSK {r.startLevel} <Icon name="arrow_forward" size={20} /></Link>
       </div>
       <ul className="space-y-2" aria-label="Kết quả từng cấp">
         {levels.map((l) => {

@@ -16,7 +16,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("bản đồ lộ trình: 36 chặng học và bài kiểm tra cuối cấp, nút bắt đầu chặng 1, đạt axe", async ({ page }) => {
-  await page.goto("/hoc");
+  await page.goto("/courses");
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 1" })).toBeVisible();
   await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).not.toHaveCount(0);
   // Số chặng đổi mỗi khi chia lại lộ trình (script generate-hsk-course): chỉ khẳng định bản đồ đủ dài, gồm chặng học, chặng ôn và bài cuối cấp.
@@ -27,26 +27,26 @@ test("bản đồ lộ trình: 36 chặng học và bài kiểm tra cuối cấp
 });
 
 test("chọn cấp: HSK 1–6, mở HSK 2 qua liên kết có thể chia sẻ", async ({ page }) => {
-  await page.goto("/hoc");
+  await page.goto("/courses");
   const chips = page.getByRole("navigation", { name: "Chọn cấp HSK" });
   await expect(chips.getByRole("link")).toHaveCount(6, { timeout: 15_000 });
   await chips.getByRole("link", { name: "HSK 2" }).click();
-  await expect(page).toHaveURL(/\/hoc\?khoa=hsk-2/);
+  await expect(page).toHaveURL(/\/courses\?course=hsk-2/);
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 2" })).toBeVisible({ timeout: 30_000 });
   await expect(page.getByRole("list", { name: "Các chặng" }).getByRole("listitem")).not.toHaveCount(0);
   expect(await page.getByRole("list", { name: "Các chặng" }).getByRole("listitem").count()).toBeGreaterThan(90);
   // HSK 6 còn đang phát triển: chip có nhãn và có lời nhắn góp ý; cấp khác thì không.
   await expect(chips.getByRole("link", { name: /HSK 6.*Đang phát triển/ })).toBeVisible();
-  await page.goto("/hoc?khoa=hsk-6");
+  await page.goto("/courses?course=hsk-6");
   await expect(page.getByRole("note")).toContainText("vẫn đang được phát triển");
-  await page.goto("/hoc?khoa=hsk-5");
+  await page.goto("/courses?course=hsk-5");
   await expect(page.getByRole("heading", { level: 1, name: "Lộ trình HSK 5" })).toBeVisible({ timeout: 15_000 });
   await expect(page.getByRole("note")).toHaveCount(0);
 });
 
 test("bài xếp lớp: 30 câu có lựa chọn Chưa biết, kết quả gợi ý cấp và mở đúng lộ trình", async ({ page }) => {
   test.setTimeout(120_000);
-  await page.goto("/hoc/xep-lop");
+  await page.goto("/courses/placement");
   await page.getByRole("button", { name: /Bắt đầu/ }).click();
   for (let i = 0; i < 30; i++) {
     await expect(page.getByText(new RegExp(`Câu ${i + 1}/30`))).toBeVisible({ timeout: 30_000 });
@@ -55,7 +55,7 @@ test("bài xếp lớp: 30 câu có lựa chọn Chưa biết, kết quả gợi
   // Chọn "Chưa biết" cho mọi câu thì chưa nắm cấp nào: gợi ý bắt đầu từ HSK 1.
   await expect(page.getByTestId("placement-result")).toContainText("Bắt đầu từ HSK 1");
   await page.getByRole("link", { name: /Mở lộ trình HSK 1/ }).click();
-  await expect(page).toHaveURL(/\/hoc\?khoa=hsk-1/);
+  await expect(page).toHaveURL(/\/courses\?course=hsk-1/);
 });
 
 test("mục Học có trên thanh điều hướng", async ({ page }) => {
@@ -72,7 +72,7 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
     saved = route.request().postDataJSON();
     return route.fulfill({ status: 201, body: "" });
   });
-  await page.goto("/hoc/hsk-1/1");
+  await page.goto("/courses/hsk-1/1");
   // Lần đầu vào trang chặng, dev server còn biên dịch tuyến này: chờ lâu hơn mặc định 5 giây.
   await expect(page.getByRole("heading", { level: 1, name: "Đại từ cơ bản" })).toBeVisible({ timeout: 45_000 });
 
@@ -135,7 +135,7 @@ test("chặng ôn tổng hợp (ôn tập chặng 1–5 của HSK 2): 20 câu nh
     saved = route.request().postDataJSON();
     return route.fulfill({ status: 201, body: "" });
   });
-  await page.goto("/hoc/hsk-2/6");
+  await page.goto("/courses/hsk-2/6");
   await expect(page.getByRole("heading", { level: 1, name: "Ôn tập chặng 1–5" })).toBeVisible({ timeout: 90_000 });
   await expect(page.getByRole("button", { name: /Nghe \p{Script=Han}/u })).toHaveCount(0); // không có bước làm quen từ
   await page.getByRole("button", { name: /Bắt đầu làm bài/ }).click();
@@ -148,7 +148,7 @@ test("chặng ôn tổng hợp (ôn tập chặng 1–5 của HSK 2): 20 câu nh
 
 test("bài kiểm tra cuối cấp HSK 1: 40 câu", async ({ page }) => {
   // Không giả lập phiên: bản đồ đọc thẳng Supabase bằng khóa công khai, token giả sẽ làm truy vấn lỗi.
-  await page.goto("/hoc?khoa=hsk-1");
+  await page.goto("/courses?course=hsk-1");
   await page.getByRole("button", { name: /Kiểm tra cuối cấp HSK 1/ }).click();
   await page.getByRole("link", { name: "Làm bài", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Kiểm tra cuối cấp HSK 1" })).toBeVisible({ timeout: 45_000 });
@@ -157,14 +157,14 @@ test("bài kiểm tra cuối cấp HSK 1: 40 câu", async ({ page }) => {
 });
 
 test("chặng không tồn tại: báo rõ và có đường về lộ trình", async ({ page }) => {
-  await page.goto("/hoc/hsk-1/999");
+  await page.goto("/courses/hsk-1/999");
   await expect(page.getByText("Không có chặng này.")).toBeVisible();
   await expect(page.getByRole("link", { name: "Về lộ trình" })).toBeVisible();
 });
 
 test("trên điện thoại: bản đồ không tràn ngang", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto("/hoc");
+  await page.goto("/courses");
   await expect(page.getByRole("list", { name: "Các chặng" })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

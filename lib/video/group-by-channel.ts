@@ -31,8 +31,8 @@ const UNNAMED_SLUG = "-";
 
 const normalize = (title: string) => title.trim().toLowerCase();
 
-/** Địa chỉ trang liệt kê mọi video của một kênh: `/video/kenh/<tên kênh mã hóa>`. */
-export const channelHref = (channelTitle: string): string => `/video/kenh/${encodeURIComponent(channelTitle.trim() || UNNAMED_SLUG)}`;
+/** Địa chỉ trang liệt kê mọi video của một kênh: `/video/channel/<tên kênh mã hóa>`. */
+export const channelHref = (channelTitle: string): string => `/video/channel/${encodeURIComponent(channelTitle.trim() || UNNAMED_SLUG)}`;
 
 /** Đọc lại tên kênh từ đoạn đường dẫn (có thể đã hoặc chưa được giải mã); "-" là kênh không có tên. */
 export function channelFromSlug(slug: string): string {

@@ -11,10 +11,10 @@ export interface NavLink {
 // Năm mục điều hướng chính theo vòng học (PRD v2 mục 5.3): Hôm nay · Học · Nghe · Ôn & Nói · Chơi. Đường dẫn cũ giữ nguyên, chỉ đổi cách gom.
 export const NAV_LINKS: NavLink[] = [
   { href: "/app", label: "Hôm nay", icon: "home" },
-  { href: "/hoc", label: "Học", icon: "school" },
+  { href: "/courses", label: "Học", icon: "school" },
   { href: "/library", label: "Nghe", icon: "headphones", matches: ["/library", "/video", "/learn", "/watch"] },
   { href: "/review", label: "Ôn & Nói", icon: "style", matches: ["/review", "/phat-am"] },
-  { href: "/room", label: "Chơi", icon: "emoji_events", matches: ["/room", "/challenge", "/chat"] },
+  { href: "/room", label: "Chơi", icon: "emoji_events", matches: ["/room", "/challenge", "/chat", "/explore"] },
 ];
 
 /** Lối vào phụ: hiện ở thanh bên (desktop) và trong bảng Menu (điện thoại, máy tính bảng). */

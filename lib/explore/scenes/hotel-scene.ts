@@ -2,14 +2,14 @@ import type { SceneDef } from "../explore-types";
 
 /** Khách sạn: phòng nghỉ có giường, ti vi và bàn để chìa khóa, khăn. Câu ví dụ tự viết, dùng được khi đặt phòng. */
 export const HOTEL_SCENE: SceneDef = {
-  id: "khach-san",
+  id: "hotel",
   title: "Khách sạn",
   subtitle: "Nhận phòng khách sạn, học từ về phòng nghỉ rồi làm nhiệm vụ cho Chú Vịt lễ tân.",
   theme: "hotel",
   start: { x: 50, y: 95 },
   exits: [
-    { sprite: "exitLeft", label: "Về Cửa hàng", to: "cua-hang", x: 7, y: 60, w: 6 },
-    { sprite: "exit", label: "Sang Sân bay", to: "san-bay", x: 90, y: 56, w: 6 },
+    { sprite: "exitLeft", label: "Về Cửa hàng", to: "clothing-store", x: 7, y: 60, w: 6 },
+    { sprite: "exit", label: "Sang Sân bay", to: "airport", x: 90, y: 56, w: 6 },
   ],
   npc: {
     id: "duck", name: "Chú Vịt", x: 88, y: 93, w: 8,

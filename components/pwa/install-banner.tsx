@@ -38,7 +38,7 @@ function snapshot(): "show" | "hide" {
 }
 
 /**
- * Lời mời cài SongHanzi lên màn hình chính, ở trang chủ trên điện thoại. Android + Chrome cho cài một chạm ngay tại đây; còn lại dẫn sang `/cai-app` (hướng dẫn từng bước).
+ * Lời mời cài SongHanzi lên màn hình chính, ở trang chủ trên điện thoại. Android + Chrome cho cài một chạm ngay tại đây; còn lại dẫn sang `/install` (hướng dẫn từng bước).
  * "Để sau" ẩn biểu ngữ 14 ngày. Không hiện khi đã cài, trên máy tính, hay khi người dùng mới chưa thiết lập xong (để họ làm quen trước).
  */
 export function InstallBanner() {
@@ -60,7 +60,7 @@ export function InstallBanner() {
         <div className="mt-2 flex flex-wrap gap-2">
           {canInstall
             ? <button type="button" onClick={() => void install().then((ok) => { if (ok) dismiss(); })} className={`${button} bg-primary text-on-primary hover:brightness-110`}>Cài app</button>
-            : <Link href="/cai-app" className={`${button} bg-primary text-on-primary hover:brightness-110`}>Xem cách cài</Link>}
+            : <Link href="/install" className={`${button} bg-primary text-on-primary hover:brightness-110`}>Xem cách cài</Link>}
           <button type="button" onClick={dismiss} className={`${button} text-on-surface-variant hover:bg-surface-container`}>Để sau</button>
         </div>
       </div>

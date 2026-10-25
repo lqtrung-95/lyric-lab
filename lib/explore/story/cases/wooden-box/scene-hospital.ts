@@ -17,8 +17,8 @@ const fox = buildInterview({
 });
 
 /** Bệnh viện: Bác sĩ Cáo khai ốm và ngủ cả ngày; nhưng bảng ký tên cho thấy ông rời bệnh viện từ hai giờ, và trên bàn toàn bút xanh. */
-export const BENH_VIEN_STORY: StorySceneDef = {
-  sceneId: "benh-vien",
+export const HOSPITAL_STORY: StorySceneDef = {
+  sceneId: "hospital",
   sceneNpcEntries: fox.entries,
   spots: [
     { id: "sign_sheet", clue: "sign_sheet", label: "Bảng ký tên ra vào", sprite: "clipboard", x: 13, y: 29, w: 5, when: { all: ["met:fox"] }, stand: { x: 13, y: 42 } },

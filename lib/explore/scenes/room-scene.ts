@@ -2,9 +2,9 @@ import type { SceneDef } from "../explore-types";
 
 /** Cảnh đầu tiên: phòng của bạn. 14 vật quen thuộc, phần lớn từ HSK 1–2. Câu ví dụ tự viết, đơn giản, dùng ngay được. */
 export const ROOM_SCENE: SceneDef = {
-  id: "phong",
+  id: "room",
   theme: "room",
-  exits: [{ sprite: "exit", label: "Sang Quán ăn", to: "quan-an", x: 89, y: 51, w: 6 }],
+  exits: [{ sprite: "exit", label: "Sang Quán ăn", to: "restaurant", x: 89, y: 51, w: 6 }],
   title: "Phòng của bạn",
   subtitle: "Điều khiển Gấu Trúc đi quanh phòng để học từ mới, rồi gặp Cú Thầy nhận nhiệm vụ.",
   npc: {

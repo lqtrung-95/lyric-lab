@@ -15,8 +15,8 @@ const turtle = buildInterview({
 });
 
 /** Công viên: Ông Rùa là nhân chứng, chỉ chịu nói khi bạn đã biết chuyện ở bệnh viện (chưa đủ thì ông ngủ gật). */
-export const CONG_VIEN_STORY: StorySceneDef = {
-  sceneId: "cong-vien",
+export const PARK_STORY: StorySceneDef = {
+  sceneId: "park",
   sceneNpcEntries: [...turtle.entries, { node: "turtle_idle" }],
   dialogues: {
     ...turtle.nodes,

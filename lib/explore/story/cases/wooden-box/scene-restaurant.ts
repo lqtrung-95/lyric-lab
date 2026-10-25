@@ -17,8 +17,8 @@ const chef = buildInterview({
 });
 
 /** Quán ăn: Bếp trưởng Gấu khai đang nấu ăn; tờ hóa đơn trên tường xác nhận quán rất đông khách. */
-export const QUAN_AN_STORY: StorySceneDef = {
-  sceneId: "quan-an",
+export const RESTAURANT_STORY: StorySceneDef = {
+  sceneId: "restaurant",
   sceneNpcEntries: chef.entries,
   spots: [{ id: "receipt", clue: "receipt", label: "Tờ hóa đơn trên tường", sprite: "note", x: 22, y: 29, w: 5, when: { all: ["met:chef"] }, stand: { x: 22, y: 42 } }],
   dialogues: chef.nodes,

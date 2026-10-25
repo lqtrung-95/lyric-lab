@@ -27,7 +27,7 @@ describe("explore-progress", () => {
   it("lưu rồi đọc lại đúng; dữ liệu hỏng hoặc không có kho lưu thì bắt đầu mới", () => {
     const mem = new Map<string, string>();
     const storage = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
-    const p = markDiscovered(emptyProgress(), progressKey("phong", "door"), 42);
+    const p = markDiscovered(emptyProgress(), progressKey("room", "door"), 42);
     saveProgress(storage, p);
     expect(loadProgress(storage)).toEqual(p);
     mem.set(STORAGE_KEY, "{hỏng");
@@ -36,16 +36,16 @@ describe("explore-progress", () => {
   });
 
   it("khóa theo cảnh; dữ liệu cũ khóa theo id trần được chuyển sang cảnh đầu tiên khi đọc", () => {
-    expect(progressKey("quan-an", "tea")).toBe("quan-an:tea");
-    const old = { terms: { bed: { discoveredAt: 1, lastSeenAt: 2, correct: 1, wrong: 0 }, "quan-an:tea": { discoveredAt: 3, lastSeenAt: 3, correct: 0, wrong: 0 } } };
+    expect(progressKey("restaurant", "tea")).toBe("restaurant:tea");
+    const old = { terms: { bed: { discoveredAt: 1, lastSeenAt: 2, correct: 1, wrong: 0 }, "restaurant:tea": { discoveredAt: 3, lastSeenAt: 3, correct: 0, wrong: 0 } } };
     const loaded = loadProgress({ getItem: () => JSON.stringify(old) });
-    expect(Object.keys(loaded.terms).sort()).toEqual([progressKey(LEGACY_SCENE_ID, "bed"), "quan-an:tea"].sort());
+    expect(Object.keys(loaded.terms).sort()).toEqual([progressKey(LEGACY_SCENE_ID, "bed"), "restaurant:tea"].sort());
     expect(loaded.terms[progressKey(LEGACY_SCENE_ID, "bed")].correct).toBe(1);
   });
 
   it("clearScene chỉ xóa tiến độ của cảnh đó", () => {
-    let p = markDiscovered(emptyProgress(), progressKey("phong", "bed"), 1);
-    p = markDiscovered(p, progressKey("quan-an", "tea"), 1);
-    expect(Object.keys(clearScene(p, "phong").terms)).toEqual(["quan-an:tea"]);
+    let p = markDiscovered(emptyProgress(), progressKey("room", "bed"), 1);
+    p = markDiscovered(p, progressKey("restaurant", "tea"), 1);
+    expect(Object.keys(clearScene(p, "room").terms)).toEqual(["restaurant:tea"]);
   });
 });

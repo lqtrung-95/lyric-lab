@@ -17,8 +17,8 @@ const cat = buildInterview({
 });
 
 /** Chợ: Cô Mèo khai bán trái cây; tờ giấy ghi giá cho thấy nhiều người nhìn thấy cô ở sạp lúc ba giờ. */
-export const CHO_STORY: StorySceneDef = {
-  sceneId: "cho",
+export const MARKET_STORY: StorySceneDef = {
+  sceneId: "market",
   sceneNpcEntries: cat.entries,
   spots: [{ id: "price_note", clue: "price_note", label: "Tờ giấy ghi giá", sprite: "note", x: 14, y: 29, w: 5, when: { all: ["met:cat"] }, stand: { x: 14, y: 42 } }],
   dialogues: cat.nodes,

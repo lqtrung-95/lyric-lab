@@ -2,14 +2,14 @@ import type { SceneDef } from "../explore-types";
 
 /** Nhà ga: tàu đỗ sát tường, quầy bán vé và mấy món đồ của hành khách. Câu ví dụ tự viết, đơn giản. */
 export const STATION_SCENE: SceneDef = {
-  id: "nha-ga",
+  id: "station",
   title: "Nhà ga",
   subtitle: "Đi quanh nhà ga, học từ về tàu, vé và hành lý rồi làm nhiệm vụ cho Trưởng ga Thỏ.",
   theme: "station",
   start: { x: 50, y: 95 },
   exits: [
-    { sprite: "exitLeft", label: "Về Chợ", to: "cho", x: 7, y: 60, w: 6 },
-    { sprite: "exit", label: "Sang Công viên", to: "cong-vien", x: 90, y: 60, w: 6 },
+    { sprite: "exitLeft", label: "Về Chợ", to: "market", x: 7, y: 60, w: 6 },
+    { sprite: "exit", label: "Sang Công viên", to: "park", x: 90, y: 60, w: 6 },
   ],
   npc: {
     id: "rabbit", name: "Trưởng ga Thỏ", x: 90, y: 93, w: 9,

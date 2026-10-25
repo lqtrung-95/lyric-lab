@@ -1,8 +1,8 @@
 import type { StorySceneDef } from "../../story-types";
 
 /** Phòng của bạn: nhận vụ án từ Cú Thầy, xem thư và bút xanh, cuối cùng buộc tội và nghe kết thúc. */
-export const PHONG_STORY: StorySceneDef = {
-  sceneId: "phong",
+export const ROOM_STORY: StorySceneDef = {
+  sceneId: "room",
   sceneNpcEntries: [
     { when: { all: ["case:solved"] }, node: "o_done" },
     { when: { all: ["clue:witness"] }, node: "o_ready" },

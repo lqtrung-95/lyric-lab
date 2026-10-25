@@ -107,18 +107,18 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
 });
 
 describe("khóa cảnh theo thứ tự mục tiêu", () => {
-  const story = CASES["hop-go"];
+  const story = CASES["wooden-box"];
   const open = (flags: string[], scene: string) => sceneUnlocked(story.objectives, story.startScene, flags, scene);
 
   it("chưa gặp Cú Thầy thì chỉ có cảnh xuất phát", () => {
-    expect(open([], "phong")).toBe(true);
-    for (const id of ["quan-an", "cho", "nha-ga", "benh-vien", "cong-vien"]) expect(open([], id), id).toBe(false);
+    expect(open([], "room")).toBe(true);
+    for (const id of ["restaurant", "market", "station", "hospital", "park"]) expect(open([], id), id).toBe(false);
   });
 
   it("mỗi cảnh mở đúng khi làm xong việc liền trước, và chơi đủ thì mở hết", () => {
-    expect(open(["met:owl"], "quan-an")).toBe(false);
-    expect(open(["met:owl", "clue:letter", "clue:pen"], "quan-an")).toBe(true);
+    expect(open(["met:owl"], "restaurant")).toBe(false);
+    expect(open(["met:owl", "clue:letter", "clue:pen"], "restaurant")).toBe(true);
     const all = [...new Set(story.objectives.flatMap((o) => [...(o.done?.all ?? [])]))];
-    for (const id of ["phong", "quan-an", "cho", "nha-ga", "benh-vien", "cong-vien"]) expect(open(all, id), id).toBe(true);
+    for (const id of ["room", "restaurant", "market", "station", "hospital", "park"]) expect(open(all, id), id).toBe(true);
   });
 });

@@ -8,7 +8,7 @@ describe("learnedTerms", () => {
     let p = markDiscovered(emptyProgress(), progressKey(ROOM_SCENE.id, "cup"), 1);
     p = markDiscovered(p, progressKey(ROOM_SCENE.id, "cat"), 1);
     p = markDiscovered(p, progressKey(ROOM_SCENE.id, "khong-co"), 1);
-    p = markDiscovered(p, progressKey("quan-an", "cup"), 1);
+    p = markDiscovered(p, progressKey("restaurant", "cup"), 1);
     expect(learnedTerms(p, [ROOM_SCENE])).toEqual(new Set(["杯子", "猫"]));
     expect(learnedTerms(emptyProgress(), [ROOM_SCENE]).size).toBe(0);
   });

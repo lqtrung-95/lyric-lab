@@ -1,10 +1,10 @@
 import type { StoryDef } from "../../story-types";
-import { BENH_VIEN_STORY } from "./scene-benh-vien";
-import { CHO_STORY } from "./scene-cho";
-import { CONG_VIEN_STORY } from "./scene-cong-vien";
-import { NHA_GA_STORY } from "./scene-nha-ga";
-import { PHONG_STORY } from "./scene-phong";
-import { QUAN_AN_STORY } from "./scene-quan-an";
+import { HOSPITAL_STORY } from "./scene-hospital";
+import { MARKET_STORY } from "./scene-market";
+import { PARK_STORY } from "./scene-park";
+import { STATION_STORY } from "./scene-station";
+import { ROOM_STORY } from "./scene-room";
+import { RESTAURANT_STORY } from "./scene-restaurant";
 import { CLUES, OBJECTIVES, SPEAKERS, SUSPECTS } from "./meta";
 
 /**
@@ -13,7 +13,7 @@ import { CLUES, OBJECTIVES, SPEAKERS, SUSPECTS } from "./meta";
  * giống cây bút rơi ở nhà Cú Thầy, và Ông Rùa thấy một con cáo mặc áo trắng cầm hộp gỗ).
  */
 export const HOP_GO_CASE: StoryDef = {
-  id: "hop-go",
+  id: "wooden-box",
   title: "Vụ án chiếc hộp gỗ biến mất",
   difficulty: "easy",
   intro: "Cú Thầy nhờ bạn, thám tử Gấu Trúc, tìm chiếc hộp gỗ đựng thư của ông nội đã biến mất lúc ba giờ chiều hôm qua. Bốn người bạn của Cú đều có mặt hôm đó. Ai đã nói dối?",
@@ -22,12 +22,12 @@ export const HOP_GO_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: {
-    phong: PHONG_STORY, "quan-an": QUAN_AN_STORY, cho: CHO_STORY, "nha-ga": NHA_GA_STORY, "benh-vien": BENH_VIEN_STORY, "cong-vien": CONG_VIEN_STORY,
+    room: ROOM_STORY, restaurant: RESTAURANT_STORY, market: MARKET_STORY, station: STATION_STORY, hospital: HOSPITAL_STORY, park: PARK_STORY,
   },
   solution: { suspectId: "fox", keyClues: ["pen", "pens_jar", "sign_sheet", "witness"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:chef", "met:cat", "met:rabbit", "met:fox", "clue:witness"] },
-  startScene: "phong",
-  accuseScene: "phong",
+  startScene: "room",
+  accuseScene: "room",
   epilogueNode: "o_epi1",
 };

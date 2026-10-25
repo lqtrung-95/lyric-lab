@@ -5,7 +5,7 @@ const MAIN = ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"];
 
 test("điện thoại: tab bar dưới có đúng 5 mục và đánh dấu mục đang chọn", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  await page.goto("/hoc");
+  await page.goto("/courses");
   const bar = page.getByRole("navigation", { name: "Điều hướng chính" }).last();
   await expect(bar.getByRole("link")).toHaveCount(5);
   for (const name of MAIN) await expect(bar.getByRole("link", { name })).toBeVisible();

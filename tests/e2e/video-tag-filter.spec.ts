@@ -46,7 +46,7 @@ test("thẻ kết hợp với cấp HSK: số video theo cấp tính trên phầ
 });
 
 test("trang kênh cũng có ô chủ đề, chỉ tính video của kênh đó", async ({ page }) => {
-  await open(page, VIDEOS, `/video/kenh/${encodeURIComponent("Kênh B")}`);
+  await open(page, VIDEOS, `/video/channel/${encodeURIComponent("Kênh B")}`);
   await expect(tagSelect(page)).toBeVisible(); // đợi danh sách video tải xong rồi mới đọc các lựa chọn
   const options = await tagOptions(page);
   expect(options).toEqual(expect.arrayContaining(["Vlog (2)", "Du lịch (1)"]));

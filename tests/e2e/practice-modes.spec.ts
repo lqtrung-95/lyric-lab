@@ -183,7 +183,7 @@ test.describe("Đọc to từ đã lưu", () => {
   test.afterEach(async () => { if (userId) await sb.auth.admin.deleteUser(userId); userId = ""; });
 
   test("liệt kê từ vựng đã lưu để chọn đọc; đạt axe", async ({ page }) => {
-    await page.goto("/review/doc-to");
+    await page.goto("/review/read-aloud");
     await expect(page.getByRole("heading", { name: "Đọc to từ đã lưu", level: 1 })).toBeVisible();
     const options = page.getByLabel("Chọn câu để đọc").locator("option");
     await expect(options.first()).toBeAttached();

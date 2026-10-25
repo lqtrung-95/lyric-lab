@@ -13,5 +13,5 @@ export default async function StorySceneRoute({ params }: { params: Promise<{ ca
   if (!ID.test(caseId) || !ID.test(sceneId)) notFound();
   const [scene, payload] = await Promise.all([loadScene(sceneId), loadStoryPayload(caseId, sceneId)]);
   if (!scene || !payload) notFound();
-  return <StoryExploreScene key={`${caseId}/${sceneId}`} scene={scene} payload={payload} basePath={`/kham-pha/vu-an/${caseId}`} />;
+  return <StoryExploreScene key={`${caseId}/${sceneId}`} scene={scene} payload={payload} basePath={`/explore/cases/${caseId}`} />;
 }

@@ -53,7 +53,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
   }, [slug, nextIdx, nextTotal]);
 
   if (unit.status === "loading") return <p role="status" className="py-space-lg text-body-md text-on-surface-variant">Đang tải chặng…</p>;
-  if (unit.status === "not_found") return <p className="py-space-lg text-body-md">Không có chặng này. <Link href={`/hoc?khoa=${slug}`} className="text-primary underline">Về lộ trình</Link></p>;
+  if (unit.status === "not_found") return <p className="py-space-lg text-body-md">Không có chặng này. <Link href={`/courses?course=${slug}`} className="text-primary underline">Về lộ trình</Link></p>;
   if (unit.status === "error") return <p role="alert" className="py-space-lg text-body-md text-error">Chưa tải được chặng. Kiểm tra kết nối rồi tải lại trang nhé.</p>;
 
   const { detail } = unit;
@@ -77,7 +77,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-space-md">
-      <Link href={`/hoc?khoa=${slug}`} className="inline-flex min-h-11 items-center gap-1 text-label-md font-medium text-primary hover:underline"><Icon name="arrow_back" size={18} /> Lộ trình {detail.course.title}</Link>
+      <Link href={`/courses?course=${slug}`} className="inline-flex min-h-11 items-center gap-1 text-label-md font-medium text-primary hover:underline"><Icon name="arrow_back" size={18} /> Lộ trình {detail.course.title}</Link>
       <header>
         <p className="text-label-md text-on-surface-variant">{detail.unit.kind === "final" ? "Kiểm tra cuối cấp" : detail.unit.kind === "checkpoint" ? "Ôn tập" : "Chặng"} {detail.unit.idx}/{detail.unit.total}</p>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">{detail.unit.title}</h1>
@@ -109,8 +109,8 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
           {!result.saved && <p className="mt-1 text-body-sm text-on-surface-variant">Chưa ghi nhớ được tiến độ lần này (mất kết nối?).</p>}
           <div className="mt-space-md flex flex-wrap justify-center gap-2">
             <button type="button" onClick={() => { setStep("learn"); setResult(null); }} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container"><Icon name="replay" size={20} /> {isReview ? "Làm lại bài" : "Học lại chặng"}</button>
-            {result.passed && hasNext && <Link href={`/hoc/${slug}/${detail.unit.idx + 1}`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary">Chặng tiếp theo <Icon name="arrow_forward" size={20} /></Link>}
-            <Link href={`/hoc?khoa=${slug}`} className="inline-flex min-h-12 items-center rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container">Về lộ trình</Link>
+            {result.passed && hasNext && <Link href={`/courses/${slug}/${detail.unit.idx + 1}`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary">Chặng tiếp theo <Icon name="arrow_forward" size={20} /></Link>}
+            <Link href={`/courses?course=${slug}`} className="inline-flex min-h-12 items-center rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container">Về lộ trình</Link>
           </div>
         </div>
       )}

@@ -2,14 +2,14 @@ import type { SceneDef } from "../explore-types";
 
 /** Trường học: bảng đen, đồ dùng học tập và hai bàn học. Câu ví dụ tự viết, đơn giản, dùng ngay ở lớp. */
 export const SCHOOL_SCENE: SceneDef = {
-  id: "truong-hoc",
+  id: "school",
   title: "Trường học",
   subtitle: "Vào lớp học, học tên đồ dùng học tập rồi làm nhiệm vụ cho Cô Chim giáo viên.",
   theme: "school",
   start: { x: 50, y: 95 },
   exits: [
-    { sprite: "exitLeft", label: "Về Bệnh viện", to: "benh-vien", x: 7, y: 58, w: 6 },
-    { sprite: "exit", label: "Sang Cửa hàng", to: "cua-hang", x: 90, y: 58, w: 6 },
+    { sprite: "exitLeft", label: "Về Bệnh viện", to: "hospital", x: 7, y: 58, w: 6 },
+    { sprite: "exit", label: "Sang Cửa hàng", to: "clothing-store", x: 90, y: 58, w: 6 },
   ],
   npc: {
     id: "bird", name: "Cô Chim", x: 90, y: 93, w: 8,
