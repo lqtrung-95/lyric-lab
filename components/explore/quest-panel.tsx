@@ -62,15 +62,16 @@ export function QuestPanel({ rounds, index, phase, wrong, words, onQuit }: Props
   );
 }
 
-interface SummaryProps { results: { id: string; firstTry: boolean }[]; words: Record<string, SceneWord>; onAgain: () => void; onBack: () => void }
+interface SummaryProps { results: { id: string; firstTry: boolean }[]; words: Record<string, SceneWord>; /** XP ước tính của lượt (còn tùy trần XP luyện tập mỗi ngày). */ xp: number; onAgain: () => void; onBack: () => void }
 
 /** Tổng kết lượt: số câu đúng ngay lần đầu và các từ cần gặp lại. */
-export function QuestSummary({ results, words, onAgain, onBack }: SummaryProps) {
+export function QuestSummary({ results, words, xp, onAgain, onBack }: SummaryProps) {
   const good = results.filter((r) => r.firstTry).length;
   const weak = results.filter((r) => !r.firstTry).map((r) => words[r.id]).filter(Boolean);
   return (
     <section aria-label="Kết quả nhiệm vụ" className="card-ink p-space-md">
       <p className="text-headline-md">Hoàn thành! Đúng ngay lần đầu {good}/{results.length}</p>
+      {xp > 0 && <p className="text-body-md font-bold text-secondary">+{xp} XP (tính vào cấp và nhiệm vụ ngày của bạn)</p>}
       {weak.length > 0 ? (
         <>
           <p className="mt-1 text-body-md text-on-surface-variant">Từ cần gặp lại:</p>

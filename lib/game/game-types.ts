@@ -8,6 +8,8 @@ export interface DayActivity {
   /** Tổng XP thô của các lượt luyện tập, chưa áp trần. */
   practiceRawXp: number;
   perfectRounds: number;
+  /** Số lượt nhiệm vụ ở cảnh Khám phá (đã tính cả trong `practiceRounds`; riêng ra để có nhiệm vụ ngày của Khám phá). */
+  exploreRounds: number;
   dictationGood: number;
   shadowingGood: number;
   songsCompleted: number;

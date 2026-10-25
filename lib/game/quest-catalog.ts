@@ -17,6 +17,7 @@ export const DAILY_QUESTS: QuestTemplate[] = [
   { id: "speak1", kind: "daily", title: "Đọc to 1 câu cho máy chấm", target: 1, rewardXp: 15, progress: (a) => a.shadowingGood },
   { id: "dictate3", kind: "daily", title: "Chép đúng 3 câu chính tả", target: 3, rewardXp: 15, progress: (a) => a.dictationGood },
   { id: "practice1", kind: "daily", title: "Chơi 1 lượt luyện tập", target: 1, rewardXp: 15, progress: (a) => a.practiceRounds },
+  { id: "explore1", kind: "daily", title: "Làm 1 nhiệm vụ ở phòng Khám phá", target: 1, rewardXp: 15, progress: (a) => a.exploreRounds },
   { id: "unit1", kind: "daily", title: "Hoàn thành 1 chặng", target: 1, rewardXp: 25, progress: (a) => a.unitsCompleted },
 ];
 

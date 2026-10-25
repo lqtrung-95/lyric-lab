@@ -33,6 +33,18 @@ describe("aggregateActivity", () => {
     }, "UTC");
     expect(days["2026-10-20"]).toMatchObject({ dictationGood: 1, shadowingGood: 1, practiceRounds: 1, perfectRounds: 1, practiceRawXp: 25 });
   });
+  it("lượt nhiệm vụ Khám phá tính như một lượt luyện tập (XP, ngày học) và đếm riêng cho nhiệm vụ ngày; 0 đúng thì không tính", () => {
+    const r = aggregateActivity({
+      ...empty,
+      rounds: [
+        { at: "2026-10-20T03:00:00Z", mode: "explore", correct: 6, total: 8 },
+        { at: "2026-10-20T03:10:00Z", mode: "explore", correct: 0, total: 8 },
+        { at: "2026-10-20T03:20:00Z", mode: "cloze", correct: 3, total: 5 },
+      ],
+    }, "UTC");
+    expect(r.days["2026-10-20"]).toMatchObject({ practiceRounds: 2, exploreRounds: 1, practiceRawXp: 12 + 6 });
+    expect(r.studiedDays.has("2026-10-20")).toBe(true);
+  });
   it("chặng và thi đấu có XP nhưng không tính vào ngày học của chuỗi (giữ nguyên hành vi chuỗi cũ)", () => {
     const r = aggregateActivity({ ...empty, units: [{ at: "2026-10-20T03:00:00Z", bestScore: 90 }], rooms: [{ at: "2026-10-21T03:00:00Z", won: true }] }, "UTC");
     expect(r.studiedDays.size).toBe(0);

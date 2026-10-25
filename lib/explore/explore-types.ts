@@ -1,3 +1,4 @@
+import type { ExampleSentence } from "@/lib/courses/course-types";
 import type { Vec } from "./player-movement";
 
 /** Một vật chạm được trong cảnh. Vị trí tính theo % khung cảnh: (x, y) là điểm giữa-đáy của vật, w là chiều rộng. */
@@ -46,6 +47,8 @@ export interface SceneWord extends SceneObjectDef {
   pinyin: string;
   sinoViet: string | null;
   hskLevel: number | null;
+  /** Câu thật từ video/bài hát đã duyệt có chứa từ này (rỗng nếu chưa có chỉ mục); dùng làm nguồn cho thẻ ôn và cầu nối sang bài nghe. */
+  examples: ExampleSentence[];
 }
 
 export interface SceneDetail extends Omit<SceneDef, "objects"> {

@@ -12,7 +12,7 @@ export interface RawActivity {
 }
 
 export const emptyDay = (): DayActivity => ({
-  reviews: 0, practiceRounds: 0, practiceRawXp: 0, perfectRounds: 0, dictationGood: 0, shadowingGood: 0, songsCompleted: 0,
+  reviews: 0, practiceRounds: 0, practiceRawXp: 0, perfectRounds: 0, exploreRounds: 0, dictationGood: 0, shadowingGood: 0, songsCompleted: 0,
   unitsCompleted: 0, unitRawXp: 0, roomsPlayed: 0, roomsWon: 0, roomRawXp: 0, nightReviews: 0, earlyReviews: 0,
 });
 
@@ -28,6 +28,8 @@ export function makeLocalizer(timeZone: string) {
 
 export const VIDEO_DICTATION = "dictation";
 export const VIDEO_SHADOWING = "shadowing";
+/** Chế độ của lượt nhiệm vụ ở cảnh Khám phá (ghi vào `practice_scores`). */
+export const VIDEO_EXPLORE = "explore";
 
 /**
  * Gom dữ liệu thô thành số liệu từng ngày theo múi giờ người dùng.
@@ -56,6 +58,7 @@ export function aggregateActivity(raw: RawActivity, timeZone: string): { days: R
     else if (r.mode === VIDEO_SHADOWING) a.shadowingGood += r.correct > 0 ? r.correct : 0;
     else if (r.correct > 0) {
       a.practiceRounds++;
+      if (r.mode === VIDEO_EXPLORE) a.exploreRounds++;
       a.practiceRawXp += practiceRoundXp(r.correct, r.total);
       if (r.correct >= r.total && r.total >= PERFECT_ROUND_MIN_ITEMS) a.perfectRounds++;
     }

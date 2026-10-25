@@ -1,14 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { buildQuestRounds } from "@/lib/explore/build-explore-quests";
 import { isDiscovered, isFaded } from "@/lib/explore/explore-progress";
 import type { SceneDetail, SceneWord } from "@/lib/explore/explore-types";
 import { keyToDir, standPoint, type Interactable } from "@/lib/explore/player-movement";
 import { playSfx } from "@/lib/feedback/sfx";
+import { answerPoints } from "@/lib/practice/scoring";
+import { submitRoundScore } from "@/lib/practice/submit-score";
+import { savedItemForWord } from "@/lib/explore/saved-item";
+import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { AvatarFx } from "./player-avatar";
 import type { ObjectMark } from "./scene-canvas";
+import type { CardState } from "./word-card";
 import { useExploreProgress } from "./use-explore-progress";
 import { usePlayerMovement } from "./use-player-movement";
 import { useQuestRun } from "./use-quest-run";
@@ -23,6 +30,7 @@ export type Panel = { kind: "word"; word: SceneWord } | { kind: "npc" } | null;
  */
 export function useSceneController(scene: SceneDetail) {
   const { progress, ready, now, discover, answer, reset } = useExploreProgress();
+  const { state: learner, toggleSaved } = useLearnerState();
   const [panel, setPanel] = useState<Panel>(null);
   const [shakeId, setShakeId] = useState<string | null>(null);
   const [fx, setFx] = useState<AvatarFx>(null);
@@ -43,7 +51,13 @@ export function useSceneController(scene: SceneDetail) {
   const onResult = useCallback((id: string, ok: boolean) => { answer(id, ok); playSfx(ok ? "correct" : "wrong"); flash(ok ? "hop" : "oops"); }, [answer, flash]);
   const quest = useQuestRun(onResult);
 
+  const runStartedAt = useRef(0);
+  const submittedRun = useRef(-1);
+  const runNo = useRef(0);
+
   function startQuest() {
+    runNo.current += 1;
+    runStartedAt.current = Date.now();
     const priority = new Set(learnedWords.filter((o) => marks[o.id] === "faded" || (progress.terms[o.id]?.wrong ?? 0) > (progress.terms[o.id]?.correct ?? 0)).map((o) => o.id));
     setPanel(null);
     quest.start(buildQuestRounds(learnedWords, priority));
@@ -62,6 +76,9 @@ export function useSceneController(scene: SceneDetail) {
       return;
     }
     discover(id);
+    // Từ học ở đây vào bộ ôn (thẻ FSRS) nếu có câu thật làm nguồn; đã lưu rồi thì thôi (toggleSaved sẽ bỏ lưu nếu gọi lại).
+    const card = savedItemForWord(o);
+    if (card && !learner.saved.some((x) => x.key === card.key)) toggleSaved(card);
     setPanel({ kind: "word", word: o });
     void playChinese(o.term);
   }
@@ -69,11 +86,30 @@ export function useSceneController(scene: SceneDetail) {
   const interactRef = useRef(interact);
   useEffect(() => { interactRef.current = interact; });
 
+  // Xong một lượt nhiệm vụ: ghi điểm (tính XP, chuỗi ngày, nhiệm vụ ngày như các lượt luyện tập khác) rồi làm mới cấp/XP ở thanh trên.
+  const finished = !quest.active && quest.rounds.length > 0 && quest.results.length === quest.rounds.length;
+  const firstTry = quest.results.filter((r) => r.firstTry).length;
+  useEffect(() => {
+    if (!finished || submittedRun.current === runNo.current) return;
+    submittedRun.current = runNo.current;
+    playSfx("complete");
+    void submitRoundScore("explore", {
+      points: firstTry * answerPoints("correct", 0), correct: firstTry, total: quest.rounds.length,
+      durationSec: Math.max(quest.rounds.length * 2, (Date.now() - runStartedAt.current) / 1000),
+    }).then((ok) => { if (ok) refreshGameSummary(); });
+  }, [finished, firstTry, quest.rounds.length]);
+
   const walkTo = player.walkTo;
   const activate = useCallback((id: string) => {
     const it = interactables.find((i) => i.id === id);
     if (it) walkTo(it.at, () => interactRef.current(id));
   }, [interactables, walkTo]);
+
+  const cardStateOf = (w: SceneWord): CardState => {
+    const card = savedItemForWord(w);
+    if (!card) return "no_example";
+    return learner.saved.some((x) => x.key === card.key) ? "saved" : "pending";
+  };
 
   const stageProps = {
     tabIndex: 0,
@@ -90,8 +126,8 @@ export function useSceneController(scene: SceneDetail) {
   };
 
   return {
-    ready, marks, words, learnedWords, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
-    startQuest, activate, reset,
+    ready, marks, words, cardStateOf, learnedWords, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
+    startQuest, activate, reset, learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
     highlightId: quest.active && (quest.phase === "correct" || quest.phase === "reveal") ? quest.round?.targetId ?? null : null,
     openWord: (w: SceneWord) => { setPanel({ kind: "word", word: w }); void playChinese(w.term); },
   };
