@@ -4,12 +4,15 @@ import { CompoundWords } from "@/components/tra-tu/compound-words";
 import { ExampleSentences } from "@/components/tra-tu/example-sentences";
 import { SaveCardButton } from "@/components/tra-tu/save-card-button";
 import { StrokeSection } from "@/components/tra-tu/stroke-section";
+import { WordPractice } from "@/components/tra-tu/word-practice";
 import { WordHeader } from "@/components/tra-tu/word-header";
 import { WordMeanings } from "@/components/tra-tu/word-meanings";
 import { WordNoteCard } from "@/components/tra-tu/word-note-card";
 import type { ExampleSentence } from "@/lib/courses/course-types";
 import { loadTermSentences } from "@/lib/courses/load-term-sentences";
 import { loadCompounds } from "@/lib/tra-tu/load-compounds";
+import { findExploreScene } from "@/lib/tra-tu/find-explore-scene";
+import { loadPracticePool } from "@/lib/tra-tu/load-practice-pool";
 import { loadWordDetail } from "@/lib/tra-tu/load-word-detail";
 import { savedItemForDetail } from "@/lib/tra-tu/saved-item-for-detail";
 import { readWordNote } from "@/lib/tra-tu/word-note-store";
@@ -32,10 +35,11 @@ export default async function WordPage({ params }: { params: Params }) {
   const detail = HAN_TERM.test(term) ? await loadWordDetail(term) : null;
   if (!detail) redirect(`/dictionary?q=${encodeURIComponent(term.slice(0, 80))}`);
 
-  const [note, sentences, compounds] = await Promise.all([
+  const [note, sentences, compounds, pool] = await Promise.all([
     readWordNote(detail.simplified).catch(() => ({ stored: null, tableReady: false })),
     loadTermSentences([detail.simplified], 6).catch(() => ({})),
     loadCompounds(detail.simplified),
+    loadPracticePool(detail.hskLevel),
   ]);
   const examples = (sentences as Record<string, ExampleSentence[]>)[detail.simplified] ?? [];
   const cardItem = savedItemForDetail(detail, examples[0], note.stored?.note.gloss ?? null);
@@ -45,6 +49,7 @@ export default async function WordPage({ params }: { params: Params }) {
       <WordHeader detail={detail}><SaveCardButton term={detail.simplified} item={cardItem} /></WordHeader>
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
       <WordMeanings readings={detail.readings} />
+      <WordPractice term={detail.simplified} examples={examples} pool={pool} scene={findExploreScene(detail.simplified)} />
       <StrokeSection term={detail.simplified} />
       <EtymologyBlock term={detail.simplified} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />

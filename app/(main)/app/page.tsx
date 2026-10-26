@@ -6,6 +6,7 @@ import { PasteLinkForm } from "@/components/home/paste-link-form";
 import { RecentSongsSection } from "@/components/home/recent-songs-section";
 import { NewcomerSteps } from "@/components/home/newcomer-steps";
 import { TodayPlan } from "@/components/home/today-plan";
+import { QuickDictionarySearch } from "@/components/home/quick-dictionary-search";
 import { ToolsHint } from "@/components/home/tools-hint";
 import { NextActionPanel } from "@/components/home/next-action-panel";
 import { HomePathCard } from "@/components/home/home-path-card";
@@ -32,6 +33,7 @@ export default function AppHomePage() {
             <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
             <div className="mt-space-sm">
               <PasteLinkForm />
+              <QuickDictionarySearch />
               <ToolsHint />
             </div>
           </section>

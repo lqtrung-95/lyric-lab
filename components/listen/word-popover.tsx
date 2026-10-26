@@ -112,6 +112,11 @@ export function WordPopover({ word, item, lookup, saved, onClose, onPlayLine, on
           <Icon name={saved ? "star" : "star_border"} filled={saved} size={18} />
           {saved ? "Đã lưu" : "Lưu"}
         </button>
+        {/* Tab mới để không làm gián đoạn bài đang nghe. */}
+        <a href={`/dictionary/${encodeURIComponent(saveTerm)}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-label-md text-on-surface-variant hover:bg-surface-container">
+          <Icon name="dictionary" size={18} />
+          Xem chi tiết
+        </a>
       </div>
     </div>
   );
