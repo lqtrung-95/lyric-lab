@@ -1,9 +1,10 @@
 import { createHash } from "node:crypto";
+import { MAX_TTS_CHARS } from "@/lib/speech/split-for-tts";
 import { toSimplifiedChinese } from "@/lib/text/to-simplified-chinese";
 import { TTS_RATE, TTS_VOICE } from "./build-ssml";
 
 const HAN = /\p{Script=Han}/u;
-export const MAX_TTS_CHARS = 40;
+export { MAX_TTS_CHARS };
 
 /**
  * Chuẩn hóa văn bản cần đọc: giản thể, bỏ khoảng trắng thừa. Chỉ nhận từ/câu ngắn có chữ Hán (không dùng làm dịch vụ đọc

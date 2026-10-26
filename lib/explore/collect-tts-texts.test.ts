@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { collectExploreTtsTexts } from "./collect-tts-texts";
+import { commandText } from "./quest-commands";
 import { SCENES } from "./scenes";
 
 describe("collectExploreTtsTexts", () => {
@@ -10,6 +11,8 @@ describe("collectExploreTtsTexts", () => {
       for (const o of s.objects) expect(texts, o.term).toContain(o.term);
       for (const p of s.phrases ?? []) expect(texts, p.zh).toContain(p.zh);
     }
+    // Lệnh của NPC trong nhiệm vụ nghe lệnh cũng có giọng sẵn.
+    for (const s of Object.values(SCENES)) for (const o of s.objects) expect(texts, o.term).toContain(commandText(o.term, !!o.portable));
     expect(texts.length).toBeGreaterThan(500);
     expect(texts.every((t) => t.length <= 40)).toBe(true);
   });

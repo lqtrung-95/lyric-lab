@@ -1,5 +1,6 @@
 import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { CLOUD_VOICE, readPreferredVoice, speakChinese } from "./speak-chinese";
+import { splitForTts } from "./split-for-tts";
 
 const blobUrls = new Map<string, string>();
 let current: HTMLAudioElement | null = null;
@@ -19,21 +20,35 @@ async function fetchCloudAudio(text: string): Promise<string> {
   return objectUrl;
 }
 
+let playToken = 0;
+
+async function playCloud(text: string, waitEnd: boolean): Promise<void> {
+  const src = await fetchCloudAudio(text);
+  current?.pause();
+  if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
+  const audio = new Audio(src);
+  current = audio;
+  await audio.play();
+  if (waitEnd) await new Promise<void>((resolve) => { audio.onended = () => resolve(); audio.onerror = () => resolve(); audio.onpause = () => resolve(); });
+}
+
 /**
  * Đọc chữ Hán: mặc định dùng giọng AI tự nhiên từ server (file đã lưu dùng chung); nếu người dùng chọn giọng hệ thống,
  * hoặc server lỗi/hết hạn mức/không phát được thì rơi về giọng hệ thống của trình duyệt để nút loa không bao giờ hỏng.
+ * Câu dài hơn giới hạn của server được chia theo câu và đọc nối tiếp từng đoạn (mỗi đoạn có file giọng riêng); bấm đọc câu khác thì dừng phần còn lại.
  */
 export async function playChinese(text: string): Promise<void> {
   const preferred = readPreferredVoice();
   if (preferred && preferred !== CLOUD_VOICE) return speakChinese(text);
+  const token = ++playToken;
+  const parts = splitForTts(text);
   try {
-    const src = await fetchCloudAudio(text);
-    current?.pause();
-    if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
-    current = new Audio(src);
-    await current.play();
+    for (let i = 0; i < parts.length; i++) {
+      if (token !== playToken) return;
+      await playCloud(parts[i], parts.length > 1);
+    }
   } catch {
-    speakChinese(text);
+    if (token === playToken) speakChinese(text);
   }
 }
 
