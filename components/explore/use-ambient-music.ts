@@ -8,18 +8,18 @@ import { startAmbientMusic, type AmbientMusic } from "./ambient-engine";
 export const MUSIC_KEY = "songhanzi-explore-music";
 
 /**
- * Nhạc nền của cảnh: mặc định BẬT (người dùng có thể tắt, lựa chọn được nhớ). Bắt đầu phát ở lần chạm/nhấn phím đầu tiên trong trang (trình duyệt chặn tự phát),
+ * Nhạc nền của cảnh: mặc định TẮT (người dùng bật thì được nhớ cho lần sau). Bắt đầu phát ở lần chạm/nhấn phím đầu tiên trong trang (trình duyệt chặn tự phát),
  * hạ nhỏ khi có giọng đọc tiếng Trung, dừng khi tab bị ẩn và khi rời cảnh.
  */
 export function useAmbientMusic(mood: Mood) {
-  const [enabled, setEnabled] = useState(true);
+  const [enabled, setEnabled] = useState(false);
   const engine = useRef<AmbientMusic | null>(null);
 
   useEffect(() => {
     try {
       // Đọc kho lưu của trình duyệt sau khi mount (server không có localStorage) nên cần setState trong effect.
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (window.localStorage.getItem(MUSIC_KEY) === "off") setEnabled(false);
+      if (window.localStorage.getItem(MUSIC_KEY) === "on") setEnabled(true);
     } catch { /* dùng mặc định */ }
   }, []);
 

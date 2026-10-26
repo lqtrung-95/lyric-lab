@@ -132,14 +132,14 @@ test("đi sang Quán ăn bằng biển chỉ đường, học một từ, quay l
   await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("0/14"); // từ học ở quán không tính vào phòng
 });
 
-test("nhạc nền: bật mặc định, tắt được và nhớ lựa chọn sau khi tải lại", async ({ page }) => {
+test("nhạc nền: tắt mặc định, bật được và nhớ lựa chọn sau khi tải lại", async ({ page }) => {
   await page.goto("/explore/room");
   const music = page.getByRole("button", { name: /Nhạc nền/ });
-  await expect(music).toHaveAttribute("aria-pressed", "true");
-  await music.click();
   await expect(music).toHaveAttribute("aria-pressed", "false");
+  await music.click();
+  await expect(music).toHaveAttribute("aria-pressed", "true");
   await page.reload();
-  await expect(page.getByRole("button", { name: /Nhạc nền/ })).toHaveAttribute("aria-pressed", "false");
+  await expect(page.getByRole("button", { name: /Nhạc nền/ })).toHaveAttribute("aria-pressed", "true");
 });
 
 test("cảnh không tồn tại trả 404", async ({ page }) => {
