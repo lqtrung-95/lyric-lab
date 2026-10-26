@@ -11,6 +11,7 @@ import { PARK_SPRITES } from "./flat-park";
 import { VENUE2A_SPRITES } from "./flat-venue2-a";
 import { VENUE2B_SPRITES } from "./flat-venue2-b";
 import { VENUE2C_SPRITES } from "./flat-venue2-c";
+import { VENUE3_SPRITES } from "./flat-venue3";
 import { NEW_FUN_SPRITES } from "./flat-new-fun";
 import { NEW_HOME_SPRITES } from "./flat-new-home";
 import { NEW_LEARN_SPRITES } from "./flat-new-learn";
@@ -29,7 +30,7 @@ import { SMALL_SPRITES } from "./flat-small";
 const BASE: Record<string, FlatSprite> = {
   ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES,
   ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES, ...VENUE_SPRITES,
-  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES,
+  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES,
 };
 
 /** Một từ khác nhau dùng chung hình: id mới → hình có sẵn (ví dụ "bệnh giường" dùng hình giường). Giữ mỗi cảnh có từ riêng mà không phải vẽ lại. */
@@ -38,6 +39,8 @@ const ALIASES: Record<string, string> = {
   scoreboard: "blackboard", jersey: "clothes", flightboard: "blackboard", boardingpass: "ticket", whiteboard: "blackboard", meetingtable: "table", receipt: "note", bookcart: "cart", exhibitboard: "blackboard",
   movieticket: "ticket", glasses3d: "glasses", bodyscale: "scale", gymclothes: "clothes", salonchair: "chair", readingtable: "table", waitingbench: "bench", wok: "pot", ancientcoin: "coin",
   airmeal: "lunchbox", checkin: "counter", pilothat: "hat", textbook: "book", breakfast: "plate", parasol: "umbrella", hotelcart: "trolley",
+  waybill: "note", label: "note", pobox: "mailbox", mail: "envelope", postscale: "scale", vitamin: "pills", disinfectant: "syrup", prescription: "note", medcabinet: "locker", handwash: "shampoo",
+  powerbank: "battery", warranty: "note", dip: "bowl", plumdrink: "juice",
 };
 
 /** Tất cả sprite Tranh C theo `id` của vật trong cảnh (kèm `guide` cho nhân vật dẫn đường). */

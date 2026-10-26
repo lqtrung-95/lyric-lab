@@ -7,7 +7,7 @@ export const SALON_SCENE: SceneDef = {
   subtitle: "Ghé hiệu cắt tóc, học từ về làm tóc rồi làm nhiệm vụ cho Cô Mèo thợ tóc.",
   theme: "salon",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Phòng gym", to: "gym", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Phòng gym", to: "gym", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Bưu điện", to: "postoffice", x: 92, y: 60, w: 6 }],
   npc: {
     id: "cat", name: "Cô Mèo thợ tóc", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến hiệu cắt tóc! Hãy ngồi chơi, lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

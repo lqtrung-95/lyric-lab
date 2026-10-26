@@ -57,6 +57,10 @@ const GENERIC: Record<Exclude<SceneTheme, "room" | "eatery">, { wall: string; wa
   bank: { wall: "#e9e3d3", wallDots: false, base: "#3b6931", floor: "#dcd6c8", floorImage: "repeating-conic-gradient(#e4dfd2 0% 25%, #cfc8b8 0% 50%)", floorSize: "72px 72px" },
   cinema: { wall: "#4a2e3b", wallDots: false, base: "#b83a2a", floor: "#8a3b3b", floorImage: "repeating-linear-gradient(90deg, rgba(0,0,0,.16) 0 56px, transparent 56px 112px)" },
   gym: { wall: "#e1ecf5", wallDots: false, base: "#51a0db", floor: "#e7a85c", floorImage: "repeating-linear-gradient(0deg, transparent 0 40px, rgba(74,46,27,.2) 40px 42px)" },
+  postoffice: { wall: "#e8eef7", wallDots: false, base: "#51a0db", floor: "#d9c7a8", floorImage: "repeating-linear-gradient(90deg, transparent 0 60px, rgba(74,46,27,.14) 60px 62px)" },
+  pharmacy: { wall: "#eaf7f1", wallDots: false, base: "#3fa8a0", floor: "#f4f1ea", floorImage: "repeating-conic-gradient(#f7f4ee 0% 25%, #e3ede6 0% 50%)", floorSize: "56px 56px" },
+  phoneshop: { wall: "#e6e8f5", wallDots: true, base: "#6a5fb8", floor: "#d8d4e3", floorImage: "repeating-linear-gradient(0deg, transparent 0 44px, rgba(74,46,27,.12) 44px 46px)" },
+  hotpot: { wall: "#f6d9c8", wallDots: false, base: "#b83a2a", floor: "#c27a3c", floorImage: "repeating-linear-gradient(90deg, rgba(74,46,27,.18) 0 3px, transparent 3px 64px)" },
   salon: { wall: "#f5e6f1", wallDots: true, base: "#b86aa0", floor: "#f0e4d8", floorImage: "repeating-conic-gradient(#f6ece2 0% 25%, #e8d8c8 0% 50%)", floorSize: "56px 56px" },
   park: { wall: "#cfe9f8", wallDots: false, base: "#7fc468", floor: "#a8dd8f", floorImage: "radial-gradient(rgba(59,105,49,.25) 2px, transparent 2.5px)", floorSize: "30px 30px" },
 };

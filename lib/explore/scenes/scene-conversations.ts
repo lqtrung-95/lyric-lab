@@ -205,4 +205,40 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 1, zh: "很好,谢谢。", vi: "Rất tốt, cảm ơn." },
     ],
   },
+  "postoffice": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 1, zh: "我想寄一个包裹到上海。", vi: "Tôi muốn gửi một bưu kiện đến Thượng Hải." },
+      { who: 0, zh: "好的,请先填快递单。", vi: "Vâng, xin điền phiếu gửi hàng trước." },
+      { who: 1, zh: "要几天才能到?", vi: "Mất mấy ngày thì tới?" },
+      { who: 0, zh: "三天。请贴好标签。", vi: "Ba ngày. Xin dán nhãn cho kỹ." },
+    ],
+  },
+  "pharmacy": {
+    speakers: ["Dược sĩ", "Khách"],
+    lines: [
+      { who: 0, zh: "你哪里不舒服?", vi: "Bạn thấy khó chịu ở đâu?" },
+      { who: 1, zh: "我头疼,还有点发烧。", vi: "Tôi đau đầu, còn hơi sốt." },
+      { who: 0, zh: "这个药一天吃三次,饭后吃。", vi: "Thuốc này một ngày uống ba lần, sau bữa ăn." },
+      { who: 1, zh: "好的,谢谢你。", vi: "Vâng, cảm ơn cô." },
+    ],
+  },
+  "phoneshop": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 1, zh: "这个手机多少钱?", vi: "Chiếc điện thoại này bao nhiêu tiền?" },
+      { who: 0, zh: "三千块,送手机壳。", vi: "Ba nghìn tệ, tặng kèm ốp điện thoại." },
+      { who: 1, zh: "可以便宜一点吗?", vi: "Có thể rẻ hơn một chút không?" },
+      { who: 0, zh: "好吧,再送你一个充电宝。", vi: "Được rồi, tặng thêm cho bạn một cục sạc dự phòng." },
+    ],
+  },
+  "hotpot": {
+    speakers: ["Phục vụ", "Khách"],
+    lines: [
+      { who: 0, zh: "你们要什么锅底?", vi: "Các bạn muốn nước lẩu loại nào?" },
+      { who: 1, zh: "一个辣的,一个不辣的。", vi: "Một nồi cay, một nồi không cay." },
+      { who: 0, zh: "还要什么?", vi: "Còn gọi gì nữa?" },
+      { who: 1, zh: "再来一盘肉片和一盘虾。", vi: "Cho thêm một đĩa thịt thái lát và một đĩa tôm." },
+    ],
+  },
 };
