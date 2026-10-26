@@ -4,6 +4,7 @@ import { CompoundWords } from "@/components/tra-tu/compound-words";
 import { ExampleSentences } from "@/components/tra-tu/example-sentences";
 import { SaveCardButton } from "@/components/tra-tu/save-card-button";
 import { StrokeSection } from "@/components/tra-tu/stroke-section";
+import { WordMap } from "@/components/tra-tu/word-map";
 import { WordPractice } from "@/components/tra-tu/word-practice";
 import { WordHeader } from "@/components/tra-tu/word-header";
 import { WordMeanings } from "@/components/tra-tu/word-meanings";
@@ -13,6 +14,8 @@ import { loadTermSentences } from "@/lib/courses/load-term-sentences";
 import { loadCompounds } from "@/lib/tra-tu/load-compounds";
 import { findExploreScene } from "@/lib/tra-tu/find-explore-scene";
 import { loadPracticePool } from "@/lib/tra-tu/load-practice-pool";
+import { loadHanziInfo } from "@/lib/tra-tu/load-hanzi-info";
+import { loadWordMap } from "@/lib/tra-tu/load-word-map";
 import { loadWordDetail } from "@/lib/tra-tu/load-word-detail";
 import { savedItemForDetail } from "@/lib/tra-tu/saved-item-for-detail";
 import { readWordNote } from "@/lib/tra-tu/word-note-store";
@@ -41,6 +44,9 @@ export default async function WordPage({ params }: { params: Params }) {
     loadCompounds(detail.simplified),
     loadPracticePool(detail.hskLevel),
   ]);
+  const firstHan = [...detail.simplified][0];
+  const info = (await loadHanziInfo([firstHan])).items[0];
+  const mapGroups = await loadWordMap(detail.simplified, compounds, info);
   const examples = (sentences as Record<string, ExampleSentence[]>)[detail.simplified] ?? [];
   const cardItem = savedItemForDetail(detail, examples[0], note.stored?.note.gloss ?? null);
 
@@ -50,6 +56,7 @@ export default async function WordPage({ params }: { params: Params }) {
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
       <WordMeanings readings={detail.readings} />
       <WordPractice term={detail.simplified} examples={examples} pool={pool} scene={findExploreScene(detail.simplified)} />
+      <WordMap term={detail.simplified} groups={mapGroups} />
       <StrokeSection term={detail.simplified} />
       <EtymologyBlock term={detail.simplified} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />

@@ -45,3 +45,21 @@ test("popover tra từ ở màn nghe có liên kết Xem chi tiết sang trang t
   await expect(link).toHaveAttribute("href", "/dictionary/" + encodeURIComponent("城市"));
   await expect(link).toHaveAttribute("target", "_blank");
 });
+
+test("bản đồ từ vựng: từ ghép, chữ cùng bộ thủ, từ cùng chủ đề; bấm nút sang trang từ đó", async ({ page }) => {
+  await page.goto("/dictionary/" + encodeURIComponent("爱"));
+  const map = page.getByRole("region", { name: "Bản đồ từ vựng" });
+  await expect(map.getByRole("link", { name: /^爱好, ài hào/ }).first()).toBeVisible();
+  await expect(map.getByText(/Cùng bộ/).first()).toBeVisible();
+  await expect(map.getByText(/Cùng chủ đề/).first()).toBeVisible();
+  await map.getByRole("link", { name: /^爱好, ài hào/ }).first().click();
+  await expect(page.getByRole("heading", { level: 1, name: "爱好" })).toBeVisible();
+});
+
+test("không còn lệch hydrate ở khối luyện từ (đáp án xáo theo hạt giống)", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
+  await page.goto("/dictionary/" + encodeURIComponent("秋天"));
+  await page.waitForLoadState("networkidle");
+  expect(errors.filter((e) => /hydrat/i.test(e))).toEqual([]);
+});

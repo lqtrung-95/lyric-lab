@@ -6,6 +6,9 @@ import { Icon } from "@/components/ui/icon";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import type { ExampleSentence } from "@/lib/courses/course-types";
 import { buildChoices, buildCloze } from "@/lib/practice/cloze";
+import { seededRng } from "@/lib/practice/random";
+
+const hashSeed = (s: string) => [...s].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) | 0, 7);
 
 /**
  * Luyện từ này: điền từ vào chỗ trống của một câu thật (đáp án nhiễu là từ HSK cùng cấp), cộng lối vào Khám phá nếu từ có trong một cảnh.
@@ -16,8 +19,8 @@ export function WordPractice({ term, examples, pool, scene }: { term: string; ex
   const [round, setRound] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const ex = usable.length ? usable[round % usable.length] : null;
-  // Đáp án xáo một lần cho mỗi vòng (khóa theo `round`); Math.random chỉ chạy ở client khi bấm sang vòng mới nên không lệch với bản dựng trên server.
-  const choices = useMemo(() => (ex ? buildChoices(term, pool, ex.text) : []), [ex, pool, term, round]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Xáo bằng bộ sinh có hạt giống (từ + vòng) chứ không Math.random: lần vẽ đầu chạy cả ở server lẫn client, thứ tự đáp án phải giống nhau, nếu không React báo lệch hydrate.
+  const choices = useMemo(() => (ex ? buildChoices(term, pool, ex.text, seededRng(hashSeed(`${term}:${round}`))) : []), [ex, pool, term, round]);
   if (!ex && !scene) return null;
   const cloze = ex ? buildCloze(term, ex.text) : null;
   const done = picked !== null;
