@@ -10,7 +10,7 @@ export function storyRoute(objectives: readonly Objective[], startScene: string)
 
 /**
  * Lối đi trong một vụ án: sang cảnh kế tiếp và về cảnh liền trước theo thứ tự của vụ (không theo đường nối của chế độ tự do, vì thứ tự điều tra khác thứ tự địa lý).
- * `isOpen` quyết định cảnh nào đã mở; cảnh chưa mở thì không có biển.
+ * `isOpen` quyết định cảnh nào đã mở; cảnh kế tiếp chưa mở vẫn có biển nhưng khóa (mờ, không đi qua được) để người chơi biết cần làm xong nhiệm vụ ở đây.
  */
 export function storyExits(route: readonly string[], sceneId: string, titleOf: (id: string) => string, isOpen: (id: string) => boolean): SceneExit[] {
   const i = route.indexOf(sceneId);
@@ -19,6 +19,6 @@ export function storyExits(route: readonly string[], sceneId: string, titleOf: (
   const prev = route[i - 1];
   const next = route[i + 1];
   if (prev && isOpen(prev)) exits.push({ sprite: "exitLeft", label: `Về ${titleOf(prev)}`, to: prev, x: 7, y: 58, w: 6 });
-  if (next && isOpen(next)) exits.push({ sprite: "exit", label: `Sang ${titleOf(next)}`, to: next, x: 92, y: 60, w: 6 });
+  if (next) exits.push({ sprite: "exit", label: isOpen(next) ? `Sang ${titleOf(next)}` : `${titleOf(next)} · xong nhiệm vụ để mở`, to: next, x: 92, y: 60, w: 6, ...(isOpen(next) ? {} : { locked: true }) });
   return exits;
 }

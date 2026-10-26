@@ -181,7 +181,8 @@ describe("lối đi trong vụ án theo thứ tự điều tra", () => {
       const title = (id: string) => id;
       const mid = route[1];
       expect(storyExits(route, mid, title, () => true).map((e) => e.to)).toEqual([route[0], route[2]]);
-      expect(storyExits(route, mid, title, () => false)).toEqual([]);
+      // Cảnh kế tiếp chưa mở vẫn có biển nhưng khóa; về cảnh trước thì không còn biển.
+      expect(storyExits(route, mid, title, () => false).map((e) => [e.to, e.locked])).toEqual([[route[2], true]]);
       expect(storyExits(route, route[0], title, () => true).map((e) => e.to)).toEqual([route[1]]);
     }
   });

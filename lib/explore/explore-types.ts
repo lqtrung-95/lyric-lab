@@ -50,6 +50,8 @@ export interface SceneExit {
   sprite: string;
   label: string;
   to: string;
+  /** Biển chưa mở (cảnh kế tiếp chưa mở): hiện mờ kèm ổ khóa và không đi qua được. */
+  locked?: boolean;
   x: number;
   y: number;
   w: number;

@@ -124,13 +124,14 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
           key={e.to}
           type="button"
           onClick={() => onActivate(exitId(e))}
-          aria-label={e.label}
-          className="group absolute cursor-pointer rounded-lg outline-offset-2 transition-transform after:absolute after:-inset-1.5 after:content-[''] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary"
+          aria-label={e.locked ? `${e.label} (đang khóa)` : e.label}
+          aria-disabled={e.locked || undefined}
+          className={`group absolute ${e.locked ? "cursor-not-allowed opacity-50 grayscale" : "cursor-pointer"} rounded-lg outline-offset-2 transition-transform after:absolute after:-inset-1.5 after:content-[''] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary`}
           style={{ left: `${e.x}%`, top: `${e.y}%`, width: `${e.w}%`, transform: "translate(-50%, -100%)", zIndex: zOf(e.y) }}
         >
-          <span className={`block ${nearId === exitId(e) ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
-          {nearId === exitId(e) && <KeyChip />}
-          <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-md font-extrabold leading-5 text-on-surface">{e.label}</span>
+          <span className={`block ${nearId === exitId(e) && !e.locked ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
+          {nearId === exitId(e) && !e.locked && <KeyChip />}
+          <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-md font-extrabold leading-5 text-on-surface">{e.locked ? "🔒 " : ""}{e.label}</span>
         </button>
       ))}
       {extras.map((e) => FLAT_SPRITES[e.sprite] && (
