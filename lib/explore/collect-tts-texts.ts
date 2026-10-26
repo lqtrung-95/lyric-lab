@@ -1,6 +1,7 @@
 import { splitForTts } from "@/lib/speech/split-for-tts";
 import { normalizeTtsText } from "@/lib/tts/tts-text";
 import { commandText } from "./quest-commands";
+import { SCENE_STORIES } from "./scene-stories/stories";
 import { SCENES } from "./scenes";
 import { CASES } from "./story/cases";
 
@@ -17,6 +18,7 @@ export function collectExploreTtsTexts(): string[] {
     for (const p of s.phrases ?? []) raw.push(p.zh);
     for (const l of s.conversation?.lines ?? []) raw.push(l.zh);
   }
+  for (const st of Object.values(SCENE_STORIES)) raw.push(st.title.zh, ...st.lines.map((l) => l.zh), st.question.right, ...st.question.wrong);
   for (const c of Object.values(CASES)) {
     for (const clue of c.clues) raw.push(clue.zh);
     for (const sc of Object.values(c.scenes)) {

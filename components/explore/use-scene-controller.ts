@@ -175,7 +175,7 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
 
   return {
     ready, marks, words, cardStateOf, learnedWords, fadedWords, startRescue, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
-    startQuest, activate, reset: () => resetScene(sceneId), learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
+    startQuest, activate, recordUse: (id: string, ok: boolean) => answer(progressKey(sceneId, id), ok), reset: () => resetScene(sceneId), learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
     highlightId: quest.active && (quest.phase === "correct" || quest.phase === "reveal") ? quest.round?.targetId ?? null : null,
     openWord: (w: SceneWord) => { setPanel({ kind: "word", word: w }); void playChinese(w.term); },
   };

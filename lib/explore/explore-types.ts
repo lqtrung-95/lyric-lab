@@ -1,3 +1,4 @@
+import type { SceneStory } from "./scene-stories/story-types";
 import type { ExampleSentence } from "@/lib/courses/course-types";
 import type { Vec } from "./player-movement";
 
@@ -97,4 +98,6 @@ export interface SceneDetail extends Omit<SceneDef, "objects"> {
   objects: SceneWord[];
   /** Pinyin của các câu hay dùng (câu tiếng Trung → pinyin), lấy từ từ điển, không viết tay. */
   phrasePinyin: Record<string, string>;
+  /** Truyện ngắn của cảnh (nếu đã viết). Pinyin của các dòng truyện nằm chung trong `phrasePinyin`. */
+  story?: SceneStory;
 }

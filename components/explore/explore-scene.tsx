@@ -12,6 +12,7 @@ import { PlayerAvatar } from "./player-avatar";
 import { QuestPanel, QuestSummary } from "./quest-panel";
 import { SceneCanvas } from "./scene-canvas";
 import { ObjectiveBar } from "./story/objective-bar";
+import { SceneStoryCard } from "./scene-story-card";
 import { ScenePhrases } from "./scene-phrases";
 import { StoryBubble } from "./story/story-bubble";
 import { StoryPanels } from "./story/story-panels";
@@ -84,6 +85,7 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
           {!c.canQuest && <p className="text-label-md text-on-surface-variant">Học ít nhất {MIN_WORDS_FOR_QUEST} từ để mở nhiệm vụ (hoặc đến gặp {scene.npc.name}).</p>}
         </div>
       )}
+      {!story && !quest.active && scene.story && <SceneStoryCard story={scene.story} words={scene.objects} marks={c.marks} pinyin={scene.phrasePinyin} onPickWord={c.openWord} onUseWord={c.recordUse} />}
       {!story && !quest.active && <ScenePhrases phrases={scene.phrases ?? []} conversation={scene.conversation} pinyin={scene.phrasePinyin} />}
       <NotebookChips words={scene.objects} marks={c.marks} onPick={c.openWord} />
       {c.learnedWords.length > 0 && !quest.active && !story && (
