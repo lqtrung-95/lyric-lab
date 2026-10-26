@@ -51,6 +51,13 @@ Bổ sung cho [`CLAUDE.md`](../CLAUDE.md) (quy tắc bắt buộc) và `~/.claud
 - Xưng hô bản dịch: một cặp duy nhất cho cả bài, theo bảng trong `build-analysis-prompt.ts`; sửa gốc ở prompt, sửa từng bài bằng script.
 - Pinyin chữ nhiều âm chọn nhầm: thêm vào `COMMON_READING` + test trong `lookup-words.test.ts` + `backfill-pinyin.mts --apply`.
 
+## Tra từ
+- Mọi truy vấn vào `dict_words` cho tìm kiếm đi qua `DictSearchPort` (`lib/tra-tu/dict-search-port.ts`); logic xếp hạng/phối hợp nguồn là hàm thuần test bằng cổng giả. Nguồn tìm lỗi phải được nuốt (`safe`) để các nguồn còn lại vẫn trả kết quả.
+- Pinyin, Hán Việt, cấp HSK trên trang tra từ chỉ lấy từ từ điển. Nghĩa tiếng Việt do AI viết (khi có) luôn gắn nhãn "do AI dịch, có thể chưa chính xác".
+- Dữ liệu từ gói có giấy phép riêng (hanzi-writer-data: Arphic Public License): không sao chép vào repo, phục vụ nguyên văn từ gói đã cài, giữ tệp giấy phép nguyên bản trong `public/licenses/` và ghi nguồn ngay trên giao diện nơi dùng.
+- Khóa của `outputFileTracingIncludes` là glob: tuyến động viết `/api/x/**`, không viết `[param]`.
+- Danh sách `in(...)` với chữ Hán phải chia lô (≤100 mục): mỗi chữ mã hóa 9 ký tự URL.
+
 ## Test
 
 - **Vitest** cho logic: tokenizer, bộ lọc level, validate vị trí, FSRS, chọn bản LRCLIB, parser, rate-limit… Không dùng dữ liệu giả để "qua build"; test phải kiểm tra hành vi thật.
