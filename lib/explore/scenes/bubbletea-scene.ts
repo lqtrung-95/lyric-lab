@@ -7,7 +7,7 @@ export const BUBBLETEA_SCENE: SceneDef = {
   subtitle: "Ghé quán trà sữa, học tên nguyên liệu và đồ uống rồi làm nhiệm vụ cho Bé Thỏ pha chế.",
   theme: "bubbletea",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Tiệm sửa xe", to: "garage", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Tiệm sửa xe", to: "garage", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Công viên giải trí", to: "funfair", x: 92, y: 60, w: 6 }],
   npc: {
     id: "rabbit", name: "Bé Thỏ pha chế", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến quán trà sữa! Hãy lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

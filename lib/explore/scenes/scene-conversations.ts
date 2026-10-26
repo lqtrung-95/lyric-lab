@@ -277,4 +277,40 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 1, zh: "要,请帮我打包。", vi: "Có, xin đóng gói giúp tôi." },
     ],
   },
+  "funfair": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 1, zh: "请问摩天轮在哪儿?", vi: "Xin hỏi vòng quay khổng lồ ở đâu?" },
+      { who: 0, zh: "在前面,买票就可以坐。", vi: "Ở phía trước, mua vé là ngồi được." },
+      { who: 1, zh: "我也想玩过山车。", vi: "Tôi cũng muốn chơi tàu lượn." },
+      { who: 0, zh: "好的,晚上还有烟花。", vi: "Được, buổi tối còn có pháo hoa." },
+    ],
+  },
+  "farm": {
+    speakers: ["Chủ trại", "Khách"],
+    lines: [
+      { who: 0, zh: "欢迎来农场!你想看什么?", vi: "Chào mừng đến nông trại! Bạn muốn xem gì?" },
+      { who: 1, zh: "我想看看奶牛和绵羊。", vi: "Tôi muốn xem bò sữa và cừu." },
+      { who: 0, zh: "它们在篱笆里,请别喂它们。", vi: "Chúng ở trong hàng rào, xin đừng cho chúng ăn." },
+      { who: 1, zh: "好的,这里空气真好。", vi: "Vâng, ở đây không khí thật trong lành." },
+    ],
+  },
+  "laundry": {
+    speakers: ["Thợ giặt", "Khách"],
+    lines: [
+      { who: 1, zh: "这件外套能洗干净吗?", vi: "Chiếc áo khoác này giặt sạch được không?" },
+      { who: 0, zh: "可以,请先把衬衫也给我。", vi: "Được, xin đưa luôn cho tôi cả áo sơ mi." },
+      { who: 1, zh: "什么时候可以来取?", vi: "Khi nào có thể đến lấy?" },
+      { who: 0, zh: "明天下午。", vi: "Chiều mai." },
+    ],
+  },
+  "toyshop": {
+    speakers: ["Chủ tiệm", "Khách"],
+    lines: [
+      { who: 1, zh: "这个玩具多少钱?", vi: "Món đồ chơi này bao nhiêu tiền?" },
+      { who: 0, zh: "六十块,这是给孩子的好礼物。", vi: "Sáu mươi tệ, đây là món quà tốt cho trẻ." },
+      { who: 1, zh: "我想送给我弟弟。", vi: "Tôi muốn tặng em trai tôi." },
+      { who: 0, zh: "好,我帮你包装一下。", vi: "Được, tôi gói giúp bạn." },
+    ],
+  },
 };
