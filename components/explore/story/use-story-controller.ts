@@ -38,7 +38,7 @@ export interface StoryExtra {
  * Phá án xong thì ghi điểm một lần (đúng/tổng câu kiểm tra hiểu) để tính XP như một lượt luyện tập.
  */
 export function useStoryController(payload: StoryPayload, sceneNpcId: string) {
-  const { progress, ready, update, reset } = useStoryProgress();
+  const { progress, ready, update, reset } = useStoryProgress(payload.story.id);
   const [view, setView] = useState<StoryView>(null);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const { story, scene } = payload;

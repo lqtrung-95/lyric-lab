@@ -8,8 +8,8 @@ import { DIFFICULTY_LABEL, type StoryDef } from "@/lib/explore/story/story-types
 import { useStoryProgress } from "./use-story-progress";
 
 /** Trang giới thiệu một vụ án: tóm tắt, mục tiêu hiện tại, nút bắt đầu/tiếp tục và chơi lại từ đầu (hỏi lại trước khi xóa tiến độ). */
-export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "title" | "difficulty" | "intro" | "objectives" | "startScene" | "solvedFlag">; basePath: string }) {
-  const { progress, ready, reset } = useStoryProgress();
+export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "id" | "title" | "difficulty" | "intro" | "objectives" | "startScene" | "solvedFlag">; basePath: string }) {
+  const { progress, ready, reset } = useStoryProgress(story.id);
   const [confirm, setConfirm] = useState(false);
   const objective = currentObjective(story.objectives, progress.flags);
   const { done, total } = objectiveProgress(story.objectives, progress.flags);

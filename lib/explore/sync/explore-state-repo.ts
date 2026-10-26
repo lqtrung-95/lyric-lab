@@ -19,3 +19,25 @@ export async function saveRemoteState(kind: ExploreStateKind, value: unknown): P
   const { error } = await sb.from("user_explore_state").upsert({ user_id: userId, kind, data: value, updated_at: new Date().toISOString() });
   if (error) throw new Error(error.message);
 }
+
+/** Tiến độ cốt truyện lưu một dòng `story` chứa mọi vụ án: `{ cases: { [caseId]: tiến độ } }`. Dữ liệu cũ (một khối tiến độ trần) thuộc vụ án đầu tiên. */
+const LEGACY_CASE = "wooden-box";
+type StoryBook = { cases: Record<string, unknown> };
+
+function toBook(raw: unknown): StoryBook {
+  const r = raw as { cases?: Record<string, unknown>; flags?: unknown } | null;
+  if (r && typeof r.cases === "object" && r.cases) return { cases: { ...r.cases } };
+  if (r && Array.isArray(r.flags)) return { cases: { [LEGACY_CASE]: r } };
+  return { cases: {} };
+}
+
+export async function loadRemoteStory(caseId: string): Promise<unknown | null> {
+  return toBook(await loadRemoteState("story")).cases[caseId] ?? null;
+}
+
+/** Ghi tiến độ một vụ án, giữ nguyên các vụ khác trong cùng dòng. */
+export async function saveRemoteStory(caseId: string, value: unknown): Promise<void> {
+  const book = toBook(await loadRemoteState("story"));
+  book.cases[caseId] = value;
+  await saveRemoteState("story", book);
+}

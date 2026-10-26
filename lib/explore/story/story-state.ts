@@ -37,15 +37,20 @@ export function parseStory(data: unknown): StoryProgress {
   return { flags: d.flags.filter((x) => typeof x === "string"), clues: d.clues.filter((x) => typeof x === "string"), checks: { right: Number(d.checks?.right) || 0, total: Number(d.checks?.total) || 0 }, scored: d.scored === true };
 }
 
-export function loadStory(storage: Pick<Storage, "getItem"> | null): StoryProgress {
+/** Vụ án đầu tiên lưu tiến độ trước khi có khóa theo vụ án: dữ liệu ở khóa trần thuộc vụ này. */
+export const LEGACY_CASE_ID = "wooden-box";
+export const storyKey = (caseId: string): string => `${STORY_KEY}:${caseId}`;
+
+/** Đọc tiến độ của một vụ án (mỗi vụ một khóa); dữ liệu hỏng hoặc không đọc được thì bắt đầu mới. */
+export function loadStory(storage: Pick<Storage, "getItem"> | null, caseId: string = LEGACY_CASE_ID): StoryProgress {
   try {
-    const raw = storage?.getItem(STORY_KEY);
+    const raw = storage?.getItem(storyKey(caseId)) ?? (caseId === LEGACY_CASE_ID ? storage?.getItem(STORY_KEY) : null);
     return raw ? parseStory(JSON.parse(raw)) : emptyStory();
   } catch {
     return emptyStory();
   }
 }
 
-export function saveStory(storage: Pick<Storage, "setItem"> | null, p: StoryProgress): void {
-  try { storage?.setItem(STORY_KEY, JSON.stringify(p)); } catch { /* đầy hoặc bị chặn: chỉ mất khi đóng tab */ }
+export function saveStory(storage: Pick<Storage, "setItem"> | null, p: StoryProgress, caseId: string = LEGACY_CASE_ID): void {
+  try { storage?.setItem(storyKey(caseId), JSON.stringify(p)); } catch { /* đầy hoặc bị chặn: chỉ mất khi đóng tab */ }
 }

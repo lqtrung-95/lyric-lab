@@ -12,6 +12,8 @@ interface Options<T> {
   merge: (local: T, remote: T) => T;
   /** Thay trạng thái bằng bản đã gộp (hook gốc cũng ghi lại localStorage). */
   replace: (next: T) => void;
+  /** Cách đọc/ghi riêng (mặc định đọc/ghi cả khối theo `kind`). */
+  remote?: { load: () => Promise<unknown | null>; save: (value: T) => Promise<void> };
 }
 
 const PUSH_DELAY_MS = 1500;
@@ -20,20 +22,20 @@ const PUSH_DELAY_MS = 1500;
  * Đồng bộ một khối tiến độ với tài khoản: lúc vào lấy bản trên tài khoản, gộp với bản ở máy rồi dùng bản gộp; sau đó mỗi thay đổi được đẩy lên (chờ 1,5 giây cho gọn).
  * Lỗi bất kỳ (chưa đăng nhập, chưa chạy migration, mất mạng) chỉ tắt đồng bộ, game vẫn chơi bình thường bằng bản ở máy.
  */
-export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace }: Options<T>) {
+export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace, remote }: Options<T>) {
   const valueRef = useRef(value);
   const enabled = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const latest = useRef({ parse, merge, replace });
+  const latest = useRef({ parse, merge, replace, remote });
   useEffect(() => {
     valueRef.current = value;
-    latest.current = { parse, merge, replace };
+    latest.current = { parse, merge, replace, remote };
   });
 
   useEffect(() => {
     if (!ready) return;
     let alive = true;
-    loadRemoteState(kind)
+    (latest.current.remote?.load() ?? loadRemoteState(kind))
       .then((raw) => {
         if (!alive) return;
         const { parse: p, merge: m, replace: r } = latest.current;
@@ -47,7 +49,7 @@ export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace }: 
   useEffect(() => {
     if (!enabled.current) return;
     clearTimeout(timer.current);
-    timer.current = setTimeout(() => { saveRemoteState(kind, valueRef.current).catch(() => { /* lần sau thử lại */ }); }, PUSH_DELAY_MS);
+    timer.current = setTimeout(() => { (latest.current.remote?.save(valueRef.current) ?? saveRemoteState(kind, valueRef.current)).catch(() => { /* lần sau thử lại */ }); }, PUSH_DELAY_MS);
     return () => clearTimeout(timer.current);
   }, [kind, value]);
 }

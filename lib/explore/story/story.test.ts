@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { judge, readyToAccuse } from "./deduction";
 import { enterNode, pickEntry, step, visibleChoices } from "./dialogue";
 import { currentObjective, objectiveProgress } from "./objectives";
-import { addFlag, applyEffects, emptyStory, holds, loadStory, recordCheck, saveStory, STORY_KEY } from "./story-state";
+import { addFlag, applyEffects, emptyStory, holds, loadStory, recordCheck, saveStory, STORY_KEY, storyKey } from "./story-state";
 import type { DialogueNode, Objective } from "./story-types";
 
 describe("story-state", () => {
@@ -31,10 +31,22 @@ describe("story-state", () => {
     const storage = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
     saveStory(storage, p);
     expect(loadStory(storage)).toEqual(p);
-    mem.set(STORY_KEY, "{hỏng");
+    mem.set(storyKey("wooden-box"), "{hỏng");
     expect(loadStory(storage)).toEqual(emptyStory());
-    mem.set(STORY_KEY, JSON.stringify({ flags: "x" }));
+    mem.set(storyKey("wooden-box"), JSON.stringify({ flags: "x" }));
     expect(loadStory(storage)).toEqual(emptyStory());
+  });
+
+  it("mỗi vụ án một khóa riêng; vụ đầu đọc được dữ liệu cũ ở khóa trần, vụ khác thì không", () => {
+    const mem = new Map<string, string>();
+    const storage = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
+    const old = { flags: ["met:owl"], clues: [], checks: { right: 0, total: 0 }, scored: false };
+    mem.set(STORY_KEY, JSON.stringify(old));
+    expect(loadStory(storage, "wooden-box").flags).toEqual(["met:owl"]);
+    expect(loadStory(storage, "golden-key")).toEqual(emptyStory());
+    saveStory(storage, { ...old, flags: ["met:duck"] }, "golden-key");
+    expect(loadStory(storage, "golden-key").flags).toEqual(["met:duck"]);
+    expect(loadStory(storage, "wooden-box").flags).toEqual(["met:owl"]);
   });
 });
 

@@ -122,3 +122,29 @@ describe("khóa cảnh theo thứ tự mục tiêu", () => {
     for (const id of ["room", "restaurant", "market", "station", "hospital", "park"]) expect(open(all, id), id).toBe(true);
   });
 });
+
+describe("vụ án chiếc chìa khóa vàng", () => {
+  const story = CASES["golden-key"];
+  const open = (flags: string[], scene: string) => sceneUnlocked(story.objectives, story.startScene, flags, scene);
+
+  it("là mức Vừa, có 4 nghi phạm và chỉ mở cảnh theo thứ tự", () => {
+    expect(story.difficulty).toBe("medium");
+    expect(story.suspects).toHaveLength(4);
+    expect(open([], "hotel")).toBe(true);
+    for (const id of ["clothing-store", "school", "station", "airport", "park"]) expect(open([], id), id).toBe(false);
+    expect(open(["clue:guest_book", "clue:umbrella"], "clothing-store")).toBe(true);
+  });
+
+  it("Ông Rùa chỉ kể khi đã có manh mối chiếc ô (câu hỏi bị khóa)", () => {
+    const ask = story.scenes.park.dialogues.t_ask;
+    const visible = (flags: string[]) => (ask.choices ?? []).filter((c) => holds(c.when, flags)).map((c) => c.next);
+    expect(visible([])).not.toContain("t_ans");
+    expect(visible(["clue:umbrella"])).toContain("t_ans");
+  });
+
+  it("buộc tội Chó (mồi nhử) dù có nhiều bằng chứng vẫn sai; chỉ cần 4/6 manh mối then chốt với Cô Chim", () => {
+    expect(judge(story, "dog", story.solution.keyClues).type).toBe("wrong_suspect");
+    expect(judge(story, "bird", story.solution.keyClues.slice(0, 3)).type).toBe("weak_evidence");
+    expect(judge(story, "bird", story.solution.keyClues.slice(0, 4)).type).toBe("solved");
+  });
+});
