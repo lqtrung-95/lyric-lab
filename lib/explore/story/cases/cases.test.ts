@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { judge, readyToAccuse } from "../deduction";
 import { enterNode, pickEntry, step } from "../dialogue";
 import { currentObjective, sceneUnlocked } from "../objectives";
+import { storyExits, storyRoute } from "../story-route";
 import { applyEffects, emptyStory, holds } from "../story-state";
 import type { Condition, Effect, StoryDef, StoryProgress } from "../story-types";
 import { CASES } from ".";
@@ -168,5 +169,20 @@ describe("vụ án chiếc bánh kem bị đánh tráo", () => {
     expect(pickEntry(park, ["met:turtle"])).toBe("t_after");
     expect(pickEntry(park, ["met:turtle", "clue:salt_buyer"])).toBe("t2_hi");
     expect(pickEntry(park, ["met:turtle", "clue:salt_buyer", "saw:turtle"])).toBe("t_after");
+  });
+});
+
+describe("lối đi trong vụ án theo thứ tự điều tra", () => {
+  it("mỗi cảnh (trừ đầu/cuối) có lối về cảnh trước và sang cảnh sau khi cả hai đã mở; cảnh chưa mở không có biển", () => {
+    for (const story of Object.values(CASES)) {
+      const route = storyRoute(story.objectives, story.startScene);
+      expect(new Set(route).size, story.id).toBe(route.length);
+      for (const id of Object.keys(story.scenes)) expect(route, `${story.id}: ${id}`).toContain(id);
+      const title = (id: string) => id;
+      const mid = route[1];
+      expect(storyExits(route, mid, title, () => true).map((e) => e.to)).toEqual([route[0], route[2]]);
+      expect(storyExits(route, mid, title, () => false)).toEqual([]);
+      expect(storyExits(route, route[0], title, () => true).map((e) => e.to)).toEqual([route[1]]);
+    }
   });
 });
