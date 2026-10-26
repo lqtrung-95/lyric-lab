@@ -95,4 +95,33 @@ const crab: FlatSprite = {
   ),
 };
 
-export const PLACE_SPRITES: Record<string, FlatSprite> = { bookshelf, cart, printer, document: documentSprite, boat, shell, crab };
+const woodbox: FlatSprite = {
+  w: 96, h: 66,
+  node: (
+    <g {...LINE}>
+      <rect x="6" y="22" width="84" height="40" rx="6" fill={C.wood} />
+      <path d="M6 28q42 10 84 0" fill="none" strokeWidth={2.5} />
+      <path d="M8 22q0-14 14-16h52q14 2 14 16Z" fill={C.woodD} />
+      <rect x="40" y="26" width="16" height="14" rx="3" fill={C.yellow} />
+      <circle cx="48" cy="33" r="2.5" fill={INK} stroke="none" />
+      <path d="M22 30v30M74 30v30" fill="none" strokeWidth={3} stroke={C.brown} />
+    </g>
+  ),
+};
+
+const cake: FlatSprite = {
+  w: 84, h: 74,
+  node: (
+    <g {...LINE}>
+      <rect x="8" y="40" width="68" height="28" rx="6" fill={C.cream} />
+      <rect x="8" y="40" width="68" height="10" rx="5" fill={C.pink} />
+      <rect x="16" y="22" width="52" height="22" rx="6" fill={C.white} />
+      <path d="M16 28q6 8 12 0t12 0t12 0t12 0" fill={C.pink} stroke={INK} />
+      <circle cx="42" cy="18" r="5" fill={C.red} />
+      <path d="M42 13V6" fill="none" strokeWidth={3} />
+      <ellipse cx="42" cy="4" rx="2.5" ry="3.5" fill={C.yellow} strokeWidth={2} />
+    </g>
+  ),
+};
+
+export const PLACE_SPRITES: Record<string, FlatSprite> = { bookshelf, cart, printer, document: documentSprite, boat, shell, crab, woodbox, cake };

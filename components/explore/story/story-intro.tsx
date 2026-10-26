@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Button3d } from "@/components/ui/button-3d";
 import { currentObjective, objectiveProgress } from "@/lib/explore/story/objectives";
 import type { StoryDef } from "@/lib/explore/story/story-types";
+import { CasePoster } from "../case-poster";
 import { DifficultyBadge } from "./difficulty-badge";
 import { useStoryProgress } from "./use-story-progress";
 
@@ -19,6 +20,7 @@ export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "id" | "
   const scene = objective?.sceneId ?? story.startScene;
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
+      <div className="card-ink overflow-hidden"><CasePoster caseId={story.id} /></div>
       <header>
         <h1 className="text-headline-lg">{story.title}</h1>
         <p className="mt-1"><DifficultyBadge level={story.difficulty} prefix="Độ khó: " /></p>

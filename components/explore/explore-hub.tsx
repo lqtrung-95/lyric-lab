@@ -7,6 +7,7 @@ import { SCENES } from "@/lib/explore/scenes";
 import { objectiveProgress } from "@/lib/explore/story/objectives";
 import { loadStory } from "@/lib/explore/story/story-state";
 import type { Objective, StoryDifficulty } from "@/lib/explore/story/story-types";
+import { CasePoster } from "./case-poster";
 import { SceneThumb } from "./scene-thumb";
 import { DifficultyBadge } from "./story/difficulty-badge";
 
@@ -65,7 +66,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
               <li key={c.id}>
                 <Link href={`/explore/cases/${c.id}`} className={card}>
                   <div className="relative">
-                    <SceneThumb scene={SCENES[c.startScene]} />
+                    <CasePoster caseId={c.id} />
                     <span className="absolute left-2 top-2"><DifficultyBadge level={c.difficulty} /></span>
                     {st?.solved && <span className="absolute right-2 top-2 rounded-full border-2 border-ink bg-surface-container-lowest px-2.5 py-0.5 text-label-md font-extrabold text-primary">✓ Đã giải</span>}
                   </div>
