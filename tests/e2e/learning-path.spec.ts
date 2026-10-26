@@ -105,7 +105,7 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
   let answerCards = 0;
   for (let i = 0; i < 10; i++) {
     await expect(page.getByText(new RegExp(`Câu ${i + 1}/10`))).toBeVisible();
-    await page.getByRole("group", { name: "Các lựa chọn" }).getByRole("button").first().click();
+    await answerQuestion(page);
     answerCards += await page.getByTestId("answer-card").count();
     await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
   }
@@ -117,11 +117,39 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
   await noViolations(page);
 });
 
+/** Trả lời câu hiện tại của bài kiểm tra, bất kể dạng (trắc nghiệm: đáp án đầu; ghép cặp: thử từng nghĩa; đúng/sai: Đúng; sắp xếp: theo thứ tự đang hiện; gõ pinyin: gõ tạm); đúng hay sai không quan trọng với luồng này. */
+async function answerQuestion(page: Page) {
+  const choices = page.getByRole("group", { name: "Các lựa chọn" });
+  if (await choices.count()) { await choices.getByRole("button").first().click(); return; }
+  const match = page.getByRole("group", { name: "Ghép chữ Hán với nghĩa" });
+  if (await match.count()) {
+    const lefts = match.locator("> div").first().getByRole("button");
+    const rights = match.locator("> div").nth(1).getByRole("button");
+    for (let i = 0, n = await lefts.count(); i < n; i++) {
+      for (let j = 0, m = await rights.count(); j < m && (await lefts.nth(i).isEnabled()); j++) {
+        await lefts.nth(i).click();
+        if (await rights.nth(j).isEnabled()) await rights.nth(j).click();
+      }
+    }
+    return;
+  }
+  const tf = page.getByRole("group", { name: "Đúng hay sai" });
+  if (await tf.count()) { await tf.getByRole("button", { name: "Đúng" }).click(); return; }
+  const pieces = page.getByLabel("Các mảnh");
+  if (await pieces.count()) {
+    while (await pieces.getByRole("button").count()) await pieces.getByRole("button").first().click();
+    await page.getByRole("button", { name: "Kiểm tra" }).click();
+    return;
+  }
+  await page.getByRole("textbox", { name: /Gõ pinyin/ }).fill("wo3");
+  await page.getByRole("button", { name: "Kiểm tra" }).click();
+}
+
 /** Làm hết một bài kiểm tra bằng cách luôn chọn đáp án đầu tiên (đúng hay sai không quan trọng với luồng này). */
 async function answerAll(page: Page, total: number) {
   for (let i = 0; i < total; i++) {
     await expect(page.getByText(new RegExp(`Câu ${i + 1}/${total}`))).toBeVisible();
-    await page.getByRole("group", { name: "Các lựa chọn" }).getByRole("button").first().click();
+    await answerQuestion(page);
     await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
   }
 }

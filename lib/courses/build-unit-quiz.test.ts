@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildUnitQuiz, CLOZE_BLANK, gradeQuiz, REVIEW_QUIZ_KINDS, wordLabel } from "./build-unit-quiz";
+import { buildUnitQuiz, CLOZE_BLANK, gradeQuiz, REVIEW_QUIZ_KINDS, UNIT_QUIZ_KINDS, wordLabel } from "./build-unit-quiz";
 import type { UnitWord } from "./unit-types";
 
 const w = (term: string, gloss: string | null, meanings: string[] = []): UnitWord => ({ term, pinyin: "p", sinoViet: null, hskLevel: 1, gloss, meanings, examples: [] });
@@ -48,7 +48,9 @@ describe("buildUnitQuiz (chặng ôn: thêm pinyin và điền chỗ trống)", 
   it("dùng đủ năm kiểu; pinyin có nhãn là pinyin, cloze có chỗ trống và bản dịch, các nhãn không trùng", () => {
     const qs = buildUnitQuiz(pool, seeded(), 20, REVIEW_QUIZ_KINDS);
     expect(qs.length).toBeGreaterThan(0);
-    expect(new Set(qs.map((q) => q.kind))).toEqual(new Set(["meaning", "cloze", "listen", "pinyin", "term"]));
+    const kinds = new Set(qs.map((q) => q.kind));
+    for (const k of ["meaning", "cloze", "listen", "pinyin", "term"] as const) expect(kinds.has(k), k).toBe(true);
+    for (const k of kinds) expect(REVIEW_QUIZ_KINDS).toContain(k);
     for (const q of qs) {
       expect(new Set(q.options.map((o) => o.label)).size).toBe(q.options.length);
       if (q.kind === "pinyin") expect(q.options.find((o) => o.term === q.answer)!.label).toBe(pool.find((x) => x.term === q.term)!.pinyin);
@@ -58,6 +60,53 @@ describe("buildUnitQuiz (chặng ôn: thêm pinyin và điền chỗ trống)", 
   it("từ không có câu thật thì câu điền chỗ trống đổi sang chữ→nghĩa", () => {
     const noExamples = pool.map((x) => ({ ...x, examples: [] }));
     expect(buildUnitQuiz(noExamples, seeded(), 20, REVIEW_QUIZ_KINDS).some((q) => q.kind === "cloze")).toBe(false);
+  });
+});
+
+describe("buildUnitQuiz (các dạng ngoài trắc nghiệm)", () => {
+  const rich = (term: string, pinyin: string, gloss: string, text?: string): UnitWord => ({
+    term, pinyin, sinoViet: null, hskLevel: 2, gloss, meanings: [],
+    examples: text ? [{ videoId: "v", lineIdx: 1, start: 0, end: 1, text, pinyin: "", translation: `dịch ${term}`, quality: 1 }] : [],
+  });
+  const pool = [rich("苹果", "píngguǒ", "quả táo", "我喜欢吃苹果。"), rich("香蕉", "xiāngjiāo", "chuối", "他想买香蕉。"), rich("西瓜", "xīguā", "dưa hấu", "夏天吃西瓜很好"), rich("橘子", "júzi", "quýt", "这个橘子很甜呀"), rich("葡萄", "pútao", "nho", "葡萄是紫色的")];
+
+  it("bài chặng xen kẽ trắc nghiệm với ghép cặp, đúng/sai, sắp xếp câu và gõ pinyin", () => {
+    const qs = buildUnitQuiz(pool, seeded(), 10, UNIT_QUIZ_KINDS);
+    expect(qs).toHaveLength(10);
+    expect(new Set(qs.map((q) => q.kind))).toEqual(new Set(["meaning", "match", "listen", "tf", "order", "term", "type"]));
+    expect(qs.filter((q) => ["meaning", "term", "listen"].includes(q.kind)).length).toBeLessThan(qs.length);
+  });
+
+  it("ghép cặp: 3-4 cặp có từ chính, nghĩa không trùng", () => {
+    for (const q of buildUnitQuiz(pool, seeded(), 20, ["match"])) {
+      expect(q.pairs!.length).toBeGreaterThanOrEqual(3);
+      expect(q.pairs!.length).toBeLessThanOrEqual(4);
+      expect(q.pairs!.some((p) => p.term === q.term)).toBe(true);
+      expect(new Set(q.pairs!.map((p) => p.label)).size).toBe(q.pairs!.length);
+    }
+  });
+
+  it("sắp xếp câu: các mảnh ghép lại đúng câu, không để nguyên thứ tự; từ không có câu hợp thì đổi sang chữ→nghĩa", () => {
+    for (const q of buildUnitQuiz(pool, seeded(), 20, ["order"])) {
+      expect([...q.chunks!.join("")].sort().join("")).toBe([...q.sentence!].sort().join(""));
+      expect(q.chunks!.join("")).not.toBe(q.sentence);
+      expect(q.prompt).toContain(q.term);
+    }
+    const none = pool.map((x) => ({ ...x, examples: [] }));
+    expect(buildUnitQuiz(none, seeded(), 10, ["order"]).every((q) => q.kind === "meaning")).toBe(true);
+  });
+
+  it("đúng/sai: nghĩa hiển thị đúng khi truth=true và khác khi truth=false; có cả hai loại", () => {
+    const qs = buildUnitQuiz(pool, seeded(), 30, ["tf"]);
+    for (const q of qs) {
+      const real = wordLabel(pool.find((x) => x.term === q.term)!);
+      expect(q.shown === real).toBe(q.truth);
+    }
+    expect(new Set(qs.map((q) => q.truth))).toEqual(new Set([true, false]));
+  });
+
+  it("gõ pinyin: không có đáp án lựa chọn, đáp án là từ", () => {
+    for (const q of buildUnitQuiz(pool, seeded(), 6, ["type"])) { expect(q.kind).toBe("type"); expect(q.options).toEqual([]); expect(q.answer).toBe(q.term); }
   });
 });
 
