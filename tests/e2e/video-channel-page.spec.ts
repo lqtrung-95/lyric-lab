@@ -30,7 +30,7 @@ test("trang Video: kênh nhiều video chỉ hiện 4 video đầu và thẻ Xem
 test("bấm Xem tất cả: sang trang kênh liệt kê đủ video, có lọc theo cấp, và quay lại được", async ({ page }) => {
   await open(page);
   await page.getByRole("region", { name: `Kênh ${BIG}` }).getByRole("link", { name: /Xem tất cả 6 video/ }).click();
-  await expect(page).toHaveURL(/\/video\/kenh\/Daihua/);
+  await expect(page).toHaveURL(/\/video\/channel\/Daihua/);
   await expect(page.getByRole("heading", { level: 1, name: BIG })).toBeVisible();
   await expect(page.getByText("6 bài học")).toBeVisible();
   await expect(page.locator("a[href^='/video/aaaaaaaaa']")).toHaveCount(6);

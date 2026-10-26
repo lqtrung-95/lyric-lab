@@ -9,7 +9,7 @@ const avatarLeft = async (page: Page) => parseFloat(await page.getByTestId("play
 test("chạm vật: nhân vật tự đi tới rồi mở thẻ từ; nhiệm vụ mở sau 3 từ và không lộ đáp án", async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 1300 });
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
-  await page.goto("/explore/phong");
+  await page.goto("/explore/room");
   await expect(page.getByRole("heading", { name: "Phòng của bạn" })).toBeVisible();
 
   const start = page.getByRole("button", { name: "Nhận nhiệm vụ" });
@@ -41,7 +41,7 @@ test("chạm vật: nhân vật tự đi tới rồi mở thẻ từ; nhiệm v�
 test("điều khiển bằng bàn phím: giữ phím mũi tên thì đi, lại gần vật thì nhấn E học từ", async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 1300 });
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
-  await page.goto("/explore/phong");
+  await page.goto("/explore/room");
   await expect(page.getByRole("heading", { name: "Phòng của bạn" })).toBeVisible();
 
   const box = (await stage(page).boundingBox())!;
@@ -66,7 +66,7 @@ test("điều khiển bằng bàn phím: giữ phím mũi tên thì đi, lại g
 test("Cú Thầy: chưa học đủ từ thì nhắc, nhận được nhiệm vụ khi đủ", async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 1300 });
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
-  await page.goto("/explore/phong");
+  await page.goto("/explore/room");
   await page.getByRole("button", { name: /Nói chuyện với Cú Thầy/ }).click();
   const owl = page.getByRole("region", { name: "Cú Thầy" });
   await expect(owl).toContainText("3 từ");
@@ -84,7 +84,7 @@ test("nhiệm vụ: câu mang đồ cần nhặt đúng vật rồi giao cho Cú
   test.setTimeout(150_000);
   await page.setViewportSize({ width: 1100, height: 1300 });
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
-  await page.goto("/explore/phong");
+  await page.goto("/explore/room");
   const obj = (id: string) => { const o = ROOM_SCENE.objects.find((x) => x.id === id)!; return page.locator(`button[style*="left:${o.x}%;top:${o.y}%"]`); };
   const portable = ROOM_SCENE.objects.filter((o) => ["cup", "cat", "book", "apple", "water"].includes(o.id));
   for (const o of portable) {
@@ -121,7 +121,7 @@ test("nhiệm vụ: câu mang đồ cần nhặt đúng vật rồi giao cho Cú
 test("đi sang Quán ăn bằng biển chỉ đường, học một từ, quay lại: tiến độ hai cảnh tách riêng", async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 1300 });
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
-  await page.goto("/explore/phong");
+  await page.goto("/explore/room");
   await page.getByRole("button", { name: "Sang Quán ăn" }).click();
   await expect(page.getByRole("heading", { name: "Quán ăn" })).toBeVisible();
   await page.getByRole("button", { name: /^茶, / }).click();
@@ -133,7 +133,7 @@ test("đi sang Quán ăn bằng biển chỉ đường, học một từ, quay l
 });
 
 test("nhạc nền: bật mặc định, tắt được và nhớ lựa chọn sau khi tải lại", async ({ page }) => {
-  await page.goto("/explore/phong");
+  await page.goto("/explore/room");
   const music = page.getByRole("button", { name: /Nhạc nền/ });
   await expect(music).toHaveAttribute("aria-pressed", "true");
   await music.click();
