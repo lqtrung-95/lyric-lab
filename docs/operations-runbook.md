@@ -295,3 +295,10 @@ Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat
 - Chọn bài theo cảnh ở `lib/explore/music-tracks.ts`, độ to riêng từng bài đã cân theo độ to trung bình đo bằng `ffmpeg -af volumedetect`.
 - Thêm/đổi bài: nén `ffmpeg -i in.mp3 -map_metadata -1 -c:a libmp3lame -b:a 112k out.mp3`, bỏ vào thư mục trên, đo độ to rồi sửa `volume`.
 - Nếu không tải được file thì tự rơi về nhạc thuật toán (`ambient-music.ts`).
+
+
+## Giọng đọc (Azure Speech) cho Khám phá
+
+- Giọng đọc tự nhiên của một từ/câu chỉ có sau khi đã tổng hợp và lưu vào Storage (bucket `tts`, dùng chung mọi người). Lần đầu một câu được bấm loa thì server gọi Azure và TÍNH HẠN MỨC theo tài khoản (`tts`: khách ẩn danh 80 lượt/ngày, thành viên 250 lượt/ngày; xem `usage-limit-config.ts`); hết hạn mức, Azure giới hạn tốc độ (gói miễn phí khoảng 20 lượt/phút), hoặc hết hạn mức tháng thì nút loa rơi về giọng hệ thống của trình duyệt (nghe như giọng máy).
+- Cách khắc phục: chạy một lần `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/prewarm-explore-tts.mts --apply` để tổng hợp sẵn mọi từ/câu của Khám phá (thiếu thì tạo, đủ thì bỏ qua; mặc định chỉ đếm). Nên chạy lại mỗi khi thêm cảnh/vụ án mới. Gặp 429 script tự đợi 65 giây rồi thử lại.
+- Khóa dự phòng (tùy chọn): `AZURE_SPEECH_KEY_2` và `AZURE_SPEECH_REGION_2` (một tài khoản/resource Azure Speech khác, lý tưởng khác tài khoản đăng ký để có thêm hạn mức miễn phí). Khi tài khoản chính trả 429/lỗi máy chủ/lỗi mạng thì `/api/tts` và script tự thử tài khoản dự phòng (`synthesizeWithFailover`). Hai khóa `key1`/`key2` của CÙNG một resource không tăng hạn mức.

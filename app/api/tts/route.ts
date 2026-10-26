@@ -1,8 +1,8 @@
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getServerEnv } from "@/lib/env/server-env";
+import { azureSpeechEndpoints } from "@/lib/env/server-env";
 import { consumeUsage } from "@/lib/rate-limit/consume-usage";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
-import { TtsUnavailableError, synthesizeWithAzure } from "@/lib/tts/azure-speech";
+import { TtsUnavailableError, synthesizeWithFailover } from "@/lib/tts/azure-speech";
 import { readStoredAudio, storeAudio } from "@/lib/tts/tts-audio-store";
 import { normalizeTtsText } from "@/lib/tts/tts-text";
 
@@ -24,15 +24,15 @@ export async function GET(req: Request) {
   const stored = await readStoredAudio(sb, text);
   if (stored) return new Response(new Uint8Array(stored), { headers: AUDIO_HEADERS });
 
-  const { AZURE_SPEECH_KEY: key, AZURE_SPEECH_REGION: region } = getServerEnv();
-  if (!key || !region) return Response.json({ error: "tts_not_configured" }, { status: 503 });
+  const endpoints = azureSpeechEndpoints();
+  if (endpoints.length === 0) return Response.json({ error: "tts_not_configured" }, { status: 503 });
 
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: "auth_required" }, { status: 401 });
   if (!(await consumeUsage(user, "tts"))) return Response.json({ error: "rate_limited" }, { status: 429 });
 
   try {
-    const audio = await synthesizeWithAzure(text, key, region);
+    const audio = await synthesizeWithFailover(text, endpoints);
     await storeAudio(sb, text, audio);
     return new Response(new Uint8Array(audio), { headers: AUDIO_HEADERS });
   } catch (error) {

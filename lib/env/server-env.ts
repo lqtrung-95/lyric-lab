@@ -29,6 +29,9 @@ const serverEnvSchema = z.object({
   // Giọng đọc thần kinh (Azure Speech). Bỏ trống thì /api/tts trả 503 và nút loa dùng giọng hệ thống.
   AZURE_SPEECH_KEY: z.string().min(1).optional(),
   AZURE_SPEECH_REGION: z.string().min(1).optional(),
+  // Tài khoản Azure Speech DỰ PHÒNG (tùy chọn): dùng khi tài khoản chính hết hạn mức hoặc lỗi.
+  AZURE_SPEECH_KEY_2: z.string().min(1).optional(),
+  AZURE_SPEECH_REGION_2: z.string().min(1).optional(),
   CAPTION_PROBE_SECRET: z.string().min(16).optional(),
 });
 
@@ -42,4 +45,12 @@ function dropEmptyValues(env: NodeJS.ProcessEnv): Record<string, string> {
 
 export function getServerEnv(): ServerEnv {
   return serverEnvSchema.parse(dropEmptyValues(process.env));
+}
+
+/** Danh sách tài khoản Azure Speech theo thứ tự ưu tiên (chính, rồi dự phòng nếu có); rỗng nếu chưa cấu hình. */
+export function azureSpeechEndpoints(env: Pick<ServerEnv, "AZURE_SPEECH_KEY" | "AZURE_SPEECH_REGION" | "AZURE_SPEECH_KEY_2" | "AZURE_SPEECH_REGION_2"> = getServerEnv()): { key: string; region: string }[] {
+  const out: { key: string; region: string }[] = [];
+  if (env.AZURE_SPEECH_KEY && env.AZURE_SPEECH_REGION) out.push({ key: env.AZURE_SPEECH_KEY, region: env.AZURE_SPEECH_REGION });
+  if (env.AZURE_SPEECH_KEY_2 && env.AZURE_SPEECH_REGION_2) out.push({ key: env.AZURE_SPEECH_KEY_2, region: env.AZURE_SPEECH_REGION_2 });
+  return out;
 }
