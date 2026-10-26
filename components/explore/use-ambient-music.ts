@@ -3,15 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Mood } from "@/lib/explore/ambient-music";
 import { isChineseAudioBusy } from "@/lib/speech/play-chinese";
+import { trackFor } from "@/lib/explore/music-tracks";
 import { startAmbientMusic, type AmbientMusic } from "./ambient-engine";
+import { startTrackMusic } from "./track-engine";
 
 export const MUSIC_KEY = "songhanzi-explore-music";
 
 /**
  * Nhạc nền của cảnh: mặc định TẮT (người dùng bật thì được nhớ cho lần sau). Bắt đầu phát ở lần chạm/nhấn phím đầu tiên trong trang (trình duyệt chặn tự phát),
- * hạ nhỏ khi có giọng đọc tiếng Trung, dừng khi tab bị ẩn và khi rời cảnh.
+ * hạ nhỏ khi có giọng đọc tiếng Trung, dừng khi tab bị ẩn và khi rời cảnh. Phát các bài có sẵn (`music-tracks.ts`), cảnh phá án dùng bài trinh thám.
  */
-export function useAmbientMusic(mood: Mood) {
+export function useAmbientMusic(mood: Mood, caseMode = false) {
   const [enabled, setEnabled] = useState(false);
   const engine = useRef<AmbientMusic | null>(null);
 
@@ -28,7 +30,8 @@ export function useAmbientMusic(mood: Mood) {
     let cancelled = false;
     const begin = () => {
       if (cancelled || engine.current) return;
-      engine.current = startAmbientMusic(mood);
+      // Bài nhạc có sẵn; không tải/phát được thì rơi về nhạc thuật toán.
+      engine.current = startTrackMusic(trackFor(mood, caseMode), () => { if (!cancelled) engine.current = startAmbientMusic(mood); });
     };
     const gestures = ["pointerdown", "keydown"] as const;
     const onGesture = () => { begin(); gestures.forEach((g) => window.removeEventListener(g, onGesture)); };
@@ -45,7 +48,7 @@ export function useAmbientMusic(mood: Mood) {
       engine.current?.stop();
       engine.current = null;
     };
-  }, [enabled, mood]);
+  }, [enabled, mood, caseMode]);
 
   const toggle = useCallback(() => {
     setEnabled((on) => {

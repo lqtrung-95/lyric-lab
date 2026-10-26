@@ -287,3 +287,11 @@ Cần `.env.local` có khóa service role. Chạy xem trước rồi mới `--ap
 ## Tạo tranh cho cảnh Khám phá
 
 Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat/`), không cần công cụ hay khóa nào. Quy trình tạo tranh AI bằng ComfyUI chạy ở máy (script, prompt, workflow) đã gỡ khỏi code khi chốt Tranh C; xem lại trong lịch sử git (commit `c034acb`, `3fed52b`) nếu cần.
+
+
+## Nhạc nền Khám phá
+
+- Nhạc là 3 bài có sẵn ở `public/explore/music/` (nén mp3 112 kbps, tổng khoảng 3,8 MB): `cozy-ambience.mp3` (cảnh yên tĩnh: phòng, khách sạn, bệnh viện, trường, công viên), `cozy-mountain.mp3` (cảnh đông vui: quán ăn, chợ, cửa hàng, nhà ga, sân bay), `detective.mp3` (đang phá án). Bản gốc là các bài Pixabay của leberch ("cozy-ambience"), the_mountain ("cozy") và MondaMusic ("spy detective robbery music"), dùng theo Pixabay Content License (miễn phí, dùng thương mại, không bắt buộc ghi nguồn).
+- Chọn bài theo cảnh ở `lib/explore/music-tracks.ts`, độ to riêng từng bài đã cân theo độ to trung bình đo bằng `ffmpeg -af volumedetect`.
+- Thêm/đổi bài: nén `ffmpeg -i in.mp3 -map_metadata -1 -c:a libmp3lame -b:a 112k out.mp3`, bỏ vào thư mục trên, đo độ to rồi sửa `volume`.
+- Nếu không tải được file thì tự rơi về nhạc thuật toán (`ambient-music.ts`).

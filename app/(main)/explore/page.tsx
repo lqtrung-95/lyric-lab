@@ -28,6 +28,7 @@ export default function ExploreIndexPage() {
           <li key={s.id}><Link href={`/explore/${s.id}`} className="card-ink block p-space-md hover:-translate-y-0.5"><span className="text-headline-md">{s.title}</span><span className="block text-body-md text-on-surface-variant">{s.objects.length} từ</span></Link></li>
         ))}
       </ul>
+      <p className="text-label-md text-on-surface-variant">Nhạc nền: leberch, the_mountain, MondaMusic (Pixabay).</p>
     </div>
   );
 }

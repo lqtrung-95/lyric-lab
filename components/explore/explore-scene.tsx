@@ -33,7 +33,7 @@ export interface StoryMode {
 export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: StoryMode }) {
   const sc = story?.controller;
   const c = useSceneController(scene, story && sc ? { extraInteractables: sc.extraInteractables, storyInteract: sc.interact, basePath: story.basePath } : {});
-  const music = useAmbientMusic(scene.theme);
+  const music = useAmbientMusic(scene.theme, !!story);
   const { quest, player } = c;
   const inSummary = !quest.active && quest.rounds.length > 0;
 
