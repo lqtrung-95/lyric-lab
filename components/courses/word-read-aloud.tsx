@@ -34,7 +34,7 @@ export function WordReadAloud({ term }: { term: string }) {
   }
 
   return (
-    <div className="space-y-space-sm">
+    <div className="flex flex-col items-center gap-space-sm text-center">
       <button type="button" onClick={() => void toggle()} disabled={!target || state.status === "loading"}
         className={`inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-ink px-4 text-label-md font-bold disabled:opacity-60 ${recording ? "bg-error text-on-error" : "bg-surface-container-lowest text-on-surface"}`}>
         <Icon name={recording ? "stop" : "mic"} size={20} filled />
@@ -43,7 +43,7 @@ export function WordReadAloud({ term }: { term: string }) {
       {recording && <p role="status" className="text-body-md text-on-surface-variant">Đang nghe, hãy đọc từ này…</p>}
       {micError && <p role="alert" className="text-body-md text-error">{micError}</p>}
       {state.status === "error" && <p role="alert" className="text-body-md text-error">{ERROR_TEXT[state.reason]}</p>}
-      {state.status === "ok" && <AssessmentResultView result={state.value} />}
+      {state.status === "ok" && <div className="w-full text-left"><AssessmentResultView result={state.value} /></div>}
     </div>
   );
 }
