@@ -3,7 +3,7 @@ import { readStrokeData } from "@/lib/tra-tu/stroke-data";
 
 export const runtime = "nodejs";
 
-/** GET /api/tra-tu/strokes/爱 → dữ liệu nét (hanzi-writer) của một chữ Hán; 404 nếu không có. Dữ liệu tĩnh nên cho nhớ đệm lâu. */
+/** GET /api/dictionary/strokes/爱 → dữ liệu nét (hanzi-writer) của một chữ Hán; 404 nếu không có. Dữ liệu tĩnh nên cho nhớ đệm lâu. */
 export async function GET(_req: Request, { params }: { params: Promise<{ char: string }> }) {
   const char = decodeURIComponent((await params).char);
   if (!isSingleHan(char)) return Response.json({ error: "invalid_char" }, { status: 400 });

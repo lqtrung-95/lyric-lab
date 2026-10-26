@@ -15,10 +15,10 @@ function themeColors() {
   };
 }
 
-// Dữ liệu nét đi qua route của app (không dùng CDN): xem /api/tra-tu/strokes/[char].
+// Dữ liệu nét đi qua route của app (không dùng CDN): xem /api/dictionary/strokes/[char].
 type CharLoader = NonNullable<NonNullable<Parameters<typeof HanziWriter.create>[2]>["charDataLoader"]>;
 const loadChar: CharLoader = (char, onLoad, onError) => {
-  fetch(`/api/tra-tu/strokes/${encodeURIComponent(char)}`).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status))))).then(onLoad, onError);
+  fetch(`/api/dictionary/strokes/${encodeURIComponent(char)}`).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status))))).then(onLoad, onError);
 };
 
 export interface WriterState { writer: HanziWriter | null; strokeCount: number | null; hasRadical: boolean; failed: boolean }

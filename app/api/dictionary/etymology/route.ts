@@ -14,7 +14,7 @@ export const maxDuration = 30;
 
 const ipLimiter = new InMemoryRateLimiter(100, 24 * 60 * 60 * 1000);
 
-/** POST /api/tra-tu/etymology {char} → lời giải chiết tự tiếng Việt do AI viết (có lưu đệm), bám dữ kiện từ Make Me a Hanzi. Tính hạn mức "explain" của tài khoản. */
+/** POST /api/dictionary/etymology {char} → lời giải chiết tự tiếng Việt do AI viết (có lưu đệm), bám dữ kiện từ Make Me a Hanzi. Tính hạn mức "explain" của tài khoản. */
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   const body = (await req.json().catch(() => null)) as { char?: unknown } | null;

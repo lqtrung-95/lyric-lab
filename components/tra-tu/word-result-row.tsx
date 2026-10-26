@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MATCH_LABEL } from "./match-label";
 import type { WordResult } from "@/lib/tra-tu/types";
 
-export const wordHref = (simplified: string) => `/tra-tu/${encodeURIComponent(simplified)}`;
+export const wordHref = (simplified: string) => `/dictionary/${encodeURIComponent(simplified)}`;
 
 /** Một kết quả tra: chữ Hán, pinyin các cách đọc, Hán Việt, cấp HSK, nghĩa tiếng Việt (nếu đã duyệt) hoặc tiếng Anh. Cả hàng là một liên kết sang trang chi tiết. */
 export function WordResultRow({ word, compact = false, onPick }: { word: WordResult; compact?: boolean; onPick?: () => void }) {

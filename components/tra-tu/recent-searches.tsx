@@ -22,7 +22,7 @@ export function RecentSearches() {
       <ul className="flex flex-wrap gap-2">
         {items.map((t) => (
           <li key={t}>
-            <Link href={`/tra-tu?q=${encodeURIComponent(t)}`} className="inline-flex min-h-11 items-center rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-body-md font-bold shadow-[0_3px_0_var(--shadow-ink)]">{t}</Link>
+            <Link href={`/dictionary?q=${encodeURIComponent(t)}`} className="inline-flex min-h-11 items-center rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-body-md font-bold shadow-[0_3px_0_var(--shadow-ink)]">{t}</Link>
           </li>
         ))}
       </ul>

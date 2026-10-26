@@ -61,7 +61,7 @@ export function CompoundWords({ term, forms, words }: { term: string; forms: str
       </ul>
       <div className="flex flex-wrap gap-x-space-md">
         {words.length > FIRST_PAGE && <button type="button" onClick={() => setAll((v) => !v)} className="min-h-11 text-label-md font-extrabold text-primary hover:underline">{all ? "Thu gọn" : `Xem thêm ${words.length - FIRST_PAGE} từ`}</button>}
-        <Link href={`/tra-tu?q=${encodeURIComponent(term)}`} className="inline-flex min-h-11 items-center text-label-md font-extrabold text-primary hover:underline">Xem mọi từ chứa “{term}”</Link>
+        <Link href={`/dictionary?q=${encodeURIComponent(term)}`} className="inline-flex min-h-11 items-center text-label-md font-extrabold text-primary hover:underline">Xem mọi từ chứa “{term}”</Link>
       </div>
     </section>
   );

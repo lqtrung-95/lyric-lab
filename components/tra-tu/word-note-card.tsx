@@ -26,7 +26,7 @@ export function WordNoteCard({ term, approvedGloss, initial, canAskAi }: {
     setState({ phase: "loading" });
     try {
       await ensureAnonymousSession();
-      const res = await fetch("/api/tra-tu/explain", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ term }) });
+      const res = await fetch("/api/dictionary/explain", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ term }) });
       const data = (await res.json().catch(() => ({}))) as Partial<StoredWordNote> & { error?: string };
       if (!res.ok || !data.note || !data.model) throw new Error(data.error ?? "server_error");
       setState({ phase: "done", stored: { note: data.note, model: data.model } });

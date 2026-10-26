@@ -19,7 +19,7 @@ export function EtymologyAiNote({ char, initial, canAskAi }: { char: string; ini
     setState({ phase: "loading" });
     try {
       await ensureAnonymousSession();
-      const res = await fetch("/api/tra-tu/etymology", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ char }) });
+      const res = await fetch("/api/dictionary/etymology", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ char }) });
       const data = (await res.json().catch(() => ({}))) as Partial<StoredEtymologyNote> & { error?: string };
       if (!res.ok || !data.note || !data.model) throw new Error(data.error ?? "server_error");
       setState({ phase: "done", stored: { note: data.note, model: data.model } });

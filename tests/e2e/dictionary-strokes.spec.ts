@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-// Nét viết dùng dữ liệu hanzi-writer-data qua /api/tra-tu/strokes/[chữ] (không gọi CDN).
+// Nét viết dùng dữ liệu hanzi-writer-data qua /api/dictionary/strokes/[chữ] (không gọi CDN).
 const open = async (page: import("@playwright/test").Page, term: string) => {
-  await page.goto("/tra-tu/" + encodeURIComponent(term));
+  await page.goto("/dictionary/" + encodeURIComponent(term));
   await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: "Xem thứ tự nét, tập viết" }).click();
 };
@@ -37,10 +37,10 @@ test("tập viết: vẽ đúng nét thì có điểm; chế độ xem phát l�
 });
 
 test("API nét: trả JSON cho chữ Hán, từ chối chuỗi không phải đúng một chữ Hán", async ({ request }) => {
-  const ok = await request.get("/api/tra-tu/strokes/" + encodeURIComponent("爱"));
+  const ok = await request.get("/api/dictionary/strokes/" + encodeURIComponent("爱"));
   expect(ok.status()).toBe(200);
   expect((await ok.json()).strokes).toHaveLength(10);
-  expect((await request.get("/api/tra-tu/strokes/a")).status()).toBe(400);
-  expect((await request.get("/api/tra-tu/strokes/" + encodeURIComponent("爱情"))).status()).toBe(400);
+  expect((await request.get("/api/dictionary/strokes/a")).status()).toBe(400);
+  expect((await request.get("/api/dictionary/strokes/" + encodeURIComponent("爱情"))).status()).toBe(400);
   expect((await request.get("/licenses/ARPHICPL.TXT")).status()).toBe(200);
 });

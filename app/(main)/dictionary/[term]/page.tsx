@@ -30,7 +30,7 @@ export default async function WordPage({ params }: { params: Params }) {
   const term = decode((await params).term);
   // Không phải từ Hán hợp lệ hoặc không có trong từ điển: đưa về tìm kiếm với chính chuỗi đó (có thể là pinyin/nghĩa).
   const detail = HAN_TERM.test(term) ? await loadWordDetail(term) : null;
-  if (!detail) redirect(`/tra-tu?q=${encodeURIComponent(term.slice(0, 80))}`);
+  if (!detail) redirect(`/dictionary?q=${encodeURIComponent(term.slice(0, 80))}`);
 
   const [note, sentences, compounds] = await Promise.all([
     readWordNote(detail.simplified).catch(() => ({ stored: null, tableReady: false })),

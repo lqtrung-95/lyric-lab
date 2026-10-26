@@ -15,7 +15,7 @@ export function useWordSuggestions(query: string, limit = 8): { items: WordResul
     const ctrl = new AbortController();
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/tra-tu/search?q=${encodeURIComponent(q)}&limit=${limit}`, { signal: ctrl.signal });
+        const res = await fetch(`/api/dictionary/search?q=${encodeURIComponent(q)}&limit=${limit}`, { signal: ctrl.signal });
         const data = res.ok ? ((await res.json()) as { results: WordResult[] }) : { results: [] };
         setState({ q, items: data.results });
       } catch { /* đổi truy vấn hoặc mất mạng: giữ gợi ý cũ */ }

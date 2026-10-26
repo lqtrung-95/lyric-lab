@@ -19,7 +19,7 @@ export const NAV_LINKS: NavLink[] = [
 
 /** Lối vào phụ: hiện ở thanh bên (desktop) và trong bảng Menu (điện thoại, máy tính bảng). */
 export const SECONDARY_LINKS: { href: string; label: string; icon: IconName }[] = [
-  { href: "/tra-tu", label: "Tra từ", icon: "dictionary" },
+  { href: "/dictionary", label: "Tra từ", icon: "dictionary" },
   { href: "/profile", label: "Hồ sơ và huy hiệu", icon: "emoji_events" },
   { href: "/cong-cu", label: "Công cụ", icon: "build" },
   { href: "/feedback", label: "Góp ý cho SongHanzi", icon: "feedback" },

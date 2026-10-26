@@ -28,7 +28,7 @@ export function SearchBox({ initialQuery = "", autoFocus = false }: { initialQue
     const picked = active >= 0 ? items[active] : undefined;
     if (picked) { remember(picked.simplified); router.push(wordHref(picked.simplified)); return; }
     remember(q);
-    router.push(`/tra-tu?q=${encodeURIComponent(q)}`);
+    router.push(`/dictionary?q=${encodeURIComponent(q)}`);
   }
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown" && items.length) { e.preventDefault(); setOpen(true); setActive((a) => (a + 1) % items.length); }
