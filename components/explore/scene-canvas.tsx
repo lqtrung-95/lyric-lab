@@ -92,13 +92,13 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
             style={{ left: `${o.x}%`, top: `${o.y}%`, width: `${o.w * (SCALES[o.id] ?? 1)}%`, transform: "translate(-50%, -100%)", zIndex: zOf(o.y, o.above) }}
           >
             {!o.wall && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[14%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
-            <span className={`block transition-all ${mark === "faded" ? "opacity-60 saturate-50" : ""} ${near ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : mark === "new" && !hideLabels ? "drop-shadow-[0_0_6px_rgba(255,200,60,0.95)]" : ""} ${hit ? "drop-shadow-[0_0_10px_rgba(60,200,90,1)]" : ""}`}>
+            <span className={`block transition-all ${mark === "faded" ? "anim-ghost" : ""} ${near ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : mark === "new" && !hideLabels ? "drop-shadow-[0_0_6px_rgba(255,200,60,0.95)]" : ""} ${hit ? "drop-shadow-[0_0_10px_rgba(60,200,90,1)]" : ""}`}>
               <ArtSprite sprite={sprite} />
             </span>
             {near && <KeyChip />}
             {!hideLabels && mark !== "new" && (
               <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-md font-extrabold leading-5 text-on-surface">
-                {o.term}{mark === "faded" && <span className="ml-1 text-primary">↻</span>}
+                {o.term}{mark === "faded" && <span className="ml-1 text-primary" title="Sắp quên: ôn lại để làm sáng">↻</span>}
               </span>
             )}
             {!hideLabels && mark === "new" && !near && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 animate-pulse text-base">✨</span>}

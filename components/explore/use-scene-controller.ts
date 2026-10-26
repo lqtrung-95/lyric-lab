@@ -73,13 +73,34 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
   const submittedRun = useRef(-1);
   const runNo = useRef(0);
 
-  function startQuest() {
+  const fadedWords = learnedWords.filter((o) => marks[o.id] === "faded");
+
+  /** `rescue`: chỉ ôn các từ đang phai (bù thêm từ đã học cho đủ tối thiểu); mặc định: ưu tiên từ phai/hay sai rồi lấp đầy bằng từ khác. */
+  function runQuest(rescue: boolean) {
     runNo.current += 1;
     runStartedAt.current = Date.now();
-    const priority = new Set(learnedWords.filter((o) => marks[o.id] === "faded" || (progress.terms[progressKey(sceneId, o.id)]?.wrong ?? 0) > (progress.terms[progressKey(sceneId, o.id)]?.correct ?? 0)).map((o) => o.id));
     setPanel(null);
+    if (rescue && fadedWords.length > 0) {
+      const ids = new Set(fadedWords.map((o) => o.id));
+      const pool = [...fadedWords, ...learnedWords.filter((o) => !ids.has(o.id))].slice(0, Math.max(MIN_WORDS_FOR_QUEST, fadedWords.length));
+      quest.start(buildQuestRounds(pool, ids, Math.random, Math.min(8, pool.length)));
+      return;
+    }
+    const priority = new Set(learnedWords.filter((o) => marks[o.id] === "faded" || (progress.terms[progressKey(sceneId, o.id)]?.wrong ?? 0) > (progress.terms[progressKey(sceneId, o.id)]?.correct ?? 0)).map((o) => o.id));
     quest.start(buildQuestRounds(learnedWords, priority));
   }
+  const startQuest = () => runQuest(false);
+  const startRescue = () => runQuest(true);
+
+  // Vào từ liên kết "Cứu từ phai" (?rescue=1) thì tự bắt đầu lượt ôn các từ phai một lần.
+  const autoRescued = useRef(false);
+  useEffect(() => {
+    if (autoRescued.current || !ready || !canQuest || fadedWords.length === 0) return;
+    if (new URLSearchParams(window.location.search).get("rescue") !== "1") return;
+    const timer = setTimeout(() => { autoRescued.current = true; startRescue(); }, 0);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, canQuest, fadedWords.length]);
 
   function interact(id: string) {
     const exit = scene.exits.find((e) => exitId(e) === id);
@@ -150,7 +171,7 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
   };
 
   return {
-    ready, marks, words, cardStateOf, learnedWords, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
+    ready, marks, words, cardStateOf, learnedWords, fadedWords, startRescue, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
     startQuest, activate, reset: () => resetScene(sceneId), learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
     highlightId: quest.active && (quest.phase === "correct" || quest.phase === "reveal") ? quest.round?.targetId ?? null : null,
     openWord: (w: SceneWord) => { setPanel({ kind: "word", word: w }); void playChinese(w.term); },

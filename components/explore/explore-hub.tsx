@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { loadProgress } from "@/lib/explore/explore-progress";
+import { fadingByScene, mostFadingScene, totalFading } from "@/lib/explore/fading-words";
 import { SCENES } from "@/lib/explore/scenes";
 import { objectiveProgress } from "@/lib/explore/story/objectives";
 import { loadStory } from "@/lib/explore/story/story-state";
@@ -32,6 +33,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
   const [tab, setTab] = useState<Tab>("cases");
   const [caseState, setCaseState] = useState<Record<string, { done: number; solved: boolean }>>({});
   const [learned, setLearned] = useState<Record<string, number>>({});
+  const [fading, setFading] = useState<Record<string, number>>({});
 
   useEffect(() => {
     // Tiến độ nằm ở localStorage (server không đọc được) nên đọc sau khi mount.
@@ -40,13 +42,15 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
       const p = loadStory(window.localStorage, c.id);
       next[c.id] = { done: objectiveProgress(c.objectives, p.flags).done, solved: p.flags.includes(c.solvedFlag) };
     }
-    const terms = Object.keys(loadProgress(window.localStorage).terms);
+    const progress = loadProgress(window.localStorage);
+    const terms = Object.keys(progress.terms);
     const counts: Record<string, number> = {};
     // Chỉ tính từ còn trong cảnh (từ đã bỏ khỏi cảnh vẫn có thể còn trong dữ liệu cũ).
     for (const s of Object.values(SCENES)) counts[s.id] = s.objects.filter((o) => terms.includes(`${s.id}:${o.id}`)).length;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCaseState(next);
     setLearned(counts);
+    setFading(fadingByScene(progress, Object.values(SCENES), Date.now()));
   }, [cases]);
 
   const tabCls = (on: boolean) => `min-h-11 flex-1 rounded-full px-4 text-label-md font-extrabold transition-colors ${on ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:bg-surface-container-high"}`;
@@ -58,6 +62,17 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
         <button type="button" role="tab" aria-selected={tab === "cases"} onClick={() => setTab("cases")} className={tabCls(tab === "cases")}>Phá án ({cases.length})</button>
         <button type="button" role="tab" aria-selected={tab === "scenes"} onClick={() => setTab("scenes")} className={tabCls(tab === "scenes")}>Học từ theo cảnh ({Object.keys(SCENES).length})</button>
       </div>
+
+      {totalFading(fading) > 0 && (
+        <Link href={`/explore/${mostFadingScene(fading)}?rescue=1`} className="card-ink flex items-center gap-space-sm bg-primary-container p-space-sm text-on-primary-container transition-transform hover:-translate-y-0.5">
+          <span aria-hidden="true" className="anim-float text-3xl">👻</span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-label-lg font-extrabold">{totalFading(fading)} từ đang phai ở {Object.keys(fading).length} cảnh</span>
+            <span className="block text-label-md">Chạm để vào cảnh phai nhiều nhất và cứu chúng bằng một lượt nhiệm vụ ngắn.</span>
+          </span>
+          <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-primary">Cứu ngay</span>
+        </Link>
+      )}
 
       {tab === "cases" ? (
         <ul className="grid gap-space-sm sm:grid-cols-2">
@@ -90,6 +105,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
                 <div className="flex-1 px-space-sm py-2">
                   <h2 className="text-label-lg font-extrabold leading-tight">{s.title}</h2>
                   <p className="text-label-md text-on-surface-variant">{learned[s.id] ?? 0}/{s.objects.length} từ đã học</p>
+                  {fading[s.id] > 0 && <p className="mt-0.5 inline-block rounded-full bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">👻 {fading[s.id]} từ phai</p>}
                 </div>
               </Link>
             </li>

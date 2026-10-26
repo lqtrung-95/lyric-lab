@@ -361,6 +361,12 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
   25% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-30px) scale(1.15) rotate(14deg); }
 }
+.anim-ghost { animation: ghost-flicker 3.4s ease-in-out infinite; }
+@keyframes ghost-flicker {
+  0%, 100% { opacity: 0.55; transform: translateY(0); filter: saturate(0.4) blur(0); }
+  50% { opacity: 0.75; transform: translateY(-3px); filter: saturate(0.6) blur(0.4px); }
+}
+@media (prefers-reduced-motion: reduce) { .anim-ghost { animation: none; opacity: 0.6; } }
 .anim-float { animation: float-slow 7s ease-in-out infinite; }
 .anim-float-late { animation: float-slow 7s ease-in-out 1.6s infinite; }
 .anim-drift { animation: drift 24s ease-in-out infinite; }
