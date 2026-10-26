@@ -7,7 +7,10 @@ export const AIRPORT_SCENE: SceneDef = {
   subtitle: "Làm thủ tục ở sân bay, học từ về chuyến bay rồi làm nhiệm vụ cho Cô Heo tiếp viên.",
   theme: "airport",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Khách sạn", to: "hotel", x: 7, y: 60, w: 6 }],
+  exits: [
+    { sprite: "exitLeft", label: "Về Khách sạn", to: "hotel", x: 7, y: 60, w: 6 },
+    { sprite: "exit", label: "Sang Văn phòng", to: "office", x: 92, y: 60, w: 6 },
+  ],
   npc: {
     id: "pig", name: "Cô Heo", x: 90, y: 93, w: 8,
     greeting: "Chào mừng đến sân bay! Hãy đi quanh sảnh, lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

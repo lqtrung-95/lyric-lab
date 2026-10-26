@@ -40,6 +40,10 @@ export const MOODS: Record<Mood, MoodConfig> = {
   shop: { rootMidi: 69, scale: MAJ, bpm: 108, density: 0.8, progression: [M(0), m(9), M(5), M(7)], arp: true },
   hotel: { rootMidi: 64, scale: MAJ, bpm: 62, density: 0.4, progression: [M(0), m(4), M(5), M(7)], arp: false },
   airport: { rootMidi: 59, scale: MAJ, bpm: 90, density: 0.6, progression: [M(0), M(7), m(9), M(5)], arp: true },
+  library: { rootMidi: 60, scale: MAJ, bpm: 60, density: 0.3, progression: [M(0), m(9), M(5), M(7)], arp: false },
+  supermarket: { rootMidi: 67, scale: MAJ, bpm: 100, density: 0.8, progression: [M(0), M(5), M(7), M(0)], arp: true },
+  beach: { rootMidi: 65, scale: MAJ, bpm: 84, density: 0.6, progression: [M(0), M(7), m(9), M(5)], arp: true },
+  office: { rootMidi: 62, scale: MAJ, bpm: 92, density: 0.55, progression: [M(0), m(9), M(5), M(7)], arp: true },
   park: { rootMidi: 64, scale: MAJ, bpm: 78, density: 0.6, progression: [M(0), M(7), M(5), M(7)], arp: true },
 };
 

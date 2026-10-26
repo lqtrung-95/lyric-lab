@@ -17,7 +17,7 @@ export const TRACKS: Record<"cozy" | "warm" | "detective", MusicTrack> = {
 };
 
 /** Cảnh yên tĩnh dùng bài êm (cozy), cảnh đông vui dùng bài ấm (warm); đang phá án thì dùng bài trinh thám. */
-const QUIET: readonly Mood[] = ["room", "hotel", "hospital", "school", "park"];
+const QUIET: readonly Mood[] = ["room", "hotel", "hospital", "school", "park", "library", "beach"];
 
 export function trackFor(mood: Mood, caseMode: boolean): MusicTrack {
   if (caseMode) return TRACKS.detective;
