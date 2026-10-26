@@ -36,5 +36,9 @@ export const HOSPITAL_SCENE: SceneDef = {
     { id: "wheelchair", term: "轮椅", gloss: "xe lăn", example: { zh: "他坐在轮椅上。", vi: "Anh ấy ngồi trên xe lăn." }, x: 14, y: 90, w: 9 },
     { id: "bandage", term: "绷带", gloss: "băng gạc", portable: true, example: { zh: "请用绷带包一下。", vi: "Xin hãy băng lại bằng gạc." }, x: 22, y: 94, w: 6 },
     { id: "drip", term: "输液瓶", gloss: "bình truyền dịch", example: { zh: "他在用输液瓶打点滴。", vi: "Anh ấy đang truyền dịch bằng bình truyền." }, x: 93, y: 46, w: 3.5 },
+    { id: "crutches", term: "拐杖", gloss: "cây nạng", portable: true, example: { zh: "他拄着拐杖走路。", vi: "Anh ấy chống nạng đi bộ." }, x: 24, y: 76, w: 5 },
+    { id: "nursecap", term: "护士帽", gloss: "mũ y tá", portable: true, example: { zh: "护士戴着白色的护士帽。", vi: "Y tá đội chiếc mũ trắng." }, x: 32, y: 94, w: 5 },
+    { id: "bpmonitor", term: "血压计", gloss: "máy đo huyết áp", above: true, portable: true, example: { zh: "请用血压计量一下。", vi: "Xin hãy đo bằng máy đo huyết áp." }, x: 24, y: 64, w: 6, stand: { x: 24, y: 86 } },
+    { id: "stretcher", term: "担架", gloss: "cáng", example: { zh: "请把病人放在担架上。", vi: "Xin đặt bệnh nhân lên cáng." }, x: 66, y: 94, w: 14 },
   ],
 };

@@ -33,5 +33,8 @@ export const AIRPORT_SCENE: SceneDef = {
     { id: "conveyor", term: "传送带", gloss: "băng chuyền hành lý", example: { zh: "行李在传送带上。", vi: "Hành lý ở trên băng chuyền." }, x: 62, y: 92, w: 16 },
     { id: "tower", wall: true, term: "塔台", gloss: "tháp điều khiển", example: { zh: "塔台指挥飞机起飞。", vi: "Tháp điều khiển chỉ huy máy bay cất cánh." }, x: 44, y: 24, w: 5 },
     { id: "flightboard", wall: true, term: "航班牌", gloss: "bảng chuyến bay", example: { zh: "请看航班牌。", vi: "Xin hãy xem bảng chuyến bay." }, x: 88, y: 26, w: 12 },
+    { id: "seatbelt", term: "安全带", gloss: "dây an toàn", portable: true, example: { zh: "请系好安全带。", vi: "Xin hãy thắt dây an toàn." }, x: 70, y: 80, w: 7 },
+    { id: "airmeal", term: "飞机餐", gloss: "suất ăn trên máy bay", portable: true, example: { zh: "飞机餐很好吃。", vi: "Suất ăn trên máy bay rất ngon." }, x: 40, y: 70, w: 6 },
+    { id: "pilothat", term: "机长帽", gloss: "mũ cơ trưởng", portable: true, example: { zh: "机长戴着机长帽。", vi: "Cơ trưởng đội mũ cơ trưởng." }, x: 46, y: 92, w: 6 },
   ],
 };

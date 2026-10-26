@@ -37,5 +37,9 @@ export const BAKERY_SCENE: SceneDef = {
     { id: "oven", term: "烤箱", gloss: "lò nướng", example: { zh: "蛋糕在烤箱里。", vi: "Bánh kem ở trong lò nướng." }, x: 54, y: 92, w: 10 },
     { id: "apron", term: "围裙", gloss: "tạp dề", portable: true, example: { zh: "面包师穿着围裙。", vi: "Thợ làm bánh mặc tạp dề." }, x: 64, y: 94, w: 6 },
     { id: "candle", term: "蜡烛", gloss: "cây nến", above: true, portable: true, example: { zh: "请在蛋糕上插蜡烛。", vi: "Xin hãy cắm nến lên bánh." }, x: 29, y: 64, w: 2.5, stand: { x: 29, y: 88 } },
+    { id: "toast", term: "吐司", gloss: "bánh mì sandwich", above: true, portable: true, example: { zh: "早餐我吃吐司。", vi: "Bữa sáng tôi ăn bánh mì sandwich." }, x: 63, y: 50, w: 5, stand: { x: 63, y: 72 } },
+    { id: "flour", term: "面粉", gloss: "bột mì", above: true, portable: true, example: { zh: "做面包要用面粉。", vi: "Làm bánh mì phải dùng bột mì." }, x: 70, y: 50, w: 5, stand: { x: 70, y: 72 } },
+    { id: "rollingpin", term: "擀面杖", gloss: "cây cán bột", above: true, portable: true, example: { zh: "请用擀面杖擀面团。", vi: "Xin hãy dùng cây cán để cán bột." }, x: 83, y: 50, w: 8, stand: { x: 83, y: 72 } },
+    { id: "baguette", term: "法棍", gloss: "bánh mì baguette", portable: true, example: { zh: "这根法棍很脆。", vi: "Ổ baguette này rất giòn." }, x: 40, y: 86, w: 12 },
   ],
 };

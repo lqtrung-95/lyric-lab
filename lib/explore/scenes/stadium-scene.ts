@@ -33,5 +33,7 @@ export const STADIUM_SCENE: SceneDef = {
     { id: "stopwatch", term: "秒表", gloss: "đồng hồ bấm giờ", portable: true, example: { zh: "教练用秒表计时。", vi: "Huấn luyện viên bấm giờ bằng đồng hồ." }, x: 90, y: 74, w: 4 },
     { id: "scoreboard", wall: true, term: "记分牌", gloss: "bảng tỉ số", example: { zh: "记分牌上是二比一。", vi: "Trên bảng tỉ số là hai một." }, x: 40, y: 24, w: 14 },
     { id: "jersey", term: "球衣", gloss: "áo thi đấu", portable: true, example: { zh: "他穿着红色的球衣。", vi: "Anh ấy mặc áo thi đấu màu đỏ." }, x: 22, y: 88, w: 9 },
+    { id: "net", term: "球网", gloss: "lưới", example: { zh: "球进了球网。", vi: "Bóng vào lưới rồi." }, x: 64, y: 52, w: 16 },
+    { id: "redcard", term: "红牌", gloss: "thẻ đỏ", portable: true, example: { zh: "裁判给了他一张红牌。", vi: "Trọng tài rút thẻ đỏ với anh ấy." }, x: 72, y: 92, w: 3.5 },
   ],
 };

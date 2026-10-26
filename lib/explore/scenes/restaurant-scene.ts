@@ -44,5 +44,6 @@ export const EATERY_SCENE: SceneDef = {
     { id: "dumpling", term: "饺子", gloss: "sủi cảo", above: true, portable: true, example: { zh: "我想吃饺子。", vi: "Tôi muốn ăn sủi cảo." }, x: 42.5, y: 70, w: 6.5, stand: { x: 42.5, y: 92 } },
     { id: "bill", term: "账单", gloss: "hóa đơn", above: true, portable: true, example: { zh: "请给我账单。", vi: "Cho tôi hóa đơn." }, x: 56.5, y: 70, w: 4.5, stand: { x: 56.5, y: 92 } },
     { id: "napkin", term: "餐巾", gloss: "khăn ăn", above: true, portable: true, example: { zh: "请给我一张餐巾。", vi: "Cho tôi một tờ khăn ăn." }, x: 67.5, y: 70, w: 5.5, stand: { x: 67.5, y: 92 } },
+    { id: "teapot", term: "茶壶", gloss: "ấm trà", above: true, portable: true, example: { zh: "茶壶里有热茶。", vi: "Trong ấm có trà nóng." }, x: 82, y: 44.5, w: 6, stand: { x: 82, y: 66 } },
   ],
 };

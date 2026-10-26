@@ -48,6 +48,10 @@ export const MOODS: Record<Mood, MoodConfig> = {
   bakery: { rootMidi: 69, scale: MAJ, bpm: 92, density: 0.7, progression: [M(0), m(9), M(5), M(7)], arp: true },
   museum: { rootMidi: 62, scale: MAJ, bpm: 56, density: 0.3, progression: [M(0), m(9), M(5), M(7)], arp: false },
   stadium: { rootMidi: 64, scale: MAJ, bpm: 108, density: 0.8, progression: [M(0), M(7), m(9), M(5)], arp: true },
+  bank: { rootMidi: 60, scale: MAJ, bpm: 64, density: 0.35, progression: [M(0), m(9), M(5), M(7)], arp: false },
+  cinema: { rootMidi: 57, scale: MIN, bpm: 72, density: 0.45, progression: [m(0), M(8), M(3), M(10)], arp: true },
+  gym: { rootMidi: 62, scale: MAJ, bpm: 112, density: 0.85, progression: [M(0), M(7), m(9), M(5)], arp: true },
+  salon: { rootMidi: 65, scale: MAJ, bpm: 84, density: 0.6, progression: [M(0), m(9), M(5), M(7)], arp: true },
   park: { rootMidi: 64, scale: MAJ, bpm: 78, density: 0.6, progression: [M(0), M(7), M(5), M(7)], arp: true },
 };
 

@@ -39,5 +39,7 @@ export const MARKET_SCENE: SceneDef = {
     { id: "bag", term: "袋子", gloss: "cái túi", portable: true, example: { zh: "请给我一个袋子。", vi: "Cho tôi một cái túi." }, x: 66, y: 93, w: 5.5 },
     { id: "coin", term: "钱", gloss: "tiền", above: true, portable: true, example: { zh: "一共十块钱。", vi: "Tổng cộng mười tệ." }, x: 87.5, y: 64, w: 4, stand: { x: 87.5, y: 87 } },
     { id: "scale", term: "秤", gloss: "cái cân", above: true, portable: true, example: { zh: "请用秤称一下。", vi: "Xin hãy dùng cân để cân." }, x: 21, y: 56, w: 6, stand: { x: 21, y: 78 } },
+    { id: "chili", term: "辣椒", gloss: "ớt", above: true, portable: true, example: { zh: "这个辣椒很辣。", vi: "Quả ớt này rất cay." }, x: 63.5, y: 56, w: 4, stand: { x: 63.5, y: 78 } },
+    { id: "tofu", term: "豆腐", gloss: "đậu phụ", portable: true, example: { zh: "我想买一块豆腐。", vi: "Tôi muốn mua một miếng đậu phụ." }, x: 28, y: 88, w: 6 },
   ],
 };

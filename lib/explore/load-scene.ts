@@ -15,7 +15,7 @@ export async function loadScene(id: string): Promise<SceneDetail | null> {
   const [entries, examples, phrasePinyin] = await Promise.all([
     Promise.all(terms.map((t) => lookupTermEntry(t).catch(() => null))),
     loadTermSentences(terms, EXAMPLES_PER_WORD).catch(() => ({})),
-    annotatePinyin((def.phrases ?? []).map((p) => p.zh)),
+    annotatePinyin([...(def.phrases ?? []).map((p) => p.zh), ...(def.conversation?.lines ?? []).map((l) => l.zh)]),
   ]);
   return {
     ...def,

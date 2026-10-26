@@ -56,7 +56,13 @@ export interface SceneExit {
 }
 
 /** Kiểu nền và nhạc của cảnh. */
-export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park" | "school" | "shop" | "hotel" | "airport" | "library" | "supermarket" | "beach" | "office" | "kitchen" | "bakery" | "museum" | "stadium";
+export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park" | "school" | "shop" | "hotel" | "airport" | "library" | "supermarket" | "beach" | "office" | "kitchen" | "bakery" | "museum" | "stadium" | "bank" | "cinema" | "gym" | "salon";
+
+/** Hội thoại mẫu giữa hai người trong một cảnh: `who` là chỉ số trong `speakers`. */
+export interface SceneConversation {
+  speakers: [string, string];
+  lines: { who: 0 | 1; zh: string; vi: string }[];
+}
 
 export interface SceneDef {
   id: string;
@@ -72,6 +78,8 @@ export interface SceneDef {
   objects: SceneObjectDef[];
   /** Vài câu hay dùng trong cảnh này (hiện ở bảng "Câu hay dùng" dưới khung cảnh). */
   phrases?: { zh: string; vi: string }[];
+  /** Hội thoại mẫu của cảnh (gắn từ `scene-conversations.ts`). */
+  conversation?: SceneConversation;
 }
 
 /** Vật cảnh kèm thông tin từ điển (pinyin, Hán Việt, cấp HSK): các trường này KHÔNG viết tay mà lấy từ từ điển. */

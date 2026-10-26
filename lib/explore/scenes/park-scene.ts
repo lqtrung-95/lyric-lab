@@ -34,5 +34,8 @@ export const PARK_SCENE: SceneDef = {
     { id: "fountain", term: "喷泉", gloss: "đài phun nước", example: { zh: "公园中间有一个喷泉。", vi: "Giữa công viên có một đài phun nước." }, x: 50, y: 82, w: 10 },
     { id: "pavilion", term: "亭子", gloss: "cái đình", example: { zh: "我们在亭子里休息。", vi: "Chúng tôi nghỉ trong đình." }, x: 70, y: 58, w: 14 },
     { id: "pond", term: "池塘", gloss: "cái ao", example: { zh: "池塘里有很多鱼。", vi: "Trong ao có nhiều cá." }, x: 76, y: 88, w: 12 },
+    { id: "swing", term: "秋千", gloss: "cái xích đu", example: { zh: "孩子们在玩秋千。", vi: "Bọn trẻ đang chơi xích đu." }, x: 86, y: 78, w: 9 },
+    { id: "butterfly", wall: true, term: "蝴蝶", gloss: "con bướm", example: { zh: "花丛里飞着一只蝴蝶。", vi: "Trong bụi hoa có một con bướm bay." }, x: 32, y: 36, w: 4 },
+    { id: "picnicmat", term: "野餐垫", gloss: "tấm trải dã ngoại", portable: true, example: { zh: "我们把野餐垫铺在草地上。", vi: "Chúng tôi trải tấm dã ngoại trên bãi cỏ." }, x: 12, y: 92, w: 12 },
   ],
 };

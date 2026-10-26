@@ -36,5 +36,10 @@ export const KITCHEN_SCENE: SceneDef = {
     { id: "ricecooker", term: "电饭锅", gloss: "nồi cơm điện", above: true, portable: true, example: { zh: "电饭锅里有米饭。", vi: "Trong nồi cơm điện có cơm." }, x: 65, y: 64, w: 7, stand: { x: 65, y: 88 } },
     { id: "stove", term: "炉子", gloss: "bếp", example: { zh: "汤在炉子上。", vi: "Canh đang ở trên bếp." }, x: 28, y: 92, w: 10 },
     { id: "sink", term: "水槽", gloss: "bồn rửa", example: { zh: "请把碗放进水槽。", vi: "Xin hãy để bát vào bồn rửa." }, x: 44, y: 94, w: 10 },
+    { id: "ladle", term: "汤勺", gloss: "cái môi", above: true, portable: true, example: { zh: "请用汤勺盛汤。", vi: "Xin hãy dùng môi múc canh." }, x: 71, y: 64, w: 5, stand: { x: 71, y: 88 } },
+    { id: "spatula", term: "锅铲", gloss: "xẻng xào", above: true, portable: true, example: { zh: "锅铲在锅旁边。", vi: "Xẻng xào ở cạnh nồi." }, x: 77, y: 64, w: 4.5, stand: { x: 77, y: 88 } },
+    { id: "oil", term: "油", gloss: "dầu ăn", above: true, portable: true, example: { zh: "炒菜要放一点油。", vi: "Xào rau phải cho một chút dầu." }, x: 11, y: 46.5, w: 3.5, stand: { x: 11, y: 68 } },
+    { id: "garlic", term: "大蒜", gloss: "tỏi", portable: true, example: { zh: "请切一点大蒜。", vi: "Xin hãy thái một ít tỏi." }, x: 20, y: 94, w: 4 },
+    { id: "wok", term: "炒锅", gloss: "chảo xào", example: { zh: "炒锅很热。", vi: "Chảo xào rất nóng." }, x: 18, y: 82, w: 9 },
   ],
 };

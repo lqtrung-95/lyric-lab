@@ -33,5 +33,7 @@ export const BEACH_SCENE: SceneDef = {
     { id: "starfish", term: "海星", gloss: "sao biển", portable: true, example: { zh: "沙滩上有一只海星。", vi: "Trên bãi cát có một con sao biển." }, x: 78, y: 82, w: 6 },
     { id: "swimsuit", term: "泳衣", gloss: "đồ bơi", portable: true, example: { zh: "我穿着泳衣去游泳。", vi: "Tôi mặc đồ bơi đi bơi." }, x: 38, y: 92, w: 5 },
     { id: "sandcastle", term: "沙堡", gloss: "lâu đài cát", example: { zh: "我们一起堆沙堡吧。", vi: "Chúng ta cùng xây lâu đài cát nhé." }, x: 90, y: 70, w: 10 },
+    { id: "surfboard", term: "冲浪板", gloss: "ván lướt sóng", example: { zh: "他扛着冲浪板下海。", vi: "Anh ấy vác ván lướt sóng xuống biển." }, x: 70, y: 60, w: 5 },
+    { id: "parasol", term: "太阳伞", gloss: "ô che nắng", example: { zh: "沙滩上有一把大太阳伞。", vi: "Trên bãi cát có một cái ô che nắng lớn." }, x: 56, y: 66, w: 12 },
   ],
 };

@@ -36,5 +36,9 @@ export const LIBRARY_SCENE: SceneDef = {
     { id: "libcard", term: "借书证", gloss: "thẻ thư viện", above: true, portable: true, example: { zh: "借书要带借书证。", vi: "Mượn sách phải mang thẻ thư viện." }, x: 74, y: 64, w: 5, stand: { x: 74, y: 87 } },
     { id: "ladder", term: "梯子", gloss: "cái thang", example: { zh: "请用梯子拿上面的书。", vi: "Hãy dùng thang lấy sách ở trên cao." }, x: 7, y: 48, w: 4.5 },
     { id: "bookcart", term: "书车", gloss: "xe đẩy sách", example: { zh: "管理员推着书车。", vi: "Thủ thư đẩy xe đẩy sách." }, x: 44, y: 92, w: 9 },
+    { id: "bookend", term: "书立", gloss: "cái chặn sách", above: true, portable: true, example: { zh: "书立让书站得很稳。", vi: "Cái chặn sách giữ cho sách đứng vững." }, x: 36.5, y: 64, w: 5, stand: { x: 36.5, y: 87 } },
+    { id: "quietsign", wall: true, term: "安静牌", gloss: "biển giữ yên lặng", example: { zh: "请看安静牌。", vi: "Xin hãy nhìn biển giữ yên lặng." }, x: 52, y: 27, w: 7 },
+    { id: "highlighter", term: "荧光笔", gloss: "bút dạ quang", above: true, portable: true, example: { zh: "我用荧光笔画重点。", vi: "Tôi dùng bút dạ quang để tô ý chính." }, x: 63, y: 64, w: 5, stand: { x: 63, y: 87 } },
+    { id: "readingtable", term: "阅览桌", gloss: "bàn đọc sách", example: { zh: "请到阅览桌看书。", vi: "Xin hãy ra bàn đọc để đọc sách." }, x: 84, y: 78, w: 12 },
   ],
 };

@@ -34,5 +34,9 @@ export const STATION_SCENE: SceneDef = {
     { id: "lunchbox", term: "盒饭", gloss: "hộp cơm", above: true, portable: true, example: { zh: "火车上可以买盒饭。", vi: "Trên tàu có thể mua hộp cơm." }, x: 31, y: 46, w: 6, stand: { x: 31, y: 68 } },
     { id: "flag", term: "信号旗", gloss: "cờ hiệu", portable: true, example: { zh: "站务员举起信号旗。", vi: "Nhân viên ga giơ cờ hiệu lên." }, x: 64, y: 88, w: 4 },
     { id: "ticketwindow", term: "售票窗口", gloss: "quầy bán vé", example: { zh: "请到售票窗口买票。", vi: "Xin hãy ra quầy bán vé để mua vé." }, x: 22, y: 92, w: 9 },
+    { id: "rails", wall: true, term: "铁轨", gloss: "đường ray", example: { zh: "火车在铁轨上跑。", vi: "Tàu chạy trên đường ray." }, x: 68, y: 50, w: 30 },
+    { id: "ticketmachine", term: "自动售票机", gloss: "máy bán vé tự động", example: { zh: "可以用自动售票机买票。", vi: "Có thể mua vé ở máy bán vé tự động." }, x: 60, y: 74, w: 6.5 },
+    { id: "turnstile", term: "检票口", gloss: "cổng soát vé", example: { zh: "请在检票口排队。", vi: "Xin xếp hàng ở cổng soát vé." }, x: 78, y: 76, w: 9 },
+    { id: "waitingbench", term: "候车椅", gloss: "ghế chờ tàu", example: { zh: "我在候车椅上等车。", vi: "Tôi ngồi ghế chờ để đợi tàu." }, x: 40, y: 72, w: 14 },
   ],
 };

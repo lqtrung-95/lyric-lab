@@ -7,7 +7,10 @@ export const MUSEUM_SCENE: SceneDef = {
   subtitle: "Tham quan bảo tàng yên tĩnh, học từ về tranh, tượng và vé rồi làm nhiệm vụ cho Cô Cú giám đốc.",
   theme: "museum",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Nhà bếp", to: "kitchen", x: 7, y: 60, w: 6 }],
+  exits: [
+    { sprite: "exitLeft", label: "Về Nhà bếp", to: "kitchen", x: 7, y: 60, w: 6 },
+    { sprite: "exit", label: "Sang Ngân hàng", to: "bank", x: 92, y: 60, w: 6 },
+  ],
   npc: {
     id: "owl", name: "Cô Cú giám đốc", x: 90, y: 93, w: 9,
     greeting: "Chào mừng đến bảo tàng! Hãy đi nhẹ, lại gần tác phẩm rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp cô để nhận nhiệm vụ nhé.",
@@ -29,5 +32,9 @@ export const MUSEUM_SCENE: SceneDef = {
     { id: "showcase", term: "展柜", gloss: "tủ trưng bày", example: { zh: "玉器放在展柜里。", vi: "Đồ ngọc đặt trong tủ trưng bày." }, x: 22, y: 94, w: 10 },
     { id: "audioguide", term: "讲解器", gloss: "máy thuyết minh", portable: true, example: { zh: "请租一个讲解器。", vi: "Xin hãy thuê một máy thuyết minh." }, x: 64, y: 90, w: 3.5, stand: { x: 64, y: 86 } },
     { id: "exhibitboard", wall: true, term: "展板", gloss: "bảng triển lãm", example: { zh: "展板上有介绍。", vi: "Trên bảng triển lãm có phần giới thiệu." }, x: 76, y: 26, w: 12 },
+    { id: "dinosaur", term: "恐龙", gloss: "khủng long", example: { zh: "这是一只恐龙的骨架。", vi: "Đây là bộ xương của một con khủng long." }, x: 80, y: 70, w: 18 },
+    { id: "barrier", term: "围栏", gloss: "hàng rào chắn", example: { zh: "请不要越过围栏。", vi: "Xin đừng vượt qua hàng rào chắn." }, x: 50, y: 58, w: 14 },
+    { id: "lantern", wall: true, term: "灯笼", gloss: "đèn lồng", example: { zh: "墙上挂着红灯笼。", vi: "Trên tường treo đèn lồng đỏ." }, x: 90, y: 34, w: 4.5 },
+    { id: "ancientcoin", term: "古币", gloss: "đồng tiền cổ", portable: true, example: { zh: "这是一枚古币。", vi: "Đây là một đồng tiền cổ." }, x: 10, y: 86, w: 3.5 },
   ],
 };

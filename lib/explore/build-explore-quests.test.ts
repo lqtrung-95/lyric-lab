@@ -68,6 +68,8 @@ describe("dữ liệu các cảnh", () => {
     for (const scene of Object.values(SCENES)) {
       expect(scene.objects.filter((o) => o.portable).length, scene.id).toBeGreaterThanOrEqual(4);
       expect(scene.phrases?.length ?? 0, `${scene.id}: câu hay dùng`).toBeGreaterThanOrEqual(3);
+      expect(scene.conversation?.lines.length ?? 0, `${scene.id}: hội thoại mẫu`).toBeGreaterThanOrEqual(4);
+      expect(scene.objects.length, `${scene.id}: số từ`).toBeGreaterThanOrEqual(9);
       for (const o of scene.objects) {
         expect(seen.get(o.term), `${o.term} trùng giữa ${seen.get(o.term)} và ${scene.id}`).toBeUndefined();
         seen.set(o.term, scene.id);

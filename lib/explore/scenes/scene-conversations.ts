@@ -1,0 +1,208 @@
+import type { SceneConversation } from "../explore-types";
+
+/** Hội thoại mẫu ngắn của từng cảnh (hai người nói chuyện đúng tình huống ở đó), hiện ở bảng "Hội thoại mẫu". Tự viết, đơn giản. */
+export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
+  "room": {
+    speakers: ["Mẹ", "Con"],
+    lines: [
+      { who: 0, zh: "你回来了?", vi: "Con về rồi à?" },
+      { who: 1, zh: "妈妈,我回来了。", vi: "Mẹ ơi, con về rồi." },
+      { who: 0, zh: "饭做好了,快去洗手。", vi: "Cơm nấu xong rồi, mau đi rửa tay." },
+      { who: 1, zh: "好的,我马上来。", vi: "Vâng, con tới ngay." },
+    ],
+  },
+  "restaurant": {
+    speakers: ["Phục vụ", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,请问几位?", vi: "Xin chào, quý khách đi mấy người?" },
+      { who: 1, zh: "两位。", vi: "Hai người." },
+      { who: 0, zh: "这是菜单,请慢慢看。", vi: "Đây là thực đơn, mời xem từ từ." },
+      { who: 1, zh: "我要一碗面条和一壶茶。", vi: "Cho tôi một bát mì và một ấm trà." },
+      { who: 0, zh: "好的,请稍等。", vi: "Vâng, xin chờ một lát." },
+    ],
+  },
+  "market": {
+    speakers: ["Chủ sạp", "Khách"],
+    lines: [
+      { who: 1, zh: "这些水果怎么卖?", vi: "Chỗ trái cây này bán thế nào?" },
+      { who: 0, zh: "十块钱一斤。", vi: "Mười tệ một cân." },
+      { who: 1, zh: "太贵了,八块行吗?", vi: "Đắt quá, tám tệ được không?" },
+      { who: 0, zh: "好吧,给你八块。", vi: "Được rồi, tính cho bạn tám tệ." },
+    ],
+  },
+  "station": {
+    speakers: ["Nhân viên bán vé", "Hành khách"],
+    lines: [
+      { who: 1, zh: "你好,我要买一张去上海的票。", vi: "Xin chào, tôi muốn mua một vé đi Thượng Hải." },
+      { who: 0, zh: "要几点的?", vi: "Chuyến mấy giờ?" },
+      { who: 1, zh: "上午九点的。", vi: "Chuyến chín giờ sáng." },
+      { who: 0, zh: "一共一百块,请在站台等车。", vi: "Tổng cộng một trăm tệ, mời chờ tàu ở sân ga." },
+    ],
+  },
+  "park": {
+    speakers: ["Bạn A", "Bạn B"],
+    lines: [
+      { who: 0, zh: "今天天气真好!", vi: "Hôm nay trời đẹp thật!" },
+      { who: 1, zh: "是啊,我们去划船吧。", vi: "Ừ, chúng ta đi chèo thuyền nhé." },
+      { who: 0, zh: "好主意!先拍张照吧。", vi: "Ý hay! Chụp tấm ảnh trước đã." },
+      { who: 1, zh: "来,笑一笑!", vi: "Nào, cười lên nào!" },
+    ],
+  },
+  "hospital": {
+    speakers: ["Bác sĩ", "Bệnh nhân"],
+    lines: [
+      { who: 0, zh: "你哪儿不舒服?", vi: "Bạn thấy không khỏe ở đâu?" },
+      { who: 1, zh: "我头疼,还有点发烧。", vi: "Tôi đau đầu và hơi sốt." },
+      { who: 0, zh: "先量一下体温吧。", vi: "Đo nhiệt độ trước nhé." },
+      { who: 0, zh: "要吃药,多喝水,好好休息。", vi: "Phải uống thuốc, uống nhiều nước và nghỉ ngơi." },
+    ],
+  },
+  "school": {
+    speakers: ["Cô giáo", "Học sinh"],
+    lines: [
+      { who: 0, zh: "同学们好!", vi: "Chào các em!" },
+      { who: 1, zh: "老师好!", vi: "Em chào cô ạ!" },
+      { who: 0, zh: "请打开课本第十页。", vi: "Mời các em mở sách giáo khoa trang mười." },
+      { who: 1, zh: "老师,我不明白。", vi: "Cô ơi, em không hiểu." },
+      { who: 0, zh: "没关系,我再说一遍。", vi: "Không sao, cô nói lại một lần nữa." },
+    ],
+  },
+  "clothing-store": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 0, zh: "欢迎光临,想买什么?", vi: "Chào mừng quý khách, muốn mua gì ạ?" },
+      { who: 1, zh: "我想买一件衣服。", vi: "Tôi muốn mua một cái áo." },
+      { who: 0, zh: "这件怎么样?", vi: "Cái này thì sao ạ?" },
+      { who: 1, zh: "我可以试一试吗?", vi: "Tôi có thể thử không?" },
+      { who: 0, zh: "当然可以,试衣间在那边。", vi: "Tất nhiên được, phòng thử đồ ở bên kia." },
+    ],
+  },
+  "hotel": {
+    speakers: ["Lễ tân", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,欢迎入住。", vi: "Xin chào, chào mừng quý khách." },
+      { who: 1, zh: "我订了一个房间。", vi: "Tôi đã đặt một phòng." },
+      { who: 0, zh: "请给我您的护照。", vi: "Xin cho tôi xem hộ chiếu của quý khách." },
+      { who: 0, zh: "这是您的房卡,房间在八楼。", vi: "Đây là thẻ phòng của quý khách, phòng ở tầng tám." },
+    ],
+  },
+  "airport": {
+    speakers: ["Nhân viên", "Hành khách"],
+    lines: [
+      { who: 0, zh: "请出示您的护照和机票。", vi: "Xin xuất trình hộ chiếu và vé máy bay." },
+      { who: 1, zh: "给您。", vi: "Của bạn đây." },
+      { who: 0, zh: "您有几件行李?", vi: "Quý khách có mấy kiện hành lý?" },
+      { who: 1, zh: "一件。", vi: "Một kiện." },
+      { who: 0, zh: "登机口在三号,请注意时间。", vi: "Cửa lên máy bay là số ba, xin chú ý thời gian." },
+    ],
+  },
+  "office": {
+    speakers: ["Đồng nghiệp A", "Đồng nghiệp B"],
+    lines: [
+      { who: 0, zh: "早上好!", vi: "Chào buổi sáng!" },
+      { who: 1, zh: "早!今天有会议吗?", vi: "Chào! Hôm nay có họp không?" },
+      { who: 0, zh: "有,十点开始。", vi: "Có, mười giờ bắt đầu." },
+      { who: 1, zh: "好,我把文件带过去。", vi: "Được, tôi mang tài liệu qua." },
+    ],
+  },
+  "library": {
+    speakers: ["Thủ thư", "Bạn đọc"],
+    lines: [
+      { who: 1, zh: "你好,我想借这本书。", vi: "Xin chào, tôi muốn mượn cuốn sách này." },
+      { who: 0, zh: "请出示借书证。", vi: "Xin xuất trình thẻ thư viện." },
+      { who: 1, zh: "可以借多久?", vi: "Mượn được bao lâu?" },
+      { who: 0, zh: "可以借一个月,请按时还书。", vi: "Mượn được một tháng, xin trả sách đúng hạn." },
+    ],
+  },
+  "supermarket": {
+    speakers: ["Thu ngân", "Khách"],
+    lines: [
+      { who: 0, zh: "一共五十块。", vi: "Tổng cộng năm mươi tệ." },
+      { who: 1, zh: "可以刷卡吗?", vi: "Có thể quẹt thẻ không?" },
+      { who: 0, zh: "可以。需要袋子吗?", vi: "Được. Bạn cần túi không?" },
+      { who: 1, zh: "要一个,谢谢。", vi: "Cho tôi một cái, cảm ơn." },
+    ],
+  },
+  "beach": {
+    speakers: ["Bạn A", "Bạn B"],
+    lines: [
+      { who: 0, zh: "海水真蓝!", vi: "Nước biển xanh thật!" },
+      { who: 1, zh: "我们去游泳吧。", vi: "Chúng ta đi bơi nhé." },
+      { who: 0, zh: "先涂防晒霜。", vi: "Thoa kem chống nắng trước đã." },
+      { who: 1, zh: "好,然后一起堆沙堡。", vi: "Được, sau đó cùng xây lâu đài cát." },
+    ],
+  },
+  "stadium": {
+    speakers: ["Huấn luyện viên", "Cầu thủ"],
+    lines: [
+      { who: 0, zh: "大家准备好了吗?", vi: "Mọi người sẵn sàng chưa?" },
+      { who: 1, zh: "准备好了!", vi: "Sẵn sàng rồi ạ!" },
+      { who: 0, zh: "比赛开始,加油!", vi: "Trận đấu bắt đầu, cố lên!" },
+      { who: 1, zh: "我们一定会赢!", vi: "Chúng ta nhất định sẽ thắng!" },
+    ],
+  },
+  "bakery": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 0, zh: "您想要什么?", vi: "Quý khách muốn gì ạ?" },
+      { who: 1, zh: "我要一个生日蛋糕。", vi: "Tôi muốn một cái bánh sinh nhật." },
+      { who: 0, zh: "要写字吗?", vi: "Có cần viết chữ lên không?" },
+      { who: 1, zh: "写:生日快乐。", vi: "Viết: Chúc mừng sinh nhật." },
+    ],
+  },
+  "kitchen": {
+    speakers: ["Đầu bếp", "Học việc"],
+    lines: [
+      { who: 0, zh: "菜切好了吗?", vi: "Rau thái xong chưa?" },
+      { who: 1, zh: "切好了。", vi: "Xong rồi ạ." },
+      { who: 0, zh: "那把油倒进锅里。", vi: "Vậy đổ dầu vào nồi." },
+      { who: 0, zh: "小心,锅很烫!", vi: "Cẩn thận, nồi rất nóng!" },
+    ],
+  },
+  "museum": {
+    speakers: ["Hướng dẫn viên", "Khách tham quan"],
+    lines: [
+      { who: 0, zh: "这是一幅古代的画。", vi: "Đây là một bức tranh cổ." },
+      { who: 1, zh: "真漂亮!可以拍照吗?", vi: "Đẹp quá! Có được chụp ảnh không?" },
+      { who: 0, zh: "可以,但是不要用闪光灯。", vi: "Được, nhưng đừng dùng đèn flash." },
+      { who: 1, zh: "好的,谢谢。", vi: "Vâng, cảm ơn." },
+    ],
+  },
+  "bank": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,请问办什么业务?", vi: "Xin chào, quý khách cần làm gì ạ?" },
+      { who: 1, zh: "我想取钱。", vi: "Tôi muốn rút tiền." },
+      { who: 0, zh: "请输入密码。", vi: "Xin nhập mật mã." },
+      { who: 0, zh: "好了,请拿好您的钱和银行卡。", vi: "Xong rồi, xin cầm cẩn thận tiền và thẻ của quý khách." },
+    ],
+  },
+  "cinema": {
+    speakers: ["Nhân viên bán vé", "Khách"],
+    lines: [
+      { who: 1, zh: "你好,我要两张电影票。", vi: "Xin chào, tôi muốn hai vé xem phim." },
+      { who: 0, zh: "看哪一场?", vi: "Xem suất nào?" },
+      { who: 1, zh: "晚上七点的。", vi: "Suất bảy giờ tối." },
+      { who: 0, zh: "请到三号厅,祝您看得开心。", vi: "Mời vào phòng chiếu số ba, chúc quý khách xem phim vui vẻ." },
+    ],
+  },
+  "gym": {
+    speakers: ["Huấn luyện viên", "Học viên"],
+    lines: [
+      { who: 0, zh: "先热身五分钟。", vi: "Khởi động năm phút trước." },
+      { who: 1, zh: "好的。", vi: "Vâng." },
+      { who: 0, zh: "然后做二十个俯卧撑。", vi: "Sau đó chống đẩy hai mươi cái." },
+      { who: 1, zh: "太累了!", vi: "Mệt quá!" },
+      { who: 0, zh: "加油,坚持住!", vi: "Cố lên, kiên trì nào!" },
+    ],
+  },
+  "salon": {
+    speakers: ["Thợ tóc", "Khách"],
+    lines: [
+      { who: 0, zh: "你想剪什么发型?", vi: "Bạn muốn cắt kiểu gì?" },
+      { who: 1, zh: "剪短一点。", vi: "Cắt ngắn một chút." },
+      { who: 0, zh: "这样可以吗?", vi: "Như thế này được không?" },
+      { who: 1, zh: "很好,谢谢。", vi: "Rất tốt, cảm ơn." },
+    ],
+  },
+};

@@ -37,5 +37,8 @@ export const SCHOOL_SCENE: SceneDef = {
     { id: "globe", term: "地球仪", gloss: "quả địa cầu", above: true, portable: true, example: { zh: "地球仪在桌子上。", vi: "Quả địa cầu ở trên bàn." }, x: 70, y: 64, w: 4.5, stand: { x: 70, y: 87 } },
     { id: "bell", wall: true, term: "铃", gloss: "cái chuông", example: { zh: "下课铃响了。", vi: "Chuông ra chơi đã reo." }, x: 68, y: 24, w: 5.5 },
     { id: "desk", term: "课桌", gloss: "bàn học", example: { zh: "请回到你的课桌。", vi: "Hãy về chỗ bàn học của em." }, x: 80, y: 90, w: 13 },
+    { id: "glue", term: "胶水", gloss: "hồ dán", above: true, portable: true, example: { zh: "请借我胶水。", vi: "Cho mình mượn hồ dán." }, x: 74, y: 64, w: 3.5, stand: { x: 74, y: 87 } },
+    { id: "paintbrush", term: "画笔", gloss: "bút vẽ", portable: true, example: { zh: "我用画笔画画。", vi: "Tôi dùng bút vẽ để vẽ tranh." }, x: 30, y: 94, w: 9 },
+    { id: "textbook", term: "课本", gloss: "sách giáo khoa", portable: true, example: { zh: "请翻开课本第十页。", vi: "Xin hãy mở sách giáo khoa trang mười." }, x: 52, y: 94, w: 6 },
   ],
 };

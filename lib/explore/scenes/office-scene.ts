@@ -38,5 +38,8 @@ export const OFFICE_SCENE: SceneDef = {
     { id: "whiteboard", wall: true, term: "白板", gloss: "bảng trắng", example: { zh: "白板上有今天的计划。", vi: "Trên bảng trắng có kế hoạch hôm nay." }, x: 28, y: 27, w: 16 },
     { id: "meetingtable", term: "会议桌", gloss: "bàn họp", example: { zh: "大家在会议桌旁开会。", vi: "Mọi người họp quanh bàn họp." }, x: 78, y: 90, w: 18 },
     { id: "desklamp", term: "台灯", gloss: "đèn bàn", example: { zh: "请打开台灯。", vi: "Xin hãy bật đèn bàn." }, x: 92, y: 50, w: 5 },
+    { id: "waterdispenser", term: "饮水机", gloss: "máy nước uống", example: { zh: "饮水机在走廊里。", vi: "Máy nước uống ở hành lang." }, x: 90, y: 80, w: 5.5 },
+    { id: "mouse", term: "鼠标", gloss: "con chuột máy tính", above: true, portable: true, example: { zh: "我的鼠标没电了。", vi: "Chuột máy tính của tôi hết pin rồi." }, x: 32, y: 64, w: 3, stand: { x: 32, y: 87 } },
+    { id: "keyboard", term: "键盘", gloss: "bàn phím", portable: true, example: { zh: "请别把水倒在键盘上。", vi: "Đừng đổ nước lên bàn phím." }, x: 20, y: 94, w: 9 },
   ],
 };
