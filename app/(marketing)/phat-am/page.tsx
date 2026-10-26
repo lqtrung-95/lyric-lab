@@ -28,8 +28,8 @@ export default function PronunciationHubPage() {
       <ul className="grid gap-space-sm sm:grid-cols-2">
         {ITEMS.map((it) => (
           <li key={it.href}>
-            <Link href={it.href} className="flex min-h-11 gap-space-sm card-ink p-space-md hover:bg-surface-container">
-              <Icon name={it.icon} size={28} className="text-primary" />
+            <Link href={it.href} className="flex h-full min-h-11 gap-space-sm card-ink p-space-md hover:bg-surface-container">
+              <Icon name={it.icon} size={28} className="shrink-0 text-primary" />
               <span><span className="block text-body-lg font-medium">{it.title}</span><span className="block text-body-md text-on-surface-variant">{it.body}</span></span>
             </Link>
           </li>

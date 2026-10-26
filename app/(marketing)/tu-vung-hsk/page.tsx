@@ -36,7 +36,7 @@ export default async function HskVocabIndexPage() {
       <ul className="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
         {counts.map(([l, n]) => (
           <li key={l}>
-            <Link href={`/tu-vung-hsk/${l}`} className="flex min-h-28 flex-col gap-1 card-ink p-space-md transition-colors hover:bg-surface-container-high">
+            <Link href={`/tu-vung-hsk/${l}`} className="flex h-full min-h-28 flex-col gap-1 card-ink p-space-md transition-colors hover:bg-surface-container-high">
               <span className="font-serif text-headline-md text-on-surface">HSK {l}</span>
               <span className="text-label-md text-on-surface-variant">{n} từ</span>
             </Link>
