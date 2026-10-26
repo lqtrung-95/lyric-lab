@@ -24,5 +24,7 @@ export function legacyRedirects(): Redirect[] {
     to("/hoc/:path*", "/courses/:path*"),
     to("/video/kenh/:channel", "/video/channel/:channel"),
     to("/review/doc-to", "/review/read-aloud"),
+    to("/tra-tu", "/dictionary"),
+    to("/tra-tu/:path*", "/dictionary/:path*"),
   ];
 }

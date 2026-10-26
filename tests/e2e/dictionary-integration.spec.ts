@@ -16,7 +16,7 @@ test("luyện từ: điền từ vào câu thật, chọn đáp án có phản h
 test("từ có trong cảnh Khám phá hiện lối vào cảnh đó", async ({ page }) => {
   const term = Object.values(SCENES)[0].objects[0].term;
   await page.goto("/dictionary/" + encodeURIComponent(term));
-  await expect(page.getByRole("link", { name: /Học trong Khám phá/ })).toHaveAttribute("href", /\/kham-pha\//);
+  await expect(page.getByRole("link", { name: /Học trong Khám phá/ })).toHaveAttribute("href", /\/explore\//);
 });
 
 test("trang chủ có ô tra từ nhanh, gửi sang trang Tra từ", async ({ page }) => {

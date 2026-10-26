@@ -50,7 +50,7 @@ export function WordPractice({ term, examples, pool, scene }: { term: string; ex
         </div>
       )}
       {scene && (
-        <Link href={`/kham-pha/${scene.id}`} className="inline-flex min-h-11 items-center gap-1 text-label-md font-extrabold text-primary hover:underline"><Icon name="school" size={20} /> Học trong Khám phá: {scene.title}</Link>
+        <Link href={`/explore/${scene.id}`} className="inline-flex min-h-11 items-center gap-1 text-label-md font-extrabold text-primary hover:underline"><Icon name="school" size={20} /> Học trong Khám phá: {scene.title}</Link>
       )}
     </section>
   );
