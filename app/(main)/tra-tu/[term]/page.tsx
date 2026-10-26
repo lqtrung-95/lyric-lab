@@ -14,6 +14,8 @@ import { loadWordDetail } from "@/lib/tra-tu/load-word-detail";
 import { savedItemForDetail } from "@/lib/tra-tu/saved-item-for-detail";
 import { readWordNote } from "@/lib/tra-tu/word-note-store";
 
+import { EtymologyBlock } from "./etymology-block";
+
 type Params = Promise<{ term: string }>;
 
 const decode = (raw: string): string => { try { return decodeURIComponent(raw); } catch { return raw; } };
@@ -44,6 +46,7 @@ export default async function WordPage({ params }: { params: Params }) {
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
       <WordMeanings readings={detail.readings} />
       <StrokeSection term={detail.simplified} />
+      <EtymologyBlock term={detail.simplified} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
       <CompoundWords term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} words={compounds} />
     </div>

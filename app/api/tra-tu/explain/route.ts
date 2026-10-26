@@ -3,7 +3,8 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { getServerEnv } from "@/lib/env/server-env";
 import { consumeUsage } from "@/lib/rate-limit/consume-usage";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
-import { ExplainWordError, explainWord } from "@/lib/tra-tu/explain-word";
+import { NoteError } from "@/lib/tra-tu/cached-llm-note";
+import { explainWord } from "@/lib/tra-tu/explain-word";
 import { loadWordDetail } from "@/lib/tra-tu/load-word-detail";
 import { readWordNote, writeWordNote } from "@/lib/tra-tu/word-note-store";
 
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
     });
     return Response.json({ ...stored, fromCache });
   } catch (error) {
-    if (error instanceof ExplainWordError) return Response.json({ error: error.code }, { status: error.code === "rate_limited" ? 429 : 502 });
+    if (error instanceof NoteError) return Response.json({ error: error.code }, { status: error.code === "rate_limited" ? 429 : 502 });
     console.error(JSON.stringify({ event: "tra_tu_explain_error", message: (error as Error).message }));
     return Response.json({ error: "server_error" }, { status: 500 });
   }
