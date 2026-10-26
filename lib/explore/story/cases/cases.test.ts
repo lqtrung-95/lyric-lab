@@ -203,3 +203,33 @@ describe("vụ án bức tranh Mùa Xuân", () => {
     expect(pickEntry(sd, ["met:dog", "clue:rabbit_slip", "saw:dog"])).toBe("dog_after");
   });
 });
+
+describe("vụ án chiếc ví bị mất", () => {
+  const story = CASES["lost-wallet"];
+  it("là mức Vừa; chỉ Chó là thủ phạm; ghi chú người mua vé chỉ hiện khi đã có cuống vé; Chó chỉ đổi lời khi có sổ ký tên và ghi chú người mua vé", () => {
+    expect(story.difficulty).toBe("medium");
+    for (const s of story.suspects.filter((x) => x.id !== "dog")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
+    const note = story.scenes.cinema.spots!.find((s) => s.id === "buyer_note")!;
+    expect(holds(note.when, ["met:rabbit"])).toBe(false);
+    expect(holds(note.when, ["met:rabbit", "clue:stub"])).toBe(true);
+    const e = story.scenes.gym.sceneNpcEntries!;
+    expect(pickEntry(e, ["met:dog", "clue:gym_signout"])).not.toBe("dog_conf");
+    expect(pickEntry(e, ["met:dog", "clue:gym_signout", "clue:buyer_note"])).toBe("dog_conf");
+  });
+});
+
+describe("vụ án chiếc cúp biến mất", () => {
+  const story = CASES["trophy-loan"];
+  it("là mức Khó, 5 nghi phạm gồm cả người báo án; người báo án (Chó) là người nói sai; câu hỏi của Cáo chỉ mở khi đã thấy lớp bụi; hỏi lại Chó cần đủ ba thứ", () => {
+    expect(story.difficulty).toBe("hard");
+    expect(story.suspects).toHaveLength(5);
+    expect(story.solution.suspectId).toBe("dog");
+    for (const s of story.suspects.filter((x) => x.id !== "dog")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
+    const fox = story.scenes.bank.sceneNpcEntries!;
+    expect(pickEntry(fox, ["met:fox"])).toBe("fox_after");
+    expect(pickEntry(fox, ["met:fox", "clue:dust_shelf"])).toBe("fox2_hi");
+    const gym = story.scenes.gym.sceneNpcEntries!;
+    expect(pickEntry(gym, ["met:dog", "clue:loan_form", "clue:dust_shelf"])).toBe("g_wait");
+    expect(pickEntry(gym, ["met:dog", "clue:loan_form", "clue:dust_shelf", "clue:witness_fox"])).toBe("g_conf");
+  });
+});
