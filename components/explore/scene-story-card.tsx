@@ -1,17 +1,20 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { Button3d } from "@/components/ui/button-3d";
-import { PronounceButton } from "@/components/ui/pronounce-button";
+import { Icon } from "@/components/ui/icon";
 import { buildCloze, segmentLine, type ClozeItem } from "@/lib/explore/scene-stories/segment-and-cloze";
 import type { SceneStory } from "@/lib/explore/scene-stories/story-types";
 import type { SceneWord } from "@/lib/explore/explore-types";
 import { answerPoints } from "@/lib/practice/scoring";
+import { playChinese, playChineseSequence, stopChinese } from "@/lib/speech/play-chinese";
 import { submitRoundScore } from "@/lib/practice/submit-score";
 import type { ObjectMark } from "./scene-canvas";
 
 interface Props {
+  /** Tên cảnh (tiêu đề thẻ: "Câu chuyện ở …"). */
+  sceneTitle: string;
   story: SceneStory;
   words: SceneWord[];
   marks: Record<string, ObjectMark>;
@@ -34,7 +37,7 @@ type Question = { kind: "read"; vi: string; before: string; answer: string; afte
  * "Câu chuyện của cảnh": một truyện ngắn dùng chính các từ vừa học (từ nào cũng bấm được để xem thẻ từ, bấm loa nghe từng câu),
  * kèm bài làm sau khi đọc: một câu hỏi hiểu bài và bốn câu điền từ khoét từ chính truyện. Đúng ngay lần đầu thì từ được tính là đã dùng trong ngữ cảnh và nhận XP như một lượt nhiệm vụ.
  */
-export function SceneStoryCard({ story, words, marks, pinyin, onPickWord, onUseWord }: Props) {
+export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPickWord, onUseWord }: Props) {
   const [showPinyin, setShowPinyin] = useState(false);
   const [showVi, setShowVi] = useState(true);
   const [quiz, setQuiz] = useState<Question[] | null>(null);
@@ -42,9 +45,26 @@ export function SceneStoryCard({ story, words, marks, pinyin, onPickWord, onUseW
   const [wrongTried, setWrongTried] = useState<string[]>([]);
   const [firstTry, setFirstTry] = useState(0);
   const [done, setDone] = useState(false);
+  const [playing, setPlaying] = useState<number>(-1);
+  const run = useRef(0);
   const started = useRef(0);
   const byTerm = useMemo(() => Object.fromEntries(words.map((w) => [w.term, w])) as Record<string, SceneWord>, [words]);
   const terms = useMemo(() => words.map((w) => w.term), [words]);
+
+  // Rời trang hoặc đổi cảnh thì dừng giọng đang đọc.
+  useEffect(() => () => stopChinese(), []);
+
+  function playAll() {
+    if (playing >= 0) { run.current++; stopChinese(); setPlaying(-1); return; }
+    const mine = ++run.current;
+    void playChineseSequence(story.lines.map((l) => l.zh), (i) => { if (run.current === mine) setPlaying(i); });
+  }
+  function playOne(i: number) {
+    run.current++;
+    setPlaying(i);
+    const mine = run.current;
+    void playChinese(story.lines[i].zh).finally(() => { if (run.current === mine) setPlaying(-1); });
+  }
 
   function start() {
     const shuffled = [story.question.right, ...story.question.wrong].sort(() => Math.random() - 0.5);
@@ -79,10 +99,10 @@ export function SceneStoryCard({ story, words, marks, pinyin, onPickWord, onUseW
   const q = quiz && !done ? quiz[step] : null;
 
   return (
-    <section aria-label="Câu chuyện của cảnh" className="card-ink flex flex-col gap-space-sm p-space-md">
+    <section aria-label={`Câu chuyện ở ${sceneTitle}`} className="card-ink flex flex-col gap-space-sm p-space-md">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-label-md font-extrabold text-primary">📖 Câu chuyện của cảnh</p>
+          <p className="text-label-md font-extrabold text-primary">📖 Câu chuyện ở {sceneTitle}</p>
           <h2 lang="zh-Hans" className="text-headline-md">{story.title.zh}</h2>
           {showVi && <p className="text-body-sm text-on-surface-variant">{story.title.vi}</p>}
         </div>
@@ -92,31 +112,35 @@ export function SceneStoryCard({ story, words, marks, pinyin, onPickWord, onUseW
         </div>
       </header>
 
-      <ol className="flex flex-col gap-2">
-        {story.lines.map((line, i) => (
-          <li key={i} className="flex items-start gap-2 rounded-xl border-2 border-outline-variant bg-surface-container-lowest px-space-sm py-2">
-            <div className="min-w-0 flex-1">
-              <p lang="zh-Hans" className="text-body-lg font-bold leading-relaxed">
-                {segmentLine(line.zh, terms).map((s, j) => {
-                  if (!s.term) return <span key={j}>{s.text}</span>;
-                  const w = byTerm[s.term];
-                  const known = w && marks[w.id] !== "new";
-                  return (
-                    <button key={j} type="button" onClick={() => w && onPickWord(w)} title={w?.gloss}
-                      className={`rounded px-0.5 font-extrabold underline decoration-2 underline-offset-4 ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
-                      {s.text}
-                    </button>
-                  );
-                })}
-              </p>
-              {showPinyin && pinyin[line.zh] && <p className="text-body-sm text-primary">{pinyin[line.zh]}</p>}
-              {showVi && <p className="text-body-sm text-on-surface-variant">{line.vi}</p>}
-            </div>
-            <PronounceButton text={line.zh} className="size-9" />
-          </li>
-        ))}
-      </ol>
-      <p className="text-label-md text-on-surface-variant">Từ gạch chân là từ của cảnh: bấm để xem thẻ từ. Từ gạch đứt là từ bạn chưa học.</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button3d variant={playing >= 0 ? "primary" : "secondary"} onClick={playAll} aria-pressed={playing >= 0}>
+          <span className="inline-flex items-center gap-1.5"><Icon name={playing >= 0 ? "stop" : "volume_up"} size={20} />{playing >= 0 ? "Dừng" : "Nghe cả bài"}</span>
+        </Button3d>
+        <p className="text-label-md text-on-surface-variant">Bấm vào một câu để nghe riêng câu đó.</p>
+      </div>
+
+      <div className="rounded-xl border-2 border-outline-variant bg-surface-container-lowest px-space-sm py-space-sm">
+        <p lang="zh-Hans" className="text-body-lg font-bold leading-loose">
+          {story.lines.map((line, i) => (
+            <span key={i} onClick={() => playOne(i)} className={`cursor-pointer rounded px-0.5 transition-colors ${playing === i ? "bg-primary-container text-on-primary-container" : "hover:bg-surface-container"}`}>
+              {segmentLine(line.zh, terms).map((s, j) => {
+                if (!s.term) return <span key={j}>{s.text}</span>;
+                const w = byTerm[s.term];
+                const known = w && marks[w.id] !== "new";
+                return (
+                  <button key={j} type="button" onClick={(e) => { e.stopPropagation(); if (w) onPickWord(w); }} title={w?.gloss}
+                    className={`rounded px-0.5 font-extrabold underline decoration-2 underline-offset-4 ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
+                    {s.text}
+                  </button>
+                );
+              })}
+            </span>
+          ))}
+        </p>
+        {showPinyin && <p className="mt-2 text-body-sm leading-relaxed text-primary">{story.lines.map((l) => pinyin[l.zh]).filter(Boolean).join(" ")}</p>}
+        {showVi && <p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{story.lines.map((l) => l.vi).join(" ")}</p>}
+      </div>
+      <p className="text-label-md text-on-surface-variant">Từ gạch chân là từ của cảnh: bấm để xem thẻ từ. Từ gạch đứt là từ bạn chưa học. Câu đang đọc được tô sáng.</p>
 
       {!quiz && <Button3d variant="secondary" onClick={start}>Làm bài sau khi đọc (hiểu bài + điền từ)</Button3d>}
 

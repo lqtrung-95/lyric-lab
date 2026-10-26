@@ -58,3 +58,39 @@ export function isChineseAudioBusy(): boolean {
   const speaking = typeof window !== "undefined" && !!window.speechSynthesis && window.speechSynthesis.speaking;
   return audioPlaying || speaking;
 }
+
+/** Dừng mọi giọng đang đọc (cả file giọng AI lẫn giọng thiết bị) và hủy phần còn lại của lượt đọc nối tiếp. */
+export function stopChinese(): void {
+  playToken++;
+  current?.pause();
+  if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Đọc nối tiếp nhiều câu (cả bài) bằng giọng AI, mỗi câu xong mới sang câu sau và tải trước file của câu kế để không bị ngắt quãng.
+ * `onLine(i)` báo câu đang đọc (-1 khi kết thúc hoặc bị dừng). Câu nào giọng AI lỗi thì rơi về giọng thiết bị cho riêng câu đó. `stopChinese()` để dừng.
+ */
+export async function playChineseSequence(lines: readonly string[], onLine: (index: number) => void): Promise<void> {
+  const token = ++playToken;
+  try {
+    for (let i = 0; i < lines.length; i++) {
+      if (token !== playToken) return;
+      onLine(i);
+      if (i + 1 < lines.length) for (const part of splitForTts(lines[i + 1])) void fetchCloudAudio(part).catch(() => undefined);
+      try {
+        for (const part of splitForTts(lines[i])) {
+          if (token !== playToken) return;
+          await playCloud(part, true);
+        }
+      } catch {
+        if (token !== playToken) return;
+        speakChinese(lines[i]);
+        await sleep(Math.max(1500, lines[i].length * 330));
+      }
+    }
+  } finally {
+    onLine(-1); // luôn báo kết thúc (kể cả khi bị dừng); bên gọi tự bỏ qua báo cũ của lượt đã bị thay thế
+  }
+}
