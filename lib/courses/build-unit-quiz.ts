@@ -24,7 +24,7 @@ export interface QuizQuestion {
   truth?: boolean;
 }
 
-export const QUIZ_LENGTH = 10;
+export const QUIZ_LENGTH = 15;
 /** Kiểu trắc nghiệm cổ điển (mặc định của `buildUnitQuiz`). */
 export const CHOICE_KINDS: QuizKind[] = ["meaning", "term", "listen"];
 /**

@@ -1,8 +1,8 @@
 export interface ReviewSource { terms: string[]; glosses?: Record<string, string> }
 export const CHECKPOINT_POOL = 30;
 export const FINAL_POOL = 60;
-export const CHECKPOINT_QUIZ_LENGTH = 20;
-export const FINAL_QUIZ_LENGTH = 40;
+export const CHECKPOINT_QUIZ_LENGTH = 30;
+export const FINAL_QUIZ_LENGTH = 60;
 
 type Random = () => number;
 

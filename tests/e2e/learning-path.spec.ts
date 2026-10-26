@@ -63,8 +63,8 @@ test("mục Học có trên thanh điều hướng", async ({ page }) => {
   await expect(page.getByRole("navigation", { name: "Điều hướng chính" }).first().getByRole("link", { name: "Học" })).toBeVisible();
 });
 
-test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết quả và lưu tiến độ", async ({ page }) => {
-  test.setTimeout(90_000); // luồng dài (ba lần axe, 10 câu) và lần đầu dev server còn biên dịch tuyến API
+test("chặng 1: làm quen → nghe câu thật → kiểm tra 15 câu → kết quả và lưu tiến độ", async ({ page }) => {
+  test.setTimeout(90_000); // luồng dài (ba lần axe, 15 câu) và lần đầu dev server còn biên dịch tuyến API
   await stubAnonymousSession(page);
   let saved: Record<string, unknown> | null = null;
   await page.route("**/rest/v1/user_unit_progress*", async (route) => {
@@ -101,10 +101,10 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 10 câu → kết
   await noViolations(page);
   await page.getByRole("button", { name: /Làm bài kiểm tra/ }).click();
 
-  // Bước 3: chọn đáp án đầu tiên cho cả 10 câu; câu sai hiện thẻ đáp án đúng.
+  // Bước 3: chọn đáp án đầu tiên cho cả 15 câu; câu sai hiện thẻ đáp án đúng.
   let answerCards = 0;
-  for (let i = 0; i < 10; i++) {
-    await expect(page.getByText(new RegExp(`Câu ${i + 1}/10`))).toBeVisible();
+  for (let i = 0; i < 15; i++) {
+    await expect(page.getByText(new RegExp(`Câu ${i + 1}/15`))).toBeVisible();
     await answerQuestion(page);
     answerCards += await page.getByTestId("answer-card").count();
     await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
@@ -154,7 +154,7 @@ async function answerAll(page: Page, total: number) {
   }
 }
 
-test("chặng ôn tổng hợp (ôn tập chặng 1–5 của HSK 2): 20 câu nhiều kiểu, từ làm sai tự vào bộ ôn, ghi tiến độ", async ({ page }) => {
+test("chặng ôn tổng hợp (ôn tập chặng 1–5 của HSK 2): 30 câu nhiều kiểu, từ làm sai tự vào bộ ôn, ghi tiến độ", async ({ page }) => {
   test.setTimeout(120_000);
   await stubAnonymousSession(page);
   let saved: Record<string, unknown> | null = null;
@@ -167,21 +167,21 @@ test("chặng ôn tổng hợp (ôn tập chặng 1–5 của HSK 2): 20 câu nh
   await expect(page.getByRole("heading", { level: 1, name: "Ôn tập chặng 1–5" })).toBeVisible({ timeout: 90_000 });
   await expect(page.getByRole("button", { name: /Nghe \p{Script=Han}/u })).toHaveCount(0); // không có bước làm quen từ
   await page.getByRole("button", { name: /Bắt đầu làm bài/ }).click();
-  await answerAll(page, 20);
+  await answerAll(page, 30);
   await expect(page.getByTestId("unit-result")).toBeVisible();
   expect(saved).toMatchObject({ unit_id: expect.any(String), best_score: expect.any(Number) });
   // Luôn chọn đáp án đầu thì gần như chắc chắn có câu sai; từ sai có câu thật làm nguồn được thêm vào bộ ôn.
   await expect(page.getByTestId("unit-result-added")).toBeVisible();
 });
 
-test("bài kiểm tra cuối cấp HSK 1: 40 câu", async ({ page }) => {
+test("bài kiểm tra cuối cấp HSK 1: 60 câu", async ({ page }) => {
   // Không giả lập phiên: bản đồ đọc thẳng Supabase bằng khóa công khai, token giả sẽ làm truy vấn lỗi.
   await page.goto("/courses?course=hsk-1");
   await page.getByRole("button", { name: /Kiểm tra cuối cấp HSK 1/ }).click();
   await page.getByRole("link", { name: "Làm bài", exact: true }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Kiểm tra cuối cấp HSK 1" })).toBeVisible({ timeout: 45_000 });
   await page.getByRole("button", { name: /Bắt đầu làm bài/ }).click();
-  await expect(page.getByText(/Câu 1\/40/)).toBeVisible();
+  await expect(page.getByText(/Câu 1\/60/)).toBeVisible();
 });
 
 test("chặng không tồn tại: báo rõ và có đường về lộ trình", async ({ page }) => {
