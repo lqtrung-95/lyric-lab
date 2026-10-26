@@ -25,31 +25,41 @@ const cat: FlatSprite = {
   ),
 };
 
-/** Gấu Trúc (gấu trúc lớn) dẫn đường: mình trắng, tai, tay, chân và vành mắt đen, má hồng, ba lô xanh ngọc và khăn đỏ của thám tử. */
+/** Gấu Trúc thám tử: đầu to tròn (dễ thương), mắt to long lanh sau cặp kính tròn viền vàng (thông minh), khăn đỏ, ba lô xanh ngọc, tay cầm kính lúp. */
 const guide: FlatSprite = {
   w: 88, h: 100,
   node: (
     <g {...LINE}>
-      <rect x="56" y="50" width="22" height="34" rx="9" fill={C.teal} />
-      <ellipse cx="42" cy="72" rx="25" ry="24" fill={C.white} />
-      <ellipse cx="14" cy="68" rx="9" ry="15" fill={INK} transform="rotate(14 14 68)" />
-      <ellipse cx="68" cy="68" rx="9" ry="15" fill={INK} transform="rotate(-14 68 68)" />
-      <ellipse cx="28" cy="92" rx="11" ry="8" fill={INK} />
-      <ellipse cx="56" cy="92" rx="11" ry="8" fill={INK} />
-      <circle cx="17" cy="16" r="10" fill={INK} />
-      <circle cx="67" cy="16" r="10" fill={INK} />
-      <ellipse cx="42" cy="38" rx="29" ry="24" fill={C.white} />
-      <ellipse cx="29" cy="38" rx="8" ry="10.500" fill={INK} transform="rotate(24 29 38)" />
-      <ellipse cx="55" cy="38" rx="8" ry="10.500" fill={INK} transform="rotate(-24 55 38)" />
-      <circle cx="30" cy="36" r="3.200" fill={C.white} stroke="none" />
-      <circle cx="54" cy="36" r="3.200" fill={C.white} stroke="none" />
-      <circle cx="30.500" cy="36.500" r="1.600" fill={INK} stroke="none" />
-      <circle cx="53.500" cy="36.500" r="1.600" fill={INK} stroke="none" />
-      <ellipse cx="42" cy="47" rx="5" ry="3.500" fill={INK} stroke="none" />
-      <path d="M42 50.500q-3 4-6 2M42 50.500q3 4 6 2" strokeWidth={2} fill="none" />
-      <ellipse cx="20" cy="49" rx="4" ry="2.800" fill={C.pink} stroke="none" opacity={0.85} />
-      <ellipse cx="64" cy="49" rx="4" ry="2.800" fill={C.pink} stroke="none" opacity={0.85} />
-      <path d="M26 58q16 9 32 0l2 7q-18 10-36 0Z" fill={C.red} strokeWidth={2.500} />
+      <rect x="4" y="58" width="20" height="30" rx="9" fill={C.teal} />
+      <ellipse cx="44" cy="78" rx="21" ry="18" fill={C.white} />
+      <ellipse cx="22" cy="76" rx="7" ry="11" fill={INK} transform="rotate(12 22 76)" />
+      <ellipse cx="29" cy="94" rx="10" ry="6" fill={INK} />
+      <ellipse cx="59" cy="94" rx="10" ry="6" fill={INK} />
+      <path d="M30 63q14 8 28 0l2 7q-16 9-32 0Z" fill={C.red} strokeWidth={2.500} />
+      <circle cx="16" cy="15" r="11" fill={INK} />
+      <circle cx="72" cy="15" r="11" fill={INK} />
+      <circle cx="16" cy="16" r="4.500" fill={C.pink} stroke="none" />
+      <circle cx="72" cy="16" r="4.500" fill={C.pink} stroke="none" />
+      <ellipse cx="44" cy="39" rx="34" ry="28" fill={C.white} />
+      <ellipse cx="28" cy="41" rx="9" ry="11.500" fill={INK} transform="rotate(22 28 41)" />
+      <ellipse cx="60" cy="41" rx="9" ry="11.500" fill={INK} transform="rotate(-22 60 41)" />
+      <circle cx="29" cy="40" r="5.600" fill={C.white} stroke="none" />
+      <circle cx="59" cy="40" r="5.600" fill={C.white} stroke="none" />
+      <circle cx="30" cy="41" r="3.600" fill={INK} stroke="none" />
+      <circle cx="58" cy="41" r="3.600" fill={INK} stroke="none" />
+      <circle cx="31.500" cy="39.500" r="1.500" fill={C.white} stroke="none" />
+      <circle cx="59.500" cy="39.500" r="1.500" fill={C.white} stroke="none" />
+      <circle cx="29" cy="40" r="10" fill={C.blueL} fillOpacity={0.3} stroke={C.yellow} strokeWidth={2.600} />
+      <circle cx="59" cy="40" r="10" fill={C.blueL} fillOpacity={0.3} stroke={C.yellow} strokeWidth={2.600} />
+      <path d="M39 38q5-3 10 0" fill="none" stroke={C.yellow} strokeWidth={2.600} />
+      <ellipse cx="44" cy="50" rx="4.500" ry="3" fill={INK} stroke="none" />
+      <path d="M44 53q-3 4.500-6.500 2M44 53q3 4.500 6.500 2" strokeWidth={2} fill="none" />
+      <ellipse cx="17" cy="53" rx="5" ry="3.200" fill={C.pink} stroke="none" opacity={0.9} />
+      <ellipse cx="71" cy="53" rx="5" ry="3.200" fill={C.pink} stroke="none" opacity={0.9} />
+      <path d="M67 80L78 66" stroke={C.brown} strokeWidth={5} fill="none" />
+      <circle cx="79" cy="62" r="8.500" fill={C.blueL} fillOpacity={0.55} />
+      <path d="M75 59q2-3 5-3" stroke={C.white} strokeWidth={2} fill="none" />
+      <ellipse cx="68" cy="79" rx="6" ry="8" fill={INK} transform="rotate(-18 68 79)" />
     </g>
   ),
 };

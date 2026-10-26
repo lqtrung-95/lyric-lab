@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SCENES } from "@/lib/explore/scenes";
+import { DifficultyBadge } from "@/components/explore/story/difficulty-badge";
 import { CASES } from "@/lib/explore/story/cases";
-import { DIFFICULTY_LABEL } from "@/lib/explore/story/story-types";
 
 export const metadata: Metadata = { title: "Khám phá", robots: { index: false } };
 
@@ -17,7 +17,7 @@ export default function ExploreIndexPage() {
           <li key={c.id}>
             <Link href={`/explore/cases/${c.id}`} className="card-ink block p-space-md hover:-translate-y-0.5">
               <span className="text-headline-md">{c.title}</span>
-              <span className="ml-2 rounded-full border-2 border-ink bg-tertiary-container px-2 py-0.5 text-label-sm font-extrabold">{DIFFICULTY_LABEL[c.difficulty]}</span>
+              <span className="ml-2 align-middle"><DifficultyBadge level={c.difficulty} /></span>
               <span className="block text-body-md text-on-surface-variant">Chế độ phá án: hỏi chuyện bằng tiếng Trung, tìm manh mối, vạch mặt kẻ nói dối.</span>
             </Link>
           </li>

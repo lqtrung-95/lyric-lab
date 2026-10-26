@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button3d } from "@/components/ui/button-3d";
 import { currentObjective, objectiveProgress } from "@/lib/explore/story/objectives";
-import { DIFFICULTY_LABEL, type StoryDef } from "@/lib/explore/story/story-types";
+import type { StoryDef } from "@/lib/explore/story/story-types";
+import { DifficultyBadge } from "./difficulty-badge";
 import { useStoryProgress } from "./use-story-progress";
 
 /** Trang giới thiệu một vụ án: tóm tắt, mục tiêu hiện tại, nút bắt đầu/tiếp tục và chơi lại từ đầu (hỏi lại trước khi xóa tiến độ). */
@@ -20,7 +21,7 @@ export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "id" | "
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
       <header>
         <h1 className="text-headline-lg">{story.title}</h1>
-        <p className="mt-1"><span className="rounded-full border-2 border-ink bg-tertiary-container px-3 py-1 text-label-md font-extrabold text-on-tertiary-container">Độ khó: {DIFFICULTY_LABEL[story.difficulty]}</span></p>
+        <p className="mt-1"><DifficultyBadge level={story.difficulty} prefix="Độ khó: " /></p>
         <p className="mt-1 text-body-lg">{story.intro}</p>
       </header>
       {ready && (
