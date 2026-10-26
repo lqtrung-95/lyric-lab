@@ -148,3 +148,25 @@ describe("vụ án chiếc chìa khóa vàng", () => {
     expect(judge(story, "bird", story.solution.keyClues.slice(0, 4)).type).toBe("solved");
   });
 });
+
+describe("vụ án chiếc bánh kem bị đánh tráo", () => {
+  const story = CASES["swapped-cake"];
+
+  it("là mức Khó, 5 nghi phạm; thủ phạm là Thỏ và Mèo/Cáo/Cô Chim/Rùa đều bị loại bằng buộc tội sai", () => {
+    expect(story.difficulty).toBe("hard");
+    expect(story.suspects).toHaveLength(5);
+    for (const s of story.suspects.filter((x) => x.id !== "rabbit")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
+    expect(judge(story, "rabbit", story.solution.keyClues.slice(0, 3)).type).toBe("weak_evidence");
+  });
+
+  it("chỉ hỏi lại được Thỏ khi có cả bảng cửa sổ vé và sổ phẫu thuật; Ông Rùa chỉ kể về người chạy khi biết người mua muối", () => {
+    const entries = story.scenes.station.sceneNpcEntries!;
+    expect(pickEntry(entries, ["met:rabbit", "clue:ticket_closed"])).not.toBe("rabbit_conf");
+    expect(pickEntry(entries, ["met:rabbit", "clue:ticket_closed", "clue:sign_sheet"])).toBe("rabbit_conf");
+    expect(pickEntry(entries, ["met:rabbit", "clue:ticket_closed", "clue:sign_sheet", "confronted:rabbit"])).not.toBe("rabbit_conf");
+    const park = story.scenes.park.sceneNpcEntries!;
+    expect(pickEntry(park, ["met:turtle"])).toBe("t_after");
+    expect(pickEntry(park, ["met:turtle", "clue:salt_buyer"])).toBe("t2_hi");
+    expect(pickEntry(park, ["met:turtle", "clue:salt_buyer", "saw:turtle"])).toBe("t_after");
+  });
+});
