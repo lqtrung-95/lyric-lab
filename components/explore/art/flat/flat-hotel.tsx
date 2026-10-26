@@ -1,4 +1,4 @@
-import { C, LINE, type FlatSprite } from "./flat-kit";
+import { C, INK, LINE, type FlatSprite } from "./flat-kit";
 
 const key: FlatSprite = {
   w: 56, h: 30,
@@ -25,19 +25,26 @@ const towel: FlatSprite = {
   ),
 };
 
+/** Chú Vịt: đầu tròn to, mắt đen to có điểm sáng, mỏ cam nhỏ, má hồng, cánh nhỏ hai bên và đôi chân màu cam. */
 const duck: FlatSprite = {
   w: 80, h: 100,
   node: (
     <g {...LINE}>
-      <rect x="22" y="86" width="12" height="10" rx="3" fill={C.orange} />
-      <rect x="46" y="86" width="12" height="10" rx="3" fill={C.orange} />
-      <ellipse cx="40" cy="64" rx="26" ry="26" fill={C.yellow} />
-      <ellipse cx="40" cy="70" rx="15" ry="16" fill={C.cream} strokeWidth={2.500} />
-      <circle cx="40" cy="30" r="22" fill={C.yellow} />
-      <path d="M26 38q14 10 28 0q-2 10-14 10t-14-10Z" fill={C.orange} />
-      <circle cx="31" cy="26" r="3" fill={C.white} strokeWidth={2.500} />
-      <circle cx="49" cy="26" r="3" fill={C.white} strokeWidth={2.500} />
-      <path d="M32 8q8-8 16 0" fill="none" strokeWidth={3} />
+      <path d="M18 92q-6-2-6-6h16q0 6-10 6ZM62 92q6-2 6-6H52q0 6 10 6Z" fill={C.orange} strokeWidth={2.5} />
+      <ellipse cx="40" cy="68" rx="25" ry="24" fill={C.yellow} />
+      <ellipse cx="40" cy="73" rx="14" ry="15" fill={C.cream} strokeWidth={2.5} />
+      <ellipse cx="14" cy="68" rx="8" ry="13" fill={C.yellow} transform="rotate(14 14 68)" />
+      <ellipse cx="66" cy="68" rx="8" ry="13" fill={C.yellow} transform="rotate(-14 66 68)" />
+      <circle cx="40" cy="34" r="27" fill={C.yellow} />
+      <path d="M34 8q6-6 12 0" fill="none" strokeWidth={3} />
+      <circle cx="30" cy="31" r="5.5" fill={INK} stroke="none" />
+      <circle cx="50" cy="31" r="5.5" fill={INK} stroke="none" />
+      <circle cx="31.800" cy="29" r="2" fill={C.white} stroke="none" />
+      <circle cx="51.800" cy="29" r="2" fill={C.white} stroke="none" />
+      <ellipse cx="40" cy="43" rx="9" ry="5.500" fill={C.orange} strokeWidth={2.500} />
+      <path d="M34 43h12" fill="none" strokeWidth={1.800} />
+      <ellipse cx="19" cy="42" rx="4.500" ry="3" fill={C.pink} stroke="none" opacity={0.9} />
+      <ellipse cx="61" cy="42" rx="4.500" ry="3" fill={C.pink} stroke="none" opacity={0.9} />
     </g>
   ),
 };

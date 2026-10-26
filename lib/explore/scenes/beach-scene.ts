@@ -7,7 +7,10 @@ export const BEACH_SCENE: SceneDef = {
   subtitle: "Dạo bãi biển, học từ về biển, cát và đồ đi biển rồi làm nhiệm vụ cho Chú Vịt cứu hộ.",
   theme: "beach",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Siêu thị", to: "supermarket", x: 7, y: 60, w: 6 }],
+  exits: [
+    { sprite: "exitLeft", label: "Về Siêu thị", to: "supermarket", x: 7, y: 60, w: 6 },
+    { sprite: "exit", label: "Sang Sân vận động", to: "stadium", x: 92, y: 52, w: 6 },
+  ],
   npc: {
     id: "duck", name: "Chú Vịt cứu hộ", x: 88, y: 93, w: 8,
     greeting: "Chào mừng đến bãi biển! Hãy đi dạo trên cát, lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

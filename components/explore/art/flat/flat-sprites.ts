@@ -14,7 +14,8 @@ import { SCHOOL_SPRITES } from "./flat-school";
 import { SHOP_SPRITES } from "./flat-shop";
 import { STATION_SPRITES } from "./flat-station";
 import { STORY_SPRITES } from "./flat-story";
+import { VENUE_SPRITES } from "./flat-venues";
 import { SMALL_SPRITES } from "./flat-small";
 
 /** Tất cả sprite Tranh C theo `id` của vật trong cảnh (kèm `guide` cho nhân vật dẫn đường). */
-export const FLAT_SPRITES: Record<string, FlatSprite> = { ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES, ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES };
+export const FLAT_SPRITES: Record<string, FlatSprite> = { ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES, ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES, ...VENUE_SPRITES };

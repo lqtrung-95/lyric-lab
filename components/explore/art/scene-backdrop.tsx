@@ -50,6 +50,10 @@ const GENERIC: Record<Exclude<SceneTheme, "room" | "eatery">, { wall: string; wa
   supermarket: { wall: "#e6f4df", wallDots: false, base: "#7fc468", floor: "#e3e6e8", floorImage: "repeating-conic-gradient(#eceff1 0% 25%, #dadfe2 0% 50%)", floorSize: "64px 64px" },
   beach: { wall: "#bfe3f7", wallDots: false, base: "#51a0db", floor: "#f6e2b0", floorImage: "radial-gradient(rgba(194,122,60,.28) 2px, transparent 2.5px)", floorSize: "26px 26px" },
   office: { wall: "#eef1f6", wallDots: false, base: "#6d8cb0", floor: "#cfd5dd", floorImage: "repeating-conic-gradient(#d5dae1 0% 25%, #c7ced8 0% 50%)", floorSize: "60px 60px" },
+  kitchen: { wall: "#f6f1e6", wallDots: false, base: "#b9a58f", floor: "#f3c98b", floorImage: "repeating-conic-gradient(#f6d29a 0% 25%, #eebd78 0% 50%)", floorSize: "60px 60px" },
+  bakery: { wall: "#ffe3ec", wallDots: true, base: "#8a5530", floor: "#fff0d8", floorImage: "repeating-conic-gradient(#fff6e4 0% 25%, #f7dcc0 0% 50%)", floorSize: "56px 56px" },
+  museum: { wall: "#efe6d6", wallDots: false, base: "#8a5530", floor: "#d9d2c6", floorImage: "repeating-linear-gradient(90deg, transparent 0 120px, rgba(74,46,27,.16) 120px 122px)" },
+  stadium: { wall: "#cfe9f8", wallDots: false, base: "#3b6931", floor: "#8fd275", floorImage: "repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 60px, transparent 60px 120px)" },
   park: { wall: "#cfe9f8", wallDots: false, base: "#7fc468", floor: "#a8dd8f", floorImage: "radial-gradient(rgba(59,105,49,.25) 2px, transparent 2.5px)", floorSize: "30px 30px" },
 };
 

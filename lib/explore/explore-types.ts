@@ -56,7 +56,7 @@ export interface SceneExit {
 }
 
 /** Kiểu nền và nhạc của cảnh. */
-export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park" | "school" | "shop" | "hotel" | "airport" | "library" | "supermarket" | "beach" | "office";
+export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park" | "school" | "shop" | "hotel" | "airport" | "library" | "supermarket" | "beach" | "office" | "kitchen" | "bakery" | "museum" | "stadium";
 
 export interface SceneDef {
   id: string;
