@@ -133,3 +133,9 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Quyền hạn (huy hiệu admin, loại tin) do server quyết từ phiên, không nhận từ client.
 - Danh sách dài (video 400+ dòng) dùng `content-visibility: auto` trên từng dòng; đừng thêm `ruby`/nút theo từng chữ mà không đo lại, vì số phần tử DOM nhân lên rất nhanh (mỗi dòng đã ~120 phần tử).
 - Game hóa: công thức (XP, cấp, huy hiệu, nhiệm vụ, đóng băng chuỗi) là hàm thuần trên `DayActivity` trong `lib/game` và `lib/streak`; chỉ `game-repo.ts`/`game-service.ts` chạm DB. Thêm nguồn XP mới = thêm cột vào `DayActivity` + đơn giá và TRẦN ngày trong `xp-rules.ts` + test; không bao giờ tính XP từ giá trị điểm do client gửi. Mọi đường đọc bảng game phải coi lỗi/bảng thiếu là rỗng (migration do người dùng chạy tay). Bảng game mới theo người dùng phải vào `merge_user_data` và danh sách "merged" của `tests/integration/rooms.test.ts`.
+
+## Đường dẫn (route)
+
+- Mọi route của ứng dụng đặt tên tiếng Anh, kebab-case (`/explore`, `/courses`, `/install`, `/video/channel/...`). Tham số truy vấn cũng tiếng Anh (`?course=`).
+- NGOẠI LỆ có chủ ý: các trang marketing công khai (`/phat-am/*`, `/tu-vung-hsk`, `/chu-han-sang-pinyin`, `/cong-cu`) giữ slug tiếng Việt vì là từ khóa SEO của người Việt (chủ dự án chốt 2026-10-26).
+- Đổi tên route thì thêm chuyển hướng vĩnh viễn vào `lib/routes/legacy-redirects.ts` để link cũ còn dùng được; dữ liệu lưu theo id cũ phải có bước đổi khóa khi đọc.
