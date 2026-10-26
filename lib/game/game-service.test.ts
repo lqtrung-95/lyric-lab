@@ -51,7 +51,7 @@ function completeFirstDailyQuest() {
   const t = slot.template.id;
   db.data.raw = {
     reviews: t === "review10" ? Array.from({ length: 10 }, () => ({ at })) : [],
-    rounds: t === "dictate3" ? Array.from({ length: 3 }, () => ({ at, mode: "dictation", correct: 1, total: 1 })) : t === "speak1" ? [{ at, mode: "shadowing", correct: 1, total: 1 }] : t === "practice1" ? [{ at, mode: "cloze", correct: 3, total: 5 }] : [],
+    rounds: t === "dictate3" ? Array.from({ length: 3 }, () => ({ at, mode: "dictation", correct: 1, total: 1 })) : t === "speak1" ? [{ at, mode: "shadowing", correct: 1, total: 1 }] : t === "practice1" ? [{ at, mode: "cloze", correct: 3, total: 5 }] : t === "explore1" ? [{ at, mode: "explore", correct: 3, total: 5 }] : [],
     songs: t === "listen1" ? [{ at, completed: true }] : [],
     units: t === "unit1" ? [{ at, bestScore: 90 }] : [],
     rooms: [],
