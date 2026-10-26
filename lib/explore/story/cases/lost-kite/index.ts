@@ -16,6 +16,7 @@ export const LOST_KITE_CASE: StoryDef = {
   id: "lost-kite",
   title: "Vụ án con diều đỏ biến mất",
   difficulty: "medium",
+  blurb: "Diều đỏ biến mất khỏi bãi biển, chỉ còn vài dấu chân. Hãy so từng dấu một.",
   intro: "Con diều đỏ của Chú Vịt cứu hộ biến mất khỏi bãi biển lúc mười hai giờ trưa qua, chỉ để lại đoạn dây và vài dấu chân. Bốn người bị nghi. Hãy so dấu chân của từng người với dấu trên cát và đừng bỏ sót người nào.",
   speakers: SPEAKERS,
   clues: CLUES,

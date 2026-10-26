@@ -16,6 +16,7 @@ export const HOP_GO_CASE: StoryDef = {
   id: "wooden-box",
   title: "Vụ án chiếc hộp gỗ biến mất",
   difficulty: "easy",
+  blurb: "Cú Thầy mất chiếc hộp gỗ đựng thư của ông nội. Ai trong bốn người bạn đang nói dối?",
   intro: "Cú Thầy nhờ bạn, thám tử Gấu Trúc, tìm chiếc hộp gỗ đựng thư của ông nội đã biến mất lúc ba giờ chiều hôm qua. Bốn người bạn của Cú đều có mặt hôm đó. Ai đã nói dối?",
   speakers: SPEAKERS,
   clues: CLUES,

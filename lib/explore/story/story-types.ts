@@ -129,6 +129,8 @@ export interface StoryDef {
   title: string;
   /** Độ khó của vụ án: số nghi phạm, độ dài lời thoại, độ gián tiếp của chứng cứ. */
   difficulty: StoryDifficulty;
+  /** Một câu giới thiệu ngắn hiện ở danh sách vụ án. */
+  blurb: string;
   /** Mở đầu (tiếng Việt). */
   intro: string;
   speakers: Record<string, Speaker>;

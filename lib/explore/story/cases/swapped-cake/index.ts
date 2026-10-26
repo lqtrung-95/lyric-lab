@@ -18,6 +18,7 @@ export const SWAPPED_CAKE_CASE: StoryDef = {
   id: "swapped-cake",
   title: "Vụ án chiếc bánh kem bị đánh tráo",
   difficulty: "hard",
+  blurb: "Bánh dự thi bị đánh tráo, và có người còn đổ lỗi cho người khác.",
   intro: "Bánh dự thi của Bếp trưởng Gấu bị đánh tráo thành bánh mặn trong lúc ông ra chợ. Năm người bị nghi, và có người không chỉ nói dối về mình mà còn đổ lỗi cho người khác. Hãy kiểm tra từng lời khai bằng sổ sách, đừng tin ngay những thứ trông có vẻ rõ ràng.",
   speakers: SPEAKERS,
   clues: CLUES,

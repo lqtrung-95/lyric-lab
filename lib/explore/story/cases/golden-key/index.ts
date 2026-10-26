@@ -17,6 +17,7 @@ export const GOLDEN_KEY_CASE: StoryDef = {
   id: "golden-key",
   title: "Vụ án chiếc chìa khóa vàng",
   difficulty: "medium",
+  blurb: "Chìa khóa két sắt của khách sạn biến mất. Những chi tiết giống nhau sẽ đánh lừa bạn.",
   intro: "Chú Vịt lễ tân nhờ bạn, thám tử Gấu Trúc, tìm chiếc chìa khóa vàng của két sắt khách sạn, mất khoảng tám giờ tối qua. Có bốn người bị nghi và không phải ai cũng nói thật. Hãy so sánh lời khai với chứng cứ, và nhớ: có những chi tiết trông giống nhau nhưng khác nhau.",
   speakers: SPEAKERS,
   clues: CLUES,

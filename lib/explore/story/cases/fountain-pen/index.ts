@@ -13,6 +13,7 @@ export const FOUNTAIN_PEN_CASE: StoryDef = {
   id: "fountain-pen",
   title: "Vụ án chiếc bút máy của Cô Cú",
   difficulty: "easy",
+  blurb: "Bút máy vàng của cô thủ thư biến mất lúc ba giờ chiều. Ba người bị nghi.",
   intro: "Cô Cú thủ thư mất chiếc bút máy vàng quý lúc ba giờ chiều qua. Có ba người bị nghi. Hãy xem kỹ những thứ bị bỏ lại ở thư viện, rồi so lời khai với sổ sách.",
   speakers: SPEAKERS,
   clues: CLUES,
