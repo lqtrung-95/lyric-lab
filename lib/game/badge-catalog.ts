@@ -17,10 +17,14 @@ export interface BadgeFacts {
   perfectRounds: number;
   nightReviews: number;
   earlyReviews: number;
+  /** Số lượt nhiệm vụ đã làm ở Khám phá (gồm cả lượt ghi điểm khi giải xong một vụ án). */
+  exploreRounds: number;
+  casesSolved: number;
+  hardCasesSolved: number;
 }
 
-export type BadgeGroup = "learn" | "streak" | "listen" | "speak" | "battle";
-export const BADGE_GROUP_LABELS: Record<BadgeGroup, string> = { learn: "Học", streak: "Chuỗi ngày", listen: "Nghe", speak: "Nói", battle: "Thi đấu" };
+export type BadgeGroup = "learn" | "streak" | "listen" | "speak" | "battle" | "explore";
+export const BADGE_GROUP_LABELS: Record<BadgeGroup, string> = { learn: "Học", streak: "Chuỗi ngày", listen: "Nghe", speak: "Nói", battle: "Thi đấu", explore: "Khám phá" };
 
 export const TIER_ORDER: BadgeTier[] = ["bronze", "silver", "gold", "diamond"];
 
@@ -49,6 +53,9 @@ export const BADGES: BadgeDef[] = [
   { id: "speak-shadowing", group: "speak", title: "Giọng ca", hint: "Luyện nói tốt {n} câu", metric: "shadowingGood", thresholds: [5, 30, 150, 600] },
   { id: "battle-played", group: "battle", title: "Đấu sĩ", hint: "Chơi {n} ván thi đấu", metric: "roomsPlayed", thresholds: [1, 5, 20, 60] },
   { id: "battle-won", group: "battle", title: "Bất bại", hint: "Thắng {n} ván thi đấu", metric: "roomsWon", thresholds: [1, 5, 20, 50] },
+  { id: "explore-rounds", group: "explore", title: "Nhà thám hiểm", hint: "Làm {n} nhiệm vụ ở cảnh Khám phá", metric: "exploreRounds", thresholds: [3, 15, 50, 150] },
+  { id: "explore-cases", group: "explore", title: "Thám tử", hint: "Phá {n} vụ án", metric: "casesSolved", thresholds: [1, 3, 6, 10] },
+  { id: "explore-hard", group: "explore", title: "Thám tử cừ khôi", hint: "Phá {n} vụ án mức Khó", metric: "hardCasesSolved", thresholds: [1, 2, 3] },
   { id: "hidden-perfect", group: "learn", title: "Hoàn hảo", hint: "Đúng hết một lượt luyện tập (từ 5 câu) {n} lần", hidden: true, metric: "perfectRounds", thresholds: [1, 10, 50, 200] },
   { id: "hidden-night-owl", group: "learn", title: "Cú đêm", hint: "Ôn thẻ lúc 0–5 giờ sáng {n} lần", hidden: true, metric: "nightReviews", thresholds: [1, 20, 100] },
   { id: "hidden-early-bird", group: "learn", title: "Chim sớm", hint: "Ôn thẻ lúc 5–8 giờ sáng {n} lần", hidden: true, metric: "earlyReviews", thresholds: [1, 20, 100] },

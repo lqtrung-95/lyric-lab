@@ -6,21 +6,29 @@ import { buildBadgeCatalog, evaluateBadges, highestTiers, mergeBadges } from "./
 const zero: BadgeFacts = {
   learnedWords: 0, levelsCompleted: 0, totalReviews: 0, unitsCompleted: 0, level: 1, longestStreak: 0, songsCompleted: 0, dictationGood: 0, shadowingGood: 0,
   roomsPlayed: 0, roomsWon: 0, perfectRounds: 0, nightReviews: 0, earlyReviews: 0,
+  exploreRounds: 0, casesSolved: 0, hardCasesSolved: 0,
 };
 
 describe("danh mục huy hiệu", () => {
-  it("id duy nhất, mốc tăng dần, tối đa 4 bậc, đủ 5 nhóm", () => {
+  it("id duy nhất, mốc tăng dần, tối đa 4 bậc, đủ 6 nhóm", () => {
     expect(new Set(BADGES.map((b) => b.id)).size).toBe(BADGES.length);
     for (const b of BADGES) {
       expect(b.thresholds.length).toBeLessThanOrEqual(4);
       expect(b.thresholds.every((t, i) => i === 0 || t > b.thresholds[i - 1])).toBe(true);
     }
-    expect(new Set(BADGES.map((b) => b.group))).toEqual(new Set(["learn", "streak", "listen", "speak", "battle"]));
+    expect(new Set(BADGES.map((b) => b.group))).toEqual(new Set(["learn", "streak", "listen", "speak", "battle", "explore"]));
     expect(BADGES.some((b) => b.hidden)).toBe(true);
   });
 });
 
 describe("evaluateBadges", () => {
+  it("Khám phá: Nhà thám hiểm theo lượt nhiệm vụ, Thám tử theo vụ án đã giải, riêng vụ Khó", () => {
+    expect(evaluateBadges({ ...zero, exploreRounds: 3 })).toContainEqual({ id: "explore-rounds", tier: "bronze" });
+    expect(evaluateBadges({ ...zero, casesSolved: 3 }).filter((b) => b.id === "explore-cases").map((b) => b.tier)).toEqual(["bronze", "silver"]);
+    expect(evaluateBadges({ ...zero, hardCasesSolved: 1 })).toContainEqual({ id: "explore-hard", tier: "bronze" });
+    expect(evaluateBadges(zero).some((b) => b.id.startsWith("explore"))).toBe(false);
+  });
+
   it("qua bài kiểm tra cuối cấp: huy hiệu Hoàn thành cấp HSK theo số cấp", () => {
     expect(evaluateBadges({ ...zero, levelsCompleted: 1 })).toContainEqual({ id: "learn-hsk", tier: "bronze" });
     expect(evaluateBadges({ ...zero, levelsCompleted: 4 }).filter((b) => b.id === "learn-hsk").map((b) => b.tier)).toEqual(["bronze", "silver", "gold"]);

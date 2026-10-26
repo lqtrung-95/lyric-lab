@@ -12,7 +12,7 @@ const TIER_STYLE: Record<BadgeTier, string> = {
   gold: "bg-primary-container text-on-primary-container",
   diamond: "bg-[#a8dcf5] text-[#0b3248]",
 };
-const GROUP_ORDER: BadgeGroup[] = ["learn", "streak", "listen", "speak", "battle"];
+const GROUP_ORDER: BadgeGroup[] = ["learn", "streak", "listen", "speak", "battle", "explore"];
 
 function BadgeCard({ badge }: { badge: BadgeCatalogItem }) {
   const next = badge.nextTarget;
