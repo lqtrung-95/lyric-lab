@@ -12,6 +12,7 @@ interface PosterDef {
 
 /** Hình áp phích riêng của từng vụ án: vật bị mất ở giữa, người nhờ giúp bên phải, Gấu Trúc thám tử bên trái, dấu hỏi lớn làm nền. */
 const POSTERS: Record<string, PosterDef> = {
+  "lost-parcel": { bg: ["#cfe3f7", "#7fb4e6"], prop: { sprite: "parcel", w: 36, rotate: -7 }, client: "rabbit" },
   "wooden-box": { bg: ["#f6cf8e", "#e8a860"], prop: { sprite: "woodbox", w: 38, rotate: -8 }, client: "owl" },
   "golden-key": { bg: ["#ffe9a8", "#f0b44c"], prop: { sprite: "key", w: 36, rotate: 18 }, client: "duck" },
   "swapped-cake": { bg: ["#ffd3dc", "#f2a0a0"], prop: { sprite: "cake", w: 36, rotate: -6 }, client: "chef" },
