@@ -12,7 +12,7 @@ export const EATERY_SCENE: SceneDef = {
   start: { x: 50, y: 94 },
   exits: [
     { sprite: "exitLeft", label: "Về Phòng của bạn", to: "room", x: 11, y: 56, w: 6 },
-    { sprite: "exit", label: "Sang Chợ", to: "market", x: 90, y: 56, w: 6 },
+    { sprite: "exit", label: "Sang Chợ", to: "market", x: 92, y: 58, w: 6 },
   ],
   npc: {
     id: "chef", name: "Bếp trưởng Gấu", x: 90, y: 92, w: 10,
@@ -23,7 +23,7 @@ export const EATERY_SCENE: SceneDef = {
     { sprite: "shelf", x: 50, y: 33, w: 30 },
     { sprite: "table", x: 22, y: 76, w: 26 },
     { sprite: "table", x: 52, y: 86, w: 30 },
-    { sprite: "counter", x: 84, y: 60, w: 26 },
+    { sprite: "counter", x: 75, y: 60, w: 26 },
   ],
   objects: [
     { id: "milk", term: "牛奶", gloss: "sữa bò", above: true, portable: true, example: { zh: "孩子喝牛奶。", vi: "Em bé uống sữa." }, x: 42, y: 26.5, w: 4, stand: { x: 42, y: 42 } },
@@ -37,8 +37,8 @@ export const EATERY_SCENE: SceneDef = {
     { id: "coffee", term: "咖啡", gloss: "cà phê", above: true, portable: true, example: { zh: "请给我一杯咖啡。", vi: "Cho tôi một ly cà phê." }, x: 56.5, y: 70, w: 5, stand: { x: 56.5, y: 92 } },
     { id: "soup", term: "汤", gloss: "canh, súp", above: true, portable: true, example: { zh: "今天的汤很热。", vi: "Món canh hôm nay rất nóng." }, x: 62, y: 70, w: 6.5, stand: { x: 62, y: 92 } },
     { id: "veg", term: "菜", gloss: "món ăn, rau", above: true, portable: true, example: { zh: "这个菜很好吃。", vi: "Món này rất ngon." }, x: 67.5, y: 70, w: 7, stand: { x: 67.5, y: 92 } },
-    { id: "coin", term: "钱", gloss: "tiền", above: true, portable: true, example: { zh: "这个多少钱?", vi: "Cái này bao nhiêu tiền?" }, x: 77, y: 44.5, w: 4, stand: { x: 77, y: 66 } },
-    { id: "menu", term: "菜单", gloss: "thực đơn", above: true, portable: true, example: { zh: "请给我菜单。", vi: "Cho tôi xem thực đơn." }, x: 84, y: 44.5, w: 5.5, stand: { x: 84, y: 66 } },
-    { id: "egg", term: "鸡蛋", gloss: "trứng gà", above: true, portable: true, example: { zh: "我早上吃一个鸡蛋。", vi: "Buổi sáng tôi ăn một quả trứng." }, x: 91, y: 44.5, w: 3.8, stand: { x: 91, y: 66 } },
+    { id: "coin", term: "钱", gloss: "tiền", above: true, portable: true, example: { zh: "这个多少钱?", vi: "Cái này bao nhiêu tiền?" }, x: 68, y: 44.5, w: 4, stand: { x: 68, y: 66 } },
+    { id: "menu", term: "菜单", gloss: "thực đơn", above: true, portable: true, example: { zh: "请给我菜单。", vi: "Cho tôi xem thực đơn." }, x: 75, y: 44.5, w: 5.5, stand: { x: 75, y: 66 } },
+    { id: "egg", term: "鸡蛋", gloss: "trứng gà", above: true, portable: true, example: { zh: "我早上吃一个鸡蛋。", vi: "Buổi sáng tôi ăn một quả trứng." }, x: 82, y: 44.5, w: 3.8, stand: { x: 82, y: 66 } },
   ],
 };
