@@ -186,3 +186,20 @@ describe("lối đi trong vụ án theo thứ tự điều tra", () => {
     }
   });
 });
+
+describe("vụ án bức tranh Mùa Xuân", () => {
+  const story = CASES["spring-painting"];
+
+  it("là mức Khó; chỉ Mèo là thủ phạm; hỏi lại Thỏ cần cả sổ bếp lẫn bảng cửa sổ; Chó chỉ kể sau khi Thỏ bị vạch trần", () => {
+    expect(story.difficulty).toBe("hard");
+    for (const s of story.suspects.filter((x) => x.id !== "cat")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
+    expect(judge(story, "cat", story.solution.keyClues.slice(0, 3)).type).toBe("weak_evidence");
+    const st = story.scenes.station.sceneNpcEntries!;
+    expect(pickEntry(st, ["met:rabbit", "clue:window_closed"])).not.toBe("rabbit_conf");
+    expect(pickEntry(st, ["met:rabbit", "clue:window_closed", "clue:kitchen_log"])).toBe("rabbit_conf");
+    const sd = story.scenes.stadium.sceneNpcEntries!;
+    expect(pickEntry(sd, ["met:dog"])).toBe("dog_after");
+    expect(pickEntry(sd, ["met:dog", "clue:rabbit_slip"])).toBe("dog2_hi");
+    expect(pickEntry(sd, ["met:dog", "clue:rabbit_slip", "saw:dog"])).toBe("dog_after");
+  });
+});
