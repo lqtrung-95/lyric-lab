@@ -29,7 +29,7 @@ export function SiteHeader() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`flex min-h-11 items-center whitespace-nowrap rounded-full px-4 text-label-md transition-colors ${
+                  className={`flex min-h-11 items-center whitespace-nowrap rounded-full px-3 text-label-md lg:px-4 transition-colors ${
                     active
                       ? "bg-surface-container-high font-medium text-on-surface"
                       : "text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface"

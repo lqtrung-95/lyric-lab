@@ -49,7 +49,7 @@ test("máy tính: thanh bên có đủ điều hướng chính và lối vào ph
   await page.goto("/app");
   const header = page.getByRole("banner");
   const side = page.getByRole("complementary");
-  for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"]) await expect(side.getByRole("link", { name, exact: true })).toBeVisible();
+  for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Khám phá", "Thi đấu"]) await expect(side.getByRole("link", { name, exact: true })).toBeVisible();
   for (const name of ["Công cụ", "Hồ sơ và huy hiệu", "Góp ý cho SongHanzi", "Cài đặt và tài khoản"]) await expect(side.getByRole("link", { name })).toBeVisible();
   await expect(header.getByRole("button", { name: "Menu" })).toBeHidden();
   await expect(header.getByRole("link", { name: /Cộng đồng/ })).toBeVisible();
@@ -61,7 +61,7 @@ test.describe("máy tính bảng", () => {
       await page.setViewportSize({ width, height });
       await page.goto("/app");
       const aside = page.getByRole("complementary");
-      for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"]) {
+      for (const name of ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Khám phá", "Thi đấu"]) {
         const box = (await aside.getByRole("link", { name, exact: true }).boundingBox())!;
         expect(box.height, `${name} bị xuống dòng`).toBeLessThanOrEqual(64);
       }

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ExploreEntryCard } from "@/components/explore/explore-entry-card";
 import { Icon } from "@/components/ui/icon";
 import { CreateChallengeDialog } from "./create-challenge-dialog";
 import { CreateRoomDialog } from "./create-room-dialog";
@@ -30,7 +29,6 @@ export function RoomHub() {
         </Link>
       </section>
 
-      <ExploreEntryCard />
 
       <div className="grid gap-space-md lg:grid-cols-2">
         <section aria-labelledby="invite-heading" className={`${card} flex flex-col`}>

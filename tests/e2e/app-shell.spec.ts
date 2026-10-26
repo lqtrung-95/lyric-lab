@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-// Khung điều hướng mới: 5 mục (Hôm nay · Học · Nghe · Ôn & Nói · Chơi), tab bar ở điện thoại, thanh bên ở máy tính bảng/máy tính; mục đang chọn theo cả các trang con.
-const MAIN = ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Chơi"];
+// Khung điều hướng mới: 6 mục (Hôm nay · Học · Nghe · Ôn & Nói · Khám phá · Thi đấu), tab bar ở điện thoại, thanh bên ở máy tính bảng/máy tính; mục đang chọn theo cả các trang con.
+const MAIN = ["Hôm nay", "Học", "Nghe", "Ôn & Nói", "Khám phá", "Thi đấu"];
 
-test("điện thoại: tab bar dưới có đúng 5 mục và đánh dấu mục đang chọn", async ({ page }) => {
+test("điện thoại: tab bar dưới có đúng 6 mục và đánh dấu mục đang chọn", async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto("/courses");
   const bar = page.getByRole("navigation", { name: "Điều hướng chính" }).last();
-  await expect(bar.getByRole("link")).toHaveCount(5);
+  await expect(bar.getByRole("link")).toHaveCount(6);
   for (const name of MAIN) await expect(bar.getByRole("link", { name })).toBeVisible();
   await expect(bar.getByRole("link", { name: "Học" })).toHaveAttribute("aria-current", "page");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -29,13 +29,13 @@ test("công tắc Bài hát | Video chuyển giữa hai trang của khu Nghe", a
   await expect(page).toHaveURL(/\/video$/);
 });
 
-test("mục Ôn & Nói và Chơi đi đúng trang", async ({ page }) => {
+test("mục Ôn & Nói và Thi đấu đi đúng trang", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/app");
   const side = page.getByRole("complementary");
   await side.getByRole("link", { name: "Ôn & Nói" }).click();
   await expect(page).toHaveURL(/\/review$/);
-  await side.getByRole("link", { name: "Chơi" }).click();
+  await side.getByRole("link", { name: "Thi đấu" }).click();
   await expect(page).toHaveURL(/\/room$/);
-  await expect(side.getByRole("link", { name: "Chơi" })).toHaveAttribute("aria-current", "page");
+  await expect(side.getByRole("link", { name: "Thi đấu" })).toHaveAttribute("aria-current", "page");
 });
