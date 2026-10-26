@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { visibleChoices } from "@/lib/explore/story/dialogue";
 import { sceneUnlocked } from "@/lib/explore/story/objectives";
 import type { StoryPayload } from "@/lib/explore/story/load-story";
 import { SCENES } from "@/lib/explore/scenes";
 import { AccusePanel } from "./accuse-panel";
 import { CaseFilePanel } from "./case-file-panel";
 import { ClueCard } from "./clue-card";
-import { DialogueCard } from "./dialogue-card";
 import { MapPanel, type MapEntry } from "./map-panel";
 import type { useStoryController } from "./use-story-controller";
 import { useStoryHints } from "./use-story-hints";
@@ -18,16 +16,10 @@ type Controller = ReturnType<typeof useStoryController>;
 /** Bảng đang mở của cốt truyện (hội thoại, manh mối vừa tìm, sổ vụ án, buộc tội, bản đồ); null khi không có bảng nào. */
 function PanelBody({ payload, sc, basePath, sceneId }: { payload: StoryPayload; sc: Controller; basePath: string; sceneId: string }) {
   const { hints, toggle } = useStoryHints();
-  const { story, scene, pinyin } = payload;
+  const { story, pinyin } = payload;
   const view = sc.view;
   if (!view) return null;
 
-  if (view.kind === "dialogue") {
-    const node = scene.dialogues[view.nodeId];
-    if (!node) return null;
-    const newClues = (node.effects ?? []).flatMap((e) => ("clue" in e ? story.clues.filter((c) => c.id === e.clue) : []));
-    return <DialogueCard node={node} choices={visibleChoices(node, sc.progress.flags)} speaker={story.speakers[node.speaker]} pinyin={pinyin} hints={hints} onToggleHint={toggle} newClues={newClues} onChoose={sc.choose} />;
-  }
   if (view.kind === "clue") {
     const clue = story.clues.find((c) => c.id === view.clueId);
     return clue ? <ClueCard clue={clue} pinyin={pinyin} hints={hints} onToggleHint={toggle} onClose={sc.close} onOpenCase={() => sc.setView({ kind: "case" })} /> : null;
@@ -49,12 +41,12 @@ export function payloadScenes(story: StoryPayload["story"]): Record<string, true
 
 /**
  * Mọi bảng của cốt truyện (hội thoại, manh mối, sổ vụ án, buộc tội, bản đồ) hiện thành hộp thoại giữa màn hình bằng <dialog> gốc: nền mờ phía sau, khóa focus (nên phím di chuyển của cảnh không bắt nhầm),
- * Esc để đóng, đóng xong trả focus về chỗ cũ. Hội thoại không đóng khi bấm ra ngoài để khỏi lỡ tay giữa câu thoại.
+ * Esc để đóng, đóng xong trả focus về chỗ cũ.
  */
 export function StoryPanels(props: { payload: StoryPayload; sc: Controller; basePath: string; sceneId: string }) {
   const ref = useRef<HTMLDialogElement>(null);
   const { view, close } = props.sc;
-  const open = !!view;
+  const open = !!view && view.kind !== "dialogue"; // hội thoại là bong bóng trong khung cảnh (xem DialogueBubble), không phải hộp thoại
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
@@ -65,9 +57,9 @@ export function StoryPanels(props: { payload: StoryPayload; sc: Controller; base
   return (
     <dialog
       ref={ref}
-      aria-label={view?.kind === "dialogue" ? "Hội thoại" : "Vụ án"}
+      aria-label="Vụ án"
       onCancel={(e) => { e.preventDefault(); close(); }} // Esc đi qua trạng thái của cha
-      onClick={(e) => { if (e.target === ref.current && view?.kind !== "dialogue") close(); }}
+      onClick={(e) => { if (e.target === ref.current) close(); }}
       className="m-auto max-h-[88vh] w-[min(94vw,40rem)] overflow-y-auto rounded-3xl bg-transparent p-0 text-on-surface backdrop:bg-black/55 backdrop:backdrop-blur-[2px]"
     >
       <PanelBody {...props} />

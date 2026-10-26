@@ -12,6 +12,7 @@ import { PlayerAvatar } from "./player-avatar";
 import { QuestPanel, QuestSummary } from "./quest-panel";
 import { SceneCanvas } from "./scene-canvas";
 import { ObjectiveBar } from "./story/objective-bar";
+import { StoryBubble } from "./story/story-bubble";
 import { StoryPanels } from "./story/story-panels";
 import type { useStoryController } from "./story/use-story-controller";
 import { useAmbientMusic } from "./use-ambient-music";
@@ -51,11 +52,12 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
       <div {...c.stageProps} onPointerDown={(e) => e.currentTarget.focus({ preventScroll: true })} className="rounded-2xl outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary">
         <SceneCanvas theme={scene.theme} objects={scene.objects} npc={scene.npc} decor={scene.decor ?? []} exits={scene.exits} extras={sc?.extras} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>
           <PlayerAvatar elRef={player.elRef} walking={player.walking} facing={player.facing} fx={c.fx} carrying={quest.carrying} />
+          {story && sc && <StoryBubble payload={story.payload} sc={sc} scene={scene} playerEl={player.elRef} />}
         </SceneCanvas>
       </div>
       <p className="-mt-2 text-label-md text-on-surface-variant">Phím mũi tên hoặc WASD để đi · E để tương tác · hoặc chạm vào sàn/đồ vật để nhân vật tự đi tới.</p>
 
-      {story && sc?.view ? (
+      {story && sc?.view && sc.view.kind !== "dialogue" ? (
         <StoryPanels payload={story.payload} sc={sc} basePath={story.basePath} sceneId={scene.id} />
       ) : quest.active ? (
         <QuestPanel rounds={quest.rounds} index={quest.index} phase={quest.phase} wrong={quest.wrong} words={c.words} carrying={quest.carrying} npcName={scene.npc.name} onQuit={quest.stop} />

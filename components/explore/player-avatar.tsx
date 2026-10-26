@@ -7,7 +7,7 @@ import { FLAT_SPRITES } from "./art/flat/flat-sprites";
 export type AvatarFx = "hop" | "oops" | null;
 
 /** Chiều rộng nhân vật, % khung cảnh. */
-const AVATAR_WIDTH = 8.5;
+export const AVATAR_WIDTH = 8.5;
 
 /**
  * Nhân vật người chơi (Gấu Trúc). Vị trí do `usePlayerMovement` ghi thẳng vào phần tử qua `elRef` (không đặt left/top ở đây để React không ghi đè);
