@@ -4,6 +4,13 @@ import { buildCloze, segmentLine } from "./segment-and-cloze";
 import { SCENE_STORIES } from "./stories";
 
 describe("truyện của cảnh", () => {
+  it("mọi cảnh đều có truyện và mọi dòng, đáp án đều đọc được bằng giọng tạo sẵn (≤ 40 ký tự)", () => {
+    expect(Object.keys(SCENE_STORIES).sort()).toEqual(Object.keys(SCENES).sort());
+    for (const [id, s] of Object.entries(SCENE_STORIES)) {
+      for (const t of [s.title.zh, s.question.right, ...s.question.wrong]) expect(t.length, `${id}: ${t}`).toBeLessThanOrEqual(40);
+    }
+  });
+
   it.each(Object.entries(SCENE_STORIES))("%s: cảnh có thật, dùng gần hết từ của cảnh, câu ngắn, câu hỏi hợp lệ", (id, story) => {
     const scene = SCENES[id];
     expect(scene, id).toBeDefined();

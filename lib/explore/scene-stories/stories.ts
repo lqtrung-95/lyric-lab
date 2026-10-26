@@ -1,7 +1,13 @@
+import { PLACE_FUN_STORIES } from "./stories-places-fun";
+import { SERVICE_STORIES } from "./stories-services";
+import { TRAVEL_FOOD_STORIES } from "./stories-travel-food";
 import type { SceneStory } from "./story-types";
 
-/** Truyện của từng cảnh (đợt đầu: 4 cảnh). Mọi truyện phải dùng gần hết từ của cảnh (có test kiểm tra). */
+/** Truyện của từng cảnh (đủ mọi cảnh). Mọi truyện phải dùng gần hết từ của cảnh (có test kiểm tra). */
 export const SCENE_STORIES: Record<string, SceneStory> = {
+  ...TRAVEL_FOOD_STORIES,
+  ...SERVICE_STORIES,
+  ...PLACE_FUN_STORIES,
   restaurant: {
     title: { zh: "小明的第一碗面", vi: "Bát mì đầu tiên của Tiểu Minh" },
     lines: [
