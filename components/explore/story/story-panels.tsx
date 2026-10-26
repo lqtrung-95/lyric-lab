@@ -47,11 +47,30 @@ export function payloadScenes(story: StoryPayload["story"]): Record<string, true
   return Object.fromEntries([...ids].map((i) => [i, true as const]));
 }
 
-/** Bảng nằm dưới khung cảnh nên dễ ngoài màn hình: mỗi lần bảng hoặc câu thoại đổi thì cuộn nó vào tầm nhìn. */
+/**
+ * Mọi bảng của cốt truyện (hội thoại, manh mối, sổ vụ án, buộc tội, bản đồ) hiện thành hộp thoại giữa màn hình bằng <dialog> gốc: nền mờ phía sau, khóa focus (nên phím di chuyển của cảnh không bắt nhầm),
+ * Esc để đóng, đóng xong trả focus về chỗ cũ. Hội thoại không đóng khi bấm ra ngoài để khỏi lỡ tay giữa câu thoại.
+ */
 export function StoryPanels(props: { payload: StoryPayload; sc: Controller; basePath: string; sceneId: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const key = JSON.stringify(props.sc.view);
-  useEffect(() => { ref.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [key]);
-  if (!props.sc.view) return null;
-  return <div ref={ref}><PanelBody {...props} /></div>;
+  const ref = useRef<HTMLDialogElement>(null);
+  const { view, close } = props.sc;
+  const open = !!view;
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+  if (!open) return null;
+  return (
+    <dialog
+      ref={ref}
+      aria-label={view?.kind === "dialogue" ? "Hội thoại" : "Vụ án"}
+      onCancel={(e) => { e.preventDefault(); close(); }} // Esc đi qua trạng thái của cha
+      onClick={(e) => { if (e.target === ref.current && view?.kind !== "dialogue") close(); }}
+      className="m-auto max-h-[88vh] w-[min(94vw,40rem)] overflow-y-auto rounded-3xl bg-transparent p-0 text-on-surface backdrop:bg-black/55 backdrop:backdrop-blur-[2px]"
+    >
+      <PanelBody {...props} />
+    </dialog>
+  );
 }
