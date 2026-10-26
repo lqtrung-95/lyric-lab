@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { loadProgress } from "@/lib/explore/explore-progress";
 import { fadingByScene, mostFadingScene, totalFading } from "@/lib/explore/fading-words";
+import { LAST_SCENE_KEY } from "@/lib/explore/last-scene";
 import { SCENES } from "@/lib/explore/scenes";
 import { objectiveProgress } from "@/lib/explore/story/objectives";
 import { loadStory } from "@/lib/explore/story/story-state";
 import type { Objective, StoryDifficulty } from "@/lib/explore/story/story-types";
 import { CasePoster } from "./case-poster";
 import { SceneThumb } from "./scene-thumb";
+import { TownMap } from "./town-map";
 import { DifficultyBadge } from "./story/difficulty-badge";
 
 /** Phần nhẹ của một vụ án đủ để vẽ thẻ trong danh sách (không kéo cả hội thoại về trình duyệt). */
@@ -23,17 +25,18 @@ export interface CaseSummary {
   objectives: Objective[];
 }
 
-type Tab = "cases" | "scenes";
+type Tab = "map" | "cases" | "scenes";
 
 /**
  * Trang Khám phá gọn: hai thẻ chuyển (Phá án / Học từ theo cảnh), mỗi mục là một thẻ có ảnh thu nhỏ của cảnh, kèm tiến độ của bạn
  * (vụ án: số mục tiêu đã xong hoặc "Đã giải"; cảnh: số từ đã học).
  */
 export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
-  const [tab, setTab] = useState<Tab>("cases");
+  const [tab, setTab] = useState<Tab>("map");
   const [caseState, setCaseState] = useState<Record<string, { done: number; solved: boolean }>>({});
   const [learned, setLearned] = useState<Record<string, number>>({});
   const [fading, setFading] = useState<Record<string, number>>({});
+  const [lastScene, setLastScene] = useState<string | null>(null);
 
   useEffect(() => {
     // Tiến độ nằm ở localStorage (server không đọc được) nên đọc sau khi mount.
@@ -51,6 +54,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
     setCaseState(next);
     setLearned(counts);
     setFading(fadingByScene(progress, Object.values(SCENES), Date.now()));
+    setLastScene(window.localStorage.getItem(LAST_SCENE_KEY));
   }, [cases]);
 
   const tabCls = (on: boolean) => `min-h-11 flex-1 rounded-full px-4 text-label-md font-extrabold transition-colors ${on ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:bg-surface-container-high"}`;
@@ -59,6 +63,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
   return (
     <div className="flex flex-col gap-space-md">
       <div role="tablist" aria-label="Khám phá" className="flex gap-1 rounded-full border-2 border-ink bg-surface-container-lowest p-1">
+        <button type="button" role="tab" aria-selected={tab === "map"} onClick={() => setTab("map")} className={tabCls(tab === "map")}>Bản đồ</button>
         <button type="button" role="tab" aria-selected={tab === "cases"} onClick={() => setTab("cases")} className={tabCls(tab === "cases")}>Phá án ({cases.length})</button>
         <button type="button" role="tab" aria-selected={tab === "scenes"} onClick={() => setTab("scenes")} className={tabCls(tab === "scenes")}>Học từ theo cảnh ({Object.keys(SCENES).length})</button>
       </div>
@@ -74,7 +79,9 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
         </Link>
       )}
 
-      {tab === "cases" ? (
+      {tab === "map" ? (
+        <TownMap cases={cases} learned={learned} fading={fading} caseState={caseState} lastScene={lastScene} />
+      ) : tab === "cases" ? (
         <ul className="grid gap-space-sm sm:grid-cols-2">
           {cases.map((c) => {
             const st = caseState[c.id];

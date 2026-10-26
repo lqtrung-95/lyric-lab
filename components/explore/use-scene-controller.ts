@@ -1,5 +1,6 @@
 "use client";
 
+import { LAST_SCENE_KEY } from "@/lib/explore/last-scene";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
@@ -60,6 +61,8 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
     ...(opts.extraInteractables ?? []),
   ], [scene, opts.extraInteractables]);
   const player = usePlayerMovement(interactables, scene.start);
+
+  useEffect(() => { try { window.localStorage.setItem(LAST_SCENE_KEY, sceneId); } catch { /* bị chặn: chỉ mất dấu trên bản đồ */ } }, [sceneId]);
 
   const later = useCallback((ms: number, fn: () => void) => { timers.current.push(setTimeout(fn, ms)); }, []);
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
