@@ -63,7 +63,15 @@ describe("dữ liệu các cảnh", () => {
     });
   }
 
-  it("có ít nhất 8 vật mang được để lượt nhiệm vụ có đủ câu mang đồ; từ không trùng giữa hai cảnh ở các vật mới", () => {
-    for (const scene of Object.values(SCENES)) expect(scene.objects.filter((o) => o.portable).length).toBeGreaterThanOrEqual(7);
+  it("mỗi cảnh có đủ vật mang được cho câu mang đồ, có câu hay dùng, và mỗi từ chỉ thuộc về MỘT cảnh (từ riêng của cảnh)", () => {
+    const seen = new Map<string, string>();
+    for (const scene of Object.values(SCENES)) {
+      expect(scene.objects.filter((o) => o.portable).length, scene.id).toBeGreaterThanOrEqual(4);
+      expect(scene.phrases?.length ?? 0, `${scene.id}: câu hay dùng`).toBeGreaterThanOrEqual(3);
+      for (const o of scene.objects) {
+        expect(seen.get(o.term), `${o.term} trùng giữa ${seen.get(o.term)} và ${scene.id}`).toBeUndefined();
+        seen.set(o.term, scene.id);
+      }
+    }
   });
 });

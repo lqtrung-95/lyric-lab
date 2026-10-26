@@ -70,6 +70,8 @@ export interface SceneDef {
   decor?: SceneDecor[];
   exits: SceneExit[];
   objects: SceneObjectDef[];
+  /** Vài câu hay dùng trong cảnh này (hiện ở bảng "Câu hay dùng" dưới khung cảnh). */
+  phrases?: { zh: string; vi: string }[];
 }
 
 /** Vật cảnh kèm thông tin từ điển (pinyin, Hán Việt, cấp HSK): các trường này KHÔNG viết tay mà lấy từ từ điển. */
@@ -83,4 +85,6 @@ export interface SceneWord extends SceneObjectDef {
 
 export interface SceneDetail extends Omit<SceneDef, "objects"> {
   objects: SceneWord[];
+  /** Pinyin của các câu hay dùng (câu tiếng Trung → pinyin), lấy từ từ điển, không viết tay. */
+  phrasePinyin: Record<string, string>;
 }

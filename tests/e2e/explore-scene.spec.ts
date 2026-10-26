@@ -86,7 +86,7 @@ test("nhiệm vụ: câu mang đồ cần nhặt đúng vật rồi giao cho Cú
   await page.route("**/api/tts**", (r) => r.fulfill({ status: 204 }));
   await page.goto("/explore/room");
   const obj = (id: string) => { const o = ROOM_SCENE.objects.find((x) => x.id === id)!; return page.locator(`button[style*="left:${o.x}%;top:${o.y}%"]`); };
-  const portable = ROOM_SCENE.objects.filter((o) => ["cup", "cat", "book", "apple", "water"].includes(o.id));
+  const portable = ROOM_SCENE.objects.filter((o) => ["cat", "apple", "alarmclock", "remote", "photoframe"].includes(o.id));
   for (const o of portable) {
     await page.getByRole("button", { name: new RegExp(`^${o.term}, `) }).click();
     await expect(page.getByRole("region", { name: `Từ ${o.term}` })).toBeVisible();
@@ -126,7 +126,7 @@ test("đi sang Quán ăn bằng biển chỉ đường, học một từ, quay l
   await expect(page.getByRole("heading", { name: "Quán ăn" })).toBeVisible();
   await page.getByRole("button", { name: /^茶, / }).click();
   await expect(page.getByRole("region", { name: "Từ 茶" })).toContainText("chá");
-  await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("1/14");
+  await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("1/12");
   await page.getByRole("button", { name: "Về Phòng của bạn" }).click();
   await expect(page.getByRole("heading", { name: "Phòng của bạn" })).toBeVisible();
   await expect(page.getByRole("region", { name: "Sổ tay" })).toContainText("0/14"); // từ học ở quán không tính vào phòng

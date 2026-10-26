@@ -42,7 +42,8 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
     }
     const terms = Object.keys(loadProgress(window.localStorage).terms);
     const counts: Record<string, number> = {};
-    for (const s of Object.values(SCENES)) counts[s.id] = terms.filter((k) => k.startsWith(`${s.id}:`)).length;
+    // Chỉ tính từ còn trong cảnh (từ đã bỏ khỏi cảnh vẫn có thể còn trong dữ liệu cũ).
+    for (const s of Object.values(SCENES)) counts[s.id] = s.objects.filter((o) => terms.includes(`${s.id}:${o.id}`)).length;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setCaseState(next);
     setLearned(counts);
