@@ -74,7 +74,7 @@ export function QuestPanel({ rounds, index, phase, wrong, words, carrying, npcNa
         )}
         {phase === "asking" && wrong > 0 && <p role="status" className="mt-1 text-label-md font-bold text-error">Chưa đúng, thử lại nhé (còn 1 lần).</p>}
         {phase === "correct" && (
-          <p role="status" className="flex items-center gap-2 text-body-lg font-extrabold text-secondary"><Icon name="check_circle" size={26} filled />Đúng rồi! <span lang="zh-Hans">{word.term}</span> ({word.pinyin}) là {word.gloss}.</p>
+          <p role="status" className="flex items-start gap-2 text-body-lg font-extrabold text-secondary"><Icon name="check_circle" size={26} filled className="mt-0.5 shrink-0" /><span className="min-w-0">Đúng rồi! <span lang="zh-Hans">{word.term}</span> ({word.pinyin}) là {word.gloss}.</span></p>
         )}
         {(phase === "correct" || phase === "reveal") && round.kind === "command" && (
           <p className="mt-1 text-body-md text-on-surface-variant">{npcName} nói: <span lang="zh-Hans" className="font-bold text-on-surface">{commandText(word.term, portable)}</span> {commandMeaning(word.gloss, portable)}</p>
