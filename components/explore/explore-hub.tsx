@@ -68,6 +68,15 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
         <button type="button" role="tab" aria-selected={tab === "scenes"} onClick={() => setTab("scenes")} className={tabCls(tab === "scenes")}>Học từ theo cảnh ({Object.keys(SCENES).length})</button>
       </div>
 
+      <Link href="/explore/coop" className="card-ink flex items-center gap-space-sm bg-secondary-container p-space-sm text-on-secondary-container transition-transform hover:-translate-y-0.5">
+        <span aria-hidden="true" className="text-3xl">🕵️‍♀️🕵️</span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-label-lg font-extrabold">Phá án cùng bạn</span>
+          <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Nói chuyện bằng tiếng Trung để ghép manh mối.</span>
+        </span>
+        <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-secondary">Mời bạn</span>
+      </Link>
+
       {totalFading(fading) > 0 && (
         <Link href={`/explore/${mostFadingScene(fading)}?rescue=1`} className="card-ink flex items-center gap-space-sm bg-primary-container p-space-sm text-on-primary-container transition-transform hover:-translate-y-0.5">
           <span aria-hidden="true" className="anim-float text-3xl">👻</span>

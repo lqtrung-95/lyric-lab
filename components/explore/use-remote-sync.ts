@@ -14,6 +14,8 @@ interface Options<T> {
   replace: (next: T) => void;
   /** Cách đọc/ghi riêng (mặc định đọc/ghi cả khối theo `kind`). */
   remote?: { load: () => Promise<unknown | null>; save: (value: T) => Promise<void> };
+  /** Tắt đồng bộ (vd. tiến độ phòng chơi chung không được ghi đè tiến độ chơi một mình). */
+  disabled?: boolean;
 }
 
 const PUSH_DELAY_MS = 1500;
@@ -22,7 +24,7 @@ const PUSH_DELAY_MS = 1500;
  * Đồng bộ một khối tiến độ với tài khoản: lúc vào lấy bản trên tài khoản, gộp với bản ở máy rồi dùng bản gộp; sau đó mỗi thay đổi được đẩy lên (chờ 1,5 giây cho gọn).
  * Lỗi bất kỳ (chưa đăng nhập, chưa chạy migration, mất mạng) chỉ tắt đồng bộ, game vẫn chơi bình thường bằng bản ở máy.
  */
-export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace, remote }: Options<T>) {
+export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace, remote, disabled }: Options<T>) {
   const valueRef = useRef(value);
   const enabled = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -33,7 +35,7 @@ export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace, re
   });
 
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || disabled) return;
     let alive = true;
     (latest.current.remote?.load() ?? loadRemoteState(kind))
       .then((raw) => {
@@ -44,7 +46,7 @@ export function useRemoteSync<T>({ kind, value, ready, parse, merge, replace, re
       })
       .catch(() => { enabled.current = false; });
     return () => { alive = false; };
-  }, [kind, ready]);
+  }, [kind, ready, disabled]);
 
   useEffect(() => {
     if (!enabled.current) return;

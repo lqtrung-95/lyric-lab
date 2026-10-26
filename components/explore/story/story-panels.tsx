@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { sceneUnlocked } from "@/lib/explore/story/objectives";
 import type { StoryPayload } from "@/lib/explore/story/load-story";
 import { SCENES } from "@/lib/explore/scenes";
 import { AccusePanel } from "./accuse-panel";
@@ -29,7 +28,7 @@ function PanelBody({ payload, sc, basePath, sceneId }: { payload: StoryPayload; 
   }
   if (view.kind === "accuse") return <AccusePanel story={story} progress={sc.progress} hints={hints} verdict={sc.verdict} onSubmit={sc.accuse} onClose={sc.close} />;
 
-  const entries: MapEntry[] = Object.keys(SCENES).map((id) => ({ id, title: SCENES[id].title, here: id === sceneId, target: sc.objective?.sceneId === id, available: id in payloadScenes(story), locked: !sceneUnlocked(story.objectives, story.startScene, sc.progress.flags, id) }));
+  const entries: MapEntry[] = Object.keys(SCENES).map((id) => ({ id, title: SCENES[id].title, here: id === sceneId, target: sc.objective?.sceneId === id, available: id in payloadScenes(story), locked: !sc.isSceneOpen(id) }));
   return <MapPanel entries={entries} basePath={basePath} onClose={sc.close} />;
 }
 
