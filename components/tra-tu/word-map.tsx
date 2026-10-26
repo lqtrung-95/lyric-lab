@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { layoutWordMap, MAP_HEIGHT, MAP_WIDTH, type MapGroup } from "@/lib/tra-tu/word-map-layout";
+import { layoutWordMap, type MapGroup } from "@/lib/tra-tu/word-map-layout";
 import { wordHref } from "./word-result-row";
 
 const COLORS = { compound: "var(--primary)", radical: "var(--secondary)", theme: "var(--tertiary)" } as const;
@@ -12,24 +12,21 @@ export function WordMap({ term, groups }: { term: string; groups: MapGroup[] }) 
   const map = layoutWordMap(groups);
   if (map.groups.length === 0) return null;
   const { center } = map;
+  const nodes = map.groups.flatMap((g) => g.nodes);
   return (
     <section aria-label="Bản đồ từ vựng" className="card-ink space-y-space-sm bg-surface-container-lowest p-space-md">
       <h2 className="text-headline-sm font-extrabold">Bản đồ từ vựng</h2>
-      <svg viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`} role="group" aria-label={`Các từ liên quan tới ${term}`} className="mx-auto block w-full max-w-md">
+      <svg viewBox={`0 0 ${map.width} ${map.height}`} role="group" aria-label={`Các từ liên quan tới ${term}`} className="mx-auto block w-full max-w-md">
+        {nodes.map((n) => <line key={`l-${n.groupId}-${n.term}`} x1={center.x} y1={center.y} x2={n.x} y2={n.y} stroke={COLORS[n.groupId]} strokeWidth="1.5" opacity="0.45" />)}
         {map.groups.map((g) => (
-          <g key={g.id}>
-            {g.nodes.map((n) => <line key={n.term} x1={g.hubX} y1={g.hubY} x2={n.x} y2={n.y} stroke={COLORS[g.id]} strokeWidth="1.5" opacity="0.5" />)}
-            <line x1={center.x} y1={center.y} x2={g.hubX} y2={g.hubY} stroke={COLORS[g.id]} strokeWidth="2.5" />
-            <circle cx={g.hubX} cy={g.hubY} r="5" fill={COLORS[g.id]} />
-            <text x={g.labelX} y={g.labelY} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--on-surface)">{g.shortLabel}</text>
-          </g>
+          <text key={g.id} x={g.labelX} y={g.labelY} textAnchor="middle" fontSize="12" fontWeight="700" fill={COLORS[g.id]}>{g.shortLabel}</text>
         ))}
         <circle cx={center.x} cy={center.y} r="34" fill="var(--primary-container)" stroke="var(--outline)" strokeWidth="2" />
         <text x={center.x} y={center.y} textAnchor="middle" dominantBaseline="central" fontSize={[...term].length > 2 ? 18 : 28} fontWeight="800" fill="var(--on-primary-container)" lang="zh-Hans">{term}</text>
-        {map.groups.flatMap((g) => g.nodes).map((n) => (
+        {nodes.map((n) => (
           <Link key={`${n.groupId}-${n.term}`} href={wordHref(n.term)} aria-label={`${n.term}, ${n.pinyin}${n.meaning ? `, ${n.meaning}` : ""}`}>
-            <circle cx={n.x} cy={n.y} r="24" fill="var(--surface-container-lowest)" stroke={COLORS[n.groupId]} strokeWidth="2.5" />
-            <text x={n.x} y={n.y} textAnchor="middle" dominantBaseline="central" fontSize={[...n.term].length > 2 ? 13 : 18} fontWeight="700" fill="var(--on-surface)" lang="zh-Hans">{n.term}</text>
+            <rect x={n.x - n.w / 2} y={n.y - n.h / 2} width={n.w} height={n.h} rx={n.h / 2} fill="var(--surface-container-lowest)" stroke={COLORS[n.groupId]} strokeWidth="2.5" />
+            <text x={n.x} y={n.y} textAnchor="middle" dominantBaseline="central" fontSize={n.fontSize} fontWeight="700" fill="var(--on-surface)" lang="zh-Hans">{n.term}</text>
           </Link>
         ))}
       </svg>

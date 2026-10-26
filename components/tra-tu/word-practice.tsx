@@ -31,7 +31,7 @@ export function WordPractice({ term, examples, pool, scene }: { term: string; ex
       {ex && cloze && choices.length > 1 && (
         <div className="space-y-space-sm">
           <p className="text-body-md text-on-surface-variant">Chọn từ điền vào chỗ trống:</p>
-          <p lang="zh-Hans" className="font-serif text-headline-md">{cloze.before}<span className="mx-1 inline-block min-w-12 border-b-4 border-primary text-center text-primary">{done ? term : "＿＿"}</span>{cloze.after}</p>
+          <p lang="zh-Hans" className="font-serif text-headline-md">{cloze.before}<span className="mx-1 inline-block min-w-16 border-b-4 border-primary text-center text-primary">{done ? term : "\u00a0"}</span>{cloze.after}</p>
           <p className="text-body-md text-on-surface-variant">{ex.translation}</p>
           <div role="group" aria-label="Đáp án" className="grid grid-cols-2 gap-2">
             {choices.map((c) => {
