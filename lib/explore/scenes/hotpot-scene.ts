@@ -7,7 +7,7 @@ export const HOTPOT_SCENE: SceneDef = {
   subtitle: "Ghé quán lẩu, học tên nguyên liệu và đồ ăn rồi làm nhiệm vụ cho Ông Rùa chủ quán.",
   theme: "hotpot",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Cửa hàng điện thoại", to: "phoneshop", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Cửa hàng điện thoại", to: "phoneshop", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Sở thú", to: "zoo", x: 92, y: 60, w: 6 }],
   npc: {
     id: "turtle", name: "Ông Rùa chủ quán", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến quán lẩu! Hãy lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

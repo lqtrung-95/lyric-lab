@@ -65,19 +65,21 @@ export function RoomHub() {
         </section>
 
         <section aria-labelledby="challenge-heading" className={`${card} lg:col-span-2`}>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container"><Icon name="emoji_events" size={22} /></span>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container"><Icon name="emoji_events" size={22} /></span>
             <div className="min-w-0 flex-1">
               <h2 id="challenge-heading" className="font-serif text-headline-md text-on-surface">Thử thách không cần cùng lúc</h2>
               <p className="text-label-md text-on-surface-variant">Bạn chơi trước đặt điểm chuẩn, gửi link cho bạn bè. Họ chơi lúc nào cũng được rồi so điểm.</p>
             </div>
-            <button type="button" onClick={() => setChallenging(true)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">Tạo thử thách</button>
+            </div>
+            <button type="button" onClick={() => setChallenging(true)} className="min-h-11 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 max-sm:w-full">Tạo thử thách</button>
           </div>
         </section>
 
         <section aria-labelledby="random-heading" className={`${card} opacity-80 lg:col-span-2`}>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant"><Icon name="shuffle" size={22} /></span>
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant"><Icon name="shuffle" size={22} /></span>
             <div className="min-w-0 flex-1">
               <h2 id="random-heading" className="font-serif text-headline-md text-on-surface">Ghép ngẫu nhiên</h2>
               <p className="text-label-md text-on-surface-variant">Tự động kết nối với bạn học cùng trình độ, không cần hẹn trước.</p>

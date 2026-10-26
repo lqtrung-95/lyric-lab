@@ -241,4 +241,40 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 1, zh: "再来一盘肉片和一盘虾。", vi: "Cho thêm một đĩa thịt thái lát và một đĩa tôm." },
     ],
   },
+  "zoo": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 1, zh: "请问熊猫在哪儿?", vi: "Xin hỏi gấu trúc ở đâu?" },
+      { who: 0, zh: "在前面,往右走。", vi: "Ở phía trước, đi về bên phải." },
+      { who: 1, zh: "这里可以拍照吗?", vi: "Ở đây được chụp ảnh không?" },
+      { who: 0, zh: "可以,但是请不要喂动物。", vi: "Được, nhưng xin đừng cho động vật ăn." },
+    ],
+  },
+  "flowershop": {
+    speakers: ["Chủ tiệm", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,想买什么花?", vi: "Xin chào, bạn muốn mua hoa gì?" },
+      { who: 1, zh: "我想买一束花,送给妈妈。", vi: "Tôi muốn mua một bó hoa tặng mẹ." },
+      { who: 0, zh: "玫瑰和百合怎么样?", vi: "Hoa hồng và hoa bách hợp thì sao?" },
+      { who: 1, zh: "很好,请帮我包一下。", vi: "Rất tốt, xin gói giúp tôi." },
+    ],
+  },
+  "garage": {
+    speakers: ["Thợ máy", "Khách"],
+    lines: [
+      { who: 1, zh: "我的车坏了,请帮我检查一下。", vi: "Xe tôi hỏng rồi, xin kiểm tra giúp tôi." },
+      { who: 0, zh: "轮胎没气了,还要换机油。", vi: "Lốp hết hơi, còn phải thay dầu máy." },
+      { who: 1, zh: "要修多长时间?", vi: "Sửa mất bao lâu?" },
+      { who: 0, zh: "两个小时,明天可以来取车。", vi: "Hai tiếng, ngày mai có thể đến lấy xe." },
+    ],
+  },
+  "bubbletea": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,想喝点什么?", vi: "Xin chào, bạn muốn uống gì?" },
+      { who: 1, zh: "我要一杯奶茶,少糖,少冰。", vi: "Cho tôi một ly trà sữa, ít đường, ít đá." },
+      { who: 0, zh: "要加珍珠吗?", vi: "Có thêm trân châu không?" },
+      { who: 1, zh: "要,请帮我打包。", vi: "Có, xin đóng gói giúp tôi." },
+    ],
+  },
 };

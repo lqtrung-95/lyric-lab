@@ -8,6 +8,7 @@ import { storyExits, storyRoute } from "@/lib/explore/story/story-route";
 import type { SceneDetail } from "@/lib/explore/explore-types";
 import type { StoryPayload } from "@/lib/explore/story/load-story";
 import { ExploreScene } from "../explore-scene";
+import { FireworksBurst } from "./fireworks-burst";
 import { useStoryController } from "./use-story-controller";
 
 /** Cảnh ở chế độ phá án: dựng bộ điều khiển cốt truyện rồi đưa vào màn khám phá. `basePath` là gốc đường dẫn các cảnh của vụ án này. */
@@ -24,5 +25,10 @@ export function StoryExploreScene({ scene, payload, basePath }: { scene: SceneDe
   const locked = controller.ready && !open(scene.id);
   useEffect(() => { if (locked) router.replace(`${basePath}/${story.startScene}`); }, [locked, router, basePath, story.startScene]);
   if (locked) return null;
-  return <ExploreScene scene={storyScene} story={{ payload, controller, basePath }} />;
+  return (
+    <>
+      <ExploreScene scene={storyScene} story={{ payload, controller, basePath }} />
+      {controller.celebrating && <FireworksBurst onDone={controller.endCelebration} />}
+    </>
+  );
 }

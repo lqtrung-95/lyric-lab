@@ -41,6 +41,8 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string) {
   const { progress, ready, update, reset } = useStoryProgress(payload.story.id);
   const [view, setView] = useState<StoryView>(null);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  const endCelebration = useCallback(() => setCelebrating(false), []);
   const { story, scene } = payload;
   const flags = progress.flags;
   const solved = flags.includes(story.solvedFlag);
@@ -94,6 +96,7 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string) {
     setVerdict(v);
     if (v.type === "solved") {
       playSfx("complete");
+      setCelebrating(true);
       update((p) => addFlag(p, story.solvedFlag));
       openNode(story.epilogueNode);
     } else playSfx("wrong");
@@ -109,7 +112,7 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string) {
   }, [ready, solved, progress.scored, progress.checks, update]);
 
   return {
-    ready, progress, view, setView, verdict, solved, extras, extraInteractables,
+    ready, progress, view, setView, verdict, solved, celebrating, endCelebration, extras, extraInteractables,
     objective: currentObjective(story.objectives, flags),
     objectiveCount: objectiveProgress(story.objectives, flags),
     canAccuse: holds(story.accuseWhen, flags),

@@ -15,7 +15,7 @@ export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Recor
       <p className="text-label-md font-extrabold text-primary">{KIND_LABEL[clue.kind]} · {clue.title}</p>
       <div className="flex items-center gap-2">
         <p lang="zh-Hans" className="min-w-0 flex-1 text-body-lg font-bold leading-snug">{clue.zh}</p>
-        <PronounceButton text={clue.zh} className="size-11" />
+        <PronounceButton text={clue.zh} className="size-10 sm:size-11" />
       </div>
       {hints.pinyin && pinyin[clue.zh] && <p className="text-body-sm text-primary">{pinyin[clue.zh]}</p>}
       {hints.vi && <p className="text-body-md text-on-surface-variant">{clue.vi}</p>}
@@ -27,9 +27,9 @@ export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Recor
 export function ClueCard({ clue, pinyin, hints, onToggleHint, onClose, onOpenCase }: { clue: ClueDef; pinyin: Record<string, string>; hints: Hints; onToggleHint: (k: keyof Hints) => void; onClose: () => void; onOpenCase: () => void }) {
   return (
     <section aria-label={`Manh mối: ${clue.title}`} className="card-ink p-space-md">
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <p role="status" className="flex items-center gap-1 text-label-md font-extrabold text-secondary"><Icon name="check_circle" size={18} filled />Đã ghi vào sổ vụ án</p>
-        <HintToggles hints={hints} onToggle={onToggleHint} />
+        <div className="max-sm:[&_button]:!min-h-9 max-sm:[&_button]:!px-3 max-sm:[&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={onToggleHint} /></div>
       </div>
       <div className="mt-1"><ClueBody clue={clue} pinyin={pinyin} hints={hints} /></div>
       <div className="mt-space-sm flex gap-3">

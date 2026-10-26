@@ -50,7 +50,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
   }, [cases]);
 
   const tabCls = (on: boolean) => `min-h-11 flex-1 rounded-full px-4 text-label-md font-extrabold transition-colors ${on ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:bg-surface-container-high"}`;
-  const card = "card-ink group block overflow-hidden transition-transform hover:-translate-y-0.5";
+  const card = "card-ink group flex h-full flex-col overflow-hidden transition-transform hover:-translate-y-0.5";
 
   return (
     <div className="flex flex-col gap-space-md">
@@ -71,7 +71,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
                     <span className="absolute left-2 top-2"><DifficultyBadge level={c.difficulty} /></span>
                     {st?.solved && <span className="absolute right-2 top-2 rounded-full border-2 border-ink bg-surface-container-lowest px-2.5 py-0.5 text-label-md font-extrabold text-primary">✓ Đã giải</span>}
                   </div>
-                  <div className="p-space-sm">
+                  <div className="flex-1 p-space-sm">
                     <h2 className="text-headline-md leading-tight">{c.title}</h2>
                     <p className="mt-0.5 text-body-sm text-on-surface-variant">{c.blurb}</p>
                     <p className="mt-1 text-label-md font-extrabold text-primary">{st && st.done > 0 && !st.solved ? `Đang điều tra: ${st.done}/${c.objectives.length}` : st?.solved ? "Chơi lại" : "Bắt đầu"}</p>
@@ -87,7 +87,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
             <li key={s.id}>
               <Link href={`/explore/${s.id}`} className={card}>
                 <SceneThumb scene={s} />
-                <div className="px-space-sm py-2">
+                <div className="flex-1 px-space-sm py-2">
                   <h2 className="text-label-lg font-extrabold leading-tight">{s.title}</h2>
                   <p className="text-label-md text-on-surface-variant">{learned[s.id] ?? 0}/{s.objects.length} từ đã học</p>
                 </div>

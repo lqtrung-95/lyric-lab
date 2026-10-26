@@ -60,7 +60,7 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
       style={{ left: `${left}%`, bottom: `${100 - top}%`, width: `${BUBBLE_WIDTH}%`, maxHeight: `${Math.max(30, top - 1)}%`, zIndex: 2000, display: "flex", flexDirection: "column" }}
     >
       <div className="flex min-h-0 flex-col overflow-y-auto rounded-[22px] border-[3px] px-3.5 py-3 text-[13px] leading-snug shadow-[0_4px_0_rgba(74,46,27,0.28)] sm:text-sm" style={{ background: "#fffaf0", borderColor: INK, color: INK }}>
-        <div className="flex items-start justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <p className="text-[12px] font-extrabold" style={{ color: "#b4531a" }}>{speaker?.name ?? node.speaker}</p>
           <div className="[&_button]:!min-h-8 [&_button]:!px-2.5 [&_button]:!text-[12px]"><HintToggles hints={hints} onToggle={onToggleHint} /></div>
         </div>
