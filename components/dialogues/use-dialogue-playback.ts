@@ -59,5 +59,8 @@ export function useDialoguePlayback({ zh, who, loop, myRole, rate }: Options) {
     else { stop(); setIndex(to); }
   }, [index, last, mine, playing, start, stop]);
 
-  return { index, playing, yourTurn: mine(index), toggle, go, stop, atStart: index === 0, atEnd: index === last };
+  /** Chỉ đổi câu đang chọn (không phát), dùng khi phát lại cả hội thoại. */
+  const show = useCallback((i: number) => setIndex(Math.min(last, Math.max(0, i))), [last]);
+
+  return { index, playing, yourTurn: mine(index), toggle, go, stop, show, atStart: index === 0, atEnd: index === last };
 }

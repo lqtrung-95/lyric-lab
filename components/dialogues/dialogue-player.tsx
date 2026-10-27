@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import type { DialogueDef, LevelBand } from "@/lib/dialogues/dialogue-types";
 import { DialogueControls } from "./dialogue-controls";
 import { DialogueLineCard } from "./dialogue-line-card";
+import { DialogueRecordingPanel } from "./dialogue-recording-panel";
 import { DialogueTranscript } from "./dialogue-transcript";
+import { playFullDialogue, stopFullDialogue } from "./play-full-dialogue";
+import { useDialogueRecorder } from "./use-dialogue-recorder";
 import { useDialoguePlayback } from "./use-dialogue-playback";
 
 interface Props {
@@ -26,7 +29,22 @@ export function DialoguePlayer({ dialogue, pinyin, level, sceneTitle }: Props) {
   const zh = useMemo(() => dialogue.lines.map((l) => l.zh), [dialogue]);
   const who = useMemo(() => dialogue.lines.map((l) => l.who), [dialogue]);
   const pb = useDialoguePlayback({ zh, who, loop, myRole, rate });
+  const rec = useDialogueRecorder();
+  const [replaying, setReplaying] = useState(false);
   const line = dialogue.lines[pb.index];
+  const mineCount = myRole === null ? 0 : who.filter((w) => w === myRole).length;
+  const recordedCount = myRole === null ? 0 : who.filter((w, i) => w === myRole && rec.recordings[i]).length;
+
+  useEffect(() => () => stopFullDialogue(), []);
+
+  const changeRole = (r: number | null) => { stopFullDialogue(); setReplaying(false); rec.clear(); setMyRole(r); };
+  const move = (i: number) => { rec.stop(); stopFullDialogue(); setReplaying(false); pb.go(i); };
+  const replayAll = () => {
+    pb.stop();
+    setReplaying(true);
+    const lines = dialogue.lines.map((l, i) => ({ zh: l.zh, recordingUrl: l.who === myRole ? rec.recordings[i] : undefined }));
+    void playFullDialogue(lines, rate, (i) => { if (i >= 0) pb.show(i); else setReplaying(false); });
+  };
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
@@ -40,13 +58,21 @@ export function DialoguePlayer({ dialogue, pinyin, level, sceneTitle }: Props) {
       <DialogueLineCard line={line} speaker={dialogue.speakers[line.who]} pinyin={pinyin[line.zh]} showPinyin={showPinyin} showVi={showVi} yourTurn={pb.yourTurn} />
       <DialogueControls
         playing={pb.playing} atStart={pb.atStart} atEnd={pb.atEnd}
-        onToggle={pb.toggle} onPrev={() => pb.go(pb.index - 1)} onNext={() => pb.go(pb.index + 1)}
+        onToggle={() => { rec.stop(); stopFullDialogue(); setReplaying(false); pb.toggle(); }} onPrev={() => move(pb.index - 1)} onNext={() => move(pb.index + 1)}
         showPinyin={showPinyin} setShowPinyin={setShowPinyin} showVi={showVi} setShowVi={setShowVi}
-        loop={loop} setLoop={setLoop} rate={rate} setRate={setRate} myRole={myRole} setMyRole={setMyRole} speakers={dialogue.speakers}
+        loop={loop} setLoop={setLoop} rate={rate} setRate={setRate} myRole={myRole} setMyRole={changeRole} speakers={dialogue.speakers}
       />
+      {myRole !== null && (
+        <DialogueRecordingPanel
+          yourTurn={pb.yourTurn} recording={rec.recordingIndex === pb.index} currentRecording={rec.recordings[pb.index]}
+          recordedCount={recordedCount} totalMine={mineCount} replaying={replaying} error={rec.error}
+          onRecord={() => void rec.start(pb.index)} onStopRecord={rec.stop}
+          onReplayAll={replayAll} onStopReplay={() => { stopFullDialogue(); setReplaying(false); }}
+        />
+      )}
       <section aria-label="Toàn văn hội thoại" className="flex flex-col gap-space-sm">
         <h2 className="text-headline-md">Toàn văn</h2>
-        <DialogueTranscript lines={dialogue.lines} speakers={dialogue.speakers} pinyin={pinyin} showPinyin={showPinyin} showVi={showVi} current={pb.index} onPick={pb.go} />
+        <DialogueTranscript lines={dialogue.lines} speakers={dialogue.speakers} pinyin={pinyin} showPinyin={showPinyin} showVi={showVi} current={pb.index} onPick={move} />
       </section>
       {dialogue.sceneId && sceneTitle && (
         <Link href={`/explore/${dialogue.sceneId}`} className="card-ink flex items-center gap-space-sm bg-secondary-container p-space-sm text-on-secondary-container">
