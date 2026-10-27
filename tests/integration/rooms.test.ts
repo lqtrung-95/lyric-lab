@@ -447,6 +447,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "video_lessons.added_by", // on delete set null: video người dùng thêm là dữ liệu dùng chung nên giữ lại, chỉ mất liên kết người thêm (bộ đếm 3 video/ngày của tài khoản gộp có thể được đặt lại, trần chung 100 video/ngày vẫn chặn lạm dụng)
       "video_translation_reports.user_id", // on delete set null: báo cáo giữ lại cho quản trị, chỉ mất liên kết người báo
       "video_reports.user_id", // on delete set null: báo cáo giữ lại cho quản trị, chỉ mất liên kết người báo
+      "user_explore_state.user_id", // tiến độ Khám phá/phá án: không gộp trong hàm gộp tài khoản vì bản gốc vẫn nằm ở trình duyệt và được gộp lại với bản trên tài khoản đích khi vào Khám phá (xem useRemoteSync và merge-explore-state); dòng của tài khoản ẩn danh xóa theo tài khoản
     ]);
     const { data, error } = await service.rpc("tables_referencing_users");
     expect(error).toBeNull();
