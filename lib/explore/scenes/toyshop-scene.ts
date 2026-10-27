@@ -7,7 +7,7 @@ export const TOYSHOP_SCENE: SceneDef = {
   subtitle: "Ghé cửa hàng đồ chơi, học tên đồ chơi rồi làm nhiệm vụ cho Cụ Cú chủ tiệm.",
   theme: "toyshop",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Tiệm giặt là", to: "laundry", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Tiệm giặt là", to: "laundry", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Đồn cảnh sát", to: "police", x: 92, y: 60, w: 6 }],
   npc: {
     id: "owl", name: "Cụ Cú chủ tiệm", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến cửa hàng đồ chơi! Hãy lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

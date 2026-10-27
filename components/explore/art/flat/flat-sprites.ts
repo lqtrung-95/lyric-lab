@@ -14,6 +14,7 @@ import { VENUE2C_SPRITES } from "./flat-venue2-c";
 import { VENUE3_SPRITES } from "./flat-venue3";
 import { VENUE4_SHOP_SPRITES } from "./flat-venue4-shops";
 import { VENUE4_ZOO_SPRITES } from "./flat-venue4-zoo";
+import { VENUE6_SPRITES } from "./flat-venue6";
 import { VENUE5_FUN_FARM_SPRITES } from "./flat-venue5-fun-farm";
 import { VENUE5_LAUNDRY_TOY_SPRITES } from "./flat-venue5-laundry-toys";
 import { NEW_FUN_SPRITES } from "./flat-new-fun";
@@ -34,7 +35,7 @@ import { SMALL_SPRITES } from "./flat-small";
 const BASE: Record<string, FlatSprite> = {
   ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES,
   ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES, ...VENUE_SPRITES,
-  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES,
+  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES,
 };
 
 /** Một từ khác nhau dùng chung hình: id mới → hình có sẵn (ví dụ "bệnh giường" dùng hình giường). Giữ mỗi cảnh có từ riêng mà không phải vẽ lại. */
@@ -45,6 +46,7 @@ const ALIASES: Record<string, string> = {
   airmeal: "lunchbox", checkin: "counter", pilothat: "hat", textbook: "book", breakfast: "plate", parasol: "umbrella", hotelcart: "trolley",
   waybill: "note", label: "note", pobox: "mailbox", mail: "envelope", postscale: "scale", vitamin: "pills", disinfectant: "syrup", prescription: "note", medcabinet: "locker", handwash: "shampoo",
   powerbank: "battery", warranty: "note", dip: "bowl", plumdrink: "juice",
+  record: "note", file: "folder", carriage: "subwaytrain", platform: "rails", routemap: "timetable", broadcast: "speaker", transitcard: "roomcard", exitsign: "signboard", transfersign: "signboard", faregate: "securitygate", labthermo: "thermometer", reagent: "syrup", reportphone: "phone",
   zooticket: "ticket", greetcard: "note", pricelist: "note", takeaway: "bag",
 };
 

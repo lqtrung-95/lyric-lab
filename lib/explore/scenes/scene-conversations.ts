@@ -313,4 +313,40 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 0, zh: "好,我帮你包装一下。", vi: "Được, tôi gói giúp bạn." },
     ],
   },
+  "police": {
+    speakers: ["Cảnh sát", "Người dân"],
+    lines: [
+      { who: 1, zh: "我要报警,我的钱包丢了。", vi: "Tôi muốn báo cảnh sát, ví của tôi bị mất." },
+      { who: 0, zh: "请出示您的证件。", vi: "Xin xuất trình giấy tờ của ông." },
+      { who: 1, zh: "这是我的证件。", vi: "Đây là giấy tờ của tôi." },
+      { who: 0, zh: "请把你看到的告诉我,我来写笔录。", vi: "Xin kể những gì ông thấy, tôi sẽ ghi biên bản." },
+    ],
+  },
+  "subway": {
+    speakers: ["Nhân viên", "Hành khách"],
+    lines: [
+      { who: 1, zh: "请问怎么去人民广场?", vi: "Xin hỏi đi đến Quảng trường Nhân Dân thế nào?" },
+      { who: 0, zh: "坐三号线,在下一站换乘。", vi: "Đi tuyến ba, đổi tuyến ở ga tiếp theo." },
+      { who: 1, zh: "地铁站的出口在哪儿?", vi: "Lối ra của ga ở đâu?" },
+      { who: 0, zh: "上扶梯就是二号出口。", vi: "Lên thang cuốn là lối ra số hai." },
+    ],
+  },
+  "camping": {
+    speakers: ["Kiểm lâm", "Du khách"],
+    lines: [
+      { who: 1, zh: "我们可以在这里生火吗?", vi: "Chúng tôi có thể nhóm lửa ở đây không?" },
+      { who: 0, zh: "可以,但是要小心火柴。", vi: "Được, nhưng phải cẩn thận với diêm." },
+      { who: 1, zh: "晚上太黑,我有手电筒。", vi: "Buổi tối rất tối, tôi có đèn pin." },
+      { who: 0, zh: "别忘了带指南针,山里容易迷路。", vi: "Đừng quên mang la bàn, trong núi dễ lạc đường." },
+    ],
+  },
+  "lab": {
+    speakers: ["Thầy giáo", "Học sinh"],
+    lines: [
+      { who: 0, zh: "做实验要戴上护目镜。", vi: "Làm thí nghiệm phải đeo kính bảo hộ." },
+      { who: 1, zh: "好的,老师。试管放在哪儿?", vi: "Vâng thưa thầy. Ống nghiệm để ở đâu?" },
+      { who: 0, zh: "放在桌子上,小心酒精灯。", vi: "Để trên bàn, cẩn thận đèn cồn." },
+      { who: 1, zh: "我知道了,谢谢老师。", vi: "Em biết rồi, cảm ơn thầy." },
+    ],
+  },
 };
