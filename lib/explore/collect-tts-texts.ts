@@ -1,3 +1,4 @@
+import { ALL_DIALOGUES } from "@/lib/dialogues/dialogue-catalog";
 import { splitForTts } from "@/lib/speech/split-for-tts";
 import { normalizeTtsText } from "@/lib/tts/tts-text";
 import { commandText } from "./quest-commands";
@@ -6,7 +7,7 @@ import { SCENES } from "./scenes";
 import { CASES } from "./story/cases";
 
 /**
- * Mọi câu/từ tiếng Trung của Khám phá cần giọng đọc: từ vựng và câu ví dụ của cảnh, câu hay dùng, hội thoại mẫu, lời thoại/lựa chọn/manh mối của các vụ án.
+ * Mọi câu/từ tiếng Trung của Khám phá cần giọng đọc: từ vựng và câu ví dụ của cảnh, câu hay dùng, hội thoại mẫu, lời thoại/lựa chọn/manh mối của các vụ án, và mọi câu của kho hội thoại.
  * Dùng để tổng hợp sẵn giọng (script `prewarm-explore-tts`) nên người học bấm loa là nghe giọng tự nhiên ngay, không phải chờ Azure hay rơi về giọng máy.
  * Câu dài được chia thành các đoạn ≤ 40 ký tự như cách nút loa đọc. Trả danh sách đã chuẩn hóa (giản thể) và bỏ trùng.
  */
@@ -18,6 +19,7 @@ export function collectExploreTtsTexts(): string[] {
     for (const p of s.phrases ?? []) raw.push(p.zh);
     for (const l of s.conversation?.lines ?? []) raw.push(l.zh);
   }
+  for (const d of ALL_DIALOGUES) for (const l of d.lines) raw.push(l.zh);
   for (const st of Object.values(SCENE_STORIES)) raw.push(st.title.zh, ...st.lines.map((l) => l.zh), st.question.right, ...st.question.wrong);
   for (const c of Object.values(CASES)) {
     for (const clue of c.clues) raw.push(clue.zh);

@@ -245,3 +245,8 @@ Route ẩn `/explore` (danh sách cảnh) và `/explore/[scene]` (`robots: noind
 
 
 **Công cụ công khai mở rộng (2026-10-28):** mỗi công cụ là một trang trong `app/(marketing)/` bọc bằng `ToolPage` (metadata, JSON-LD WebApplication và FAQPage) và một mục trong `lib/tools/tool-registry.ts` (nguồn của `/cong-cu`, sitemap, chân trang). Công cụ có tính toán nặng chạy ở API `/api/tools/*` (giới hạn IP trong bộ nhớ): `han-to-pinyin`, `convert-script`, `measure-words`, `pinyin-to-han` (bộ tìm từ điển `searchWords` rồi `filterByTone`), `example-sentences` (`loadTermSentences`), `grammar-check` (LLM qua `createChat` và `EXPLAIN_MODELS`, kiểm đầu ra bằng zod, pinyin câu sửa lấy từ `convertHanText`). Công cụ tĩnh (quy tắc biến điệu, lượng từ thông dụng, tiếng Trung hằng ngày, tờ tập viết) chạy hoàn toàn ở trình duyệt với dữ liệu trong `lib/tools/`.
+
+## Hội thoại (`lib/dialogues`, `components/dialogues`, `app/(main)/hoi-thoai`)
+
+Kho hội thoại hai người, tự viết, tĩnh trong mã (`authored-dialogues-*.ts`) cộng hội thoại ngắn của các cảnh Khám phá. Pinyin lấy từ từ điển qua `annotatePinyin` (như truyện của cảnh), cấp HSK tính bằng `dialogueLevel` (phân vị 90% của cấp từ trong từ điển, cấp 4 trở lên gộp "HSK 4+"), memo theo tiến trình server. Trang danh sách lọc ở client (tìm, cấp, chủ đề); trang `/hoi-thoai/[id]` là trình phát từng câu dùng `playChineseSequence`, mỗi lượt phát có số riêng (`run`) để bỏ qua báo cũ. Giọng đọc dùng chung `/api/tts` và kho file đã tổng hợp.
+

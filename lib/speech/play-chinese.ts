@@ -21,12 +21,20 @@ async function fetchCloudAudio(text: string): Promise<string> {
 }
 
 let playToken = 0;
+let playbackRate = 1;
+
+/** Tốc độ đọc của file giọng AI (0.5–1.5); áp ngay cho câu đang phát và các câu sau. Giọng thiết bị không đổi tốc độ. */
+export function setChinesePlaybackRate(rate: number): void {
+  playbackRate = Math.min(1.5, Math.max(0.5, rate));
+  if (current) current.playbackRate = playbackRate;
+}
 
 async function playCloud(text: string, waitEnd: boolean): Promise<void> {
   const src = await fetchCloudAudio(text);
   current?.pause();
   if (typeof window !== "undefined" && window.speechSynthesis) window.speechSynthesis.cancel();
   const audio = new Audio(src);
+  audio.playbackRate = playbackRate;
   current = audio;
   await audio.play();
   if (waitEnd) await new Promise<void>((resolve) => { audio.onended = () => resolve(); audio.onerror = () => resolve(); audio.onpause = () => resolve(); });
