@@ -137,4 +137,13 @@ export const TOOLS: readonly ToolEntry[] = [
     category: "everyday",
     keywords: ["xin loi", "dui bu qi", "sorry", "bu hao yi si", "bao qian"],
   },
+  {
+    href: "/kiem-tra-ngu-phap-tieng-trung",
+    title: "Kiểm tra ngữ pháp tiếng Trung bằng AI",
+    description: "Dán một câu tiếng Trung để AI cho biết đúng hay sai, câu sửa ít nhất, cách nói tự nhiên và giải thích bằng tiếng Việt.",
+    icon: "auto_awesome",
+    category: "sentences",
+    popular: true,
+    keywords: ["ngu phap", "grammar", "sua cau", "ai", "kiem tra cau", "check"],
+  },
 ];
