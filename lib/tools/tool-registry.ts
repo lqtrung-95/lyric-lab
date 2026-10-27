@@ -88,4 +88,13 @@ export const TOOLS: readonly ToolEntry[] = [
     category: "pronunciation",
     keywords: ["bien dieu", "tone sandhi", "thanh 3", "bu", "yi", "quy tac"],
   },
+  {
+    href: "/to-tap-viet-chu-han",
+    title: "Tạo tờ tập viết chữ Hán",
+    description: "Nhập chữ Hán, nhận tờ tập viết A4 có chữ mẫu, ô mờ để tô theo, pinyin và âm Hán Việt. In hoặc lưu PDF.",
+    icon: "history_edu",
+    category: "writing",
+    popular: true,
+    keywords: ["to tap viet", "worksheet", "tap viet", "tracing", "in", "pdf", "luyen viet"],
+  },
 ];
