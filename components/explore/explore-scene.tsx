@@ -12,6 +12,7 @@ import { PlayerAvatar } from "./player-avatar";
 import { QuestPanel, QuestSummary } from "./quest-panel";
 import { SceneCanvas } from "./scene-canvas";
 import { ObjectiveBar } from "./story/objective-bar";
+import { StoryHintTip } from "./story/story-hint-tip";
 import { SceneStoryCard } from "./scene-story-card";
 import { ScenePhrases } from "./scene-phrases";
 import { StoryBubble } from "./story/story-bubble";
@@ -50,6 +51,7 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
       </header>
 
       {story && sc && <ObjectiveBar title={story.payload.story.title} objective={sc.objective} done={sc.objectiveCount.done} total={sc.objectiveCount.total} solved={sc.solved} freeRoam={story.payload.story.freeRoam} clueCount={sc.progress.clues.length} onCase={() => sc.setView({ kind: "case" })} onMap={() => sc.setView({ kind: "map" })} />}
+      {story && sc && <StoryHintTip />}
 
       <div {...c.stageProps} onPointerDown={(e) => e.currentTarget.focus({ preventScroll: true })} className="rounded-2xl outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary">
         <SceneCanvas theme={scene.theme} objects={scene.objects} npc={scene.npc} decor={scene.decor ?? []} exits={scene.exits} extras={sc?.extras} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>

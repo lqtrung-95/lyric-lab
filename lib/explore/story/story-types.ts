@@ -146,8 +146,6 @@ export interface StoryDef {
   solution: { suspectId: string; keyClues: string[]; needed: number; /** Đồng phạm: phải chọn cả hai người mới phá án. */ partnerId?: string };
   /** Tự do điều tra: mọi cảnh mở sẵn, không có thanh mục tiêu dẫn từng bước (vụ khó). */
   freeRoam?: boolean;
-  /** Vụ đọc hiểu: pinyin và nghĩa tiếng Việt mặc định tắt để người chơi thử tự đọc trước (vẫn bấm nút gợi ý để bật). */
-  readingFirst?: boolean;
   /** Câu hỏi cần làm rõ (hiện trong sổ vụ án thay cho mục tiêu từng bước). */
   questions?: string[];
   /** Cờ đặt khi vụ án được giải. */

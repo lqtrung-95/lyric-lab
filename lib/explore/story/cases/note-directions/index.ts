@@ -23,7 +23,6 @@ export const NOTE_DIRECTIONS_CASE: StoryDef = {
   scenes: { postoffice: POSTOFFICE_STORY, salon: SALON_STORY, gym: GYM_STORY, laundry: LAUNDRY_STORY, phoneshop: PHONESHOP_STORY },
   solution: { suspectId: "dog", keyClues: ["d_cat", "d_pig", "d_duck", "d_dog_east", "d_dog_near", "dog_slip"], needed: 5 },
   freeRoam: true,
-  readingFirst: true,
   questions: ["Nhà của kẻ trộm ở hướng nào so với bưu điện?", "Nhà đó cách bưu điện bao xa?", "Ai sống ở đúng chỗ đó?"],
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:cat", "met:dog", "met:duck", "met:pig", "clue:dog_slip"] },

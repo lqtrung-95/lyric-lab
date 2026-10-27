@@ -1,29 +1,37 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
-const KEY = "songhanzi-story-hints";
+/** Khóa mới (v2) để mọi người bắt đầu với gợi ý TẮT, luyện đọc trước; lựa chọn cũ (mặc định bật) không còn áp dụng. */
+const KEY = "songhanzi-story-hints-v2";
 export interface Hints { pinyin: boolean; vi: boolean }
 
+const OFF: Hints = { pinyin: false, vi: false };
+let current: Hints = OFF;
+let loaded = false;
+const listeners = new Set<() => void>();
+
+function load(): void {
+  if (loaded || typeof window === "undefined") return;
+  loaded = true;
+  try {
+    const raw = window.localStorage.getItem(KEY);
+    if (raw) { const d = JSON.parse(raw) as Partial<Hints>; current = { pinyin: d.pinyin === true, vi: d.vi === true }; }
+  } catch { /* dùng mặc định */ }
+}
+const subscribe = (cb: () => void) => { listeners.add(cb); return () => { listeners.delete(cb); }; };
+const getSnapshot = (): Hints => { load(); return current; };
+
 /**
- * Gợi ý khi đọc hội thoại: hiện pinyin và/hoặc nghĩa tiếng Việt. Mặc định bật cả hai (người mới); ai muốn thử thách thì tắt đi. Nhớ lựa chọn.
- * Vụ đọc hiểu (`readingFirst`) có kho lưu riêng và mặc định tắt cả hai để người chơi tự đọc trước.
+ * Gợi ý khi đọc trong chế độ phá án: hiện pinyin và/hoặc nghĩa tiếng Việt. Mặc định TẮT cả hai để người chơi luyện đọc; bấm nút để bật khi cần.
+ * Dùng chung một kho cho cả thanh trên cảnh, bong bóng thoại và sổ vụ án (bật ở đâu thì mọi nơi đổi theo), nhớ lựa chọn trong trình duyệt.
  */
-export function useStoryHints(readingFirst = false) {
-  const key = readingFirst ? `${KEY}:reading` : KEY;
-  const [hints, setHints] = useState<Hints>({ pinyin: !readingFirst, vi: !readingFirst });
-  useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(key);
-      // Đọc kho lưu sau khi mount (server không có localStorage) nên cần setState trong effect.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (raw) { const d = JSON.parse(raw) as Partial<Hints>; setHints({ pinyin: d.pinyin ?? !readingFirst, vi: d.vi ?? !readingFirst }); }
-    } catch { /* dùng mặc định */ }
-  }, [key, readingFirst]);
-  const toggle = useCallback((k: keyof Hints) => setHints((h) => {
-    const next = { ...h, [k]: !h[k] };
-    try { window.localStorage.setItem(key, JSON.stringify(next)); } catch { /* không lưu được */ }
-    return next;
-  }), [key]);
+export function useStoryHints() {
+  const hints = useSyncExternalStore(subscribe, getSnapshot, () => OFF);
+  const toggle = useCallback((k: keyof Hints) => {
+    current = { ...current, [k]: !current[k] };
+    try { window.localStorage.setItem(KEY, JSON.stringify(current)); } catch { /* không lưu được */ }
+    listeners.forEach((l) => l());
+  }, []);
   return { hints, toggle };
 }

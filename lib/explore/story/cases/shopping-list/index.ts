@@ -23,7 +23,6 @@ export const SHOPPING_LIST_CASE: StoryDef = {
   scenes: { bank: BANK_STORY, market: MARKET_STORY, "clothing-store": CLOTHING_STORE_STORY, hotel: HOTEL_STORY, supermarket: SUPERMARKET_STORY },
   solution: { suspectId: "pig", keyClues: ["d_cat", "d_dog", "d_duck", "d_pig", "pig_slip"], needed: 4 },
   freeRoam: true,
-  readingFirst: true,
   questions: ["Danh sách mua sắm của kẻ trộm gồm những gì?", "Túi đồ của ai khớp từng chữ?", "Mỗi người còn lại sai ở chi tiết nào?"],
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:cat", "met:dog", "met:duck", "met:pig", "clue:pig_slip"] },
