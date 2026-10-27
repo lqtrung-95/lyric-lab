@@ -1,6 +1,6 @@
 import type { StorySceneDef } from "../../story-types";
 
-/** Cửa hàng đồ chơi: nhận vụ án từ Cụ Cú, tìm ba dấu vết của tên trộm (sợi chỉ xanh dương, dấu tay trái, dấu giày cỡ 45), cuối cùng buộc tội và nghe kết thúc. */
+/** Cửa hàng đồ chơi: nhận vụ án từ Cụ Cú, tìm ba dấu vết của tên trộm (sợi chỉ xanh dương, chữ viết bằng tay trái, dấu giày cỡ 45), cuối cùng buộc tội và nghe kết thúc. */
 export const TOYSHOP_STORY: StorySceneDef = {
   sceneId: "toyshop",
   sceneNpcEntries: [
@@ -12,7 +12,7 @@ export const TOYSHOP_STORY: StorySceneDef = {
   spots: [
     { id: "report", clue: "report", label: "Lời báo án trên bàn", sprite: "note", x: 14, y: 86, w: 5, stand: { x: 20, y: 92 } },
     { id: "toy_thread", clue: "toy_thread", label: "Sợi chỉ trên cửa", sprite: "note", x: 68, y: 92, w: 4, when: { all: ["met:owl"] }, stand: { x: 68, y: 95 } },
-    { id: "toy_hand", clue: "toy_hand", label: "Dấu tay trên kệ", sprite: "note", x: 24, y: 80, w: 5, when: { all: ["met:owl"] }, stand: { x: 24, y: 90 } },
+    { id: "toy_hand", clue: "toy_hand", label: "Tờ giấy ghi chú trên kệ", sprite: "note", x: 24, y: 80, w: 5, when: { all: ["met:owl"] }, stand: { x: 24, y: 90 } },
     { id: "toy_foot", clue: "toy_foot", label: "Dấu chân trên sàn", sprite: "note", x: 66, y: 80, w: 5, when: { all: ["met:owl"] }, stand: { x: 66, y: 90 } },
   ],
   dialogues: {

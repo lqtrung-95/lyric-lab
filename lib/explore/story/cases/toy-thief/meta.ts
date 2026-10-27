@@ -11,11 +11,11 @@ export const SPEAKERS: Record<string, Speaker> = {
   dog: { name: "Chú Chó bán vé", sprite: "dog" },
 };
 
-/** Vụ án đối chiếu đặc điểm: tên trộm để lại sợi chỉ xanh dương, dấu tay trái, dấu giày cỡ 45. Năm nghi phạm, mỗi người có áo khoác, tay thuận, cỡ giày riêng; chỉ Hổ khớp cả ba, mỗi người còn lại khớp hai hoặc ít hơn. */
+/** Vụ án đối chiếu đặc điểm: tên trộm để lại sợi chỉ xanh dương, chữ viết bằng tay trái, dấu giày cỡ 45. Năm nghi phạm, mỗi người có áo khoác, tay thuận, cỡ giày riêng; chỉ Hổ khớp cả ba, mỗi người còn lại khớp hai hoặc ít hơn. */
 export const CLUES: ClueDef[] = [
   { id: "report", title: "Lời báo án của Cụ Cú", zh: "昨天晚上八点,我的遥控车不见了。有人进了店。", vi: "Tám giờ tối qua, chiếc xe điều khiển từ xa của tôi biến mất. Có người đã vào tiệm.", sceneId: "toyshop", kind: "testimony" },
   { id: "toy_thread", title: "Sợi chỉ trên cửa", zh: "门上有一根蓝色的线。", vi: "Trên cửa có một sợi chỉ màu xanh dương.", sceneId: "toyshop", kind: "object" },
-  { id: "toy_hand", title: "Dấu tay trên kệ", zh: "架子上的灰里有一个左手的手印。", vi: "Trong lớp bụi trên kệ có một dấu tay trái.", sceneId: "toyshop", kind: "object" },
+  { id: "toy_hand", title: "Tờ giấy ghi chú trên kệ", zh: "架子上有一张便条,字是用左手写的。", vi: "Trên kệ có một tờ giấy ghi chú, chữ được viết bằng tay trái.", sceneId: "toyshop", kind: "object" },
   { id: "toy_foot", title: "Dấu chân trên sàn", zh: "地上有一个很大的脚印,是四十五码的鞋。", vi: "Trên sàn có một dấu chân rất lớn, của đôi giày cỡ 45.", sceneId: "toyshop", kind: "object" },
   { id: "rabbit_alibi", title: "Lời khai của Thỏ", zh: "昨天晚上八点,我不在玩具店。", vi: "Tám giờ tối qua, tôi không ở cửa hàng đồ chơi.", sceneId: "bubbletea", kind: "testimony" },
   { id: "rabbit_coat", title: "Áo khoác của Thỏ", zh: "兔子的外套是蓝色的。", vi: "Áo khoác của Thỏ màu xanh dương.", sceneId: "bubbletea", kind: "object" },

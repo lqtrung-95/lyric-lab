@@ -8,7 +8,7 @@ import { FUNFAIR_STORY } from "./scene-funfair";
 import { CLUES, OBJECTIVES, SPEAKERS, SUSPECTS } from "./meta";
 
 /**
- * Vụ án khó: "Tên trộm ở cửa hàng đồ chơi". Không có nhân chứng; dấu vết tên trộm: áo khoác xanh dương (sợi chỉ), tay trái (dấu tay), giày cỡ 45 (dấu chân).
+ * Vụ án khó: "Tên trộm ở cửa hàng đồ chơi". Không có nhân chứng; dấu vết tên trộm: áo khoác xanh dương (sợi chỉ), tay trái (chữ viết trên tờ ghi chú), giày cỡ 45 (dấu chân).
  * Thỏ: xanh dương, tay phải, 45; Chim: đỏ, tay trái, 45; Vịt: xanh dương, tay trái, 38; Hổ: xanh dương, tay trái, 45 (khớp cả ba, thủ phạm); Chó: xanh lá, tay phải, 45.
  * Cần 5 trong 6 manh mối then chốt: ba dấu vết ở cửa hàng và ba đặc điểm của Hổ.
  */
