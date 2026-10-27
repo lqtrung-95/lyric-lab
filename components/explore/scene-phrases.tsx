@@ -27,7 +27,7 @@ export function ScenePhrases({ phrases, conversation, pinyin }: Props) {
               <li key={p.zh} className="flex items-start gap-2 rounded-xl border-2 border-ink bg-surface-container-lowest px-space-sm py-2">
                 <div className="min-w-0 flex-1">
                   <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.1]"><RubyLine zh={p.zh} pinyin={pinyin[p.zh]} show /></p>
-                  <p className="text-body-sm text-on-surface-variant">{p.vi}</p>
+                  <p className="mt-1.5 text-body-sm text-on-surface-variant">{p.vi}</p>
                 </div>
                 <PronounceButton text={p.zh} className="size-10" />
               </li>
@@ -45,7 +45,7 @@ export function ScenePhrases({ phrases, conversation, pinyin }: Props) {
                   <div className="min-w-0">
                     <p className="text-label-md font-extrabold opacity-80">{conversation.speakers[l.who]}</p>
                     <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.1]"><RubyLine zh={l.zh} pinyin={pinyin[l.zh]} show rtClassName="[&_rt]:text-current [&_rt]:opacity-80" fallbackClassName="opacity-90" /></p>
-                    <p className="text-body-sm opacity-80">{l.vi}</p>
+                    <p className="mt-1.5 text-body-sm opacity-80">{l.vi}</p>
                   </div>
                   <PronounceButton text={l.zh} className="size-9" />
                 </div>

@@ -71,7 +71,7 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
               <p lang="zh-Hans" className={`min-w-0 flex-1 text-lg font-bold sm:text-xl ${hints.pinyin ? "leading-[2.2]" : "leading-snug"}`}><RubyLine zh={node.zh} pinyin={pinyin[node.zh]} show={hints.pinyin} rtClassName="[&_rt]:text-[#b4531a]" fallbackClassName="text-[#b4531a]" /></p>
               <PronounceButton text={node.zh} className="!size-9 !bg-[#f6e6c4] !text-[#b4531a] hover:!bg-[#efd9a8]" />
             </div>
-            {hints.vi && <p className="text-[13px] opacity-80">{node.vi}</p>}
+            {hints.vi && <p className={`text-[13px] opacity-80 ${hints.pinyin ? "mt-1.5" : ""}`}>{node.vi}</p>}
           </>
         ) : <p className="mt-0.5 italic">{node.vi}</p>}
         {newClues.map((c) => <p key={c.id} role="status" className="mt-2 rounded-lg px-2 py-1 text-[12px] font-extrabold" style={{ background: "#d9f0c8", color: "#2f5a22" }}>Manh mối mới: {c.title}</p>)}
@@ -86,7 +86,7 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
               style={{ borderColor: INK, background: "#fff1d3" }}
             >
               <span lang="zh-Hans" className={`text-[15px] font-bold ${hints.pinyin ? "leading-[2.2]" : ""}`}><RubyLine zh={c.zh} pinyin={pinyin[c.zh]} show={hints.pinyin} rtClassName="[&_rt]:text-[#b4531a]" fallbackClassName="text-[#b4531a]" /></span>
-              {hints.vi && <span className="text-[12px] opacity-80">{c.vi}</span>}
+              {hints.vi && <span className={`text-[12px] opacity-80 ${hints.pinyin ? "mt-1" : ""}`}>{c.vi}</span>}
             </button>
           )) : (
             <button type="button" data-primary onClick={() => onChoose(null)} className="min-h-10 self-end rounded-full border-2 px-5 text-[13px] font-extrabold transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2" style={{ borderColor: INK, background: "#bcf1a9", color: "#1f4a17" }}>

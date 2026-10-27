@@ -19,7 +19,7 @@ export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Recor
         <p lang="zh-Hans" className={`min-w-0 flex-1 text-body-lg font-bold ${hints.pinyin ? "leading-[2.2]" : "leading-snug"}`}><RubyLine zh={clue.zh} pinyin={pinyin[clue.zh]} show={hints.pinyin} /></p>
         <PronounceButton text={clue.zh} className="size-10 sm:size-11" />
       </div>
-      {hints.vi && <p className="text-body-md text-on-surface-variant">{clue.vi}</p>}
+      {hints.vi && <p className={`text-body-md text-on-surface-variant ${hints.pinyin ? "mt-1.5" : ""}`}>{clue.vi}</p>}
     </div>
   );
 }
