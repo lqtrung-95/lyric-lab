@@ -28,6 +28,23 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
 
   return (
     <div className="space-y-space-sm">
+      {/* Khi in chỉ hiện khối #hsk-print (danh sách gọn hai cột có ô tích), ẩn mọi thứ còn lại của trang. */}
+      <style>{`@media print { @page { size: A4; margin: 12mm; } body * { visibility: hidden !important; } #hsk-print, #hsk-print * { visibility: visible !important; } #hsk-print { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; } }`}</style>
+      <section id="hsk-print" aria-hidden="true" className="hidden print:block">
+        <h1 style={{ fontSize: "16pt", fontWeight: 700 }}>Từ vựng HSK {level} ({shown.length} từ)</h1>
+        <p style={{ fontSize: "9pt", color: "#555", marginBottom: "6pt" }}>songhanzi.com/tu-vung-hsk/{level} · Tích vào ô khi bạn đã thuộc từ.</p>
+        <ul style={{ columnCount: 2, columnGap: "10mm", listStyle: "none", padding: 0, margin: 0 }}>
+          {shown.map((r) => (
+            <li key={r.word} style={{ breakInside: "avoid", borderBottom: "0.3pt solid #bbb", padding: "2.5pt 0", fontSize: "9pt", lineHeight: 1.3 }}>
+              <span style={{ display: "inline-block", width: "9pt", height: "9pt", border: "0.8pt solid #333", marginRight: "5pt", verticalAlign: "middle" }} />
+              <span lang="zh" style={{ fontSize: "13pt", fontWeight: 700, marginRight: "5pt" }}>{r.word}</span>
+              <span style={{ marginRight: "5pt" }}>{r.pinyin}</span>
+              {r.sinoViet && <span style={{ textTransform: "uppercase", fontWeight: 600, marginRight: "5pt" }}>{r.sinoViet}</span>}
+              <span style={{ color: "#444" }}>{r.meanings.slice(0, 2).join("; ")}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-surface-container-high px-4 text-on-surface-variant focus-within:ring-2 focus-within:ring-primary">
           <Icon name="search" size={20} />
@@ -37,7 +54,10 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
             className="min-h-11 w-full bg-transparent text-body-md text-on-surface outline-none placeholder:text-on-surface-variant"
           />
         </label>
-        <button type="button" onClick={download} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary-container hover:bg-primary hover:text-on-primary">
+        <button type="button" onClick={() => window.print()} className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-primary px-5 text-label-md font-semibold text-primary hover:bg-surface-container-high print:hidden">
+          <Icon name="list_alt" size={18} />In hoặc lưu PDF
+        </button>
+        <button type="button" onClick={download} className="print:hidden inline-flex min-h-11 items-center gap-2 rounded-full bg-primary-container px-5 text-label-md font-semibold text-on-primary-container hover:bg-primary hover:text-on-primary">
           <Icon name="download" size={18} />Tải CSV
         </button>
       </div>

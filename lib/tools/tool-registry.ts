@@ -40,7 +40,7 @@ export const TOOLS: readonly ToolEntry[] = [
   {
     href: "/tu-vung-hsk",
     title: "Từ vựng HSK có âm Hán Việt",
-    description: "Danh sách từ HSK 1–6 kèm pinyin, âm Hán Việt và nghĩa. Tìm nhanh, tải CSV để nạp vào Anki.",
+    description: "Danh sách từ HSK 1–6 kèm pinyin, âm Hán Việt và nghĩa. Tìm nhanh, tải CSV để nạp vào Anki, hoặc in thành bảng A4 có ô tích.",
     icon: "list_alt",
     category: "hsk",
     keywords: ["hsk1", "hsk2", "hsk3", "hsk4", "hsk5", "hsk6", "anki", "csv", "tu vung"],
