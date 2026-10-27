@@ -3,6 +3,7 @@
 import { PanelFrame } from "./panel-frame";
 import { Icon } from "@/components/ui/icon";
 import { PronounceButton } from "@/components/ui/pronounce-button";
+import { RubyLine } from "@/components/ui/ruby-text";
 import type { ClueDef } from "@/lib/explore/story/story-types";
 import { HintToggles } from "./hint-toggles";
 import type { Hints } from "./use-story-hints";
@@ -15,10 +16,9 @@ export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Recor
     <div>
       <p className="text-label-md font-extrabold text-primary">{KIND_LABEL[clue.kind]} · {clue.title}</p>
       <div className="flex items-center gap-2">
-        <p lang="zh-Hans" className="min-w-0 flex-1 text-body-lg font-bold leading-snug">{clue.zh}</p>
+        <p lang="zh-Hans" className={`min-w-0 flex-1 text-body-lg font-bold ${hints.pinyin ? "leading-[2.2]" : "leading-snug"}`}><RubyLine zh={clue.zh} pinyin={pinyin[clue.zh]} show={hints.pinyin} /></p>
         <PronounceButton text={clue.zh} className="size-10 sm:size-11" />
       </div>
-      {hints.pinyin && pinyin[clue.zh] && <p className="text-body-sm text-primary">{pinyin[clue.zh]}</p>}
       {hints.vi && <p className="text-body-md text-on-surface-variant">{clue.vi}</p>}
     </div>
   );

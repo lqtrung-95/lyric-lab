@@ -1,6 +1,7 @@
 "use client";
 
 import { PronounceButton } from "@/components/ui/pronounce-button";
+import { RubyLine } from "@/components/ui/ruby-text";
 import type { SceneConversation } from "@/lib/explore/explore-types";
 
 interface Props {
@@ -25,8 +26,7 @@ export function ScenePhrases({ phrases, conversation, pinyin }: Props) {
             {phrases.map((p) => (
               <li key={p.zh} className="flex items-start gap-2 rounded-xl border-2 border-ink bg-surface-container-lowest px-space-sm py-2">
                 <div className="min-w-0 flex-1">
-                  <p lang="zh-Hans" className="text-body-lg font-bold">{p.zh}</p>
-                  {pinyin[p.zh] && <p className="text-body-sm text-primary">{pinyin[p.zh]}</p>}
+                  <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.1]"><RubyLine zh={p.zh} pinyin={pinyin[p.zh]} show /></p>
                   <p className="text-body-sm text-on-surface-variant">{p.vi}</p>
                 </div>
                 <PronounceButton text={p.zh} className="size-10" />
@@ -44,8 +44,7 @@ export function ScenePhrases({ phrases, conversation, pinyin }: Props) {
                 <div className={`flex max-w-[92%] items-start gap-2 rounded-2xl border-2 border-ink px-space-sm py-2 sm:max-w-[78%] ${l.who === 1 ? "bg-primary-container text-on-primary-container" : "bg-surface-container-lowest"}`}>
                   <div className="min-w-0">
                     <p className="text-label-md font-extrabold opacity-80">{conversation.speakers[l.who]}</p>
-                    <p lang="zh-Hans" className="text-body-lg font-bold">{l.zh}</p>
-                    {pinyin[l.zh] && <p className="text-body-sm opacity-90">{pinyin[l.zh]}</p>}
+                    <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.1]"><RubyLine zh={l.zh} pinyin={pinyin[l.zh]} show rtClassName="[&_rt]:text-current [&_rt]:opacity-80" fallbackClassName="opacity-90" /></p>
                     <p className="text-body-sm opacity-80">{l.vi}</p>
                   </div>
                   <PronounceButton text={l.zh} className="size-9" />

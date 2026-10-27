@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
+import { RubyLine } from "@/components/ui/ruby-text";
 import type { ClueDef, DialogueChoice, DialogueNode, Speaker } from "@/lib/explore/story/story-types";
 import { FLAT_SPRITES } from "../art/flat/flat-sprites";
 import { HintToggles } from "./hint-toggles";
@@ -67,10 +68,9 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
         {node.zh ? (
           <>
             <div className="mt-0.5 flex items-center gap-2">
-              <p lang="zh-Hans" className="min-w-0 flex-1 text-lg font-bold leading-snug sm:text-xl">{node.zh}</p>
+              <p lang="zh-Hans" className={`min-w-0 flex-1 text-lg font-bold sm:text-xl ${hints.pinyin ? "leading-[2.2]" : "leading-snug"}`}><RubyLine zh={node.zh} pinyin={pinyin[node.zh]} show={hints.pinyin} rtClassName="[&_rt]:text-[#b4531a]" fallbackClassName="text-[#b4531a]" /></p>
               <PronounceButton text={node.zh} className="!size-9 !bg-[#f6e6c4] !text-[#b4531a] hover:!bg-[#efd9a8]" />
             </div>
-            {hints.pinyin && pinyin[node.zh] && <p className="text-[13px]" style={{ color: "#b4531a" }}>{pinyin[node.zh]}</p>}
             {hints.vi && <p className="text-[13px] opacity-80">{node.vi}</p>}
           </>
         ) : <p className="mt-0.5 italic">{node.vi}</p>}
@@ -85,8 +85,7 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
               className="flex min-h-10 w-full flex-col items-start rounded-xl border-2 px-2.5 py-1.5 text-left transition-colors hover:brightness-95 focus-visible:outline-2 focus-visible:outline-offset-2"
               style={{ borderColor: INK, background: "#fff1d3" }}
             >
-              <span lang="zh-Hans" className="text-[15px] font-bold">{c.zh}</span>
-              {hints.pinyin && pinyin[c.zh] && <span className="text-[12px]" style={{ color: "#b4531a" }}>{pinyin[c.zh]}</span>}
+              <span lang="zh-Hans" className={`text-[15px] font-bold ${hints.pinyin ? "leading-[2.2]" : ""}`}><RubyLine zh={c.zh} pinyin={pinyin[c.zh]} show={hints.pinyin} rtClassName="[&_rt]:text-[#b4531a]" fallbackClassName="text-[#b4531a]" /></span>
               {hints.vi && <span className="text-[12px] opacity-80">{c.vi}</span>}
             </button>
           )) : (

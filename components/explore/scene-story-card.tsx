@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { Button3d } from "@/components/ui/button-3d";
 import { Icon } from "@/components/ui/icon";
+import { RubyChars } from "@/components/ui/ruby-text";
+import { alignPinyin } from "@/lib/pinyin/align-ruby";
 import { buildCloze, segmentLine, type ClozeItem } from "@/lib/explore/scene-stories/segment-and-cloze";
 import type { SceneStory } from "@/lib/explore/scene-stories/story-types";
 import type { SceneWord } from "@/lib/explore/explore-types";
@@ -120,24 +122,32 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
       </div>
 
       <div className="rounded-xl border-2 border-outline-variant bg-surface-container-lowest px-space-sm py-space-sm">
-        <p lang="zh-Hans" className="text-body-lg font-bold leading-loose">
-          {story.lines.map((line, i) => (
+        <p lang="zh-Hans" className={`text-body-lg font-bold ${showPinyin ? "leading-[2.4]" : "leading-loose"}`}>
+          {story.lines.map((line, i) => {
+            const py = showPinyin ? alignPinyin(line.zh, pinyin[line.zh]) : null;
+            let at = 0;
+            return (
             <span key={i} onClick={() => playOne(i)} className={`cursor-pointer rounded px-0.5 transition-colors ${playing === i ? "bg-primary-container text-on-primary-container" : "hover:bg-surface-container"}`}>
               {segmentLine(line.zh, terms).map((s, j) => {
-                if (!s.term) return <span key={j}>{s.text}</span>;
+                const offset = at;
+                at += s.text.length;
+                if (!s.term) return <span key={j}><RubyChars text={s.text} py={py} offset={offset} /></span>;
                 const w = byTerm[s.term];
                 const known = w && marks[w.id] !== "new";
                 return (
                   <button key={j} type="button" onClick={(e) => { e.stopPropagation(); if (w) onPickWord(w); }} title={w?.gloss}
                     className={`rounded px-0.5 font-extrabold underline decoration-2 underline-offset-4 ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
-                    {s.text}
+                    <RubyChars text={s.text} py={py} offset={offset} />
                   </button>
                 );
               })}
             </span>
-          ))}
+            );
+          })}
         </p>
-        {showPinyin && <p className="mt-2 text-body-sm leading-relaxed text-primary">{story.lines.map((l) => pinyin[l.zh]).filter(Boolean).join(" ")}</p>}
+        {showPinyin && story.lines.some((l) => !alignPinyin(l.zh, pinyin[l.zh]) && pinyin[l.zh]) && (
+          <p className="mt-2 text-body-sm leading-relaxed text-primary">{story.lines.filter((l) => !alignPinyin(l.zh, pinyin[l.zh])).map((l) => pinyin[l.zh]).filter(Boolean).join(" ")}</p>
+        )}
         {showVi && <p className="mt-2 text-body-md leading-relaxed text-on-surface-variant">{story.lines.map((l) => l.vi).join(" ")}</p>}
       </div>
       <p className="text-label-md text-on-surface-variant">Từ gạch chân là từ của cảnh: bấm để xem thẻ từ. Từ gạch đứt là từ bạn chưa học. Câu đang đọc được tô sáng.</p>
