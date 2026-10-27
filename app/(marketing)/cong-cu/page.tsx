@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ToolsCta } from "@/components/tools/tools-cta";
 import { ToolsHub } from "@/components/tools/tools-hub";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { TOOLS } from "@/lib/tools/tool-registry";
@@ -36,6 +37,7 @@ export default function ToolsIndexPage() {
         <p className="mt-2 text-body-lg text-on-surface-variant">Tờ tập viết, pinyin, lượng từ, thanh điệu và nhiều hơn nữa. Dùng được ngay, không cần đăng ký.</p>
       </header>
       <ToolsHub tools={TOOLS} />
+      <ToolsCta />
       <section aria-labelledby="faq-heading" className="pt-space-md">
         <h2 id="faq-heading" className="font-serif text-headline-md">Câu hỏi thường gặp</h2>
         <dl className="mt-space-sm space-y-space-sm">
