@@ -62,11 +62,16 @@ const juice = s(44, 70, <>
   <circle cx="22" cy="40" r="11" fill={C.yellow} strokeWidth={2.5} />
   <path d="M22 29v22M11 40h22" fill="none" strokeWidth={2} />
 </>);
-const instantnoodles = s(60, 56, <>
-  <path d="M6 12h48l-5 38q-1 4-5 4H16q-4 0-5-4Z" fill={C.red} />
-  <ellipse cx="30" cy="12" rx="24" ry="5" fill={C.cream} />
-  <path d="M16 6q4-6 8 0t8 0t8 0" fill="none" strokeWidth={2.5} />
-  <path d="M14 30h32" fill="none" stroke={C.yellow} strokeWidth={5} />
+const instantnoodles = s(64, 76, <>
+  <path d="M8 34h48l-6 34q-1 4-5 4H19q-4 0-5-4Z" fill={C.red} />
+  <path d="M11 50h42" fill="none" stroke={C.yellow} strokeWidth={8} />
+  <path d="M26 56l4 6 4-6" fill="none" stroke={C.cream} strokeWidth={3} />
+  <ellipse cx="32" cy="34" rx="26" ry="6" fill={C.cream} />
+  <path d="M44 30q10-10 18-2-6 8-16 6Z" fill={C.white} strokeWidth={2.500} />
+  <path d="M14 30q4-18 10-4t10-6 12 4" fill="none" stroke={INK} strokeWidth={9} />
+  <path d="M14 30q4-18 10-4t10-6 12 4" fill="none" stroke={C.woodL} strokeWidth={4.500} />
+  <path d="M22 16q-3-4 0-8M34 14q-3-4 0-8" fill="none" strokeWidth={2.500} opacity={0.6} />
+  <path d="M46 2L34 30M54 4L40 30" fill="none" strokeWidth={3} />
 </>);
 const toiletpaper = s(52, 56, <>
   <ellipse cx="26" cy="12" rx="20" ry="7" fill={C.white} />
@@ -87,11 +92,12 @@ const icecream = s(40, 78, <>
   <circle cx="20" cy="12" r="9" fill={C.cream} />
   <circle cx="24" cy="5" r="3" fill={C.red} strokeWidth={2.5} />
 </>);
-const chips = s(52, 66, <>
-  <path d="M6 8q23 8 40 0v52q-20 8-40 0Z" fill={C.yellow} />
-  <path d="M6 8q23 8 40 0" fill="none" strokeWidth={2.5} />
-  <circle cx="26" cy="32" r="12" fill={C.orange} strokeWidth={2.5} />
-  <path d="M20 32h12" fill="none" stroke={C.cream} strokeWidth={4} />
+const chips = s(60, 82, <>
+  <path d="M6 6l6 8 6-8 6 8 6-8 6 8 6-8 6 8 6-8v60l-6 8-6-8-6 8-6-8-6 8-6-8-6 8-6-8Z" fill={C.yellow} />
+  <ellipse cx="30" cy="42" rx="19" ry="17" fill={C.red} strokeWidth={2.500} />
+  <path d="M18 44q4-12 14-10t10 8q-4 10-14 8t-10-6Z" fill={C.woodL} strokeWidth={2.500} />
+  <path d="M24 42q4-4 9-2" fill="none" stroke={C.wood} strokeWidth={2.500} />
+  <path d="M12 22v38" fill="none" stroke={C.white} strokeWidth={4} opacity={0.6} />
 </>);
 const scanner = s(50, 66, <>
   <path d="M10 8h30q6 0 6 6v14H4V14q0-6 6-6Z" fill={C.greyD} />
