@@ -146,4 +146,13 @@ export const TOOLS: readonly ToolEntry[] = [
     popular: true,
     keywords: ["ngu phap", "grammar", "sua cau", "ai", "kiem tra cau", "check"],
   },
+  {
+    href: "/cau-vi-du-tieng-trung",
+    title: "Câu ví dụ tiếng Trung",
+    description: "Nhập một từ để xem câu thật từ video, kèm pinyin, nghĩa tiếng Việt, giọng đọc và mở video đúng chỗ.",
+    icon: "format_quote",
+    category: "sentences",
+    popular: true,
+    keywords: ["cau vi du", "example sentences", "dat cau", "mau cau", "cach dung tu"],
+  },
 ];
