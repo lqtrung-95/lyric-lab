@@ -7,7 +7,7 @@ export const FIRESTATION_SCENE: SceneDef = {
   subtitle: "Ghé trạm cứu hỏa, học từ về phòng cháy chữa cháy rồi làm nhiệm vụ cho Chú Chó lính cứu hỏa.",
   theme: "firestation",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Hồ bơi", to: "pool", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Hồ bơi", to: "pool", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Trung tâm dữ liệu", to: "datacenter", x: 92, y: 60, w: 6 }],
   npc: {
     id: "dog", name: "Chú Chó lính cứu hỏa", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến trạm cứu hỏa! Hãy lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

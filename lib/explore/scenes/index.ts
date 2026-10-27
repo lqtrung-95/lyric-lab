@@ -38,10 +38,15 @@ import { CAFE_SCENE } from "./cafe-scene";
 import { BOOKSTORE_SCENE } from "./bookstore-scene";
 import { POOL_SCENE } from "./pool-scene";
 import { FIRESTATION_SCENE } from "./firestation-scene";
+import { DATACENTER_SCENE } from "./datacenter-scene";
+import { DEVROOM_SCENE } from "./devroom-scene";
+import { AILAB_SCENE } from "./ailab-scene";
+import { PORT_SCENE } from "./port-scene";
+import { GREENHOUSE_SCENE } from "./greenhouse-scene";
 import { SCENE_CONVERSATIONS } from "./scene-conversations";
 import { STATION_SCENE } from "./station-scene";
 import { STADIUM_SCENE } from "./stadium-scene";
 import { SUPERMARKET_SCENE } from "./supermarket-scene";
 
 /** Các cảnh của Khám phá, theo thứ tự hiện ở danh sách. Cảnh nối thành một đường: Phòng, Quán ăn, Chợ, Nhà ga, Công viên, Bệnh viện, Trường học, Cửa hàng, Khách sạn, Sân bay, Văn phòng, Thư viện, Siêu thị, Bãi biển, Sân vận động, Tiệm bánh, Nhà bếp, Bảo tàng, Ngân hàng, Rạp phim, Phòng gym, Hiệu cắt tóc, Bưu điện, Hiệu thuốc, Cửa hàng điện thoại, Quán lẩu, Sở thú, Tiệm hoa, Tiệm sửa xe, Quán trà sữa, Công viên giải trí, Nông trại, Tiệm giặt là, Cửa hàng đồ chơi, Đồn cảnh sát, Ga tàu điện ngầm, Khu cắm trại, Phòng thí nghiệm (đi qua lại bằng `exits`). */
-export const SCENES: Record<string, SceneDef> = Object.fromEntries([ROOM_SCENE, EATERY_SCENE, MARKET_SCENE, STATION_SCENE, PARK_SCENE, HOSPITAL_SCENE, SCHOOL_SCENE, SHOP_SCENE, HOTEL_SCENE, AIRPORT_SCENE, OFFICE_SCENE, LIBRARY_SCENE, SUPERMARKET_SCENE, BEACH_SCENE, STADIUM_SCENE, BAKERY_SCENE, KITCHEN_SCENE, MUSEUM_SCENE, BANK_SCENE, CINEMA_SCENE, GYM_SCENE, SALON_SCENE, POSTOFFICE_SCENE, PHARMACY_SCENE, PHONESHOP_SCENE, HOTPOT_SCENE, ZOO_SCENE, FLOWERSHOP_SCENE, GARAGE_SCENE, BUBBLETEA_SCENE, FUNFAIR_SCENE, FARM_SCENE, LAUNDRY_SCENE, TOYSHOP_SCENE, POLICE_SCENE, SUBWAY_SCENE, CAMPING_SCENE, LAB_SCENE, CAFE_SCENE, BOOKSTORE_SCENE, POOL_SCENE, FIRESTATION_SCENE].map((s) => [s.id, { ...s, conversation: SCENE_CONVERSATIONS[s.id] }]));
+export const SCENES: Record<string, SceneDef> = Object.fromEntries([ROOM_SCENE, EATERY_SCENE, MARKET_SCENE, STATION_SCENE, PARK_SCENE, HOSPITAL_SCENE, SCHOOL_SCENE, SHOP_SCENE, HOTEL_SCENE, AIRPORT_SCENE, OFFICE_SCENE, LIBRARY_SCENE, SUPERMARKET_SCENE, BEACH_SCENE, STADIUM_SCENE, BAKERY_SCENE, KITCHEN_SCENE, MUSEUM_SCENE, BANK_SCENE, CINEMA_SCENE, GYM_SCENE, SALON_SCENE, POSTOFFICE_SCENE, PHARMACY_SCENE, PHONESHOP_SCENE, HOTPOT_SCENE, ZOO_SCENE, FLOWERSHOP_SCENE, GARAGE_SCENE, BUBBLETEA_SCENE, FUNFAIR_SCENE, FARM_SCENE, LAUNDRY_SCENE, TOYSHOP_SCENE, POLICE_SCENE, SUBWAY_SCENE, CAMPING_SCENE, LAB_SCENE, CAFE_SCENE, BOOKSTORE_SCENE, POOL_SCENE, FIRESTATION_SCENE, DATACENTER_SCENE, DEVROOM_SCENE, AILAB_SCENE, PORT_SCENE, GREENHOUSE_SCENE].map((s) => [s.id, { ...s, conversation: SCENE_CONVERSATIONS[s.id] }]));

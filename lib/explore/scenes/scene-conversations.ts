@@ -385,4 +385,49 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 0, zh: "不可以,要走楼梯。", vi: "Không được, phải đi cầu thang." },
     ],
   },
+  "datacenter": {
+    speakers: ["Quản trị viên", "Nhân viên"],
+    lines: [
+      { who: 1, zh: "网络又断了,怎么办?", vi: "Mạng lại đứt rồi, làm sao đây?" },
+      { who: 0, zh: "先看看网线和交换机。", vi: "Hãy xem cáp mạng và bộ chuyển mạch trước." },
+      { who: 1, zh: "服务器的灯是红色的。", vi: "Đèn của máy chủ màu đỏ." },
+      { who: 0, zh: "别怕,我们有备份。", vi: "Đừng sợ, chúng ta có bản sao lưu." },
+    ],
+  },
+  "devroom": {
+    speakers: ["Đồng nghiệp", "Lập trình viên"],
+    lines: [
+      { who: 0, zh: "你的程序测试过了吗?", vi: "Chương trình của bạn kiểm thử chưa?" },
+      { who: 1, zh: "测试过了,可是还有一个漏洞。", vi: "Kiểm thử rồi, nhưng còn một lỗi." },
+      { who: 0, zh: "那就先别发布新版本。", vi: "Vậy tạm thời đừng phát hành phiên bản mới." },
+      { who: 1, zh: "好的,我现在就修。", vi: "Vâng, tôi sửa ngay bây giờ." },
+    ],
+  },
+  "ailab": {
+    speakers: ["Nhà nghiên cứu", "Sinh viên"],
+    lines: [
+      { who: 1, zh: "这个模型是怎么学会说话的?", vi: "Mô hình này học nói bằng cách nào?" },
+      { who: 0, zh: "我们给它很多数据,让它不停地训练。", vi: "Chúng tôi cho nó rất nhiều dữ liệu và để nó liên tục luyện tập." },
+      { who: 1, zh: "它的回答都是对的吗?", vi: "Câu trả lời của nó đều đúng sao?" },
+      { who: 0, zh: "不一定,所以我们要自己检查。", vi: "Chưa chắc, nên chúng ta phải tự kiểm tra." },
+    ],
+  },
+  "port": {
+    speakers: ["Điều phối viên", "Khách hàng"],
+    lines: [
+      { who: 1, zh: "我的货到了吗?", vi: "Hàng của tôi đã đến chưa?" },
+      { who: 0, zh: "到了,请先交关税。", vi: "Đến rồi, xin nộp thuế quan trước." },
+      { who: 1, zh: "报关单我已经填好了。", vi: "Tờ khai hải quan tôi đã điền xong." },
+      { who: 0, zh: "好,拿提单来提货吧。", vi: "Được, mang vận đơn đến nhận hàng nhé." },
+    ],
+  },
+  "greenhouse": {
+    speakers: ["Kỹ sư", "Nông dân"],
+    lines: [
+      { who: 1, zh: "今天温室里太热了。", vi: "Hôm nay trong nhà kính nóng quá." },
+      { who: 0, zh: "那就拉上遮阳网,再开一开滴灌。", vi: "Vậy kéo lưới che nắng lại, rồi bật tưới nhỏ giọt." },
+      { who: 1, zh: "番茄的种苗要不要施肥料?", vi: "Cây giống cà chua có cần bón phân không?" },
+      { who: 0, zh: "现在不用,过一个星期再说。", vi: "Bây giờ chưa cần, một tuần nữa hãy tính." },
+    ],
+  },
 };

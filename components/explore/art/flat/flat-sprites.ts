@@ -16,6 +16,7 @@ import { VENUE4_SHOP_SPRITES } from "./flat-venue4-shops";
 import { VENUE4_ZOO_SPRITES } from "./flat-venue4-zoo";
 import { VENUE6_SPRITES } from "./flat-venue6";
 import { VENUE7_SPRITES } from "./flat-venue7";
+import { VENUE8_SPRITES } from "./flat-venue8";
 import { VENUE5_FUN_FARM_SPRITES } from "./flat-venue5-fun-farm";
 import { VENUE5_LAUNDRY_TOY_SPRITES } from "./flat-venue5-laundry-toys";
 import { NEW_FUN_SPRITES } from "./flat-new-fun";
@@ -36,7 +37,7 @@ import { SMALL_SPRITES } from "./flat-small";
 const BASE: Record<string, FlatSprite> = {
   ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES,
   ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES, ...VENUE_SPRITES,
-  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES, ...VENUE7_SPRITES,
+  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES, ...VENUE7_SPRITES, ...VENUE8_SPRITES,
 };
 
 /** Một từ khác nhau dùng chung hình: id mới → hình có sẵn (ví dụ "bệnh giường" dùng hình giường). Giữ mỗi cảnh có từ riêng mà không phải vẽ lại. */
@@ -51,6 +52,10 @@ const ALIASES: Record<string, string> = {
   zooticket: "ticket", greetcard: "note", pricelist: "note", takeaway: "bag",
   latte: "coffee", syrupbottle: "syrup", togocup: "cup", barcounter: "counter", pastrycase: "showcase", potplant: "flowerpot",
   novel: "book", comic: "magazine", fountainpen: "pen", journal: "notebook", cashdesk: "counter", revolveshelf: "bookshelf", readlamp: "lamp",
+  networkcable: "cable", monitor: "screen", password: "lock", backupfiles: "folder", powersupply: "socket",
+  software: "laptop", program: "document", requirement: "note", techdoc: "document", workstation: "desk", bigscreen: "tv", projectorbeam: "projector", staffcard: "idcard",
+  voiceassistant: "speaker", touchscreen: "tablet", cargoship: "boat", customsform: "document", tariff: "receipt", importgoods: "parcel", freight: "cash", billoflading: "file", sample: "woodbox", shelving: "shelf",
+  hygrometer: "thermometer", plasticfilm: "sheetcloth", compostbin: "bucket", handcart: "cart",
   swimgoggles: "goggles", bathtowel: "towel", firealarm: "bell", firesuit: "coat", turntable: "ladder",
 };
 
