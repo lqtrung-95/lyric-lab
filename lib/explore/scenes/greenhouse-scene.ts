@@ -7,7 +7,7 @@ export const GREENHOUSE_SCENE: SceneDef = {
   subtitle: "Vào nhà kính trồng rau, học từ về nông nghiệp thông minh rồi làm nhiệm vụ cho Bé Thỏ kỹ sư nông nghiệp.",
   theme: "greenhouse",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Cảng xuất nhập khẩu", to: "port", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Cảng xuất nhập khẩu", to: "port", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Tiệm thú cưng", to: "petshop", x: 92, y: 60, w: 6 }],
   npc: {
     id: "rabbit", name: "Bé Thỏ kỹ sư nông nghiệp", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến nhà kính! Hãy lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

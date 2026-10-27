@@ -430,4 +430,49 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 0, zh: "现在不用,过一个星期再说。", vi: "Bây giờ chưa cần, một tuần nữa hãy tính." },
     ],
   },
+  "petshop": {
+    speakers: ["Chủ tiệm", "Khách"],
+    lines: [
+      { who: 1, zh: "我想给小狗买一条牵引绳。", vi: "Tôi muốn mua cho chú chó một sợi dây dắt." },
+      { who: 0, zh: "这条红色的怎么样?", vi: "Sợi màu đỏ này thế nào?" },
+      { who: 1, zh: "很好,再来一袋狗粮。", vi: "Tốt, cho thêm một túi thức ăn cho chó." },
+      { who: 0, zh: "一共八十块。", vi: "Tổng cộng tám mươi tệ." },
+    ],
+  },
+  "tailor": {
+    speakers: ["Thợ may", "Khách"],
+    lines: [
+      { who: 1, zh: "这条裤子太长了,能改吗?", vi: "Chiếc quần này dài quá, sửa được không?" },
+      { who: 0, zh: "可以,请到试衣间里试一试。", vi: "Được, mời vào phòng thử đồ thử xem." },
+      { who: 1, zh: "什么时候可以取?", vi: "Khi nào có thể lấy?" },
+      { who: 0, zh: "后天下午就好了。", vi: "Chiều ngày kia là xong." },
+    ],
+  },
+  "photostudio": {
+    speakers: ["Thợ ảnh", "Khách"],
+    lines: [
+      { who: 1, zh: "我要拍两张证件照。", vi: "Tôi muốn chụp hai tấm ảnh thẻ." },
+      { who: 0, zh: "请坐在这里,看镜头。", vi: "Mời ngồi ở đây, nhìn vào ống kính." },
+      { who: 0, zh: "好,笑一笑,一、二、三。", vi: "Được, cười lên nào, một, hai, ba." },
+      { who: 1, zh: "照片什么时候能拿?", vi: "Khi nào lấy được ảnh?" },
+    ],
+  },
+  "dental": {
+    speakers: ["Bác sĩ", "Bệnh nhân"],
+    lines: [
+      { who: 0, zh: "哪颗牙不舒服?", vi: "Chiếc răng nào không thoải mái?" },
+      { who: 1, zh: "右边的牙齿有点疼。", vi: "Răng bên phải hơi đau." },
+      { who: 0, zh: "请躺下,张开嘴,我看一看。", vi: "Mời nằm xuống, há miệng, để tôi xem." },
+      { who: 1, zh: "要补牙吗?", vi: "Có phải trám răng không?" },
+    ],
+  },
+  "construction": {
+    speakers: ["Đốc công", "Công nhân"],
+    lines: [
+      { who: 0, zh: "你的安全帽呢?", vi: "Mũ bảo hộ của cậu đâu?" },
+      { who: 1, zh: "在这儿,我马上戴上。", vi: "Ở đây, tôi đội ngay." },
+      { who: 0, zh: "今天要按图纸砌这面墙。", vi: "Hôm nay phải xây bức tường này theo bản vẽ." },
+      { who: 1, zh: "好的,我去搬砖头。", vi: "Vâng, tôi đi bê gạch." },
+    ],
+  },
 };
