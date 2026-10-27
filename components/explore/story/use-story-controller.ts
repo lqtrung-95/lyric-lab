@@ -48,6 +48,8 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
   const [view, setView] = useState<StoryView>(null);
   const [verdict, setVerdict] = useState<Verdict | null>(null);
   const [celebrating, setCelebrating] = useState(false);
+  /** Phá án xong khi đang ở cảnh không phải cảnh kết thúc: bảng buộc tội đóng, rồi đưa người chơi về cảnh kết thúc để nghe đoạn kết. */
+  const [epilogueElsewhere, setEpilogueElsewhere] = useState(false);
   const endCelebration = useCallback(() => setCelebrating(false), []);
   const { story, scene } = payload;
   const flags = progress.flags;
@@ -128,9 +130,16 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
       playSfx("complete");
       setCelebrating(true);
       update((p) => addFlag(p, story.solvedFlag));
-      openNode(story.epilogueNode);
+      if (scene.dialogues[story.epilogueNode]) openNode(story.epilogueNode);
+      else { setView(null); setEpilogueElsewhere(true); }
     } else playSfx("wrong");
-  }, [story, update, openNode]);
+  }, [story, scene, update, openNode]);
+
+  /** Mở đoạn kết ở cảnh kết thúc (sau khi được đưa về từ cảnh khác) và mừng. */
+  const playEpilogue = useCallback(() => {
+    setCelebrating(true);
+    openNode(story.epilogueNode);
+  }, [story.epilogueNode, openNode]);
 
   /** Nối hai manh mối trong sổ vụ án: cặp đúng thì thêm suy luận vào sổ. */
   const link = useCallback((a: string, b: string): LinkResult => {
@@ -154,7 +163,7 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
     objective: story.freeRoam ? null : currentObjective(story.objectives, flags),
     objectiveCount: story.freeRoam ? { done: 0, total: 0 } : objectiveProgress(story.objectives, flags),
     canAccuse: holds(story.accuseWhen, flags),
-    interact, choose, accuse, link, reset,
+    interact, choose, accuse, link, reset, epilogueElsewhere, playEpilogue,
     close: () => setView(null),
   };
 }

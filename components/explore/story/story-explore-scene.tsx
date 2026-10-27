@@ -23,6 +23,14 @@ export function StoryExploreScene({ scene, payload, basePath, coop }: { scene: S
   const storyScene = { ...scene, exits: storyExits(route, scene.id, (id) => SCENES[id]?.title ?? id, open) };
   const locked = controller.ready && !open(scene.id);
   useEffect(() => { if (locked) router.replace(`${basePath}/${story.startScene}`); }, [locked, router, basePath, story.startScene]);
+  // Buộc tội ở cảnh khác: sang cảnh kết thúc (kèm cờ) rồi nghe đoạn kết ở đó.
+  useEffect(() => { if (controller.epilogueElsewhere) router.push(`${basePath}/${story.accuseScene}?epilogue=1`); }, [controller.epilogueElsewhere, router, basePath, story.accuseScene]);
+  const { ready, solved, playEpilogue } = controller;
+  useEffect(() => {
+    if (!ready || !solved || scene.id !== story.accuseScene || !window.location.search.includes("epilogue=1")) return;
+    window.history.replaceState(null, "", window.location.pathname);
+    playEpilogue();
+  }, [ready, solved, scene.id, story.accuseScene, playEpilogue]);
   if (locked) return null;
   return (
     <>
