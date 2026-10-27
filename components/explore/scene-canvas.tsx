@@ -57,6 +57,12 @@ function KeyChip() {
  * Khung cảnh 4:3: nền + các vật đặt theo % (giữa-đáy) + NPC + nhân vật người chơi, xếp lớp theo y (vật gần người xem vẽ sau). Mỗi vật là một nút thật
  * (bàn phím và trình đọc màn hình dùng được); vùng bấm = kích thước vật nới 6 px mỗi cạnh (trên điện thoại vài vật nhỏ vẫn nhỏ hơn 44 px, đã ghi trong tài liệu bàn giao).
  */
+/**
+ * Nhãn nổi trên đồ vật. Màn hẹp (điện thoại) thu nhỏ nhãn của vật học từ, và ẩn nhãn của NPC, biển lối đi và chỗ xem xét cho tới khi nhân vật đứng gần
+ * (thay bằng biểu tượng nhỏ) để chữ không che mất đồ vật bên dưới; tên đầy đủ vẫn có ở aria-label và hiện khi tới gần.
+ */
+const LABEL = "pointer-events-none absolute -top-5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink px-2 text-label-md font-extrabold leading-5 max-sm:-top-4 max-sm:border max-sm:px-1.5 max-sm:text-[10px] max-sm:leading-4";
+
 export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], marks, hideLabels, highlightId, shakeId, nearId, onActivate, onFloorPoint, children }: Props) {
   const ordered = [...objects].sort((a, b) => Number(!!a.above) - Number(!!b.above) || a.y - b.y);
   const npcSprite = FLAT_SPRITES[npc.id];
@@ -97,7 +103,7 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
             </span>
             {near && <KeyChip />}
             {!hideLabels && mark !== "new" && (
-              <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-md font-extrabold leading-5 text-on-surface">
+              <span className={`${LABEL} bg-surface-container-lowest text-on-surface`}>
                 {o.term}{mark === "faded" && <span className="ml-1 text-primary" title="Sắp quên: ôn lại để làm sáng">↻</span>}
               </span>
             )}
@@ -116,7 +122,7 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
           <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[12%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />
           <span className={`block ${nearId === npc.id ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : ""}`}><ArtSprite sprite={npcSprite} /></span>
           {nearId === npc.id && <KeyChip />}
-          <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold leading-5 text-on-primary-container">{npc.name}</span>
+          <span className={`${LABEL} bg-primary-container text-on-primary-container ${nearId === npc.id ? "" : "max-sm:hidden"}`}>{npc.name}</span>
         </button>
       )}
       {exits.map((e) => FLAT_SPRITES[e.sprite] && (
@@ -131,7 +137,8 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
         >
           <span className={`block ${nearId === exitId(e) && !e.locked ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
           {nearId === exitId(e) && !e.locked && <KeyChip />}
-          <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-md font-extrabold leading-5 text-on-surface">{e.locked ? "🔒 " : ""}{e.label}</span>
+          <span className={`${LABEL} bg-surface-container-lowest text-on-surface ${nearId === exitId(e) ? "" : "max-sm:hidden"}`}>{e.locked ? "🔒 " : ""}{e.label}</span>
+          {e.locked && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 text-sm sm:hidden">🔒</span>}
         </button>
       ))}
       {extras.map((e) => FLAT_SPRITES[e.sprite] && (
@@ -146,7 +153,8 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
           {e.kind === "npc" && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[12%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
           <span className={`block ${nearId === e.id ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : e.kind === "spot" ? "drop-shadow-[0_0_6px_rgba(80,160,220,0.95)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
           {nearId === e.id && <KeyChip />}
-          <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-tertiary-container px-2 text-label-md font-extrabold leading-5 text-on-tertiary-container">{e.label}</span>
+          <span className={`${LABEL} bg-tertiary-container text-on-tertiary-container ${nearId === e.id ? "" : "max-sm:hidden"}`}>{e.label}</span>
+          {e.kind === "spot" && nearId !== e.id && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 text-sm sm:hidden">🔎</span>}
         </button>
       ))}
       {children}
