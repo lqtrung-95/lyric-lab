@@ -17,6 +17,10 @@ import { VENUE4_ZOO_SPRITES } from "./flat-venue4-zoo";
 import { VENUE6_SPRITES } from "./flat-venue6";
 import { VENUE7_SPRITES } from "./flat-venue7";
 import { VENUE8_SPRITES } from "./flat-venue8";
+import { VENUE9_SPRITES } from "./flat-venue9";
+import { VENUE10_SPRITES } from "./flat-venue10";
+import { VENUE11_SPRITES } from "./flat-venue11";
+import { VENUE12_SPRITES } from "./flat-venue12";
 import { VENUE5_FUN_FARM_SPRITES } from "./flat-venue5-fun-farm";
 import { VENUE5_LAUNDRY_TOY_SPRITES } from "./flat-venue5-laundry-toys";
 import { NEW_FUN_SPRITES } from "./flat-new-fun";
@@ -37,18 +41,18 @@ import { SMALL_SPRITES } from "./flat-small";
 const BASE: Record<string, FlatSprite> = {
   ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES,
   ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES, ...VENUE_SPRITES,
-  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES, ...VENUE7_SPRITES, ...VENUE8_SPRITES,
+  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES, ...VENUE7_SPRITES, ...VENUE8_SPRITES, ...VENUE9_SPRITES, ...VENUE10_SPRITES, ...VENUE11_SPRITES, ...VENUE12_SPRITES,
 };
 
 /** Một từ khác nhau dùng chung hình: id mới → hình có sẵn (ví dụ "bệnh giường" dùng hình giường). Giữ mỗi cảnh có từ riêng mà không phải vẽ lại. */
 const ALIASES: Record<string, string> = {
   hospitalbed: "bed", chart: "clipboard", desk: "table", telephone: "phone", reception: "counter", minibar: "fridge", desklamp: "lamp", libcard: "roomcard",
   scoreboard: "blackboard", jersey: "clothes", flightboard: "blackboard", boardingpass: "ticket", whiteboard: "blackboard", meetingtable: "table", receipt: "note", bookcart: "cart", exhibitboard: "blackboard",
-  movieticket: "ticket", glasses3d: "glasses", bodyscale: "scale", gymclothes: "clothes", salonchair: "chair", readingtable: "table", waitingbench: "bench", wok: "pot", ancientcoin: "coin",
+  movieticket: "ticket", glasses3d: "glasses", bodyscale: "scale", gymclothes: "clothes", salonchair: "chair", readingtable: "table", waitingbench: "bench", ancientcoin: "coin",
   airmeal: "lunchbox", checkin: "counter", pilothat: "hat", textbook: "book", breakfast: "plate", parasol: "umbrella", hotelcart: "trolley",
-  waybill: "note", label: "note", pobox: "mailbox", mail: "envelope", postscale: "scale", vitamin: "pills", disinfectant: "syrup", prescription: "note", medcabinet: "locker", handwash: "shampoo",
-  powerbank: "battery", warranty: "note", dip: "bowl", plumdrink: "juice",
-  record: "note", file: "folder", carriage: "subwaytrain", platform: "rails", routemap: "timetable", broadcast: "speaker", transitcard: "roomcard", exitsign: "signboard", transfersign: "signboard", faregate: "securitygate", labthermo: "thermometer", reagent: "syrup", reportphone: "phone",
+  postscale: "scale", prescription: "note", medcabinet: "locker", handwash: "shampoo",
+  warranty: "note", dip: "bowl", plumdrink: "juice",
+  record: "note", file: "folder", platform: "rails", routemap: "timetable", broadcast: "speaker", transitcard: "roomcard", faregate: "securitygate", labthermo: "thermometer", reagent: "syrup", reportphone: "phone",
   zooticket: "ticket", greetcard: "note", pricelist: "note", takeaway: "bag",
   latte: "coffee", syrupbottle: "syrup", togocup: "cup", barcounter: "counter", pastrycase: "showcase", potplant: "flowerpot",
   novel: "book", comic: "magazine", fountainpen: "pen", journal: "notebook", cashdesk: "counter", revolveshelf: "bookshelf", readlamp: "lamp",
