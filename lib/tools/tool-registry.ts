@@ -80,4 +80,12 @@ export const TOOLS: readonly ToolEntry[] = [
     popular: true,
     keywords: ["luong tu", "measure word", "classifier", "dem", "con", "cai"],
   },
+  {
+    href: "/bien-dieu-thanh-dieu",
+    title: "Biến điệu thanh điệu (3-3, 不, 一)",
+    description: "Gõ cụm từ để xem chữ nào đổi thanh khi nói: 你好 đọc ní hǎo, 不是 đọc bú shì, 一个 đọc yí gè.",
+    icon: "graphic_eq",
+    category: "pronunciation",
+    keywords: ["bien dieu", "tone sandhi", "thanh 3", "bu", "yi", "quy tac"],
+  },
 ];
