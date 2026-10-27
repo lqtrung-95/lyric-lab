@@ -97,4 +97,12 @@ export const TOOLS: readonly ToolEntry[] = [
     popular: true,
     keywords: ["to tap viet", "worksheet", "tap viet", "tracing", "in", "pdf", "luyen viet"],
   },
+  {
+    href: "/pinyin-sang-chu-han",
+    title: "Pinyin sang chữ Hán",
+    description: "Gõ pinyin (có hoặc không dấu thanh) để tìm đúng chữ Hán, kèm âm Hán Việt, nghĩa và cấp HSK.",
+    icon: "translate",
+    category: "pronunciation",
+    keywords: ["pinyin to chinese", "go pinyin", "tim chu han", "nihao", "danh may"],
+  },
 ];
