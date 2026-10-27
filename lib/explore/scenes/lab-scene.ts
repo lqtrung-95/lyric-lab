@@ -7,7 +7,7 @@ export const LAB_SCENE: SceneDef = {
   subtitle: "Vào phòng thí nghiệm, học từ về dụng cụ khoa học rồi làm nhiệm vụ cho Cụ Cú nhà khoa học.",
   theme: "lab",
   start: { x: 50, y: 95 },
-  exits: [{ sprite: "exitLeft", label: "Về Khu cắm trại", to: "camping", x: 7, y: 60, w: 6 }],
+  exits: [{ sprite: "exitLeft", label: "Về Khu cắm trại", to: "camping", x: 7, y: 60, w: 6 }, { sprite: "exit", label: "Sang Quán cà phê", to: "cafe", x: 92, y: 60, w: 6 }],
   npc: {
     id: "owl", name: "Cụ Cú nhà khoa học", x: 88, y: 93, w: 9,
     greeting: "Chào mừng đến phòng thí nghiệm! Hãy lại gần đồ vật rồi nhấn E (hoặc chạm vào) để học tên tiếng Trung. Học được 3 từ thì đến gặp mình để nhận nhiệm vụ nhé.",

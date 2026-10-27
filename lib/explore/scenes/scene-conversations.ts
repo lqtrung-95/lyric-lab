@@ -349,4 +349,40 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 1, zh: "我知道了,谢谢老师。", vi: "Em biết rồi, cảm ơn thầy." },
     ],
   },
+  "cafe": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 0, zh: "欢迎光临!请问喝点什么?", vi: "Chào mừng quý khách! Bạn uống gì ạ?" },
+      { who: 1, zh: "我要一杯热拿铁,不要糖浆。", vi: "Cho tôi một ly latte nóng, không siro." },
+      { who: 0, zh: "好的,在这儿喝还是外带?", vi: "Vâng, uống tại đây hay mang đi?" },
+      { who: 1, zh: "外带,谢谢。再来一块提拉米苏。", vi: "Mang đi, cảm ơn. Thêm một miếng tiramisu nữa." },
+    ],
+  },
+  "bookstore": {
+    speakers: ["Chủ tiệm", "Khách"],
+    lines: [
+      { who: 1, zh: "请问有没有适合小朋友的童话?", vi: "Xin hỏi có truyện cổ tích nào hợp với trẻ nhỏ không?" },
+      { who: 0, zh: "有,在旋转书架那边。", vi: "Có, ở chỗ giá sách xoay kia." },
+      { who: 1, zh: "这本多少钱?", vi: "Cuốn này bao nhiêu tiền?" },
+      { who: 0, zh: "三十块,请到收银台付钱。", vi: "Ba mươi tệ, xin ra quầy thu ngân thanh toán." },
+    ],
+  },
+  "pool": {
+    speakers: ["Huấn luyện viên", "Học viên"],
+    lines: [
+      { who: 0, zh: "下水以前,先戴好泳帽和泳镜。", vi: "Trước khi xuống nước, hãy đội mũ và đeo kính bơi." },
+      { who: 1, zh: "我不会游,可以用浮板吗?", vi: "Em chưa biết bơi, em dùng phao tập bơi được không?" },
+      { who: 0, zh: "可以,抱着浮板慢慢打水。", vi: "Được, ôm phao rồi từ từ đạp nước." },
+      { who: 1, zh: "好的,谢谢教练。", vi: "Vâng, cảm ơn huấn luyện viên." },
+    ],
+  },
+  "firestation": {
+    speakers: ["Lính cứu hỏa", "Học sinh"],
+    lines: [
+      { who: 1, zh: "着火了应该怎么办?", vi: "Khi cháy thì phải làm sao?" },
+      { who: 0, zh: "先打电话,再用湿毛巾捂住鼻子。", vi: "Gọi điện trước, rồi dùng khăn ướt bịt mũi." },
+      { who: 1, zh: "可以乘电梯下楼吗?", vi: "Có đi thang máy xuống được không?" },
+      { who: 0, zh: "不可以,要走楼梯。", vi: "Không được, phải đi cầu thang." },
+    ],
+  },
 };
