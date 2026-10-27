@@ -195,4 +195,12 @@ export const TOOLS: readonly ToolEntry[] = [
     inApp: true,
     keywords: ["level test", "xep lop", "trinh do", "hsk may", "kiem tra hsk"],
   },
+  {
+    href: "/cap-thanh-dieu-tieng-trung",
+    title: "Bốn thanh và 20 cặp thanh điệu",
+    description: "Nghe bốn thanh điệu, luyện đủ 20 cặp thanh với từ thật (kèm mẹo đổi thanh) và thử nghe đoán cặp.",
+    icon: "repeat_one",
+    category: "pronunciation",
+    keywords: ["tone pairs", "cap thanh", "20 cap", "tones chart", "thanh dieu", "thanh nhe"],
+  },
 ];
