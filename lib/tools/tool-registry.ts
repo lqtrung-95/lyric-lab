@@ -54,4 +54,21 @@ export const TOOLS: readonly ToolEntry[] = [
     popular: true,
     keywords: ["thanh dieu", "bang pinyin", "tone", "phat am"],
   },
+  {
+    href: "/gian-the-phon-the",
+    title: "Giản thể ⇄ Phồn thể",
+    description: "Chuyển chữ Hán giữa giản thể và phồn thể (chuẩn, Đài Loan, Hồng Kông), có đánh dấu chữ cần đọc lại.",
+    icon: "translate",
+    category: "writing",
+    keywords: ["gian the", "phon the", "traditional", "simplified", "dai loan", "hong kong"],
+  },
+  {
+    href: "/giay-tap-viet-chu-han",
+    title: "Giấy tập viết chữ Hán in được",
+    description: "In giấy 田字格, 米字格, ô vuông trơn và giấy pinyin bốn dòng khổ A4. Chọn cỡ ô, lề, màu rồi in hoặc lưu PDF.",
+    icon: "edit",
+    category: "writing",
+    popular: true,
+    keywords: ["tap viet", "o vuong", "dien tu cach", "mi tu cach", "in", "pdf", "giay"],
+  },
 ];

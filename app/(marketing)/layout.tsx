@@ -6,12 +6,12 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
   return (
     // Cột dọc cao tối thiểu bằng màn hình: trang ngắn (như mục lục Công cụ) vẫn đẩy chân trang xuống đáy thay vì để nó lơ lửng giữa trang.
     <div className="flex min-h-dvh flex-col">
-      <MarketingHeader />
-      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-page flex-1 px-gutter pt-24 outline-none md:px-6 lg:px-12">
+      <div className="print:hidden"><MarketingHeader /></div>
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-page flex-1 px-gutter pt-24 outline-none md:px-6 lg:px-12 print:max-w-none print:px-0 print:pt-0">
         <span id="top" />
         {children}
       </main>
-      <MarketingFooter />
+      <div className="print:hidden"><MarketingFooter /></div>
     </div>
   );
 }
