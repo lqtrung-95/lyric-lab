@@ -48,7 +48,7 @@ export function AccusePanel({ story, progress, hints, verdict, onSubmit, onClose
               className={`flex min-h-11 w-full flex-col items-start rounded-xl border-2 border-ink px-space-sm py-1.5 text-left ${picked.includes(c.id) ? "bg-secondary-container" : "bg-surface-container-lowest"}`}>
               <span className="text-label-md font-extrabold">{c.title}</span>
               <span lang="zh-Hans" className="text-body-md">{c.zh}</span>
-              {hints.vi && !c.noTranslation && <span className="text-body-sm text-on-surface-variant">{c.vi}</span>}
+              {hints.vi && <span className="text-body-sm text-on-surface-variant">{c.vi}</span>}
             </button>
           </li>
         ))}

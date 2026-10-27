@@ -14,7 +14,7 @@ type Controller = ReturnType<typeof useStoryController>;
 
 /** Bảng đang mở của cốt truyện (hội thoại, manh mối vừa tìm, sổ vụ án, buộc tội, bản đồ); null khi không có bảng nào. */
 function PanelBody({ payload, sc, basePath, sceneId }: { payload: StoryPayload; sc: Controller; basePath: string; sceneId: string }) {
-  const { hints, toggle } = useStoryHints();
+  const { hints, toggle } = useStoryHints(payload.story.readingFirst);
   const { story, pinyin } = payload;
   const view = sc.view;
   if (!view) return null;

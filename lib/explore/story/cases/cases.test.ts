@@ -331,10 +331,10 @@ describe("vụ án mới: không có thủ phạm, đồng phạm, nối manh m�
     }
   });
 
-  it("vụ đọc hiểu: manh mối chữ Hán không kèm bản dịch nội dung", () => {
+  it("vụ đọc hiểu: mặc định tắt pinyin và nghĩa (readingFirst) nhưng mọi manh mối vẫn có bản dịch thật để bật khi cần", () => {
     for (const id of ["note-directions", "shopping-list"]) {
-      const hidden = CASES[id].clues.filter((c) => c.noTranslation);
-      expect(hidden.length, id).toBeGreaterThanOrEqual(5);
+      expect(CASES[id].readingFirst, id).toBe(true);
+      for (const c of CASES[id].clues) expect(c.vi.length, `${id}/${c.id}`).toBeGreaterThan(10);
     }
   });
 });

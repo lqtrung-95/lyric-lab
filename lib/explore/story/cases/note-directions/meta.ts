@@ -10,19 +10,19 @@ export const SPEAKERS: Record<string, Speaker> = {
   pig: { name: "Anh Heo bán máy", sprite: "pig" },
 };
 
-/** Vụ bắt buộc đọc tiếng Trung: manh mối chỉ ghi bằng chữ Hán (hướng đông/tây/nam/bắc, khoảng cách, số cây), bản dịch tiếng Việt bị giấu. Hai mảnh giấy của kẻ trộm (nhà ở phía đông, cách bưu điện chưa tới 200 mét) chỉ khớp nhà Chó. */
+/** Vụ bắt buộc đọc tiếng Trung: manh mối chỉ ghi bằng chữ Hán (hướng đông/tây/nam/bắc, khoảng cách, số cây), pinyin và nghĩa mặc định tắt (readingFirst). Hai mảnh giấy của kẻ trộm (nhà ở phía đông, cách bưu điện chưa tới 200 mét) chỉ khớp nhà Chó. */
 export const CLUES: ClueDef[] = [
-  { id: "note_east", title: "Mảnh giấy thứ nhất", zh: "小偷留下的纸条:我家在邮局的东边。", vi: "", noTranslation: true, sceneId: "postoffice", kind: "document" },
-  { id: "note_dist", title: "Mảnh giấy thứ hai", zh: "小偷留下的另一张纸条:我家离邮局不到两百米。", vi: "", noTranslation: true, sceneId: "postoffice", kind: "document" },
+  { id: "note_east", title: "Mảnh giấy thứ nhất", zh: "小偷留下的纸条:我家在邮局的东边。", vi: "Mảnh giấy kẻ trộm để lại: Nhà tôi ở phía đông bưu điện.", sceneId: "postoffice", kind: "document" },
+  { id: "note_dist", title: "Mảnh giấy thứ hai", zh: "小偷留下的另一张纸条:我家离邮局不到两百米。", vi: "Một mảnh giấy khác của kẻ trộm: Nhà tôi cách bưu điện chưa tới 200 mét.", sceneId: "postoffice", kind: "document" },
   { id: "cat_home_talk", title: "Lời khai của Cô Mèo", zh: "昨天下午我在家里休息。", vi: "Chiều qua tôi nghỉ ở nhà.", sceneId: "salon", kind: "testimony" },
-  { id: "home_cat", title: "Biển địa chỉ nhà Mèo", zh: "门牌:小猫的家在邮局西边一百米,门口有两棵树。", vi: "", noTranslation: true, sceneId: "salon", kind: "object" },
+  { id: "home_cat", title: "Biển địa chỉ nhà Mèo", zh: "门牌:小猫的家在邮局西边一百米,门口有两棵树。", vi: "Biển địa chỉ: nhà Mèo ở phía tây bưu điện 100 mét, trước cửa có hai cái cây.", sceneId: "salon", kind: "object" },
   { id: "dog_home_talk", title: "Lời khai của Chú Chó", zh: "昨天下午我在家里休息。", vi: "Chiều qua tôi nghỉ ở nhà.", sceneId: "gym", kind: "testimony" },
-  { id: "home_dog", title: "Biển địa chỉ nhà Chó", zh: "门牌:小狗的家在邮局东边一百五十米,门口有三棵树。", vi: "", noTranslation: true, sceneId: "gym", kind: "object" },
+  { id: "home_dog", title: "Biển địa chỉ nhà Chó", zh: "门牌:小狗的家在邮局东边一百五十米,门口有三棵树。", vi: "Biển địa chỉ: nhà Chó ở phía đông bưu điện 150 mét, trước cửa có ba cái cây.", sceneId: "gym", kind: "object" },
   { id: "dog_slip", title: "Chó đổi lời", zh: "我……我只是想看看那个包裹里有什么。", vi: "Tôi... tôi chỉ muốn xem trong bưu kiện có gì thôi.", sceneId: "gym", kind: "testimony" },
   { id: "duck_home_talk", title: "Lời khai của Chú Vịt", zh: "昨天下午我在家里休息。", vi: "Chiều qua tôi nghỉ ở nhà.", sceneId: "laundry", kind: "testimony" },
-  { id: "home_duck", title: "Biển địa chỉ nhà Vịt", zh: "门牌:小鸭的家在邮局东边三百米,门口有两棵树。", vi: "", noTranslation: true, sceneId: "laundry", kind: "object" },
+  { id: "home_duck", title: "Biển địa chỉ nhà Vịt", zh: "门牌:小鸭的家在邮局东边三百米,门口有两棵树。", vi: "Biển địa chỉ: nhà Vịt ở phía đông bưu điện 300 mét, trước cửa có hai cái cây.", sceneId: "laundry", kind: "object" },
   { id: "pig_home_talk", title: "Lời khai của Anh Heo", zh: "昨天下午我在家里休息。", vi: "Chiều qua tôi nghỉ ở nhà.", sceneId: "phoneshop", kind: "testimony" },
-  { id: "home_pig", title: "Biển địa chỉ nhà Heo", zh: "门牌:小猪的家在邮局北边一百五十米,门口有三棵树。", vi: "", noTranslation: true, sceneId: "phoneshop", kind: "object" },
+  { id: "home_pig", title: "Biển địa chỉ nhà Heo", zh: "门牌:小猪的家在邮局北边一百五十米,门口有三棵树。", vi: "Biển địa chỉ: nhà Heo ở phía bắc bưu điện 150 mét, trước cửa có ba cái cây.", sceneId: "phoneshop", kind: "object" },
   { id: "d_cat", title: "Suy luận: nhà Mèo ở phía tây", zh: "小猫的家在西边,可是纸条说小偷的家在东边,所以不是小猫。", vi: "Nhà Mèo ở phía tây, còn tờ giấy nói nhà kẻ trộm ở phía đông, nên không phải Mèo.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_cat"] },
   { id: "d_pig", title: "Suy luận: nhà Heo ở phía bắc", zh: "小猪的家在北边,可是纸条说小偷的家在东边,所以不是小猪。", vi: "Nhà Heo ở phía bắc, còn tờ giấy nói nhà kẻ trộm ở phía đông, nên không phải Heo.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_pig"] },
   { id: "d_duck", title: "Suy luận: nhà Vịt quá xa", zh: "小鸭的家离邮局三百米,可是纸条说不到两百米,所以不是小鸭。", vi: "Nhà Vịt cách bưu điện 300 mét, còn tờ giấy nói chưa tới 200 mét, nên không phải Vịt.", sceneId: "postoffice", kind: "deduction", link: ["note_dist", "home_duck"] },

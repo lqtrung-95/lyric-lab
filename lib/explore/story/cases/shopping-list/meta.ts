@@ -12,15 +12,15 @@ export const SPEAKERS: Record<string, Speaker> = {
 
 /** Vụ bắt buộc đọc số và lượng từ: danh sách mua sắm của kẻ trộm (3 chai sữa, 2 cân táo, 1 con cá) chỉ khớp túi đồ của Heo; ba người còn lại sai một chi tiết (loại hàng, lượng từ, số lượng). */
 export const CLUES: ClueDef[] = [
-  { id: "shopping_list", title: "Danh sách mua sắm rơi lại", zh: "柜台上有一张购物清单:三瓶牛奶、两斤苹果、一条鱼。", vi: "", noTranslation: true, sceneId: "bank", kind: "document" },
+  { id: "shopping_list", title: "Danh sách mua sắm rơi lại", zh: "柜台上有一张购物清单:三瓶牛奶、两斤苹果、一条鱼。", vi: "Trên quầy có một danh sách mua sắm: ba chai sữa, hai cân táo, một con cá.", sceneId: "bank", kind: "document" },
   { id: "cat_talk", title: "Lời khai của Cô Mèo", zh: "昨天下午我去买东西了。", vi: "Chiều qua tôi đi mua đồ.", sceneId: "market", kind: "testimony" },
-  { id: "bag_cat", title: "Túi đồ của Mèo", zh: "小猫的购物袋里有:三瓶果汁、两斤苹果、一条鱼。", vi: "", noTranslation: true, sceneId: "market", kind: "object" },
+  { id: "bag_cat", title: "Túi đồ của Mèo", zh: "小猫的购物袋里有:三瓶果汁、两斤苹果、一条鱼。", vi: "Trong túi đồ của Mèo có: ba chai nước ép, hai cân táo, một con cá.", sceneId: "market", kind: "object" },
   { id: "dog_talk", title: "Lời khai của Chú Chó", zh: "昨天下午我去买东西了。", vi: "Chiều qua tôi đi mua đồ.", sceneId: "clothing-store", kind: "testimony" },
-  { id: "bag_dog", title: "Túi đồ của Chó", zh: "小狗的购物袋里有:三盒牛奶、两斤苹果、一条鱼。", vi: "", noTranslation: true, sceneId: "clothing-store", kind: "object" },
+  { id: "bag_dog", title: "Túi đồ của Chó", zh: "小狗的购物袋里有:三盒牛奶、两斤苹果、一条鱼。", vi: "Trong túi đồ của Chó có: ba hộp sữa, hai cân táo, một con cá.", sceneId: "clothing-store", kind: "object" },
   { id: "duck_talk", title: "Lời khai của Chú Vịt", zh: "昨天下午我去买东西了。", vi: "Chiều qua tôi đi mua đồ.", sceneId: "hotel", kind: "testimony" },
-  { id: "bag_duck", title: "Túi đồ của Vịt", zh: "小鸭的购物袋里有:三瓶牛奶、两斤苹果、两条鱼。", vi: "", noTranslation: true, sceneId: "hotel", kind: "object" },
+  { id: "bag_duck", title: "Túi đồ của Vịt", zh: "小鸭的购物袋里有:三瓶牛奶、两斤苹果、两条鱼。", vi: "Trong túi đồ của Vịt có: ba chai sữa, hai cân táo, hai con cá.", sceneId: "hotel", kind: "object" },
   { id: "pig_talk", title: "Lời khai của Anh Heo", zh: "昨天下午我去买东西了。", vi: "Chiều qua tôi đi mua đồ.", sceneId: "supermarket", kind: "testimony" },
-  { id: "bag_pig", title: "Túi đồ của Heo", zh: "小猪的购物袋里有:三瓶牛奶、两斤苹果、一条鱼。", vi: "", noTranslation: true, sceneId: "supermarket", kind: "object" },
+  { id: "bag_pig", title: "Túi đồ của Heo", zh: "小猪的购物袋里有:三瓶牛奶、两斤苹果、一条鱼。", vi: "Trong túi đồ của Heo có: ba chai sữa, hai cân táo, một con cá.", sceneId: "supermarket", kind: "object" },
   { id: "pig_slip", title: "Heo đổi lời", zh: "我……我只是想买点好吃的。", vi: "Tôi... tôi chỉ muốn mua ít đồ ngon thôi.", sceneId: "supermarket", kind: "testimony" },
   { id: "d_cat", title: "Suy luận: Mèo mua nước ép", zh: "小猫买的是果汁,不是牛奶,和清单不一样。", vi: "Mèo mua nước ép chứ không phải sữa, khác với danh sách.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_cat"] },
   { id: "d_dog", title: "Suy luận: Chó mua hộp, không phải chai", zh: "小狗买的是三盒牛奶,清单上是三瓶牛奶,量词不一样。", vi: "Chó mua ba hộp sữa, danh sách ghi ba chai sữa: lượng từ khác nhau.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_dog"] },

@@ -87,8 +87,6 @@ export interface ClueDef {
   kind: "document" | "object" | "testimony" | "deduction";
   /** Chỉ cho `kind: "deduction"`: hai manh mối cần nối với nhau. Suy luận không nhặt được ở đâu cả, chỉ có khi người chơi nối đúng cặp trong sổ vụ án. */
   link?: [string, string];
-  /** Manh mối bắt người chơi tự đọc tiếng Trung: không có bản dịch (`vi` để trống). Nội dung đầy đủ chỉ hiện ở suy luận khi nối đúng. */
-  noTranslation?: boolean;
 }
 
 /** Phần cốt truyện của một cảnh: ai đứng đó nói được gì, có gì để xem xét, cả đồ thị hội thoại của cảnh. */
@@ -148,6 +146,8 @@ export interface StoryDef {
   solution: { suspectId: string; keyClues: string[]; needed: number; /** Đồng phạm: phải chọn cả hai người mới phá án. */ partnerId?: string };
   /** Tự do điều tra: mọi cảnh mở sẵn, không có thanh mục tiêu dẫn từng bước (vụ khó). */
   freeRoam?: boolean;
+  /** Vụ đọc hiểu: pinyin và nghĩa tiếng Việt mặc định tắt để người chơi thử tự đọc trước (vẫn bấm nút gợi ý để bật). */
+  readingFirst?: boolean;
   /** Câu hỏi cần làm rõ (hiện trong sổ vụ án thay cho mục tiêu từng bước). */
   questions?: string[];
   /** Cờ đặt khi vụ án được giải. */

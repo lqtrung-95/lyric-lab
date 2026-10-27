@@ -24,7 +24,7 @@ function anchorOf(speakerId: string, scene: SceneDetail, playerEl: HTMLElement |
 
 /** Câu thoại hiện tại của cốt truyện dưới dạng bong bóng chat trong khung cảnh; không có câu thoại thì không vẽ gì. Đặt làm con của `SceneCanvas`. */
 export function StoryBubble({ payload, sc, scene, playerEl }: { payload: StoryPayload; sc: Controller; scene: SceneDetail; playerEl: RefObject<HTMLElement | null> }) {
-  const { hints, toggle } = useStoryHints();
+  const { hints, toggle } = useStoryHints(payload.story.readingFirst);
   const view = sc.view;
   if (!view || view.kind !== "dialogue") return null;
   const node = payload.scene.dialogues[view.nodeId];
