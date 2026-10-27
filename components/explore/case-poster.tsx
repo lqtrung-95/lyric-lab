@@ -18,6 +18,8 @@ const POSTERS: Record<string, PosterDef> = {
   "slow-clock": { bg: ["#fde3ea", "#e07a9a"], prop: { sprite: "bouquet", w: 36, rotate: 8 }, client: "cat" },
   "fireworks-cup": { bg: ["#1f2a5c", "#6a4fbf"], prop: { sprite: "prize", w: 30, rotate: -8 }, client: "dog" },
   "toy-thief": { bg: ["#ffe2b8", "#e8923c"], prop: { sprite: "rccar", w: 40, rotate: -6 }, client: "owl" },
+  "three-tents": { bg: ["#1c2d57", "#4a6fb8"], prop: { sprite: "campfire", w: 34, rotate: 0 }, client: "fox" },
+  "liar-puzzle": { bg: ["#dde6f2", "#6f8fc4"], prop: { sprite: "badge", w: 30, rotate: 10 }, client: "dog" },
   "wooden-box": { bg: ["#f6cf8e", "#e8a860"], prop: { sprite: "woodbox", w: 38, rotate: -8 }, client: "owl" },
   "golden-key": { bg: ["#ffe9a8", "#f0b44c"], prop: { sprite: "key", w: 36, rotate: 18 }, client: "duck" },
   "swapped-cake": { bg: ["#ffd3dc", "#f2a0a0"], prop: { sprite: "cake", w: 36, rotate: -6 }, client: "chef" },
