@@ -7,7 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: `${SITE_URL}/`, changeFrequency: "monthly", priority: 1 },
     { url: `${SITE_URL}/cong-cu`, changeFrequency: "monthly", priority: 0.7 },
-    ...TOOLS.map((t) => ({ url: `${SITE_URL}${t.href}`, changeFrequency: "monthly" as const, priority: 0.7 })),
+    ...TOOLS.filter((t) => !t.inApp).map((t) => ({ url: `${SITE_URL}${t.href}`, changeFrequency: "monthly" as const, priority: 0.7 })),
     ...["bang-pinyin", "luyen-thanh-dieu", "doc-to-cham-diem", "luyen-moi-ngay", "lo-trinh", "rao-khau-lenh", "nghe-doan-thanh"].map((slug) => ({ url: `${SITE_URL}/phat-am/${slug}`, changeFrequency: "monthly" as const, priority: 0.6 })),
     ...HSK_LEVELS.map((l) => ({ url: `${SITE_URL}/tu-vung-hsk/${l}`, changeFrequency: "monthly" as const, priority: 0.6 })),
   ];

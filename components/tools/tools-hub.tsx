@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { foldVietnamese } from "@/lib/tra-tu/fold-vietnamese";
+import { ToolsHowTo } from "./tools-howto";
 import { TOOL_CATEGORIES, type ToolCategory, type ToolEntry } from "@/lib/tools/tool-registry";
 
 const chip = (on: boolean) => `min-h-11 rounded-full border-2 px-4 text-label-md font-semibold transition-colors ${on ? "border-primary bg-primary text-on-primary" : "border-outline-variant bg-surface-container-lowest text-on-surface hover:bg-surface-container-high"}`;
@@ -66,6 +67,7 @@ export function ToolsHub({ tools }: { tools: readonly ToolEntry[] }) {
           <ul className="mt-space-sm grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">{rest.map((t) => <li key={t.href}><ToolCard t={t} /></li>)}</ul>
         )}
       </section>
+      {!filtering && <ToolsHowTo tools={tools} />}
     </div>
   );
 }

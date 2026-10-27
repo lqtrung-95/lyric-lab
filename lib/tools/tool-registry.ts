@@ -2,12 +2,21 @@ import type { IconName } from "@/components/ui/icon-names";
 
 export type ToolCategory = "writing" | "pronunciation" | "sentences" | "everyday" | "hsk";
 
-export const TOOL_CATEGORIES: readonly { id: ToolCategory; label: string }[] = [
-  { id: "writing", label: "Viết chữ" },
-  { id: "pronunciation", label: "Phát âm" },
-  { id: "sentences", label: "Câu và ngữ pháp" },
-  { id: "everyday", label: "Tiếng Trung hằng ngày" },
-  { id: "hsk", label: "HSK và trình độ" },
+export interface ToolCategoryInfo {
+  id: ToolCategory;
+  label: string;
+  /** Tiêu đề và một câu giới thiệu cho phần "Cách dùng các công cụ". */
+  heading: string;
+  blurb: string;
+  icon: IconName;
+}
+
+export const TOOL_CATEGORIES: readonly ToolCategoryInfo[] = [
+  { id: "writing", label: "Viết chữ", heading: "Viết chữ và tờ tập viết", blurb: "Luyện viết chữ Hán bằng tay trên tờ giấy bạn tự in.", icon: "edit" },
+  { id: "pronunciation", label: "Phát âm", heading: "Phát âm và thanh điệu", blurb: "Nghe thanh điệu tiếng Trung phải đọc ra sao, rồi kiểm tra giọng của chính bạn.", icon: "mic" },
+  { id: "sentences", label: "Câu và ngữ pháp", heading: "Ngữ pháp và câu", blurb: "Kiểm tra câu bạn đặt và xem từ được dùng trong câu thật.", icon: "format_quote" },
+  { id: "everyday", label: "Tiếng Trung hằng ngày", heading: "Tiếng Trung hằng ngày", blurb: "Nói đúng những điều cơ bản: các thứ, tháng ngày, lời cảm ơn và xin lỗi.", icon: "event" },
+  { id: "hsk", label: "HSK và trình độ", heading: "HSK và từ vựng", blurb: "Học trọn từ vựng theo cấp HSK, hoặc kiểm tra bạn đang ở cấp nào.", icon: "school" },
 ];
 
 export interface ToolEntry {
@@ -19,6 +28,8 @@ export interface ToolEntry {
   category: ToolCategory;
   /** Hiện ở hàng "Dùng nhiều nhất" đầu trang. */
   popular?: boolean;
+  /** Tính năng nằm trong app (không phải trang công khai được lập chỉ mục): có trong mục lục nhưng không vào sơ đồ trang web. */
+  inApp?: boolean;
   /** Từ khóa phụ cho ô tìm (không dấu cũng khớp), ngoài tên và mô tả. */
   keywords?: string[];
 }
@@ -150,5 +161,38 @@ export const TOOLS: readonly ToolEntry[] = [
     icon: "format_quote",
     category: "sentences",
     keywords: ["cau vi du", "example sentences", "dat cau", "mau cau", "cach dung tu"],
+  },
+  {
+    href: "/phat-am/bang-pinyin",
+    title: "Bảng pinyin có giọng đọc",
+    description: "Chạm vào từng phụ âm đầu và vần để nghe giọng chuẩn, kèm mẹo so với tiếng Việt và lỗi người Việt hay mắc.",
+    icon: "headphones",
+    category: "pronunciation",
+    keywords: ["pinyin chart", "bang chu cai", "phu am", "van", "nghe pinyin"],
+  },
+  {
+    href: "/phat-am/luyen-thanh-dieu",
+    title: "Kiểm tra thanh điệu bằng giọng bạn",
+    description: "Nghe mẫu, ghi âm và xem đường cao độ giọng bạn so với bốn thanh. Âm thanh được phân tích ngay trên máy bạn.",
+    icon: "graphic_eq",
+    category: "pronunciation",
+    keywords: ["tone checker", "cao do", "ghi am", "thanh 1", "thanh 2", "thanh 3", "thanh 4"],
+  },
+  {
+    href: "/phat-am/nghe-doan-thanh",
+    title: "Trò nghe đoán thanh điệu",
+    description: "Nghe một âm tiết và đoán đó là thanh 1, 2, 3 hay 4. Trò chơi ngắn để luyện tai nghe thanh điệu.",
+    icon: "quiz",
+    category: "pronunciation",
+    keywords: ["nghe doan thanh", "tone game", "tro choi", "luyen tai"],
+  },
+  {
+    href: "/courses/placement",
+    title: "Kiểm tra trình độ HSK",
+    description: "Làm bài xếp lớp khoảng 30 câu để biết bạn đang ở cấp HSK nào và nên bắt đầu học từ đâu.",
+    icon: "school",
+    category: "hsk",
+    inApp: true,
+    keywords: ["level test", "xep lop", "trinh do", "hsk may", "kiem tra hsk"],
   },
 ];
