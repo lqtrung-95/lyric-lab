@@ -122,7 +122,7 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
       </div>
 
       <div className="rounded-xl border-2 border-outline-variant bg-surface-container-lowest px-space-sm py-space-sm">
-        <p lang="zh-Hans" className={`text-body-lg font-bold ${showPinyin ? "leading-[2.7]" : "leading-loose"}`}>
+        <p lang="zh-Hans" className={`text-body-lg font-bold ${showPinyin ? "leading-[3]" : "leading-loose"}`}>
           {story.lines.map((line, i) => {
             const py = showPinyin ? alignPinyin(line.zh, pinyin[line.zh]) : null;
             let at = 0;
@@ -136,7 +136,7 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
                 const known = w && marks[w.id] !== "new";
                 return (
                   <button key={j} type="button" onClick={(e) => { e.stopPropagation(); if (w) onPickWord(w); }} title={w?.gloss}
-                    className={`rounded px-0.5 font-extrabold underline decoration-2 ${showPinyin ? "underline-offset-[1px]" : "underline-offset-4"} ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
+                    className={`rounded px-0.5 font-extrabold underline decoration-2 ${"underline-offset-4"} ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
                     <RubyChars text={s.text} py={py} offset={offset} />
                   </button>
                 );
