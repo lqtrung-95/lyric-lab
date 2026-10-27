@@ -1,11 +1,18 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Icon } from "@/components/ui/icon";
+import { ToolsCta } from "@/components/tools/tools-cta";
+import { ToolsHub } from "@/components/tools/tools-hub";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { TOOLS } from "@/lib/tools/tool-registry";
 
 const TITLE = "Công cụ học tiếng Trung miễn phí | SongHanzi";
-const DESCRIPTION = "Các công cụ nhỏ cho người Việt học tiếng Trung: chuyển chữ Hán sang pinyin và âm Hán Việt. Miễn phí, không cần đăng ký.";
+const DESCRIPTION = "Công cụ miễn phí cho người Việt học tiếng Trung: pinyin và Hán Việt, tờ tập viết chữ Hán, lượng từ, thanh điệu, từ vựng HSK. Không cần đăng ký.";
+
+const FAQ = [
+  { q: "Các công cụ của SongHanzi có miễn phí không?", a: "Có. Mọi công cụ ở đây miễn phí, không cần đăng ký và không lưu văn bản bạn nhập." },
+  { q: "Dùng công cụ nào để luyện phát âm?", a: "Vào Luyện phát âm tiếng Trung: bảng pinyin có giọng đọc, luyện thanh điệu có chấm cao độ giọng bạn và trò nghe đoán thanh. Muốn biết chữ đọc ra sao thì dùng Chữ Hán sang pinyin." },
+  { q: "Làm sao để tìm đúng công cụ?", a: "Gõ vào ô tìm (không dấu cũng được) hoặc chọn một nhóm: Viết chữ, Phát âm, Câu và ngữ pháp, Tiếng Trung hằng ngày, HSK và trình độ." },
+  { q: "Các công cụ có dùng được trên điện thoại không?", a: "Có. Mọi công cụ chạy trên trình duyệt điện thoại, máy tính bảng và máy tính." },
+];
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -20,26 +27,28 @@ const jsonLd = {
   hasPart: TOOLS.map((t) => ({ "@type": "WebApplication", name: t.title, url: `${SITE_URL}${t.href}`, description: t.description })),
 };
 
-/** Mục lục các công cụ công khai (đọc từ `TOOLS`). Trang được lập chỉ mục và liên kết nội bộ tới từng công cụ. */
+/** Mục lục các công cụ công khai (đọc từ `TOOLS`): tìm kiếm, lọc nhóm, "dùng nhiều nhất" và hỏi đáp. Trang được lập chỉ mục và liên kết nội bộ tới từng công cụ. */
 export default function ToolsIndexPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-space-lg pb-space-lg">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) }]) }} />
       <header>
-        <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Công cụ</h1>
-        <p className="mt-2 text-body-lg text-on-surface-variant">Những công cụ nhỏ dùng được ngay, không cần đăng ký hay lưu thẻ học.</p>
+        <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Công cụ học tiếng Trung miễn phí</h1>
+        <p className="mt-2 text-body-lg text-on-surface-variant">Tờ tập viết, pinyin, lượng từ, thanh điệu và nhiều hơn nữa. Dùng được ngay, không cần đăng ký.</p>
       </header>
-      <ul className="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
-        {TOOLS.map((t) => (
-          <li key={t.href}>
-            <Link href={t.href} className="flex h-full min-h-28 flex-col gap-2 card-ink p-space-md transition-colors hover:bg-surface-container-high">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-primary"><Icon name={t.icon} size={22} /></span>
-              <span className="text-body-lg font-semibold text-on-surface">{t.title}</span>
-              <span className="text-label-md text-on-surface-variant">{t.description}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <ToolsHub tools={TOOLS} />
+      <ToolsCta />
+      <section aria-labelledby="faq-heading" className="pt-space-md">
+        <h2 id="faq-heading" className="font-serif text-headline-md">Câu hỏi thường gặp</h2>
+        <dl className="mt-space-sm space-y-space-sm">
+          {FAQ.map((f) => (
+            <div key={f.q}>
+              <dt className="text-body-lg font-medium text-on-surface">{f.q}</dt>
+              <dd className="mt-1 text-body-md text-on-surface-variant">{f.a}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
     </div>
   );
 }
