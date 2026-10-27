@@ -10,7 +10,7 @@ import { CLUES, OBJECTIVES, SPEAKERS, SUSPECTS } from "./meta";
 /**
  * Vụ án 2: "Chiếc chìa khóa vàng". Chìa khóa két sắt của khách sạn mất khoảng 8 giờ tối. Bốn người bị nghi, lời khai có chỗ không khớp.
  * Thủ phạm: Cô Chim (giáo viên): nói ở trường nhưng sổ ra vào cho thấy đã rời lúc 7 giờ 30; chiếc ô đỏ trong sảnh có chữ "校" (ô ở cửa hàng của Chó thì không có chữ);
- * Heo thấy một người cầm ô đỏ vào khách sạn lúc 8 giờ 15 và Ông Rùa thấy cô giáo cầm ô đỏ đi về phía đó lúc 7 giờ 45. Mồi nhử: Chó (ô ở cửa hàng cũng đỏ, lại giấu quà).
+ * Heo thấy một người cầm ô đỏ vào khách sạn lúc 8 giờ 15 và Ông Rùa thấy cô giáo cầm ô đỏ đi về phía đó lúc 7 giờ 45. Mồi nhử: Chó (ô ở cửa hàng cũng đỏ, lại giấu quà) và chính chiếc ô “校” (hòm đồ thất lạc ở ga có nhiều ô giống hệt nên ô không chứng minh chủ nhân); phải dựa vào sổ ra vào, bảng ca của Heo và hai nhân chứng.
  * Mức Vừa: 4 nghi phạm, chứng cứ gián tiếp phải ghép, một người làm chứng chỉ khai khi đã có manh mối chiếc ô.
  */
 export const GOLDEN_KEY_CASE: StoryDef = {
@@ -24,7 +24,7 @@ export const GOLDEN_KEY_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { hotel: HOTEL_STORY, "clothing-store": CLOTHING_STORE_STORY, school: SCHOOL_STORY, station: STATION_STORY, airport: AIRPORT_STORY, park: PARK_STORY },
-  solution: { suspectId: "bird", keyClues: ["sign_sheet", "umbrella", "shop_umbrellas", "witness_pig", "witness_turtle", "bird_slip"], needed: 4 },
+  solution: { suspectId: "bird", keyClues: ["sign_sheet", "pig_shift", "witness_pig", "witness_turtle", "bird_slip"], needed: 4 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:dog", "met:bird", "met:rabbit", "met:pig", "clue:witness_turtle"] },
   startScene: "hotel",

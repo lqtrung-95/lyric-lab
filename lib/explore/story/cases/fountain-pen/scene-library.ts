@@ -1,17 +1,18 @@
 import type { StorySceneDef } from "../../story-types";
 
-/** Thư viện: nhận vụ án từ Cô Cú, xem vệt mực và nắp bút dính cát, cuối cùng buộc tội và nghe kết thúc. */
+/** Thư viện: nhận vụ án từ Cô Cú, xem vệt mực, nắp bút dính cát trắng và phiếu mượn sách, cuối cùng buộc tội và nghe kết thúc. */
 export const LIBRARY_STORY: StorySceneDef = {
   sceneId: "library",
   sceneNpcEntries: [
     { when: { all: ["case:solved"] }, node: "l_done" },
-    { when: { all: ["clue:beach_log"] }, node: "l_ready" },
+    { when: { all: ["clue:dog_slip"] }, node: "l_ready" },
     { when: { all: ["met:owl"] }, node: "l_wait" },
     { node: "l_hi" },
   ],
   spots: [
     { id: "ink_trail", clue: "ink_trail", label: "Vệt mực trên sàn", sprite: "note", x: 46, y: 72, w: 4, when: { all: ["met:owl"] }, stand: { x: 46, y: 80 } },
     { id: "pen_cap", clue: "pen_cap", label: "Nắp bút ở cửa", sprite: "pen", x: 80, y: 88, w: 3.5, when: { all: ["met:owl"] } },
+    { id: "library_card", clue: "library_card", label: "Phiếu mượn sách", sprite: "note", x: 16, y: 84, w: 5, when: { all: ["met:owl"] }, stand: { x: 22, y: 90 } },
   ],
   dialogues: {
     l_hi: { id: "l_hi", speaker: "owl", zh: "你好!我的金笔不见了!", vi: "Chào bạn! Chiếc bút máy vàng của tôi biến mất rồi!", next: "l_ask" },
@@ -49,7 +50,7 @@ export const LIBRARY_STORY: StorySceneDef = {
     },
     l_done: { id: "l_done", speaker: "owl", zh: "谢谢你!你是最好的朋友。", vi: "Cảm ơn bạn! Bạn là người bạn tốt nhất.", next: null },
     l_epi1: { id: "l_epi1", speaker: "owl", zh: "笔找到了!谢谢你!", vi: "Tìm được bút rồi! Cảm ơn bạn!", next: "l_epi2" },
-    l_epi2: { id: "l_epi2", speaker: "player", zh: "", vi: "Chú Vịt thú nhận: anh chỉ định mượn bút để ký giấy tờ cho bãi biển rồi quên trả, và sợ bị mắng nên giấu đi.", next: "l_epi3" },
+    l_epi2: { id: "l_epi2", speaker: "player", zh: "", vi: "Chú Chó thú nhận: ông lấy bút để viết báo cáo, rồi rắc cát trắng ở cửa và nói đã thấy Chú Vịt để đổ lỗi. Chú Vịt chỉ trốn trực một lát để mượn sách.", next: "l_epi3" },
     l_epi3: { id: "l_epi3", speaker: "owl", zh: "没关系。下次要先问我。", vi: "Không sao. Lần sau phải hỏi tôi trước nhé.", next: "l_epi4" },
     l_epi4: { id: "l_epi4", speaker: "owl", zh: "我们一起去喝茶吧!", vi: "Mình cùng đi uống trà nhé!", next: null },
   },

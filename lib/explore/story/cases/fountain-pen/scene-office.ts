@@ -16,10 +16,21 @@ const dog = buildInterview({
   after: { zh: "记录在墙上。还有事吗?", vi: "Biên bản ở trên tường. Còn việc gì không?" },
 });
 
-/** Văn phòng: biên bản họp xác nhận Chó ở phòng họp; lời khai của Chó cho biết ông thấy một con vịt chân dính cát. */
+/** Văn phòng: biên bản cho thấy họp bắt đầu lúc 3 giờ 20 nên Chó không có chứng cứ ngoại phạm lúc 3 giờ; khay cát trắng mịn trên bàn khớp với cát ở nắp bút. Khi đã so cát và mốc giờ, hỏi lại thì Chó đổi lời. */
 export const OFFICE_STORY: StorySceneDef = {
   sceneId: "office",
-  sceneNpcEntries: dog.entries,
-  spots: [{ id: "meeting_note", clue: "meeting_note", label: "Biên bản cuộc họp", sprite: "clipboard", x: 80, y: 30, w: 5, when: { all: ["met:dog"] }, stand: { x: 80, y: 46 } }],
-  dialogues: dog.nodes,
+  sceneNpcEntries: [
+    { when: { all: ["met:dog", "clue:meeting_note", "clue:office_sand", "clue:pen_cap", "clue:beach_sand", "clue:library_card"], none: ["confronted:dog"] }, node: "dog_conf" },
+    ...dog.entries,
+  ],
+  spots: [
+    { id: "meeting_note", clue: "meeting_note", label: "Biên bản cuộc họp", sprite: "clipboard", x: 80, y: 30, w: 5, when: { all: ["met:dog"] }, stand: { x: 80, y: 46 } },
+    { id: "office_sand", clue: "office_sand", label: "Khay cát trên bàn", sprite: "bag", x: 24, y: 80, w: 4, when: { all: ["met:dog"] }, stand: { x: 24, y: 90 } },
+  ],
+  dialogues: {
+    ...dog.nodes,
+    dog_conf: { id: "dog_conf", speaker: "player", zh: "笔帽上的沙子是白色的细沙,和您桌上的一样,不是海边的黄沙。鸭子两点五十分就离开了图书馆,三点笔还在。而您三点二十分才开会。", vi: "Cát trên nắp bút là cát trắng mịn, giống khay trên bàn ông, không phải cát vàng ở biển. Vịt rời thư viện lúc 2 giờ 50, đến 3 giờ bút vẫn còn. Còn ông thì 3 giờ 20 mới họp.", next: "dog_conf2" },
+    dog_conf2: { id: "dog_conf2", speaker: "dog", zh: "我……我只是想用它写一份报告,明天就还给她。", vi: "Tôi... tôi chỉ muốn dùng nó viết một bản báo cáo, mai trả cô ấy thôi.", effects: [{ clue: "dog_slip" }, { flag: "confronted:dog" }], next: "dog_conf3" },
+    dog_conf3: { id: "dog_conf3", speaker: "dog", zh: "请不要再问了!", vi: "Xin đừng hỏi nữa!", next: null },
+  },
 };

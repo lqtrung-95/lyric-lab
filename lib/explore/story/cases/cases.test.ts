@@ -234,3 +234,42 @@ describe("vụ án chiếc cúp biến mất", () => {
     expect(pickEntry(gym, ["met:dog", "clue:loan_form", "clue:dust_shelf", "clue:witness_fox"])).toBe("g_conf");
   });
 });
+
+describe("vụ án bưu kiện biến mất (hộp đỏ)", () => {
+  const story = CASES["lost-parcel"];
+  it("là mức Khó; Mèo nói dối nhưng vẫn là người bị buộc tội sai; chỉ Heo là thủ phạm; Heo chỉ đổi lời khi đã có đủ chứng cứ ngoại phạm của Cáo và Rùa", () => {
+    expect(story.difficulty).toBe("hard");
+    expect(story.suspects).toHaveLength(4);
+    for (const s of story.suspects.filter((x) => x.id !== "pig")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
+    expect(judge(story, "pig", story.solution.keyClues.slice(0, 4)).type).toBe("weak_evidence");
+    const e = story.scenes.phoneshop.sceneNpcEntries!;
+    const base = ["met:pig", "clue:closing_sign", "clue:thief_note", "clue:rabbit_list", "clue:pharmacy_receipt"];
+    expect(pickEntry(e, base)).not.toBe("pig_conf");
+    expect(pickEntry(e, [...base, "clue:kitchen_log"])).toBe("pig_conf");
+  });
+});
+
+describe("vụ án hộp dụng cụ biến mất (tính giờ)", () => {
+  const story = CASES["lost-toolbox"];
+  it("là mức Khó; thủ phạm Thỏ; hỏi lại Thỏ cần đủ mốc giờ của cả ba người còn lại", () => {
+    expect(story.difficulty).toBe("hard");
+    for (const s of story.suspects.filter((x) => x.id !== "rabbit")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
+    const e = story.scenes.bubbletea.sceneNpcEntries!;
+    const all = ["met:rabbit", "clue:tea_tickets", "clue:last_seen", "clue:route_map", "clue:flower_orders", "clue:zoo_log", "clue:hotpot_log"];
+    expect(pickEntry(e, all.filter((f) => f !== "clue:hotpot_log"))).not.toBe("rabbit_conf");
+    expect(pickEntry(e, all)).toBe("rabbit_conf");
+  });
+});
+
+describe("vụ án chiếc bút máy (bị đổ oan)", () => {
+  const story = CASES["fountain-pen"];
+  it("là mức Vừa; thủ phạm là Chó chứ không phải Vịt; Chó chỉ đổi lời khi đã so cát trắng, cát biển và phiếu mượn sách", () => {
+    expect(story.difficulty).toBe("medium");
+    expect(story.solution.suspectId).toBe("dog");
+    expect(judge(story, "duck", story.solution.keyClues).type).toBe("wrong_suspect");
+    const e = story.scenes.office.sceneNpcEntries!;
+    const all = ["met:dog", "clue:meeting_note", "clue:office_sand", "clue:pen_cap", "clue:beach_sand", "clue:library_card"];
+    expect(pickEntry(e, all.filter((f) => f !== "clue:beach_sand"))).not.toBe("dog_conf");
+    expect(pickEntry(e, all)).toBe("dog_conf");
+  });
+});

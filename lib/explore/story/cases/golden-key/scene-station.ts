@@ -20,6 +20,9 @@ const rabbit = buildInterview({
 export const STATION_STORY: StorySceneDef = {
   sceneId: "station",
   sceneNpcEntries: rabbit.entries,
-  spots: [{ id: "rabbit_log", clue: "rabbit_log", label: "Sổ ca trực ở ga", sprite: "clipboard", x: 9, y: 31, w: 5, when: { all: ["met:rabbit"] }, stand: { x: 9, y: 48 } }],
+  spots: [
+    { id: "rabbit_log", clue: "rabbit_log", label: "Sổ ca trực ở ga", sprite: "clipboard", x: 9, y: 31, w: 5, when: { all: ["met:rabbit"] }, stand: { x: 9, y: 48 } },
+    { id: "lost_found", clue: "lost_found", label: "Hòm đồ thất lạc", sprite: "umbrella", x: 70, y: 84, w: 5, when: { all: ["met:rabbit"] }, stand: { x: 70, y: 92 } },
+  ],
   dialogues: rabbit.nodes,
 };

@@ -16,9 +16,10 @@ export const SPEAKERS: Record<string, Speaker> = {
  */
 export const CLUES: ClueDef[] = [
   { id: "kite_string", title: "Đoạn dây đỏ trên cát", zh: "沙滩上有一段红线,风筝不见了。", vi: "Trên cát có một đoạn dây đỏ, con diều biến mất.", sceneId: "beach", kind: "object" },
-  { id: "paw_print", title: "Dấu chân trên cát", zh: "沙滩上有小脚印,有四个脚趾,没有爪印。", vi: "Trên cát có dấu chân nhỏ, bốn ngón, không có vết móng.", sceneId: "beach", kind: "object" },
+  { id: "paw_print", title: "Dấu chân trên cát", zh: "沙滩上有小脚印,有四个脚趾。沙子是湿的,看不出有没有爪印。", vi: "Trên cát có dấu chân nhỏ, bốn ngón. Cát ướt nên không thấy được có vết móng hay không.", sceneId: "beach", kind: "object" },
   { id: "dog_alibi", title: "Lời khai của Chú Chó", zh: "昨天中午十二点,我在店里卖衣服。", vi: "Trưa qua mười hai giờ, tôi bán quần áo ở cửa hàng.", sceneId: "clothing-store", kind: "testimony" },
-  { id: "dog_print", title: "Dấu chân của Chó", zh: "小狗的脚印有长长的爪印。", vi: "Dấu chân của Chó có vết móng dài.", sceneId: "clothing-store", kind: "object" },
+  { id: "dog_print", title: "Dấu chân của Chó", zh: "小狗的脚印有四个脚趾,还有长长的爪印。但在湿沙子上,爪印可能留不下来。", vi: "Dấu chân của Chó có bốn ngón và vết móng dài. Nhưng trên cát ướt, vết móng có thể không in lại.", sceneId: "clothing-store", kind: "object" },
+  { id: "dog_log", title: "Sổ thu ngân cửa hàng", zh: "服装店的收银记录:昨天中午十二点到十二点半,小狗一直在给客人量尺寸。", vi: "Sổ thu ngân cửa hàng quần áo: từ 12 giờ đến 12 giờ rưỡi trưa qua, Chó đo cỡ cho khách suốt.", sceneId: "clothing-store", kind: "document" },
   { id: "pig_alibi", title: "Lời khai của Cô Heo", zh: "昨天中午十二点,我在超市收钱。", vi: "Trưa qua mười hai giờ, tôi thu tiền ở siêu thị.", sceneId: "supermarket", kind: "testimony" },
   { id: "pig_print", title: "Dấu chân của Heo", zh: "小猪的脚印只有两个脚趾。", vi: "Dấu chân của Heo chỉ có hai ngón.", sceneId: "supermarket", kind: "object" },
   { id: "bird_alibi", title: "Lời khai của Cô Chim", zh: "昨天中午十二点,我在学校吃饭。", vi: "Trưa qua mười hai giờ, tôi ăn cơm ở trường.", sceneId: "school", kind: "testimony" },
@@ -31,7 +32,7 @@ export const CLUES: ClueDef[] = [
 ];
 
 export const SUSPECTS: Suspect[] = [
-  { id: "dog", name: "Chú Chó bán hàng", sprite: "dog", sceneId: "clothing-store", metFlag: "met:dog", note: "Nói trưa qua bán quần áo. Dấu chân của ông có vết móng dài, không giống dấu trên cát." },
+  { id: "dog", name: "Chú Chó bán hàng", sprite: "dog", sceneId: "clothing-store", metFlag: "met:dog", note: "Nói trưa qua bán quần áo. Dấu chân bốn ngón giống dấu trên cát, nhưng cát ướt có thể làm mất vết móng. Sổ thu ngân nói gì?" },
   { id: "pig", name: "Cô Heo thu ngân", sprite: "pig", sceneId: "supermarket", metFlag: "met:pig", note: "Nói trưa qua thu tiền ở siêu thị. Dấu chân heo chỉ có hai ngón." },
   { id: "bird", name: "Cô Chim giáo viên", sprite: "bird", sceneId: "school", metFlag: "met:bird", note: "Nói trưa qua ăn cơm ở trường. Dấu chân chim có ba ngón." },
   { id: "cat", name: "Cô Mèo bán hàng", sprite: "cat", sceneId: "market", metFlag: "met:cat", note: "Nói trưa qua bán trái cây ở chợ. Nhưng chợ nghỉ trưa, và dấu chân mèo khớp…" },
@@ -40,8 +41,8 @@ export const SUSPECTS: Suspect[] = [
 export const OBJECTIVES: Objective[] = [
   { id: "talk-duck", sceneId: "beach", text: "Nói chuyện với Chú Vịt ở Bãi biển để nhận vụ án.", done: { all: ["met:duck"] } },
   { id: "inspect-beach", sceneId: "beach", text: "Xem xét bãi cát: tìm dây diều và dấu chân.", when: { all: ["met:duck"] }, done: { all: ["clue:kite_string", "clue:paw_print"] } },
-  { id: "dog", sceneId: "clothing-store", text: "Đến Cửa hàng quần áo: hỏi Chú Chó và so dấu chân của ông với dấu trên cát.", when: { all: ["clue:kite_string", "clue:paw_print"] }, done: { all: ["met:dog", "clue:dog_print"] } },
-  { id: "pig", sceneId: "supermarket", text: "Đến Siêu thị: hỏi Cô Heo và xem dấu chân của cô.", when: { all: ["met:dog", "clue:dog_print"] }, done: { all: ["met:pig", "clue:pig_print"] } },
+  { id: "dog", sceneId: "clothing-store", text: "Đến Cửa hàng quần áo: hỏi Chú Chó, so dấu chân của ông với dấu trên cát và xem sổ thu ngân.", when: { all: ["clue:kite_string", "clue:paw_print"] }, done: { all: ["met:dog", "clue:dog_print", "clue:dog_log"] } },
+  { id: "pig", sceneId: "supermarket", text: "Đến Siêu thị: hỏi Cô Heo và xem dấu chân của cô.", when: { all: ["met:dog", "clue:dog_print", "clue:dog_log"] }, done: { all: ["met:pig", "clue:pig_print"] } },
   { id: "bird", sceneId: "school", text: "Đến Trường học: hỏi Cô Chim và xem dấu chân của cô.", when: { all: ["met:pig", "clue:pig_print"] }, done: { all: ["met:bird", "clue:bird_print"] } },
   { id: "cat", sceneId: "market", text: "Đến Chợ: hỏi Cô Mèo, xem dấu chân và bảng nghỉ trưa, rồi hỏi lại cô khi đã có chứng cứ.", when: { all: ["met:bird", "clue:bird_print"] }, done: { all: ["met:cat", "clue:cat_print", "clue:market_sign", "clue:cat_slip"] } },
   { id: "turtle", sceneId: "park", text: "Ra Công viên: hỏi Ông Rùa xem trưa qua ông có thấy ai cầm diều.", when: { all: ["clue:cat_slip"] }, done: { all: ["clue:witness_turtle"] } },

@@ -16,10 +16,13 @@ const duck = buildInterview({
   after: { zh: "值班本在沙滩上。你还要去哪儿?", vi: "Sổ trực ở trên bãi cát. Bạn còn muốn đi đâu?" },
 });
 
-/** Bãi biển: sổ trực cho thấy Vịt rời bãi biển lúc hai giờ rưỡi, trái với lời khai. */
+/** Bãi biển: sổ trực cho thấy Vịt rời bãi biển lúc hai giờ rưỡi (trái lời khai, nhưng chưa phải bằng chứng lấy bút); cát ở đây là cát vàng thô. */
 export const BEACH_STORY: StorySceneDef = {
   sceneId: "beach",
   sceneNpcEntries: duck.entries,
-  spots: [{ id: "beach_log", clue: "beach_log", label: "Sổ trực của bãi biển", sprite: "clipboard", x: 48, y: 92, w: 5, when: { all: ["met:duck"] } }],
+  spots: [
+    { id: "beach_log", clue: "beach_log", label: "Sổ trực của bãi biển", sprite: "clipboard", x: 48, y: 92, w: 5, when: { all: ["met:duck"] } },
+    { id: "beach_sand", clue: "beach_sand", label: "Nắm cát trên bãi", sprite: "bag", x: 20, y: 90, w: 4, when: { all: ["met:duck"] } },
+  ],
   dialogues: duck.nodes,
 };

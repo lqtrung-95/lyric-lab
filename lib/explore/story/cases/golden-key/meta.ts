@@ -26,6 +26,7 @@ export const CLUES: ClueDef[] = [
   { id: "sign_sheet", title: "Sổ ra vào của trường", zh: "老师昨天晚上七点半就离开学校了。", vi: "Tối qua cô giáo đã rời trường từ 7 giờ 30.", sceneId: "school", kind: "document" },
   { id: "bird_slip", title: "Cô Chim đổi lời", zh: "我……我回家拿东西了。", vi: "Tôi... tôi về nhà lấy đồ.", sceneId: "school", kind: "testimony" },
   { id: "rabbit_alibi", title: "Lời khai của Trưởng ga Thỏ", zh: "昨天晚上八点,我在火车站工作。", vi: "Tối qua 8 giờ, tôi đang làm việc ở ga tàu.", sceneId: "station", kind: "testimony" },
+  { id: "lost_found", title: "Hòm đồ thất lạc ở ga", zh: "火车站的失物箱里有好几把红伞,伞柄上也有“校”字,是学生们忘在车上的。", vi: "Hòm đồ thất lạc ở ga có mấy cái ô đỏ, cán cũng có chữ “校”, là học sinh bỏ quên trên tàu.", sceneId: "station", kind: "object" },
   { id: "rabbit_log", title: "Sổ ca trực ở ga", zh: "兔子昨天晚上从六点到十点都在火车站。", vi: "Thỏ ở ga tàu từ 6 giờ đến 10 giờ tối qua.", sceneId: "station", kind: "document" },
   { id: "witness_pig", title: "Lời khai của Cô Heo", zh: "八点下班,八点一刻我经过酒店,看见一个人拿着红伞走进去。", vi: "Hết ca lúc 8 giờ, 8 giờ 15 đi ngang khách sạn thì tôi thấy một người cầm ô đỏ đi vào.", sceneId: "airport", kind: "testimony" },
   { id: "pig_shift", title: "Bảng ca của sân bay", zh: "小猪昨天晚上八点下班。", vi: "Heo hết ca lúc 8 giờ tối qua.", sceneId: "airport", kind: "document" },
@@ -45,8 +46,8 @@ export const OBJECTIVES: Objective[] = [
   { id: "inspect-hotel", sceneId: "hotel", text: "Xem xét sảnh khách sạn: đọc sổ khách và xem chiếc ô đỏ.", when: { all: ["met:duck"] }, done: { all: ["clue:guest_book", "clue:umbrella"] } },
   { id: "dog", sceneId: "clothing-store", text: "Đến Cửa hàng quần áo: hỏi Chú Chó, xem hóa đơn và các cái ô trong cửa hàng.", when: { all: ["clue:guest_book", "clue:umbrella"] }, done: { all: ["met:dog", "clue:shop_umbrellas"] } },
   { id: "bird", sceneId: "school", text: "Đến Trường học: hỏi Cô Chim, tìm sổ ra vào, rồi hỏi lại cô khi đã có chứng cứ.", when: { all: ["met:dog", "clue:shop_umbrellas"] }, done: { all: ["met:bird", "clue:sign_sheet", "clue:bird_slip"] } },
-  { id: "rabbit", sceneId: "station", text: "Đến Nhà ga: hỏi Trưởng ga Thỏ và xem sổ ca trực.", when: { all: ["clue:bird_slip"] }, done: { all: ["met:rabbit", "clue:rabbit_log"] } },
-  { id: "pig", sceneId: "airport", text: "Đến Sân bay: hỏi Cô Heo và xem bảng ca.", when: { all: ["met:rabbit", "clue:rabbit_log"] }, done: { all: ["met:pig", "clue:pig_shift"] } },
+  { id: "rabbit", sceneId: "station", text: "Đến Nhà ga: hỏi Trưởng ga Thỏ, xem sổ ca trực và hòm đồ thất lạc.", when: { all: ["clue:bird_slip"] }, done: { all: ["met:rabbit", "clue:rabbit_log", "clue:lost_found"] } },
+  { id: "pig", sceneId: "airport", text: "Đến Sân bay: hỏi Cô Heo và xem bảng ca.", when: { all: ["met:rabbit", "clue:rabbit_log", "clue:lost_found"] }, done: { all: ["met:pig", "clue:pig_shift"] } },
   { id: "turtle", sceneId: "park", text: "Ra Công viên: hỏi Ông Rùa về chiếc ô đỏ.", when: { all: ["met:pig", "clue:pig_shift"] }, done: { all: ["clue:witness_turtle"] } },
   { id: "accuse", sceneId: "hotel", text: "Về Khách sạn, nói với Chú Vịt bạn biết ai đã lấy chìa khóa vàng.", when: { all: ["clue:witness_turtle"] }, done: { all: ["case:solved"] } },
 ];

@@ -3,25 +3,25 @@ import type { StorySceneDef } from "../../story-types";
 
 const cat = buildInterview({
   prefix: "cat", speaker: "cat",
-  greeting: { zh: "你好!欢迎光临。", vi: "Chào bạn! Hoan nghênh quý khách." },
-  question: { zh: "昨天下午四点你在哪儿?", vi: "Bốn giờ chiều hôm qua cô ở đâu?" },
+  greeting: { zh: "你好!要买花吗?", vi: "Chào bạn! Bạn muốn mua hoa à?" },
+  question: { zh: "昨天下午三点到四点你在哪儿?", vi: "Chiều qua từ 3 đến 4 giờ cô ở đâu?" },
   chatter: [
-    { ask: { zh: "你的店卖什么花?", vi: "Tiệm cô bán hoa gì?" }, reply: { zh: "玫瑰、百合,还有向日葵。", vi: "Hoa hồng, hoa bách hợp và cả hoa hướng dương." } },
-    { ask: { zh: "你每天几点开门?", vi: "Hằng ngày cô mở cửa lúc mấy giờ?" }, reply: { zh: "早上九点。", vi: "Chín giờ sáng." } },
+    { ask: { zh: "玫瑰花怎么卖?", vi: "Hoa hồng bán thế nào?" }, reply: { zh: "十块钱一朵。", vi: "Mười tệ một bông." } },
+    { ask: { zh: "你的店几点关门?", vi: "Tiệm cô mấy giờ đóng cửa?" }, reply: { zh: "晚上七点关门。", vi: "Bảy giờ tối đóng cửa." } },
   ],
-  answer: { zh: "昨天下午四点,我在店里包花。", vi: "Bốn giờ chiều hôm qua, tôi đang gói hoa trong tiệm." },
-  check: { vi: "Cô Mèo nói bốn giờ chiều hôm qua cô làm gì?", right: { zh: "包花", vi: "Gói hoa" }, wrong: [{ zh: "修车", vi: "Sửa xe" }, { zh: "喂动物", vi: "Cho động vật ăn" }] },
+  answer: { zh: "昨天下午三点到四点,我一直在花店里。", vi: "Chiều qua từ 3 đến 4 giờ, tôi ở trong tiệm hoa suốt." },
+  check: { vi: "Cô Mèo nói chiều qua từ 3 đến 4 giờ cô ở đâu?", right: { zh: "在花店里", vi: "Trong tiệm hoa" }, wrong: [{ zh: "在动物园", vi: "Ở sở thú" }, { zh: "在火锅店", vi: "Ở quán lẩu" }], rightAt: 0 },
   clue: "cat_alibi", metFlag: "met:cat",
-  closing: { zh: "桌子上有一张单子,你可以看看。", vi: "Trên bàn có một tờ đơn, bạn có thể xem." },
-  after: { zh: "单子在桌子上。你还有事吗?", vi: "Tờ đơn ở trên bàn. Bạn còn việc gì không?" },
+  closing: { zh: "签收单在柜台上。", vi: "Phiếu ký nhận ở trên quầy." },
+  after: { zh: "还想买花吗?", vi: "Bạn còn muốn mua hoa không?" },
 });
 
-/** Cảnh flowershop của vụ án lost-toolbox (xem chú thích ở index.ts của vụ án). */
+/** Tiệm hoa: phiếu ký nhận bốn lần, cách nhau 15 phút nên Mèo không kịp đi về (cần ít nhất 20 phút). */
 export const FLOWERSHOP_STORY: StorySceneDef = {
   sceneId: "flowershop",
   sceneNpcEntries: cat.entries,
   spots: [
-    { id: "flower_order", clue: "flower_order", label: "Đơn đặt hoa trên bàn", sprite: "note", x: 14, y: 86, w: 5, when: { all: ["met:cat"] }, stand: { x: 20, y: 92 } },
+    { id: "flower_orders", clue: "flower_orders", label: "Phiếu ký nhận", sprite: "note", x: 14, y: 86, w: 5, when: { all: ["met:cat"] }, stand: { x: 20, y: 92 } },
   ],
   dialogues: cat.nodes,
 };

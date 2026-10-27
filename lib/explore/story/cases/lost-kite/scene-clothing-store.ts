@@ -16,12 +16,13 @@ const dog = buildInterview({
   after: { zh: "你还想买什么?", vi: "Bạn còn muốn mua gì nữa?" },
 });
 
-/** Cửa hàng quần áo: dấu chân Chó có vết móng dài nên không khớp dấu trên cát (loại trừ). */
+/** Cửa hàng quần áo: dấu chân Chó cũng có bốn ngón (móng có thể không in trên cát ướt) nên phải dựa vào sổ thu ngân để loại Chó. */
 export const CLOTHING_STORE_STORY: StorySceneDef = {
   sceneId: "clothing-store",
   sceneNpcEntries: dog.entries,
   spots: [
     { id: "dog_print", clue: "dog_print", label: "Dấu chân ở cửa", sprite: "note", x: 40, y: 76, w: 4, when: { all: ["met:dog"] } },
+    { id: "dog_log", clue: "dog_log", label: "Sổ thu ngân", sprite: "clipboard", x: 68, y: 84, w: 5, when: { all: ["met:dog"] }, stand: { x: 68, y: 92 } },
   ],
   dialogues: dog.nodes,
 };

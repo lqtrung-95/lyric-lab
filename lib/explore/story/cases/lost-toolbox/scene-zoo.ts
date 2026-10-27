@@ -4,24 +4,24 @@ import type { StorySceneDef } from "../../story-types";
 const fox = buildInterview({
   prefix: "fox", speaker: "fox",
   greeting: { zh: "你好!欢迎来动物园。", vi: "Chào bạn! Chào mừng đến sở thú." },
-  question: { zh: "昨天下午四点你在哪儿?", vi: "Bốn giờ chiều hôm qua cô ở đâu?" },
+  question: { zh: "昨天下午三点到四点你在哪儿?", vi: "Chiều qua từ 3 đến 4 giờ cô ở đâu?" },
   chatter: [
-    { ask: { zh: "你最喜欢哪个动物?", vi: "Cô thích con vật nào nhất?" }, reply: { zh: "我最喜欢熊猫。", vi: "Tôi thích nhất gấu trúc." } },
-    { ask: { zh: "动物们吃什么?", vi: "Các con vật ăn gì?" }, reply: { zh: "有的吃肉,有的吃草。", vi: "Con ăn thịt, con ăn cỏ." } },
+    { ask: { zh: "海豹喜欢吃什么?", vi: "Hải cẩu thích ăn gì?" }, reply: { zh: "它们最爱吃鱼。", vi: "Chúng thích ăn cá nhất." } },
+    { ask: { zh: "动物园几点关门?", vi: "Sở thú mấy giờ đóng cửa?" }, reply: { zh: "下午五点关门。", vi: "Năm giờ chiều đóng cửa." } },
   ],
-  answer: { zh: "昨天下午四点,我在动物园喂动物。", vi: "Bốn giờ chiều hôm qua, tôi đang cho động vật ăn ở sở thú." },
-  check: { vi: "Cô Cáo nói bốn giờ chiều hôm qua cô làm gì?", right: { zh: "喂动物", vi: "Cho động vật ăn" }, wrong: [{ zh: "包花", vi: "Gói hoa" }, { zh: "做奶茶", vi: "Pha trà sữa" }], rightAt: 0 },
+  answer: { zh: "昨天下午三点到四点,我一直在动物园工作。", vi: "Chiều qua từ 3 đến 4 giờ, tôi làm việc ở sở thú suốt." },
+  check: { vi: "Cô Cáo nói chiều qua từ 3 đến 4 giờ cô ở đâu?", right: { zh: "在动物园", vi: "Ở sở thú" }, wrong: [{ zh: "在花店里", vi: "Trong tiệm hoa" }, { zh: "在奶茶店", vi: "Ở quán trà sữa" }], rightAt: 0 },
   clue: "fox_alibi", metFlag: "met:fox",
-  closing: { zh: "门口有一本记录,你可以看看。", vi: "Ở cửa có một cuốn sổ ghi, bạn có thể xem." },
-  after: { zh: "记录在门口。你还有事吗?", vi: "Sổ ghi ở cửa. Bạn còn việc gì không?" },
+  closing: { zh: "记录本在栏杆上。", vi: "Sổ ghi chép ở trên lan can." },
+  after: { zh: "还想看动物吗?", vi: "Bạn còn muốn xem thú không?" },
 });
 
-/** Cảnh zoo của vụ án lost-toolbox (xem chú thích ở index.ts của vụ án). */
+/** Sở thú: hai mốc cho ăn cách nhau 40 phút, ít hơn 50 phút khứ hồi nên Cáo không kịp. */
 export const ZOO_STORY: StorySceneDef = {
   sceneId: "zoo",
   sceneNpcEntries: fox.entries,
   spots: [
-    { id: "feed_log", clue: "feed_log", label: "Sổ cho ăn ở cửa", sprite: "note", x: 14, y: 86, w: 5, when: { all: ["met:fox"] }, stand: { x: 20, y: 92 } },
+    { id: "zoo_log", clue: "zoo_log", label: "Sổ cho ăn", sprite: "clipboard", x: 14, y: 86, w: 5, when: { all: ["met:fox"] }, stand: { x: 20, y: 92 } },
   ],
   dialogues: fox.nodes,
 };
