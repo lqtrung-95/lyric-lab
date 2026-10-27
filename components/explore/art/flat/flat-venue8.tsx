@@ -56,6 +56,32 @@ const code = s(100, 80, <>
   <path d="M56 22L44 58" fill="none" stroke={C.yellow} strokeWidth={5} />
   <rect x="10" y="10" width="80" height="8" rx="4" fill={C.grey} />
 </>);
+// Hình riêng cho các từ trước đây dùng chung hình tài liệu: chương trình, tài liệu kỹ thuật, tờ khai hải quan, vận đơn.
+const appwindow = s(100, 80, <>
+  <rect x="6" y="8" width="88" height="64" rx="8" fill={C.white} />
+  <rect x="6" y="8" width="88" height="16" rx="8" fill={C.blue} />
+  <circle cx="18" cy="16" r="3" fill={C.cream} strokeWidth={1.500} /><circle cx="30" cy="16" r="3" fill={C.cream} strokeWidth={1.500} />
+  <path d="M40 38l22 12-22 12Z" fill={C.green} />
+</>);
+const manualbook = s(80, 100, <>
+  <rect x="8" y="6" width="64" height="88" rx="6" fill={C.teal} />
+  <rect x="8" y="6" width="10" height="88" rx="4" fill={C.greyD} />
+  <circle cx="45" cy="38" r="14" fill={C.cream} />
+  <path d="M45 26v-4M45 54v-4M33 38h-4M61 38h-4" fill="none" strokeWidth={4} />
+  <path d="M26 74h40M26 84h28" fill="none" stroke={C.cream} strokeWidth={4} />
+</>);
+const customsform = s(80, 100, <>
+  <rect x="8" y="6" width="64" height="88" rx="4" fill={C.white} />
+  <path d="M18 22h44M18 36h44M18 50h30" fill="none" strokeWidth={3} />
+  <circle cx="54" cy="72" r="14" fill="none" stroke={C.red} strokeWidth={4} />
+  <path d="M46 72l6 6 10-12" fill="none" stroke={C.red} strokeWidth={4} />
+</>);
+const billoflading = s(80, 100, <>
+  <rect x="8" y="6" width="64" height="88" rx="4" fill={C.cream} />
+  <path d="M14 70h52l-8 12H22Z" fill={C.blue} />
+  <path d="M40 30v34M30 64l10-10 10 10M40 30l-8-6M40 30l8-6" fill="none" strokeWidth={4} />
+  <path d="M18 16h44" fill="none" strokeWidth={3} />
+</>);
 const bug = s(80, 80, <>
   <ellipse cx="40" cy="46" rx="22" ry="26" fill={C.red} />
   <circle cx="40" cy="18" r="11" fill={C.redD} />
@@ -217,7 +243,7 @@ const veggiebed = s(160, 70, <>
 
 export const VENUE8_SPRITES: Record<string, FlatSprite> = {
   server, harddisk, firewall, netswitch, rack, aircon, fan,
-  code, bug, versiontag, testcheck,
+  code, bug, versiontag, testcheck, appwindow, manualbook, customsform, billoflading,
   algorithm, neuralmodel, databars, chip, graphicscard, webcam, prompt, dronebot, roboticarm, sensor,
   container, crane, forklift, wharf,
   tomato, cucumber, seedling, fertilizer, seedtray, shadenet, dripline, veggiebed,
