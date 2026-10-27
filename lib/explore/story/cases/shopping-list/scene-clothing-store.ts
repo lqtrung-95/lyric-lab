@@ -16,8 +16,8 @@ const dog = buildInterview({
 });
 
 /** Cửa hàng: túi đồ của Chó (hộp sữa chứ không phải chai). */
-export const SHOP_STORY: StorySceneDef = {
-  sceneId: "shop",
+export const CLOTHING_STORE_STORY: StorySceneDef = {
+  sceneId: "clothing-store",
   sceneNpcEntries: [
     ...dog.entries,
   ],

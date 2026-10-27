@@ -1,7 +1,7 @@
 import type { StoryDef } from "../../story-types";
 import { BANK_STORY } from "./scene-bank";
 import { MARKET_STORY } from "./scene-market";
-import { SHOP_STORY } from "./scene-shop";
+import { CLOTHING_STORE_STORY } from "./scene-clothing-store";
 import { HOTEL_STORY } from "./scene-hotel";
 import { SUPERMARKET_STORY } from "./scene-supermarket";
 import { CLUES, OBJECTIVES, SPEAKERS, SUSPECTS } from "./meta";
@@ -20,7 +20,7 @@ export const SHOPPING_LIST_CASE: StoryDef = {
   clues: CLUES,
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
-  scenes: { bank: BANK_STORY, market: MARKET_STORY, shop: SHOP_STORY, hotel: HOTEL_STORY, supermarket: SUPERMARKET_STORY },
+  scenes: { bank: BANK_STORY, market: MARKET_STORY, "clothing-store": CLOTHING_STORE_STORY, hotel: HOTEL_STORY, supermarket: SUPERMARKET_STORY },
   solution: { suspectId: "pig", keyClues: ["d_cat", "d_dog", "d_duck", "d_pig", "pig_slip"], needed: 4 },
   freeRoam: true,
   questions: ["Danh sách mua sắm của kẻ trộm gồm những gì?", "Túi đồ của ai khớp từng chữ?", "Mỗi người còn lại sai ở chi tiết nào?"],

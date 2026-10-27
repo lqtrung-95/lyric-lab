@@ -19,7 +19,9 @@ export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Recor
         <PronounceButton text={clue.zh} className="size-10 sm:size-11" />
       </div>
       {hints.pinyin && pinyin[clue.zh] && <p className="text-body-sm text-primary">{pinyin[clue.zh]}</p>}
-      {hints.vi && <p className="text-body-md text-on-surface-variant">{clue.vi}</p>}
+      {hints.vi && (clue.noTranslation
+        ? <p className="text-body-sm italic text-on-surface-variant">Manh mối này không có bản dịch. Hãy tự đọc kỹ.</p>
+        : <p className="text-body-md text-on-surface-variant">{clue.vi}</p>)}
     </div>
   );
 }

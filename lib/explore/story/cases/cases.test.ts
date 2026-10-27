@@ -5,6 +5,7 @@ import { currentObjective, sceneUnlocked } from "../objectives";
 import { storyExits, storyRoute } from "../story-route";
 import { applyEffects, emptyStory, holds } from "../story-state";
 import type { Condition, Effect, StoryDef, StoryProgress } from "../story-types";
+import { SCENES } from "@/lib/explore/scenes";
 import { CASES } from ".";
 
 const conds = (c?: Condition) => [...(c?.all ?? []), ...(c?.none ?? [])];
@@ -332,8 +333,15 @@ describe("vụ án mới: không có thủ phạm, đồng phạm, nối manh m�
 
   it("vụ đọc hiểu: manh mối chữ Hán không kèm bản dịch nội dung", () => {
     for (const id of ["note-directions", "shopping-list"]) {
-      const hidden = CASES[id].clues.filter((c) => c.kind !== "deduction" && c.vi.startsWith("Một dòng chữ tiếng Trung"));
+      const hidden = CASES[id].clues.filter((c) => c.noTranslation);
       expect(hidden.length, id).toBeGreaterThanOrEqual(5);
     }
+  });
+});
+
+describe("mọi cảnh của mọi vụ án có thật trong danh sách cảnh (tránh 404)", () => {
+  it.each(Object.values(CASES))("vụ án $id", (story) => {
+    const ids = new Set([story.startScene, story.accuseScene, ...Object.keys(story.scenes), ...story.clues.map((c) => c.sceneId), ...story.suspects.map((s) => s.sceneId), ...story.objectives.flatMap((o) => (o.sceneId ? [o.sceneId] : []))]);
+    for (const id of ids) expect(SCENES[id], `cảnh "${id}"`).toBeDefined();
   });
 });

@@ -87,6 +87,8 @@ export interface ClueDef {
   kind: "document" | "object" | "testimony" | "deduction";
   /** Chỉ cho `kind: "deduction"`: hai manh mối cần nối với nhau. Suy luận không nhặt được ở đâu cả, chỉ có khi người chơi nối đúng cặp trong sổ vụ án. */
   link?: [string, string];
+  /** Manh mối bắt người chơi tự đọc tiếng Trung: không có bản dịch (`vi` để trống). Nội dung đầy đủ chỉ hiện ở suy luận khi nối đúng. */
+  noTranslation?: boolean;
 }
 
 /** Phần cốt truyện của một cảnh: ai đứng đó nói được gì, có gì để xem xét, cả đồ thị hội thoại của cảnh. */
