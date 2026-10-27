@@ -22,10 +22,10 @@ export const CLUES: ClueDef[] = [
   { id: "pig_talk", title: "Lời khai của Anh Heo", zh: "昨天下午我去买东西了。", vi: "Chiều qua tôi đi mua đồ.", sceneId: "supermarket", kind: "testimony" },
   { id: "bag_pig", title: "Túi đồ của Heo", zh: "小猪的购物袋里有:三瓶牛奶、两斤苹果、一条鱼。", vi: "Trong túi đồ của Heo có: ba chai sữa, hai cân táo, một con cá.", sceneId: "supermarket", kind: "object" },
   { id: "pig_slip", title: "Heo đổi lời", zh: "我……我只是想买点好吃的。", vi: "Tôi... tôi chỉ muốn mua ít đồ ngon thôi.", sceneId: "supermarket", kind: "testimony" },
-  { id: "d_cat", title: "Suy luận: Mèo mua nước ép", zh: "小猫买的是果汁,不是牛奶,和清单不一样。", vi: "Mèo mua nước ép chứ không phải sữa, khác với danh sách.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_cat"] },
-  { id: "d_dog", title: "Suy luận: Chó mua hộp, không phải chai", zh: "小狗买的是三盒牛奶,清单上是三瓶牛奶,量词不一样。", vi: "Chó mua ba hộp sữa, danh sách ghi ba chai sữa: lượng từ khác nhau.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_dog"] },
-  { id: "d_duck", title: "Suy luận: Vịt mua hai con cá", zh: "小鸭买了两条鱼,清单上是一条鱼,数量不一样。", vi: "Vịt mua hai con cá, danh sách chỉ có một con: số lượng khác nhau.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_duck"] },
-  { id: "d_pig", title: "Suy luận: Heo khớp hoàn toàn", zh: "小猪买的东西和清单一模一样:三瓶牛奶、两斤苹果、一条鱼。", vi: "Đồ Heo mua giống hệt danh sách: ba chai sữa, hai cân táo, một con cá.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_pig"] },
+  { id: "d_cat", title: "Mèo mua nước ép", zh: "小猫买的是果汁,不是牛奶,和清单不一样。", vi: "Mèo mua nước ép chứ không phải sữa, khác với danh sách.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_cat"] },
+  { id: "d_dog", title: "Chó mua hộp, không phải chai", zh: "小狗买的是三盒牛奶,清单上是三瓶牛奶,量词不一样。", vi: "Chó mua ba hộp sữa, danh sách ghi ba chai sữa: lượng từ khác nhau.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_dog"] },
+  { id: "d_duck", title: "Vịt mua hai con cá", zh: "小鸭买了两条鱼,清单上是一条鱼,数量不一样。", vi: "Vịt mua hai con cá, danh sách chỉ có một con: số lượng khác nhau.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_duck"] },
+  { id: "d_pig", title: "Heo khớp hoàn toàn", zh: "小猪买的东西和清单一模一样:三瓶牛奶、两斤苹果、一条鱼。", vi: "Đồ Heo mua giống hệt danh sách: ba chai sữa, hai cân táo, một con cá.", sceneId: "bank", kind: "deduction", link: ["shopping_list", "bag_pig"] },
 ];
 
 export const SUSPECTS: Suspect[] = [

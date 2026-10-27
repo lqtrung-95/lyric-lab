@@ -82,7 +82,7 @@ function LinkClues({ found, onLink }: { found: StoryDef["clues"]; onLink: (a: st
     <label className="flex min-w-0 flex-1 flex-col gap-1 text-label-md font-extrabold">{label}
       <select value={value} onChange={(e) => { set(e.target.value); setMsg(null); }} className="min-h-11 w-full rounded-xl border-2 border-ink bg-surface-container-lowest px-2 text-body-md font-normal">
         <option value="">Chọn manh mối…</option>
-        {found.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+        {found.map((c) => <option key={c.id} value={c.id}>{c.kind === "deduction" ? `Suy luận: ${c.title}` : c.title}</option>)}
       </select>
     </label>
   );

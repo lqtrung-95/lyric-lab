@@ -23,13 +23,13 @@ export const CLUES: ClueDef[] = [
   { id: "tiger_alibi", title: "Lời khai của Chú Hổ", zh: "今天下午三点半到四点半,我一直在修车店修车。", vi: "Chiều nay từ 3 rưỡi đến 4 rưỡi, tôi sửa xe ở tiệm suốt.", sceneId: "garage", kind: "testimony" },
   { id: "tiger_log", title: "Sổ sửa xe", zh: "修车记录:三点半到四点半,老虎一直在修一辆大卡车,没有离开。", vi: "Sổ sửa xe: từ 3:30 đến 4:30, Hổ sửa một chiếc xe tải lớn suốt, không rời đi.", sceneId: "garage", kind: "document" },
   { id: "witness_turtle", title: "Lời khai của Ông Rùa", zh: "三点五十分,我看见一只狗抱着一个粉色的蛋糕盒,一边走一边笑,往小猫的家走去。", vi: "3 giờ 50, tôi thấy một con chó ôm hộp bánh màu hồng, vừa đi vừa cười, đi về hướng nhà Mèo.", sceneId: "park", kind: "testimony" },
-  { id: "d_order", title: "Suy luận: lấy bánh, không phải trộm", zh: "抱着蛋糕盒的人,就是三点四十五分来取蛋糕的客人。", vi: "Người ôm hộp bánh chính là khách đã đặt bánh và hẹn đến lấy lúc 3:45. Đây là việc lấy bánh, không phải trộm.", sceneId: "bakery", kind: "deduction", link: ["order_book", "witness_turtle"] },
-  { id: "d_lie", title: "Suy luận: Chó nói dối", zh: "小狗说他一直在健身房,可是签名本上写着他三点半就走了,所以他说了谎。", vi: "Chó nói tập gym suốt, nhưng sổ ký tên ghi ông rời lúc 3:30, nên ông đã nói dối.", sceneId: "bakery", kind: "deduction", link: ["dog_alibi", "gym_signout"] },
-  { id: "d_dog", title: "Suy luận: Chó nói dối vì giữ bí mật", zh: "小狗说了谎,而且他就是来取蛋糕的客人,所以他是为了保密才说谎。", vi: "Chó nói dối, và ông chính là khách đến lấy bánh lúc 3:45, nên ông nói dối chỉ để giữ bí mật.", sceneId: "bakery", kind: "deduction", link: ["d_lie", "d_order"] },
-  { id: "d_bird_ok", title: "Suy luận: lời khai của Cô Chim khớp lịch dạy", zh: "鸟老师说她在上课,课程表也证明了。", vi: "Cô Chim nói đang dạy và thời khóa biểu chứng minh điều đó.", sceneId: "bakery", kind: "deduction", link: ["bird_alibi", "class_roster"] },
-  { id: "d_tiger_ok", title: "Suy luận: lời khai của Hổ khớp sổ sửa xe", zh: "老虎说他在修车,修车记录也证明了。", vi: "Hổ nói đang sửa xe và sổ sửa xe chứng minh điều đó.", sceneId: "bakery", kind: "deduction", link: ["tiger_alibi", "tiger_log"] },
-  { id: "d_bird", title: "Suy luận: Cô Chim không liên quan", zh: "鸟老师一直在上课,学校也没有订外面的蛋糕。", vi: "Cô Chim dạy suốt buổi, và trường cũng không đặt bánh bên ngoài.", sceneId: "bakery", kind: "deduction", link: ["d_bird_ok", "party_note"] },
-  { id: "d_tiger", title: "Suy luận: Hổ không liên quan", zh: "老虎一直在修车,抱着蛋糕的是一只狗。", vi: "Hổ sửa xe suốt, còn người ôm hộp bánh là một con chó.", sceneId: "bakery", kind: "deduction", link: ["d_tiger_ok", "witness_turtle"] },
+  { id: "d_order", title: "lấy bánh, không phải trộm", zh: "抱着蛋糕盒的人,就是三点四十五分来取蛋糕的客人。", vi: "Người ôm hộp bánh chính là khách đã đặt bánh và hẹn đến lấy lúc 3:45. Đây là việc lấy bánh, không phải trộm.", sceneId: "bakery", kind: "deduction", link: ["order_book", "witness_turtle"] },
+  { id: "d_lie", title: "Chó nói dối", zh: "小狗说他一直在健身房,可是签名本上写着他三点半就走了,所以他说了谎。", vi: "Chó nói tập gym suốt, nhưng sổ ký tên ghi ông rời lúc 3:30, nên ông đã nói dối.", sceneId: "bakery", kind: "deduction", link: ["dog_alibi", "gym_signout"] },
+  { id: "d_dog", title: "Chó nói dối vì giữ bí mật", zh: "小狗说了谎,而且他就是来取蛋糕的客人,所以他是为了保密才说谎。", vi: "Chó nói dối, và ông chính là khách đến lấy bánh lúc 3:45, nên ông nói dối chỉ để giữ bí mật.", sceneId: "bakery", kind: "deduction", link: ["d_lie", "d_order"] },
+  { id: "d_bird_ok", title: "lời khai của Cô Chim khớp lịch dạy", zh: "鸟老师说她在上课,课程表也证明了。", vi: "Cô Chim nói đang dạy và thời khóa biểu chứng minh điều đó.", sceneId: "bakery", kind: "deduction", link: ["bird_alibi", "class_roster"] },
+  { id: "d_tiger_ok", title: "lời khai của Hổ khớp sổ sửa xe", zh: "老虎说他在修车,修车记录也证明了。", vi: "Hổ nói đang sửa xe và sổ sửa xe chứng minh điều đó.", sceneId: "bakery", kind: "deduction", link: ["tiger_alibi", "tiger_log"] },
+  { id: "d_bird", title: "Cô Chim không liên quan", zh: "鸟老师一直在上课,学校也没有订外面的蛋糕。", vi: "Cô Chim dạy suốt buổi, và trường cũng không đặt bánh bên ngoài.", sceneId: "bakery", kind: "deduction", link: ["d_bird_ok", "party_note"] },
+  { id: "d_tiger", title: "Hổ không liên quan", zh: "老虎一直在修车,抱着蛋糕的是一只狗。", vi: "Hổ sửa xe suốt, còn người ôm hộp bánh là một con chó.", sceneId: "bakery", kind: "deduction", link: ["d_tiger_ok", "witness_turtle"] },
 ];
 
 export const SUSPECTS: Suspect[] = [

@@ -22,11 +22,11 @@ export const CLUES: ClueDef[] = [
   { id: "beach_sand", title: "Cát ở bãi biển", zh: "海边的沙子是黄色的粗沙。", vi: "Cát ở bãi biển là cát vàng thô.", sceneId: "beach", kind: "object" },
   { id: "dog_slip", title: "Chó đổi lời", zh: "我……我只是想用它写一份报告,明天就还给她。", vi: "Tôi... tôi chỉ muốn dùng nó viết một bản báo cáo, mai trả cô ấy thôi.", sceneId: "office", kind: "testimony" },
   { id: "beach_log", title: "Sổ trực của bãi biển", zh: "鸭子昨天下午两点半就离开海边了。", vi: "Hôm qua Vịt đã rời bãi biển từ hai giờ rưỡi chiều.", sceneId: "beach", kind: "document" },
-  { id: "d_sand", title: "Suy luận: cát từ khay của Chó", zh: "笔帽上的白色细沙和小狗桌上的沙子一样。", vi: "Cát trắng mịn trên nắp bút giống cát trong khay trên bàn Chó.", sceneId: "library", kind: "deduction", link: ["pen_cap", "office_sand"] },
-  { id: "d_notbeach", title: "Suy luận: không phải cát biển", zh: "海边是黄色的粗沙,笔帽上的不是海边的沙子。", vi: "Cát biển là cát vàng thô, nên cát trên nắp bút không phải từ bãi biển.", sceneId: "library", kind: "deduction", link: ["pen_cap", "beach_sand"] },
-  { id: "d_duck_lie", title: "Suy luận: Vịt nói dối", zh: "鸭子说他三点在海边,可是值班本上写着他两点半就离开了,所以他说了谎。", vi: "Vịt nói ba giờ ở bãi biển, nhưng sổ trực ghi anh rời lúc 2 rưỡi, nên Vịt đã nói dối.", sceneId: "library", kind: "deduction", link: ["duck_alibi", "beach_log"] },
-  { id: "d_duck", title: "Suy luận: Vịt vô tội", zh: "鸭子说了谎,但他两点五十分就离开了图书馆,那时笔还在,所以他不是小偷。", vi: "Vịt nói dối, nhưng rời thư viện lúc 2:50 khi bút vẫn còn, nên Vịt không phải kẻ lấy bút.", sceneId: "library", kind: "deduction", link: ["library_card", "d_duck_lie"] },
-  { id: "d_dog", title: "Suy luận: Chó không có ngoại phạm", zh: "会议三点二十分才开始,所以三点的时候小狗没有不在场证明。", vi: "Họp bắt đầu lúc 3:20 nên lúc 3 giờ Chó không có chứng cứ ngoại phạm.", sceneId: "library", kind: "deduction", link: ["meeting_note", "dog_alibi"] },
+  { id: "d_sand", title: "cát từ khay của Chó", zh: "笔帽上的白色细沙和小狗桌上的沙子一样。", vi: "Cát trắng mịn trên nắp bút giống cát trong khay trên bàn Chó.", sceneId: "library", kind: "deduction", link: ["pen_cap", "office_sand"] },
+  { id: "d_notbeach", title: "không phải cát biển", zh: "海边是黄色的粗沙,笔帽上的不是海边的沙子。", vi: "Cát biển là cát vàng thô, nên cát trên nắp bút không phải từ bãi biển.", sceneId: "library", kind: "deduction", link: ["pen_cap", "beach_sand"] },
+  { id: "d_duck_lie", title: "Vịt nói dối", zh: "鸭子说他三点在海边,可是值班本上写着他两点半就离开了,所以他说了谎。", vi: "Vịt nói ba giờ ở bãi biển, nhưng sổ trực ghi anh rời lúc 2 rưỡi, nên Vịt đã nói dối.", sceneId: "library", kind: "deduction", link: ["duck_alibi", "beach_log"] },
+  { id: "d_duck", title: "Vịt vô tội", zh: "鸭子说了谎,但他两点五十分就离开了图书馆,那时笔还在,所以他不是小偷。", vi: "Vịt nói dối, nhưng rời thư viện lúc 2:50 khi bút vẫn còn, nên Vịt không phải kẻ lấy bút.", sceneId: "library", kind: "deduction", link: ["library_card", "d_duck_lie"] },
+  { id: "d_dog", title: "Chó không có ngoại phạm", zh: "会议三点二十分才开始,所以三点的时候小狗没有不在场证明。", vi: "Họp bắt đầu lúc 3:20 nên lúc 3 giờ Chó không có chứng cứ ngoại phạm.", sceneId: "library", kind: "deduction", link: ["meeting_note", "dog_alibi"] },
 ];
 
 export const SUSPECTS: Suspect[] = [

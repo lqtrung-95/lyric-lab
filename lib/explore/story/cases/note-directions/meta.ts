@@ -23,11 +23,11 @@ export const CLUES: ClueDef[] = [
   { id: "home_duck", title: "Biển địa chỉ nhà Vịt", zh: "门牌:小鸭的家在邮局东边三百米,门口有两棵树。", vi: "Biển địa chỉ: nhà Vịt ở phía đông bưu điện 300 mét, trước cửa có hai cái cây.", sceneId: "laundry", kind: "object" },
   { id: "pig_home_talk", title: "Lời khai của Anh Heo", zh: "昨天下午我在家里休息。", vi: "Chiều qua tôi nghỉ ở nhà.", sceneId: "phoneshop", kind: "testimony" },
   { id: "home_pig", title: "Biển địa chỉ nhà Heo", zh: "门牌:小猪的家在邮局北边一百五十米,门口有三棵树。", vi: "Biển địa chỉ: nhà Heo ở phía bắc bưu điện 150 mét, trước cửa có ba cái cây.", sceneId: "phoneshop", kind: "object" },
-  { id: "d_cat", title: "Suy luận: nhà Mèo ở phía tây", zh: "小猫的家在西边,可是纸条说小偷的家在东边,所以不是小猫。", vi: "Nhà Mèo ở phía tây, còn tờ giấy nói nhà kẻ trộm ở phía đông, nên không phải Mèo.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_cat"] },
-  { id: "d_pig", title: "Suy luận: nhà Heo ở phía bắc", zh: "小猪的家在北边,可是纸条说小偷的家在东边,所以不是小猪。", vi: "Nhà Heo ở phía bắc, còn tờ giấy nói nhà kẻ trộm ở phía đông, nên không phải Heo.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_pig"] },
-  { id: "d_duck", title: "Suy luận: nhà Vịt quá xa", zh: "小鸭的家离邮局三百米,可是纸条说不到两百米,所以不是小鸭。", vi: "Nhà Vịt cách bưu điện 300 mét, còn tờ giấy nói chưa tới 200 mét, nên không phải Vịt.", sceneId: "postoffice", kind: "deduction", link: ["note_dist", "home_duck"] },
-  { id: "d_dog_east", title: "Suy luận: nhà Chó ở phía đông", zh: "小狗的家在邮局东边,和纸条一样。", vi: "Nhà Chó ở phía đông bưu điện, khớp với tờ giấy thứ nhất.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_dog"] },
-  { id: "d_dog_near", title: "Suy luận: nhà Chó đủ gần", zh: "小狗的家离邮局一百五十米,不到两百米,和纸条一样。", vi: "Nhà Chó cách bưu điện 150 mét, chưa tới 200 mét, khớp với tờ giấy thứ hai.", sceneId: "postoffice", kind: "deduction", link: ["note_dist", "home_dog"] },
+  { id: "d_cat", title: "nhà Mèo ở phía tây", zh: "小猫的家在西边,可是纸条说小偷的家在东边,所以不是小猫。", vi: "Nhà Mèo ở phía tây, còn tờ giấy nói nhà kẻ trộm ở phía đông, nên không phải Mèo.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_cat"] },
+  { id: "d_pig", title: "nhà Heo ở phía bắc", zh: "小猪的家在北边,可是纸条说小偷的家在东边,所以不是小猪。", vi: "Nhà Heo ở phía bắc, còn tờ giấy nói nhà kẻ trộm ở phía đông, nên không phải Heo.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_pig"] },
+  { id: "d_duck", title: "nhà Vịt quá xa", zh: "小鸭的家离邮局三百米,可是纸条说不到两百米,所以不是小鸭。", vi: "Nhà Vịt cách bưu điện 300 mét, còn tờ giấy nói chưa tới 200 mét, nên không phải Vịt.", sceneId: "postoffice", kind: "deduction", link: ["note_dist", "home_duck"] },
+  { id: "d_dog_east", title: "nhà Chó ở phía đông", zh: "小狗的家在邮局东边,和纸条一样。", vi: "Nhà Chó ở phía đông bưu điện, khớp với tờ giấy thứ nhất.", sceneId: "postoffice", kind: "deduction", link: ["note_east", "home_dog"] },
+  { id: "d_dog_near", title: "nhà Chó đủ gần", zh: "小狗的家离邮局一百五十米,不到两百米,和纸条一样。", vi: "Nhà Chó cách bưu điện 150 mét, chưa tới 200 mét, khớp với tờ giấy thứ hai.", sceneId: "postoffice", kind: "deduction", link: ["note_dist", "home_dog"] },
 ];
 
 export const SUSPECTS: Suspect[] = [
