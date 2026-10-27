@@ -37,7 +37,7 @@ export function DialogueBrowser({ dialogues }: { dialogues: DialogueSummary[] })
       <ul className="grid gap-space-sm sm:grid-cols-2">
         {shown.map((d) => (
           <li key={d.id}>
-            <Link href={`/hoi-thoai/${d.id}`} className="card-ink flex h-full items-start gap-space-sm bg-surface-container-lowest p-space-sm transition-transform hover:-translate-y-0.5">
+            <Link href={`/dialogues/${d.id}`} className="card-ink flex h-full items-start gap-space-sm bg-surface-container-lowest p-space-sm transition-transform hover:-translate-y-0.5">
               <span aria-hidden className="text-3xl">{emoji(d.topic)}</span>
               <span className="min-w-0">
                 <span className="block text-body-lg font-extrabold">{d.title.vi}</span>

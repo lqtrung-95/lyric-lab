@@ -31,7 +31,7 @@ export function DialoguePlayer({ dialogue, pinyin, level, sceneTitle }: Props) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
       <header className="flex flex-col gap-1">
-        <Link href="/hoi-thoai" className="inline-flex min-h-11 items-center gap-1 text-label-lg font-extrabold text-primary"><Icon name="arrow_back" size={20} />Tất cả hội thoại</Link>
+        <Link href="/dialogues" className="inline-flex min-h-11 items-center gap-1 text-label-lg font-extrabold text-primary"><Icon name="arrow_back" size={20} />Tất cả hội thoại</Link>
         <h1 className="text-headline-lg">{dialogue.title.vi}</h1>
         {dialogue.title.zh && <p lang="zh-Hans" className="text-body-lg font-bold text-on-surface-variant">{dialogue.title.zh}</p>}
         <p className="text-label-lg text-on-surface-variant">{level ? `HSK ${level === 4 ? "4+" : level} · ` : ""}{dialogue.lines.length} câu · {dialogue.speakers.join(" và ")}</p>
