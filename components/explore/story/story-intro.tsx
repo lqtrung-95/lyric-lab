@@ -10,7 +10,7 @@ import { DifficultyBadge } from "./difficulty-badge";
 import { useStoryProgress } from "./use-story-progress";
 
 /** Trang giới thiệu một vụ án: tóm tắt, mục tiêu hiện tại, nút bắt đầu/tiếp tục và chơi lại từ đầu (hỏi lại trước khi xóa tiến độ). */
-export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "id" | "title" | "difficulty" | "intro" | "objectives" | "startScene" | "solvedFlag">; basePath: string }) {
+export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "id" | "title" | "difficulty" | "intro" | "objectives" | "startScene" | "solvedFlag" | "freeRoam" | "questions">; basePath: string }) {
   const { progress, ready, reset } = useStoryProgress(story.id);
   const [confirm, setConfirm] = useState(false);
   const objective = currentObjective(story.objectives, progress.flags);
@@ -28,8 +28,8 @@ export function StoryIntro({ story, basePath }: { story: Pick<StoryDef, "id" | "
       </header>
       {ready && (
         <section aria-label="Tiến độ vụ án" className="card-ink p-space-md">
-          <p className="text-label-md font-extrabold text-on-surface-variant">Tiến độ {done}/{total}</p>
-          <p className="text-body-md font-bold">{solved ? "Vụ án đã được giải. Bạn có thể chơi lại từ đầu." : objective ? `Mục tiêu hiện tại: ${objective.text}` : "Chưa bắt đầu."}</p>
+          <p className="text-label-md font-extrabold text-on-surface-variant">{story.freeRoam ? "Tự do điều tra: không có mục tiêu từng bước" : `Tiến độ ${done}/${total}`}</p>
+          <p className="text-body-md font-bold">{solved ? "Vụ án đã được giải. Bạn có thể chơi lại từ đầu." : story.freeRoam ? "Đi đâu, hỏi ai tùy bạn. Hãy tự tìm câu trả lời cho các câu hỏi trong sổ vụ án." : objective ? `Mục tiêu hiện tại: ${objective.text}` : "Chưa bắt đầu."}</p>
           <div className="mt-space-sm flex flex-wrap items-center gap-3">
             <Link href={`${basePath}/${scene}`} className="btn-3d btn-3d-bright">{started && !solved ? "Tiếp tục vụ án" : "Bắt đầu vụ án"}</Link>
             {started && !confirm && <button type="button" onClick={() => setConfirm(true)} className="min-h-11 text-label-md text-on-surface-variant underline">Chơi lại từ đầu</button>}

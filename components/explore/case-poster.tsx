@@ -27,6 +27,10 @@ const POSTERS: Record<string, PosterDef> = {
   "spring-painting": { bg: ["#e6d3f5", "#a98bd0"], prop: { sprite: "painting", w: 38, rotate: -5 }, client: "owl" },
   "lost-wallet": { bg: ["#cdeede", "#6fc0a6"], prop: { sprite: "wallet", w: 30, rotate: -8 }, client: "fox" },
   "trophy-loan": { bg: ["#ffe6a0", "#d9a441"], prop: { sprite: "trophy", w: 24, rotate: 10 }, client: "dog" },
+  "birthday-cake": { bg: ["#ffd9e8", "#f08fb4"], prop: { sprite: "cake", w: 34, rotate: -5 }, client: "cat" },
+  "jade-vase": { bg: ["#d8efe3", "#5fb494"], prop: { sprite: "prize", w: 28, rotate: 8 }, client: "owl" },
+  "note-directions": { bg: ["#e8dcc4", "#b08b4f"], prop: { sprite: "routemap", w: 34, rotate: -6 }, client: "rabbit" },
+  "shopping-list": { bg: ["#d6efd0", "#6aa86a"], prop: { sprite: "wallet", w: 28, rotate: 8 }, client: "fox" },
   "lost-kite": { bg: ["#bfe3f7", "#7fc9b9"], prop: { sprite: "kite", w: 22, rotate: 12 }, client: "duck" },
 };
 

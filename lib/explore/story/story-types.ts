@@ -84,7 +84,9 @@ export interface ClueDef {
   vi: string;
   /** Cảnh tìm ra manh mối. */
   sceneId: string;
-  kind: "document" | "object" | "testimony";
+  kind: "document" | "object" | "testimony" | "deduction";
+  /** Chỉ cho `kind: "deduction"`: hai manh mối cần nối với nhau. Suy luận không nhặt được ở đâu cả, chỉ có khi người chơi nối đúng cặp trong sổ vụ án. */
+  link?: [string, string];
 }
 
 /** Phần cốt truyện của một cảnh: ai đứng đó nói được gì, có gì để xem xét, cả đồ thị hội thoại của cảnh. */
@@ -118,6 +120,8 @@ export interface Suspect {
   note: string;
   /** Cờ đặt khi đã nghe lời khai của người này. */
   metFlag: string;
+  /** Lựa chọn không có người thật (ví dụ "Không ai cả"): có trong bảng buộc tội, không cần gặp và không hiện trong danh sách nghi phạm. */
+  virtual?: boolean;
 }
 
 export type StoryDifficulty = "easy" | "medium" | "hard";
@@ -139,7 +143,11 @@ export interface StoryDef {
   objectives: Objective[];
   scenes: Record<string, StorySceneDef>;
   /** Kết luận: thủ phạm đúng, các manh mối then chốt và số manh mối đúng tối thiểu cần chọn để buộc tội. */
-  solution: { suspectId: string; keyClues: string[]; needed: number };
+  solution: { suspectId: string; keyClues: string[]; needed: number; /** Đồng phạm: phải chọn cả hai người mới phá án. */ partnerId?: string };
+  /** Tự do điều tra: mọi cảnh mở sẵn, không có thanh mục tiêu dẫn từng bước (vụ khó). */
+  freeRoam?: boolean;
+  /** Câu hỏi cần làm rõ (hiện trong sổ vụ án thay cho mục tiêu từng bước). */
+  questions?: string[];
   /** Cờ đặt khi vụ án được giải. */
   solvedFlag: string;
   /** Khi nào được buộc tội (mở nút trong sổ vụ án). */

@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { PanelFrame } from "./panel-frame";
 import { Button3d } from "@/components/ui/button-3d";
+import type { LinkResult } from "@/lib/explore/story/deduction";
 import type { StoryDef, StoryProgress } from "@/lib/explore/story/story-types";
 import { ArtSprite } from "../art/art-sprite";
 import { FLAT_SPRITES } from "../art/flat/flat-sprites";
@@ -18,19 +20,21 @@ interface Props {
   canAccuse: boolean;
   solved: boolean;
   onAccuse: () => void;
+  onLink: (a: string, b: string) => LinkResult;
   onClose: () => void;
 }
 
 /** Sổ vụ án: các manh mối đã tìm (đọc lại, nghe lại), các nghi phạm và lời khai của họ, nút buộc tội khi đủ điều kiện. */
-export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, canAccuse, solved, onAccuse, onClose }: Props) {
+export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, canAccuse, solved, onAccuse, onLink, onClose }: Props) {
   const found = story.clues.filter((c) => progress.clues.includes(c.id));
+  const hasDeductions = story.clues.some((c) => c.kind === "deduction");
   return (
     <PanelFrame label="Sổ vụ án" title="Sổ vụ án" extra={<div className="max-sm:[&_button]:!min-h-9 max-sm:[&_button]:!px-2.5 max-sm:[&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={onToggleHint} /></div>} onClose={onClose}>
       <p className="text-body-md text-on-surface-variant">{story.title}</p>
 
       <h3 className="mt-space-sm text-label-md font-extrabold">Nghi phạm</h3>
       <ul className="mt-1 grid gap-2 sm:grid-cols-2">
-        {story.suspects.map((s) => {
+        {story.suspects.filter((s) => !s.virtual).map((s) => {
           const met = progress.flags.includes(s.metFlag);
           const sprite = FLAT_SPRITES[s.sprite];
           return (
@@ -42,10 +46,19 @@ export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, ca
         })}
       </ul>
 
-      <h3 className="mt-space-sm text-label-md font-extrabold">Manh mối ({found.length}/{story.clues.length})</h3>
+      {story.questions && story.questions.length > 0 && (
+        <>
+          <h3 className="mt-space-sm text-label-md font-extrabold">Câu hỏi cần làm rõ</h3>
+          <ul className="mt-1 list-disc space-y-0.5 pl-5 text-body-md">{story.questions.map((q) => <li key={q}>{q}</li>)}</ul>
+        </>
+      )}
+
+      <h3 className="mt-space-sm text-label-md font-extrabold">Manh mối ({found.filter((c) => c.kind !== "deduction").length})</h3>
       {found.length === 0 ? <p className="text-body-md text-on-surface-variant">Chưa có manh mối nào. Hãy xem xét căn phòng và hỏi mọi người.</p> : (
         <ul className="mt-1 space-y-2">{found.map((c) => <li key={c.id} className="rounded-xl bg-surface-container-low p-space-sm"><ClueBody clue={c} pinyin={pinyin} hints={hints} /></li>)}</ul>
       )}
+
+      {hasDeductions && <LinkClues found={found.filter((c) => c.kind !== "deduction")} onLink={onLink} />}
 
       <div className="mt-space-sm flex flex-wrap items-center gap-3">
         {!solved && <Button3d variant="secondary" disabled={!canAccuse} onClick={onAccuse}>Buộc tội</Button3d>}
@@ -53,5 +66,35 @@ export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, ca
         {solved && <p role="status" className="text-label-md font-extrabold text-secondary">Vụ án đã được giải!</p>}
       </div>
     </PanelFrame>
+  );
+}
+
+/** Nối hai manh mối đã tìm: cặp đúng cho ra một suy luận mới, cặp sai thì không có gì xảy ra. */
+function LinkClues({ found, onLink }: { found: StoryDef["clues"]; onLink: (a: string, b: string) => LinkResult }) {
+  const [a, setA] = useState("");
+  const [b, setB] = useState("");
+  const [msg, setMsg] = useState<string | null>(null);
+  const submit = () => {
+    const r = onLink(a, b);
+    setMsg(r.status === "linked" ? `Suy luận mới: ${r.clue.vi}` : r.status === "known" ? "Hai manh mối này bạn đã nối rồi." : "Hai manh mối này chưa dẫn tới điều gì. Thử cặp khác.");
+  };
+  const select = (label: string, value: string, set: (v: string) => void) => (
+    <label className="flex min-w-0 flex-1 flex-col gap-1 text-label-md font-extrabold">{label}
+      <select value={value} onChange={(e) => { set(e.target.value); setMsg(null); }} className="min-h-11 w-full rounded-xl border-2 border-ink bg-surface-container-lowest px-2 text-body-md font-normal">
+        <option value="">Chọn manh mối…</option>
+        {found.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+      </select>
+    </label>
+  );
+  return (
+    <section aria-label="Nối manh mối" className="mt-space-sm rounded-xl border-2 border-ink p-space-sm">
+      <h3 className="text-label-md font-extrabold">Nối manh mối</h3>
+      <p className="text-body-sm text-on-surface-variant">Chọn hai manh mối có liên quan để rút ra suy luận. Các suy luận mới là bằng chứng mạnh nhất khi buộc tội.</p>
+      <div className="mt-1 flex flex-col gap-2 sm:flex-row">{select("Manh mối thứ nhất", a, setA)}{select("Manh mối thứ hai", b, setB)}</div>
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <Button3d variant="secondary" disabled={!a || !b || a === b} onClick={submit}>Nối lại</Button3d>
+        {msg && <p role="status" className="text-label-md font-bold">{msg}</p>}
+      </div>
+    </section>
   );
 }

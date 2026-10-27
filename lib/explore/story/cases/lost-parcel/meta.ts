@@ -25,6 +25,10 @@ export const CLUES: ClueDef[] = [
   { id: "pig_alibi", title: "Lời khai của Anh Heo", zh: "昨天下午六点,我在手机店工作。", vi: "Sáu giờ chiều hôm qua, tôi đang làm việc ở cửa hàng điện thoại.", sceneId: "phoneshop", kind: "testimony" },
   { id: "closing_sign", title: "Bảng giờ đóng cửa", zh: "这家手机店昨天下午五点半就关门了。", vi: "Cửa hàng điện thoại này hôm qua đã đóng cửa từ 5 giờ rưỡi chiều.", sceneId: "phoneshop", kind: "document" },
   { id: "pig_slip", title: "Heo đổi lời", zh: "我……我只是想再看一眼那块表,明天就还。", vi: "Tôi... tôi chỉ muốn ngắm lại chiếc đồng hồ đó, mai tôi trả thôi.", sceneId: "phoneshop", kind: "testimony" },
+  { id: "d_cat", title: "Suy luận: Mèo nói dối nhưng vô tội", zh: "小猫说了谎,但她没有看过红盒子,所以不是小偷。", vi: "Mèo nói dối nhưng không nằm trong ba người từng thấy hộp đỏ, nên không phải kẻ trộm.", sceneId: "postoffice", kind: "deduction", link: ["salon_book", "rabbit_list"] },
+  { id: "d_fox", title: "Suy luận: Cáo có ngoại phạm", zh: "狐狸见过红盒子,但六点她一直在药店,所以不是小偷。", vi: "Cáo từng thấy hộp đỏ nhưng lúc sáu giờ ở hiệu thuốc suốt, nên không phải kẻ trộm.", sceneId: "postoffice", kind: "deduction", link: ["pharmacy_receipt", "thief_note"] },
+  { id: "d_turtle", title: "Suy luận: Rùa có ngoại phạm", zh: "乌龟见过红盒子,但六点他忙着招待客人,所以不是小偷。", vi: "Rùa từng thấy hộp đỏ nhưng lúc sáu giờ bận tiếp khách, nên không phải kẻ trộm.", sceneId: "postoffice", kind: "deduction", link: ["kitchen_log", "thief_note"] },
+  { id: "d_pig", title: "Suy luận: Heo biết hộp đỏ mà không có ngoại phạm", zh: "只有猪、狐狸和乌龟看过红盒子,而猪的店六点已经关门了。", vi: "Heo là một trong ba người biết hộp đỏ, và cửa hàng của Heo đã đóng cửa từ 5 rưỡi.", sceneId: "postoffice", kind: "deduction", link: ["closing_sign", "rabbit_list"] },
 ];
 
 export const SUSPECTS: Suspect[] = [

@@ -7,7 +7,7 @@ import type { ClueDef } from "@/lib/explore/story/story-types";
 import { HintToggles } from "./hint-toggles";
 import type { Hints } from "./use-story-hints";
 
-const KIND_LABEL: Record<ClueDef["kind"], string> = { document: "Tài liệu", object: "Vật chứng", testimony: "Lời khai" };
+const KIND_LABEL: Record<ClueDef["kind"], string> = { document: "Tài liệu", object: "Vật chứng", testimony: "Lời khai", deduction: "Suy luận" };
 
 /** Một manh mối: tiêu đề, loại, câu tiếng Trung (kèm pinyin/nghĩa theo gợi ý, nghe được). Dùng ở thẻ "đã tìm thấy" và trong sổ vụ án. */
 export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Record<string, string>; hints: Hints }) {

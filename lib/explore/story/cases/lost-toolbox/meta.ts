@@ -24,6 +24,10 @@ export const CLUES: ClueDef[] = [
   { id: "rabbit_alibi", title: "Lời khai của Bé Thỏ", zh: "昨天下午三点到四点,我一直在奶茶店做奶茶。", vi: "Chiều qua từ 3 đến 4 giờ, tôi pha trà sữa ở quán suốt.", sceneId: "bubbletea", kind: "testimony" },
   { id: "tea_tickets", title: "Phiếu đơn trà sữa", zh: "奶茶店的订单:三点十分有一单,然后三点五十五分才有下一单。中间店里没有别的客人。", vi: "Phiếu đơn quán trà sữa: 3 giờ 10 có một đơn, đến 3 giờ 55 mới có đơn kế tiếp. Ở giữa quán không có khách nào khác.", sceneId: "bubbletea", kind: "document" },
   { id: "rabbit_slip", title: "Thỏ đổi lời", zh: "我……我只是想借用一下,马上就还。", vi: "Tôi... tôi chỉ định mượn một chút rồi trả ngay thôi.", sceneId: "bubbletea", kind: "testimony" },
+  { id: "d_cat", title: "Suy luận: Mèo không kịp", zh: "小猫每隔十五分钟签一次字,来回要二十分钟,所以她来不及。", vi: "Mèo ký nhận cách nhau 15 phút mà đi về tiệm sửa xe mất 20 phút, nên Mèo không kịp.", sceneId: "garage", kind: "deduction", link: ["flower_orders", "route_map"] },
+  { id: "d_fox", title: "Suy luận: Cáo không kịp", zh: "狐狸两次喂食只隔四十分钟,来回要五十分钟,所以她来不及。", vi: "Hai lần cho ăn của Cáo cách nhau 40 phút mà đi về mất 50 phút, nên Cáo không kịp.", sceneId: "garage", kind: "deduction", link: ["zoo_log", "route_map"] },
+  { id: "d_turtle", title: "Suy luận: Rùa không kịp", zh: "乌龟两次端菜只隔二十分钟,来回要四十分钟,所以他来不及。", vi: "Hai lần bưng món của Rùa cách nhau 20 phút mà đi về mất 40 phút, nên Rùa không kịp.", sceneId: "garage", kind: "deduction", link: ["hotpot_log", "route_map"] },
+  { id: "d_rabbit", title: "Suy luận: Thỏ có cơ hội", zh: "兔子的店三点十分到三点五十五分没有客人,工具箱就是这段时间不见的。", vi: "Quán của Thỏ vắng khách từ 3:10 đến 3:55, đúng lúc hộp biến mất, và đi về chỉ mất 10 phút.", sceneId: "garage", kind: "deduction", link: ["tea_tickets", "last_seen"] },
 ];
 
 export const SUSPECTS: Suspect[] = [

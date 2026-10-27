@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { judge, readyToAccuse } from "../deduction";
+import { judge, linkClues, readyToAccuse } from "../deduction";
 import { enterNode, pickEntry, step } from "../dialogue";
 import { currentObjective, sceneUnlocked } from "../objectives";
 import { storyExits, storyRoute } from "../story-route";
@@ -20,6 +20,7 @@ function producibleFlags(story: StoryDef): Set<string> {
     }
     for (const s of sc.spots ?? []) out.add(`clue:${s.clue}`);
   }
+  for (const c of story.clues) if (c.kind === "deduction") out.add(`clue:${c.id}`);
   return out;
 }
 
@@ -65,6 +66,10 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
       for (const n of Object.values(sc.dialogues)) for (const f of [...(n.effects ?? []), ...(n.choices ?? []).flatMap((c) => c.effects ?? [])]) if ("clue" in f) expect(clueIds.has(f.clue), f.clue).toBe(true);
     }
     for (const k of story.solution.keyClues) expect(clueIds.has(k), k).toBe(true);
+    for (const d of story.clues.filter((c) => c.kind === "deduction")) {
+      expect(d.link, d.id).toHaveLength(2);
+      for (const l of d.link!) expect(story.clues.find((c) => c.id === l && c.kind !== "deduction"), `${d.id} → ${l}`).toBeDefined();
+    }
     expect(story.suspects.map((s) => s.id)).toContain(story.solution.suspectId);
     expect(story.solution.needed).toBeLessThanOrEqual(story.solution.keyClues.length);
   });
@@ -78,7 +83,7 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
       for (const n of Object.values(sc.dialogues)) for (const c of n.choices ?? []) if (c.when) all.push(c.when);
     }
     for (const c of all) for (const f of conds(c)) expect(can.has(f) || f.startsWith("met:"), `cờ ${f}`).toBe(true);
-    for (const s of story.suspects) expect(can.has(s.metFlag), s.metFlag).toBe(true);
+    for (const s of story.suspects.filter((x) => !x.virtual)) expect(can.has(s.metFlag), s.metFlag).toBe(true);
   });
 
   it("chơi theo đường lý tưởng thì đi hết các mục tiêu và buộc tội đúng được (vụ án giải được)", () => {
@@ -92,8 +97,14 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
       }
       if (p.flags.length === before) break;
     }
+    // Người chơi nối các cặp manh mối để ra suy luận (chỉ vụ có suy luận).
+    for (const d of story.clues.filter((c) => c.kind === "deduction")) {
+      const r = linkClues(story, p, d.link![0], d.link![1]);
+      expect(r.status, `nối ${d.id}`).toBe("linked");
+      if (r.status === "linked") p = r.progress;
+    }
     expect(readyToAccuse(story.suspects, p.flags)).toBe(true);
-    expect(judge(story, story.solution.suspectId, story.solution.keyClues.slice(0, story.solution.needed)).type).toBe("solved");
+    expect(judge(story, [story.solution.suspectId, ...(story.solution.partnerId ? [story.solution.partnerId] : [])], story.solution.keyClues.slice(0, story.solution.needed)).type).toBe("solved");
     for (const k of story.solution.keyClues) expect(p.clues, k).toContain(k);
     p = applyEffects(p, [{ flag: story.solvedFlag }]);
     expect(currentObjective(story.objectives, p.flags)).toBeNull();
@@ -101,9 +112,9 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
   });
 
   it("buộc tội sai người hoặc thiếu bằng chứng thì không phá án", () => {
-    const wrong = story.suspects.find((s) => s.id !== story.solution.suspectId)!;
+    const wrong = story.suspects.find((s) => s.id !== story.solution.suspectId && s.id !== story.solution.partnerId)!;
     expect(judge(story, wrong.id, story.solution.keyClues).type).toBe("wrong_suspect");
-    expect(judge(story, story.solution.suspectId, []).type).toBe("weak_evidence");
+    expect(judge(story, [story.solution.suspectId, ...(story.solution.partnerId ? [story.solution.partnerId] : [])], []).type).toBe("weak_evidence");
   });
 });
 
@@ -241,7 +252,7 @@ describe("vụ án bưu kiện biến mất (hộp đỏ)", () => {
     expect(story.difficulty).toBe("hard");
     expect(story.suspects).toHaveLength(4);
     for (const s of story.suspects.filter((x) => x.id !== "pig")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
-    expect(judge(story, "pig", story.solution.keyClues.slice(0, 4)).type).toBe("weak_evidence");
+    expect(judge(story, "pig", story.solution.keyClues.slice(0, 3)).type).toBe("weak_evidence");
     const e = story.scenes.phoneshop.sceneNpcEntries!;
     const base = ["met:pig", "clue:closing_sign", "clue:thief_note", "clue:rabbit_list", "clue:pharmacy_receipt"];
     expect(pickEntry(e, base)).not.toBe("pig_conf");
@@ -271,5 +282,58 @@ describe("vụ án chiếc bút máy (bị đổ oan)", () => {
     const all = ["met:dog", "clue:meeting_note", "clue:office_sand", "clue:pen_cap", "clue:beach_sand", "clue:library_card"];
     expect(pickEntry(e, all.filter((f) => f !== "clue:beach_sand"))).not.toBe("dog_conf");
     expect(pickEntry(e, all)).toBe("dog_conf");
+  });
+});
+
+describe("vụ án mới: không có thủ phạm, đồng phạm, nối manh mối, đọc hiểu", () => {
+  it("birthday-cake: đáp án là 'Không ai cả'; buộc tội Chó là sai; Chó chỉ đổi lời khi có sổ đơn của tiệm bánh", () => {
+    const story = CASES["birthday-cake"];
+    expect(story.solution.suspectId).toBe("nobody");
+    expect(story.suspects.find((s) => s.id === "nobody")?.virtual).toBe(true);
+    expect(judge(story, "nobody", story.solution.keyClues).type).toBe("solved");
+    expect(judge(story, "dog", story.solution.keyClues).type).toBe("wrong_suspect");
+    const dog = story.scenes.gym.dialogues.dog_conf;
+    const visible = (flags: string[]) => (dog.choices ?? []).filter((c) => holds(c.when, flags)).filter((c) => c.check === "right");
+    expect(visible(["clue:class_roster"])).toHaveLength(0);
+    expect(visible(["clue:order_book"])).toHaveLength(1);
+  });
+
+  it("jade-vase: phải chọn đủ cả hai người (thừa hoặc thiếu đều sai)", () => {
+    const story = CASES["jade-vase"];
+    const keys = story.solution.keyClues;
+    expect(judge(story, ["rabbit", "duck"], keys).type).toBe("solved");
+    expect(judge(story, ["duck", "rabbit"], keys).type).toBe("solved");
+    expect(judge(story, "rabbit", keys).type).toBe("wrong_suspect");
+    expect(judge(story, ["rabbit", "duck", "fox"], keys).type).toBe("wrong_suspect");
+    expect(judge(story, ["rabbit", "fox"], keys).type).toBe("wrong_suspect");
+  });
+
+  it("nối manh mối: cặp đúng ra suy luận (không phụ thuộc thứ tự), cặp sai hoặc chưa tìm thì không", () => {
+    const story = CASES["note-directions"];
+    const have = emptyStory();
+    expect(linkClues(story, have, "note_east", "home_cat").status).toBe("none");
+    const p = applyEffects(have, [{ clue: "note_east" }, { clue: "home_cat" }]);
+    const r = linkClues(story, p, "home_cat", "note_east");
+    expect(r.status).toBe("linked");
+    if (r.status === "linked") {
+      expect(r.progress.clues).toContain("d_cat");
+      expect(linkClues(story, r.progress, "note_east", "home_cat").status).toBe("known");
+    }
+    expect(linkClues(story, p, "note_east", "note_east").status).toBe("none");
+  });
+
+  it("vụ khó dùng tự do điều tra: mọi cảnh mở sẵn và không có mục tiêu dẫn từng bước", () => {
+    for (const id of ["lost-toolbox", "lost-parcel", "fountain-pen", "birthday-cake", "jade-vase", "note-directions", "shopping-list"]) {
+      const s = CASES[id];
+      expect(s.freeRoam, id).toBe(true);
+      expect(s.questions?.length, id).toBeGreaterThan(0);
+    }
+  });
+
+  it("vụ đọc hiểu: manh mối chữ Hán không kèm bản dịch nội dung", () => {
+    for (const id of ["note-directions", "shopping-list"]) {
+      const hidden = CASES[id].clues.filter((c) => c.kind !== "deduction" && c.vi.startsWith("Một dòng chữ tiếng Trung"));
+      expect(hidden.length, id).toBeGreaterThanOrEqual(5);
+    }
   });
 });
