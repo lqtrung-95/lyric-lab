@@ -1,5 +1,6 @@
 "use client";
 
+import { PanelFrame } from "./panel-frame";
 import { Icon } from "@/components/ui/icon";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import type { ClueDef } from "@/lib/explore/story/story-types";
@@ -26,7 +27,7 @@ export function ClueBody({ clue, pinyin, hints }: { clue: ClueDef; pinyin: Recor
 /** Thẻ hiện ngay sau khi xem xét một chỗ và tìm ra manh mối. */
 export function ClueCard({ clue, pinyin, hints, onToggleHint, onClose, onOpenCase }: { clue: ClueDef; pinyin: Record<string, string>; hints: Hints; onToggleHint: (k: keyof Hints) => void; onClose: () => void; onOpenCase: () => void }) {
   return (
-    <section aria-label={`Manh mối: ${clue.title}`} className="card-ink p-space-md">
+    <PanelFrame label={`Manh mối: ${clue.title}`} title="Manh mối mới" onClose={onClose}>
       <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
         <p role="status" className="flex items-center gap-1 text-label-md font-extrabold text-secondary"><Icon name="check_circle" size={18} filled />Đã ghi vào sổ vụ án</p>
         <div className="max-sm:[&_button]:!min-h-9 max-sm:[&_button]:!px-3 max-sm:[&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={onToggleHint} /></div>
@@ -36,6 +37,6 @@ export function ClueCard({ clue, pinyin, hints, onToggleHint, onClose, onOpenCas
         <button type="button" onClick={onOpenCase} className="min-h-11 text-label-md font-extrabold text-primary hover:underline">Mở sổ vụ án</button>
         <button type="button" onClick={onClose} className="min-h-11 text-label-md font-extrabold text-primary hover:underline">Đóng</button>
       </div>
-    </section>
+    </PanelFrame>
   );
 }

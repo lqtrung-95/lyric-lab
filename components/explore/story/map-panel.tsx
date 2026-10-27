@@ -1,5 +1,6 @@
 "use client";
 
+import { PanelFrame } from "./panel-frame";
 import Link from "next/link";
 import { Icon } from "@/components/ui/icon";
 
@@ -19,9 +20,8 @@ export interface MapEntry {
 /** Bản đồ vụ án: danh sách các địa điểm, đi thẳng tới từng nơi (không phải đi bộ qua các cảnh), cảnh của mục tiêu hiện tại được đánh dấu. */
 export function MapPanel({ entries, basePath, onClose }: { entries: MapEntry[]; basePath: string; onClose: () => void }) {
   return (
-    <section aria-label="Bản đồ" className="card-ink p-space-md">
-      <h2 className="text-headline-md">Bản đồ</h2>
-      <ul className="mt-space-sm grid gap-2 sm:grid-cols-2">
+    <PanelFrame label="Bản đồ" title="Bản đồ" onClose={onClose}>
+      <ul className="grid gap-2 sm:grid-cols-2">
         {entries.filter((e) => e.available).map((e) => (
           <li key={e.id}>
             {e.locked ? (
@@ -36,7 +36,6 @@ export function MapPanel({ entries, basePath, onClose }: { entries: MapEntry[]; 
           </li>
         ))}
       </ul>
-      <button type="button" onClick={onClose} className="mt-space-sm min-h-11 text-label-md font-extrabold text-primary hover:underline">Đóng</button>
-    </section>
+    </PanelFrame>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { PanelFrame } from "./panel-frame";
 import { useState } from "react";
 import { Button3d } from "@/components/ui/button-3d";
 import type { Verdict } from "@/lib/explore/story/deduction";
@@ -28,8 +29,7 @@ export function AccusePanel({ story, progress, hints, verdict, onSubmit, onClose
   const clues = story.clues.filter((c) => progress.clues.includes(c.id));
   const toggle = (id: string) => setPicked((cur) => (cur.includes(id) ? cur.filter((x) => x !== id) : cur.length < needed ? [...cur, id] : cur));
   return (
-    <section aria-label="Buộc tội" className="card-ink p-space-md">
-      <h2 className="text-headline-md">Ai đã lấy hộp gỗ?</h2>
+    <PanelFrame label="Buộc tội" title="Ai là thủ phạm?" onClose={onClose}>
       <p className="text-body-md text-on-surface-variant">Chọn một người, rồi chọn {needed} manh mối chứng minh điều đó.</p>
       <div role="radiogroup" aria-label="Nghi phạm" className="mt-space-sm flex flex-wrap gap-2">
         {story.suspects.map((s) => (
@@ -58,6 +58,6 @@ export function AccusePanel({ story, progress, hints, verdict, onSubmit, onClose
         <Button3d variant="secondary" disabled={!suspect || picked.length !== needed} onClick={() => suspect && onSubmit(suspect, picked)}>Buộc tội</Button3d>
         <button type="button" onClick={onClose} className="min-h-11 text-label-md font-extrabold text-primary hover:underline">Để tôi xem lại</button>
       </div>
-    </section>
+    </PanelFrame>
   );
 }

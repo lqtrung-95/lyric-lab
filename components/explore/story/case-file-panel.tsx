@@ -1,5 +1,6 @@
 "use client";
 
+import { PanelFrame } from "./panel-frame";
 import { Button3d } from "@/components/ui/button-3d";
 import type { StoryDef, StoryProgress } from "@/lib/explore/story/story-types";
 import { ArtSprite } from "../art/art-sprite";
@@ -24,11 +25,7 @@ interface Props {
 export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, canAccuse, solved, onAccuse, onClose }: Props) {
   const found = story.clues.filter((c) => progress.clues.includes(c.id));
   return (
-    <section aria-label="Sổ vụ án" className="card-ink p-space-md">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-headline-md">Sổ vụ án</h2>
-        <HintToggles hints={hints} onToggle={onToggleHint} />
-      </div>
+    <PanelFrame label="Sổ vụ án" title="Sổ vụ án" extra={<div className="max-sm:[&_button]:!min-h-9 max-sm:[&_button]:!px-2.5 max-sm:[&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={onToggleHint} /></div>} onClose={onClose}>
       <p className="text-body-md text-on-surface-variant">{story.title}</p>
 
       <h3 className="mt-space-sm text-label-md font-extrabold">Nghi phạm</h3>
@@ -54,8 +51,7 @@ export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, ca
         {!solved && <Button3d variant="secondary" disabled={!canAccuse} onClick={onAccuse}>Buộc tội</Button3d>}
         {!solved && !canAccuse && <p className="text-label-md text-on-surface-variant">Cần hỏi hết mọi người và nghe nhân chứng trước.</p>}
         {solved && <p role="status" className="text-label-md font-extrabold text-secondary">Vụ án đã được giải!</p>}
-        <button type="button" onClick={onClose} className="min-h-11 text-label-md font-extrabold text-primary hover:underline">Đóng</button>
       </div>
-    </section>
+    </PanelFrame>
   );
 }

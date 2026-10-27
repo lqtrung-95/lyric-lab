@@ -59,7 +59,7 @@ export function StoryPanels(props: { payload: StoryPayload; sc: Controller; base
       aria-label="Vụ án"
       onCancel={(e) => { e.preventDefault(); close(); }} // Esc đi qua trạng thái của cha
       onClick={(e) => { if (e.target === ref.current) close(); }}
-      className="m-auto max-h-[88vh] w-[min(94vw,40rem)] overflow-y-auto rounded-3xl bg-transparent p-0 text-on-surface backdrop:bg-black/55 backdrop:backdrop-blur-[2px]"
+      className="m-auto w-[min(94vw,40rem)] overflow-visible rounded-3xl bg-transparent p-0 text-on-surface backdrop:bg-black/55 backdrop:backdrop-blur-[2px]"
     >
       <PanelBody {...props} />
     </dialog>
