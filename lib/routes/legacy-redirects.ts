@@ -17,6 +17,8 @@ export function legacyRedirects(): Redirect[] {
     to("/kham-pha/vu-an/hop-go", "/explore/cases/wooden-box"),
     ...scenes.flatMap(([old, now]) => [to(`/kham-pha/vu-an/hop-go/${old}`, `/explore/cases/wooden-box/${now}`), to(`/kham-pha/${old}`, `/explore/${now}`)]),
     to("/kham-pha/:path*", "/explore/:path*"),
+    // Vụ danh sách mua sắm từng có đường dẫn cảnh sai (`shop`), id đúng của cảnh cửa hàng là `clothing-store`.
+    to("/explore/cases/shopping-list/shop", "/explore/cases/shopping-list/clothing-store"),
     to("/cai-app", "/install"),
     { source: "/hoc", has: [{ type: "query", key: "khoa", value: "(?<course>.+)" }], destination: "/courses?course=:course", permanent: true },
     to("/hoc/xep-lop", "/courses/placement"),
