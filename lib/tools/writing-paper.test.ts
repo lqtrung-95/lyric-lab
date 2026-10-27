@@ -31,7 +31,11 @@ describe("paperLayout", () => {
 
   it("mọi đoạn nằm trong trang và cỡ ô, lề ngoài khoảng cho phép được kẹp lại", () => {
     const l = paperLayout({ type: "mizige", cellMm: 999, marginMm: -5 });
-    for (const s of l.segments) for (const v of [s.x1, s.x2]) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(210);
-    for (const s of l.segments) for (const v of [s.y1, s.y2]) expect(v).toBeGreaterThanOrEqual(0), expect(v).toBeLessThanOrEqual(297);
+    const xs = l.segments.flatMap((s) => [s.x1, s.x2]);
+    const ys = l.segments.flatMap((s) => [s.y1, s.y2]);
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(210);
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(297);
   });
 });

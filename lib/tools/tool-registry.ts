@@ -71,4 +71,13 @@ export const TOOLS: readonly ToolEntry[] = [
     popular: true,
     keywords: ["tap viet", "o vuong", "dien tu cach", "mi tu cach", "in", "pdf", "giay"],
   },
+  {
+    href: "/luong-tu-tieng-trung",
+    title: "Tra lượng từ tiếng Trung",
+    description: "Nhập danh từ để biết dùng lượng từ nào (书 → 本, 鱼 → 条), kèm bảng 15 lượng từ thông dụng bằng tiếng Việt.",
+    icon: "quiz",
+    category: "sentences",
+    popular: true,
+    keywords: ["luong tu", "measure word", "classifier", "dem", "con", "cai"],
+  },
 ];
