@@ -122,7 +122,7 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
       </div>
 
       <div className="rounded-xl border-2 border-outline-variant bg-surface-container-lowest px-space-sm py-space-sm">
-        <p lang="zh-Hans" className={`text-body-lg font-bold ${showPinyin ? "leading-[3]" : "leading-loose"}`}>
+        <p lang="zh-Hans" className={`text-body-lg font-bold ${showPinyin ? "leading-[3] [--rt-gap:1em]" : "leading-loose"}`}>
           {story.lines.map((line, i) => {
             const py = showPinyin ? alignPinyin(line.zh, pinyin[line.zh]) : null;
             let at = 0;

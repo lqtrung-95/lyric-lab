@@ -1,7 +1,7 @@
 import { alignPinyin } from "@/lib/pinyin/align-ruby";
 
-/** Màu và cỡ chữ pinyin dưới chữ Hán; chỗ nền cố định (bong bóng thoại) truyền màu riêng qua `rtClassName`. */
-const RT_BASE = "mx-[0.1em] [ruby-position:under] [&_rt]:text-[0.6em] [&_rt]:font-semibold [&_rt]:pt-[1em] [&_rt]:leading-none [&_rt]:tracking-normal";
+/** Màu và cỡ chữ pinyin dưới chữ Hán; khoảng hở giữa chữ và pinyin mặc định nhỏ, chỗ có gạch chân (truyện của cảnh) đặt `--rt-gap` lớn hơn trên thẻ bao ngoài; chỗ nền cố định (bong bóng thoại) truyền màu riêng qua `rtClassName`. */
+const RT_BASE = "mx-[0.1em] [ruby-position:under] [&_rt]:text-[0.6em] [&_rt]:font-semibold [&_rt]:pt-[var(--rt-gap,0.25em)] [&_rt]:leading-none [&_rt]:tracking-normal";
 
 /** Một đoạn chữ Hán, mỗi chữ có pinyin ngay bên dưới (thẻ `<ruby>`); `py` là pinyin từng chữ của cả câu, `offset` là vị trí đoạn này trong câu. */
 export function RubyChars({ text, py, offset = 0, rtClassName = "[&_rt]:text-primary" }: { text: string; py: string[] | null; offset?: number; rtClassName?: string }) {
