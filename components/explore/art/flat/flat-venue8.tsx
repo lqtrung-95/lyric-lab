@@ -54,6 +54,7 @@ const code = s(100, 80, <>
   <rect x="4" y="6" width="92" height="68" rx="8" fill={C.greyD} />
   <path d="M32 26L16 40l16 14M68 26l16 14-16 14" fill="none" stroke={C.greenL} strokeWidth={6} />
   <path d="M56 22L44 58" fill="none" stroke={C.yellow} strokeWidth={5} />
+  <rect x="10" y="10" width="80" height="8" rx="4" fill={C.grey} />
 </>);
 const bug = s(80, 80, <>
   <ellipse cx="40" cy="46" rx="22" ry="26" fill={C.red} />
@@ -65,11 +66,13 @@ const versiontag = s(90, 70, <>
   <path d="M6 12h46l32 24-32 24H6Z" fill={C.green} />
   <circle cx="20" cy="36" r="6" fill={C.cream} strokeWidth={2.500} />
   <path d="M32 28h26M32 38h20M32 48h14" fill="none" stroke={C.cream} strokeWidth={4} />
+  <path d="M12 18h30" fill="none" stroke={C.greenL} strokeWidth={3} />
 </>);
 const testcheck = s(80, 90, <>
   <rect x="8" y="6" width="64" height="78" rx="6" fill={C.white} />
   <path d="M18 24l6 6 10-12M18 44l6 6 10-12M18 64l6 6 10-12" fill="none" stroke={C.green} strokeWidth={5} />
   <path d="M42 26h22M42 46h22M42 66h22" fill="none" strokeWidth={4} />
+  <rect x="8" y="6" width="64" height="10" rx="4" fill={C.blueL} />
 </>);
 
 // ── Phòng thí nghiệm AI
@@ -113,6 +116,7 @@ const prompt = s(110, 80, <>
   <path d="M10 8h90q6 0 6 6v36q0 6-6 6H46L28 72V56H10q-6 0-6-6V14q0-6 6-6Z" fill={C.cream} />
   <path d="M18 22h40M18 34h60" fill="none" strokeWidth={4} />
   <path d="M84 20l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z" fill={C.yellow} strokeWidth={2} />
+  <circle cx="30" cy="62" r="3" fill={C.cream} strokeWidth={2} />
 </>);
 const dronebot = s(130, 80, <>
   <ellipse cx="65" cy="46" rx="26" ry="14" fill={C.greyD} />
@@ -172,11 +176,14 @@ const tomato = s(70, 70, <>
 const cucumber = s(110, 60, <>
   <path d="M10 40q0-22 30-26l56-4q10 4 6 18-4 14-24 18L30 56q-20 2-20-16Z" fill={C.green} />
   <path d="M30 24l4 4M48 20l4 4M66 18l4 4M84 22l4 4M44 38l4 4M62 34l4 4" fill="none" stroke={C.greenD} strokeWidth={4} />
+  <path d="M22 26q10-8 24-10" fill="none" stroke={C.greenL} strokeWidth={3} />
+  <circle cx="96" cy="14" r="3" fill={C.yellow} strokeWidth={2} />
 </>);
 const seedling = s(70, 90, <>
   <path d="M10 56h50l-6 30H16Z" fill={C.clay} />
   <path d="M35 56V30" fill="none" strokeWidth={5} />
   <path d="M35 36q-24-2-26-22 22 0 26 22ZM35 30q22-4 26-22-22 2-26 22Z" fill={C.green} />
+  <path d="M14 66h42" fill="none" stroke={C.woodD} strokeWidth={3} />
 </>);
 const fertilizer = s(70, 100, <>
   <path d="M10 14q25-8 50 0l4 78q-29 8-58 0Z" fill={C.cream} />
@@ -188,11 +195,13 @@ const seedtray = s(130, 70, <>
   <path d="M6 32h118l-12 34H18Z" fill={C.brown} />
   <path d="M34 32v34M62 32v34M90 32v34" fill="none" stroke={C.woodD} strokeWidth={3} />
   <path d="M20 30q4-20 10 0M48 30q4-20 10 0M76 30q4-20 10 0M102 30q4-20 10 0" fill="none" stroke={C.green} strokeWidth={6} />
+  <path d="M10 36h110" fill="none" stroke={C.woodL} strokeWidth={3} />
 </>);
 const shadenet = s(130, 80, <>
   <rect x="6" y="10" width="118" height="56" rx="4" fill={C.greenD} opacity={0.85} />
   <path d="M6 24h118M6 38h118M6 52h118M30 10v56M54 10v56M78 10v56M102 10v56" fill="none" strokeWidth={2} stroke={C.green} />
   <path d="M10 70v8M120 70v8" fill="none" strokeWidth={5} />
+  <circle cx="65" cy="38" r="6" fill={C.green} strokeWidth={2} />
 </>);
 const dripline = s(140, 60, <>
   <path d="M6 24h128" fill="none" strokeWidth={10} stroke={INK} /><path d="M6 24h128" fill="none" strokeWidth={5} stroke={C.greyD} />
@@ -203,6 +212,7 @@ const veggiebed = s(160, 70, <>
   <path d="M6 30h148l-10 36H16Z" fill={C.brown} />
   <path d="M26 30q4-22 12 0M56 30q4-22 12 0M86 30q4-22 12 0M116 30q4-22 12 0" fill="none" stroke={C.green} strokeWidth={7} />
   <path d="M6 30h148" fill="none" stroke={C.woodD} strokeWidth={4} />
+  <path d="M20 52h120" fill="none" stroke={C.woodD} strokeWidth={3} opacity={0.6} />
 </>);
 
 export const VENUE8_SPRITES: Record<string, FlatSprite> = {

@@ -53,8 +53,8 @@ const ALIASES: Record<string, string> = {
   latte: "coffee", syrupbottle: "syrup", togocup: "cup", barcounter: "counter", pastrycase: "showcase", potplant: "flowerpot",
   novel: "book", comic: "magazine", fountainpen: "pen", journal: "notebook", cashdesk: "counter", revolveshelf: "bookshelf", readlamp: "lamp",
   networkcable: "cable", monitor: "screen", password: "lock", backupfiles: "folder", powersupply: "socket",
-  software: "laptop", program: "document", requirement: "note", techdoc: "document", workstation: "desk", bigscreen: "tv", projectorbeam: "projector", staffcard: "idcard",
-  voiceassistant: "speaker", touchscreen: "tablet", cargoship: "boat", customsform: "document", tariff: "receipt", importgoods: "parcel", freight: "cash", billoflading: "file", sample: "woodbox", shelving: "shelf",
+  software: "laptop", program: "document", requirement: "note", techdoc: "document", workstation: "table", bigscreen: "tv", projectorbeam: "projector", staffcard: "idcard",
+  voiceassistant: "speaker", touchscreen: "tablet", cargoship: "boat", customsform: "document", tariff: "note", importgoods: "parcel", freight: "cash", billoflading: "document", sample: "woodbox", shelving: "shelf",
   hygrometer: "thermometer", plasticfilm: "sheetcloth", compostbin: "bucket", handcart: "cart",
   swimgoggles: "goggles", bathtowel: "towel", firealarm: "bell", firesuit: "coat", turntable: "ladder",
 };
