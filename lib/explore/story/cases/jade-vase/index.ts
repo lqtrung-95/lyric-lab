@@ -21,7 +21,7 @@ export const JADE_VASE_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { museum: MUSEUM_STORY, cinema: CINEMA_STORY, laundry: LAUNDRY_STORY, bank: BANK_STORY, airport: AIRPORT_STORY },
-  solution: { suspectId: "rabbit", partnerId: "duck", keyClues: ["d_film", "d_ticket", "d_ring", "d_two", "d_fox", "d_pig", "rabbit_slip"], needed: 5 },
+  solution: { suspectId: "rabbit", partnerId: "duck", keyClues: ["d_film", "d_ticket", "d_ring", "d_two", "d_fox", "d_pig", "d_fox_ok", "d_pig_ok", "cinema_log", "laundry_log", "footprints", "museum_time", "bank_log", "flight_log", "rabbit_slip"], needed: 5 },
   freeRoam: true,
   questions: ["Có mấy người đã ra tay?", "Lời khai nào của ai là giả?", "Ai thật sự có chứng cứ ngoại phạm?"],
   solvedFlag: "case:solved",

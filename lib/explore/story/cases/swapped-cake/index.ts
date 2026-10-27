@@ -25,7 +25,7 @@ export const SWAPPED_CAKE_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { restaurant: RESTAURANT_STORY, market: MARKET_STORY, hospital: HOSPITAL_STORY, school: SCHOOL_STORY, station: STATION_STORY, park: PARK_STORY },
-  solution: { suspectId: "rabbit", keyClues: ["sign_sheet", "salt_buyer", "ticket_closed", "rabbit_slip", "turtle_sighting"], needed: 4 },
+  solution: { suspectId: "rabbit", keyClues: ["sign_sheet", "salt_buyer", "ticket_closed", "rabbit_slip", "turtle_sighting", "price_note", "class_schedule"], needed: 4 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:cat", "met:fox", "met:bird", "met:rabbit", "met:turtle", "clue:turtle_sighting"] },
   startScene: "restaurant",

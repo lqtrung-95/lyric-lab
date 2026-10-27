@@ -21,7 +21,7 @@ export const BIRTHDAY_CAKE_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { bakery: BAKERY_STORY, gym: GYM_STORY, school: SCHOOL_STORY, garage: GARAGE_STORY, park: PARK_STORY },
-  solution: { suspectId: "nobody", keyClues: ["d_order", "d_dog", "d_bird", "d_tiger", "dog_slip"], needed: 4 },
+  solution: { suspectId: "nobody", keyClues: ["d_order", "d_dog", "d_bird", "d_tiger", "d_lie", "d_bird_ok", "d_tiger_ok", "order_book", "witness_turtle", "gym_signout", "class_roster", "party_note", "tiger_log", "dog_slip"], needed: 4 },
   freeRoam: true,
   questions: ["Chiếc bánh có thật sự bị trộm không?", "Ai đã nói dối, và vì sao?", "Người ôm hộp bánh là ai, đến lấy lúc nào?"],
   solvedFlag: "case:solved",

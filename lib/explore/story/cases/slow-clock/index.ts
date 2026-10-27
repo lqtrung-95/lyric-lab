@@ -21,7 +21,7 @@ export const SLOW_CLOCK_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { flowershop: FLOWERSHOP_STORY, garage: GARAGE_STORY, bubbletea: BUBBLETEA_STORY, zoo: ZOO_STORY, hotpot: HOTPOT_STORY },
-  solution: { suspectId: "fox", keyClues: ["slow_clock", "feed_log", "petals", "witness"], needed: 3 },
+  solution: { suspectId: "fox", keyClues: ["slow_clock", "feed_log", "petals", "witness", "repair_sheet", "order_sheet"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:tiger", "met:rabbit", "met:fox", "clue:witness"] },
   startScene: "flowershop",

@@ -24,7 +24,7 @@ export const GOLDEN_KEY_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { hotel: HOTEL_STORY, "clothing-store": CLOTHING_STORE_STORY, school: SCHOOL_STORY, station: STATION_STORY, airport: AIRPORT_STORY, park: PARK_STORY },
-  solution: { suspectId: "bird", keyClues: ["sign_sheet", "pig_shift", "witness_pig", "witness_turtle", "bird_slip"], needed: 4 },
+  solution: { suspectId: "bird", keyClues: ["sign_sheet", "pig_shift", "witness_pig", "witness_turtle", "bird_slip", "dog_receipt", "shop_umbrellas", "rabbit_log"], needed: 4 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:dog", "met:bird", "met:rabbit", "met:pig", "clue:witness_turtle"] },
   startScene: "hotel",

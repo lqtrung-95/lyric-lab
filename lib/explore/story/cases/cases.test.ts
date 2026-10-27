@@ -258,7 +258,7 @@ describe("vụ án bưu kiện biến mất (hộp đỏ)", () => {
     expect(story.difficulty).toBe("hard");
     expect(story.suspects).toHaveLength(4);
     for (const s of story.suspects.filter((x) => x.id !== "pig")) expect(judge(story, s.id, story.solution.keyClues).type, s.id).toBe("wrong_suspect");
-    expect(judge(story, "pig", story.solution.keyClues.slice(0, 3)).type).toBe("weak_evidence");
+    expect(judge(story, "pig", story.solution.keyClues.slice(0, 2)).type).toBe("weak_evidence");
     const e = story.scenes.phoneshop.sceneNpcEntries!;
     const base = ["met:pig", "clue:closing_sign", "clue:thief_note", "clue:rabbit_list", "clue:pharmacy_receipt"];
     expect(pickEntry(e, base)).not.toBe("pig_conf");
@@ -363,5 +363,20 @@ describe("mọi cảnh của mọi vụ án có thật trong danh sách cảnh (
   it.each(Object.values(CASES))("vụ án $id", (story) => {
     const ids = new Set([story.startScene, story.accuseScene, ...Object.keys(story.scenes), ...story.clues.map((c) => c.sceneId), ...story.suspects.map((s) => s.sceneId), ...story.objectives.flatMap((o) => (o.sceneId ? [o.sceneId] : []))]);
     for (const id of ids) expect(SCENES[id], `cảnh "${id}"`).toBeDefined();
+  });
+});
+
+describe("bằng chứng hợp lệ đều được tính khi buộc tội", () => {
+  it("lost-parcel: người chơi chọn 'Heo nói dối', bảng giờ đóng cửa và lời Heo đổi lời thì phá án được", () => {
+    const story = CASES["lost-parcel"];
+    expect(judge(story, "pig", ["d_pig_lie", "closing_sign", "pig_slip"]).type).toBe("solved");
+    expect(judge(story, "pig", ["d_pig_lie", "closing_sign", "pig_alibi"]).type).toBe("weak_evidence");
+  });
+
+  it("mọi vụ: các suy luận trung gian (không phải suy luận kết luận bẫy) cũng nằm trong bằng chứng hợp lệ của vụ có nối manh mối", () => {
+    for (const story of Object.values(CASES)) {
+      const key = new Set(story.solution.keyClues);
+      expect(key.size, story.id).toBeGreaterThanOrEqual(story.solution.needed + 1);
+    }
   });
 });

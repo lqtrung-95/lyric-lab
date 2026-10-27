@@ -25,7 +25,7 @@ export const HOP_GO_CASE: StoryDef = {
   scenes: {
     room: ROOM_STORY, restaurant: RESTAURANT_STORY, market: MARKET_STORY, station: STATION_STORY, hospital: HOSPITAL_STORY, park: PARK_STORY,
   },
-  solution: { suspectId: "fox", keyClues: ["pen", "pens_jar", "sign_sheet", "witness"], needed: 3 },
+  solution: { suspectId: "fox", keyClues: ["pen", "pens_jar", "sign_sheet", "witness", "receipt", "price_note", "ticket_log"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:chef", "met:cat", "met:rabbit", "met:fox", "clue:witness"] },
   startScene: "room",

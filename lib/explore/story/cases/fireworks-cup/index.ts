@@ -23,7 +23,7 @@ export const FIREWORKS_CUP_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { funfair: FUNFAIR_STORY, zoo: ZOO_STORY, toyshop: TOYSHOP_STORY, garage: GARAGE_STORY, laundry: LAUNDRY_STORY, farm: FARM_STORY },
-  solution: { suspectId: "bird", keyClues: ["feed_log", "fence_hole", "gold_flake", "farm_road"], needed: 3 },
+  solution: { suspectId: "bird", keyClues: ["feed_log", "fence_hole", "gold_flake", "farm_road", "gate_log", "show_sign", "ferris_log", "toy_receipt", "road_toy", "laundry_receipt", "road_laundry"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:fox", "met:owl", "met:tiger", "met:duck", "met:bird", "clue:farm_road"] },
   startScene: "funfair",

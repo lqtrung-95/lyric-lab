@@ -22,7 +22,7 @@ export const SPRING_PAINTING_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { museum: MUSEUM_STORY, kitchen: KITCHEN_STORY, station: STATION_STORY, bakery: BAKERY_STORY, stadium: STADIUM_STORY },
-  solution: { suspectId: "cat", keyClues: ["kitchen_log", "rabbit_slip", "bakery_sign", "apron_color", "dog_sighting"], needed: 4 },
+  solution: { suspectId: "cat", keyClues: ["kitchen_log", "rabbit_slip", "bakery_sign", "apron_color", "dog_sighting", "attendance", "window_closed"], needed: 4 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:chef", "met:rabbit", "met:cat", "met:dog", "clue:dog_sighting"] },
   startScene: "museum",

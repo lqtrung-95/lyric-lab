@@ -54,7 +54,7 @@ export function AccusePanel({ story, progress, hints, verdict, onSubmit, onClose
         ))}
       </ul>
       {verdict?.type === "wrong_suspect" && <p role="alert" className="mt-space-sm text-label-md font-bold text-error">Kết luận này chưa đúng: có người có bằng chứng ngoại phạm, hoặc còn thiếu/thừa người. Hãy đọc lại lời khai và sổ vụ án.</p>}
-      {verdict?.type === "weak_evidence" && <p role="alert" className="mt-space-sm text-label-md font-bold text-error">Bạn chọn đúng người! Nhưng chỉ {verdict.matched}/{verdict.needed} manh mối thật sự chỉ vào người đó. Hãy chọn lại bằng chứng.</p>}
+      {verdict?.type === "weak_evidence" && <p role="alert" className="mt-space-sm text-label-md font-bold text-error">Bạn chọn đúng người! Nhưng mới có {verdict.matched}/{verdict.needed} bằng chứng thuyết phục. Hãy ưu tiên các suy luận và manh mối trực tiếp chỉ vào người đó, bỏ những thứ chỉ là lời khai hoặc chuyện của người khác.</p>}
       <div className="mt-space-sm flex items-center gap-3">
         <Button3d variant="secondary" disabled={chosen.length === 0 || picked.length !== needed} onClick={() => onSubmit(chosen, picked)}>Buộc tội</Button3d>
         <button type="button" onClick={onClose} className="min-h-11 text-label-md font-extrabold text-primary hover:underline">Để tôi xem lại</button>

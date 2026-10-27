@@ -22,7 +22,7 @@ export const LOST_PARCEL_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { postoffice: POSTOFFICE_STORY, salon: SALON_STORY, pharmacy: PHARMACY_STORY, hotpot: HOTPOT_STORY, phoneshop: PHONESHOP_STORY },
-  solution: { suspectId: "pig", keyClues: ["d_know", "d_fox", "d_turtle", "d_pig", "pig_slip"], needed: 4 },
+  solution: { suspectId: "pig", keyClues: ["d_know", "d_fox", "d_turtle", "d_pig", "d_fox_ok", "d_turtle_ok", "d_pig_lie", "thief_note", "rabbit_list", "closing_sign", "pharmacy_receipt", "kitchen_log", "pig_slip"], needed: 3 },
   freeRoam: true,
   questions: ["Kẻ trộm biết điều gì mà không phải ai cũng biết?", "Ai thật sự từng thấy chiếc hộp đỏ?", "Trong số đó, ai không có chứng cứ ngoại phạm lúc sáu giờ?"],
   solvedFlag: "case:solved",

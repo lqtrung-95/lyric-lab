@@ -22,7 +22,7 @@ export const LOST_WALLET_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { bank: BANK_STORY, cinema: CINEMA_STORY, salon: SALON_STORY, supermarket: SUPERMARKET_STORY, gym: GYM_STORY },
-  solution: { suspectId: "dog", keyClues: ["stub", "buyer_note", "gym_signout", "dog_slip"], needed: 3 },
+  solution: { suspectId: "dog", keyClues: ["stub", "buyer_note", "gym_signout", "dog_slip", "sales_log", "appointment", "pig_receipt"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:rabbit", "met:cat", "met:pig", "met:dog", "clue:dog_slip"] },
   startScene: "bank",

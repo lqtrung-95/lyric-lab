@@ -22,7 +22,7 @@ export const TROPHY_LOAN_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { gym: GYM_STORY, bank: BANK_STORY, cinema: CINEMA_STORY, salon: SALON_STORY, museum: MUSEUM_STORY },
-  solution: { suspectId: "dog", keyClues: ["dust_shelf", "witness_fox", "loan_form", "dog_slip"], needed: 3 },
+  solution: { suspectId: "dog", keyClues: ["dust_shelf", "witness_fox", "loan_form", "dog_slip", "sales_log", "appointment"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:fox", "met:rabbit", "met:cat", "met:owl", "clue:dog_slip"] },
   startScene: "gym",

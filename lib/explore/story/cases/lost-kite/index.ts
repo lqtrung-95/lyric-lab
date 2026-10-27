@@ -23,7 +23,7 @@ export const LOST_KITE_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { beach: BEACH_STORY, "clothing-store": CLOTHING_STORE_STORY, supermarket: SUPERMARKET_STORY, school: SCHOOL_STORY, market: MARKET_STORY, park: PARK_STORY },
-  solution: { suspectId: "cat", keyClues: ["paw_print", "cat_print", "dog_log", "market_sign", "cat_slip", "witness_turtle"], needed: 5 },
+  solution: { suspectId: "cat", keyClues: ["paw_print", "cat_print", "dog_log", "market_sign", "cat_slip", "witness_turtle", "pig_print", "bird_print"], needed: 5 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:dog", "met:pig", "met:bird", "met:cat", "clue:witness_turtle"] },
   startScene: "beach",

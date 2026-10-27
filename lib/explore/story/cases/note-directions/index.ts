@@ -21,7 +21,7 @@ export const NOTE_DIRECTIONS_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { postoffice: POSTOFFICE_STORY, salon: SALON_STORY, gym: GYM_STORY, laundry: LAUNDRY_STORY, phoneshop: PHONESHOP_STORY },
-  solution: { suspectId: "dog", keyClues: ["d_cat", "d_pig", "d_duck", "d_dog_east", "d_dog_near", "dog_slip"], needed: 5 },
+  solution: { suspectId: "dog", keyClues: ["d_cat", "d_pig", "d_duck", "d_dog_east", "d_dog_near", "note_east", "note_dist", "home_dog", "dog_slip"], needed: 5 },
   freeRoam: true,
   questions: ["Nhà của kẻ trộm ở hướng nào so với bưu điện?", "Nhà đó cách bưu điện bao xa?", "Ai sống ở đúng chỗ đó?"],
   solvedFlag: "case:solved",

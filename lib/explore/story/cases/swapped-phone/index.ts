@@ -22,7 +22,7 @@ export const SWAPPED_PHONE_CASE: StoryDef = {
   suspects: SUSPECTS,
   objectives: OBJECTIVES,
   scenes: { phoneshop: PHONESHOP_STORY, pharmacy: PHARMACY_STORY, salon: SALON_STORY, postoffice: POSTOFFICE_STORY, hotpot: HOTPOT_STORY },
-  solution: { suspectId: "rabbit", keyClues: ["label_box", "post_log", "rabbit_bag", "witness"], needed: 3 },
+  solution: { suspectId: "rabbit", keyClues: ["label_box", "post_log", "rabbit_bag", "witness", "pharmacy_log", "neighbor_note"], needed: 3 },
   solvedFlag: "case:solved",
   accuseWhen: { all: ["met:fox", "met:cat", "met:rabbit", "clue:witness"] },
   startScene: "phoneshop",
