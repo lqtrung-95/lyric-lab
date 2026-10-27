@@ -1,18 +1,22 @@
 import { z } from "zod";
 import { createChat } from "@/lib/analysis/server-deps";
+import { getCurrentUser } from "@/lib/auth/current-user";
 import { TtlCache } from "@/lib/courses/ttl-cache";
 import { getServerEnv } from "@/lib/env/server-env";
 import { EXPLAIN_MODELS } from "@/lib/lookup/explain-term";
+import { consumeUsage } from "@/lib/rate-limit/consume-usage";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
 import { convertHanText, joinField } from "@/lib/tools/convert-han-text";
 import { createConvertDeps } from "@/lib/tools/convert-han-text-deps";
 import { checkGrammar, cleanSentence, GrammarError } from "@/lib/tools/grammar-check/check-grammar";
+import { allowGrammarCall } from "@/lib/tools/grammar-check/grammar-quota";
 import { MAX_GRAMMAR_CHARS, type GrammarOutput } from "@/lib/tools/grammar-check/grammar-schema";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-// Công cụ công khai nhưng có gọi AI nên giới hạn chặt: mỗi IP 15 lượt/ngày, và một trần chung cho cả máy chủ để chi phí không vượt tầm kiểm soát.
+// Công cụ công khai nhưng có gọi AI nên giới hạn chặt: có tài khoản (kể cả khách ẩn danh trong app) thì tính vào hạn mức "explain" của tài khoản (đếm trong Postgres);
+// khách chưa có phiên thì mỗi IP 15 lượt/ngày; và một trần chung cho cả máy chủ để chi phí không vượt tầm kiểm soát.
 const ipLimiter = new InMemoryRateLimiter(15, 24 * 60 * 60 * 1000);
 const globalLimiter = new InMemoryRateLimiter(1500, 24 * 60 * 60 * 1000);
 // Cùng một câu hỏi lại thì dùng kết quả cũ (không tốn lượt và không tốn token).
@@ -33,6 +37,7 @@ export async function POST(req: Request) {
   const sentence = cleanSentence(parsed.data.sentence);
   if (!sentence) return Response.json({ error: "invalid_sentence" }, { status: 400 });
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const user = await getCurrentUser();
 
   try {
     let result = cache.get(sentence);
@@ -40,7 +45,7 @@ export async function POST(req: Request) {
       result = await checkGrammar(sentence, {
         chat: createChat(getServerEnv()),
         models: EXPLAIN_MODELS,
-        allowLlmCall: () => ipLimiter.tryConsume(ip) && globalLimiter.tryConsume("all"),
+        allowLlmCall: () => allowGrammarCall(user, ip, { consumeGlobal: () => globalLimiter.tryConsume("all"), consumeIp: (k) => ipLimiter.tryConsume(k), consumeUser: (u) => consumeUsage(u, "explain") }),
       });
       cache.set(sentence, result);
     }
