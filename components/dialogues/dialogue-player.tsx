@@ -34,7 +34,7 @@ export function DialoguePlayer({ dialogue, pinyin, level, sceneTitle }: Props) {
         <Link href="/dialogues" className="inline-flex min-h-11 items-center gap-1 text-label-lg font-extrabold text-primary"><Icon name="arrow_back" size={20} />Tất cả hội thoại</Link>
         <h1 className="text-headline-lg">{dialogue.title.vi}</h1>
         {dialogue.title.zh && <p lang="zh-Hans" className="text-body-lg font-bold text-on-surface-variant">{dialogue.title.zh}</p>}
-        <p className="text-label-lg text-on-surface-variant">{level ? `HSK ${level === 4 ? "4+" : level} · ` : ""}{dialogue.lines.length} câu · {dialogue.speakers.join(" và ")}</p>
+        <p className="text-label-lg text-on-surface-variant">{level ? `HSK ${level === 6 ? "6+" : level} · ` : ""}{dialogue.lines.length} câu · {dialogue.speakers.join(" và ")}</p>
       </header>
       <p className="text-label-lg font-extrabold" aria-live="polite">Câu {pb.index + 1} / {dialogue.lines.length}</p>
       <DialogueLineCard line={line} speaker={dialogue.speakers[line.who]} pinyin={pinyin[line.zh]} showPinyin={showPinyin} showVi={showVi} yourTurn={pb.yourTurn} />

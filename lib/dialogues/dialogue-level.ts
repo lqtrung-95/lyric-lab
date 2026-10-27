@@ -15,11 +15,11 @@ function wordLevel(word: string, dictionary: ReadonlyMap<string, DictWordRow[]>)
 
 /**
  * Cấp HSK của một hội thoại (quy tắc 2: lấy từ từ điển, không để AI đoán): cấp nhỏ nhất mà ≥ 90% từ có cấp nằm trong đó.
- * Dùng phân vị thay vì cấp cao nhất để một tên riêng hay từ hiếm không đẩy cả bài lên cấp cao. Cấp 4 trở lên gộp một nhóm; không có từ nào có cấp thì null.
+ * Dùng phân vị thay vì cấp cao nhất để một tên riêng hay từ hiếm không đẩy cả bài lên cấp cao. Cấp 6 trở lên gộp một nhóm; không có từ nào có cấp thì null.
  */
 export function dialogueLevel(words: readonly string[], dictionary: ReadonlyMap<string, DictWordRow[]>): LevelBand | null {
   const levels = words.map((w) => wordLevel(w, dictionary)).filter((l): l is number => l !== null).sort((a, b) => a - b);
   if (levels.length === 0) return null;
   const at = levels[Math.min(levels.length - 1, Math.ceil(levels.length * COVERAGE) - 1)];
-  return Math.min(4, Math.max(1, at)) as LevelBand;
+  return Math.min(6, Math.max(1, at)) as LevelBand;
 }

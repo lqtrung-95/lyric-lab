@@ -29,14 +29,16 @@ export interface DialogueDef {
   sceneId?: string;
 }
 
-/** Nhóm cấp để lọc (cấp từ HSK 3.0 từ 4 trở lên gộp một nhóm). */
-export type LevelBand = 1 | 2 | 3 | 4;
+/** Nhóm cấp để lọc (cấp HSK 3.0; từ cấp 6 trở lên gộp một nhóm). */
+export type LevelBand = 1 | 2 | 3 | 4 | 5 | 6;
 
 export const LEVEL_BANDS: { id: LevelBand; label: string }[] = [
   { id: 1, label: "HSK 1" },
   { id: 2, label: "HSK 2" },
   { id: 3, label: "HSK 3" },
-  { id: 4, label: "HSK 4+" },
+  { id: 4, label: "HSK 4" },
+  { id: 5, label: "HSK 5" },
+  { id: 6, label: "HSK 6+" },
 ];
 
 /** Thông tin hiện ở danh sách (không kèm pinyin). `level` null khi không tra được từ điển. */

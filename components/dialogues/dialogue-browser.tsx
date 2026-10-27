@@ -42,7 +42,7 @@ export function DialogueBrowser({ dialogues }: { dialogues: DialogueSummary[] })
               <span className="min-w-0">
                 <span className="block text-body-lg font-extrabold">{d.title.vi}</span>
                 {d.title.zh && <span lang="zh-Hans" className="block text-body-md font-bold text-on-surface-variant">{d.title.zh}</span>}
-                <span className="mt-1 block text-label-md text-on-surface-variant">{d.level ? `HSK ${d.level === 4 ? "4+" : d.level} · ` : ""}{d.lineCount} câu · {d.speakers.join(" và ")}</span>
+                <span className="mt-1 block text-label-md text-on-surface-variant">{d.level ? `HSK ${d.level === 6 ? "6+" : d.level} · ` : ""}{d.lineCount} câu · {d.speakers.join(" và ")}</span>
               </span>
             </Link>
           </li>
