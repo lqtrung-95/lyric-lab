@@ -34,7 +34,6 @@ export const TOOLS: readonly ToolEntry[] = [
     description: "Dán đoạn chữ Hán (giản thể hoặc phồn thể), nhận pinyin có dấu thanh và âm Hán Việt từng từ, sao chép được.",
     icon: "dictionary",
     category: "pronunciation",
-    popular: true,
     keywords: ["pinyin", "phiên âm", "han viet", "chuyen doi"],
   },
   {
@@ -68,7 +67,6 @@ export const TOOLS: readonly ToolEntry[] = [
     description: "In giấy 田字格, 米字格, ô vuông trơn và giấy pinyin bốn dòng khổ A4. Chọn cỡ ô, lề, màu rồi in hoặc lưu PDF.",
     icon: "edit",
     category: "writing",
-    popular: true,
     keywords: ["tap viet", "o vuong", "dien tu cach", "mi tu cach", "in", "pdf", "giay"],
   },
   {
@@ -77,7 +75,6 @@ export const TOOLS: readonly ToolEntry[] = [
     description: "Nhập danh từ để biết dùng lượng từ nào (书 → 本, 鱼 → 条), kèm bảng 15 lượng từ thông dụng bằng tiếng Việt.",
     icon: "quiz",
     category: "sentences",
-    popular: true,
     keywords: ["luong tu", "measure word", "classifier", "dem", "con", "cai"],
   },
   {
@@ -152,7 +149,6 @@ export const TOOLS: readonly ToolEntry[] = [
     description: "Nhập một từ để xem câu thật từ video, kèm pinyin, nghĩa tiếng Việt, giọng đọc và mở video đúng chỗ.",
     icon: "format_quote",
     category: "sentences",
-    popular: true,
     keywords: ["cau vi du", "example sentences", "dat cau", "mau cau", "cach dung tu"],
   },
 ];
