@@ -136,7 +136,7 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
                 const known = w && marks[w.id] !== "new";
                 return (
                   <button key={j} type="button" onClick={(e) => { e.stopPropagation(); if (w) onPickWord(w); }} title={w?.gloss}
-                    className={`rounded px-0.5 font-extrabold underline decoration-2 underline-offset-4 ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
+                    className={`rounded px-0.5 font-extrabold underline decoration-2 ${showPinyin ? "underline-offset-[1px]" : "underline-offset-4"} ${known ? "bg-primary-container/60 text-on-primary-container decoration-primary" : "text-on-surface-variant decoration-dashed decoration-outline"}`}>
                     <RubyChars text={s.text} py={py} offset={offset} />
                   </button>
                 );
