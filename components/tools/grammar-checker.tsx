@@ -9,7 +9,7 @@ type Result = GrammarOutput & { model: string; pinyin: { minimalFix: string | nu
 
 const ERRORS: Record<string, string> = {
   invalid_sentence: `Hãy nhập một câu tiếng Trung (2 đến ${MAX_GRAMMAR_CHARS} ký tự).`,
-  rate_limited: "Bạn đã dùng hết lượt kiểm tra hôm nay (15 lượt mỗi ngày). Hãy quay lại vào ngày mai nhé.",
+  rate_limited: "Bạn đã dùng hết lượt kiểm tra AI hôm nay. Hãy quay lại vào ngày mai, hoặc đăng nhập trong app để có thêm lượt.",
   check_failed: "AI chưa chấm được câu này, thử lại sau một lát nhé.",
 };
 const QUICK = ["我昨天去商店", "他比我很高", "我很喜欢吃苹果。", "我吃饭了没有", "她是很漂亮"];
