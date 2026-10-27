@@ -28,8 +28,10 @@ export const CLUES: ClueDef[] = [
   { id: "d_ticket", title: "Suy luận: Thỏ cũng nói sai", zh: "没有卖出电影票,所以兔子的话也是假的。", vi: "Không có vé nào được bán nên lời khai bán vé cho Vịt của Thỏ cũng sai.", sceneId: "museum", kind: "deduction", link: ["cinema_log", "rabbit_alibi"] },
   { id: "d_ring", title: "Suy luận: hai người che cho nhau", zh: "兔子给鸭子作证,鸭子给兔子作证,可是两个人的话都是假的,他们在互相掩护。", vi: "Thỏ làm chứng cho Vịt, Vịt làm chứng cho Thỏ, nhưng cả hai đều nói sai: họ che giấu cho nhau.", sceneId: "museum", kind: "deduction", link: ["rabbit_alibi", "duck_alibi"] },
   { id: "d_two", title: "Suy luận: không chỉ một người", zh: "地上有两种脚印,所以小偷不止一个人。", vi: "Có hai loại dấu chân nên kẻ trộm không chỉ một người, và chuyện xảy ra trong 30 phút.", sceneId: "museum", kind: "deduction", link: ["footprints", "museum_time"] },
-  { id: "d_fox", title: "Suy luận: Cáo có ngoại phạm", zh: "三点到三点半狐狸一直在银行,所以不是她。", vi: "Từ 3 đến 3 rưỡi Cáo ở ngân hàng suốt, nên không phải Cáo.", sceneId: "museum", kind: "deduction", link: ["bank_log", "museum_time"] },
-  { id: "d_pig", title: "Suy luận: Heo có ngoại phạm", zh: "三点到三点半小猪一直在检票口,所以不是他。", vi: "Từ 3 đến 3 rưỡi Heo ở cổng soát vé suốt, nên không phải Heo.", sceneId: "museum", kind: "deduction", link: ["flight_log", "museum_time"] },
+  { id: "d_fox_ok", title: "Suy luận: lời khai của Cáo khớp sổ ngân hàng", zh: "狐狸说她在银行上班,银行记录也证明了。", vi: "Cáo nói làm ở ngân hàng và sổ giao dịch chứng minh điều đó.", sceneId: "museum", kind: "deduction", link: ["fox_alibi", "bank_log"] },
+  { id: "d_pig_ok", title: "Suy luận: lời khai của Heo khớp sổ chuyến bay", zh: "小猪说他在检票,机场记录也证明了。", vi: "Heo nói đang soát vé và sổ chuyến bay chứng minh điều đó.", sceneId: "museum", kind: "deduction", link: ["pig_alibi", "flight_log"] },
+  { id: "d_fox", title: "Suy luận: Cáo có ngoại phạm", zh: "三点到三点半狐狸一直在银行,所以不是她。", vi: "Từ 3 đến 3 rưỡi Cáo ở ngân hàng suốt, nên không phải Cáo.", sceneId: "museum", kind: "deduction", link: ["d_fox_ok", "museum_time"] },
+  { id: "d_pig", title: "Suy luận: Heo có ngoại phạm", zh: "三点到三点半小猪一直在检票口,所以不是他。", vi: "Từ 3 đến 3 rưỡi Heo ở cổng soát vé suốt, nên không phải Heo.", sceneId: "museum", kind: "deduction", link: ["d_pig_ok", "museum_time"] },
 ];
 
 export const SUSPECTS: Suspect[] = [
