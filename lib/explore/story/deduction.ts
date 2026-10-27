@@ -26,16 +26,19 @@ export const readyToAccuse = (suspects: readonly Pick<Suspect, "metFlag" | "virt
 export type LinkResult =
   | { status: "linked"; clue: ClueDef; progress: StoryProgress }
   | { status: "known"; clue: ClueDef }
-  | { status: "none" };
+  | { status: "none"; /** Một trong hai manh mối có tham gia một suy luận chưa tìm ra (gợi ý thử ghép với manh mối khác). */ near: boolean };
 
 /**
- * Nối hai manh mối đã tìm: nếu cặp đó dẫn tới một suy luận của vụ án thì suy luận được thêm vào sổ (như một manh mối mới), cặp sai thì không có gì.
- * Thứ tự hai manh mối không quan trọng.
+ * Nối hai manh mối (hoặc suy luận) đã có: nếu cặp đó dẫn tới một suy luận của vụ án thì suy luận được thêm vào sổ (như một manh mối mới), cặp sai thì không có gì
+ * (kèm `near` nếu một trong hai còn dùng được ở suy luận khác). Thứ tự hai manh mối không quan trọng; suy luận có thể nối tiếp với suy luận khác.
  */
 export function linkClues(story: Pick<StoryDef, "clues">, progress: StoryProgress, a: string, b: string): LinkResult {
-  if (a === b || !progress.clues.includes(a) || !progress.clues.includes(b)) return { status: "none" };
+  if (a === b || !progress.clues.includes(a) || !progress.clues.includes(b)) return { status: "none", near: false };
   const found = story.clues.find((c) => c.kind === "deduction" && c.link && c.link.includes(a) && c.link.includes(b));
-  if (!found) return { status: "none" };
+  if (!found) {
+    const near = story.clues.some((c) => c.kind === "deduction" && c.link && !progress.clues.includes(c.id) && (c.link.includes(a) || c.link.includes(b)));
+    return { status: "none", near };
+  }
   if (progress.clues.includes(found.id)) return { status: "known", clue: found };
   return { status: "linked", clue: found, progress: applyEffects(progress, [{ clue: found.id }]) };
 }

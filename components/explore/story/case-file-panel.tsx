@@ -58,7 +58,7 @@ export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, ca
         <ul className="mt-1 space-y-2">{found.map((c) => <li key={c.id} className="rounded-xl bg-surface-container-low p-space-sm"><ClueBody clue={c} pinyin={pinyin} hints={hints} /></li>)}</ul>
       )}
 
-      {hasDeductions && <LinkClues found={found.filter((c) => c.kind !== "deduction")} onLink={onLink} />}
+      {hasDeductions && <LinkClues found={found} onLink={onLink} />}
 
       <div className="mt-space-sm flex flex-wrap items-center gap-3">
         {!solved && <Button3d variant="secondary" disabled={!canAccuse} onClick={onAccuse}>Buộc tội</Button3d>}
@@ -76,7 +76,7 @@ function LinkClues({ found, onLink }: { found: StoryDef["clues"]; onLink: (a: st
   const [msg, setMsg] = useState<string | null>(null);
   const submit = () => {
     const r = onLink(a, b);
-    setMsg(r.status === "linked" ? `Suy luận mới: ${r.clue.vi}` : r.status === "known" ? "Hai manh mối này bạn đã nối rồi." : "Hai manh mối này chưa dẫn tới điều gì. Thử cặp khác.");
+    setMsg(r.status === "linked" ? `Suy luận mới: ${r.clue.vi}` : r.status === "known" ? "Hai manh mối này bạn đã nối rồi." : r.near ? "Chưa đủ: một trong hai manh mối này có ích, hãy thử ghép nó với một manh mối khác." : "Hai manh mối này chưa dẫn tới điều gì. Thử cặp khác.");
   };
   const select = (label: string, value: string, set: (v: string) => void) => (
     <label className="flex min-w-0 flex-1 flex-col gap-1 text-label-md font-extrabold">{label}
@@ -89,7 +89,7 @@ function LinkClues({ found, onLink }: { found: StoryDef["clues"]; onLink: (a: st
   return (
     <section aria-label="Nối manh mối" className="mt-space-sm rounded-xl border-2 border-ink p-space-sm">
       <h3 className="text-label-md font-extrabold">Nối manh mối</h3>
-      <p className="text-body-sm text-on-surface-variant">Chọn hai manh mối có liên quan để rút ra suy luận. Các suy luận mới là bằng chứng mạnh nhất khi buộc tội.</p>
+      <p className="text-body-sm text-on-surface-variant">Chọn hai manh mối có liên quan để rút ra suy luận (suy luận cũng nối tiếp được với manh mối khác). Các suy luận là bằng chứng mạnh nhất khi buộc tội.</p>
       <div className="mt-1 flex flex-col gap-2 sm:flex-row">{select("Manh mối thứ nhất", a, setA)}{select("Manh mối thứ hai", b, setB)}</div>
       <div className="mt-2 flex flex-wrap items-center gap-3">
         <Button3d variant="secondary" disabled={!a || !b || a === b} onClick={submit}>Nối lại</Button3d>

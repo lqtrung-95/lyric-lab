@@ -69,7 +69,7 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
     for (const k of story.solution.keyClues) expect(clueIds.has(k), k).toBe(true);
     for (const d of story.clues.filter((c) => c.kind === "deduction")) {
       expect(d.link, d.id).toHaveLength(2);
-      for (const l of d.link!) expect(story.clues.find((c) => c.id === l && c.kind !== "deduction"), `${d.id} → ${l}`).toBeDefined();
+      for (const l of d.link!) expect(story.clues.find((c) => c.id === l && c.id !== d.id), `${d.id} → ${l}`).toBeDefined();
     }
     expect(story.suspects.map((s) => s.id)).toContain(story.solution.suspectId);
     expect(story.solution.needed).toBeLessThanOrEqual(story.solution.keyClues.length);
@@ -99,11 +99,16 @@ describe.each(Object.values(CASES))("vụ án $id", (story) => {
       if (p.flags.length === before) break;
     }
     // Người chơi nối các cặp manh mối để ra suy luận (chỉ vụ có suy luận).
-    for (const d of story.clues.filter((c) => c.kind === "deduction")) {
-      const r = linkClues(story, p, d.link![0], d.link![1]);
-      expect(r.status, `nối ${d.id}`).toBe("linked");
-      if (r.status === "linked") p = r.progress;
+    // Suy luận có thể dựa trên suy luận khác nên nối nhiều lượt cho tới khi hết.
+    const ded = story.clues.filter((c) => c.kind === "deduction");
+    for (let pass = 0; pass < ded.length; pass++) {
+      for (const d of ded.filter((x) => !p.clues.includes(x.id) && x.link!.every((l) => p.clues.includes(l)))) {
+        const r = linkClues(story, p, d.link![0], d.link![1]);
+        expect(r.status, `nối ${d.id}`).toBe("linked");
+        if (r.status === "linked") p = r.progress;
+      }
     }
+    for (const d of ded) expect(p.clues, `suy luận ${d.id}`).toContain(d.id);
     expect(readyToAccuse(story.suspects, p.flags)).toBe(true);
     expect(judge(story, [story.solution.suspectId, ...(story.solution.partnerId ? [story.solution.partnerId] : [])], story.solution.keyClues.slice(0, story.solution.needed)).type).toBe("solved");
     for (const k of story.solution.keyClues) expect(p.clues, k).toContain(k);
@@ -299,6 +304,17 @@ describe("vụ án mới: không có thủ phạm, đồng phạm, nối manh m�
     expect(visible(["clue:order_book"])).toHaveLength(1);
   });
 
+  it("birthday-cake: cặp tự nhiên (lời khai Chó + sổ ký tên) ra suy luận 'Chó nói dối', rồi nối tiếp với suy luận người lấy bánh", () => {
+    const story = CASES["birthday-cake"];
+    let p = applyEffects(emptyStory(), ["dog_alibi", "gym_signout", "order_book", "witness_turtle"].map((clue) => ({ clue })));
+    const lie = linkClues(story, p, "dog_alibi", "gym_signout");
+    expect(lie.status).toBe("linked");
+    if (lie.status === "linked") p = lie.progress;
+    const order = linkClues(story, p, "order_book", "witness_turtle");
+    if (order.status === "linked") p = order.progress;
+    expect(linkClues(story, p, "d_lie", "d_order").status).toBe("linked");
+  });
+
   it("jade-vase: phải chọn đủ cả hai người (thừa hoặc thiếu đều sai)", () => {
     const story = CASES["jade-vase"];
     const keys = story.solution.keyClues;
@@ -321,6 +337,11 @@ describe("vụ án mới: không có thủ phạm, đồng phạm, nối manh m�
       expect(linkClues(story, r.progress, "note_east", "home_cat").status).toBe("known");
     }
     expect(linkClues(story, p, "note_east", "note_east").status).toBe("none");
+    // Cặp sai nhưng một manh mối còn dùng được thì có gợi ý "near"; cặp không dính tới suy luận nào thì không.
+    const q = applyEffects(have, [{ clue: "note_east" }, { clue: "home_pig" }, { clue: "home_dog" }]);
+    expect(linkClues(story, q, "home_pig", "home_dog")).toEqual({ status: "none", near: true });
+    const m = applyEffects(have, [{ clue: "cat_home_talk" }, { clue: "dog_home_talk" }]);
+    expect(linkClues(story, m, "cat_home_talk", "dog_home_talk")).toEqual({ status: "none", near: false });
   });
 
   it("vụ khó dùng tự do điều tra: mọi cảnh mở sẵn và không có mục tiêu dẫn từng bước", () => {
