@@ -16,7 +16,7 @@ const sel = "min-h-11 min-w-0 flex-1 rounded-xl border-2 border-ink bg-surface-c
  * Soạn câu tiếng Trung nói với đồng đội: chọn mẫu câu, điền nơi chốn (các cảnh của vụ án) hoặc đồ vật rồi gửi; hoặc bấm một câu nói nhanh có sẵn.
  * Không có chữ gõ tự do. Pinyin và nghĩa tiếng Việt chỉ hiện khi bật gợi ý. "Gửi + đọc to" ghi vài giây giọng bạn đọc câu rồi gửi kèm, khuyến khích nói thật.
  */
-export function CoopComposer({ places, hints, onSay }: { places: readonly string[]; hints: Hints; onSay: (zh: string, clip?: VoiceClip) => void }) {
+export function CoopComposer({ places, hints, onSay, compact = false }: { places: readonly string[]; hints: Hints; onSay: (zh: string, clip?: VoiceClip) => void; compact?: boolean }) {
   const [tpl, setTpl] = useState(MESSAGE_TEMPLATES[0].id);
   const [value, setValue] = useState("");
   const template = MESSAGE_TEMPLATES.find((t) => t.id === tpl) ?? MESSAGE_TEMPLATES[0];
@@ -52,14 +52,14 @@ export function CoopComposer({ places, hints, onSay }: { places: readonly string
           className={`inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-ink px-4 text-label-md font-extrabold disabled:opacity-40 ${recording ? "bg-error text-on-error" : "bg-primary-container text-on-primary-container"}`}>
           <Icon name={recording ? "stop" : "mic"} size={18} filled />{recording ? "Đang ghi… bấm để gửi" : "Gửi + đọc to"}
         </button>
-        <span className="text-label-md text-on-surface-variant">Đọc to câu trên, đồng đội nghe được giọng bạn.</span>
+        {!compact && <span className="text-label-md text-on-surface-variant">Đọc to câu trên, đồng đội nghe được giọng bạn.</span>}
         {voice.error && <span role="alert" className="text-label-md font-bold text-error">{voice.error}</span>}
       </div>
-      <div role="group" aria-label="Câu nói nhanh" className="flex flex-wrap gap-1.5">
+      {!compact && <div role="group" aria-label="Câu nói nhanh" className="flex flex-wrap gap-1.5">
         {COOP_PHRASES.map((p) => (
           <button key={p.zh} type="button" onClick={() => onSay(p.zh)} title={p.vi} className="min-h-9 rounded-full border-2 border-ink bg-surface-container-lowest px-3 text-label-md font-bold hover:bg-surface-container-low"><span lang="zh-Hans">{p.zh}</span>{hints.pinyin && <span className="block text-[0.7em] font-normal text-primary">{coopPinyin(p.zh)}</span>}</button>
         ))}
-      </div>
+      </div>}
     </div>
   );
 }
