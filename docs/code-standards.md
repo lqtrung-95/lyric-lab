@@ -144,7 +144,7 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 ## Đường dẫn (route)
 
 - Mọi route của ứng dụng đặt tên tiếng Anh, kebab-case (`/explore`, `/courses`, `/install`, `/video/channel/...`). Tham số truy vấn cũng tiếng Anh (`?course=`).
-- NGOẠI LỆ có chủ ý: các trang marketing công khai (`/phat-am/*`, `/tu-vung-hsk`, `/chu-han-sang-pinyin`, `/cong-cu`) giữ slug tiếng Việt vì là từ khóa SEO của người Việt (chủ dự án chốt 2026-10-26).
+- NGOẠI LỆ có chủ ý: các trang marketing công khai (`/phat-am/*`, `/tu-vung-hsk`, `/chu-han-sang-pinyin`, `/tools`) giữ slug tiếng Việt vì là từ khóa SEO của người Việt (chủ dự án chốt 2026-10-26).
 - Đổi tên route thì thêm chuyển hướng vĩnh viễn vào `lib/routes/legacy-redirects.ts` để link cũ còn dùng được; dữ liệu lưu theo id cũ phải có bước đổi khóa khi đọc.
 
 - Vụ án khó: đặt `freeRoam: true`, viết `questions`, dùng manh mối `kind: "deduction"` (có `link`) làm bằng chứng then chốt và thêm test cho cơ chế riêng của vụ. Manh mối chữ Hán cần người chơi tự đọc thì `vi` chỉ là câu giấu nghĩa, nội dung đầy đủ nằm ở suy luận.

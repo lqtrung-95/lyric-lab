@@ -28,7 +28,7 @@ export function ToolPage({ href, name, description, h1, intro, faq, children, wi
   return (
     <div className={`mx-auto space-y-space-lg pb-space-lg ${wide ? "max-w-5xl" : "max-w-3xl"}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Link href="/cong-cu" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline print:hidden">← Tất cả công cụ</Link>
+      <Link href="/tools" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline print:hidden">← Tất cả công cụ</Link>
       <header className="print:hidden">
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">{h1}</h1>
         <p className="mt-2 text-body-lg text-on-surface-variant">{intro}</p>

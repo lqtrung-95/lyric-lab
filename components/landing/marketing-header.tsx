@@ -21,7 +21,7 @@ export function MarketingHeader() {
           {LINKS.map((l) => (
             <a key={l.href} href={l.href} className="flex min-h-11 items-center whitespace-nowrap rounded-full px-3 text-label-md lg:px-4 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">{l.label}</a>
           ))}
-          <Link href="/cong-cu" className="flex min-h-11 items-center whitespace-nowrap rounded-full px-3 text-label-md lg:px-4 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">Công cụ</Link>
+          <Link href="/tools" className="flex min-h-11 items-center whitespace-nowrap rounded-full px-3 text-label-md lg:px-4 text-on-surface-variant transition-colors hover:bg-surface-container-high hover:text-on-surface">Công cụ</Link>
         </nav>
         <div className="flex items-center gap-1">
           <ThemeToggle />

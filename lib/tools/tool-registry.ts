@@ -35,7 +35,7 @@ export interface ToolEntry {
 }
 
 /**
- * Danh sách công cụ công khai (không cần tài khoản hay dữ liệu học). Trang mục lục `/cong-cu`, sitemap và chân trang đều đọc từ đây:
+ * Danh sách công cụ công khai (không cần tài khoản hay dữ liệu học). Trang mục lục `/tools`, sitemap và chân trang đều đọc từ đây:
  * thêm công cụ mới = thêm một mục ở đây cộng với trang của nó. Việc cần thẻ đã lưu hay tiến độ học thì thuộc mục Ôn tập, không phải Công cụ.
  */
 export const TOOLS: readonly ToolEntry[] = [

@@ -22,7 +22,7 @@ export const NAV_LINKS: NavLink[] = [
 export const SECONDARY_LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/dictionary", label: "Tra từ", icon: "dictionary" },
   { href: "/profile", label: "Hồ sơ và huy hiệu", icon: "emoji_events" },
-  { href: "/cong-cu", label: "Công cụ", icon: "build" },
+  { href: "/tools", label: "Công cụ", icon: "build" },
   { href: "/feedback", label: "Góp ý cho SongHanzi", icon: "feedback" },
   { href: "/settings", label: "Cài đặt và tài khoản", icon: "person" },
 ];

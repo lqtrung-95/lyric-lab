@@ -34,7 +34,7 @@ export default function HanToPinyinPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-space-lg pb-space-lg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Link href="/cong-cu" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">← Tất cả công cụ</Link>
+      <Link href="/tools" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">← Tất cả công cụ</Link>
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Chuyển chữ Hán sang pinyin và âm Hán Việt</h1>
         <p className="mt-2 text-body-lg text-on-surface-variant">Dán chữ Hán vào ô dưới, nhận pinyin có dấu thanh và âm Hán Việt của từng từ. Miễn phí, không cần đăng ký.</p>

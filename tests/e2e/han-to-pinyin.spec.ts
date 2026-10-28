@@ -40,33 +40,33 @@ test("trang công cụ nằm trong sitemap và có dữ liệu có cấu trúc",
 
 test("trang Công cụ liệt kê công cụ, bấm vào mở đúng trang, có link quay lại và nằm trong sitemap", async ({ page, request }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/cong-cu");
+  await page.goto("/tools");
   await expect(page.getByRole("heading", { level: 1, name: "Công cụ" })).toBeVisible();
   await page.getByRole("link", { name: /Chữ Hán sang pinyin và Hán Việt/ }).click();
   await expect(page).toHaveURL(/\/chu-han-sang-pinyin$/);
   await page.getByRole("link", { name: "← Tất cả công cụ" }).click();
-  await expect(page).toHaveURL(/\/cong-cu$/);
-  expect(await (await request.get("/sitemap.xml")).text()).toContain("/cong-cu");
+  await expect(page).toHaveURL(/\/tools$/);
+  expect(await (await request.get("/sitemap.xml")).text()).toContain("/tools");
 });
 
 test("lối vào Công cụ: thanh trên trang giới thiệu, biểu tượng ở thanh trên của app và dòng gợi ý ở trang chủ", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/");
   await page.getByRole("navigation", { name: "Các phần của trang" }).getByRole("link", { name: "Công cụ" }).click();
-  await expect(page).toHaveURL(/\/cong-cu$/);
+  await expect(page).toHaveURL(/\/tools$/);
   await page.route("**/api/videos", (r) => r.fulfill({ json: { videos: [] } }));
   await page.route("**/api/library/songs", (r) => r.fulfill({ json: { songs: [] } }));
   await page.route("**/api/discover**", (r) => r.fulfill({ json: { songs: [], hasMore: false } }));
   await page.goto("/app");
   await page.getByRole("link", { name: "Công cụ", exact: true }).click(); // biểu tượng trên thanh trên
-  await expect(page).toHaveURL(/\/cong-cu$/);
+  await expect(page).toHaveURL(/\/tools$/);
   await page.goto("/app");
   await page.getByRole("link", { name: "Mở Công cụ" }).click();
-  await expect(page).toHaveURL(/\/cong-cu$/);
+  await expect(page).toHaveURL(/\/tools$/);
 });
 
 test("chân trang trang giới thiệu có email liên hệ, trang Góp ý cũng ghi email", async ({ page }) => {
-  await page.goto("/cong-cu");
+  await page.goto("/tools");
   const footer = page.locator("footer");
   await expect(footer.getByRole("link", { name: "Liên hệ" })).toHaveAttribute("href", "mailto:hello@songhanzi.com");
   await expect(footer.getByRole("link", { name: "hello@songhanzi.com" })).toHaveAttribute("href", "mailto:hello@songhanzi.com");

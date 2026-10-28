@@ -45,7 +45,7 @@ test("cấp không hợp lệ trả 404; chuyển cấp bằng thanh chọn cấ
 
 test("trang Công cụ ngắn vẫn đẩy chân trang xuống đáy màn hình, và liệt kê công cụ Từ vựng HSK", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/cong-cu");
+  await page.goto("/tools");
   await expect(page.getByRole("link", { name: /Từ vựng HSK có âm Hán Việt/ })).toBeVisible();
   const bottom = await page.locator("footer").evaluate((el) => el.getBoundingClientRect().bottom);
   expect(bottom).toBeGreaterThanOrEqual(899);

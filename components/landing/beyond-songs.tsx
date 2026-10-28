@@ -14,7 +14,7 @@ const CARDS = [
   {
     emoji: "🛠️", title: "Công cụ miễn phí, không cần đăng ký",
     body: "Bảng pinyin có hình vị trí đặt lưỡi cho người Việt, kiểm tra ngữ pháp bằng AI, đổi giản thể và phồn thể, giấy tập viết chữ Hán và nhiều công cụ khác.",
-    chips: ["Hình đặt lưỡi", "Ngữ pháp AI", "In giấy tập viết"], href: "/cong-cu", cta: "Xem công cụ",
+    chips: ["Hình đặt lưỡi", "Ngữ pháp AI", "In giấy tập viết"], href: "/tools", cta: "Xem công cụ",
   },
 ];
 

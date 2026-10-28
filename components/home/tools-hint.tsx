@@ -4,7 +4,7 @@ import Link from "next/link";
 export function ToolsHint() {
   return (
     <p className="mt-3 text-label-md text-on-surface-variant">
-      Cần tra pinyin hay âm Hán Việt? <Link href="/cong-cu" className="inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-2">Mở Công cụ</Link>
+      Cần tra pinyin hay âm Hán Việt? <Link href="/tools" className="inline-flex min-h-11 items-center font-semibold text-primary underline underline-offset-2">Mở Công cụ</Link>
     </p>
   );
 }
