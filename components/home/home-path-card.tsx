@@ -55,7 +55,7 @@ export function HomePathCard() {
         </div>
         <Link href={`/courses?course=${slug}`} className="inline-flex min-h-11 shrink-0 items-center gap-1 text-label-md font-extrabold text-primary hover:underline">Bản đồ <Icon name="chevron_right" size={18} /></Link>
       </div>
-      <ol className="my-auto flex items-start justify-between gap-1 py-space-sm" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} slug={slug} unit={u} current={u.idx === current.idx} />)}</ol>
+      <ol className="flex items-start justify-between gap-1 py-space-md" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} slug={slug} unit={u} current={u.idx === current.idx} />)}</ol>
       <Link href={`/courses/${slug}/${current.idx}`} className="btn-3d btn-3d-bright w-full">{done === 0 && !current.progress ? "Bắt đầu chặng " : "Tiếp tục chặng "}{current.idx}</Link>
     </section>
   );
