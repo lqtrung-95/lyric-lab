@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
 import { playSfx } from "@/lib/feedback/sfx";
+import { truthOptionBadge, truthOptionClass, type TruthOptionKind } from "./truth-or-lie-option-style";
 import type { CoopRole } from "@/lib/explore/coop/coop-state";
 import type { Trial } from "@/lib/practice/truth-or-lie";
 import { ROUND_SECONDS, TIMEOUT, emptyPicks, isComplete, mergePicks, resultFor, scoreOf, type Picks } from "@/lib/practice/truth-room";
@@ -104,17 +105,18 @@ export function TruthOrLieRoom({ code, role, trials, pinyin }: Props) {
       <ul className="flex flex-col gap-2">
         {trial.options.map((o, idx) => {
           const isLie = idx === trial.lieIndex;
-          const state = !bothAnswered ? (myPick === idx ? "border-primary bg-primary-container" : "") : isLie ? "border-secondary bg-secondary-container" : "opacity-80";
+          const kind: TruthOptionKind = !bothAnswered ? (myPick === idx ? "selected" : "idle") : isLie ? "lie" : myPick === idx || theirPick === idx ? "wrong-pick" : "other";
+          const badge = truthOptionBadge(kind);
           return (
             <li key={o.zh} className="flex items-stretch gap-2">
               <button type="button" onClick={() => pick(idx)} disabled={myPick !== null} aria-pressed={myPick === idx}
-                className={`min-h-14 min-w-0 flex-1 rounded-xl border-2 border-ink bg-surface-container-lowest px-space-sm py-2 text-left disabled:cursor-default ${state}`}>
+                className={truthOptionClass(kind)}>
                 <span lang="zh-Hans" className={`block text-body-lg font-bold ${showPinyin ? "leading-[2.2]" : ""}`}><RubyLine zh={o.zh} pinyin={pinyin[o.zh]} show={showPinyin} /></span>
                 {(showVi || bothAnswered) && <span className="block text-body-sm text-on-surface-variant">{o.vi}</span>}
                 {bothAnswered && (
-                  <span className="block text-label-md font-extrabold">
-                    {isLie ? "Câu SAI" : "Câu đúng"}
-                    {myPick === idx && " · bạn chọn"}{theirPick === idx && " · đồng đội chọn"}
+                  <span className="block">
+                    {badge && <span className={badge.className}>{badge.text}</span>}
+                    <span className="ml-2 text-label-md font-extrabold">{myPick === idx && "· bạn chọn "}{theirPick === idx && "· đồng đội chọn"}</span>
                   </span>
                 )}
               </button>

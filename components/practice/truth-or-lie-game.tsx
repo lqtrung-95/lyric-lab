@@ -6,6 +6,7 @@ import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
 import { playSfx } from "@/lib/feedback/sfx";
 import type { Trial } from "@/lib/practice/truth-or-lie";
+import { truthOptionBadge, truthOptionClass, type TruthOptionKind } from "./truth-or-lie-option-style";
 import { useWordGameScore } from "./use-word-game-score";
 
 const tog = (on: boolean) => `min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-extrabold ${on ? "bg-primary text-on-primary" : "bg-surface-container-lowest"}`;
@@ -54,14 +55,15 @@ export function TruthOrLieGame({ trials, pinyin }: { trials: Trial[]; pinyin: Re
       <ul className="flex flex-col gap-2">
         {trial.options.map((o, idx) => {
           const isLie = idx === trial.lieIndex;
-          const state = !answered ? "" : isLie ? "border-secondary bg-secondary-container" : idx === picked ? "border-error bg-error-container" : "opacity-80";
+          const kind: TruthOptionKind = !answered ? "idle" : isLie ? "lie" : idx === picked ? "wrong-pick" : "other";
+          const badge = truthOptionBadge(kind);
           return (
             <li key={o.zh} className="flex items-stretch gap-2">
               <button type="button" onClick={() => pick(idx)} disabled={answered} aria-pressed={picked === idx}
-                className={`min-h-14 min-w-0 flex-1 rounded-xl border-2 border-ink bg-surface-container-lowest px-space-sm py-2 text-left disabled:cursor-default ${state}`}>
+                className={truthOptionClass(kind)}>
                 <span lang="zh-Hans" className={`block text-body-lg font-bold ${showPinyin ? "leading-[2.2]" : ""}`}><RubyLine zh={o.zh} pinyin={pinyin[o.zh]} show={showPinyin} /></span>
                 {(showVi || answered) && <span className="block text-body-sm text-on-surface-variant">{o.vi}</span>}
-                {answered && <span className="block text-label-md font-extrabold">{isLie ? "Câu SAI" : "Câu đúng"}{idx === picked && !isLie ? " (bạn chọn nhầm)" : ""}</span>}
+                {badge && <span className={badge.className}>{badge.text}{isLie && idx === picked ? " · bạn chọn" : ""}</span>}
               </button>
               <PronounceButton text={o.zh} className="size-14 self-center" />
             </li>
