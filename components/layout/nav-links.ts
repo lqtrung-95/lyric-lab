@@ -12,7 +12,7 @@ export interface NavLink {
 export const NAV_LINKS: NavLink[] = [
   { href: "/app", label: "Hôm nay", icon: "home" },
   { href: "/courses", label: "Học", icon: "school" },
-  { href: "/library", label: "Nghe", icon: "headphones", matches: ["/library", "/video", "/learn", "/watch"] },
+  { href: "/library", label: "Nghe", icon: "headphones", matches: ["/library", "/video", "/dialogues", "/learn", "/watch"] },
   { href: "/review", label: "Ôn & Nói", icon: "style", matches: ["/review", "/phat-am"] },
   { href: "/explore", label: "Khám phá", icon: "search" },
   { href: "/room", label: "Thi đấu", icon: "emoji_events", matches: ["/room", "/challenge", "/chat"] },
@@ -22,7 +22,7 @@ export const NAV_LINKS: NavLink[] = [
 export const SECONDARY_LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/dictionary", label: "Tra từ", icon: "dictionary" },
   { href: "/profile", label: "Hồ sơ và huy hiệu", icon: "emoji_events" },
-  { href: "/cong-cu", label: "Công cụ", icon: "build" },
+  { href: "/tools", label: "Công cụ", icon: "build" },
   { href: "/feedback", label: "Góp ý cho SongHanzi", icon: "feedback" },
   { href: "/settings", label: "Cài đặt và tài khoản", icon: "person" },
 ];

@@ -26,6 +26,9 @@ export interface GameInputs {
   /** Số vụ án Khám phá đã giải và riêng vụ mức Khó (mặc định 0 nếu chưa đọc được). */
   casesSolved?: number;
   hardCasesSolved?: number;
+  /** Phá án cùng bạn: số vụ đã giải chung và số ngày đã chơi chung. */
+  coopCasesSolved?: number;
+  coopDays?: number;
   claims: QuestClaimRow[];
   storedBadges: EarnedBadge[];
   /** Ngày đã được đóng băng (đã lưu). */
@@ -80,6 +83,7 @@ export function computeGame(input: GameInputs): GameComputation {
     songsCompleted: all.songsCompleted, dictationGood: all.dictationGood, shadowingGood: all.shadowingGood, roomsPlayed: all.roomsPlayed,
     roomsWon: all.roomsWon, perfectRounds: all.perfectRounds, nightReviews: all.nightReviews, earlyReviews: all.earlyReviews,
     exploreRounds: all.exploreRounds, casesSolved: input.casesSolved ?? 0, hardCasesSolved: input.hardCasesSolved ?? 0,
+    coopCasesSolved: input.coopCasesSolved ?? 0, coopDays: input.coopDays ?? 0,
   };
   const { earned, fresh } = mergeBadges(storedBadges, facts);
   const recent = [...earned].sort((a, b) => (b.earnedAt ?? "9").localeCompare(a.earnedAt ?? "9")).slice(0, RECENT_BADGES);

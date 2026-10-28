@@ -2,32 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon } from "@/components/ui/icon";
+import { MODE_LABELS } from "./review-modes";
 
-const MODES = [
-  { href: "/review", label: "Ôn thẻ" },
-  { href: "/review/pinyin", label: "Gõ pinyin" },
-  { href: "/review/cloze", label: "Điền lời" },
-  { href: "/review/match", label: "Ghép cặp" },
-  { href: "/review/listen", label: "Nghe và chọn" },
-  { href: "/review/read-aloud", label: "Đọc to" },
-  { href: "/review/karaoke", label: "Karaoke" },
-  { href: "/review/leaderboard", label: "Xếp hạng" },
-];
-
-/** Thanh chuyển chế độ ôn tập: ôn thẻ chuẩn (theo lịch FSRS) và ba chế độ luyện dạng game. */
+/** Thanh đầu mỗi chế độ luyện: quay về trang chủ Ôn & Nói (nơi chọn chế độ, gom theo mục đích) và cho biết đang ở chế độ nào. */
 export function ModeTabs() {
   const pathname = usePathname();
+  const label = MODE_LABELS[pathname] ?? null;
   return (
-    <nav aria-label="Chế độ ôn tập" className="mx-auto mb-space-md flex w-fit max-w-full gap-1 overflow-x-auto rounded-full bg-surface-container-low p-1">
-      {MODES.map((m) => {
-        const active = pathname === m.href;
-        return (
-          <Link key={m.href} href={m.href} aria-current={active ? "page" : undefined}
-            className={`flex min-h-11 shrink-0 items-center rounded-full px-4 text-label-md transition-colors ${active ? "bg-surface-container-high font-semibold text-on-surface" : "text-on-surface-variant hover:bg-surface-container-high"}`}>
-            {m.label}
-          </Link>
-        );
-      })}
+    <nav aria-label="Ôn và nói" className="mx-auto mb-space-md flex max-w-3xl items-center gap-2">
+      <Link href="/review" className="flex min-h-11 items-center gap-1 rounded-full bg-surface-container-low px-4 text-label-md font-semibold text-on-surface hover:bg-surface-container-high">
+        <Icon name="arrow_back" size={18} />Ôn &amp; Nói
+      </Link>
+      {label && <span aria-current="page" className="text-label-md text-on-surface-variant">/ {label}</span>}
     </nav>
   );
 }

@@ -6,7 +6,7 @@ import { buildBadgeCatalog, evaluateBadges, highestTiers, mergeBadges } from "./
 const zero: BadgeFacts = {
   learnedWords: 0, levelsCompleted: 0, totalReviews: 0, unitsCompleted: 0, level: 1, longestStreak: 0, songsCompleted: 0, dictationGood: 0, shadowingGood: 0,
   roomsPlayed: 0, roomsWon: 0, perfectRounds: 0, nightReviews: 0, earlyReviews: 0,
-  exploreRounds: 0, casesSolved: 0, hardCasesSolved: 0,
+  exploreRounds: 0, casesSolved: 0, hardCasesSolved: 0, coopCasesSolved: 0, coopDays: 0,
 };
 
 describe("danh mục huy hiệu", () => {
@@ -26,6 +26,8 @@ describe("evaluateBadges", () => {
     expect(evaluateBadges({ ...zero, exploreRounds: 3 })).toContainEqual({ id: "explore-rounds", tier: "bronze" });
     expect(evaluateBadges({ ...zero, casesSolved: 3 }).filter((b) => b.id === "explore-cases").map((b) => b.tier)).toEqual(["bronze", "silver"]);
     expect(evaluateBadges({ ...zero, hardCasesSolved: 1 })).toContainEqual({ id: "explore-hard", tier: "bronze" });
+    expect(evaluateBadges({ ...zero, coopCasesSolved: 3 })).toContainEqual({ id: "explore-duo", tier: "silver" });
+    expect(evaluateBadges({ ...zero, coopDays: 2 })).toContainEqual({ id: "explore-duo-days", tier: "bronze" });
     expect(evaluateBadges(zero).some((b) => b.id.startsWith("explore"))).toBe(false);
   });
 

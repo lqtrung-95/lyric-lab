@@ -44,6 +44,8 @@ describe("chơi chung vụ án", () => {
     expect(parseCoopLink("https://songhanzi.app/explore/coop/abc234/toy-thief/toyshop?r=b")).toEqual({ code: "ABC234", caseId: "toy-thief", sceneId: "toyshop" });
     expect(parseCoopLink("/explore/coop/ABC234/lost-parcel/postoffice")).not.toBeNull();
     expect(parseCoopLink("/explore/coop/O0I1AB/x/y")).toBeNull();
+    // Dán nhầm đường dẫn có vai của chính mình vẫn đọc đúng vụ án và cảnh.
+    expect(parseCoopLink("/explore/coop/ABC234/play/a/toy-thief/toyshop")).toEqual({ code: "ABC234", caseId: "toy-thief", sceneId: "toyshop" });
     expect(parseCoopLink("hello")).toBeNull();
   });
 });

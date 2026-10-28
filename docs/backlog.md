@@ -126,3 +126,9 @@ Xếp hạng cho thi đấu: điểm thi đấu hiện **không** vào `practice
 
 ## Nhận dạng giọng nói cho BÀI HÁT không có lời (2026-10-14, tạm bỏ qua)
 Ý tưởng: dùng lại `lib/video/asr/` (Gemini nghe link YouTube) làm bước cuối sau caption YouTube, LRCLIB và NetEase, gắn nhãn "Nhận dạng tự động, có thể sai" (PRD IN-06). Chưa đo độ chính xác trên bài hát. Rủi ro: nhạc nền át giọng và hát luyến láy, Gemini có thể từ chối/cắt lời có bản quyền, điệp khúc lặp nguyên khối bị `cleanAsrLines` gom nhầm (ngưỡng 3 lần liền nhau), phân tích từ vựng dựa trên lời sai. Nếu làm lại: thử 3-4 bài C-pop đã có lời chuẩn từ LRCLIB (một bài rap/hát nhanh, một ballad chậm) và so lời trước khi viết code.
+
+## Quán ăn 3D kiểu Wok Rush (2026-10-28, tạm bỏ, muốn làm sau)
+Ý tưởng: game nấu ăn 3D, khách gọi món bằng tiếng Trung (nghe + đọc, bật/tắt Pinyin và Nghĩa), người chơi đi tới đúng bếp để nấu rồi mang ra bàn; có bản đồ Việt Nam (khách du lịch Trung Quốc gọi phở, bánh mì, cà phê trứng ở Hà Nội, Sài Gòn, Hội An) và Trung Quốc (Bắc Kinh, Thượng Hải, Quảng Châu, Thành Đô). Không dùng tên, hình, bố cục của Wok Rush. Kế hoạch đầy đủ: `plans/261028-2225-3d-cooking-game/plan.md`.
+Đã thử và rút ra: `three` + `@react-three/fiber` chạy ~60 FPS trên desktop (chưa đo điện thoại); Tripo gói miễn phí không export được GLB và mô hình HD ~2 triệu mặt (cần giảm số mặt); gói CC0 Kenney Food Kit rất nhẹ và đủ dùng cho đồ ăn/bếp; nhân vật khối Kenney xấu, nhân vật chibi dựng bằng code đẹp hơn nhưng vẫn thua bản gốc rõ rệt. Muốn đẹp ngang bản gốc cần họa sĩ 3D hoặc mô hình AI trả phí (Tripo Pro, khoảng $20/tháng).
+Mã bản thử đã gỡ khỏi `main` để nhẹ repo, vẫn nằm trong lịch sử git: commit `9a6fb2f` (bản đầy đủ nhất: `components/kitchen`, `lib/kitchen`, `app/(main)/review/kitchen`, `public/models/kitchen`); lấy lại bằng `git checkout 9a6fb2f -- <đường dẫn>` rồi `npm i three @react-three/fiber @types/three`.
+

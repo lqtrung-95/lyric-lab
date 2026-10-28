@@ -72,9 +72,18 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
         <span aria-hidden="true" className="text-3xl">🕵️‍♀️🕵️</span>
         <span className="min-w-0 flex-1">
           <span className="block text-label-lg font-extrabold">Phá án cùng bạn</span>
-          <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Nói chuyện bằng tiếng Trung để ghép manh mối.</span>
+          <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Manh mối là riêng: báo nhau bằng tiếng Trung rồi cùng buộc tội. Thưởng XP x1,5.</span>
         </span>
         <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-secondary">Mời bạn</span>
+      </Link>
+
+      <Link href="/dialogues" className="card-ink flex items-center gap-space-sm bg-tertiary-container p-space-sm text-on-tertiary-container transition-transform hover:-translate-y-0.5">
+        <span aria-hidden="true" className="text-3xl">💬</span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-label-lg font-extrabold">Hội thoại</span>
+          <span className="block text-label-md">Nghe từng câu, xem pinyin, đóng vai một bên và ghi âm giọng bạn. Có bài dài cho mỗi cảnh.</span>
+        </span>
+        <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-primary">Luyện nói</span>
       </Link>
 
       {totalFading(fading) > 0 && (

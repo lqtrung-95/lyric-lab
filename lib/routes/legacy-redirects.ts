@@ -20,6 +20,7 @@ export function legacyRedirects(): Redirect[] {
     // Vụ danh sách mua sắm từng có đường dẫn cảnh sai (`shop`), id đúng của cảnh cửa hàng là `clothing-store`.
     to("/explore/cases/shopping-list/shop", "/explore/cases/shopping-list/clothing-store"),
     to("/cai-app", "/install"),
+    to("/cong-cu", "/tools"),
     { source: "/hoc", has: [{ type: "query", key: "khoa", value: "(?<course>.+)" }], destination: "/courses?course=:course", permanent: true },
     to("/hoc/xep-lop", "/courses/placement"),
     to("/hoc", "/courses"),

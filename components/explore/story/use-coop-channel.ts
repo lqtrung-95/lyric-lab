@@ -2,41 +2,59 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { otherRole, validPhrase, type CoopRole } from "@/lib/explore/coop/coop-state";
+import { parseProposal, parseReply, parseReport, parseVerdict, sharedFlags, type CaseIds, type ProposalEvent, type ReplyEvent, type ReportEvent, type VerdictEvent, type VerdictKind } from "@/lib/explore/coop/coop-events";
+import { parseMessage } from "@/lib/explore/coop/coop-messages";
+import { parseClip, type VoiceClip } from "@/lib/speech/voice-clip";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 
-export interface SharedState { flags: string[]; clues: string[] }
-export interface CoopSay { from: CoopRole; zh: string; at: number }
+export interface SharedState { flags: string[] }
+export interface CoopSay { from: CoopRole; zh: string; at: number; /** Giọng người nói đọc câu đó (nếu họ gửi kèm). */ clip?: VoiceClip }
+
+/** Các việc cần làm khi nhận tin từ đồng đội (đã kiểm tra dạng). */
+export interface CoopHandlers {
+  onPartnerState: (s: SharedState) => void;
+  onReport: (e: ReportEvent) => void;
+  onProposal: (e: ProposalEvent) => void;
+  onReply: (e: ReplyEvent) => void;
+  onVerdict: (e: VerdictEvent) => void;
+}
 
 interface Options {
   code: string;
   caseId: string;
   role: CoopRole;
-  /** Trạng thái hiện tại của mình để gửi cho đồng đội (khi đồng đội mới vào, hoặc khi mình có thay đổi). */
+  /** Cờ hiện tại của mình để gửi cho đồng đội (khi đồng đội mới vào, hoặc khi mình có thay đổi). Manh mối KHÔNG chia sẻ tự động: chỉ vào sổ người kia khi được báo. */
   state: SharedState;
-  onPartnerState: (s: SharedState) => void;
+  /** Id manh mối và nghi phạm của vụ án, để bỏ tin có id lạ. */
+  ids: CaseIds;
+  handlers: CoopHandlers;
   /** Tắt hẳn (chơi một mình): không mở kênh. */
   enabled: boolean;
 }
 
 const isStrings = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === "string") && v.length < 500;
+/** Câu nói hợp lệ: một câu nói nhanh có sẵn hoặc một câu ghép từ mẫu. */
+const validSay = (v: unknown): string | null => validPhrase(v) ?? parseMessage(v)?.zh ?? null;
 
 /**
  * Kênh thời gian thực giữa hai người chơi chung (Supabase Realtime, broadcast + presence; không lưu gì vào cơ sở dữ liệu, nên không cần migration).
- * Trao đổi: tiến độ (cờ và manh mối, chỉ ghép thêm) và câu nói nhanh có sẵn. Dữ liệu nhận về được kiểm tra dạng; nội dung lạ bị bỏ.
+ * Trao đổi: cờ tiến độ (chỉ ghép thêm), câu nói, báo manh mối, đề nghị buộc tội và trả lời, kết quả buộc tội. Dữ liệu nhận về được kiểm tra dạng; nội dung lạ bị bỏ.
  * Lỗi kết nối chỉ làm mất đồng bộ (`connected` = false), người chơi vẫn chơi tiếp phần mình.
  */
-export function useCoopChannel({ code, caseId, role, state, onPartnerState, enabled }: Options) {
+export function useCoopChannel({ code, caseId, role, state, ids, handlers, enabled }: Options) {
   const [connected, setConnected] = useState(false);
   const [partnerOnline, setPartnerOnline] = useState(false);
   const [said, setSaid] = useState<CoopSay[]>([]);
   const chanRef = useRef<ReturnType<ReturnType<typeof createSupabaseBrowserClient>["channel"]> | null>(null);
   const stateRef = useRef(state);
-  const handlerRef = useRef(onPartnerState);
-  useEffect(() => { stateRef.current = state; handlerRef.current = onPartnerState; });
+  const handlersRef = useRef(handlers);
+  const idsRef = useRef(ids);
+  useEffect(() => { stateRef.current = state; handlersRef.current = handlers; idsRef.current = ids; });
 
-  const sendState = useCallback(() => {
-    void chanRef.current?.send({ type: "broadcast", event: "state", payload: { from: role, ...stateRef.current } });
+  const send = useCallback((event: string, payload: Record<string, unknown>) => {
+    void chanRef.current?.send({ type: "broadcast", event, payload: { from: role, ...payload } });
   }, [role]);
+  const sendState = useCallback(() => send("state", { flags: sharedFlags(stateRef.current.flags) }), [send]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -50,16 +68,21 @@ export function useCoopChannel({ code, caseId, role, state, onPartnerState, enab
       chanRef.current = channel;
       channel
         .on("broadcast", { event: "state" }, ({ payload }) => {
-          const p = payload as { from?: unknown; flags?: unknown; clues?: unknown };
-          if (p?.from === role || !isStrings(p?.flags) || !isStrings(p?.clues)) return;
-          handlerRef.current({ flags: p.flags, clues: p.clues });
+          const p = payload as { from?: unknown; flags?: unknown };
+          if (p?.from === role || !isStrings(p?.flags)) return;
+          handlersRef.current.onPartnerState({ flags: sharedFlags(p.flags) });
         })
         .on("broadcast", { event: "say" }, ({ payload }) => {
-          const p = payload as { from?: unknown; zh?: unknown };
-          const zh = validPhrase(p?.zh);
+          const p = payload as { from?: unknown; zh?: unknown; clip?: unknown };
+          const zh = validSay(p?.zh);
           if (p?.from === role || (p?.from !== "a" && p?.from !== "b") || !zh) return;
-          setSaid((cur) => [...cur.slice(-4), { from: p.from as CoopRole, zh, at: Date.now() }]);
+          const clip = p.clip === undefined ? null : parseClip(p.clip);
+          setSaid((cur) => [...cur.slice(-4), { from: p.from as CoopRole, zh, at: Date.now(), ...(clip ? { clip } : {}) }]);
         })
+        .on("broadcast", { event: "report" }, ({ payload }) => { const e = parseReport(payload, idsRef.current); if (e && e.from !== role) handlersRef.current.onReport(e); })
+        .on("broadcast", { event: "propose" }, ({ payload }) => { const e = parseProposal(payload, idsRef.current); if (e && e.from !== role) handlersRef.current.onProposal(e); })
+        .on("broadcast", { event: "reply" }, ({ payload }) => { const e = parseReply(payload); if (e && e.from !== role) handlersRef.current.onReply(e); })
+        .on("broadcast", { event: "verdict" }, ({ payload }) => { const e = parseVerdict(payload); if (e && e.from !== role) handlersRef.current.onVerdict(e); })
         .on("presence", { event: "sync" }, () => setPartnerOnline(otherRole(role) in channel!.presenceState()))
         // Đồng đội vừa vào: gửi ngay trạng thái của mình để họ bắt kịp.
         .on("presence", { event: "join" }, ({ key }) => { if (key !== role) sendState(); })
@@ -76,20 +99,25 @@ export function useCoopChannel({ code, caseId, role, state, onPartnerState, enab
     };
   }, [code, caseId, role, sendState, enabled]);
 
-  // Mỗi khi tiến độ của mình đổi thì báo cho đồng đội (gộp thay đổi liên tiếp).
-  const stamp = `${state.flags.length}:${state.clues.length}`;
+  // Mỗi khi cờ của mình đổi thì báo cho đồng đội (gộp thay đổi liên tiếp).
+  const stamp = sharedFlags(state.flags).length;
   useEffect(() => {
     if (!connected) return;
     const t = setTimeout(sendState, 200);
     return () => clearTimeout(t);
   }, [stamp, connected, sendState]);
 
-  const say = useCallback((zh: string) => {
-    const ok = validPhrase(zh);
+  const say = useCallback((zh: string, clip?: VoiceClip) => {
+    const ok = validSay(zh);
     if (!ok) return;
-    setSaid((cur) => [...cur.slice(-4), { from: role, zh: ok, at: Date.now() }]);
-    void chanRef.current?.send({ type: "broadcast", event: "say", payload: { from: role, zh: ok } });
-  }, [role]);
+    setSaid((cur) => [...cur.slice(-4), { from: role, zh: ok, at: Date.now(), ...(clip ? { clip } : {}) }]);
+    send("say", { zh: ok, ...(clip ? { clip } : {}) });
+  }, [role, send]);
 
-  return { connected, partnerOnline, said, say };
+  const sendReport = useCallback((clueId: string, clip?: VoiceClip) => send("report", { clueId, ...(clip ? { clip } : {}) }), [send]);
+  const sendProposal = useCallback((suspectIds: string[], clueIds: string[]) => send("propose", { suspectIds, clueIds }), [send]);
+  const sendReply = useCallback((ok: boolean) => send("reply", { ok }), [send]);
+  const sendVerdict = useCallback((kind: VerdictKind) => send("verdict", { kind }), [send]);
+
+  return { connected, partnerOnline, said, say, sendReport, sendProposal, sendReply, sendVerdict };
 }

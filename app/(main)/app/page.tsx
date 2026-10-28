@@ -23,7 +23,7 @@ export default function AppHomePage() {
   return (
     <>
       <AnnouncementBanner />
-      {/* Hai hàng hai ô cao bằng nhau: hàng trên là việc cần làm (hành động + nhiệm vụ), hàng dưới là việc mới (dán bài + lộ trình). Điện thoại xếp một cột theo thứ tự đọc. */}
+      {/* Hai hàng hai ô: hàng trên là việc cần làm (hành động + nhiệm vụ, cao bằng nhau), hàng dưới là việc mới (dán bài + lộ trình; lộ trình chỉ cao vừa nội dung, không kéo giãn). Điện thoại xếp một cột theo thứ tự đọc. */}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-2">
         <div className="lg:col-start-1 lg:row-start-1"><NextActionPanel /></div>
         <div className="lg:col-start-2 lg:row-start-1 max-lg:order-3"><HomeQuests /></div>
@@ -38,7 +38,7 @@ export default function AppHomePage() {
             </div>
           </section>
         </div>
-        <div className="lg:col-start-2 lg:row-start-2 max-lg:order-4"><HomePathCard /></div>
+        <div className="lg:col-start-2 lg:row-start-2 lg:self-start max-lg:order-4"><HomePathCard /></div>
       </div>
       <div className="mt-space-md"><HomeVersusCard /></div>
       <TodayPlan />

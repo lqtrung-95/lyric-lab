@@ -17,13 +17,13 @@ const FAQ = [
 export const metadata: Metadata = {
   title: { absolute: TITLE },
   description: DESCRIPTION,
-  alternates: { canonical: "/cong-cu" },
-  openGraph: { type: "website", locale: "vi_VN", siteName: "SongHanzi", title: TITLE, description: DESCRIPTION, url: "/cong-cu" },
+  alternates: { canonical: "/tools" },
+  openGraph: { type: "website", locale: "vi_VN", siteName: "SongHanzi", title: TITLE, description: DESCRIPTION, url: "/tools" },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION },
 };
 
 const jsonLd = {
-  "@context": "https://schema.org", "@type": "CollectionPage", name: "Công cụ học tiếng Trung", url: `${SITE_URL}/cong-cu`, description: DESCRIPTION, inLanguage: "vi",
+  "@context": "https://schema.org", "@type": "CollectionPage", name: "Công cụ học tiếng Trung", url: `${SITE_URL}/tools`, description: DESCRIPTION, inLanguage: "vi",
   hasPart: TOOLS.map((t) => ({ "@type": "WebApplication", name: t.title, url: `${SITE_URL}${t.href}`, description: t.description })),
 };
 

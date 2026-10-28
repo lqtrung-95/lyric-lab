@@ -28,7 +28,7 @@ export default async function HskVocabIndexPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-space-lg pb-space-lg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Link href="/cong-cu" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">← Tất cả công cụ</Link>
+      <Link href="/tools" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">← Tất cả công cụ</Link>
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Từ vựng HSK có âm Hán Việt</h1>
         <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">Chọn một cấp để xem danh sách từ kèm pinyin, âm Hán Việt và nghĩa tiếng Anh, xếp từ từ thường gặp nhất. Tìm nhanh trong từng cấp và tải CSV để nạp vào Anki.</p>

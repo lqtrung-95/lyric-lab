@@ -1,4 +1,4 @@
-export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice" | "translate" | "chat" | "transcribe";
+export type UsageKind = "analyze" | "explain" | "tts" | "score" | "room" | "room_join" | "ask" | "voice" | "translate" | "chat" | "transcribe" | "stt" | "roleplay";
 
 // Hạn mức trong 24 giờ theo tài khoản. Phân tích bài mới theo PRD §7; giải nghĩa từ bằng LLM tốn ít hơn nên cho nhiều hơn.
 const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
@@ -21,9 +21,13 @@ const LIMITS: Record<UsageKind, { anonymous: number; member: number }> = {
   // Mỗi đoạn 2 phút Gemini nghe tính 1 lượt (video 30 phút tối đa 15 đoạn): thành viên đăng nhập Google ~6 video/ngày (số video thêm mỗi ngày còn bị giới hạn riêng).
   // Khách (ẩn danh) không được dùng: API chặn bằng 403 account_required trước khi đếm, số 0 ở đây chỉ để nếu lỡ gọi thì cũng bị từ chối.
   transcribe: { anonymous: 0, member: 90 },
+  // Nhận diện lời nói tự do cho các bài Nói phản xạ (mỗi câu nói một lượt Azure STT, mỗi lượt vài giây âm thanh): 10 câu Hỏi nhanh ≈ 10 lượt.
+  stt: { anonymous: 60, member: 300 },
+  // Lượt trò chuyện tự do với AI (mỗi lượt một lần gọi LLM). Chỉ tài khoản đã đăng ký; API chặn khách bằng 403 account_required, số 0 chỉ để nếu lỡ gọi vẫn bị từ chối.
+  roleplay: { anonymous: 0, member: 20 },
 };
 
-const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24, translate: 24, chat: 1, transcribe: 24 };
+const WINDOW_HOURS: Record<UsageKind, number> = { analyze: 24, explain: 24, tts: 24, score: 1, room: 24, room_join: 1, ask: 24, voice: 24, translate: 24, chat: 1, transcribe: 24, stt: 24, roleplay: 24 };
 
 /** Cửa sổ đếm (giờ) của từng loại: điểm luyện tập tính theo giờ, còn lại theo 24 giờ. */
 export const usageWindowHours = (kind: UsageKind): number => WINDOW_HOURS[kind];

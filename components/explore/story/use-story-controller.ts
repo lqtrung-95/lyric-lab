@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { judge, linkClues, type LinkResult, type Verdict } from "@/lib/explore/story/deduction";
 import { enterNode, pickEntry, step, visibleChoices } from "@/lib/explore/story/dialogue";
@@ -10,10 +10,12 @@ import { addFlag, applyEffects, holds } from "@/lib/explore/story/story-state";
 import { standPoint, type Interactable, type Vec } from "@/lib/explore/player-movement";
 import { playSfx } from "@/lib/feedback/sfx";
 import { submitRoundScore } from "@/lib/practice/submit-score";
-import { coopStorageId, mergeShared, sceneOwner, unseenShared, type CoopRole } from "@/lib/explore/coop/coop-state";
+import { coopStorageId, sceneOwner, type CoopRole } from "@/lib/explore/coop/coop-state";
+import { coopPoints } from "@/lib/explore/coop/coop-reward";
+import { recordRemoteCoopSolve } from "@/lib/explore/sync/explore-state-repo";
 import { storyRoute } from "@/lib/explore/story/story-route";
 import { sceneUnlocked } from "@/lib/explore/story/objectives";
-import { useCoopChannel } from "./use-coop-channel";
+import { useCoopSession } from "./use-coop-session";
 import { useStoryProgress } from "./use-story-progress";
 
 export type StoryView =
@@ -34,7 +36,13 @@ export interface StoryExtra {
   y: number;
   w: number;
   stand?: Vec;
+  /** Chỗ xem xét đã lấy manh mối chưa (chỉ khi đó mới hiện tên). */
+  found?: boolean;
 }
+
+/** Số lần nhờ gợi ý chỗ xem xét trong mỗi cảnh, và thời gian chỗ được gợi ý lóe sáng. */
+export const SPOT_HINTS_PER_SCENE = 2;
+const SPOT_HINT_MS = 5000;
 
 /**
  * Điều khiển cốt truyện của một cảnh: nói chuyện (hội thoại có lựa chọn và câu kiểm tra hiểu), xem xét manh mối, sổ vụ án, bản đồ, buộc tội.
@@ -55,27 +63,32 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
   const flags = progress.flags;
   const solved = flags.includes(story.solvedFlag);
 
-  // Chơi chung: ghép tiến độ của đồng đội, ghi lại manh mối họ vừa tìm, và mừng cùng lúc khi họ phá án xong.
+  // Chơi chung: cảnh nào của ai (xem `sceneOwner`); manh mối, buộc tội và hộp thư ở `useCoopSession`.
   const route = useMemo(() => storyRoute(story.objectives, story.startScene), [story.objectives, story.startScene]);
-  const [partnerNews, setPartnerNews] = useState<string[]>([]);
   const [blocked, setBlocked] = useState<string | null>(null);
-  const progressRef = useRef(progress);
-  useEffect(() => { progressRef.current = progress; });
-  const onPartnerState = useCallback((incoming: { flags: string[]; clues: string[] }) => {
-    const add = unseenShared(progressRef.current, incoming);
-    if (!add.flags.length && !add.clues.length) return;
-    if (add.clues.length) setPartnerNews((cur) => [...cur, ...add.clues].slice(-4));
-    if (add.flags.includes(story.solvedFlag)) setCelebrating(true);
-    update((p) => mergeShared(p, incoming));
-  }, [story.solvedFlag, update]);
-  const channel = useCoopChannel({ code: coop?.code ?? "", caseId: story.id, role: coop?.role ?? "a", state: { flags: progress.flags, clues: progress.clues }, onPartnerState, enabled: !!coop });
   /** Chơi chung: mọi cảnh đều mở (hai người chia nhau đi); chơi một mình: mở dần theo mục tiêu. */
   const isSceneOpen = useCallback((id: string) => !!coop || !!story.freeRoam || sceneUnlocked(story.objectives, story.startScene, flags, id), [coop, story.freeRoam, story.objectives, story.startScene, flags]);
 
   const extras = useMemo<StoryExtra[]>(() => [
     ...(scene.npcs ?? []).filter((n) => holds(n.when, flags)).map((n): StoryExtra => ({ id: n.id, kind: "npc", sprite: n.sprite, label: n.name, x: n.x, y: n.y, w: n.w })),
-    ...(scene.spots ?? []).filter((s) => holds(s.when, flags)).map((s): StoryExtra => ({ id: s.id, kind: "spot", sprite: s.sprite, label: s.label, x: s.x, y: s.y, w: s.w, stand: s.stand })),
-  ], [scene, flags]);
+    ...(scene.spots ?? []).filter((s) => holds(s.when, flags)).map((s): StoryExtra => ({ id: s.id, kind: "spot", sprite: s.sprite, label: s.label, x: s.x, y: s.y, w: s.w, stand: s.stand, found: progress.clues.includes(s.clue) })),
+  ], [scene, flags, progress.clues]);
+
+  // Gợi ý có giới hạn: chỗ xem xét chưa lấy manh mối lóe sáng vài giây (mặc định chúng trông như đồ vật thường).
+  const [spotHintsUsed, setSpotHintsUsed] = useState(0);
+  const [hintSpotId, setHintSpotId] = useState<string | null>(null);
+  const spotsLeft = extras.filter((e) => e.kind === "spot" && !e.found).length;
+  const requestSpotHint = useCallback(() => {
+    const target = extras.find((e) => e.kind === "spot" && !e.found);
+    if (!target || spotHintsUsed >= SPOT_HINTS_PER_SCENE) return;
+    setSpotHintsUsed((n) => n + 1);
+    setHintSpotId(target.id);
+  }, [extras, spotHintsUsed]);
+  useEffect(() => {
+    if (!hintSpotId) return;
+    const t = window.setTimeout(() => setHintSpotId(null), SPOT_HINT_MS);
+    return () => window.clearTimeout(t);
+  }, [hintSpotId]);
   const extraInteractables = useMemo<Interactable[]>(() => extras.map((e) => ({ id: e.id, at: standPoint(e) })), [extras]);
 
   const openNode = useCallback((id: string) => {
@@ -123,7 +136,8 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
     else setView(null);
   }, [view, scene, flags, progress, openNode, update]);
 
-  const accuse = useCallback((suspectIds: string[], clueIds: string[]) => {
+  /** Chấm lời buộc tội ở máy này: đúng thì đặt cờ phá án, mừng và mở đoạn kết. */
+  const runAccuse = useCallback((suspectIds: string[], clueIds: string[]): Verdict => {
     const v = judge(story, suspectIds, clueIds);
     setVerdict(v);
     if (v.type === "solved") {
@@ -133,7 +147,17 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
       if (scene.dialogues[story.epilogueNode]) openNode(story.epilogueNode);
       else { setView(null); setEpilogueElsewhere(true); }
     } else playSfx("wrong");
+    return v;
   }, [story, scene, update, openNode]);
+
+  const session = useCoopSession({ enabled: !!coop, code: coop?.code ?? "", role: coop?.role ?? "a", payload, progress, update, runAccuse, onPartnerSolved: () => setCelebrating(true) });
+
+  /** Chơi một mình: chấm ngay. Chơi chung: gửi đề nghị cho đồng đội, họ đồng ý thì máy này mới chấm (xem `useCoopSession`). */
+  const accuse = useCallback((suspectIds: string[], clueIds: string[]) => {
+    if (!coop) { runAccuse(suspectIds, clueIds); return; }
+    setVerdict(null);
+    if (session.propose(suspectIds, clueIds) === "offline") setBlocked("Buộc tội cần cả hai người đồng ý, hãy chờ đồng đội vào phòng rồi thử lại.");
+  }, [coop, runAccuse, session]);
 
   /** Mở đoạn kết ở cảnh kết thúc (sau khi được đưa về từ cảnh khác) và mừng. */
   const playEpilogue = useCallback(() => {
@@ -154,12 +178,15 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
     update((p) => ({ ...p, scored: true }));
     const total = Math.min(20, Math.max(1, progress.checks.total));
     const correct = Math.min(total, progress.checks.right);
-    void submitRoundScore("explore", { points: correct * 100, correct, total, durationSec: Math.max(total * 3, 60) }).then((ok) => { if (ok) refreshGameSummary(); });
-  }, [ready, solved, progress.scored, progress.checks, update]);
+    const points = coop ? coopPoints(correct * 100) : correct * 100; // chơi cùng bạn được thưởng thêm
+    if (coop) void recordRemoteCoopSolve(story.id, new Date().toLocaleDateString("sv-SE")).catch(() => undefined);
+    void submitRoundScore("explore", { points, correct, total, durationSec: Math.max(total * 3, 60) }).then((ok) => { if (ok) refreshGameSummary(); });
+  }, [ready, solved, progress.scored, progress.checks, update, coop, story.id]);
 
   return {
     ready, progress, view, setView, verdict, solved, isSceneOpen,
-    coop: coop ? { role: coop.role, code: coop.code, connected: channel.connected, partnerOnline: channel.partnerOnline, said: channel.said, say: channel.say, news: partnerNews, blocked, route, clearNews: () => setPartnerNews([]), clearBlocked: () => setBlocked(null) } : null, celebrating, endCelebration, extras, extraInteractables,
+    coop: coop ? { role: coop.role, code: coop.code, ...session, blocked, route, clearBlocked: () => setBlocked(null) } : null, celebrating, endCelebration, extras, extraInteractables,
+    spotHint: { left: SPOT_HINTS_PER_SCENE - spotHintsUsed, remaining: spotsLeft, activeId: hintSpotId, use: requestSpotHint },
     objective: story.freeRoam ? null : currentObjective(story.objectives, flags),
     objectiveCount: story.freeRoam ? { done: 0, total: 0 } : objectiveProgress(story.objectives, flags),
     canAccuse: holds(story.accuseWhen, flags),

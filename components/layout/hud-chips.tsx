@@ -26,7 +26,7 @@ export function HudChips() {
         </span>
       )}
       {!!due && (
-        <Link href="/review" className={CHIP} title="Thẻ cần ôn hôm nay">
+        <Link href="/review/cards" className={CHIP} title="Thẻ cần ôn hôm nay">
           <Icon name="style" size={18} className="text-primary" />
           {due}<span className="sr-only"> thẻ cần ôn</span>
         </Link>

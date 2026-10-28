@@ -1,0 +1,98 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/ui/icon";
+import { RubyLine } from "@/components/ui/ruby-text";
+import { coopPinyin } from "@/lib/explore/coop/coop-pinyin";
+import { parseMessage } from "@/lib/explore/coop/coop-messages";
+import { COOP_PHRASES, ROLE_LABEL } from "@/lib/explore/coop/coop-state";
+import type { VoiceClip } from "@/lib/speech/voice-clip";
+import type { StoryPayload } from "@/lib/explore/story/load-story";
+import { playVoiceClip } from "./clip-player";
+import { CoopComposer } from "./coop-composer";
+import { HintToggles } from "./hint-toggles";
+import { CoopInbox } from "./coop-inbox";
+import type { useStoryController } from "./use-story-controller";
+import { useStoryHints } from "./use-story-hints";
+
+type Coop = NonNullable<ReturnType<typeof useStoryController>["coop"]>;
+
+/** Nổi trên mọi vật trong khung cảnh (cảnh xếp lớp theo vị trí và dùng z-index lên tới hàng nghìn). */
+const ABOVE_SCENE = { zIndex: 3000 } as const;
+
+const viOf = (zh: string): string | undefined => COOP_PHRASES.find((p) => p.zh === zh)?.vi ?? parseMessage(zh)?.vi;
+
+/**
+ * Bong bóng chat ở góc dưới bên phải: bấm mở khung có hộp thư (manh mối được báo, đề nghị buộc tội), tin nhắn và bộ soạn câu tiếng Trung.
+ * Số trên bong bóng là tin chưa đọc + việc cần xử lý; đề nghị buộc tội của đồng đội tự mở khung vì cần trả lời. Trên điện thoại nằm trên thanh điều hướng dưới.
+ */
+export function CoopChat({ coop, payload, hasClue, onOpenCase, open, onOpenChange }: { coop: Coop; payload: StoryPayload; hasClue: (id: string) => boolean; onOpenCase: () => void; open: boolean; onOpenChange: (open: boolean) => void }) {
+  const { hints, toggle: toggleHint } = useStoryHints();
+  /** Khung gọn (mặc định) chỉ có hộp thư, tin nhắn và bộ soạn câu; "Thêm" mới mở gợi ý đọc, cách chơi và câu nói nhanh. */
+  const [more, setMore] = useState(false);
+  const [seenAt, setSeenAt] = useState(() => Date.now());
+  const [copied, setCopied] = useState(false);
+  const proposals = coop.inbox.filter((i) => i.kind === "proposal").length;
+  const lastProposals = useRef(0);
+
+  // Đề nghị buộc tội mới từ đồng đội: mở khung ngay vì cần trả lời.
+  useEffect(() => {
+    if (proposals > lastProposals.current) onOpenChange(true);
+    lastProposals.current = proposals;
+  }, [proposals, onOpenChange]);
+
+  const unread = coop.inbox.length + (open ? 0 : coop.said.filter((m) => m.from !== coop.role && m.at > seenAt).length);
+  const toggle = () => { onOpenChange(!open); setSeenAt(Date.now()); };
+  // Gửi xong thì tự thu về bong bóng sau một nhịp (trừ màn rộng, nơi khung ghim bên cạnh cảnh không che gì).
+  const say = (zh: string, clip?: VoiceClip) => {
+    coop.say(zh, clip);
+    if (!window.matchMedia("(min-width: 1280px)").matches) setTimeout(() => onOpenChange(false), 1500);
+  };
+
+  async function copyLink() {
+    const url = `${window.location.origin}/explore/coop/${coop.code}/${payload.story.id}/${payload.story.startScene}`;
+    try { await navigator.clipboard.writeText(url); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* trình duyệt chặn: tự chép từ thanh địa chỉ */ }
+  }
+
+  return (
+    <>
+      {open && (
+        <aside aria-label="Chat với đồng đội" style={ABOVE_SCENE} className="card-ink fixed bottom-40 right-3 flex max-h-[45vh] w-[min(94vw,26rem)] flex-col gap-2 overflow-y-auto bg-surface p-space-sm sm:bottom-24 sm:right-6 sm:max-h-[55vh] xl:bottom-auto xl:top-24 xl:max-h-[calc(100vh-8rem)] xl:w-[22rem]">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-label-lg font-extrabold">Chat với {coop.partnerOnline ? ROLE_LABEL[coop.role === "a" ? "b" : "a"] : "đồng đội"}</h2>
+            <button type="button" onClick={toggle} aria-label="Thu nhỏ chat" className="flex size-11 items-center justify-center rounded-full hover:bg-surface-container"><Icon name="close" size={20} /></button>
+          </div>
+          {more && (
+            <>
+              <div className="max-sm:[&_button]:!min-h-9 max-sm:[&_button]:!px-2.5 max-sm:[&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={toggleHint} /></div>
+              <p className="text-label-md text-on-surface-variant"><strong>Cách chơi cùng bạn:</strong> manh mối bạn tìm là RIÊNG của bạn: mở <button type="button" onClick={onOpenCase} className="font-extrabold underline">Sổ vụ án</button> và bấm &ldquo;Báo cho đồng đội&rdquo; (hoặc &ldquo;Báo + đọc to&rdquo;), họ đọc bằng tiếng Trung rồi mới ghi vào sổ của họ. Buộc tội cần cả hai đồng ý.</p>
+            </>
+          )}
+          {!coop.partnerOnline && <button type="button" onClick={copyLink} className="min-h-11 self-start rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-extrabold text-on-primary-container">{copied ? "Đã chép liên kết ✓" : "Chép liên kết mời bạn"}</button>}
+          <CoopInbox items={coop.inbox} payload={payload} hints={hints} hasClue={hasClue} onAccept={coop.acceptReport} onDismiss={coop.dismiss} onAnswer={coop.answerProposal} />
+          {coop.said.length > 0 && (
+            <ul aria-label="Tin nhắn" aria-live="polite" className="flex flex-col gap-0.5">
+              {coop.said.slice(more ? -5 : -3).map((m) => (
+                <li key={m.at} className={`text-body-sm ${m.from === coop.role ? "text-right text-on-surface-variant" : "font-bold"}`}>
+                  <span className="text-label-md">{m.from === coop.role ? "Bạn" : ROLE_LABEL[m.from]}: </span><span lang="zh-Hans" className={hints.pinyin ? "leading-[2.2]" : ""}><RubyLine zh={m.zh} pinyin={coopPinyin(m.zh)} show={hints.pinyin} /></span>
+                  {hints.vi && <span className="ml-1 text-label-md font-normal text-on-surface-variant">({viOf(m.zh)})</span>}
+                  {m.clip && <button type="button" onClick={() => void playVoiceClip(m.clip!)} aria-label="Nghe giọng đọc" className="ml-1 inline-flex size-8 items-center justify-center rounded-full bg-primary-container align-middle text-on-primary-container"><Icon name="volume_up" size={16} /></button>}
+                </li>
+              ))}
+            </ul>
+          )}
+          <CoopComposer places={coop.route} hints={hints} onSay={say} compact={!more} />
+          <button type="button" onClick={() => setMore((m) => !m)} aria-expanded={more} className="inline-flex min-h-9 items-center gap-1 self-start text-label-md font-extrabold text-primary">
+            <Icon name={more ? "expand_less" : "expand_more"} size={18} />{more ? "Gọn lại" : "Thêm: gợi ý đọc, cách chơi, câu nói nhanh"}
+          </button>
+        </aside>
+      )}
+      <button type="button" onClick={toggle} aria-expanded={open} aria-label={`Chat với đồng đội${unread > 0 ? `, ${unread} việc mới` : ""}`} style={ABOVE_SCENE}
+        className={`fixed bottom-24 right-3 flex size-14 items-center justify-center rounded-full border-2 border-ink bg-primary text-on-primary shadow-[0_4px_0_var(--shadow-ink)] sm:bottom-6 sm:right-6 ${unread > 0 && !open ? "animate-bounce" : ""}`}>
+        <Icon name="forum" size={26} filled />
+        <span aria-hidden="true" className={`absolute -left-0.5 -top-0.5 size-3.5 rounded-full border-2 border-ink ${coop.partnerOnline ? "bg-secondary" : "bg-outline"}`} />
+        {unread > 0 && <span aria-hidden="true" className="absolute -right-1.5 -top-1.5 flex min-w-6 items-center justify-center rounded-full border-2 border-ink bg-error px-1 text-label-md font-extrabold text-on-error">{unread}</span>}
+      </button>
+    </>
+  );
+}

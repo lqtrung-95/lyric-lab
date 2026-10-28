@@ -35,7 +35,7 @@ export interface ToolEntry {
 }
 
 /**
- * Danh sách công cụ công khai (không cần tài khoản hay dữ liệu học). Trang mục lục `/cong-cu`, sitemap và chân trang đều đọc từ đây:
+ * Danh sách công cụ công khai (không cần tài khoản hay dữ liệu học). Trang mục lục `/tools`, sitemap và chân trang đều đọc từ đây:
  * thêm công cụ mới = thêm một mục ở đây cộng với trang của nó. Việc cần thẻ đã lưu hay tiến độ học thì thuộc mục Ôn tập, không phải Công cụ.
  */
 export const TOOLS: readonly ToolEntry[] = [
@@ -46,6 +46,14 @@ export const TOOLS: readonly ToolEntry[] = [
     icon: "dictionary",
     category: "pronunciation",
     keywords: ["pinyin", "phiên âm", "han viet", "chuyen doi"],
+  },
+  {
+    href: "/bai-tap-tu-vung-tieng-trung",
+    title: "Bài tập từ vựng có đáp án",
+    description: "Dán danh sách từ, nhận tờ bài tập A4: nối chữ với pinyin hoặc nghĩa, viết pinyin, viết chữ Hán vào ô, kèm trang đáp án để in.",
+    icon: "list_alt",
+    category: "writing",
+    keywords: ["bai tap", "tu vung", "worksheet", "noi chu", "dap an", "in"],
   },
   {
     href: "/tu-vung-hsk",

@@ -15,7 +15,7 @@ export function PronunciationPageShell({ path, name, description, title, intro, 
   return (
     <div className="mx-auto max-w-3xl space-y-space-lg pb-space-lg">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Link href={path === "/phat-am" ? "/cong-cu" : "/phat-am"} className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">{path === "/phat-am" ? "← Tất cả công cụ" : "← Luyện phát âm"}</Link>
+      <Link href={path === "/phat-am" ? "/tools" : "/phat-am"} className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">{path === "/phat-am" ? "← Tất cả công cụ" : "← Luyện phát âm"}</Link>
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">{title}</h1>
         <p className="mt-2 text-body-lg text-on-surface-variant">{intro}</p>

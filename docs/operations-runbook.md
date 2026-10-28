@@ -304,6 +304,18 @@ Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat
 ## Giọng đọc (Azure Speech) cho Khám phá
 
 - Giọng đọc tự nhiên của một từ/câu chỉ có sau khi đã tổng hợp và lưu vào Storage (bucket `tts`, dùng chung mọi người). Lần đầu một câu được bấm loa thì server gọi Azure và TÍNH HẠN MỨC theo tài khoản (`tts`: khách ẩn danh 80 lượt/ngày, thành viên 250 lượt/ngày; xem `usage-limit-config.ts`); hết hạn mức, Azure giới hạn tốc độ (gói miễn phí khoảng 20 lượt/phút), hoặc hết hạn mức tháng thì nút loa rơi về giọng hệ thống của trình duyệt (nghe như giọng máy).
-- Cách khắc phục: chạy một lần `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/prewarm-explore-tts.mts --apply` để tổng hợp sẵn mọi từ/câu của Khám phá (thiếu thì tạo, đủ thì bỏ qua; mặc định chỉ đếm). Nên chạy lại mỗi khi thêm cảnh/vụ án mới. Gặp 429 script tự đợi 65 giây rồi thử lại.
+- Cách khắc phục: chạy một lần `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/prewarm-explore-tts.mts --apply` để tổng hợp sẵn mọi từ/câu của Khám phá (thiếu thì tạo, đủ thì bỏ qua; mặc định chỉ đếm). Nên chạy lại mỗi khi thêm cảnh/vụ án/hội thoại mới (script phủ cả kho hội thoại `lib/dialogues`). Gặp 429 script tự đợi 65 giây rồi thử lại.
 - Câu dài hơn 40 ký tự được client chia đoạn (`splitForTts`) và mỗi đoạn có file riêng; script prewarm chia theo đúng cách đó. Thêm cảnh/vụ án/lệnh mới thì chạy lại script (dry-run trước để xem số còn thiếu).
 - Khóa dự phòng (tùy chọn): `AZURE_SPEECH_KEY_2` và `AZURE_SPEECH_REGION_2` (một tài khoản/resource Azure Speech khác, lý tưởng khác tài khoản đăng ký để có thêm hạn mức miễn phí). Khi tài khoản chính trả 429/lỗi máy chủ/lỗi mạng thì `/api/tts` và script tự thử tài khoản dự phòng (`synthesizeWithFailover`). Hai khóa `key1`/`key2` của CÙNG một resource không tăng hạn mức.
+
+## Nói phản xạ: migration và hạn mức
+
+- Chạy `supabase/migrations/20261028000002_speaking_reflex_modes.sql` trong Supabase SQL Editor (thêm loại hạn mức `stt`, `roleplay` vào `usage_events_kind_check` và chế độ điểm `reflex`, `fiveword`, `roleplay` vào `practice_scores_mode_check`). Chưa chạy: `/api/speech/transcribe` và `/api/roleplay/turn` lỗi khi trừ hạn mức; điểm XP của các bài này bị bỏ qua.
+- Dùng chung khóa Azure Speech của TTS/chấm phát âm (`AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`, kèm khóa dự phòng `_2`); thiếu thì `/api/speech/transcribe` trả 503 và bài chuyển sang gõ chữ. Trò chuyện tự do dùng chuỗi model giải nghĩa (`EXPLAIN_MODELS`).
+- Chỉnh hạn mức: `stt` và `roleplay` ở `lib/rate-limit/usage-limit-config.ts` (tài khoản trong `unlimited-accounts` không bị giới hạn).
+
+## Game vui: migration
+
+- Chạy `supabase/migrations/20261028000003_arcade_game_modes.sql` trong Supabase SQL Editor (thêm chế độ điểm `blaster`, `rain`, `whack`, `daily`, `duel` vào `practice_scores_mode_check`). Chưa chạy thì game vẫn chơi được, chỉ điểm XP bị bỏ qua.
+- Đấu 1–1 dùng Supabase Realtime (broadcast + presence), không cần bảng mới. Kho từ chung phụ thuộc bảng `dict_words`; tra lỗi thì các trang Hán tự mỗi ngày và Đấu 1–1 báo chưa tải được từ.
+

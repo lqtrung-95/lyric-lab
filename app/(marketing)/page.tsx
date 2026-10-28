@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { AudienceLevels } from "@/components/landing/audience-levels";
 import { BeforeAfter } from "@/components/landing/before-after";
+import { BeyondSongs } from "@/components/landing/beyond-songs";
 import { FaqSection } from "@/components/landing/faq-section";
 import { FeatureShowcase } from "@/components/landing/feature-showcase";
 import { FeaturesGrid } from "@/components/landing/features-grid";
@@ -37,6 +38,7 @@ export default function LandingPage() {
       <Reveal><HowItWorks /></Reveal>
       <Reveal><GameLoop /></Reveal>
       <Reveal><FeatureShowcase /></Reveal>
+      <Reveal><BeyondSongs /></Reveal>
       <Reveal><AudienceLevels /></Reveal>
       <Reveal><FeaturesGrid /></Reveal>
       <Reveal><FaqSection /></Reveal>

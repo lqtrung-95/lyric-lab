@@ -5,6 +5,7 @@ import { LogoMark } from "@/components/brand/logo-mark";
 import { ChatNavLink } from "@/components/chat/chat-nav-link";
 import { Icon } from "@/components/ui/icon";
 import { HeaderOverflowMenu } from "./header-overflow-menu";
+import { useSidebarCollapsed } from "./use-sidebar-collapsed";
 import { HudChips } from "./hud-chips";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -13,8 +14,9 @@ import { ThemeToggle } from "./theme-toggle";
  * (đổi giao diện sáng/tối và hồ sơ hiện từ lg, dưới lg nằm trong bảng Menu).
  */
 export function HudBar() {
+  const { collapsed } = useSidebarCollapsed();
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b-2 border-outline-variant bg-surface/95 pt-safe backdrop-blur-md md:left-20 lg:left-64">
+    <header className={`fixed inset-x-0 top-0 z-50 border-b-2 border-outline-variant bg-surface/95 pt-safe backdrop-blur-md md:left-20 ${collapsed ? "" : "lg:left-64"}`}>
       <div className="flex h-16 items-center justify-between gap-3 px-gutter md:px-6">
         <Link href="/app" aria-label="SongHanzi, về Hôm nay" className="flex min-h-11 items-center gap-2 md:hidden">
           <LogoMark size={32} />

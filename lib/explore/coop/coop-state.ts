@@ -53,9 +53,9 @@ export function validPhrase(text: unknown): string | null {
   return typeof text === "string" && COOP_PHRASES.some((p) => p.zh === text) ? text : null;
 }
 
-/** Đọc liên kết mời (hoặc đường dẫn) dạng `/explore/coop/<mã>/<vụ án>/<cảnh>`; không đúng dạng thì null. */
+/** Đọc liên kết mời (hoặc đường dẫn) dạng `/explore/coop/<mã>/<vụ án>/<cảnh>`, có thể kèm vai ở giữa (`/<mã>/play/<a|b>/<vụ án>/<cảnh>`, dán nhầm liên kết của chính mình); không đúng dạng thì null. */
 export function parseCoopLink(text: string): { code: string; caseId: string; sceneId: string } | null {
-  const m = text.trim().match(/\/explore\/coop\/([A-Za-z0-9]{6})\/([a-z0-9-]{1,40})\/([a-z0-9-]{1,40})/);
+  const m = text.trim().match(/\/explore\/coop\/([A-Za-z0-9]{6})\/(?:play\/[ab]\/)?([a-z0-9-]{1,40})\/([a-z0-9-]{1,40})/);
   if (!m) return null;
   const code = m[1].toUpperCase();
   return COOP_CODE.test(code) ? { code, caseId: m[2], sceneId: m[3] } : null;

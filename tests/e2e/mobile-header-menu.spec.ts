@@ -25,7 +25,7 @@ test.describe("điện thoại 375px", () => {
     expect((await new AxeBuilder({ page }).include("dialog").analyze()).violations).toEqual([]);
 
     await sheet.getByRole("link", { name: "Công cụ" }).click();
-    await expect(page).toHaveURL(/\/cong-cu$/);
+    await expect(page).toHaveURL(/\/tools$/);
     await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
   });
 

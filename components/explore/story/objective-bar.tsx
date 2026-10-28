@@ -6,7 +6,7 @@ import { useStoryHints } from "./use-story-hints";
 import type { Objective } from "@/lib/explore/story/story-types";
 
 /** Thanh mục tiêu trên đầu cảnh cốt truyện: việc cần làm tiếp theo, tiến độ vụ án, lối vào sổ vụ án và bản đồ. */
-export function ObjectiveBar({ title, objective, done, total, solved, clueCount, freeRoam, onCase, onMap }: { title: string; objective: Objective | null; freeRoam?: boolean; done: number; total: number; solved: boolean; clueCount: number; onCase: () => void; onMap: () => void }) {
+export function ObjectiveBar({ title, objective, done, total, solved, clueCount, freeRoam, spotHint, onCase, onMap }: { title: string; objective: Objective | null; freeRoam?: boolean; done: number; total: number; solved: boolean; clueCount: number; spotHint: { left: number; remaining: number; activeId: string | null; use: () => void }; onCase: () => void; onMap: () => void }) {
   const { hints, toggle } = useStoryHints();
   const onOff = (on: boolean) => (on ? "bật" : "tắt");
   return (
@@ -26,6 +26,11 @@ export function ObjectiveBar({ title, objective, done, total, solved, clueCount,
         <span className="text-label-md font-extrabold text-on-surface-variant">Gợi ý đọc:</span>
         <div className="[&_button]:!min-h-9 [&_button]:!px-3 [&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={toggle} /></div>
         <span className="text-label-md text-on-surface-variant">Pinyin {onOff(hints.pinyin)}, nghĩa {onOff(hints.vi)}{!hints.pinyin && !hints.vi ? " (luyện đọc)" : ""}</span>
+        {spotHint.remaining > 0 && (
+          <button type="button" onClick={spotHint.use} disabled={spotHint.left <= 0 || !!spotHint.activeId} className="ml-auto inline-flex min-h-9 items-center gap-1 rounded-full border-2 border-ink bg-surface-container-lowest px-3 text-[13px] font-extrabold hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-50">
+            <Icon name="search" size={16} />Gợi ý chỗ cần xem ({Math.max(spotHint.left, 0)})
+          </button>
+        )}
       </div>
     </section>
   );

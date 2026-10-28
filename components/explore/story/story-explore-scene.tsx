@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SCENES } from "@/lib/explore/scenes";
 import { storyExits, storyRoute } from "@/lib/explore/story/story-route";
@@ -14,6 +14,7 @@ import { useStoryController, type CoopOptions } from "./use-story-controller";
 /** Cảnh ở chế độ phá án: dựng bộ điều khiển cốt truyện rồi đưa vào màn khám phá. `basePath` là gốc đường dẫn các cảnh của vụ án này. */
 export function StoryExploreScene({ scene, payload, basePath, coop }: { scene: SceneDetail; payload: StoryPayload; basePath: string; coop?: CoopOptions }) {
   const controller = useStoryController(payload, scene.npc.id, coop);
+  const [chatOpen, setChatOpen] = useState(false);
   // Trong vụ án, lối đi theo thứ tự điều tra của vụ (không theo đường nối chế độ tự do).
   // Và chỉ sang được cảnh đã mở; vào thẳng cảnh chưa mở bằng đường dẫn thì đưa về cảnh xuất phát.
   const router = useRouter();
@@ -32,15 +33,16 @@ export function StoryExploreScene({ scene, payload, basePath, coop }: { scene: S
     playEpilogue();
   }, [ready, solved, scene.id, story.accuseScene, playEpilogue]);
   if (locked) return null;
+  // Màn rộng: chat mở thì ghim bên phải và cảnh nhường chỗ (đệm phải) thay vì bị che.
   return (
-    <>
+    <div className={chatOpen && controller.coop ? "transition-[padding] xl:pr-[23rem]" : "transition-[padding]"}>
       {controller.coop && (
         <div className="mx-auto mb-space-md w-full max-w-3xl">
-          <CoopBar coop={controller.coop} payload={payload} sceneId={scene.id} onOpenCase={() => controller.setView({ kind: "case" })} />
+          <CoopBar coop={controller.coop} payload={payload} sceneId={scene.id} hasClue={(id) => controller.progress.clues.includes(id)} onOpenCase={() => controller.setView({ kind: "case" })} chatOpen={chatOpen} onChatOpenChange={setChatOpen} />
         </div>
       )}
       <ExploreScene scene={storyScene} story={{ payload, controller, basePath }} />
       {controller.celebrating && <FireworksBurst onDone={controller.endCelebration} />}
-    </>
+    </div>
   );
 }

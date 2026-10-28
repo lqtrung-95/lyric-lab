@@ -1,0 +1,44 @@
+import { describe, expect, it, vi } from "vitest";
+import { RoleplayError, runRoleplayTurn } from "./roleplay-turn";
+import { buildRoleplayPrompt } from "./build-turn-prompt";
+import { findScenario } from "./scenarios";
+import { roleplayRequestSchema } from "./turn-schema";
+
+const req = { scenarioId: "cafe", level: 2, history: [{ role: "ai" as const, zh: "你想喝点什么？" }], userText: "我想喝咖啡" };
+const good = JSON.stringify({ reply: "好的，要热的还是冰的？", replyVi: "Vâng, nóng hay đá?", tips: ["我要冰的。"], feedback: null });
+
+describe("runRoleplayTurn", () => {
+  it("trả lượt đáp hợp lệ, chấp nhận JSON bọc trong khối mã", async () => {
+    const chat = vi.fn().mockResolvedValue("```json\n" + good + "\n```");
+    const out = await runRoleplayTurn(req, { chat, models: ["m1"] });
+    expect(out).toMatchObject({ reply: "好的，要热的还是冰的？", tips: ["我要冰的。"], feedback: null, model: "m1" });
+  });
+  it("chuyển sang model sau khi model đầu trả sai định dạng", async () => {
+    const chat = vi.fn().mockResolvedValueOnce("không phải json").mockResolvedValueOnce(JSON.stringify({ reply: "hello", replyVi: "x" })).mockResolvedValueOnce(good);
+    const out = await runRoleplayTurn(req, { chat, models: ["a", "b", "c"] });
+    expect(out.model).toBe("c");
+  });
+  it("ném turn_failed khi mọi model lỗi, rate_limited khi hết hạn mức (không gọi LLM)", async () => {
+    await expect(runRoleplayTurn(req, { chat: vi.fn().mockRejectedValue(new Error("x")), models: ["a"] })).rejects.toMatchObject({ code: "turn_failed" });
+    const chat = vi.fn();
+    await expect(runRoleplayTurn(req, { chat, allowLlmCall: () => false })).rejects.toBeInstanceOf(RoleplayError);
+    expect(chat).not.toHaveBeenCalled();
+  });
+  it("tình huống không có thì ném scenario_not_found", async () => {
+    await expect(runRoleplayTurn({ ...req, scenarioId: "nope" }, { chat: vi.fn() })).rejects.toMatchObject({ code: "scenario_not_found" });
+  });
+});
+
+describe("request schema / prompt", () => {
+  it("từ chối cấp ngoài 1-4 và tình huống lạ", () => {
+    expect(roleplayRequestSchema.safeParse({ ...req, level: 5 }).success).toBe(false);
+    expect(roleplayRequestSchema.safeParse({ ...req, scenarioId: "x" }).success).toBe(false);
+    expect(roleplayRequestSchema.safeParse(req).success).toBe(true);
+  });
+  it("prompt chứa cấp độ, vai và lời người học trong khối trích dẫn", () => {
+    const p = buildRoleplayPrompt(findScenario("cafe")!, req);
+    expect(p).toContain("HSK 2");
+    expect(p).toContain("nhân viên quán cà phê");
+    expect(p).toContain('"""\n我想喝咖啡\n"""');
+  });
+});
