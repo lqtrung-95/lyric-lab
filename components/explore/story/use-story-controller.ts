@@ -36,7 +36,13 @@ export interface StoryExtra {
   y: number;
   w: number;
   stand?: Vec;
+  /** Chỗ xem xét đã lấy manh mối chưa (chỉ khi đó mới hiện tên). */
+  found?: boolean;
 }
+
+/** Số lần nhờ gợi ý chỗ xem xét trong mỗi cảnh, và thời gian chỗ được gợi ý lóe sáng. */
+export const SPOT_HINTS_PER_SCENE = 2;
+const SPOT_HINT_MS = 5000;
 
 /**
  * Điều khiển cốt truyện của một cảnh: nói chuyện (hội thoại có lựa chọn và câu kiểm tra hiểu), xem xét manh mối, sổ vụ án, bản đồ, buộc tội.
@@ -65,8 +71,24 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
 
   const extras = useMemo<StoryExtra[]>(() => [
     ...(scene.npcs ?? []).filter((n) => holds(n.when, flags)).map((n): StoryExtra => ({ id: n.id, kind: "npc", sprite: n.sprite, label: n.name, x: n.x, y: n.y, w: n.w })),
-    ...(scene.spots ?? []).filter((s) => holds(s.when, flags)).map((s): StoryExtra => ({ id: s.id, kind: "spot", sprite: s.sprite, label: s.label, x: s.x, y: s.y, w: s.w, stand: s.stand })),
-  ], [scene, flags]);
+    ...(scene.spots ?? []).filter((s) => holds(s.when, flags)).map((s): StoryExtra => ({ id: s.id, kind: "spot", sprite: s.sprite, label: s.label, x: s.x, y: s.y, w: s.w, stand: s.stand, found: progress.clues.includes(s.clue) })),
+  ], [scene, flags, progress.clues]);
+
+  // Gợi ý có giới hạn: chỗ xem xét chưa lấy manh mối lóe sáng vài giây (mặc định chúng trông như đồ vật thường).
+  const [spotHintsUsed, setSpotHintsUsed] = useState(0);
+  const [hintSpotId, setHintSpotId] = useState<string | null>(null);
+  const spotsLeft = extras.filter((e) => e.kind === "spot" && !e.found).length;
+  const requestSpotHint = useCallback(() => {
+    const target = extras.find((e) => e.kind === "spot" && !e.found);
+    if (!target || spotHintsUsed >= SPOT_HINTS_PER_SCENE) return;
+    setSpotHintsUsed((n) => n + 1);
+    setHintSpotId(target.id);
+  }, [extras, spotHintsUsed]);
+  useEffect(() => {
+    if (!hintSpotId) return;
+    const t = window.setTimeout(() => setHintSpotId(null), SPOT_HINT_MS);
+    return () => window.clearTimeout(t);
+  }, [hintSpotId]);
   const extraInteractables = useMemo<Interactable[]>(() => extras.map((e) => ({ id: e.id, at: standPoint(e) })), [extras]);
 
   const openNode = useCallback((id: string) => {
@@ -164,6 +186,7 @@ export function useStoryController(payload: StoryPayload, sceneNpcId: string, co
   return {
     ready, progress, view, setView, verdict, solved, isSceneOpen,
     coop: coop ? { role: coop.role, code: coop.code, ...session, blocked, route, clearBlocked: () => setBlocked(null) } : null, celebrating, endCelebration, extras, extraInteractables,
+    spotHint: { left: SPOT_HINTS_PER_SCENE - spotHintsUsed, remaining: spotsLeft, activeId: hintSpotId, use: requestSpotHint },
     objective: story.freeRoam ? null : currentObjective(story.objectives, flags),
     objectiveCount: story.freeRoam ? { done: 0, total: 0 } : objectiveProgress(story.objectives, flags),
     canAccuse: holds(story.accuseWhen, flags),

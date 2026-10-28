@@ -50,11 +50,11 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
         <MusicToggle enabled={music.enabled} onToggle={music.toggle} />
       </header>
 
-      {story && sc && <ObjectiveBar title={story.payload.story.title} objective={sc.objective} done={sc.objectiveCount.done} total={sc.objectiveCount.total} solved={sc.solved} freeRoam={story.payload.story.freeRoam} clueCount={sc.progress.clues.length} onCase={() => sc.setView({ kind: "case" })} onMap={() => sc.setView({ kind: "map" })} />}
+      {story && sc && <ObjectiveBar title={story.payload.story.title} objective={sc.objective} done={sc.objectiveCount.done} total={sc.objectiveCount.total} solved={sc.solved} freeRoam={story.payload.story.freeRoam} clueCount={sc.progress.clues.length} spotHint={sc.spotHint} onCase={() => sc.setView({ kind: "case" })} onMap={() => sc.setView({ kind: "map" })} />}
       {story && sc && <StoryHintTip />}
 
       <div {...c.stageProps} onPointerDown={(e) => e.currentTarget.focus({ preventScroll: true })} className="rounded-2xl outline-offset-4 focus-visible:outline-2 focus-visible:outline-primary">
-        <SceneCanvas theme={scene.theme} objects={scene.objects} npc={scene.npc} decor={scene.decor ?? []} exits={scene.exits} extras={sc?.extras} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>
+        <SceneCanvas theme={scene.theme} objects={scene.objects} npc={scene.npc} decor={scene.decor ?? []} exits={scene.exits} extras={sc?.extras} marks={c.marks} hideLabels={quest.active} highlightId={c.highlightId} shakeId={c.shakeId} nearId={player.nearId} hintSpotId={sc?.spotHint.activeId} onActivate={c.activate} onFloorPoint={(p) => player.walkTo(p)}>
           <PlayerAvatar elRef={player.elRef} walking={player.walking} facing={player.facing} fx={c.fx} carrying={quest.carrying} />
           {story && sc && <StoryBubble payload={story.payload} sc={sc} scene={scene} playerEl={player.elRef} />}
         </SceneCanvas>

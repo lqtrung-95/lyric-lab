@@ -18,6 +18,8 @@ export interface CanvasExtra {
   x: number;
   y: number;
   w: number;
+  /** Chỗ xem xét đã lấy manh mối: chỉ khi đó mới hiện tên (trước đó trông như đồ vật thường). */
+  found?: boolean;
 }
 
 interface Props {
@@ -35,6 +37,8 @@ interface Props {
   shakeId: string | null;
   /** Vật (hoặc NPC) đang ở gần nhân vật: nhấn E để tương tác. */
   nearId: string | null;
+  /** Chỗ xem xét đang được gợi ý (lóe sáng có thời hạn). */
+  hintSpotId?: string | null;
   /** Bấm/chạm vào một vật hoặc NPC: nhân vật tự đi tới rồi tương tác. */
   onActivate: (id: string) => void;
   /** Bấm/chạm vào sàn: nhân vật tự đi tới đó. */
@@ -63,7 +67,7 @@ function KeyChip() {
  */
 const LABEL = "pointer-events-none absolute -top-5 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink px-2 text-label-md font-extrabold leading-5 max-sm:-top-4 max-sm:border max-sm:px-1.5 max-sm:text-[10px] max-sm:leading-4";
 
-export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], marks, hideLabels, highlightId, shakeId, nearId, onActivate, onFloorPoint, children }: Props) {
+export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], marks, hideLabels, highlightId, shakeId, nearId, hintSpotId = null, onActivate, onFloorPoint, children }: Props) {
   const ordered = [...objects].sort((a, b) => Number(!!a.above) - Number(!!b.above) || a.y - b.y);
   const npcSprite = FLAT_SPRITES[npc.id];
   return (
@@ -141,22 +145,30 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
           {e.locked && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 text-sm sm:hidden">🔒</span>}
         </button>
       ))}
-      {extras.map((e) => FLAT_SPRITES[e.sprite] && (
-        <button
-          key={e.id}
-          type="button"
-          onClick={() => onActivate(e.id)}
-          aria-label={e.kind === "npc" ? `Nói chuyện với ${e.label}` : `Xem xét: ${e.label}`}
-          className="group absolute cursor-pointer rounded-lg outline-offset-2 transition-transform after:absolute after:-inset-1.5 after:content-[''] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary"
-          style={{ left: `${e.x}%`, top: `${e.y}%`, width: `${e.w}%`, transform: "translate(-50%, -100%)", zIndex: zOf(e.y, e.kind === "spot") }}
-        >
-          {e.kind === "npc" && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[12%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
-          <span className={`block ${nearId === e.id ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : e.kind === "spot" ? "drop-shadow-[0_0_6px_rgba(80,160,220,0.95)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
-          {nearId === e.id && <KeyChip />}
-          <span className={`${LABEL} bg-tertiary-container text-on-tertiary-container ${nearId === e.id ? "" : "max-sm:hidden"}`}>{e.label}</span>
-          {e.kind === "spot" && nearId !== e.id && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 text-sm sm:hidden">🔎</span>}
-        </button>
-      ))}
+      {extras.map((e) => {
+        if (!FLAT_SPRITES[e.sprite]) return null;
+        const spot = e.kind === "spot";
+        // Chỗ xem xét chưa lấy manh mối trông như đồ vật thường: không nhãn, không ánh sáng riêng, tên đọc cho trình đọc màn hình cũng ẩn.
+        const hidden = spot && !e.found;
+        const hinted = hintSpotId === e.id;
+        const near = nearId === e.id;
+        return (
+          <button
+            key={e.id}
+            type="button"
+            onClick={() => onActivate(e.id)}
+            aria-label={e.kind === "npc" ? `Nói chuyện với ${e.label}` : hidden ? "Vật có thể xem xét" : `Xem xét: ${e.label}`}
+            className="group absolute cursor-pointer rounded-lg outline-offset-2 transition-transform after:absolute after:-inset-1.5 after:content-[''] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary"
+            style={{ left: `${e.x}%`, top: `${e.y}%`, width: `${e.w}%`, transform: "translate(-50%, -100%)", zIndex: zOf(e.y, spot) }}
+          >
+            {e.kind === "npc" && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[12%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
+            <span className={`block ${near ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : hinted ? "animate-pulse drop-shadow-[0_0_10px_rgba(80,160,220,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
+            {near && <KeyChip />}
+            {hinted && !near && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 animate-pulse text-base">🔎</span>}
+            {!hidden && <span className={`${LABEL} bg-tertiary-container text-on-tertiary-container ${near ? "" : "max-sm:hidden"}`}>{spot ? "✓ " : ""}{e.label}</span>}
+          </button>
+        );
+      })}
       {children}
     </div>
   );
