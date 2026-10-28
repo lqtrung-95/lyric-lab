@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
 import type { SceneConversation } from "@/lib/explore/explore-types";
@@ -9,13 +10,15 @@ interface Props {
   conversation?: SceneConversation;
   /** Câu tiếng Trung → pinyin (từ từ điển). */
   pinyin: Record<string, string>;
+  /** Cảnh này (để mời sang bản hội thoại dài). */
+  sceneId?: string;
 }
 
 /**
  * "Vận dụng" ở cảnh này: vài câu hay dùng và một hội thoại mẫu ngắn đúng tình huống (có pinyin từ từ điển, nghĩa tiếng Việt, nút nghe),
  * để người học dùng ngay các từ vừa học vào câu nói thật.
  */
-export function ScenePhrases({ phrases, conversation, pinyin }: Props) {
+export function ScenePhrases({ phrases, conversation, pinyin, sceneId }: Props) {
   if (phrases.length === 0 && !conversation) return null;
   return (
     <section aria-label="Câu hay dùng và hội thoại mẫu" className="card-ink flex flex-col gap-space-md p-space-md">
@@ -37,7 +40,10 @@ export function ScenePhrases({ phrases, conversation, pinyin }: Props) {
       )}
       {conversation && (
         <div>
-          <h2 className="text-headline-md">Hội thoại mẫu</h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-headline-md">Hội thoại mẫu</h2>
+            {sceneId && <Link href={`/dialogues/scene-${sceneId}`} className="inline-flex min-h-11 items-center rounded-full border-2 border-ink bg-secondary-container px-space-sm text-label-lg font-extrabold text-on-secondary-container">Nghe bản dài và đóng vai</Link>}
+          </div>
           <ol className="mt-space-sm flex flex-col gap-2">
             {conversation.lines.map((l, i) => (
               <li key={i} className={`flex ${l.who === 1 ? "justify-end" : "justify-start"}`}>

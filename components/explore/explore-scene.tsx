@@ -88,7 +88,7 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
         </div>
       )}
       {!story && !quest.active && scene.story && <SceneStoryCard sceneTitle={scene.title} story={scene.story} words={scene.objects} marks={c.marks} pinyin={scene.phrasePinyin} onPickWord={c.openWord} onUseWord={c.recordUse} />}
-      {!story && !quest.active && <ScenePhrases phrases={scene.phrases ?? []} conversation={scene.conversation} pinyin={scene.phrasePinyin} />}
+      {!story && !quest.active && <ScenePhrases phrases={scene.phrases ?? []} conversation={scene.conversation} pinyin={scene.phrasePinyin} sceneId={scene.id} />}
       <NotebookChips words={scene.objects} marks={c.marks} onPick={c.openWord} />
       {c.learnedWords.length > 0 && !quest.active && !story && (
         <button type="button" onClick={() => { c.reset(); c.setPanel(null); quest.stop(); }} className="min-h-11 self-start text-label-md text-on-surface-variant underline">Học lại từ đầu</button>
