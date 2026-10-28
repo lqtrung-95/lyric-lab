@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { directionTo, nearestWithin, stepChef, type Circle, type Vec2 } from "@/lib/kitchen/chef-motion";
 import { STATIONS, TABLE, type StationId } from "@/lib/kitchen/spike-orders";
-import { Person, StationMesh, TableMesh } from "./kitchen-props";
+import { preloadModels } from "./glb-model";
+import { Character, StationMesh, TableMesh } from "./kitchen-props";
+
+preloadModels(["steamer", "pot-stew", "frying-pan", "dim-sum", "cup-tea", "pancakes", "character-c", "character-e"]);
 
 export type NearId = StationId | "table";
 const INTERACTABLES: (Vec2 & { id: NearId })[] = [...STATIONS.map((s) => ({ id: s.id as NearId, x: s.x, z: s.z })), { id: "table", x: TABLE.x, z: TABLE.z }];
@@ -71,6 +74,8 @@ function Chef({ carrying, onNear, onFps, targetRef }: ChefProps) {
   const keys = useRef(new Set<string>());
   const lastNear = useRef<NearId | null>(null);
   const bob = useRef(0);
+  const [moving, setMoving] = useState(false);
+  const wasMoving = useRef(false);
   const fps = useRef({ frames: 0, t: 0 });
   useEffect(() => {
     const down = (e: KeyboardEvent) => { if (!(e.target instanceof HTMLInputElement)) { keys.current.add(e.key.toLowerCase()); if (KEY_DIR[e.key.toLowerCase()]) targetRef.current = null; } };
@@ -89,14 +94,15 @@ function Chef({ carrying, onNear, onFps, targetRef }: ChefProps) {
       bob.current += dt * 14;
       if (group.current) group.current.rotation.y = Math.atan2(dir.x, dir.z);
     } else bob.current = 0;
+    const isMoving = !!dir;
+    if (isMoving !== wasMoving.current) { wasMoving.current = isMoving; setMoving(isMoving); }
     group.current?.position.set(pos.current.x, 0, pos.current.z);
-    if (body.current) body.current.position.y = Math.abs(Math.sin(bob.current)) * 0.08;
     const near = nearestWithin(pos.current, INTERACTABLES)?.id ?? null;
     if (near !== lastNear.current) { lastNear.current = near; onNear(near); }
     fps.current.frames++; fps.current.t += dtRaw;
     if (fps.current.t >= 0.5) { onFps(Math.round(fps.current.frames / fps.current.t)); fps.current = { frames: 0, t: 0 }; }
   });
-  return <group ref={group} position={[-1, 0, 1.5]}><group ref={body}><Person body="#2f7d5b" hair="#3a2a20" hat carry={carrying} /></group></group>;
+  return <group ref={group} position={[-1, 0, 1.5]}><group ref={body}><Character skin="c" hat animation={carrying ? "holding-both" : moving ? "sprint" : "idle"} carry={carrying} /></group></group>;
 }
 
 interface Props { near: NearId | null; busy: StationId | null; carrying: StationId | null; customerHere: boolean; onNear: (id: NearId | null) => void; onFps: (fps: number) => void }
@@ -110,12 +116,14 @@ export function KitchenWorld({ near, busy, carrying, customerHere, onNear, onFps
       <Rig />
       <ambientLight intensity={0.85} />
       <directionalLight position={[6, 10, 4]} intensity={1.6} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-9} shadow-camera-right={9} shadow-camera-top={9} shadow-camera-bottom={-9} />
+      <Suspense fallback={null}>
       <Floor onGo={(p) => { target.current = p; }} />
       <Walls />
       {STATIONS.map((s) => <StationMesh key={s.id} s={s} near={near === s.id} busy={busy === s.id} />)}
       <TableMesh x={TABLE.x} z={TABLE.z} near={near === "table"} />
-      {customerHere && <group position={[TABLE.x + 1.5, 0, TABLE.z]} rotation-y={-Math.PI / 2}><Person body="#c0513f" hair="#1f1a17" /></group>}
+      {customerHere && <group position={[TABLE.x + 1.5, 0, TABLE.z]} rotation-y={-Math.PI / 2}><Character skin="e" animation="idle" /></group>}
       <Chef carrying={carrying} onNear={onNear} onFps={onFps} targetRef={target} />
+      </Suspense>
     </Canvas>
   );
 }
