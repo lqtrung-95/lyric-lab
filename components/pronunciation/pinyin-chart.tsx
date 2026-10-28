@@ -23,7 +23,7 @@ function GroupSection({ group }: { group: SoundGroup }) {
         {group.note && <p className="text-body-md text-on-surface-variant">{group.note}</p>}
       </div>
       {GROUP_ARTICULATION[group.id] && <ArticulationPanel articulation={GROUP_ARTICULATION[group.id]} label={group.sounds.map((x) => x.symbol).join(", ")} />}
-      <ul className="grid gap-space-sm sm:grid-cols-2">
+      <ul className="grid items-start gap-space-sm sm:grid-cols-2">
         {group.sounds.map((s) => (
           <li key={s.symbol} className="rounded-xl border border-outline-variant bg-surface-container-low p-space-md">
             <div className="flex items-start justify-between gap-2">
@@ -40,7 +40,7 @@ function GroupSection({ group }: { group: SoundGroup }) {
               </span>
             </div>
             <p className="mt-2 text-body-md text-on-surface-variant">{s.tip}</p>
-            {SOUND_ARTICULATION[s.symbol] && <div className="mt-2"><ArticulationPanel articulation={SOUND_ARTICULATION[s.symbol]} label={s.symbol} /></div>}
+            {SOUND_ARTICULATION[s.symbol] && <div className="mt-2"><ArticulationPanel articulation={SOUND_ARTICULATION[s.symbol]} label={s.symbol} stacked /></div>}
           </li>
         ))}
       </ul>
