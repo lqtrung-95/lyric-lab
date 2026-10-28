@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activeRow, initRain, stepRain, tapLane } from "./rain-engine";
+import { DIFFICULTY, activeRow, initRain, rainSpeed, stepRain, tapLane } from "./rain-engine";
 
 const pool = ["朋友", "学习", "你好", "老师", "学生", "中国"].map((han, i) => ({ han, pinyin: `a${i} b` }));
 const rng = () => 0.3;
@@ -31,6 +31,10 @@ describe("rain", () => {
     for (let i = 0; i < 200 && !s.over; i++) s = stepRain(s, 0.25, pool, rng);
     expect(s.over).toBe(true);
     expect(s.lives).toBeLessThanOrEqual(0);
+  });
+  it("độ khó dễ rơi chậm hơn khó, tốc độ có trần", () => {
+    expect(rainSpeed(1, DIFFICULTY.easy)).toBeLessThan(rainSpeed(1, DIFFICULTY.hard));
+    expect(rainSpeed(99, DIFFICULTY.easy)).toBe(DIFFICULTY.easy * 2);
   });
   it("không chạy khi thiếu từ", () => { expect(stepRain(initRain(), 1, pool.slice(0, 3), rng).rows).toHaveLength(0); });
 });

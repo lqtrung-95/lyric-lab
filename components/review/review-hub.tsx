@@ -28,10 +28,10 @@ export function ReviewHub() {
         <section key={g.id} aria-labelledby={`grp-${g.id}`}>
           <h2 id={`grp-${g.id}`} className="text-label-lg font-extrabold">{g.title}</h2>
           <p className="text-body-sm text-on-surface-variant">{g.blurb}</p>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          <ul className="mt-2 grid auto-rows-fr gap-2 sm:grid-cols-2">
             {g.modes.map((m) => (
-              <li key={m.href}>
-                <Link href={m.href} className="flex min-h-16 items-center gap-3 rounded-xl border-2 border-ink bg-surface-container-lowest p-space-sm hover:bg-surface-container-low">
+              <li key={m.href} className="flex">
+                <Link href={m.href} className="flex min-h-16 w-full items-center gap-3 rounded-xl border-2 border-ink bg-surface-container-lowest p-space-sm hover:bg-surface-container-low">
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-surface-container-high text-primary"><Icon name={m.icon} size={22} /></span>
                   <span className="min-w-0"><span className="block text-label-lg font-extrabold">{m.label}</span><span className="block text-body-sm text-on-surface-variant">{m.desc}</span></span>
                 </Link>

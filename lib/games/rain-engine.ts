@@ -4,17 +4,20 @@ export const LANES = 4;
 export const ROW_H = 0.2;
 export interface Row { id: number; y: number; words: GameWord[]; answer: number; done: boolean; hit: boolean }
 export interface RainState {
-  rows: Row[]; score: number; combo: number; bestCombo: number; cleared: number; level: number; lives: number; nextId: number;
+  base: number; rows: Row[]; score: number; combo: number; bestCombo: number; cleared: number; level: number; lives: number; nextId: number;
   missed: GameWord[]; over: boolean; shake: number;
 }
 
 export const RAIN_LIVES = 3;
 const PER_LEVEL = 8;
 export const rainLevel = (cleared: number): number => 1 + Math.floor(cleared / PER_LEVEL);
-/** Tốc độ rơi (phần màn hình mỗi giây), tăng theo cấp và có trần để vẫn chơi được. */
-export const rainSpeed = (level: number): number => Math.min(0.5, 0.15 + 0.03 * (level - 1));
+/** Tốc độ rơi cơ bản (phần màn hình mỗi giây) theo độ khó: dễ ≈ 12 giây để một hàng chạm đáy. */
+export const DIFFICULTY = { easy: 0.08, normal: 0.11, hard: 0.15 } as const;
+export type Difficulty = keyof typeof DIFFICULTY;
+/** Tốc độ rơi: tăng chậm theo cấp, trần gấp đôi tốc độ cơ bản để vẫn chơi được. */
+export const rainSpeed = (level: number, base: number): number => Math.min(base * 2, base + 0.012 * (level - 1));
 
-export const initRain = (): RainState => ({ rows: [], score: 0, combo: 0, bestCombo: 0, cleared: 0, level: 1, lives: RAIN_LIVES, nextId: 1, missed: [], over: false, shake: 0 });
+export const initRain = (base: number = DIFFICULTY.easy): RainState => ({ base, rows: [], score: 0, combo: 0, bestCombo: 0, cleared: 0, level: 1, lives: RAIN_LIVES, nextId: 1, missed: [], over: false, shake: 0 });
 
 /** Hàng đang chờ trả lời: hàng thấp nhất chưa xử lý. */
 export const activeRow = (s: RainState): Row | undefined => s.rows.filter((r) => !r.done).sort((a, b) => b.y - a.y)[0];
@@ -29,7 +32,7 @@ function makeRow(id: number, y: number, pool: readonly GameWord[], rng: () => nu
 /** Tiến `dt` giây: các hàng rơi, hàng chạm đáy mà chưa trả lời mất một mạng, hàng mới nối đuôi hàng trên cùng. Cần ít nhất `LANES` từ khác nhau. */
 export function stepRain(state: RainState, dt: number, pool: readonly GameWord[], rng: () => number): RainState {
   if (state.over || pool.length < LANES) return state;
-  const speed = rainSpeed(state.level);
+  const speed = rainSpeed(state.level, state.base);
   let s: RainState = { ...state, shake: Math.max(0, state.shake - dt), rows: state.rows.map((r) => ({ ...r, y: r.y + speed * dt })) };
   const fallen = s.rows.filter((r) => r.y + ROW_H >= 1 && !r.done);
   if (fallen.length > 0) {

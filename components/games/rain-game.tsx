@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { playSfx } from "@/lib/feedback/sfx";
 import { arcadeRound } from "@/lib/games/arcade-score";
 import type { GameWord } from "@/lib/games/game-word";
-import { LANES, RAIN_LIVES, ROW_H, activeRow, initRain, stepRain, tapLane, type RainState } from "@/lib/games/rain-engine";
+import { melodyNote, playNote } from "@/lib/games/melody";
+import { DIFFICULTY, LANES, RAIN_LIVES, ROW_H, activeRow, initRain, stepRain, tapLane, type Difficulty, type RainState } from "@/lib/games/rain-engine";
 import { useArcadeScore } from "./use-arcade-score";
 import { useGameLoop } from "./use-game-loop";
 
@@ -20,23 +21,27 @@ export function RainGame({ words }: { words: GameWord[] }) {
 }
 
 function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
-  const [s, setS] = useState<RainState>(initRain);
+  const [s, setS] = useState<RainState>(() => initRain());
   const [started, setStarted] = useState(false);
+  const [music, setMusic] = useState(true);
   useGameLoop((dt) => setS((cur) => stepRain(cur, dt, words, Math.random)), started && !s.over);
   const { saved } = useArcadeScore("rain", s.over, (sec) => (s.cleared > 0 ? arcadeRound(s.score, s.cleared, s.cleared + s.missed.length, sec) : null));
 
   function tap(lane: number) {
     setS((cur) => {
       const next = tapLane(cur, lane);
-      if (next !== cur) playSfx(next.cleared > cur.cleared ? "correct" : "wrong");
+      if (next.cleared > cur.cleared) { if (music) playNote(melodyNote(cur.cleared)); else playSfx("correct"); }
+      else if (next !== cur) playSfx("wrong");
       return next;
     });
   }
+  const tapRef = useRef(tap);
+  useEffect(() => { tapRef.current = tap; });
   useEffect(() => {
     if (!started) return;
     const onKey = (e: KeyboardEvent) => {
       const lane = "1234".indexOf(e.key) >= 0 ? "1234".indexOf(e.key) : KEYS.indexOf(e.key.toLowerCase());
-      if (lane >= 0) tap(lane);
+      if (lane >= 0) tapRef.current(lane);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -86,7 +91,13 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
         {!started && (
           <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/60 px-6 text-center text-white">
             <p className="text-xl font-bold">Đọc pinyin, chạm đúng chữ</p>
-            <p className="max-w-sm text-sm text-white/80">Hàng thấp nhất là hàng đang chờ. Chạm sai hoặc để rơi mất một mạng. Trên máy tính dùng phím 1–4 hoặc D F J K.</p>
+            <p className="max-w-sm text-sm text-white/80">Hàng thấp nhất là hàng đang chờ. Chạm sai hoặc để rơi mất một mạng. Mỗi lần chạm đúng là một nốt của bài “Mạt Lỵ Hoa”, chơi đúng là bạn đang đánh nhạc. Máy tính: phím 1–4 hoặc D F J K.</p>
+            <div role="group" aria-label="Độ khó" className="flex gap-2">
+              {([["easy", "Dễ"], ["normal", "Vừa"], ["hard", "Khó"]] as [Difficulty, string][]).map(([k, label]) => (
+                <button key={k} type="button" aria-pressed={s.base === DIFFICULTY[k]} onClick={() => setS(initRain(DIFFICULTY[k]))} className={`min-h-11 rounded-full border-2 px-5 text-sm font-extrabold ${s.base === DIFFICULTY[k] ? "border-amber-300 bg-amber-300 text-slate-900" : "border-white/40 text-white"}`}>{label}</button>
+              ))}
+            </div>
+            <button type="button" aria-pressed={music} onClick={() => setMusic((v) => !v)} className="min-h-11 rounded-full border-2 border-white/40 px-5 text-sm font-bold text-white">🎵 Nhạc {music ? "BẬT" : "TẮT"}</button>
             <button type="button" onClick={() => setStarted(true)} className="min-h-12 rounded-full bg-amber-300 px-8 text-base font-extrabold text-slate-900 hover:brightness-110">Bắt đầu</button>
           </div>
         )}
