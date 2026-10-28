@@ -18,7 +18,7 @@ export function CoopLobby({ cases }: { cases: LobbyCase[] }) {
 
   function create() {
     const c = cases.find((x) => x.id === picked);
-    if (c) router.push(`/explore/coop/${newCoopCode()}/${c.id}/${c.startScene}?r=a`);
+    if (c) router.push(`/explore/coop/${newCoopCode()}/play/a/${c.id}/${c.startScene}`);
   }
   function join() {
     const p = parseCoopLink(link);
