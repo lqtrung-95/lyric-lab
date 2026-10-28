@@ -2,10 +2,11 @@ import { GROUP_ARTICULATION, SOUND_ARTICULATION } from "@/lib/pronunciation/arti
 import type { SoundGroup } from "@/lib/pronunciation/pinyin-chart-data";
 import { ArticulationBlock } from "./articulation-block";
 import { SoundRow } from "./sound-row";
+import { VowelExplorer } from "./vowel-explorer";
 
 /**
  * Một nhóm âm thành một thẻ gọn: tiêu đề và ghi chú ở trên; nhóm cùng một chỗ đặt lưỡi thì có khối hình + mô tả (kèm khối riêng cho âm lẻ như f),
- * rồi danh sách các âm đều nhau bên dưới. Nhóm nguyên âm đơn (mỗi âm một chỗ đặt lưỡi) xếp thành lưới thẻ, mỗi thẻ có hình riêng.
+ * rồi danh sách các âm đều nhau bên dưới. Nhóm nguyên âm đơn (mỗi âm một chỗ đặt lưỡi) dùng dạng chọn-xem (`VowelExplorer`).
  */
 export function SoundGroupCard({ group }: { group: SoundGroup }) {
   const art = GROUP_ARTICULATION[group.id];
@@ -24,9 +25,13 @@ export function SoundGroupCard({ group }: { group: SoundGroup }) {
             <ArticulationBlock art={SOUND_ARTICULATION[s.symbol]} label={s.symbol} title={`Riêng âm ${s.symbol}`} />
           </div>
         ))}
-        <ul className={`grid items-stretch gap-space-sm sm:grid-cols-2 ${perSound ? "lg:grid-cols-3" : ""}`}>
-          {group.sounds.map((s) => <SoundRow key={s.symbol} sound={s} withDiagram={perSound} />)}
-        </ul>
+        {perSound ? (
+          <VowelExplorer sounds={group.sounds} />
+        ) : (
+          <ul className="grid items-stretch gap-space-sm sm:grid-cols-2">
+            {group.sounds.map((s) => <SoundRow key={s.symbol} sound={s} />)}
+          </ul>
+        )}
       </div>
     </section>
   );
