@@ -1,6 +1,6 @@
 # Game nấu ăn 3D gọi món bằng tiếng Trung (tên tạm: "Quán Hán Ngữ")
 
-Trạng thái: TẠM HOÃN (backlog, 2026-10-28; bản thử giai đoạn 0 đã làm xong và chạy được ở /review/kitchen, chưa có trong menu; muốn làm tiếp thì bắt đầu ở giai đoạn 1). Trước đó: ĐÃ DUYỆT (three/r3f, Hà Nội trước, có ngân sách mô hình AI). Giai đoạn 0 đã làm xong bản thử; chờ đo trên điện thoại rồi sang giai đoạn 1. Cảm hứng từ Wok Rush (saymei.app); KHÔNG dùng tên, hình, bố cục của họ.
+Trạng thái: TẠM HOÃN, mã bản thử đã gỡ khỏi main (còn ở commit 9a6fb2f) (backlog, 2026-10-28; bản thử giai đoạn 0 đã làm xong và chạy được ở /review/kitchen, chưa có trong menu; muốn làm tiếp thì bắt đầu ở giai đoạn 1). Trước đó: ĐÃ DUYỆT (three/r3f, Hà Nội trước, có ngân sách mô hình AI). Giai đoạn 0 đã làm xong bản thử; chờ đo trên điện thoại rồi sang giai đoạn 1. Cảm hứng từ Wok Rush (saymei.app); KHÔNG dùng tên, hình, bố cục của họ.
 
 ## Ý tưởng
 Người chơi làm đầu bếp kiêm phục vụ. Khách gọi món bằng tiếng Trung (nghe + đọc, bật/tắt pinyin và nghĩa), người chơi đi tới đúng bếp, nấu, mang ra bàn. Đúng và nhanh thì có tiền và sao.
