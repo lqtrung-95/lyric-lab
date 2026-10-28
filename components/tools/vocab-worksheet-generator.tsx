@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { HSK_LEVELS } from "@/lib/tools/build-hsk-rows";
 import { MAX_CONVERT_CHARS, type ConvertedLine } from "@/lib/tools/han-converter-shared";
+import { DEFAULT_SAMPLE } from "@/lib/tools/hsk-sample";
 import { DEFAULT_OPTIONS, MAX_WORDS, buildMatch, canMatchMeaning, parseWordList, type MatchExercise, type SheetOptions, type VocabItem } from "@/lib/tools/vocab-worksheet";
 import { VocabWorksheetSheet } from "./vocab-worksheet-sheet";
 
@@ -28,6 +30,8 @@ export function VocabWorksheetGenerator() {
   const [sheet, setSheet] = useState<{ items: VocabItem[]; pinyin: MatchExercise; meaning: MatchExercise | null } | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hskLevel, setHskLevel] = useState<number>(1);
+  const [hskCount, setHskCount] = useState(DEFAULT_SAMPLE);
 
   async function generate(value = text) {
     const entries = parseWordList(value);
@@ -51,6 +55,23 @@ export function VocabWorksheetGenerator() {
     }
   }
 
+  /** Lấy ngẫu nhiên từ một cấp HSK (kèm nghĩa tiếng Anh), điền vào ô danh sách rồi tạo luôn tờ bài tập. */
+  async function loadHsk() {
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch(`/api/tools/hsk-words?level=${hskLevel}&count=${hskCount}`);
+      const body = (await res.json().catch(() => ({}))) as { lines?: string[]; error?: string };
+      if (!res.ok || !body.lines?.length) throw new Error(ERRORS[body.error ?? ""] ?? "Chưa lấy được từ HSK, thử lại sau nhé.");
+      const value = body.lines.join("\n");
+      setText(value);
+      await generate(value);
+    } catch (e) {
+      setError((e as Error).message);
+      setBusy(false);
+    }
+  }
+
   const toggle = (k: keyof SheetOptions) => setOptions((o) => ({ ...o, [k]: !o[k] }));
   return (
     <div className="space-y-space-md">
@@ -62,6 +83,17 @@ export function VocabWorksheetGenerator() {
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-label-md text-on-surface-variant">Bộ từ gợi ý:</span>
           {PRESETS.map((p) => <button key={p.label} type="button" onClick={() => { setText(p.text); void generate(p.text); }} className="min-h-11 rounded-full border border-outline-variant px-4 text-label-md font-medium hover:bg-surface-container">{p.label}</button>)}
+        </div>
+        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-surface-container-low p-3">
+          <span className="text-label-md font-medium text-on-surface">Hoặc lấy từ HSK ngẫu nhiên:</span>
+          <select aria-label="Cấp HSK" value={hskLevel} onChange={(e) => setHskLevel(Number(e.target.value))} className="min-h-11 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 text-body-md">
+            {HSK_LEVELS.map((l) => <option key={l} value={l}>HSK {l}</option>)}
+          </select>
+          <select aria-label="Số từ" value={hskCount} onChange={(e) => setHskCount(Number(e.target.value))} className="min-h-11 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 text-body-md">
+            {[8, 12, 16, 20].map((n) => <option key={n} value={n}>{n} từ</option>)}
+          </select>
+          <button type="button" onClick={() => void loadHsk()} disabled={busy} className="min-h-11 rounded-full border-2 border-primary px-5 text-label-md font-semibold text-primary hover:bg-primary-container disabled:opacity-50">Lấy từ và tạo bài</button>
+          <span className="text-label-md text-on-surface-variant">Nghĩa kèm theo là tiếng Anh; bấm lại để có bộ từ khác.</span>
         </div>
         <label className="flex flex-col gap-1 text-label-md font-medium text-on-surface">Tiêu đề tờ bài tập
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={60} className="min-h-11 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 text-body-md font-normal" /></label>
