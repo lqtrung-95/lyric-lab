@@ -21,7 +21,7 @@ function Ship({ x }: { x: number }) {
 }
 
 /** Cảnh Bắn chữ: nền sao trôi ba lớp, từ rơi (đỏ lên khi gần đáy), tia laser, vụ nổ có hạt, số điểm bay lên, tàu có lửa đẩy, rung và nháy đỏ khi mất mạng, biểu ngữ lên cấp. Chỉ hiển thị, không giữ trạng thái. */
-export function BlasterScene({ s, showPinyin }: { s: BlasterState; showPinyin: boolean }) {
+export function BlasterScene({ s, showPinyin, showMeaning }: { s: BlasterState; showPinyin: boolean; showMeaning: boolean }) {
   const locked = s.targets.find((t) => t.id === s.lockedId);
   const lastShot = s.shots[s.shots.length - 1];
   const shipX = lastShot?.x ?? locked?.x ?? 0.5;
@@ -44,7 +44,7 @@ export function BlasterScene({ s, showPinyin }: { s: BlasterState; showPinyin: b
                 <div className={`rounded-2xl border px-3 py-2 backdrop-blur-sm ${hot ? "bz-danger border-red-400 bg-red-950/80" : on ? "border-cyan-300 bg-slate-900/90 shadow-[0_0_24px_rgba(34,211,238,.6)]" : "border-white/25 bg-slate-900/80"}`}>
                   <div className="flex items-baseline gap-2">
                     <span lang="zh-Hans" className="text-2xl font-bold leading-none">{t.word.han}</span>
-                    {t.word.meaning && <span className="max-w-32 truncate rounded-md bg-blue-900/80 px-1.5 text-xs text-blue-200">({t.word.meaning})</span>}
+                    {showMeaning && t.word.meaning && <span className="max-w-32 truncate rounded-md bg-blue-900/80 px-1.5 text-xs text-blue-200">({t.word.meaning})</span>}
                   </div>
                   <div className="mt-1 flex gap-0.5 font-mono text-sm leading-none" aria-hidden="true">
                     {[...t.letters].map((ch, i) => <span key={i} className={on && i < s.typed.length ? "text-cyan-300" : showPinyin ? "text-white/70" : "text-white/30"}>{(on && i < s.typed.length) || showPinyin ? ch : "_"}</span>)}

@@ -9,6 +9,8 @@ import { EMPTY_DAILY, guessesFor, parseDaily, readDailyRaw, subscribeDaily, with
 import type { GameWord } from "@/lib/games/game-word";
 import { isSolved, scoreGuess, shareRow, syllablesOf } from "@/lib/games/pinyin-parts";
 import { DailyBoard, type BoardRow } from "./daily-board";
+import { HintToggles } from "./hint-toggles";
+import { useArcadeHints } from "./use-arcade-hints";
 import { useArcadeScore } from "./use-arcade-score";
 
 /** Hán tự mỗi ngày (kiểu Wordle): cả nước cùng đoán một từ hai chữ. Gõ pinyin kèm số thanh; mỗi âm tiết được chấm riêng phụ âm đầu, vần và thanh. Kết quả chia sẻ bằng ô màu, không lộ đáp án. */
@@ -17,6 +19,7 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
   const answerSyls = useMemo(() => (answer ? syllablesOf(answer.pinyin) : null), [answer]);
   const raw = useSyncExternalStore(subscribeDaily, () => readDailyRaw(), () => "");
   const blob = useMemo(() => (raw ? parseDaily(raw) : EMPTY_DAILY), [raw]);
+  const hints = useArcadeHints();
   const [text, setText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -61,6 +64,12 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
         <span>Ngày #{dayNumber(todayKey)}</span>
         <span>🔥 Chuỗi {streak} · Thắng {wins}/{played}</span>
       </div>
+      {answer.meaning && (
+        <div className="flex flex-wrap items-center gap-2">
+          <HintToggles pinyin={false} />
+          {hints.meaning ? <p className="text-body-md"><span className="font-bold">Nghĩa:</span> {answer.meaning}</p> : <p className="text-body-sm text-on-surface-variant">Bật “Nghĩa” để xem gợi ý nghĩa của từ hôm nay.</p>}
+        </div>
+      )}
       <DailyBoard rows={rows} tries={DAILY_TRIES} />
       {!over && rows.length >= 2 && (
         <p className="flex flex-wrap items-center gap-2 text-body-md text-secondary">
@@ -85,7 +94,7 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
           <h2 id="daily-done" className="font-serif text-headline-md">{won ? `Đúng rồi! ${rows.length}/${DAILY_TRIES}` : "Hết lượt rồi"}</h2>
           <p className="mt-1 flex items-center justify-center gap-3">
             <span lang="zh-Hans" className="text-headline-lg font-bold">{answer.han}</span>
-            <span className="text-body-lg text-primary">{answer.pinyin}</span>
+            <span className="text-body-lg text-primary">{answer.pinyin}</span>{answer.meaning && <span className="text-body-md text-on-surface-variant">· {answer.meaning}</span>}
             <PronounceButton text={answer.han} />
           </p>
           {saved && <p role="status" className="mt-1 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}

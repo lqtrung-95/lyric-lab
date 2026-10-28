@@ -1,6 +1,8 @@
 import "server-only";
 import themed from "@/lib/courses/hsk-themed-words.json";
+import { lookupWords, pickPrimaryEntry } from "@/lib/dictionary/lookup-words";
 import { annotatePinyin } from "@/lib/explore/story/annotate-lines";
+import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import type { GameWord } from "./game-word";
 
 const TWO_HAN = /^\p{Script=Han}{2}$/u;
@@ -18,12 +20,41 @@ function candidates(): string[] {
 
 let cache: Promise<GameWord[]> | null = null;
 
+/** Nghĩa tiếng Việt đã sinh sẵn cho các từ của lộ trình HSK (`course_units.content.glosses`); lỗi thì trả rỗng và rơi về nghĩa tiếng Anh. */
+async function courseGlosses(): Promise<Record<string, string>> {
+  try {
+    const { data } = await createSupabaseServiceClient().from("course_units").select("content");
+    const out: Record<string, string> = {};
+    for (const row of data ?? []) Object.assign(out, (row.content as { glosses?: Record<string, string> } | null)?.glosses ?? {});
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+/** Nghĩa tiếng Anh ngắn từ từ điển (nghĩa đầu, bỏ phần trong ngoặc) cho những từ chưa có nghĩa tiếng Việt. */
+async function englishMeanings(words: string[]): Promise<Record<string, string>> {
+  if (words.length === 0) return {};
+  try {
+    const entries = await lookupWords(createSupabaseServiceClient() as never, words);
+    const out: Record<string, string> = {};
+    for (const w of words) {
+      const first = pickPrimaryEntry(entries.get(w) ?? [])?.meanings[0]?.replace(/\s*\(.*?\)/g, "").trim();
+      if (first && first.length <= 40) out[w] = first;
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 async function build(): Promise<GameWord[]> {
   const words = candidates();
-  const pinyin = await annotatePinyin(words);
+  const [pinyin, glosses] = await Promise.all([annotatePinyin(words), courseGlosses()]);
+  const english = await englishMeanings(words.filter((w) => !glosses[w]));
   return words.flatMap((han) => {
     const p = pinyin[han]?.trim();
-    return p && p.split(/\s+/).length === 2 ? [{ han, pinyin: p }] : [];
+    return p && p.split(/\s+/).length === 2 ? [{ han, pinyin: p, meaning: glosses[han] ?? english[han] }] : [];
   });
 }
 

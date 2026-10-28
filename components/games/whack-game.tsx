@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { GameKeyframes } from "./game-keyframes";
+import { HintToggles } from "./hint-toggles";
+import { useArcadeHints } from "./use-arcade-hints";
 import { SoundToggle } from "./sound-toggle";
 import { WhackHole } from "./whack-hole";
 import { sfx } from "@/lib/games/arcade-sfx";
@@ -27,6 +29,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const [phase, setPhase] = useState<"idle" | "play" | "over">("idle");
   const [g, setG] = useState<Play>(() => fresh(words));
   const [left, setLeft] = useState(WHACK_SECONDS);
+  const hints = useArcadeHints();
   const [flash, setFlash] = useState<number | null>(null);
   const [fx, setFx] = useState<{ cell: number; points: number } | null>(null);
   const endAt = useRef(0);
@@ -94,12 +97,17 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
       <div className="flex flex-wrap items-center justify-between gap-2 text-label-lg font-extrabold">
         <span>🔨 {g.score}</span>
         <SoundToggle className="min-h-11 min-w-11 rounded-full bg-surface-container-low text-xl" />
+        <HintToggles />
         <span role="timer" aria-label={`Còn ${left} giây`} className={`rounded-full border-2 border-ink px-3 py-1 ${left <= 5 && phase === "play" ? "animate-pulse bg-error text-on-error" : "bg-surface-container-lowest"}`}>⏱ {left}s</span>
         {g.combo >= 2 && <span className="text-secondary">Combo ×{g.combo}</span>}
       </div>
       <div className="mt-space-sm flex items-center justify-center gap-3 rounded-2xl bg-surface-container-low p-space-sm" role="status" aria-live="polite">
         <span className="text-label-md text-on-surface-variant">Đập chữ</span>
-        <span className="text-headline-md font-extrabold text-primary">{g.round?.answer.pinyin}</span>
+        <span className="flex flex-col items-center leading-tight">
+          {hints.pinyin && <span className="text-headline-md font-extrabold text-primary">{g.round?.answer.pinyin}</span>}
+          {hints.meaning && g.round?.answer.meaning && <span className={hints.pinyin ? "text-body-md text-on-surface-variant" : "text-headline-md font-extrabold text-primary"}>{g.round.answer.meaning}</span>}
+          {!hints.pinyin && !(hints.meaning && g.round?.answer.meaning) && <span className="text-body-lg font-bold text-primary">Nghe và đập chữ</span>}
+        </span>
         {g.round && <PronounceButton text={g.round.answer.han} />}
       </div>
       {phase === "play" && <div className="mx-auto mt-1 h-1.5 max-w-md overflow-hidden rounded-full bg-surface-container-high"><div key={g.no} className="bz-shrink h-full rounded-full bg-primary" style={{ "--win": `${win}ms` } as React.CSSProperties} /></div>}

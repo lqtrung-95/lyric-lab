@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
+import { HintToggles } from "./hint-toggles";
+import { useArcadeHints } from "./use-arcade-hints";
 import { playSfx } from "@/lib/feedback/sfx";
 import { SKIP_PENALTY_MS } from "@/lib/games/duel";
 import type { GameWord } from "@/lib/games/game-word";
@@ -13,6 +15,7 @@ const nowMs = (): number => Date.now();
 
 /** Đường đua gõ pinyin: nhìn chữ Hán, gõ pinyin (có hoặc không thanh). Đúng thì sang từ kế; sai thì gõ lại; bỏ qua bị cộng 5 giây. Xong hết thì báo thời gian (đã cộng phạt). */
 export function DuelRace({ words, theirsDone, onProgress, onFinish }: Props) {
+  const hints = useArcadeHints();
   const [i, setI] = useState(0);
   const [text, setText] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -54,7 +57,8 @@ export function DuelRace({ words, theirsDone, onProgress, onFinish }: Props) {
       <div className="rounded-3xl bg-surface-container-low p-space-lg text-center">
         <p className="text-label-md text-on-surface-variant">Từ {i + 1}/{words.length}</p>
         <p lang="zh-Hans" className="mt-1 text-[4rem] font-bold leading-tight">{w.han}</p>
-        <PronounceButton text={w.han} className="mx-auto" />
+        {hints.meaning && w.meaning && <p className="mt-1 text-body-lg text-on-surface-variant">{w.meaning}</p>}
+        <div className="mt-2 flex items-center justify-center gap-2"><PronounceButton text={w.han} /><HintToggles pinyin={false} /></div>
       </div>
       <form onSubmit={submit} className="flex flex-col gap-2">
         <label htmlFor="duel-input" className="text-label-md font-bold">Gõ pinyin (ví dụ <span className="font-mono">pengyou</span> hoặc <span className="font-mono">peng2 you3</span>)</label>

@@ -7,7 +7,9 @@ import { LIVES, initBlaster, setTyped, stepBlaster, typeLetter, type BlasterStat
 import type { GameWord } from "@/lib/games/game-word";
 import { BlasterScene } from "./blaster-scene";
 import { GameKeyframes } from "./game-keyframes";
+import { HintToggles } from "./hint-toggles";
 import { SoundToggle } from "./sound-toggle";
+import { useArcadeHints } from "./use-arcade-hints";
 import { useArcadeScore } from "./use-arcade-score";
 import { useBlasterSound } from "./use-blaster-sound";
 import { useGameLoop } from "./use-game-loop";
@@ -23,7 +25,7 @@ export function BlasterGame({ words }: { words: GameWord[] }) {
 function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const [s, setS] = useState<BlasterState>(initBlaster);
   const [started, setStarted] = useState(false);
-  const [showPinyin, setShowPinyin] = useState(true);
+  const hints = useArcadeHints();
   const inputRef = useRef<HTMLInputElement>(null);
   useGameLoop((dt) => setS((cur) => stepBlaster(cur, dt, words, Math.random)), started && !s.over);
   useBlasterSound(s, started);
@@ -53,14 +55,14 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
       <GameKeyframes />
       {saved && <p role="status" className="mb-2 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
       <div onClick={() => inputRef.current?.focus()} className={`relative isolate h-[min(68vh,540px)] min-h-[380px] select-none overflow-hidden rounded-3xl border border-white/10 bg-[#040816] ${s.shake > 0 ? "bz-shake" : ""}`}>
-        <BlasterScene s={s} showPinyin={showPinyin} />
+        <BlasterScene s={s} showPinyin={hints.pinyin} showMeaning={hints.meaning} />
         <div className="absolute inset-x-3 top-3 z-10 flex flex-wrap items-center justify-between gap-2">
           <span className={chip}>🏆 {s.score}</span>
           <span className={chip}>Cấp {s.level}</span>
           <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join(" ")}</span>
           {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}>🔥 Combo ×{s.combo}</span>}
           <SoundToggle className={`${chip} min-h-11 min-w-11`} />
-          <button type="button" aria-pressed={showPinyin} onClick={(e) => { e.stopPropagation(); setShowPinyin((v) => !v); }} className={`${chip} min-h-11`}>Pinyin {showPinyin ? "BẬT" : "TẮT"}</button>
+          <HintToggles dark />
         </div>
         {!started && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/60 px-6 text-center text-white">

@@ -266,3 +266,4 @@ Kho hội thoại hai người, tự viết, tĩnh trong mã (`authored-dialogue
 - Đấu 1–1: kênh Realtime `duel:<mã>` (broadcast `state` + presence), tin được kiểm dạng bằng `parseDuelState`; mỗi người tự đo giờ, bỏ qua một từ cộng 5 giây; không lưu gì vào cơ sở dữ liệu. Mã phòng dùng chung dạng `COOP_CODE`.
 - Điểm: `PracticeMode` thêm `blaster`, `rain`, `whack`, `daily`, `duel`; `arcadeRound` đưa kết quả về khuôn bảng điểm (tối đa 20 mục, 150 điểm mỗi mục).
 - Âm thanh game: `arcade-sfx.ts` tổng hợp bằng WebAudio trên `audio-context.ts` dùng chung, công tắc lưu localStorage `songhanzi-arcade-sound`; hoạt ảnh CSS gom ở `game-keyframes.tsx` (chỉ chạy khi không bật giảm chuyển động).
+- Gợi ý pinyin/nghĩa: `lib/games/arcade-hints.ts` + `HintToggles`; nghĩa của kho từ: `loadGameWords` gộp nghĩa tiếng Việt (`course_units.content.glosses`) rồi nghĩa tiếng Anh từ `dict_words`, đều nhớ trong bộ nhớ máy chủ.

@@ -9,6 +9,8 @@ import type { GameWord } from "@/lib/games/game-word";
 import { melodyNote, playNote } from "@/lib/games/melody";
 import { DIFFICULTY, LANES, RAIN_LIVES, ROW_H, activeRow, initRain, stepRain, tapLane, type Difficulty, type RainState } from "@/lib/games/rain-engine";
 import { GameKeyframes } from "./game-keyframes";
+import { HintToggles } from "./hint-toggles";
+import { useArcadeHints } from "./use-arcade-hints";
 import { SoundToggle } from "./sound-toggle";
 import { useArcadeScore } from "./use-arcade-score";
 import { useGameLoop } from "./use-game-loop";
@@ -26,6 +28,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const [s, setS] = useState<RainState>(() => initRain());
   const [started, setStarted] = useState(false);
   const [music, setMusic] = useState(true);
+  const hints = useArcadeHints();
   useGameLoop((dt) => setS((cur) => stepRain(cur, dt, words, Math.random)), started && !s.over);
   const lives = useRef(s.lives);
   useEffect(() => {
@@ -76,11 +79,16 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
           <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: RAIN_LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join(" ")}</span>
           {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}>🔥 Combo ×{s.combo}</span>}
           <SoundToggle className={`${chip} min-h-11 min-w-11`} />
+          <HintToggles dark />
         </div>
         {active && (
           <div className="absolute inset-x-3 top-14 z-10 flex items-center justify-center gap-3 rounded-2xl bg-white/90 px-3 py-2 text-slate-900" role="status" aria-live="polite">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tìm chữ</span>
-            <span className="text-2xl font-extrabold">{active.words[active.answer].pinyin}</span>
+            <span className="flex flex-col items-center leading-tight">
+              {hints.pinyin && <span className="text-2xl font-extrabold">{active.words[active.answer].pinyin}</span>}
+              {hints.meaning && active.words[active.answer].meaning && <span className={hints.pinyin ? "text-sm text-slate-600" : "text-xl font-bold"}>{active.words[active.answer].meaning}</span>}
+              {!hints.pinyin && !(hints.meaning && active.words[active.answer].meaning) && <span className="text-lg font-bold">Nghe và chọn chữ</span>}
+            </span>
             <PronounceButton text={active.words[active.answer].han} className="!size-10 !bg-slate-200" />
           </div>
         )}
