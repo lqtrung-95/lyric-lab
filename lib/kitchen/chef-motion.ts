@@ -6,7 +6,7 @@ export interface Circle extends Vec2 { r: number }
 export const ROOM = { minX: -6.2, maxX: 6.2, minZ: -4.2, maxZ: 4.6 } as const;
 export const CHEF_RADIUS = 0.45;
 export const CHEF_SPEED = 4.4;
-export const REACH = 1.9;
+export const REACH = 2.3;
 
 const len = (v: Vec2): number => Math.hypot(v.x, v.z);
 
@@ -42,4 +42,12 @@ export function nearestWithin<T extends Vec2>(pos: Vec2, items: readonly T[], re
     if (d <= bestD) { best = it; bestD = d; }
   }
   return best;
+}
+
+/** Điểm dừng cách `to` đúng `stop` đơn vị trên đường từ `from` tới (để đầu bếp đứng gần bếp/bàn chứ không đâm vào); đã trong tầm thì giữ nguyên chỗ đứng. */
+export function approachPoint(from: Vec2, to: Vec2, stop: number): Vec2 {
+  const d = { x: from.x - to.x, z: from.z - to.z };
+  const l = len(d);
+  if (l <= stop) return from;
+  return { x: to.x + (d.x / l) * stop, z: to.z + (d.z / l) * stop };
 }

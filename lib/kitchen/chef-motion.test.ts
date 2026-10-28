@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHEF_RADIUS, ROOM, directionTo, nearestWithin, stepChef } from "./chef-motion";
+import { CHEF_RADIUS, ROOM, approachPoint, directionTo, nearestWithin, stepChef } from "./chef-motion";
 
 describe("chef motion", () => {
   it("đi theo hướng với tốc độ cố định, đi chéo không nhanh hơn", () => {
@@ -24,5 +24,10 @@ describe("chef motion", () => {
     const items = [{ id: "a", x: 1, z: 0 }, { id: "b", x: 5, z: 0 }];
     expect(nearestWithin({ x: 0, z: 0 }, items)?.id).toBe("a");
     expect(nearestWithin({ x: 0, z: 0 }, [items[1]])).toBeUndefined();
+  });
+  it("điểm tiến tới dừng trước đích đúng khoảng cách", () => {
+    const p = approachPoint({ x: 10, z: 0 }, { x: 0, z: 0 }, 2);
+    expect(p).toEqual({ x: 2, z: 0 });
+    expect(approachPoint({ x: 1, z: 0 }, { x: 0, z: 0 }, 2)).toEqual({ x: 1, z: 0 });
   });
 });
