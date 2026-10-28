@@ -55,7 +55,19 @@ export function HomePathCard() {
         </div>
         <Link href={`/courses?course=${slug}`} className="inline-flex min-h-11 shrink-0 items-center gap-1 text-label-md font-extrabold text-primary hover:underline">Bản đồ <Icon name="chevron_right" size={18} /></Link>
       </div>
-      <ol className="flex items-start justify-between gap-1 py-space-md" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} slug={slug} unit={u} current={u.idx === current.idx} />)}</ol>
+      {/* Thẻ cao bằng ô bên cạnh: cụm chặng + tiến độ nằm giữa phần còn dư, không để hở một khoảng trống. */}
+      <div className="my-auto py-space-md">
+        <ol className="flex items-start justify-between gap-1" aria-label="Các chặng gần đây">{shown.map((u) => <Step key={u.id} slug={slug} unit={u} current={u.idx === current.idx} />)}</ol>
+        <div className="mt-space-md">
+          <div className="flex items-center justify-between text-label-md text-on-surface-variant">
+            <span>Đã hoàn thành</span>
+            <span className="font-extrabold text-on-surface">{done}/{state.units.length} chặng</span>
+          </div>
+          <div role="progressbar" aria-label="Tiến độ lộ trình" aria-valuemin={0} aria-valuemax={state.units.length} aria-valuenow={done} className="mt-1.5 h-3 overflow-hidden rounded-full border-2 border-ink bg-surface-container">
+            <div className="h-full bg-secondary" style={{ width: `${Math.max(2, (done / state.units.length) * 100)}%` }} />
+          </div>
+        </div>
+      </div>
       <Link href={`/courses/${slug}/${current.idx}`} className="btn-3d btn-3d-bright w-full">{done === 0 && !current.progress ? "Bắt đầu chặng " : "Tiếp tục chặng "}{current.idx}</Link>
     </section>
   );
