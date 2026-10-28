@@ -15,7 +15,7 @@ export default async function TruthOrLiePage() {
       <ModeTabs />
       <div className="mx-auto max-w-3xl">
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Hai thật một giả</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">Ba câu tiếng Trung đơn giản, hai câu đúng và một câu sai. Đọc kỹ rồi tìm câu sai. Luyện đọc hiểu, không tính điểm xếp hạng.</p>
+        <p className="mt-1 text-body-md text-on-surface-variant">Ba câu tiếng Trung đơn giản, hai câu đúng và một câu sai. Đọc kỹ rồi tìm câu sai. Luyện đọc hiểu, làm xong được tính điểm luyện tập (XP).</p>
         <div className="mt-space-md"><TruthOrLieLobby /></div>
         <div className="mt-space-md"><TruthOrLieGame key={set.trials.map((t) => t.options[0].zh).join("")} trials={set.trials} pinyin={set.pinyin} /></div>
       </div>

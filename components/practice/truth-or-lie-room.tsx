@@ -7,7 +7,9 @@ import { RubyLine } from "@/components/ui/ruby-text";
 import { playSfx } from "@/lib/feedback/sfx";
 import type { CoopRole } from "@/lib/explore/coop/coop-state";
 import type { Trial } from "@/lib/practice/truth-or-lie";
-import { emptyPicks, isComplete, mergePicks, resultFor, scoreOf, type Picks } from "@/lib/practice/truth-room";
+import { ROUND_SECONDS, TIMEOUT, emptyPicks, isComplete, mergePicks, resultFor, scoreOf, type Picks } from "@/lib/practice/truth-room";
+import { useCountdown } from "./use-countdown";
+import { useWordGameScore } from "./use-word-game-score";
 import { useTruthRoomChannel } from "./use-truth-room-channel";
 
 const NEXT_MS = 6000;
@@ -17,7 +19,7 @@ interface Props { code: string; role: CoopRole; trials: Trial[]; pinyin: Record<
 
 /**
  * Hai thật một giả chơi cùng bạn: hai người nhận cùng bộ câu (suy ra từ mã phòng), trả lời song song; khi CẢ HAI đã chọn thì lộ đáp án, lựa chọn của nhau và lời giải thích,
- * rồi tự sang vòng sau sau vài giây. Cuối cùng so điểm. Tiến độ hai người đi qua kênh Realtime, không lưu lên server.
+ * rồi tự sang vòng sau sau vài giây. Mỗi vòng có đồng hồ `ROUND_SECONDS` giây: hết giờ mà chưa chọn thì tính là chưa đúng. Cuối cùng so điểm và ghi XP (x1,5). Tiến độ hai người đi qua kênh Realtime, không lưu lên server.
  */
 export function TruthOrLieRoom({ code, role, trials, pinyin }: Props) {
   const rounds = trials.length;
@@ -32,6 +34,15 @@ export function TruthOrLieRoom({ code, role, trials, pinyin }: Props) {
 
   const done = i >= rounds;
   const bothAnswered = !done && mine[i] !== null && theirs[i] !== null;
+  const { saved } = useWordGameScore({ mode: "truthduo", done, correct: scoreOf(trials, mine), total: rounds, duo: true });
+  // Đồng hồ vòng: hết giờ mà chưa chọn thì ghi "hết giờ" (không bao giờ trùng câu sai nên không có điểm) và gửi cho đồng đội.
+  const answered = !done && mine[i] !== null;
+  useEffect(() => {
+    if (done || answered) return;
+    const t = setTimeout(() => setMine((cur) => cur.map((p, k) => (k === i && p === null ? TIMEOUT : p))), ROUND_SECONDS * 1000);
+    return () => clearTimeout(t);
+  }, [i, done, answered]);
+  const left = useCountdown(i, !done && !answered, ROUND_SECONDS);
   // Cả hai đã trả lời vòng này: tự sang vòng sau sau vài giây (hoặc bấm "Vòng tiếp").
   useEffect(() => {
     if (!bothAnswered) return;
@@ -66,6 +77,7 @@ export function TruthOrLieRoom({ code, role, trials, pinyin }: Props) {
           {complete ? (
             <>
               <p className="font-serif text-headline-md">Bạn {a} - {b} Đồng đội</p>
+              {saved && <p role="status" className="mt-1 text-label-lg font-bold text-secondary">Đã ghi +{Math.round(a * 150)} điểm luyện tập (x1,5 chơi cùng bạn)</p>}
               <p className="mt-1 text-body-lg font-bold">{{ win: "Bạn thắng!", lose: "Đồng đội thắng, chúc mừng họ!", draw: "Hòa nhau!" }[resultFor(a, b)]}</p>
             </>
           ) : <p className="text-body-lg font-bold" role="status">Bạn tìm đúng {a}/{rounds}. Đang chờ đồng đội làm xong…</p>}
@@ -82,6 +94,7 @@ export function TruthOrLieRoom({ code, role, trials, pinyin }: Props) {
       {status}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-label-lg font-extrabold">Vòng {i + 1}/{rounds} · {trial.topic}</p>
+        {!answered && <p role="timer" aria-label={`Còn ${left} giây`} className={`min-w-20 rounded-full border-2 border-ink px-3 py-1 text-center text-label-lg font-extrabold ${left <= 5 ? "animate-pulse bg-error text-on-error" : "bg-surface-container-lowest"}`}>⏱ {left}s</p>}
         <div role="group" aria-label="Gợi ý" className="flex gap-1.5">
           <button type="button" aria-pressed={showPinyin} onClick={() => setShowPinyin((v) => !v)} className={tog(showPinyin)}>Pinyin</button>
           <button type="button" aria-pressed={showVi} onClick={() => setShowVi((v) => !v)} className={tog(showVi)}>Nghĩa</button>
@@ -110,10 +123,10 @@ export function TruthOrLieRoom({ code, role, trials, pinyin }: Props) {
           );
         })}
       </ul>
-      {myPick !== null && !bothAnswered && <p role="status" className="rounded-xl bg-surface-container-low p-space-sm text-body-md font-bold">Bạn đã chọn. Đang chờ đồng đội…</p>}
+      {myPick !== null && !bothAnswered && <p role="status" className="rounded-xl bg-surface-container-low p-space-sm text-body-md font-bold">{myPick === TIMEOUT ? "Bạn đã hết giờ." : "Bạn đã chọn."} Đang chờ đồng đội…</p>}
       {bothAnswered && (
         <div role="status" className="rounded-xl bg-surface-container-low p-space-sm">
-          <p className="text-body-md font-bold">{myPick === trial.lieIndex ? "Bạn chọn đúng!" : "Bạn chưa đúng."} {theirPick === trial.lieIndex ? "Đồng đội cũng đúng." : "Đồng đội chưa đúng."} {trial.explain}</p>
+          <p className="text-body-md font-bold">{myPick === trial.lieIndex ? "Bạn chọn đúng!" : myPick === TIMEOUT ? "Bạn hết giờ." : "Bạn chưa đúng."} {theirPick === trial.lieIndex ? "Đồng đội cũng đúng." : theirPick === TIMEOUT ? "Đồng đội hết giờ." : "Đồng đội chưa đúng."} {trial.explain}</p>
           <button type="button" onClick={() => setI((n) => n + 1)} className="mt-2 min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">{i + 1 === rounds ? "Xem kết quả" : "Vòng tiếp"} (tự chuyển sau vài giây)</button>
         </div>
       )}

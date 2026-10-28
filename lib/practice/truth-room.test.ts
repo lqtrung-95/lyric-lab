@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { hashString, seededRng } from "./seeded-rng";
 import { buildTrial, pickRounds } from "./truth-or-lie";
-import { emptyPicks, isComplete, mergePicks, parsePicks, resultFor, scoreOf } from "./truth-room";
+import { TIMEOUT, emptyPicks, isComplete, mergePicks, parsePicks, resultFor, scoreOf } from "./truth-room";
 
 describe("bộ số ngẫu nhiên có hạt giống", () => {
   it("cùng hạt giống cho cùng dãy, khác hạt giống cho dãy khác, nằm trong [0, 1)", () => {
@@ -31,6 +31,8 @@ describe("phòng Hai thật một giả", () => {
     expect(scoreOf(trials, emptyPicks(4))).toBe(0);
     expect(scoreOf(trials, right.map((p, i) => (i === 0 ? (p + 1) % 3 : p)))).toBe(3);
     expect(isComplete(right, 4)).toBe(true);
+    expect(scoreOf(trials, right.map((p, i) => (i === 0 ? TIMEOUT : p)))).toBe(3); // hết giờ không có điểm
+    expect(isComplete(right.map((p, i) => (i === 0 ? TIMEOUT : p)), 4)).toBe(true);
     expect(isComplete([0, 1, null, 2], 4)).toBe(false);
     expect(isComplete([0, 1], 4)).toBe(false);
     expect([resultFor(3, 2), resultFor(1, 2), resultFor(2, 2)]).toEqual(["win", "lose", "draw"]);
@@ -39,7 +41,8 @@ describe("phòng Hai thật một giả", () => {
   it("chỉ nhận tin đáp án đúng dạng", () => {
     expect(parsePicks({ from: "a", picks: [0, null, 2, 1] }, 4)).toEqual({ from: "a", picks: [0, null, 2, 1] });
     expect(parsePicks({ from: "a", picks: [0, 1] }, 4)).toBeNull();
-    expect(parsePicks({ from: "a", picks: [0, 1, 2, 3] }, 4)).toBeNull();
+    expect(parsePicks({ from: "a", picks: [0, TIMEOUT, 2, 1] }, 4)).not.toBeNull(); // hết giờ hợp lệ
+    expect(parsePicks({ from: "a", picks: [0, 1, 2, 4] }, 4)).toBeNull();
     expect(parsePicks({ from: "a", picks: [0, 1, 2, 1.5] }, 4)).toBeNull();
     expect(parsePicks({ from: "z", picks: [0, 1, 2, 1] }, 4)).toBeNull();
     expect(parsePicks(null, 4)).toBeNull();

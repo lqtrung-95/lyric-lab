@@ -6,6 +6,7 @@ import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
 import { playSfx } from "@/lib/feedback/sfx";
 import { wrongPositions, type OrderItem } from "@/lib/practice/word-order";
+import { useWordGameScore } from "./use-word-game-score";
 
 const chip = "min-h-12 rounded-xl border-2 border-ink px-4 text-body-lg font-bold";
 
@@ -23,11 +24,13 @@ export function WordOrderGame({ items }: { items: OrderItem[] }) {
   const [hints, setHints] = useState(0);
   const [firstTry, setFirstTry] = useState(0);
   const done = i >= items.length;
+  const { saved } = useWordGameScore({ mode: "order", done: done && items.length > 0, correct: firstTry, total: Math.max(1, items.length) });
 
   if (done || items.length === 0) {
     return (
       <div className="rounded-2xl bg-surface-container-low p-space-lg text-center" data-testid="wo-done">
         <p className="font-serif text-headline-md">{items.length === 0 ? "Chưa tải được câu để xếp." : `Đúng ngay lần đầu ${firstTry}/${items.length} câu`}</p>
+        {saved && <p role="status" className="mt-1 text-label-lg font-bold text-secondary">Đã ghi +{firstTry * 100} điểm luyện tập</p>}
         <button type="button" onClick={() => router.refresh()} className="mt-space-md min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">Chơi bộ khác</button>
       </div>
     );

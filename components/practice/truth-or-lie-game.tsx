@@ -6,12 +6,13 @@ import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
 import { playSfx } from "@/lib/feedback/sfx";
 import type { Trial } from "@/lib/practice/truth-or-lie";
+import { useWordGameScore } from "./use-word-game-score";
 
 const tog = (on: boolean) => `min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-extrabold ${on ? "bg-primary text-on-primary" : "bg-surface-container-lowest"}`;
 
 /**
  * Hai thật một giả (真话还是假话): ba câu tiếng Trung, hai đúng một sai; chọn câu sai. Chọn xong thì lộ đáp án, nghĩa tiếng Việt và lời giải thích.
- * Luyện đọc hiểu câu đơn giản. Chỉ là luyện thêm nên không ghi điểm lên bảng xếp hạng.
+ * Luyện đọc hiểu câu đơn giản; làm xong được tính điểm luyện tập (XP).
  */
 export function TruthOrLieGame({ trials, pinyin }: { trials: Trial[]; pinyin: Record<string, string> }) {
   const router = useRouter();
@@ -21,10 +22,12 @@ export function TruthOrLieGame({ trials, pinyin }: { trials: Trial[]; pinyin: Re
   const [showPinyin, setShowPinyin] = useState(true);
   const [showVi, setShowVi] = useState(false);
   const done = i >= trials.length;
+  const { saved } = useWordGameScore({ mode: "truth", done, correct: score, total: trials.length });
   if (done) {
     return (
       <div className="rounded-2xl bg-surface-container-low p-space-lg text-center" data-testid="tol-done">
         <p className="font-serif text-headline-md">Bạn tìm đúng {score}/{trials.length} câu sai</p>
+        {saved && <p role="status" className="mt-1 text-label-lg font-bold text-secondary">Đã ghi +{score * 100} điểm luyện tập</p>}
         <button type="button" onClick={() => router.refresh()} className="mt-space-md min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">Chơi bộ khác</button>
       </div>
     );

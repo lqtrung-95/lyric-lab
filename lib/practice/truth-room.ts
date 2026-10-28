@@ -1,6 +1,11 @@
 import type { Trial } from "./truth-or-lie";
 
-/** Lượt chọn của một người qua từng vòng: chỉ số câu họ cho là sai, hoặc null nếu chưa trả lời. */
+/** Giá trị đặc biệt: hết giờ mà chưa chọn (không bao giờ trùng chỉ số câu sai nên tính là chưa đúng). */
+export const TIMEOUT = 3;
+/** Giây cho mỗi vòng ở chế độ chơi cùng bạn. */
+export const ROUND_SECONDS = 20;
+
+/** Lượt chọn của một người qua từng vòng: chỉ số câu họ cho là sai (0 đến 2), `TIMEOUT` nếu hết giờ, hoặc null nếu chưa trả lời. */
 export type Picks = (number | null)[];
 
 /** Số vòng của một phòng. */
@@ -18,13 +23,13 @@ export type RoomResult = "win" | "lose" | "draw";
 export const resultFor = (mine: number, theirs: number): RoomResult => (mine > theirs ? "win" : mine < theirs ? "lose" : "draw");
 
 /**
- * Đọc tin đáp án của đồng đội qua kênh: một mảng đúng `rounds` phần tử, mỗi phần tử là null hoặc chỉ số 0 đến 2. Sai dạng thì bỏ (null),
+ * Đọc tin đáp án của đồng đội qua kênh: một mảng đúng `rounds` phần tử, mỗi phần tử là null, chỉ số 0 đến 2 hoặc `TIMEOUT`. Sai dạng thì bỏ (null),
  * nên người ngoài gửi gì lên kênh cũng không làm hỏng trạng thái.
  */
 export function parsePicks(payload: unknown, rounds: number): { from: "a" | "b"; picks: Picks } | null {
   const d = payload as { from?: unknown; picks?: unknown } | null;
   if (!d || (d.from !== "a" && d.from !== "b") || !Array.isArray(d.picks) || d.picks.length !== rounds) return null;
-  return d.picks.every((p) => p === null || (Number.isInteger(p) && p >= 0 && p <= 2)) ? { from: d.from, picks: d.picks as Picks } : null;
+  return d.picks.every((p) => p === null || (Number.isInteger(p) && p >= 0 && p <= TIMEOUT)) ? { from: d.from, picks: d.picks as Picks } : null;
 }
 
 /** Hợp hai bản đáp án của cùng một người (giữ đáp án đã có, không để bản cũ xóa bản mới): dùng khi nhận lại trạng thái sau khi vào phòng. */

@@ -14,7 +14,7 @@ export default async function WordOrderPage() {
       <ModeTabs />
       <div className="mx-auto max-w-3xl">
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Xếp câu</h1>
-        <p className="mt-1 text-body-md text-on-surface-variant">Cho nghĩa tiếng Việt, hãy xếp các thẻ từ thành câu tiếng Trung đúng trật tự. Câu lấy từ các bài Hội thoại. Chỉ là luyện thêm, không tính điểm xếp hạng.</p>
+        <p className="mt-1 text-body-md text-on-surface-variant">Cho nghĩa tiếng Việt, hãy xếp các thẻ từ thành câu tiếng Trung đúng trật tự. Câu lấy từ các bài Hội thoại. Làm xong được tính điểm luyện tập (XP) cho các câu đúng ngay lần đầu.</p>
         <div className="mt-space-md"><WordOrderGame key={items.map((i) => i.zh).join("")} items={items} /></div>
       </div>
     </>
