@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
+import { playChinese, stopChinese } from "@/lib/speech/play-chinese";
 import type { ClueDef, DialogueChoice, DialogueNode, Speaker } from "@/lib/explore/story/story-types";
 import { FLAT_SPRITES } from "../art/flat/flat-sprites";
 import { HintToggles } from "./hint-toggles";
@@ -48,6 +49,15 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
   // Mỗi câu mới: chuyển focus vào nút hành động đầu tiên để nhấn Enter/Space là đi tiếp.
   useEffect(() => { rootRef.current?.querySelector<HTMLButtonElement>("[data-primary]")?.focus({ preventScroll: true }); }, [node.id]);
 
+  // Câu mới của NPC tự đọc to (người chơi vừa bấm/nhấn phím để vào hội thoại nên trình duyệt cho phát). Đổi câu hoặc đóng bong bóng thì dừng giọng đang đọc.
+  // Công tắc "Tự đọc" đọc qua ref để bật/tắt giữa chừng không làm đọc lại câu hiện tại.
+  const voiceOn = useRef(hints.voice);
+  useEffect(() => { voiceOn.current = hints.voice; }, [hints.voice]);
+  useEffect(() => {
+    if (node.zh && node.speaker !== "player" && voiceOn.current) void playChinese(node.zh);
+    return () => stopChinese();
+  }, [node.id, node.zh, node.speaker]);
+
   return (
     <div
       ref={rootRef}
@@ -63,7 +73,7 @@ export function DialogueBubble({ node, choices, speaker, anchor, pinyin, hints, 
       <div className="flex min-h-0 flex-col overflow-y-auto rounded-[22px] border-[3px] px-3.5 py-3 text-[13px] leading-snug shadow-[0_4px_0_rgba(74,46,27,0.28)] sm:text-sm" style={{ background: "#fffaf0", borderColor: INK, color: INK }}>
         <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
           <p className="text-[12px] font-extrabold" style={{ color: "#b4531a" }}>{speaker?.name ?? node.speaker}</p>
-          <div className="[&_button]:!min-h-8 [&_button]:!px-2.5 [&_button]:!text-[12px]"><HintToggles hints={hints} onToggle={onToggleHint} /></div>
+          <div className="[&_button]:!min-h-8 [&_button]:!px-2.5 [&_button]:!text-[12px]"><HintToggles hints={hints} onToggle={onToggleHint} withVoice /></div>
         </div>
         {node.zh ? (
           <>
