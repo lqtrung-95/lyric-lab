@@ -148,3 +148,9 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Đổi tên route thì thêm chuyển hướng vĩnh viễn vào `lib/routes/legacy-redirects.ts` để link cũ còn dùng được; dữ liệu lưu theo id cũ phải có bước đổi khóa khi đọc.
 
 - Vụ án khó: đặt `freeRoam: true`, viết `questions`, dùng manh mối `kind: "deduction"` (có `link`) làm bằng chứng then chốt và thêm test cho cơ chế riêng của vụ. Manh mối chữ Hán cần người chơi tự đọc thì `vi` chỉ là câu giấu nghĩa, nội dung đầy đủ nằm ở suy luận.
+
+## Bài nói (micro)
+
+- Mọi bài nói dùng `useSpeakTurn` + `SpeakBox` + `MicIntro` (`components/speaking`): xin quyền micro đúng lúc người dùng bấm Bắt đầu, và LUÔN có đường gõ chữ thay thế khi mic bị chặn/không hỗ trợ/hết hạn mức STT. Không dựng bài chỉ chạy được bằng mic.
+- Chấm lời nói chỉ khẳng định được những gì đo được (đã đáp, có từ khóa giống câu mẫu, có dùng từ cho trước); không gắn nhãn "đúng/sai ý nghĩa" khi chưa có LLM chấm.
+- Hook trả về giá trị từ `useRef` thì không đọc `ref.current` lúc render (lint `react-hooks/refs`): phản chiếu sang state.

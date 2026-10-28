@@ -68,7 +68,7 @@ export function WordCard({ word, cardState, onClose }: { word: SceneWord; cardSt
       {clip && <div className="mt-space-sm"><SnippetPlayer key={clip.videoId} videoId={clip.videoId} request={clip.request} /></div>}
 
       <p role="status" className="mt-space-sm flex flex-wrap items-center gap-x-2 text-label-md text-on-surface-variant">
-        {cardState === "saved" && <><Icon name="check_circle" size={18} filled /> Đã thêm vào bộ ôn tập. <Link href="/review" className="font-bold text-primary hover:underline">Ôn ngay</Link></>}
+        {cardState === "saved" && <><Icon name="check_circle" size={18} filled /> Đã thêm vào bộ ôn tập. <Link href="/review/cards" className="font-bold text-primary hover:underline">Ôn ngay</Link></>}
         {cardState === "no_example" && "Từ này chưa có câu thật trong kho nên chưa tạo được thẻ ôn."}
         {cardState === "pending" && "Đang thêm vào bộ ôn tập…"}
       </p>

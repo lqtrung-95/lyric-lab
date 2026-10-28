@@ -53,7 +53,7 @@ export function NextActionPanel() {
                 <span className="text-body-lg text-on-surface-variant">thẻ cần ôn</span>
               </p>
               <p className="mt-1 text-body-md text-on-surface-variant">Ôn ngắn mỗi ngày giúp bạn nhớ lâu hơn.</p>
-              <Link href="/review" className={`${cta} bg-primary text-on-primary hover:brightness-110`}><Icon name="style" size={20} />Bắt đầu ôn</Link>
+              <Link href="/review/cards" className={`${cta} bg-primary text-on-primary hover:brightness-110`}><Icon name="style" size={20} />Bắt đầu ôn</Link>
             </>
           )}
           {ready && action.kind === "continue" && (

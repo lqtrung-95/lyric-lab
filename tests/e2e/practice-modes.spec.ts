@@ -173,7 +173,7 @@ test("chưa có thẻ nào: mỗi chế độ hướng dẫn cách lưu từ và
     await expect(page.getByRole("link", { name: "Chọn bài hát để lưu từ" })).toBeVisible();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
-  await expect(page.getByRole("navigation", { name: "Chế độ ôn tập" }).getByRole("link", { name: "Ghép cặp" })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByRole("navigation", { name: "Ôn và nói" }).getByRole("link", { name: "Ôn & Nói" })).toBeVisible();
 });
 
 test.describe("Đọc to từ đã lưu", () => {

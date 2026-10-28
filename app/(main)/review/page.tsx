@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { ModeTabs } from "@/components/review/mode-tabs";
-import { ReviewScreen } from "@/components/review/review-screen";
+import { ReviewHub } from "@/components/review/review-hub";
 
-export const metadata: Metadata = { title: "Ôn tập", robots: { index: false } };
+export const metadata: Metadata = { title: "Ôn & Nói", robots: { index: false } };
 
+/** Trang chủ Ôn & Nói: chọn chế độ luyện theo mục đích. Ôn thẻ theo lịch nằm ở `/review/cards`. */
 export default function ReviewPage() {
-  return (
-    <>
-      <ModeTabs />
-      <ReviewScreen />
-    </>
-  );
+  return <ReviewHub />;
 }

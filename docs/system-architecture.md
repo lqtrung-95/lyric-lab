@@ -250,3 +250,11 @@ Route ẩn `/explore` (danh sách cảnh) và `/explore/[scene]` (`robots: noind
 
 Kho hội thoại hai người, tự viết, tĩnh trong mã (`authored-dialogues-*.ts`) cộng hội thoại ngắn của các cảnh Khám phá. Pinyin lấy từ từ điển qua `annotatePinyin` (như truyện của cảnh), cấp HSK tính bằng `dialogueLevel` (phân vị 90% của cấp từ trong từ điển, cấp 4 trở lên gộp "HSK 4+"), memo theo tiến trình server. Trang danh sách lọc ở client (tìm, cấp, chủ đề); trang `/dialogues/[id]` là trình phát từng câu dùng `playChineseSequence`, mỗi lượt phát có số riêng (`run`) để bỏ qua báo cũ. Giọng đọc dùng chung `/api/tts` và kho file đã tổng hợp.
 
+## Nói phản xạ (`lib/speaking`, `lib/roleplay`, `components/speaking`, `app/(main)/review/speak-*`)
+
+- Luồng một lượt nói: `startVadRecording` (MediaRecorder + AnalyserNode, `lib/speaking/vad.ts` tính mốc bắt đầu/ngừng nói từ RMS) → `blobToWavBase64` (WAV 16 kHz) → `POST /api/speech/transcribe` (Azure Speech REST, không câu mẫu; thử lần lượt khóa chính rồi khóa dự phòng `azureSpeechEndpoints`) → chữ Hán. Âm thanh không lưu. Nếu AudioContext bị treo (iOS) thì vẫn ghi, chỉ không tự dừng theo giọng; hết `maxSec` vẫn dừng.
+- Hạn mức: `stt` (nhận diện giọng, khách 60 / thành viên 300 mỗi 24 giờ) và `roleplay` (lượt trò chuyện AI, chỉ thành viên 20/ngày) trong `usage-limit-config.ts`, cùng `consume_usage`; lỗi hệ thống thì `refundUsage`.
+- Hỏi nhanh – Đáp nhanh: cặp hỏi–đáp trích từ `ALL_DIALOGUES` (`reflex-questions.ts`), lọc hội thoại cấp ≤ 4 theo `loadDialogueSummaries`; chấm bằng so chữ nội dung với mệnh đề đầu câu mẫu (`reply-match.ts`). Dùng 5 từ: thẻ của người học (`usePracticePool`), từ dùng được thì chấm `correct` vào FSRS. Trò chuyện tự do: `runRoleplayTurn` (prompt có vai, cấp HSK, chống chỉ thị trong lời người học; đầu ra Zod), pinyin từ từ điển qua `annotatePinyin`.
+- Điểm: `PracticeMode` thêm `reflex`, `fiveword`, `roleplay`; `useWordGameScore` nhận `points` tính sẵn.
+- Trang `/review` là trang chủ chia nhóm (`review-modes.ts`); ôn thẻ ở `/review/cards`.
+

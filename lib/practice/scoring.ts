@@ -1,6 +1,6 @@
 import type { PracticeOutcome } from "./practice-grade";
 
-export type PracticeMode = "pinyin" | "cloze" | "listen" | "match" | "karaoke" | "explore" | "truth" | "truthduo" | "order";
+export type PracticeMode = "pinyin" | "cloze" | "listen" | "match" | "karaoke" | "explore" | "truth" | "truthduo" | "order" | "reflex" | "fiveword" | "roleplay";
 
 const BASE = 100;
 const COMBO_STEP = 5;
@@ -23,4 +23,4 @@ export function maxRoundPoints(mode: PracticeMode, total: number): number {
   return mode === "match" ? MATCH_CAP : total * PER_ANSWER_CAP;
 }
 
-export const PRACTICE_MODES: readonly PracticeMode[] = ["pinyin", "cloze", "listen", "match", "karaoke", "explore", "truth", "truthduo", "order"];
+export const PRACTICE_MODES: readonly PracticeMode[] = ["pinyin", "cloze", "listen", "match", "karaoke", "explore", "truth", "truthduo", "order", "reflex", "fiveword", "roleplay"];

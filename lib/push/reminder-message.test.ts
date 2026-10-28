@@ -6,7 +6,7 @@ describe("buildReminder", () => {
     expect(buildReminder({ dueCards: 9, currentStreak: 5, studiedToday: true })).toBeNull();
   });
   it("ưu tiên thẻ đến hạn", () => {
-    expect(buildReminder({ dueCards: 12, currentStreak: 5, studiedToday: false })).toMatchObject({ title: "Có 12 thẻ cần ôn", url: "/review" });
+    expect(buildReminder({ dueCards: 12, currentStreak: 5, studiedToday: false })).toMatchObject({ title: "Có 12 thẻ cần ôn", url: "/review/cards" });
   });
   it("không có thẻ thì nhắc giữ chuỗi", () => {
     expect(buildReminder({ dueCards: 0, currentStreak: 7, studiedToday: false })).toMatchObject({ title: "Giữ chuỗi 7 ngày nhé", url: "/app" });

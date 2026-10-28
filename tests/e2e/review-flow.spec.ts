@@ -21,7 +21,7 @@ test("Lưu → ôn: lật bằng Space, chấm bằng phím 3, ghi FSRS và nh�
       return userId;
     }, { timeout: 15_000 }).not.toBe("");
 
-    await page.goto("/review");
+    await page.goto("/review/cards");
     await expect(page.getByRole("heading", { name: "离开", exact: true })).toBeVisible();
     await expect(page.getByText("Nhớ nghĩa của từ này")).toBeVisible();
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -53,7 +53,7 @@ test("Lưu → ôn: lật bằng Space, chấm bằng phím 3, ghi FSRS và nh�
 });
 
 test("chưa có thẻ nào: hướng dẫn cách lưu từ", async ({ page }) => {
-  await page.goto("/review");
+  await page.goto("/review/cards");
   await expect(page.getByRole("heading", { name: "Chưa có thẻ nào để ôn" })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
@@ -73,7 +73,7 @@ test("nút 'Hoàn tác' căn giữa ở màn kết thúc buổi ôn", async ({ p
       return userId;
     }, { timeout: 15_000 }).not.toBe("");
     await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto("/review");
+    await page.goto("/review/cards");
     await expect(page.getByRole("heading", { name: "离开", exact: true })).toBeVisible(); // đợi thẻ tải xong rồi mới bấm phím
     await page.keyboard.press("Space");
     await page.keyboard.press("3");
@@ -98,7 +98,7 @@ test("hết hạn mức thẻ mới: nói rõ còn bao nhiêu thẻ đang chờ 
       await sb.from("review_logs").insert({ user_id: userId, item_key: c.item_key, rating: 3, state: 0, due: c.due, stability: 0, difficulty: 0, elapsed_days: 0, scheduled_days: 5 });
       await sb.from("user_cards").update({ state: 2, reps: 1, stability: 5, difficulty: 5, scheduled_days: 5, due: new Date(Date.now() + 5 * 86_400_000).toISOString(), last_review: new Date().toISOString() }).eq("user_id", userId).eq("item_key", c.item_key);
     }
-    await page.goto("/review");
+    await page.goto("/review/cards");
     await expect(page.getByRole("heading", { name: "Bạn đã học đủ thẻ mới hôm nay" })).toBeVisible();
     await expect(page.getByText("Hôm nay bạn đã học 2/2 thẻ mới")).toBeVisible();
     await expect(page.getByText("Còn 4 thẻ mới đang chờ")).toBeVisible();

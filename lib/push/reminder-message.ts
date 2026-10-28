@@ -19,7 +19,7 @@ export interface ReminderMessage {
  */
 export function buildReminder({ dueCards, currentStreak, studiedToday }: ReminderInput): ReminderMessage | null {
   if (studiedToday) return null;
-  if (dueCards > 0) return { title: `Có ${dueCards} thẻ cần ôn`, body: "Ôn vài phút để từ vựng không bị quên.", url: "/review" };
+  if (dueCards > 0) return { title: `Có ${dueCards} thẻ cần ôn`, body: "Ôn vài phút để từ vựng không bị quên.", url: "/review/cards" };
   if (currentStreak > 0) return { title: `Giữ chuỗi ${currentStreak} ngày nhé`, body: "Nghe một bài hoặc ôn vài thẻ là đủ.", url: "/app" };
   return { title: "Hôm nay nghe một bài nhé?", body: "Học tiếng Trung qua bài hát chỉ mất vài phút.", url: "/app" };
 }
