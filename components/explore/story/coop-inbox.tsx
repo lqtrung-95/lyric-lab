@@ -2,8 +2,10 @@
 
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
+import { Icon } from "@/components/ui/icon";
 import { ROLE_LABEL } from "@/lib/explore/coop/coop-state";
 import type { StoryPayload } from "@/lib/explore/story/load-story";
+import { playVoiceClip } from "./clip-player";
 import type { InboxItem } from "./use-coop-session";
 import type { Hints } from "./use-story-hints";
 
@@ -48,6 +50,11 @@ export function CoopInbox({ items, payload, hints, hasClue, onAccept, onDismiss,
             <>
               <p className="text-label-md font-extrabold">{ROLE_LABEL[item.from]} báo một manh mối cho bạn:</p>
               <div className="mt-1">{zhLine(item.clueId)}</div>
+              {item.clip && (
+                <button type="button" onClick={() => void playVoiceClip(item.clip!)} className={`${btn} mt-2 inline-flex items-center gap-1.5 bg-primary-container text-on-primary-container`}>
+                  <Icon name="play_arrow" size={18} filled />Nghe bạn đọc
+                </button>
+              )}
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 {hasClue(item.clueId)
                   ? <span className="text-label-md font-bold">Bạn đã có manh mối này rồi.</span>

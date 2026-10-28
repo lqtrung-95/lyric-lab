@@ -5,9 +5,11 @@ import { PanelFrame } from "./panel-frame";
 import { Button3d } from "@/components/ui/button-3d";
 import type { LinkResult } from "@/lib/explore/story/deduction";
 import type { StoryDef, StoryProgress } from "@/lib/explore/story/story-types";
+import type { VoiceClip } from "@/lib/speech/voice-clip";
 import { ArtSprite } from "../art/art-sprite";
 import { FLAT_SPRITES } from "../art/flat/flat-sprites";
 import { ClueBody } from "./clue-card";
+import { VoiceReportButton } from "./voice-report-button";
 import { HintToggles } from "./hint-toggles";
 import type { Hints } from "./use-story-hints";
 
@@ -23,7 +25,7 @@ interface Props {
   onLink: (a: string, b: string) => LinkResult;
   onClose: () => void;
   /** Chơi chung: manh mối là riêng của người tìm ra, nút "Báo cho đồng đội" gửi nó (bằng tiếng Trung) sang sổ của người kia. */
-  coop?: { reported: string[]; partnerOnline: boolean; onReport: (clueId: string) => void };
+  coop?: { reported: string[]; partnerOnline: boolean; onReport: (clueId: string, clip?: VoiceClip) => void };
 }
 
 /** Sổ vụ án: các manh mối đã tìm (đọc lại, nghe lại), các nghi phạm và lời khai của họ, nút buộc tội khi đủ điều kiện. */
@@ -61,9 +63,12 @@ export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, ca
           <li key={c.id} className="rounded-xl bg-surface-container-low p-space-sm">
             <ClueBody clue={c} pinyin={pinyin} hints={hints} />
             {coop && (
-              <button type="button" disabled={!coop.partnerOnline} onClick={() => coop.onReport(c.id)} className="mt-2 min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-extrabold disabled:opacity-40">
-                {coop.reported.includes(c.id) ? "Đã báo ✓ (báo lại)" : coop.partnerOnline ? "Báo cho đồng đội" : "Báo cho đồng đội (chờ họ online)"}
-              </button>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <button type="button" disabled={!coop.partnerOnline} onClick={() => coop.onReport(c.id)} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-extrabold disabled:opacity-40">
+                  {coop.reported.includes(c.id) ? "Đã báo ✓ (báo lại)" : coop.partnerOnline ? "Báo cho đồng đội" : "Báo cho đồng đội (chờ họ online)"}
+                </button>
+                <VoiceReportButton clueId={c.id} disabled={!coop.partnerOnline} onSend={(clip) => coop.onReport(c.id, clip)} />
+              </div>
             )}
           </li>
         ))}</ul>

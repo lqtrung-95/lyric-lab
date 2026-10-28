@@ -7,11 +7,12 @@ import type { StoryProgress } from "@/lib/explore/story/story-types";
 import { applyEffects } from "@/lib/explore/story/story-state";
 import { mergeShared, unseenShared, type CoopRole } from "@/lib/explore/coop/coop-state";
 import { playSfx } from "@/lib/feedback/sfx";
+import type { VoiceClip } from "@/lib/speech/voice-clip";
 import { useCoopChannel } from "./use-coop-channel";
 
 /** Mục trong hộp thư của đồng đội: manh mối được báo, đề nghị buộc tội cần trả lời, hoặc thông báo ngắn. */
 export type InboxItem =
-  | { id: number; kind: "report"; from: CoopRole; clueId: string }
+  | { id: number; kind: "report"; from: CoopRole; clueId: string; clip?: VoiceClip }
   | { id: number; kind: "proposal"; from: CoopRole; suspectIds: string[]; clueIds: string[] }
   | { id: number; kind: "note"; text: string };
 type NewItem = InboxItem extends infer T ? (T extends { id: number } ? Omit<T, "id"> : never) : never;
@@ -67,7 +68,7 @@ export function useCoopSession({ enabled, code, role, payload, progress, update,
         if (add.flags.includes(story.solvedFlag)) onPartnerSolved();
         update((p) => mergeShared(p, { flags: incoming.flags, clues: [] }));
       },
-      onReport: (e) => push({ kind: "report", from: e.from, clueId: e.clueId }),
+      onReport: (e) => push({ kind: "report", from: e.from, clueId: e.clueId, ...(e.clip ? { clip: e.clip } : {}) }),
       onProposal: (e) => { push({ kind: "proposal", from: e.from, suspectIds: e.suspectIds, clueIds: e.clueIds }); playSfx("correct"); },
       onReply: (e) => {
         const mine = pendingRef.current;
@@ -81,7 +82,7 @@ export function useCoopSession({ enabled, code, role, payload, progress, update,
   });
   useEffect(() => { verdictSender.current = channel.sendVerdict; }, [channel.sendVerdict]);
 
-  const report = useCallback((clueId: string) => { channel.sendReport(clueId); setReported((cur) => (cur.includes(clueId) ? cur : [...cur, clueId])); }, [channel]);
+  const report = useCallback((clueId: string, clip?: VoiceClip) => { channel.sendReport(clueId, clip); setReported((cur) => (cur.includes(clueId) ? cur : [...cur, clueId])); }, [channel]);
   const remove = useCallback((id: number) => setInbox((cur) => cur.filter((i) => i.id !== id)), []);
   const acceptReport = useCallback((item: InboxItem) => {
     if (item.kind === "report") { update((p) => applyEffects(p, [{ clue: item.clueId }])); playSfx("correct"); }

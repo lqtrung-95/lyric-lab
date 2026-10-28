@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { otherRole, validPhrase, type CoopRole } from "@/lib/explore/coop/coop-state";
 import { parseProposal, parseReply, parseReport, parseVerdict, sharedFlags, type CaseIds, type ProposalEvent, type ReplyEvent, type ReportEvent, type VerdictEvent, type VerdictKind } from "@/lib/explore/coop/coop-events";
 import { parseMessage } from "@/lib/explore/coop/coop-messages";
+import type { VoiceClip } from "@/lib/speech/voice-clip";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 
 export interface SharedState { flags: string[] }
@@ -112,7 +113,7 @@ export function useCoopChannel({ code, caseId, role, state, ids, handlers, enabl
     send("say", { zh: ok });
   }, [role, send]);
 
-  const sendReport = useCallback((clueId: string) => send("report", { clueId }), [send]);
+  const sendReport = useCallback((clueId: string, clip?: VoiceClip) => send("report", { clueId, ...(clip ? { clip } : {}) }), [send]);
   const sendProposal = useCallback((suspectIds: string[], clueIds: string[]) => send("propose", { suspectIds, clueIds }), [send]);
   const sendReply = useCallback((ok: boolean) => send("reply", { ok }), [send]);
   const sendVerdict = useCallback((kind: VerdictKind) => send("verdict", { kind }), [send]);

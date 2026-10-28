@@ -1,3 +1,5 @@
+import { parseClip, type VoiceClip } from "@/lib/speech/voice-clip";
+
 /**
  * Kiểm tra dạng của các tin đặc biệt gửi qua kênh chơi chung (báo manh mối, đề nghị buộc tội, trả lời, kết quả). Tin lạ hoặc có id không thuộc vụ án bị bỏ,
  * nên người ngoài (hoặc bản cũ) gửi gì lên kênh cũng không làm hỏng trạng thái của người chơi.
@@ -9,10 +11,13 @@ const isRole = (v: unknown): v is "a" | "b" => v === "a" || v === "b";
 const strings = (v: unknown, allowed: readonly string[], max: number): string[] | null =>
   Array.isArray(v) && v.length > 0 && v.length <= max && v.every((x) => typeof x === "string" && allowed.includes(x)) ? [...new Set(v as string[])] : null;
 
-export interface ReportEvent { from: "a" | "b"; clueId: string }
+/** `clip`: người báo có thể đọc to manh mối bằng giọng của mình kèm theo (đoạn thoại ngắn, xem `voice-clip.ts`); đoạn hỏng thì bỏ riêng đoạn đó, tin báo vẫn nhận. */
+export interface ReportEvent { from: "a" | "b"; clueId: string; clip?: VoiceClip }
 export function parseReport(p: unknown, ids: CaseIds): ReportEvent | null {
-  const d = p as { from?: unknown; clueId?: unknown } | null;
-  return d && isRole(d.from) && typeof d.clueId === "string" && ids.clues.includes(d.clueId) ? { from: d.from, clueId: d.clueId } : null;
+  const d = p as { from?: unknown; clueId?: unknown; clip?: unknown } | null;
+  if (!d || !isRole(d.from) || typeof d.clueId !== "string" || !ids.clues.includes(d.clueId)) return null;
+  const clip = d.clip === undefined ? null : parseClip(d.clip);
+  return { from: d.from, clueId: d.clueId, ...(clip ? { clip } : {}) };
 }
 
 export interface ProposalEvent { from: "a" | "b"; suspectIds: string[]; clueIds: string[] }

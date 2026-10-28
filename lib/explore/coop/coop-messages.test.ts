@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SCENES } from "@/lib/explore/scenes";
+import { COOP_ITEMS } from "./coop-items";
 import { COOP_PLACES } from "./coop-places";
 import { allComposedMessages, composeMessage, parseMessage } from "./coop-messages";
 import { parseProposal, parseReply, parseReport, parseVerdict, sharedFlags } from "./coop-events";
@@ -14,18 +15,29 @@ describe("nơi chốn bằng tiếng Trung", () => {
   });
 });
 
+describe("đồ vật", () => {
+  it("chữ Hán đồ vật không trùng và không trùng tên nơi chốn", () => {
+    const zh = COOP_ITEMS.map((i) => i.zh);
+    expect(new Set(zh).size).toBe(zh.length);
+    for (const p of Object.values(COOP_PLACES)) expect(zh).not.toContain(p.zh);
+  });
+});
+
 describe("câu ghép từ mẫu", () => {
   it("ghép mẫu có chỗ trống với nơi chốn, mẫu không chỗ trống thì dùng nguyên", () => {
     expect(composeMessage("at", "hospital")).toEqual({ zh: "我在医院。", vi: "Tôi đang ở Bệnh viện." });
     expect(composeMessage("agree")).toEqual({ zh: "我同意。", vi: "Tôi đồng ý." });
     expect(composeMessage("at")).toBeNull();
     expect(composeMessage("at", "không-có")).toBeNull();
+    expect(composeMessage("sawo", "笔")).toEqual({ zh: "你看见笔了吗?", vi: "Bạn có thấy bút không?" });
+    expect(composeMessage("sawo", "hospital")).toBeNull(); // đồ vật không nhận id nơi chốn
     expect(composeMessage("lạ", "room")).toBeNull();
   });
 
   it("chỉ nhận tin khớp đúng một câu ghép; chữ lạ, câu dài hoặc nơi chốn ngoài vụ án bị bỏ", () => {
     expect(parseMessage("你去书店看看。")?.vi).toBe("Bạn đến Hiệu sách xem thử.");
-    expect(parseMessage("你去书店看看。", ["hospital"])).toBeNull();
+    expect(parseMessage("我找到了钥匙。")?.vi).toBe("Tôi đã tìm thấy chìa khóa.");
+    expect(parseMessage("我找到了大象。")).toBeNull();
     expect(parseMessage("tùy ý")).toBeNull();
     expect(parseMessage(42)).toBeNull();
     expect(parseMessage("我在医院。<script>")).toBeNull();
@@ -46,6 +58,9 @@ describe("tin đặc biệt qua kênh", () => {
     expect(parseReport({ from: "a", clueId: "zzz" }, ids)).toBeNull();
     expect(parseReport({ from: "x", clueId: "c1" }, ids)).toBeNull();
     expect(parseReport(null, ids)).toBeNull();
+    // Kèm đoạn thoại hợp lệ thì giữ, đoạn hỏng thì bỏ riêng đoạn đó.
+    expect(parseReport({ from: "a", clueId: "c1", clip: { mime: "audio/webm", b64: "QUJD" } }, ids)?.clip).toEqual({ mime: "audio/webm", b64: "QUJD" });
+    expect(parseReport({ from: "a", clueId: "c1", clip: { mime: "x/y", b64: "QUJD" } }, ids)).toEqual({ from: "a", clueId: "c1" });
   });
 
   it("đề nghị buộc tội: nghi phạm tối đa hai, bằng chứng thuộc vụ án, bỏ trùng", () => {
