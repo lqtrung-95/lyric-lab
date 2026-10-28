@@ -48,6 +48,14 @@ export const TOOLS: readonly ToolEntry[] = [
     keywords: ["pinyin", "phiên âm", "han viet", "chuyen doi"],
   },
   {
+    href: "/bai-tap-tu-vung-tieng-trung",
+    title: "Bài tập từ vựng có đáp án",
+    description: "Dán danh sách từ, nhận tờ bài tập A4: nối chữ với pinyin hoặc nghĩa, viết pinyin, viết chữ Hán vào ô, kèm trang đáp án để in.",
+    icon: "list_alt",
+    category: "writing",
+    keywords: ["bai tap", "tu vung", "worksheet", "noi chu", "dap an", "in"],
+  },
+  {
     href: "/tu-vung-hsk",
     title: "Từ vựng HSK có âm Hán Việt",
     description: "Danh sách từ HSK 1–6 kèm pinyin, âm Hán Việt và nghĩa. Tìm nhanh, tải CSV để nạp vào Anki, hoặc in thành bảng A4 có ô tích.",
