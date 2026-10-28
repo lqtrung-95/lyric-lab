@@ -42,12 +42,12 @@ export function RoleplayPractice({ openingPinyin }: { openingPinyin: Record<stri
           ))}
         </div>
       </fieldset>
-      <ul className="grid gap-2 sm:grid-cols-2">
+      <ul className="grid auto-rows-fr gap-3 sm:grid-cols-2">
         {SCENARIOS.map((s) => (
-          <li key={s.id}>
-            <button type="button" onClick={() => setScenario(s)} className="flex min-h-16 w-full items-start gap-3 rounded-xl border-2 border-ink bg-surface-container-lowest p-space-sm text-left hover:bg-surface-container-low">
-              <span aria-hidden className="text-2xl">{s.emoji}</span>
-              <span><span className="block text-label-lg font-extrabold">{s.title}</span><span className="block text-body-sm text-on-surface-variant">{s.goal}</span></span>
+          <li key={s.id} className="flex">
+            <button type="button" onClick={() => setScenario(s)} className="flex min-h-20 w-full items-center gap-3 rounded-xl border-2 border-ink bg-surface-container-lowest p-space-sm text-left hover:bg-surface-container-low">
+              <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-2xl">{s.emoji}</span>
+              <span className="min-w-0"><span className="block text-label-lg font-extrabold">{s.title}</span><span className="block text-body-sm text-on-surface-variant">{s.goal}</span></span>
             </button>
           </li>
         ))}
