@@ -2,7 +2,8 @@ import { pinyinForms } from "@/lib/practice/pinyin-answer";
 
 /** Một âm tiết tách thành phụ âm đầu, vần và thanh (1–5; 5 = thanh nhẹ). */
 export interface Syl { initial: string; final: string; tone: number }
-export type Mark = "hit" | "near" | "miss";
+/** `unk`: người chơi không gõ thanh nên chưa có thông tin về thanh ở âm tiết đó. */
+export type Mark = "hit" | "near" | "miss" | "unk";
 
 const INITIALS = ["zh", "ch", "sh", "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "j", "q", "x", "r", "z", "c", "s", "y", "w"];
 const FINALS = new Set(("a o e i u v ai ei ao ou an en ang eng ong ia ie iao iu ian in iang ing iong ua uo uai ui uan un uang ue er").split(" "));
@@ -56,16 +57,17 @@ export interface GuessMarks { initial: Mark[]; final: Mark[]; tone: Mark[] }
 
 /** Chấm một lượt đoán: phụ âm đầu, vần, thanh được chấm riêng từng nhóm (như Pinyle). */
 export function scoreGuess(answer: readonly Syl[], guess: readonly Syl[]): GuessMarks {
+  const tone = wordleMarks(answer.map((s) => s.tone), guess.map((s) => s.tone)).map((m, i): Mark => (guess[i].tone === 0 ? "unk" : m));
   return {
     initial: wordleMarks(answer.map((s) => s.initial), guess.map((s) => s.initial)),
     final: wordleMarks(answer.map((s) => s.final), guess.map((s) => s.final)),
-    tone: wordleMarks(answer.map((s) => s.tone), guess.map((s) => s.tone)),
+    tone,
   };
 }
 
 export const isSolved = (m: GuessMarks): boolean => [...m.initial, ...m.final, ...m.tone].every((x) => x === "hit");
 
-const EMOJI: Record<Mark, string> = { hit: "🟩", near: "🟨", miss: "⬛" };
+const EMOJI: Record<Mark, string> = { hit: "🟩", near: "🟨", miss: "⬛", unk: "⬜" };
 
 /** Một hàng kết quả để chia sẻ (không lộ đáp án): mỗi âm tiết ba ô, các âm tiết cách nhau một khoảng trắng. */
 export function shareRow(m: GuessMarks): string {

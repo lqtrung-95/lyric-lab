@@ -265,4 +265,4 @@ Kho hội thoại hai người, tự viết, tĩnh trong mã (`authored-dialogue
 - Hán tự mỗi ngày: từ của ngày chọn theo hạt giống là khóa ngày giờ Việt Nam; mỗi âm tiết tách phụ âm đầu / vần / thanh (`parseSyllable`) và chấm Wordle riêng từng nhóm; tiến độ và chuỗi thắng lưu localStorage (`daily-store`).
 - Đấu 1–1: kênh Realtime `duel:<mã>` (broadcast `state` + presence), tin được kiểm dạng bằng `parseDuelState`; mỗi người tự đo giờ, bỏ qua một từ cộng 5 giây; không lưu gì vào cơ sở dữ liệu. Mã phòng dùng chung dạng `COOP_CODE`.
 - Điểm: `PracticeMode` thêm `blaster`, `rain`, `whack`, `daily`, `duel`; `arcadeRound` đưa kết quả về khuôn bảng điểm (tối đa 20 mục, 150 điểm mỗi mục).
-
+- Âm thanh game: `arcade-sfx.ts` tổng hợp bằng WebAudio trên `audio-context.ts` dùng chung, công tắc lưu localStorage `songhanzi-arcade-sound`; hoạt ảnh CSS gom ở `game-keyframes.tsx` (chỉ chạy khi không bật giảm chuyển động).

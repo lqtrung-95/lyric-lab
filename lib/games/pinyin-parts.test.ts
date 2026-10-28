@@ -45,6 +45,12 @@ describe("wordleMarks", () => {
 describe("scoreGuess", () => {
   const ans = syllablesOf("péng yǒu")!;
   it("đoán đúng hoàn toàn", () => { expect(isSolved(scoreGuess(ans, ans))).toBe(true); });
+  it("không gõ thanh thì ô thanh là chưa biết, và chưa tính là thắng", () => {
+    const g = scoreGuess(ans, syllablesOf("péng yǒu")!.map((s) => ({ ...s, tone: 0 })));
+    expect(g.tone).toEqual(["unk", "unk"]);
+    expect(isSolved(g)).toBe(false);
+    expect(shareRow(g)).toBe("🟩🟩⬜ 🟩🟩⬜");
+  });
   it("chấm từng nhóm và tạo hàng chia sẻ", () => {
     const g = scoreGuess(ans, syllablesOf("péng yǒu")!.map((s, i) => (i === 1 ? { ...s, tone: 4 } : s)));
     expect(g.tone).toEqual(["hit", "miss"]);

@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
-import { playSfx } from "@/lib/feedback/sfx";
+import { sfx } from "@/lib/games/arcade-sfx";
 import { arcadeRound } from "@/lib/games/arcade-score";
 import type { GameWord } from "@/lib/games/game-word";
 import { melodyNote, playNote } from "@/lib/games/melody";
 import { DIFFICULTY, LANES, RAIN_LIVES, ROW_H, activeRow, initRain, stepRain, tapLane, type Difficulty, type RainState } from "@/lib/games/rain-engine";
+import { GameKeyframes } from "./game-keyframes";
+import { SoundToggle } from "./sound-toggle";
 import { useArcadeScore } from "./use-arcade-score";
 import { useGameLoop } from "./use-game-loop";
 
@@ -25,13 +27,18 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const [started, setStarted] = useState(false);
   const [music, setMusic] = useState(true);
   useGameLoop((dt) => setS((cur) => stepRain(cur, dt, words, Math.random)), started && !s.over);
+  const lives = useRef(s.lives);
+  useEffect(() => {
+    if (s.lives < lives.current) { if (s.over) sfx.gameOver(); else sfx.miss(); }
+    lives.current = s.lives;
+  }, [s.lives, s.over]);
   const { saved } = useArcadeScore("rain", s.over, (sec) => (s.cleared > 0 ? arcadeRound(s.score, s.cleared, s.cleared + s.missed.length, sec) : null));
 
   function tap(lane: number) {
     setS((cur) => {
       const next = tapLane(cur, lane);
-      if (next.cleared > cur.cleared) { if (music) playNote(melodyNote(cur.cleared)); else playSfx("correct"); }
-      else if (next !== cur) playSfx("wrong");
+      if (next.cleared > cur.cleared) { if (music) playNote(melodyNote(cur.cleared)); else sfx.pop(next.combo); if (next.level > cur.level) sfx.levelUp(); }
+      else if (next !== cur) sfx.buzz();
       return next;
     });
   }
@@ -60,13 +67,15 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const active = activeRow(s);
   return (
     <div>
+      <GameKeyframes />
       {saved && <p role="status" className="mb-2 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
       <div className={`relative isolate h-[min(72vh,600px)] min-h-[420px] touch-manipulation select-none overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#1a0b3a] to-[#311a6b] ${s.shake > 0 ? "ring-4 ring-red-500" : ""}`}>
         <div className="absolute inset-x-0 top-0 z-10 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-b from-black/60 to-transparent p-3">
           <span className={chip}>🎵 {s.score}</span>
           <span className={chip}>Cấp {s.level}</span>
           <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: RAIN_LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join(" ")}</span>
-          {s.combo >= 2 && <span className={`${chip} text-amber-300`}>Combo ×{s.combo}</span>}
+          {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}>🔥 Combo ×{s.combo}</span>}
+          <SoundToggle className={`${chip} min-h-11 min-w-11`} />
         </div>
         {active && (
           <div className="absolute inset-x-3 top-14 z-10 flex items-center justify-center gap-3 rounded-2xl bg-white/90 px-3 py-2 text-slate-900" role="status" aria-live="polite">

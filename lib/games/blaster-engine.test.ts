@@ -46,5 +46,28 @@ describe("blaster", () => {
     s = { ...s, lives: 1, targets: [{ ...withTargets().targets[0], y: 0.99 }], nextSpawn: 99 };
     expect(stepBlaster(s, 5, pool, first).over).toBe(true);
   });
+  it("mỗi phím đúng bắn một tia, nổ từ kèm điểm để hiện số bay lên", () => {
+    const s = stepBlaster(initBlaster(), 0.5, pool, first);
+    const partial = typeLetter(s, s.targets[0].letters[0]);
+    expect(partial.shots).toHaveLength(1);
+    const done = typeAll(s, s.targets[0].letters);
+    expect(done.shots).toHaveLength(s.targets[0].letters.length);
+    expect(done.blasts[0].points).toBe(done.score);
+  });
+  it("mất mạng thì màn hình rung, rồi hết rung", () => {
+    let s = stepBlaster(initBlaster(), 0.5, pool, first);
+    s = stepBlaster({ ...s, nextSpawn: 99 }, 100, pool, first);
+    expect(s.shake).toBeGreaterThan(0);
+    expect(stepBlaster({ ...s, nextSpawn: 99 }, 1, pool, first).shake).toBe(0);
+  });
+  it("lên cấp thì bật biểu ngữ", () => {
+    let s = initBlaster();
+    for (let i = 0; i < 6; i++) {
+      s = stepBlaster({ ...s, nextSpawn: 0, targets: [] }, 0.01, pool, first);
+      s = typeAll(s, s.targets[0].letters);
+    }
+    expect(s.level).toBe(2);
+    expect(s.levelUp).toBeGreaterThan(0);
+  });
   it("cấp cao thì từ xuất hiện dày hơn", () => { expect(spawnGap(5)).toBeLessThan(spawnGap(1)); });
 });

@@ -35,7 +35,7 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const g = parseGuess(text);
-    if (!g) { setError("Gõ đúng 2 âm tiết kèm số thanh 1–5, ví dụ: peng2 you3 (thanh nhẹ là 5)."); return; }
+    if (!g) { setError("Gõ 2 âm tiết cách nhau bằng dấu cách, ví dụ: peng you hoặc peng2 you3 (thanh nhẹ là 5)."); return; }
     if (guessesFor(blob, todayKey).includes(g.norm)) { setError("Bạn đã đoán từ này rồi."); return; }
     const hit = isSolved(scoreGuess(answerSyls!, g.syls));
     const done = hit || rows.length + 1 >= DAILY_TRIES;
@@ -62,17 +62,22 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
         <span>🔥 Chuỗi {streak} · Thắng {wins}/{played}</span>
       </div>
       <DailyBoard rows={rows} tries={DAILY_TRIES} />
-      {!over && rows.length >= 4 && <p className="text-body-md text-secondary">Gợi ý: chữ đầu tiên là <span lang="zh-Hans" className="text-headline-md font-bold">{answer.han[0]}</span></p>}
+      {!over && rows.length >= 2 && (
+        <p className="flex flex-wrap items-center gap-2 text-body-md text-secondary">
+          Gợi ý: {rows.length >= 4 ? "từ này là" : "chữ đầu tiên là"} <span lang="zh-Hans" className="text-headline-md font-bold">{rows.length >= 4 ? answer.han : answer.han[0]}</span>
+          <PronounceButton text={rows.length >= 4 ? answer.han : answer.han[0]} />
+        </p>
+      )}
       {!over && (
         <form onSubmit={submit} className="flex flex-col gap-2">
-          <label htmlFor="daily-guess" className="text-label-md font-bold">Từ hai chữ (HSK 2–4). Gõ pinyin kèm số thanh, ví dụ <span className="font-mono">peng2 you3</span></label>
+          <label htmlFor="daily-guess" className="text-label-md font-bold">Từ hai chữ (HSK 2–4). Gõ 2 âm tiết cách nhau bằng dấu cách: <span className="font-mono">peng you</span> để dò âm trước, thêm số thanh <span className="font-mono">peng2 you3</span> khi đã chắc</label>
           <div className="flex gap-2">
             <input id="daily-guess" value={text} onChange={(e) => { setText(e.target.value); setError(null); }} autoComplete="off" autoCapitalize="off" autoCorrect="off" spellCheck={false}
               className="min-h-12 min-w-0 flex-1 rounded-2xl bg-surface-container px-4 font-mono text-body-lg outline-none ring-2 ring-transparent focus:ring-secondary" />
             <button type="submit" disabled={!text.trim()} className="min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110 disabled:opacity-50">Đoán</button>
           </div>
           {error && <p role="alert" className="text-label-md font-bold text-error">{error}</p>}
-          <p className="text-body-sm text-on-surface-variant">Ô xanh ✓: đúng vị trí. Ô vàng ~: có trong từ nhưng sai vị trí. Ô xám: không có. Ba ô mỗi âm tiết là phụ âm đầu, vần, thanh.</p>
+          <p className="text-body-sm text-on-surface-variant">Ô xanh ✓: đúng vị trí. Ô vàng ~: có trong từ nhưng sai vị trí. Ô xám: không có. Ô ? : bạn chưa gõ thanh. Ba ô mỗi âm tiết là phụ âm đầu, vần, thanh. Muốn thắng phải gõ đủ thanh. Đoán sai 2 lượt sẽ có gợi ý chữ Hán.</p>
         </form>
       )}
       {over && (

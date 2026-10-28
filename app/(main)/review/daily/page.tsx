@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function DailyPage() {
   const bank = await loadGameWords();
   return (
-    <ArcadeShell title="Hán tự mỗi ngày" intro="Mỗi ngày một từ hai chữ, cả nước cùng đoán. Gõ pinyin kèm số thanh, mỗi âm tiết được chấm phụ âm đầu, vần và thanh. Thắng thì chia sẻ kết quả cho bạn bè.">
+    <ArcadeShell title="Hán tự mỗi ngày" intro="Mỗi ngày một từ hai chữ, cả nước cùng đoán. Gõ pinyin (thanh gõ hay không đều được, nhưng muốn thắng phải đủ thanh); mỗi âm tiết được chấm phụ âm đầu, vần và thanh. Thắng thì chia sẻ kết quả cho bạn bè.">
       <DailyGame bank={bank} todayKey={dayKey(new Date())} />
     </ArcadeShell>
   );

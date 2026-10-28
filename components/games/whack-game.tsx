@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
-import { playSfx } from "@/lib/feedback/sfx";
+import { GameKeyframes } from "./game-keyframes";
+import { SoundToggle } from "./sound-toggle";
+import { WhackHole } from "./whack-hole";
+import { sfx } from "@/lib/games/arcade-sfx";
 import { arcadeRound } from "@/lib/games/arcade-score";
 import type { GameWord } from "@/lib/games/game-word";
 import { WHACK_SECONDS, makeWhackRound, whackPoints, windowMs, type WhackRound } from "@/lib/games/whack-round";
@@ -25,6 +28,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const [g, setG] = useState<Play>(() => fresh(words));
   const [left, setLeft] = useState(WHACK_SECONDS);
   const [flash, setFlash] = useState<number | null>(null);
+  const [fx, setFx] = useState<{ cell: number; points: number } | null>(null);
   const endAt = useRef(0);
   const roundStart = useRef(0);
   const win = windowMs(g.played);
@@ -39,11 +43,13 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
     if (phase !== "play" || !g.round) return;
     if (g.round.cells[cell]?.han === g.round.answer.han) {
       const frac = 1 - msSince(roundStart.current) / win;
-      playSfx("correct");
-      setG((c) => advance(c, true, whackPoints(frac, c.combo)));
+      const points = whackPoints(frac, g.combo);
+      sfx.pop(g.combo);
+      setFx({ cell, points });
+      setG((c) => advance(c, true, points));
     } else {
       endAt.current -= PENALTY_MS;
-      playSfx("wrong");
+      sfx.buzz();
       setFlash(cell);
       setG((c) => ({ ...c, combo: 0 }));
     }
@@ -59,6 +65,12 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
     const id = setInterval(() => { const sec = Math.max(0, Math.ceil((endAt.current - Date.now()) / 1000)); setLeft(sec); if (sec <= 0) setPhase("over"); }, 200);
     return () => clearInterval(id);
   }, [phase]);
+  useEffect(() => {
+    if (!fx) return;
+    const t = setTimeout(() => setFx(null), 700);
+    return () => clearTimeout(t);
+  }, [fx]);
+  useEffect(() => { if (phase === "over") sfx.gameOver(); }, [phase]);
   useEffect(() => {
     if (flash === null) return;
     const t = setTimeout(() => setFlash(null), 350);
@@ -78,8 +90,10 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   return (
     <div>
       {saved && <p role="status" className="mb-2 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
+      <GameKeyframes />
       <div className="flex flex-wrap items-center justify-between gap-2 text-label-lg font-extrabold">
         <span>🔨 {g.score}</span>
+        <SoundToggle className="min-h-11 min-w-11 rounded-full bg-surface-container-low text-xl" />
         <span role="timer" aria-label={`Còn ${left} giây`} className={`rounded-full border-2 border-ink px-3 py-1 ${left <= 5 && phase === "play" ? "animate-pulse bg-error text-on-error" : "bg-surface-container-lowest"}`}>⏱ {left}s</span>
         {g.combo >= 2 && <span className="text-secondary">Combo ×{g.combo}</span>}
       </div>
@@ -88,16 +102,16 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
         <span className="text-headline-md font-extrabold text-primary">{g.round?.answer.pinyin}</span>
         {g.round && <PronounceButton text={g.round.answer.han} />}
       </div>
-      <ul className="mt-space-sm grid grid-cols-3 gap-2 sm:gap-3">
-        {(g.round?.cells ?? []).map((w, i) => (
-          <li key={i}>
-            <button type="button" disabled={phase !== "play" || !w} onClick={() => hit(i)} aria-label={w ? `Chữ ${w.han}` : "Hố trống"}
-              className={`flex aspect-square w-full items-center justify-center rounded-3xl border-2 border-ink text-4xl font-extrabold transition-transform sm:text-5xl ${w ? "bg-amber-200 text-slate-900 shadow-[0_4px_0_#1e1a16] active:translate-y-1 active:shadow-none" : "bg-surface-container-high"} ${flash === i ? "animate-pulse !bg-error !text-on-error" : ""}`}>
-              {w && <span lang="zh-Hans">{w.han}</span>}
-            </button>
-          </li>
-        ))}
-      </ul>
+      {phase === "play" && <div className="mx-auto mt-1 h-1.5 max-w-md overflow-hidden rounded-full bg-surface-container-high"><div key={g.no} className="bz-shrink h-full rounded-full bg-primary" style={{ "--win": `${win}ms` } as React.CSSProperties} /></div>}
+      <div className="mx-auto mt-space-sm max-w-md rounded-3xl border-4 border-[#2f5d1f] bg-gradient-to-b from-[#7cc15a] to-[#4c9a35] p-3 shadow-[0_6px_0_#2f5d1f] sm:p-4">
+        <ul className="grid grid-cols-3 gap-x-2 gap-y-1 sm:gap-x-3">
+          {(g.round?.cells ?? []).map((w, i) => (
+            <li key={`${g.no}-${i}`}>
+              <WhackHole word={w} index={i} disabled={phase !== "play"} flash={flash === i} fx={fx?.cell === i ? { points: fx.points } : null} onHit={() => hit(i)} />
+            </li>
+          ))}
+        </ul>
+      </div>
       {phase === "idle" && (
         <div className="mt-space-md text-center">
           <p className="text-body-md text-on-surface-variant">30 giây. Đọc pinyin ở trên rồi đập đúng chữ. Đập sai trừ 2 giây.</p>

@@ -1,3 +1,6 @@
+import { isArcadeMuted } from "./arcade-sfx";
+import { getAudioContext } from "./audio-context";
+
 // Giai điệu "Mạt Lỵ Hoa" (茉莉花, dân ca Trung Quốc, thuộc phạm vi công cộng) cho Nhạc rơi: mỗi lần chạm đúng phát nốt kế tiếp, nên chơi đúng là "đánh" được bài hát.
 // Ghi bằng số nửa cung so với nốt Đô giữa (C4); gam ngũ cung nên chạm nhịp nào nghe cũng êm.
 const MELODY = [4, 4, 7, 9, 12, 9, 7, 7, 4, 7, 9, 7, 4, 4, 7, 9, 12, 9, 7, 7, 4, 7, 9, 7, 7, 7, 4, 7, 9, 12, 9, 7, 4, 2, 4, 2, 0];
@@ -7,13 +10,12 @@ export const melodyNote = (i: number): number => MELODY[((i % MELODY.length) + M
 export const melodyLength = MELODY.length;
 export const noteFrequency = (semitonesFromC4: number): number => 261.63 * 2 ** (semitonesFromC4 / 12);
 
-let ctx: AudioContext | null = null;
-
-/** Phát một nốt nhạc ngắn (sóng tam giác, tắt dần). Phải gọi sau thao tác người dùng; mọi lỗi âm thanh bị nuốt vì đây chỉ là phần thưởng. */
+/** Phát một nốt nhạc ngắn (sóng tam giác, tắt dần), tôn trọng công tắc âm thanh của game. Phải gọi sau thao tác người dùng; mọi lỗi âm thanh bị nuốt vì đây chỉ là phần thưởng. */
 export function playNote(semitonesFromC4: number): void {
   try {
-    ctx ??= new AudioContext();
-    if (ctx.state === "suspended") void ctx.resume();
+    if (isArcadeMuted()) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
     const t = ctx.currentTime;
     const osc = ctx.createOscillator(), gain = ctx.createGain();
     osc.type = "triangle";
