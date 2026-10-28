@@ -38,3 +38,4 @@ scripts/pr-video/voice/
 # bản chép/audio tạm của scripts/transcribe-video.mts
 /tmp/
 
+/public/_trial/
