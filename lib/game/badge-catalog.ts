@@ -21,6 +21,9 @@ export interface BadgeFacts {
   exploreRounds: number;
   casesSolved: number;
   hardCasesSolved: number;
+  /** Số vụ án đã giải cùng bạn (chế độ phá án cùng bạn) và số ngày khác nhau đã chơi chung. */
+  coopCasesSolved: number;
+  coopDays: number;
 }
 
 export type BadgeGroup = "learn" | "streak" | "listen" | "speak" | "battle" | "explore";
@@ -55,6 +58,8 @@ export const BADGES: BadgeDef[] = [
   { id: "battle-won", group: "battle", title: "Bất bại", hint: "Thắng {n} ván thi đấu", metric: "roomsWon", thresholds: [1, 5, 20, 50] },
   { id: "explore-rounds", group: "explore", title: "Nhà thám hiểm", hint: "Làm {n} nhiệm vụ ở cảnh Khám phá", metric: "exploreRounds", thresholds: [3, 15, 50, 150] },
   { id: "explore-cases", group: "explore", title: "Thám tử", hint: "Phá {n} vụ án", metric: "casesSolved", thresholds: [1, 3, 6, 10] },
+  { id: "explore-duo", group: "explore", title: "Cặp thám tử", hint: "Cùng bạn phá {n} vụ án", metric: "coopCasesSolved", thresholds: [1, 3, 6, 10] },
+  { id: "explore-duo-days", group: "explore", title: "Bạn đồng hành", hint: "Phá án chung vào {n} ngày khác nhau", metric: "coopDays", thresholds: [2, 5, 10] },
   { id: "explore-hard", group: "explore", title: "Thám tử cừ khôi", hint: "Phá {n} vụ án mức Khó", metric: "hardCasesSolved", thresholds: [1, 2, 3] },
   { id: "hidden-perfect", group: "learn", title: "Hoàn hảo", hint: "Đúng hết một lượt luyện tập (từ 5 câu) {n} lần", hidden: true, metric: "perfectRounds", thresholds: [1, 10, 50, 200] },
   { id: "hidden-night-owl", group: "learn", title: "Cú đêm", hint: "Ôn thẻ lúc 0–5 giờ sáng {n} lần", hidden: true, metric: "nightReviews", thresholds: [1, 20, 100] },

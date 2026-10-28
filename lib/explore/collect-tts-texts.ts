@@ -1,4 +1,6 @@
 import { ALL_DIALOGUES } from "@/lib/dialogues/dialogue-catalog";
+import { allComposedMessages } from "./coop/coop-messages";
+import { COOP_PHRASES } from "./coop/coop-state";
 import { splitForTts } from "@/lib/speech/split-for-tts";
 import { normalizeTtsText } from "@/lib/tts/tts-text";
 import { commandText } from "./quest-commands";
@@ -20,6 +22,9 @@ export function collectExploreTtsTexts(): string[] {
     for (const l of s.conversation?.lines ?? []) raw.push(l.zh);
   }
   for (const d of ALL_DIALOGUES) for (const l of d.lines) raw.push(l.zh);
+  // Chế độ phá án cùng bạn: câu nói nhanh và mọi câu ghép từ mẫu (người nhận bấm loa nghe).
+  for (const p of COOP_PHRASES) raw.push(p.zh);
+  for (const m of allComposedMessages()) raw.push(m.zh);
   for (const st of Object.values(SCENE_STORIES)) raw.push(st.title.zh, ...st.lines.map((l) => l.zh), st.question.right, ...st.question.wrong);
   for (const c of Object.values(CASES)) {
     for (const clue of c.clues) raw.push(clue.zh);

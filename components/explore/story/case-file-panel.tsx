@@ -22,10 +22,12 @@ interface Props {
   onAccuse: () => void;
   onLink: (a: string, b: string) => LinkResult;
   onClose: () => void;
+  /** Chơi chung: manh mối là riêng của người tìm ra, nút "Báo cho đồng đội" gửi nó (bằng tiếng Trung) sang sổ của người kia. */
+  coop?: { reported: string[]; partnerOnline: boolean; onReport: (clueId: string) => void };
 }
 
 /** Sổ vụ án: các manh mối đã tìm (đọc lại, nghe lại), các nghi phạm và lời khai của họ, nút buộc tội khi đủ điều kiện. */
-export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, canAccuse, solved, onAccuse, onLink, onClose }: Props) {
+export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, canAccuse, solved, onAccuse, onLink, onClose, coop }: Props) {
   const found = story.clues.filter((c) => progress.clues.includes(c.id));
   const hasDeductions = story.clues.some((c) => c.kind === "deduction");
   return (
@@ -55,13 +57,22 @@ export function CaseFilePanel({ story, progress, pinyin, hints, onToggleHint, ca
 
       <h3 className="mt-space-sm text-label-md font-extrabold">Manh mối ({found.filter((c) => c.kind !== "deduction").length})</h3>
       {found.length === 0 ? <p className="text-body-md text-on-surface-variant">Chưa có manh mối nào. Hãy xem xét căn phòng và hỏi mọi người.</p> : (
-        <ul className="mt-1 space-y-2">{found.map((c) => <li key={c.id} className="rounded-xl bg-surface-container-low p-space-sm"><ClueBody clue={c} pinyin={pinyin} hints={hints} /></li>)}</ul>
+        <ul className="mt-1 space-y-2">{found.map((c) => (
+          <li key={c.id} className="rounded-xl bg-surface-container-low p-space-sm">
+            <ClueBody clue={c} pinyin={pinyin} hints={hints} />
+            {coop && (
+              <button type="button" disabled={!coop.partnerOnline} onClick={() => coop.onReport(c.id)} className="mt-2 min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-extrabold disabled:opacity-40">
+                {coop.reported.includes(c.id) ? "Đã báo ✓ (báo lại)" : coop.partnerOnline ? "Báo cho đồng đội" : "Báo cho đồng đội (chờ họ online)"}
+              </button>
+            )}
+          </li>
+        ))}</ul>
       )}
 
       {hasDeductions && <LinkClues found={found} onLink={onLink} />}
 
       <div className="mt-space-sm flex flex-wrap items-center gap-3">
-        {!solved && <Button3d variant="secondary" disabled={!canAccuse} onClick={onAccuse}>Buộc tội</Button3d>}
+        {!solved && <Button3d variant="secondary" disabled={!canAccuse} onClick={onAccuse}>{coop ? "Đề nghị buộc tội" : "Buộc tội"}</Button3d>}
         {!solved && !canAccuse && <p className="text-label-md text-on-surface-variant">Cần hỏi hết mọi người và nghe nhân chứng trước.</p>}
         {solved && <p role="status" className="text-label-md font-extrabold text-secondary">Vụ án đã được giải!</p>}
       </div>

@@ -1,4 +1,5 @@
 import "server-only";
+import { parseCoopRecord } from "@/lib/explore/coop/coop-reward";
 import { CASES } from "@/lib/explore/story/cases";
 import { countSolvedCases } from "@/lib/explore/story/solved-cases";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
@@ -22,6 +23,8 @@ export interface GameData {
   levelsCompleted: number;
   casesSolved?: number;
   hardCasesSolved?: number;
+  coopCasesSolved?: number;
+  coopDays?: number;
   claims: QuestClaimRow[];
   storedBadges: EarnedBadge[];
   frozenDays: string[];
@@ -60,6 +63,7 @@ export async function loadGameData(userId: string): Promise<GameData> {
     sb.from("user_explore_state").select("data").eq("user_id", userId).eq("kind", "story").maybeSingle(),
   ]);
   const solved = countSolvedCases(story.data?.data, CASES);
+  const coop = parseCoopRecord((story.data?.data as { coop?: unknown } | null)?.coop);
   return {
     timeZone: profile.data?.timezone ?? DEFAULT_TIMEZONE,
     raw: {
@@ -73,6 +77,8 @@ export async function loadGameData(userId: string): Promise<GameData> {
     levelsCompleted: finals.count ?? 0,
     casesSolved: solved.solved,
     hardCasesSolved: solved.hardSolved,
+    coopCasesSolved: coop.solved.length,
+    coopDays: coop.days.length,
     claims: rows(claims).map((r) => ({ questId: r.quest_id as string, rewardXp: r.reward_xp as number, freezeGranted: r.freeze_granted === true, claimedAt: r.claimed_at as string })),
     storedBadges: rows(badges).map((r) => ({ id: r.badge_id as string, tier: r.tier as BadgeTier, earnedAt: r.earned_at as string })),
     frozenDays: rows(freezes).map((r) => r.day as string),

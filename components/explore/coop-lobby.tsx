@@ -28,6 +28,16 @@ export function CoopLobby({ cases }: { cases: LobbyCase[] }) {
 
   return (
     <div className="flex flex-col gap-space-md">
+      <section aria-labelledby="coop-how" className="card-ink flex flex-col gap-space-sm bg-secondary-container p-space-md text-on-secondary-container">
+        <h2 id="coop-how" className="text-headline-md">Cách chơi cùng bạn</h2>
+        <ol className="list-decimal space-y-1 pl-5 text-body-md">
+          <li>Mỗi người phụ trách một nửa số cảnh: chỉ bạn hỏi được nhân vật và tìm manh mối ở cảnh của mình.</li>
+          <li>Manh mối bạn tìm là <strong>riêng của bạn</strong>. Mở Sổ vụ án và bấm &quot;Báo cho đồng đội&quot;: họ đọc câu tiếng Trung rồi mới ghi vào sổ của họ.</li>
+          <li>Hai người nói chuyện bằng câu tiếng Trung soạn từ mẫu (ví dụ &quot;我在医院。&quot;).</li>
+          <li>Buộc tội cần cả hai: một người đề nghị, người kia đọc bằng chứng và đồng ý thì mới chấm.</li>
+        </ol>
+        <p className="text-label-md font-bold">Phá án xong cùng nhau: XP nhân 1,5 và mở huy hiệu &quot;Cặp thám tử&quot;, &quot;Bạn đồng hành&quot;.</p>
+      </section>
       <section aria-labelledby="coop-create" className="card-ink flex flex-col gap-space-sm p-space-md">
         <h2 id="coop-create" className="text-headline-md">Tạo phòng</h2>
         <fieldset className="flex flex-col gap-1.5">

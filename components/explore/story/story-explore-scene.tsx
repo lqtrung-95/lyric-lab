@@ -36,7 +36,7 @@ export function StoryExploreScene({ scene, payload, basePath, coop }: { scene: S
     <>
       {controller.coop && (
         <div className="mx-auto mb-space-md w-full max-w-3xl">
-          <CoopBar coop={controller.coop} payload={payload} sceneId={scene.id} onOpenCase={() => controller.setView({ kind: "case" })} />
+          <CoopBar coop={controller.coop} payload={payload} sceneId={scene.id} hasClue={(id) => controller.progress.clues.includes(id)} onOpenCase={() => controller.setView({ kind: "case" })} />
         </div>
       )}
       <ExploreScene scene={storyScene} story={{ payload, controller, basePath }} />

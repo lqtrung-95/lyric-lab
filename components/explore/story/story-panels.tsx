@@ -24,9 +24,9 @@ function PanelBody({ payload, sc, basePath, sceneId }: { payload: StoryPayload; 
     return clue ? <ClueCard clue={clue} pinyin={pinyin} hints={hints} onToggleHint={toggle} onClose={sc.close} onOpenCase={() => sc.setView({ kind: "case" })} /> : null;
   }
   if (view.kind === "case") {
-    return <CaseFilePanel story={story} progress={sc.progress} pinyin={pinyin} hints={hints} onToggleHint={toggle} canAccuse={sc.canAccuse} solved={sc.solved} onAccuse={() => sc.setView({ kind: "accuse" })} onLink={sc.link} onClose={sc.close} />;
+    return <CaseFilePanel story={story} progress={sc.progress} pinyin={pinyin} hints={hints} onToggleHint={toggle} canAccuse={sc.canAccuse} solved={sc.solved} onAccuse={() => sc.setView({ kind: "accuse" })} onLink={sc.link} onClose={sc.close} coop={sc.coop ? { reported: sc.coop.reported, partnerOnline: sc.coop.partnerOnline, onReport: sc.coop.report } : undefined} />;
   }
-  if (view.kind === "accuse") return <AccusePanel story={story} progress={sc.progress} hints={hints} verdict={sc.verdict} onSubmit={sc.accuse} onClose={sc.close} />;
+  if (view.kind === "accuse") return <AccusePanel story={story} progress={sc.progress} hints={hints} verdict={sc.verdict} onSubmit={sc.accuse} onClose={sc.close} coop={sc.coop ? { pending: !!sc.coop.pending } : undefined} />;
 
   const entries: MapEntry[] = Object.keys(SCENES).map((id) => ({ id, title: SCENES[id].title, here: id === sceneId, target: sc.objective?.sceneId === id, available: id in payloadScenes(story), locked: !sc.isSceneOpen(id) }));
   return <MapPanel entries={entries} basePath={basePath} onClose={sc.close} />;

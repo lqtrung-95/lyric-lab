@@ -72,7 +72,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
         <span aria-hidden="true" className="text-3xl">🕵️‍♀️🕵️</span>
         <span className="min-w-0 flex-1">
           <span className="block text-label-lg font-extrabold">Phá án cùng bạn</span>
-          <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Nói chuyện bằng tiếng Trung để ghép manh mối.</span>
+          <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Manh mối là riêng: báo nhau bằng tiếng Trung rồi cùng buộc tội. Thưởng XP x1,5.</span>
         </span>
         <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-secondary">Mời bạn</span>
       </Link>
