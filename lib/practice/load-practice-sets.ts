@@ -8,9 +8,9 @@ import { isEligible, isSingleClause, shuffleDifferent, toTiles, type OrderItem }
 
 export interface TruthSet { trials: Trial[]; pinyin: Record<string, string> }
 
-/** Một bộ "Hai thật một giả" ngẫu nhiên (đã xáo trộn ở server nên server và client thấy cùng thứ tự) kèm pinyin lấy từ từ điển. */
-export async function loadTruthSet(count = 8): Promise<TruthSet> {
-  const trials = pickRounds(count).map((r) => buildTrial(r));
+/** Một bộ "Hai thật một giả" (đã xáo trộn ở server nên server và client thấy cùng thứ tự) kèm pinyin lấy từ từ điển. Ngẫu nhiên, hoặc theo `rng` có hạt giống (phòng chơi cùng bạn: cả hai người nhận cùng một bộ). */
+export async function loadTruthSet(count = 8, rng: () => number = Math.random): Promise<TruthSet> {
+  const trials = pickRounds(count, rng).map((r) => buildTrial(r, rng));
   return { trials, pinyin: await annotatePinyin(trials.flatMap((t) => t.options.map((o) => o.zh))) };
 }
 
