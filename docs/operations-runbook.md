@@ -313,3 +313,9 @@ Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat
 - Chạy `supabase/migrations/20261028000002_speaking_reflex_modes.sql` trong Supabase SQL Editor (thêm loại hạn mức `stt`, `roleplay` vào `usage_events_kind_check` và chế độ điểm `reflex`, `fiveword`, `roleplay` vào `practice_scores_mode_check`). Chưa chạy: `/api/speech/transcribe` và `/api/roleplay/turn` lỗi khi trừ hạn mức; điểm XP của các bài này bị bỏ qua.
 - Dùng chung khóa Azure Speech của TTS/chấm phát âm (`AZURE_SPEECH_KEY`, `AZURE_SPEECH_REGION`, kèm khóa dự phòng `_2`); thiếu thì `/api/speech/transcribe` trả 503 và bài chuyển sang gõ chữ. Trò chuyện tự do dùng chuỗi model giải nghĩa (`EXPLAIN_MODELS`).
 - Chỉnh hạn mức: `stt` và `roleplay` ở `lib/rate-limit/usage-limit-config.ts` (tài khoản trong `unlimited-accounts` không bị giới hạn).
+
+## Game vui: migration
+
+- Chạy `supabase/migrations/20261028000003_arcade_game_modes.sql` trong Supabase SQL Editor (thêm chế độ điểm `blaster`, `rain`, `whack`, `daily`, `duel` vào `practice_scores_mode_check`). Chưa chạy thì game vẫn chơi được, chỉ điểm XP bị bỏ qua.
+- Đấu 1–1 dùng Supabase Realtime (broadcast + presence), không cần bảng mới. Kho từ chung phụ thuộc bảng `dict_words`; tra lỗi thì các trang Hán tự mỗi ngày và Đấu 1–1 báo chưa tải được từ.
+

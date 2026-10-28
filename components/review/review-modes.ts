@@ -36,6 +36,16 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
     ],
   },
   {
+    id: "arcade", title: "Game vui", blurb: "Chơi cho vui mà vẫn nhớ từ: bắn chữ, nhạc rơi, đấu với bạn",
+    modes: [
+      { href: "/review/blaster", label: "Bắn chữ", desc: "Từ Hán rơi xuống, gõ pinyin để bắn nổ", icon: "local_fire_department" },
+      { href: "/review/rain", label: "Nhạc rơi", desc: "Đọc pinyin, chạm đúng chữ như Piano Tiles", icon: "library_music" },
+      { href: "/review/whack", label: "Đập chữ", desc: "30 giây đập đúng chữ trong chín hố", icon: "timer" },
+      { href: "/review/daily", label: "Hán tự mỗi ngày", desc: "Mỗi ngày một từ, đoán bằng pinyin kiểu Wordle", icon: "calendar_month" },
+      { href: "/review/duel", label: "Đấu 1–1", desc: "Thách bạn gõ pinyin, ai nhanh hơn thắng", icon: "group" },
+    ],
+  },
+  {
     id: "compete", title: "Thi đấu", blurb: "So điểm với người học khác",
     modes: [{ href: "/review/leaderboard", label: "Xếp hạng", desc: "Bảng điểm luyện tập", icon: "leaderboard" }],
   },

@@ -258,3 +258,11 @@ Kho hội thoại hai người, tự viết, tĩnh trong mã (`authored-dialogue
 - Điểm: `PracticeMode` thêm `reflex`, `fiveword`, `roleplay`; `useWordGameScore` nhận `points` tính sẵn.
 - Trang `/review` là trang chủ chia nhóm (`review-modes.ts`); ôn thẻ ở `/review/cards`.
 
+## Game vui (`lib/games`, `components/games`, `app/(main)/review/{blaster,rain,whack,daily,duel}`)
+
+- Kho từ chung: `loadGameWords` (máy chủ, nhớ trong bộ nhớ) lấy từ hai chữ HSK 2–4 từ `hsk-themed-words.json`, pinyin từ từ điển qua `annotatePinyin`; sắp theo chữ để mọi máy chủ cho cùng thứ tự (từ trong ngày và bộ từ phòng đấu phải trùng nhau). Bắn chữ / Nhạc rơi / Đập chữ dùng từ đã lưu của người chơi, thiếu thì bổ sung từ kho (`useGameWords`).
+- Engine thuần (`blaster-engine`, `rain-engine`, `whack-round`, `duel`, `pinyin-parts`) tách khỏi giao diện để test; vòng khung hình `useGameLoop` (rAF, `dt` chặn 0,05 giây).
+- Hán tự mỗi ngày: từ của ngày chọn theo hạt giống là khóa ngày giờ Việt Nam; mỗi âm tiết tách phụ âm đầu / vần / thanh (`parseSyllable`) và chấm Wordle riêng từng nhóm; tiến độ và chuỗi thắng lưu localStorage (`daily-store`).
+- Đấu 1–1: kênh Realtime `duel:<mã>` (broadcast `state` + presence), tin được kiểm dạng bằng `parseDuelState`; mỗi người tự đo giờ, bỏ qua một từ cộng 5 giây; không lưu gì vào cơ sở dữ liệu. Mã phòng dùng chung dạng `COOP_CODE`.
+- Điểm: `PracticeMode` thêm `blaster`, `rain`, `whack`, `daily`, `duel`; `arcadeRound` đưa kết quả về khuôn bảng điểm (tối đa 20 mục, 150 điểm mỗi mục).
+
