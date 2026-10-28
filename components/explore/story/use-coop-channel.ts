@@ -4,11 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { otherRole, validPhrase, type CoopRole } from "@/lib/explore/coop/coop-state";
 import { parseProposal, parseReply, parseReport, parseVerdict, sharedFlags, type CaseIds, type ProposalEvent, type ReplyEvent, type ReportEvent, type VerdictEvent, type VerdictKind } from "@/lib/explore/coop/coop-events";
 import { parseMessage } from "@/lib/explore/coop/coop-messages";
-import type { VoiceClip } from "@/lib/speech/voice-clip";
+import { parseClip, type VoiceClip } from "@/lib/speech/voice-clip";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 
 export interface SharedState { flags: string[] }
-export interface CoopSay { from: CoopRole; zh: string; at: number }
+export interface CoopSay { from: CoopRole; zh: string; at: number; /** Giọng người nói đọc câu đó (nếu họ gửi kèm). */ clip?: VoiceClip }
 
 /** Các việc cần làm khi nhận tin từ đồng đội (đã kiểm tra dạng). */
 export interface CoopHandlers {
@@ -73,10 +73,11 @@ export function useCoopChannel({ code, caseId, role, state, ids, handlers, enabl
           handlersRef.current.onPartnerState({ flags: sharedFlags(p.flags) });
         })
         .on("broadcast", { event: "say" }, ({ payload }) => {
-          const p = payload as { from?: unknown; zh?: unknown };
+          const p = payload as { from?: unknown; zh?: unknown; clip?: unknown };
           const zh = validSay(p?.zh);
           if (p?.from === role || (p?.from !== "a" && p?.from !== "b") || !zh) return;
-          setSaid((cur) => [...cur.slice(-4), { from: p.from as CoopRole, zh, at: Date.now() }]);
+          const clip = p.clip === undefined ? null : parseClip(p.clip);
+          setSaid((cur) => [...cur.slice(-4), { from: p.from as CoopRole, zh, at: Date.now(), ...(clip ? { clip } : {}) }]);
         })
         .on("broadcast", { event: "report" }, ({ payload }) => { const e = parseReport(payload, idsRef.current); if (e && e.from !== role) handlersRef.current.onReport(e); })
         .on("broadcast", { event: "propose" }, ({ payload }) => { const e = parseProposal(payload, idsRef.current); if (e && e.from !== role) handlersRef.current.onProposal(e); })
@@ -106,11 +107,11 @@ export function useCoopChannel({ code, caseId, role, state, ids, handlers, enabl
     return () => clearTimeout(t);
   }, [stamp, connected, sendState]);
 
-  const say = useCallback((zh: string) => {
+  const say = useCallback((zh: string, clip?: VoiceClip) => {
     const ok = validSay(zh);
     if (!ok) return;
-    setSaid((cur) => [...cur.slice(-4), { from: role, zh: ok, at: Date.now() }]);
-    send("say", { zh: ok });
+    setSaid((cur) => [...cur.slice(-4), { from: role, zh: ok, at: Date.now(), ...(clip ? { clip } : {}) }]);
+    send("say", { zh: ok, ...(clip ? { clip } : {}) });
   }, [role, send]);
 
   const sendReport = useCallback((clueId: string, clip?: VoiceClip) => send("report", { clueId, ...(clip ? { clip } : {}) }), [send]);

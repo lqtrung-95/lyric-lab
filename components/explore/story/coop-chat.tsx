@@ -2,10 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/icon";
+import { RubyLine } from "@/components/ui/ruby-text";
+import { coopPinyin } from "@/lib/explore/coop/coop-pinyin";
 import { parseMessage } from "@/lib/explore/coop/coop-messages";
 import { COOP_PHRASES, ROLE_LABEL } from "@/lib/explore/coop/coop-state";
 import type { StoryPayload } from "@/lib/explore/story/load-story";
+import { playVoiceClip } from "./clip-player";
 import { CoopComposer } from "./coop-composer";
+import { HintToggles } from "./hint-toggles";
 import { CoopInbox } from "./coop-inbox";
 import type { useStoryController } from "./use-story-controller";
 import { useStoryHints } from "./use-story-hints";
@@ -22,7 +26,7 @@ const viOf = (zh: string): string | undefined => COOP_PHRASES.find((p) => p.zh =
  * Số trên bong bóng là tin chưa đọc + việc cần xử lý; đề nghị buộc tội của đồng đội tự mở khung vì cần trả lời. Trên điện thoại nằm trên thanh điều hướng dưới.
  */
 export function CoopChat({ coop, payload, hasClue, onOpenCase }: { coop: Coop; payload: StoryPayload; hasClue: (id: string) => boolean; onOpenCase: () => void }) {
-  const { hints } = useStoryHints();
+  const { hints, toggle: toggleHint } = useStoryHints();
   const [open, setOpen] = useState(false);
   const [seenAt, setSeenAt] = useState(() => Date.now());
   const [copied, setCopied] = useState(false);
@@ -51,6 +55,7 @@ export function CoopChat({ coop, payload, hasClue, onOpenCase }: { coop: Coop; p
             <h2 className="text-label-lg font-extrabold">Chat với {coop.partnerOnline ? ROLE_LABEL[coop.role === "a" ? "b" : "a"] : "đồng đội"}</h2>
             <button type="button" onClick={toggle} aria-label="Thu nhỏ chat" className="flex size-11 items-center justify-center rounded-full hover:bg-surface-container"><Icon name="close" size={20} /></button>
           </div>
+          <div className="max-sm:[&_button]:!min-h-9 max-sm:[&_button]:!px-2.5 max-sm:[&_button]:!text-[13px]"><HintToggles hints={hints} onToggle={toggleHint} /></div>
           <details className="text-label-md text-on-surface-variant">
             <summary className="min-h-9 cursor-pointer font-extrabold">Cách chơi cùng bạn</summary>
             <p className="mt-1">Manh mối bạn tìm là RIÊNG của bạn: mở <button type="button" onClick={onOpenCase} className="font-extrabold underline">Sổ vụ án</button> và bấm &ldquo;Báo cho đồng đội&rdquo; (hoặc &ldquo;Báo + đọc to&rdquo;), họ đọc bằng tiếng Trung rồi mới ghi vào sổ của họ. Buộc tội cần cả hai đồng ý.</p>
@@ -61,8 +66,9 @@ export function CoopChat({ coop, payload, hasClue, onOpenCase }: { coop: Coop; p
             <ul aria-label="Tin nhắn" aria-live="polite" className="flex flex-col gap-0.5">
               {coop.said.slice(-5).map((m) => (
                 <li key={m.at} className={`text-body-sm ${m.from === coop.role ? "text-right text-on-surface-variant" : "font-bold"}`}>
-                  <span className="text-label-md">{m.from === coop.role ? "Bạn" : ROLE_LABEL[m.from]}: </span><span lang="zh-Hans">{m.zh}</span>
+                  <span className="text-label-md">{m.from === coop.role ? "Bạn" : ROLE_LABEL[m.from]}: </span><span lang="zh-Hans" className={hints.pinyin ? "leading-[2.2]" : ""}><RubyLine zh={m.zh} pinyin={coopPinyin(m.zh)} show={hints.pinyin} /></span>
                   {hints.vi && <span className="ml-1 text-label-md font-normal text-on-surface-variant">({viOf(m.zh)})</span>}
+                  {m.clip && <button type="button" onClick={() => void playVoiceClip(m.clip!)} aria-label="Nghe giọng đọc" className="ml-1 inline-flex size-8 items-center justify-center rounded-full bg-primary-container align-middle text-on-primary-container"><Icon name="volume_up" size={16} /></button>}
                 </li>
               ))}
             </ul>
