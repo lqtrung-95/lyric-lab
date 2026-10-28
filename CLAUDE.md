@@ -55,6 +55,7 @@ docs/                # PRD, design brief
 
 - Làm theo milestone trong `docs/PRD.md` mục 10 (M0 → M3). Mỗi milestone: lập kế hoạch trước, chờ duyệt, rồi mới code.
 - Commit nhỏ, message dạng Conventional Commits (`feat:`, `fix:`, `chore:`…).
+- Với chức năng chưa quen thuộc, đừng viết từ con số 0: hãy tìm các dự án mã nguồn mở trên GitHub để so sánh ý tưởng trước khi bắt tay vào làm.
 - Viết test cho tokenizer, bộ lọc level, validate vị trí, FSRS. E2E cho luồng dán link → xem trước → nghe.
 - Khi thêm yêu cầu mới, ghi ID tương ứng trong PRD vào PR/commit.
 - **Sau mỗi lần cập nhật (tính năng, sửa lỗi, đổi prompt/model/cấu hình, thêm biến môi trường, script, quyết định kỹ thuật), phải rà và cập nhật 4 tài liệu bàn giao nếu cần**, trong cùng commit/PR với thay đổi:
