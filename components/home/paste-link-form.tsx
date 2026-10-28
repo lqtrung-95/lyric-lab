@@ -66,9 +66,10 @@ export function PasteLinkForm() {
         <Icon name="smart_display" size={18} className="text-primary" />
         Dán link YouTube hoặc gõ tên bài hát / nghệ sĩ
       </label>
-      <div className="mt-space-sm flex flex-col gap-space-sm md:flex-row">
+      {/* Tự xuống dòng khi ô hẹp (iPad chia 2 cột): nút không bao giờ tràn ra ngoài thẻ. */}
+      <div className="mt-space-sm flex flex-wrap gap-space-sm">
         <div
-          className={`flex min-h-12 flex-1 items-center gap-2 rounded-2xl bg-surface-container px-3 ring-2 transition-shadow focus-within:ring-secondary ${
+          className={`flex min-h-12 min-w-0 flex-[1_1_16rem] items-center gap-2 rounded-2xl bg-surface-container px-3 ring-2 transition-shadow focus-within:ring-secondary ${
             error ? "ring-error" : "ring-transparent"
           }`}
         >
@@ -82,7 +83,7 @@ export function PasteLinkForm() {
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? "video-link-error" : undefined}
             onChange={(e) => { setText(e.target.value); if (error) setError(null); }}
-            className="min-h-11 flex-1 bg-transparent text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/70"
+            className="min-h-11 min-w-0 flex-1 bg-transparent text-body-md text-on-surface outline-none placeholder:text-on-surface-variant/70"
           />
           <button
             type="button"
