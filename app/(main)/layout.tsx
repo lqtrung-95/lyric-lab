@@ -1,5 +1,6 @@
 import { ChatBubble } from "@/components/chat/chat-bubble";
 import { HudBar } from "@/components/layout/hud-bar";
+import { RewardSounds } from "@/components/feedback/reward-sounds";
 import { MainShell } from "@/components/layout/main-shell";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
 import { SideNav } from "@/components/layout/side-nav";
@@ -14,6 +15,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <>
       <SideNav />
       <HudBar />
+      <RewardSounds />
       <MainShell>
         <main id="main" tabIndex={-1} className="mx-auto max-w-page px-gutter pb-28 pt-24 outline-none md:px-6 md:pb-24 lg:px-10">{children}</main>
       </MainShell>

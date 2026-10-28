@@ -12,10 +12,18 @@ describe("sfxNotes", () => {
     expect(done.map((n) => n.freq)).toEqual([...done.map((n) => n.freq)].sort((a, b) => a - b));
   });
   it("hiệu ứng ngắn (dưới 0,7 giây) và đủ nhỏ để không át giọng đọc", () => {
-    for (const kind of ["correct", "wrong", "complete"] as const) {
+    for (const kind of ["correct", "wrong", "complete", "xp", "quest", "streak"] as const) {
       const notes = sfxNotes(kind);
       expect(Math.max(...notes.map((n) => n.at + n.dur))).toBeLessThan(0.7);
       expect(Math.max(...notes.map((n) => n.gain))).toBeLessThanOrEqual(0.1);
     }
+  });
+  it("các hiệu ứng thưởng đi lên; lên cấp dài nhất nhưng vẫn dưới 1 giây", () => {
+    for (const kind of ["xp", "quest", "streak", "levelup"] as const) {
+      const f = sfxNotes(kind).map((n) => n.freq);
+      expect(f).toEqual([...f].sort((a, b) => a - b));
+      expect(Math.max(...sfxNotes(kind).map((n) => n.gain))).toBeLessThanOrEqual(0.1);
+    }
+    expect(Math.max(...sfxNotes("levelup").map((n) => n.at + n.dur))).toBeLessThan(1);
   });
 });

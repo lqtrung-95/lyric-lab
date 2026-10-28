@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import type { PreviewItem } from "@/lib/analysis/analysis-types";
 import { Icon } from "@/components/ui/icon";
+import { playSfx } from "@/lib/feedback/sfx";
 import { cleanSavedMeaning } from "@/lib/lookup/clean-saved-meaning";
 import { levelLabel } from "@/lib/preview/preview-format";
 import type { CardSnapshot } from "@/lib/user-state/learner-state";
@@ -108,7 +109,7 @@ export function WordPopover({ word, item, lookup, saved, onClose, onPlayLine, on
           <Icon name="play_circle" size={20} />
           Nghe câu này
         </button>
-        <button type="button" aria-pressed={saved} onClick={() => onToggleSave(saveTerm, { reading, sinoViet, level, meaning: cleanSavedMeaning(meaning?.text ?? entry?.meanings[0] ?? saveTerm, saveTerm) })}
+        <button type="button" aria-pressed={saved} onClick={() => { if (!saved) playSfx("correct"); onToggleSave(saveTerm, { reading, sinoViet, level, meaning: cleanSavedMeaning(meaning?.text ?? entry?.meanings[0] ?? saveTerm, saveTerm) }); }}
           className={`inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-label-md hover:bg-surface-container ${saved ? "font-semibold text-primary" : "text-on-surface-variant"}`}>
           <Icon name={saved ? "star" : "star_border"} filled={saved} size={18} />
           {saved ? "Đã lưu" : "Lưu"}
