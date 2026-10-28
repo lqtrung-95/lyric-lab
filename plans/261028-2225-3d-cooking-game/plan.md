@@ -1,6 +1,6 @@
 # Game nấu ăn 3D gọi món bằng tiếng Trung (tên tạm: "Quán Hán Ngữ")
 
-Trạng thái: ĐÃ DUYỆT (three/r3f, Hà Nội trước, có ngân sách mô hình AI). Giai đoạn 0 đã làm xong bản thử; chờ đo trên điện thoại rồi sang giai đoạn 1. Cảm hứng từ Wok Rush (saymei.app); KHÔNG dùng tên, hình, bố cục của họ.
+Trạng thái: TẠM HOÃN (backlog, 2026-10-28; bản thử giai đoạn 0 đã làm xong và chạy được ở /review/kitchen, chưa có trong menu; muốn làm tiếp thì bắt đầu ở giai đoạn 1). Trước đó: ĐÃ DUYỆT (three/r3f, Hà Nội trước, có ngân sách mô hình AI). Giai đoạn 0 đã làm xong bản thử; chờ đo trên điện thoại rồi sang giai đoạn 1. Cảm hứng từ Wok Rush (saymei.app); KHÔNG dùng tên, hình, bố cục của họ.
 
 ## Ý tưởng
 Người chơi làm đầu bếp kiêm phục vụ. Khách gọi món bằng tiếng Trung (nghe + đọc, bật/tắt pinyin và nghĩa), người chơi đi tới đúng bếp, nấu, mang ra bàn. Đúng và nhanh thì có tiền và sao.
@@ -31,3 +31,8 @@ Người chơi làm đầu bếp kiêm phục vụ. Khách gọi món bằng ti�
 
 ## Câu hỏi mở
 1. Duyệt thêm thư viện three/r3f? 2. Bản đồ đầu tiên: Việt Nam hay Trung Quốc? 3. Có ngân sách cho mô hình 3D thuê/AI không?
+
+## Việc còn lại khi mở lại
+- Đo FPS trên điện thoại thật (cổng quyết định 3D hay 2D).
+- Giai đoạn 1: lõi game có test (đơn nhiều món, công thức nhiều bước, hẹn giờ, sao); nội dung Hà Nội (phở, cà phê trứng, bánh mì).
+- Muốn đẹp ngang Wok Rush: họa sĩ 3D hoặc mô hình AI trả phí (Tripo Pro); gói miễn phí không export được.
