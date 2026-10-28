@@ -11,10 +11,12 @@ const MODES = [
   { href: "/review/listen", label: "Nghe và chọn" },
   { href: "/review/read-aloud", label: "Đọc to" },
   { href: "/review/karaoke", label: "Karaoke" },
+  { href: "/review/truth-or-lie", label: "Hai thật một giả" },
+  { href: "/review/word-order", label: "Xếp câu" },
   { href: "/review/leaderboard", label: "Xếp hạng" },
 ];
 
-/** Thanh chuyển chế độ ôn tập: ôn thẻ chuẩn (theo lịch FSRS) và ba chế độ luyện dạng game. */
+/** Thanh chuyển chế độ ôn tập: ôn thẻ chuẩn (theo lịch FSRS) và các chế độ luyện dạng game. */
 export function ModeTabs() {
   const pathname = usePathname();
   return (

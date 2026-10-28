@@ -1,0 +1,76 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { PronounceButton } from "@/components/ui/pronounce-button";
+import { RubyLine } from "@/components/ui/ruby-text";
+import { playSfx } from "@/lib/feedback/sfx";
+import type { Trial } from "@/lib/practice/truth-or-lie";
+
+const tog = (on: boolean) => `min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-extrabold ${on ? "bg-primary text-on-primary" : "bg-surface-container-lowest"}`;
+
+/**
+ * Hai thật một giả (真话还是假话): ba câu tiếng Trung, hai đúng một sai; chọn câu sai. Chọn xong thì lộ đáp án, nghĩa tiếng Việt và lời giải thích.
+ * Luyện đọc hiểu câu đơn giản. Chỉ là luyện thêm nên không ghi điểm lên bảng xếp hạng.
+ */
+export function TruthOrLieGame({ trials, pinyin }: { trials: Trial[]; pinyin: Record<string, string> }) {
+  const router = useRouter();
+  const [i, setI] = useState(0);
+  const [picked, setPicked] = useState<number | null>(null);
+  const [score, setScore] = useState(0);
+  const [showPinyin, setShowPinyin] = useState(true);
+  const [showVi, setShowVi] = useState(false);
+  const done = i >= trials.length;
+  if (done) {
+    return (
+      <div className="rounded-2xl bg-surface-container-low p-space-lg text-center" data-testid="tol-done">
+        <p className="font-serif text-headline-md">Bạn tìm đúng {score}/{trials.length} câu sai</p>
+        <button type="button" onClick={() => router.refresh()} className="mt-space-md min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">Chơi bộ khác</button>
+      </div>
+    );
+  }
+  const trial = trials[i];
+  const answered = picked !== null;
+  function pick(idx: number) {
+    if (answered) return;
+    setPicked(idx);
+    const ok = idx === trial.lieIndex;
+    if (ok) setScore((s) => s + 1);
+    playSfx(ok ? "correct" : "wrong");
+  }
+  return (
+    <div className="flex flex-col gap-space-md">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-label-lg font-extrabold">Vòng {i + 1}/{trials.length} · {trial.topic}</p>
+        <div role="group" aria-label="Gợi ý" className="flex gap-1.5">
+          <button type="button" aria-pressed={showPinyin} onClick={() => setShowPinyin((v) => !v)} className={tog(showPinyin)}>Pinyin</button>
+          <button type="button" aria-pressed={showVi} onClick={() => setShowVi((v) => !v)} className={tog(showVi)}>Nghĩa</button>
+        </div>
+      </div>
+      <p className="text-body-lg font-bold">Hai câu đúng, một câu SAI. Chọn câu sai.</p>
+      <ul className="flex flex-col gap-2">
+        {trial.options.map((o, idx) => {
+          const isLie = idx === trial.lieIndex;
+          const state = !answered ? "" : isLie ? "border-secondary bg-secondary-container" : idx === picked ? "border-error bg-error-container" : "opacity-80";
+          return (
+            <li key={o.zh} className="flex items-stretch gap-2">
+              <button type="button" onClick={() => pick(idx)} disabled={answered} aria-pressed={picked === idx}
+                className={`min-h-14 min-w-0 flex-1 rounded-xl border-2 border-ink bg-surface-container-lowest px-space-sm py-2 text-left disabled:cursor-default ${state}`}>
+                <span lang="zh-Hans" className={`block text-body-lg font-bold ${showPinyin ? "leading-[2.2]" : ""}`}><RubyLine zh={o.zh} pinyin={pinyin[o.zh]} show={showPinyin} /></span>
+                {(showVi || answered) && <span className="block text-body-sm text-on-surface-variant">{o.vi}</span>}
+                {answered && <span className="block text-label-md font-extrabold">{isLie ? "Câu SAI" : "Câu đúng"}{idx === picked && !isLie ? " (bạn chọn nhầm)" : ""}</span>}
+              </button>
+              <PronounceButton text={o.zh} className="size-14 self-center" />
+            </li>
+          );
+        })}
+      </ul>
+      {answered && (
+        <div role="status" className="rounded-xl bg-surface-container-low p-space-sm">
+          <p className="text-body-md font-bold">{picked === trial.lieIndex ? "Chính xác!" : "Chưa đúng."} {trial.explain}</p>
+          <button type="button" onClick={() => { setI((n) => n + 1); setPicked(null); }} className="mt-2 min-h-11 rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">{i + 1 === trials.length ? "Xem kết quả" : "Vòng tiếp"}</button>
+        </div>
+      )}
+    </div>
+  );
+}

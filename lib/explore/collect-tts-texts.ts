@@ -1,4 +1,5 @@
 import { ALL_DIALOGUES } from "@/lib/dialogues/dialogue-catalog";
+import { TRUTH_ROUNDS } from "@/lib/practice/truth-or-lie-data";
 import { allComposedMessages } from "./coop/coop-messages";
 import { COOP_PHRASES } from "./coop/coop-state";
 import { splitForTts } from "@/lib/speech/split-for-tts";
@@ -23,6 +24,7 @@ export function collectExploreTtsTexts(): string[] {
   }
   for (const d of ALL_DIALOGUES) for (const l of d.lines) raw.push(l.zh);
   // Chế độ phá án cùng bạn: câu nói nhanh và mọi câu ghép từ mẫu (người nhận bấm loa nghe).
+  for (const r of TRUTH_ROUNDS) raw.push(...r.truths.map((s) => s.zh), r.lie.zh); // trò Hai thật một giả
   for (const p of COOP_PHRASES) raw.push(p.zh);
   for (const m of allComposedMessages()) raw.push(m.zh);
   for (const st of Object.values(SCENE_STORIES)) raw.push(st.title.zh, ...st.lines.map((l) => l.zh), st.question.right, ...st.question.wrong);
