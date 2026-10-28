@@ -1,3 +1,4 @@
+import { cleanSavedMeaning } from "@/lib/lookup/clean-saved-meaning";
 import { DEFAULT_LEVEL, type LearnerState, type SavedItem } from "@/lib/user-state/learner-state";
 
 /** Thay đổi cần ghi lên Supabase để bản từ xa khớp trạng thái cục bộ mới. */
@@ -55,7 +56,7 @@ export function cardRowFromSaved(item: SavedItem): (CardRow & Record<string, unk
   return {
     item_key: item.key, kind: item.type, term: item.term,
     pinyin: item.reading ?? null, han_viet: item.sinoViet ?? null, hsk_level: item.level ?? null,
-    meaning: item.meaning, video_id: item.videoId, line_index: item.lineIndex,
+    meaning: cleanSavedMeaning(item.meaning, item.term), video_id: item.videoId, line_index: item.lineIndex,
     created_at: new Date(item.savedAt).toISOString(),
   };
 }

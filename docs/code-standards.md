@@ -161,4 +161,4 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Vòng lặp dùng `useGameLoop`; `Date.now()` trong handler gọi qua hàm phụ ngoài component để không vướng lint `react-hooks/purity`. Ghi điểm qua `useArcadeScore` (một lần khi hết ván, key mới mỗi ván).
 - Màu trạng thái (đúng / lệch / sai) luôn kèm ký hiệu hoặc `aria-label`, không chỉ dựa vào màu.
 - Pane trình duyệt trong app không chạy `requestAnimationFrame`: khi tự kiểm game, ghi đè `requestAnimationFrame` bằng `setTimeout` trong trang trước khi bấm Bắt đầu.
-
+- Nghĩa ghi vào `user_cards.meaning` phải đi qua `cleanSavedMeaning`; không lưu câu giải thích dài hay cụm dẫn nhập.

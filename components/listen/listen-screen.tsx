@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLikedSongs } from "@/components/library/use-liked-songs";
 import { CompletedToast } from "./completed-toast";
+import { cleanSavedMeaning } from "@/lib/lookup/clean-saved-meaning";
 import { Toast } from "@/components/ui/toast";
 import type { AnalyzedLine, PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
@@ -184,7 +185,7 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
     const entry: SavedItem = {
       key: itemKey(item), videoId: analysis.videoId, type: item.type, term: item.term,
       lineIndex: occurrence?.lineIndex ?? 0, start: occurrence?.start ?? 0, savedAt: Date.now(),
-      reading: item.reading, sinoViet: item.sinoViet, level: item.level, meaning: item.meaningInContext,
+      reading: item.reading, sinoViet: item.sinoViet, level: item.level, meaning: cleanSavedMeaning(item.meaningInContext, item.term),
     };
     learner.toggleSaved(entry);
   };
