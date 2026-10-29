@@ -2,10 +2,10 @@
 // căn vào các câu đã lưu theo chữ, chỉ đổi `start`/`end` (chữ, pinyin, bản dịch, từ giữ nguyên). Mặc định chỉ BÁO CÁO (dry-run); thêm --apply để ghi DB.
 // Cần yt-dlp trên máy (brew install yt-dlp). Chạy:
 //   NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/backfill-video-ms-timestamps.mts [--apply] [--only id1,id2] [--limit 20]
-//     [--include ms,mixed] [--min-match 0.85] [--delay 2500] [--cookies-from-browser chrome] [--report ra.csv] [--backup mốc-cũ.json]
+//     [--include ms,mixed] [--min-match 0.85] [--delay 2500] [--cookies-from-browser chrome] [--report ra.csv] [--backup mốc-cũ.jsonl]
 // Mặc định xử lý video phụ đề (không phải bản AI nghe) có mốc "seconds". Video AI nghe và video đã có mili giây được bỏ qua.
 import { execFile } from "node:child_process";
-import { mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { appendFileSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -25,7 +25,7 @@ const minMatch = Number(opt("--min-match") ?? 0.85);
 const delay = Number(opt("--delay") ?? 2500);
 const cookies = opt("--cookies-from-browser");
 const reportPath = opt("--report");
-const backupPath = opt("--backup") ?? join(tmpdir(), `video-times-backup-${Date.now()}.json`);
+const backupPath = opt("--backup") ?? join(tmpdir(), `video-times-backup-${Date.now()}.jsonl`);
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false }, realtime: { transport: ws as never } });
 interface Line { text: string; start: number; end: number; [k: string]: unknown }
@@ -49,7 +49,6 @@ async function fetchTracks(id: string): Promise<{ lang: string; cues: ReturnType
   return readdirSync(dir).filter((f) => f.endsWith(".json3")).map((f) => ({ lang: f.replace(`${id}.`, "").replace(".json3", ""), cues: parseJson3(JSON.parse(readFileSync(join(dir, f), "utf8"))) }));
 }
 
-const backup: Record<string, [number, number][]> = {};
 const report: string[] = ["video_id,result,lang,matched,total,ratio,changed,title"];
 const tally: Record<string, number> = {};
 for (const [n, r] of todo.entries()) {
@@ -65,7 +64,8 @@ for (const [n, r] of todo.entries()) {
       else {
         result = apply ? "updated" : "would_update";
         if (apply) {
-          backup[r.video_id] = r.lines.map((l) => [l.start, l.end]);
+          // Sao lưu mốc cũ (mỗi video một dòng JSON) NGAY TRƯỚC khi ghi, để dừng giữa chừng vẫn khôi phục được video đã đổi.
+          appendFileSync(backupPath, JSON.stringify({ video_id: r.video_id, times: r.lines.map((l) => [l.start, l.end]) }) + "\n");
           const lines = r.lines.map((l, i) => ({ ...l, start: best.a.lines[i].start, end: best.a.lines[i].end }));
           const { error } = await sb.from("video_lessons").update({ lines, updated_at: new Date().toISOString() }).eq("video_id", r.video_id);
           if (error) result = `db_error: ${error.message}`;
@@ -81,5 +81,5 @@ for (const [n, r] of todo.entries()) {
   if (n < todo.length - 1) await new Promise((res) => setTimeout(res, delay));
 }
 console.log("\nTổng kết:", Object.entries(tally).map(([k, v]) => `${k}=${v}`).join("  "));
-if (apply && Object.keys(backup).length) { writeFileSync(backupPath, JSON.stringify(backup)); console.log(`Đã sao lưu mốc cũ của ${Object.keys(backup).length} video: ${backupPath}`); }
+if (apply) console.log(`Sao lưu mốc cũ (mỗi video một dòng JSON): ${backupPath}`);
 if (reportPath) { writeFileSync(reportPath, report.join("\n") + "\n"); console.log(`Đã ghi báo cáo ${reportPath}`); }
