@@ -42,3 +42,15 @@ describe("request schema / prompt", () => {
     expect(p).toContain('"""\n我想喝咖啡\n"""');
   });
 });
+
+describe("kịch bản pet", () => {
+  it("có trong danh sách hợp lệ nhưng ẩn khỏi màn chọn chung, prompt giữ vai linh vật và quy tắc an toàn", () => {
+    const pet = findScenario("pet")!;
+    expect(pet.hidden).toBe(true);
+    expect(roleplayRequestSchema.safeParse({ scenarioId: "pet", level: 1, history: [{ role: "ai", zh: pet.opening.zh }], userText: "我学了你好" }).success).toBe(true);
+    const p = buildRoleplayPrompt(pet, { scenarioId: "pet", level: 1, history: [{ role: "ai", zh: pet.opening.zh }], userText: "我学了你好" });
+    expect(p).toContain("linh vật");
+    expect(p).toContain("không phù hợp");
+    expect(p).toContain("HSK 1");
+  });
+});

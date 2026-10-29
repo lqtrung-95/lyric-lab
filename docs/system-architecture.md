@@ -267,3 +267,6 @@ Kho hội thoại hai người, tự viết, tĩnh trong mã (`authored-dialogue
 - Điểm: `PracticeMode` thêm `blaster`, `rain`, `whack`, `daily`, `duel`; `arcadeRound` đưa kết quả về khuôn bảng điểm (tối đa 20 mục, 150 điểm mỗi mục).
 - Âm thanh game: `arcade-sfx.ts` tổng hợp bằng WebAudio trên `audio-context.ts` dùng chung, công tắc lưu localStorage `songhanzi-arcade-sound`; hoạt ảnh CSS gom ở `game-keyframes.tsx` (chỉ chạy khi không bật giảm chuyển động).
 - Gợi ý pinyin/nghĩa: `lib/games/arcade-hints.ts` + `HintToggles`; nghĩa của kho từ: `loadGameWords` gộp nghĩa tiếng Việt (`course_units.content.glosses`) rồi nghĩa tiếng Anh từ `dict_words`, đều nhớ trong bộ nhớ máy chủ.
+
+### Linh vật (pet)
+Trạng thái chỉ lưu loài/tên/ngày nhận nuôi (`user_pet` + localStorage); giai đoạn, tâm trạng, phụ kiện tính lại từ XP (`lib/game`), chuỗi ngày và mục tiêu ngày. Pet chỉ ĐỌC XP, không ghi. Các tương tác dùng lại luồng có sẵn: cho ăn = `useReviewSession` (FSRS + `review_logs`), tập nói = `/api/pronunciation-assess`, nói chuyện = `/api/roleplay/turn` (kịch bản ẩn `pet`), quà = từ vựng của bài vừa nghe (localStorage). Chi tiết ở `docs/handoff-and-status.md` mục Linh vật.

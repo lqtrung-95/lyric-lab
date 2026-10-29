@@ -322,3 +322,6 @@ Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat
 
 ### Làm sạch nghĩa thẻ đã lưu (`scripts/clean-saved-meanings.mts`)
 Thẻ lưu trước đây có thể mang nghĩa dài kiểu "Ở câu này mang nghĩa là…". `NODE_OPTIONS=--experimental-websocket npx tsx --env-file=.env.local scripts/clean-saved-meanings.mts` (dry-run, in 15 ví dụ đầu và tổng số thẻ đổi), thêm `--apply` để ghi `user_cards.meaning`. Không gọi LLM, chạy lại được. Dùng chung DB với production nên xem dry-run trước.
+
+### Linh vật (pet)
+Chạy tay migration `supabase/migrations/20261029000002_user_pet.sql` (tạo `user_pet`) TRƯỚC khi deploy; thiếu bảng thì pet vẫn chạy bằng localStorage, chỉ không đồng bộ giữa thiết bị. Không có biến môi trường mới. "Nói chuyện với pet" tốn hạn mức AI `roleplay` (20 lượt/ngày/tài khoản, chung với Trò chuyện tự do, cấu hình ở `lib/rate-limit/usage-limit-config.ts`); "Tập nói" tốn hạn mức `voice`.
