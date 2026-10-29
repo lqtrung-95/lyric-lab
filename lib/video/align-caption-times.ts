@@ -6,6 +6,15 @@
 export interface Cue { start: number; end: number; text: string }
 export interface TimedLine { text: string; start: number; end: number }
 
+/**
+ * Khóa so khớp: câu có chữ Hán thì CHỈ giữ chữ Hán (phụ đề gốc hay ghi pinyin hoặc tiếng Anh chen cùng dòng, còn câu đã lưu chỉ có chữ Hán);
+ * câu không có chữ Hán thì dùng `textKey`.
+ */
+export const matchKey = (s: string): string => {
+  const han = s.normalize("NFKC").replace(/[^\p{Script=Han}]/gu, "");
+  return han || textKey(s);
+};
+
 /** Giữ chữ và số (mọi ngôn ngữ), hạ chữ thường: so khớp bỏ qua dấu câu và khoảng trắng. */
 export const textKey = (s: string): string => s.normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 
@@ -31,14 +40,15 @@ const MAX_MERGE = 5;
 const MAX_SHIFT_SEC = 4;
 
 export function alignTimes(lines: readonly TimedLine[], cues: readonly Cue[]): AlignResult {
-  const keys = cues.map((c) => textKey(c.text));
+  const keys = cues.map((c) => matchKey(c.text));
   const next: TimedLine[] = lines.map((l) => ({ ...l }));
   let j = 0;
   let matched = 0;
   lines.forEach((line, i) => {
-    const want = textKey(line.text);
+    const want = matchKey(line.text);
     if (!want) return;
     for (let skip = 0; skip <= MAX_SKIP && j + skip < cues.length; skip++) {
+      if (!keys[j + skip]) continue;
       let acc = "";
       for (let k = 0; k < MAX_MERGE && j + skip + k < cues.length; k++) {
         acc += keys[j + skip + k];

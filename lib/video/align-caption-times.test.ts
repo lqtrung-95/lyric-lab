@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alignTimes, parseJson3, textKey } from "./align-caption-times";
+import { alignTimes, matchKey, parseJson3, textKey } from "./align-caption-times";
 
 const cue = (start: number, end: number, text: string) => ({ start, end, text });
 
@@ -37,6 +37,20 @@ describe("alignTimes", () => {
   it("cắt cuối câu không chồng sang đầu câu kế", () => {
     const r = alignTimes([{ text: "a", start: 0, end: 5 }, { text: "b", start: 5, end: 8 }], [cue(0, 6, "a"), cue(5.2, 8, "b")]);
     expect(r.lines[0].end).toBe(5.2);
+  });
+  it("phụ đề gốc có pinyin chen cùng dòng vẫn khớp câu chỉ có chữ Hán", () => {
+    const withPinyin = [cue(8.433, 10.233, "huānyíng huídào wǒde píndào 欢迎 回到 我的 频道"), cue(10.433, 14.266, "jīntiān wǒ 今天 我 将 继续")];
+    const r = alignTimes([{ text: "欢迎 回到 我的 频道", start: 8, end: 10 }, { text: "今天 我 将 继续", start: 10, end: 14 }], withPinyin);
+    expect(r.matched).toBe(2);
+    expect(r.lines.map((l) => [l.start, l.end])).toEqual([[8.433, 10.233], [10.433, 14.266]]);
+  });
+  it("cue không có chữ Hán (tiếng Anh) không bị lấy làm điểm bắt đầu", () => {
+    const r = alignTimes([{ text: "你好", start: 1, end: 2 }], [cue(0.5, 0.9, "Hello everyone"), cue(1.2, 2.4, "你好")]);
+    expect(r.lines[0]).toMatchObject({ start: 1.2, end: 2.4 });
+  });
+  it("matchKey: chữ Hán thì chỉ giữ chữ Hán, không có thì giữ chữ/số", () => {
+    expect(matchKey("nǐ hǎo 你 好!")).toBe("你好");
+    expect(matchKey("Hello, World!")).toBe("helloworld");
   });
   it("textKey bỏ dấu câu/khoảng trắng", () => {
     expect(textKey("你好, 我 是！")).toBe("你好我是");
