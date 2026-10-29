@@ -329,6 +329,8 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
 
 /* Viền focus rõ ràng cho điều hướng bàn phím (WCAG 2.2). */
 @layer base {
+  /* Tailwind v4 để nút mặc định con trỏ mũi tên: mọi phần tử bấm được (đang bật) hiện bàn tay để người dùng biết bấm được. */
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), summary, label[for] { cursor: pointer; }
   :focus-visible { outline: 2px solid var(--secondary); outline-offset: 2px; }
 }
 

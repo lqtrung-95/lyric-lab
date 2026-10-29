@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { playSfx } from "@/lib/feedback/sfx";
 import { ToneContourChart } from "@/components/pronunciation/tone-contour-chart";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { TONES } from "@/lib/pronunciation/tone-data";
@@ -23,7 +24,9 @@ export function TonePairsTrainer() {
   function answer(option: string) {
     if (!q || picked) return;
     setPicked(option);
-    if (option === pairLabel(q.pair)) setScore((s) => s + 1);
+    const right = option === pairLabel(q.pair);
+    if (right) setScore((s) => s + 1);
+    playSfx(right ? "correct" : "wrong");
   }
 
   return (
@@ -90,7 +93,7 @@ export function TonePairsTrainer() {
               <div role="status" className="space-y-2">
                 <p className={`text-body-md font-medium ${picked === pairLabel(q.pair) ? "text-primary" : "text-error"}`}>{picked === pairLabel(q.pair) ? "Đúng rồi!" : `Chưa đúng. Đáp án là ${pairLabel(q.pair)}.`}</p>
                 <p className="text-body-md text-on-surface-variant"><span lang="zh" className="font-serif text-body-lg">{q.pair.han}</span> {q.pair.pinyin}: {q.pair.vi}.</p>
-                <button type="button" onClick={() => { setPicked(null); setStep((s) => s + 1); }} className="inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">{step + 1 < quiz.length ? "Câu tiếp" : "Xem kết quả"}</button>
+                <button type="button" onClick={() => { if (step + 1 >= quiz.length && score * 2 >= quiz.length) playSfx("complete"); setPicked(null); setStep((s) => s + 1); }} className="inline-flex min-h-11 items-center rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">{step + 1 < quiz.length ? "Câu tiếp" : "Xem kết quả"}</button>
               </div>
             )}
           </div>
