@@ -90,7 +90,8 @@ export function HomeQuests() {
         <h2 id="quests-heading" className="text-headline-md">Nhiệm vụ</h2>
         <p className="text-label-md font-bold text-on-surface-variant">{game.xp.today} XP hôm nay</p>
       </div>
-      <ul className="mt-space-sm space-y-1.5">{shown.map((q) => <QuestRow key={q.id} quest={q} onClaim={claim} busy={busy} />)}</ul>
+      {/* Mở rộng: trên màn hai cột, danh sách cuộn trong khung cao bằng đúng 3 nhiệm vụ để thẻ không cao thêm (thẻ "Việc tiếp theo" cùng hàng cao bằng nhau nên sẽ bị kéo giãn trống rỗng). */}
+      <ul className={`mt-space-sm space-y-1.5 ${expanded ? "lg:max-h-[19.5rem] lg:overflow-y-auto lg:pr-1" : ""}`}>{shown.map((q) => <QuestRow key={q.id} quest={q} onClaim={claim} busy={busy} />)}</ul>
       {hidden > 0 && (
         <button type="button" aria-expanded={expanded} onClick={() => setExpanded((e) => !e)} className="mt-1 inline-flex min-h-11 items-center gap-1 text-label-md font-extrabold text-primary hover:underline">
           {expanded ? "Thu gọn" : `Xem thêm ${hidden} nhiệm vụ`}
