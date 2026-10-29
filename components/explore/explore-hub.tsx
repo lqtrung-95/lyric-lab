@@ -10,6 +10,7 @@ import { objectiveProgress } from "@/lib/explore/story/objectives";
 import { loadStory } from "@/lib/explore/story/story-state";
 import type { Objective, StoryDifficulty } from "@/lib/explore/story/story-types";
 import { CasePoster } from "./case-poster";
+import { JourneysView } from "./journeys-view";
 import { computeStamps, PassportView } from "./passport-view";
 import { SceneThumb } from "./scene-thumb";
 import { TownMap } from "./town-map";
@@ -26,7 +27,7 @@ export interface CaseSummary {
   objectives: Objective[];
 }
 
-type Tab = "map" | "passport" | "cases" | "scenes";
+type Tab = "map" | "passport" | "journeys" | "cases" | "scenes";
 
 /**
  * Trang Khám phá gọn: hai thẻ chuyển (Phá án / Học từ theo cảnh), mỗi mục là một thẻ có ảnh thu nhỏ của cảnh, kèm tiến độ của bạn
@@ -59,6 +60,9 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
     setFading(fadingByScene(progress, Object.values(SCENES), Date.now()));
     setLastScene(window.localStorage.getItem(LAST_SCENE_KEY));
     setProgressAll(progress);
+    // Liên kết sâu (vd. từ biểu ngữ hành trình trong cảnh): mở thẳng tab được chỉ định.
+    const wanted = new URLSearchParams(window.location.search).get("tab");
+    if (wanted === "journeys" || wanted === "passport" || wanted === "cases" || wanted === "scenes") setTab(wanted);
     setNow(Date.now());
   }, [cases]);
 
@@ -70,6 +74,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
       <div role="tablist" aria-label="Khám phá" className="flex gap-1 rounded-full border-2 border-ink bg-surface-container-lowest p-1">
         <button type="button" role="tab" aria-selected={tab === "map"} onClick={() => setTab("map")} className={tabCls(tab === "map")}>Bản đồ</button>
         <button type="button" role="tab" aria-selected={tab === "passport"} onClick={() => setTab("passport")} className={tabCls(tab === "passport")}>Hộ chiếu</button>
+        <button type="button" role="tab" aria-selected={tab === "journeys"} onClick={() => setTab("journeys")} className={tabCls(tab === "journeys")}>Hành trình</button>
         <button type="button" role="tab" aria-selected={tab === "cases"} onClick={() => setTab("cases")} className={tabCls(tab === "cases")}>Phá án ({cases.length})</button>
         <button type="button" role="tab" aria-selected={tab === "scenes"} onClick={() => setTab("scenes")} className={tabCls(tab === "scenes")}>Học từ theo cảnh ({Object.keys(SCENES).length})</button>
       </div>
@@ -107,6 +112,8 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
         <TownMap cases={cases} learned={learned} fading={fading} caseState={caseState} lastScene={lastScene} tiers={Object.fromEntries(Object.entries(computeStamps(progressAll, now)).map(([id, st]) => [id, st.tier]))} />
       ) : tab === "passport" ? (
         <PassportView progress={progressAll} now={now} lastScene={lastScene} />
+      ) : tab === "journeys" ? (
+        <JourneysView progress={progressAll} />
       ) : tab === "cases" ? (
         <ul className="grid gap-space-sm sm:grid-cols-2">
           {cases.map((c) => {

@@ -44,12 +44,12 @@ const PET_CSS = `
 export const TINT: Record<PetSpecies, string> = { dragon: "#dff6e6", panda: "#dcecff", cat: "#ffe9d6", dog: "#f3e6d4", owl: "#e8e1ff", rabbit: "#ffe9ee", fox: "#fff0c9", penguin: "#dff7f5" };
 
 /** Hình linh vật. Chỉ trang trí (aria-hidden): thông tin tên, giai đoạn, tâm trạng luôn có chữ bên cạnh. */
-export function PetSprite({ species, stage, mood, accessories = [], tapKey = 0, chewKey = 0, className = "size-28" }: { species: PetSpecies; stage: PetStage; mood: PetMood; accessories?: readonly string[]; /** Tăng mỗi lần chạm để phát lại hoạt ảnh nảy. */ tapKey?: number; /** Tăng mỗi lần cho ăn để pet nhai (co giãn nhanh vài nhịp). */ chewKey?: number; className?: string }) {
+export function PetSprite({ species, stage, mood, accessories = [], tapKey = 0, chewKey = 0, className = "size-28", bare = false }: { species: PetSpecies; stage: PetStage; mood: PetMood; accessories?: readonly string[]; /** Tăng mỗi lần chạm để phát lại hoạt ảnh nảy. */ tapKey?: number; /** Tăng mỗi lần cho ăn để pet nhai (co giãn nhanh vài nhịp). */ chewKey?: number; className?: string; /** Bỏ vòng nền tròn (khi đặt trong căn phòng). */ bare?: boolean }) {
   return (
     <>
       <style>{PET_CSS}</style>
       <svg viewBox="0 0 120 120" aria-hidden="true" className={`${className} overflow-visible`}>
-        <circle cx="60" cy="64" r="56" fill={TINT[species]} />
+        {!bare && <circle cx="60" cy="64" r="56" fill={TINT[species]} />}
         <ellipse cx="60" cy="112" rx="34" ry="5" fill="#3a2b2b" opacity="0.14" />
         <g key={tapKey} className={tapKey > 0 ? "pet-tap" : undefined}>
         <g key={chewKey} className={chewKey > 0 ? "pet-chew" : undefined}>

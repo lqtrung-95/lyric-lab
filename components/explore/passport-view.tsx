@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import type { ExploreProgress } from "@/lib/explore/explore-progress";
+import { completedJourneys, JOURNEYS } from "@/lib/explore/journeys";
 import { newScenesToday, nextDestination, passportSummary, sceneStamp, STAMP_LABELS, STAMP_MEDALS, type SceneStamp, type StampTier } from "@/lib/explore/passport";
 import { SCENES } from "@/lib/explore/scenes";
 import { SCENE_EMOJI, TOWN_DISTRICTS } from "@/lib/explore/town-layout";
@@ -39,6 +40,7 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
   const stamps = useMemo(() => computeStamps(progress, now), [progress, now]);
   const sum = useMemo(() => passportSummary(scenes, stamps), [scenes, stamps]);
   const today = useMemo(() => newScenesToday(stamps, now), [stamps, now]);
+  const journeysDone = useMemo(() => completedJourneys(progress), [progress]);
   const dest = useMemo(() => nextDestination(scenes, stamps, lastScene), [scenes, stamps, lastScene]);
   const destScene = dest ? SCENES[dest.sceneId] : null;
   const destStamp = dest ? stamps[dest.sceneId] : null;
@@ -56,6 +58,7 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
         </div>
         <ul aria-label="Số dấu theo bậc" className="flex flex-wrap gap-2 text-label-md font-bold">
           {([1, 2, 3] as StampTier[]).map((t) => <li key={t} className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-0.5">{STAMP_MEDALS[t]} {STAMP_LABELS[t]}: {sum.byTier[t]}</li>)}
+          <li className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-0.5">🧳 Hành trình: {journeysDone}/{JOURNEYS.length}</li>
         </ul>
         {sum.next && (
           <div>

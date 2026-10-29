@@ -4,6 +4,7 @@ import type { SceneDetail } from "@/lib/explore/explore-types";
 import { Button3d } from "@/components/ui/button-3d";
 import { ArtSprite } from "./art/art-sprite";
 import { FLAT_SPRITES } from "./art/flat/flat-sprites";
+import { JourneyBanner } from "./journey-banner";
 import { SceneStampChip } from "./scene-stamp-chip";
 import { MusicToggle } from "./music-toggle";
 import { NotebookChips } from "./notebook-chips";
@@ -52,6 +53,7 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
         <MusicToggle enabled={music.enabled} onToggle={music.toggle} />
       </header>
 
+      {!story && !quest.active && c.ready && <JourneyBanner sceneId={scene.id} words={scene.objects} progress={c.progress} />}
       {story && sc && <ObjectiveBar title={story.payload.story.title} objective={sc.objective} done={sc.objectiveCount.done} total={sc.objectiveCount.total} solved={sc.solved} freeRoam={story.payload.story.freeRoam} clueCount={sc.progress.clues.length} spotHint={sc.spotHint} onCase={() => sc.setView({ kind: "case" })} onMap={() => sc.setView({ kind: "map" })} />}
       {story && sc && <StoryHintTip />}
 
