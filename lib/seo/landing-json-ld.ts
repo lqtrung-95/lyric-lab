@@ -21,6 +21,11 @@ export function landingJsonLd(description: string) {
       "XP, cấp độ, huy hiệu, nhiệm vụ mỗi ngày và thi đấu 1v1",
       "Ôn tập flashcard FSRS và trò chơi luyện tập",
       "Chuỗi ngày học, mục tiêu hằng ngày và thi đấu 1v1",
+      "Khám phá 60 cảnh đời sống bằng tiếng Trung, hành trình trong ngày và hộ chiếu",
+      "Bạn nhỏ đồng hành (pet): phiêu lưu, nhà trang trí, mục tiêu tuần",
+      "Truyện ngắn có cấp độ, hội thoại đóng vai, bấm từ để tra và lưu thẻ",
+      "Viết chữ Hán theo thứ tự nét, ghép bộ thủ, luyện từ khó",
+      "Công cụ miễn phí: tên tiếng Trung, pinyin, ngữ pháp AI, giấy tập viết",
     ],
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
   };
