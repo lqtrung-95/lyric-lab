@@ -1,0 +1,79 @@
+"use client";
+
+import { useState } from "react";
+import { useGameSummary } from "@/components/layout/use-game-summary";
+import { useStreak } from "@/components/streak/use-streak";
+import { Button3d } from "@/components/ui/button-3d";
+import { ProgressBar } from "@/components/ui/progress-bar";
+import { PET_NAME_MAX, PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrowth, petMood, unlockedAccessories, type PetMood, type PetSpecies } from "@/lib/pet/pet-logic";
+import { dailyGoalProgress } from "@/lib/streak/daily-goal";
+import { PET_SPECIES_READY, PetSprite } from "./pet-sprite";
+import { usePet } from "./use-pet";
+
+const STAGE_NAMES: readonly string[] = ["Con non", "Thiếu niên", "Trưởng thành"];
+const MOOD_TEXT: Record<PetMood, (name: string) => string> = {
+  happy: (n) => `${n} no bụng và vui lắm. Hôm nay bạn đã đạt mục tiêu!`,
+  hungry: (n) => `${n} đang đói chữ. Học một chút là ${n} no ngay.`,
+  sleepy: (n) => `${n} đang ngủ gật. Quay lại học là ${n} dậy liền, không mất gì cả.`,
+};
+
+/** Thẻ linh vật ở trang chủ: chưa có thì mời nhận nuôi; có rồi thì hiện hình, giai đoạn, tiến độ tới giai đoạn sau và lời nhắn theo tâm trạng. */
+export function PetCard() {
+  const { pet, adopt } = usePet();
+  const game = useGameSummary();
+  const streak = useStreak();
+  if (pet === undefined) return null;
+  if (pet === null) return <AdoptPet onAdopt={(species, name) => adopt({ species, name, adoptedAt: new Date().toISOString() })} />;
+
+  const growth = petGrowth(game?.xp.total ?? 0);
+  const goal = dailyGoalProgress(streak?.todayItems ?? 0, streak?.dailyGoal ?? 0);
+  const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
+  const nextStage = (STAGE_NAMES[growth.stage] ?? "").toLowerCase();
+  const accessories = unlockedAccessories(streak?.longest ?? 0);
+  return (
+    <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
+      <PetSprite species={pet.species} stage={growth.stage} mood={mood} className="size-28 shrink-0" />
+      <div className="min-w-[14rem] flex-1">
+        <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
+        <p role="status" className="mt-1 text-body-md">{MOOD_TEXT[mood](pet.name)}</p>
+        {growth.maxed ? (
+          <p className="mt-2 text-label-md font-bold text-secondary">{pet.name} đã trưởng thành!</p>
+        ) : (
+          <div className="mt-2">
+            <ProgressBar size="sm" value={growth.progressXp} max={growth.nextXp} label={`Tiến độ lên giai đoạn ${nextStage}`} />
+            <p className="mt-1 text-label-md text-on-surface-variant">Còn {growth.nextXp - growth.progressXp} XP nữa là lên giai đoạn {nextStage}</p>
+          </div>
+        )}
+        {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
+      </div>
+    </section>
+  );
+}
+
+/** Màn nhận nuôi: chọn loài (chỉ loài đã có hình), đặt tên, lưu một lần. */
+function AdoptPet({ onAdopt }: { onAdopt: (species: PetSpecies, name: string) => void }) {
+  const [species, setSpecies] = useState<PetSpecies>(PET_SPECIES_READY[0]);
+  const [name, setName] = useState("");
+  const clean = cleanPetName(name);
+  return (
+    <section aria-labelledby="adopt-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
+      <PetSprite species={species} stage={1} mood="happy" className="size-28 shrink-0" />
+      <form className="min-w-[14rem] flex-1" onSubmit={(e) => { e.preventDefault(); if (clean) onAdopt(species, clean); }}>
+        <h2 id="adopt-heading" className="text-headline-md">Nhận nuôi một người bạn học</h2>
+        <p className="mt-1 text-body-md text-on-surface-variant">Bạn học càng đều, bạn nhỏ càng lớn nhanh. {PET_SPECIES_LABELS[species]} sẽ lớn thêm sau mỗi buổi học.</p>
+        {PET_SPECIES_READY.length > 1 && (
+          <div role="radiogroup" aria-label="Chọn loài" className="mt-2 flex flex-wrap gap-2">
+            {PET_SPECIES_READY.map((s) => (
+              <button key={s} type="button" role="radio" aria-checked={s === species} onClick={() => setSpecies(s)} className={`min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-bold ${s === species ? "bg-primary-container" : "bg-surface-container-low"}`}>{PET_SPECIES_LABELS[s]}</button>
+            ))}
+          </div>
+        )}
+        <div className="mt-space-sm flex flex-wrap items-center gap-2">
+          <label className="sr-only" htmlFor="pet-name">Tên bạn nhỏ</label>
+          <input id="pet-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={PET_NAME_MAX * 2} placeholder="Đặt tên, ví dụ Tiểu Long" autoComplete="off" className="min-h-11 min-w-[12rem] flex-1 rounded-xl border-2 border-ink bg-surface-container-lowest px-3 text-body-md" />
+          <Button3d type="submit" variant="bright" disabled={!clean}>Nhận nuôi</Button3d>
+        </div>
+      </form>
+    </section>
+  );
+}

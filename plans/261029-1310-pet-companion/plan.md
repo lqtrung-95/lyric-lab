@@ -1,6 +1,6 @@
 # Linh vật đồng hành (Pet) — bản thử nhỏ
 
-Trạng thái: ĐÃ DUYỆT (2026-10-29). Bước 1 (logic, test, repo, migration) xong; chờ duyệt để sang bước 2. Mục tiêu: thêm lý do quay lại mỗi ngày + cảm giác sở hữu, KHÔNG thêm game mới. Bản thử chỉ 1 pet, 3 giai đoạn, nối vào XP/chuỗi ngày có sẵn. Xem rồi mới quyết định mở rộng.
+Trạng thái: ĐÃ DUYỆT (2026-10-29). Bước 1 (logic, test, repo, migration) và bước 2 (hình rồng, nhận nuôi, thẻ trang chủ) xong; chờ duyệt hình rồng trước khi vẽ 4 loài còn lại và sang bước 3. Mục tiêu: thêm lý do quay lại mỗi ngày + cảm giác sở hữu, KHÔNG thêm game mới. Bản thử chỉ 1 pet, 3 giai đoạn, nối vào XP/chuỗi ngày có sẵn. Xem rồi mới quyết định mở rộng.
 
 ## Nguyên tắc
 - Không đếm XP hai lần: "thức ăn" của pet = XP đã có trong sổ cái (`lib/game`, suy ra từ bảng sự kiện). Pet chỉ đọc, không ghi XP.

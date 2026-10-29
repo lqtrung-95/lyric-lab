@@ -4,7 +4,7 @@ import type { DailyGoalProgress } from "@/lib/streak/daily-goal";
 export const PET_SPECIES = ["dragon", "cat", "dog", "panda", "owl"] as const;
 export type PetSpecies = (typeof PET_SPECIES)[number];
 
-export const PET_SPECIES_LABELS: Record<PetSpecies, string> = { dragon: "Rồng con", cat: "Mèo", dog: "Cún", panda: "Gấu trúc", owl: "Cú" };
+export const PET_SPECIES_LABELS: Record<PetSpecies, string> = { dragon: "Rồng", cat: "Mèo", dog: "Cún", panda: "Gấu trúc", owl: "Cú" };
 
 export interface Pet {
   species: PetSpecies;
@@ -79,3 +79,23 @@ export const PET_ACCESSORIES: readonly PetAccessory[] = [
 ];
 
 export const unlockedAccessories = (longestStreak: number): PetAccessory[] => PET_ACCESSORIES.filter((a) => longestStreak >= a.streak);
+
+export interface StudyDaysInput {
+  studiedToday: boolean;
+  current: number;
+  longest: number;
+  week: { day: string; studied: boolean; isToday: boolean }[];
+}
+
+const DAY_MS = 86_400_000;
+const dayNumber = (key: string): number => Date.parse(`${key}T00:00:00Z`) / DAY_MS;
+
+/** Số ngày kể từ lần học gần nhất (0 = hôm nay) từ dữ liệu chuỗi ngày; null = chưa từng học. Không thấy ngày học nào trong tuần này thì coi là ít nhất 7 ngày. */
+export function daysSinceStudy(s: StudyDaysInput): number | null {
+  if (s.studiedToday) return 0;
+  if (s.current > 0) return 1;
+  const today = s.week.find((d) => d.isToday);
+  const last = [...s.week].reverse().find((d) => d.studied && !d.isToday);
+  if (today && last) return Math.max(1, Math.round(dayNumber(today.day) - dayNumber(last.day)));
+  return s.longest > 0 ? 7 : null;
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { dailyGoalProgress } from "@/lib/streak/daily-goal";
-import { PET_NAME_MAX, cleanPetName, parsePet, petGrowth, petMood, unlockedAccessories } from "./pet-logic";
+import { PET_NAME_MAX, cleanPetName, daysSinceStudy, parsePet, petGrowth, petMood, unlockedAccessories } from "./pet-logic";
 
 describe("cleanPetName", () => {
   it("bỏ khoảng trắng thừa và cắt theo số ký tự", () => {
@@ -64,5 +64,20 @@ describe("unlockedAccessories", () => {
     expect(unlockedAccessories(6)).toHaveLength(0);
     expect(unlockedAccessories(7).map((a) => a.id)).toEqual(["scarf"]);
     expect(unlockedAccessories(100).map((a) => a.id)).toEqual(["scarf", "hat", "crown"]);
+  });
+});
+
+describe("daysSinceStudy", () => {
+  const week = (studied: number[], todayIdx: number) => Array.from({ length: 7 }, (_, i) => ({ day: `2026-10-${String(26 + i).padStart(2, "0")}`, studied: studied.includes(i), isToday: i === todayIdx }));
+  it("học hôm nay = 0; chuỗi còn sống = 1", () => {
+    expect(daysSinceStudy({ studiedToday: true, current: 3, longest: 3, week: week([2], 2) })).toBe(0);
+    expect(daysSinceStudy({ studiedToday: false, current: 2, longest: 2, week: week([1], 2) })).toBe(1);
+  });
+  it("chuỗi đứt: đếm từ ngày học gần nhất trong tuần", () => {
+    expect(daysSinceStudy({ studiedToday: false, current: 0, longest: 5, week: week([0], 4) })).toBe(4);
+  });
+  it("không thấy ngày học trong tuần thì 7; chưa từng học thì null", () => {
+    expect(daysSinceStudy({ studiedToday: false, current: 0, longest: 5, week: week([], 3) })).toBe(7);
+    expect(daysSinceStudy({ studiedToday: false, current: 0, longest: 0, week: week([], 3) })).toBeNull();
   });
 });

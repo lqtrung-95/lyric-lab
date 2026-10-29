@@ -12,6 +12,7 @@ import { NextActionPanel } from "@/components/home/next-action-panel";
 import { HomePathCard } from "@/components/home/home-path-card";
 import { HomeQuests } from "@/components/home/home-quests";
 import { HomeVersusCard } from "@/components/home/home-versus-card";
+import { PetCard } from "@/components/pet/pet-card";
 import { StreakCard } from "@/components/streak/streak-card";
 import { RecommendedSongs } from "@/components/home/recommended-songs";
 
@@ -40,6 +41,7 @@ export default function AppHomePage() {
         </div>
         <div className="lg:col-start-2 lg:row-start-2 max-lg:order-4"><HomePathCard /></div>
       </div>
+      <div className="mt-space-md"><PetCard /></div>
       <div className="mt-space-md"><HomeVersusCard /></div>
       <TodayPlan />
       <StreakCard />
