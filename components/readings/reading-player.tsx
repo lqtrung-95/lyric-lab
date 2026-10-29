@@ -53,7 +53,7 @@ export function ReadingPlayer({ reading, pinyin, tokens, level }: { reading: Rea
           const from = starts[pi];
           return (
             <section key={pi} aria-label={`Đoạn ${pi + 1}`} className="flex flex-col gap-2">
-              <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.6]">
+              <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.9] [--rt-gap:0.7em]">
                 {para.map((s, si) => (
                   <span key={si} aria-current={from + si === playing ? "true" : undefined} className={`rounded-md ${from + si === playing ? "bg-primary-container" : ""}`}>
                     <Sentence zh={s.zh} pinyin={showPinyin ? pinyin[s.zh] : undefined} tokens={tokens[s.zh] ?? []} active={tapped} onWord={setTapped} />
