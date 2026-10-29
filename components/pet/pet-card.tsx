@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useGameSummary } from "@/components/layout/use-game-summary";
 import { useStreak } from "@/components/streak/use-streak";
+import { SoundToggle } from "@/components/games/sound-toggle";
 import { Button3d } from "@/components/ui/button-3d";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { PET_NAME_MAX, PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrowth, petMood, unlockedAccessories, type PetMood, type PetSpecies } from "@/lib/pet/pet-logic";
+import { PET_NAME_MAX, PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrowth, petMood, unlockedAccessories, type Pet, type PetMood, type PetSpecies, type PetStage } from "@/lib/pet/pet-logic";
 import { dailyGoalProgress } from "@/lib/streak/daily-goal";
 import { PET_SPECIES_READY, PetSprite } from "./pet-sprite";
 import { usePet } from "./use-pet";
 import { usePetEvolution } from "./use-pet-evolution";
+import { usePetTalk } from "./use-pet-talk";
 
 const STAGE_NAMES: readonly string[] = ["Con non", "Thiếu niên", "Trưởng thành"];
 const MOOD_TEXT: Record<PetMood, (name: string) => string> = {
@@ -35,7 +37,7 @@ export function PetCard() {
   const accessories = unlockedAccessories(streak?.longest ?? 0);
   return (
     <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetSprite species={pet.species} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} className="size-28 shrink-0" />
+      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} />
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
@@ -79,5 +81,19 @@ function AdoptPet({ onAdopt }: { onAdopt: (species: PetSpecies, name: string) =>
         </div>
       </form>
     </section>
+  );
+}
+
+/** Hình pet có thể chạm: là `<button>` thật (vùng bấm lớn), có nhãn cho trình đọc màn hình; bóng thoại đọc to bằng aria-live; có công tắc tiếng. */
+function PetTouch({ pet, stage, mood, accessories }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[] }) {
+  const { tapKey, bubble, tap } = usePetTalk(mood, pet.name);
+  return (
+    <div className="relative shrink-0">
+      <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="block rounded-full">
+        <PetSprite species={pet.species} stage={stage} mood={mood} accessories={accessories} tapKey={tapKey} className="size-28" />
+      </button>
+      <SoundToggle className="absolute -bottom-1 -right-2 flex size-11 items-center justify-center rounded-full text-lg hover:bg-surface-container" />
+      <p aria-live="polite" className={bubble ? "absolute -top-4 left-2 z-10 w-max max-w-[11rem] rounded-2xl border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold shadow-[0_2px_0_var(--shadow-ink)]" : "sr-only"}>{bubble}</p>
+    </div>
   );
 }
