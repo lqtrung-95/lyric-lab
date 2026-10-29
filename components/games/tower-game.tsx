@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { usePetView } from "@/components/pet/use-pet-view";
 import { useLocalJson } from "@/components/pet/use-local-json-store";
 import { PracticeSummary } from "@/components/practice/practice-summary";
-import { Button3d } from "@/components/ui/button-3d";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import type { GameWord } from "@/lib/games/game-word";
 import { LIVES, answerTower, frontMonster, initTower, stepTower, type TowerState } from "@/lib/games/tower-engine";
@@ -84,22 +83,28 @@ export function TowerGame({ words }: { words: GameWord[] }) {
           </div>
         )}
       </div>
-      <p role="status" className="mt-space-sm min-h-8 text-center text-body-md font-bold">
-        {s.reveal ? (s.reveal.ok ? `Trúng! ${s.reveal.han} đọc là ${s.reveal.pinyin}` : `Quái lọt qua rồi! ${s.reveal.han} phải đọc là ${s.reveal.pinyin}`) : front ? "Chọn âm đọc của chữ có viền vàng:" : started ? "Quái đang tới…" : ""}
-      </p>
-      <div className="flex items-stretch justify-center gap-2">
-        {front && <span className="flex items-center gap-1"><span lang="zh-Hans" className="font-serif text-hanzi-display">{front.word.han}</span><PronounceButton text={front.word.han} /></span>}
+      <div className="mt-space-sm rounded-3xl border-2 border-ink bg-surface-container-low p-space-sm">
+        <p role="status" className={`min-h-7 rounded-full px-3 py-0.5 text-center text-body-md font-bold ${s.reveal ? (s.reveal.ok ? "bg-secondary-container text-on-secondary-container" : "bg-error-container text-on-error-container") : "text-on-surface-variant"}`}>
+          {s.reveal ? (s.reveal.ok ? `Trúng! ${s.reveal.han} đọc là ${s.reveal.pinyin}` : `Quái lọt qua rồi! ${s.reveal.han} phải đọc là ${s.reveal.pinyin}`) : front ? "Chọn âm đọc của quái có viền vàng" : started ? "Quái đang tới…" : ""}
+        </p>
+        {front && (
+          <div className="mt-1 flex flex-wrap items-center justify-center gap-x-3 gap-y-0">
+            <span lang="zh-Hans" className="font-serif text-5xl font-bold leading-tight">{front.word.han}</span>
+            <PronounceButton text={front.word.han} />
+            {front.word.meaning && <span className="rounded-full bg-surface-container-high px-3 py-0.5 text-label-lg text-on-surface-variant">{front.word.meaning}</span>}
+          </div>
+        )}
+        <ul className="mt-2 grid grid-cols-3 gap-3">
+          {[0, 1, 2].map((i) => (
+            <li key={i}>
+              <button type="button" disabled={!active || !front} onClick={() => choose(i)} className="flex min-h-16 w-full flex-col items-center justify-center gap-0.5 rounded-2xl border-2 border-ink bg-surface-container-lowest px-1 shadow-[0_4px_0_0_var(--ink)] transition active:translate-y-1 active:shadow-none enabled:hover:bg-primary-container disabled:opacity-60 sm:flex-row sm:gap-3">
+                <span aria-hidden="true" className="flex size-7 items-center justify-center rounded-full bg-[var(--ink)] text-sm font-extrabold text-white">{i + 1}</span>
+                <span className="text-2xl font-bold sm:text-3xl">{front ? front.options[i] : "…"}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="mt-1 grid grid-cols-3 gap-3">
-        {[0, 1, 2].map((i) => (
-          <li key={i}>
-            <Button3d type="button" variant="tertiary" className="w-full" disabled={!active || !front} onClick={() => choose(i)}>
-              <span className="mr-1 text-on-surface-variant">{i + 1}</span><span className="text-pinyin-reading">{front ? front.options[i] : "…"}</span>
-            </Button3d>
-          </li>
-        ))}
-      </ul>
-      {front?.word.meaning && <p className="mt-1 text-center text-label-md text-on-surface-variant">Nghĩa: {front.word.meaning}</p>}
     </div>
   );
 }
