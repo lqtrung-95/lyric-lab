@@ -9,6 +9,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useWordGameScore } from "@/components/practice/use-word-game-score";
 import type { Scenario } from "@/lib/roleplay/scenarios";
 import { MAX_ROLEPLAY_TURNS } from "@/lib/roleplay/turn-schema";
+import { RoleplaySummaryModal } from "./roleplay-summary-modal";
 import { SpeakBox } from "./speak-box";
 import { WordTapPanel, type TappedWord } from "./word-tap-panel";
 import { useRoleplaySession, type Msg, type SessionError } from "./use-roleplay-session";
@@ -81,7 +82,7 @@ function LookedRow({ w }: { w: TappedWord }) {
 }
 
 /** Buổi trò chuyện tự do với AI đóng vai: nghe → nói (micro tự bật) → AI đáp, tối đa 8 lượt. Có Pinyin, gợi ý câu nói tiếp, lời sửa nhẹ sau mỗi lượt. */
-export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExit, exitLabel = "Chọn tình huống khác" }: { scenario: Scenario; level: number; openingPinyin?: string; typingOnly: boolean; onExit: () => void; exitLabel?: string }) {
+export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExit, exitLabel = "Chọn tình huống khác", summaryModal = false }: { scenario: Scenario; level: number; openingPinyin?: string; typingOnly: boolean; onExit: () => void; exitLabel?: string; /** Hiện tổng kết cuối buổi trong hộp thoại (nói chuyện với linh vật) thay vì thay nội dung trang. */ summaryModal?: boolean }) {
   const s = useRoleplaySession(scenario, level, openingPinyin, typingOnly);
   const [showPinyin, setShowPinyin] = useState(false);
   const [showTips, setShowTips] = useState(false);
@@ -96,8 +97,8 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
     const fixes = s.msgs.filter((m) => m.feedback);
     const userLines = s.msgs.filter((m) => m.role === "user");
     const avgChars = userLines.length ? Math.round(s.han / userLines.length) : 0;
-    return (
-      <div className="flex flex-col gap-space-md rounded-2xl bg-surface-container-low p-space-lg" data-testid="roleplay-done">
+    const summary = (
+      <div className={`flex flex-col gap-space-md p-space-lg ${summaryModal ? "" : "rounded-2xl bg-surface-container-low"}`} data-testid="roleplay-done">
         <div>
           <p className="font-serif text-headline-md">Bạn đã nói {s.turns} lượt trong “{scenario.title}”</p>
           {saved && <p role="status" className="mt-1 text-label-lg font-bold text-secondary">Đã ghi +{s.turns * 100} điểm luyện tập</p>}
@@ -140,6 +141,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
         <button type="button" onClick={onExit} className="min-h-11 w-fit rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">{exitLabel}</button>
       </div>
     );
+    return summaryModal ? <RoleplaySummaryModal label={`Tổng kết: ${scenario.title}`} onClose={onExit}>{summary}</RoleplaySummaryModal> : summary;
   }
   const typingNow = s.status === "your_turn";
   return (

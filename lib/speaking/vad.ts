@@ -11,6 +11,8 @@ export interface VadOptions {
 }
 
 export const DEFAULT_VAD: VadOptions = { threshold: 0.025, endSilenceMs: 1300, minSpeechMs: 350 };
+/** Cho nói câu dài và có lúc ngừng suy nghĩ giữa chừng (trò chuyện tự do, nói chuyện với linh vật): chờ im lặng 3 giây mới tự dừng. */
+export const CONVERSATION_VAD: VadOptions = { threshold: 0.025, endSilenceMs: 3000, minSpeechMs: 600 };
 
 export type VadEvent = "none" | "onset" | "end";
 

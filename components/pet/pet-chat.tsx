@@ -51,7 +51,7 @@ export function PetChat({ name, onClose }: { name: string; onClose: () => void }
     // Chờ pinyin một lát rồi mới vào buổi nói: câu mở đầu chỉ đọc pinyin lúc khởi tạo.
     body = <p role="status" className="text-body-md text-on-surface-variant">Đang chuẩn bị…</p>;
   } else {
-    body = <RoleplayChat scenario={PET_SCENARIO} level={level} openingPinyin={openingPinyin || undefined} typingOnly={mic !== "ok"} onExit={onClose} exitLabel="Xong" />;
+    body = <RoleplayChat scenario={PET_SCENARIO} level={level} openingPinyin={openingPinyin || undefined} typingOnly={mic !== "ok"} onExit={onClose} exitLabel="Xong" summaryModal />;
   }
   return (
     <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm" role="group" aria-label={`Nói chuyện với ${name}`}>

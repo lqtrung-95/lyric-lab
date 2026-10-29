@@ -4,9 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { recordFluency } from "@/lib/speaking/fluency-stats";
 import { playAndWait, stopChinese } from "@/lib/speaking/play-and-wait";
 import { hanChars } from "@/lib/speaking/reply-match";
+import { CONVERSATION_VAD } from "@/lib/speaking/vad";
 import { MAX_ROLEPLAY_TURNS } from "@/lib/roleplay/turn-schema";
 import type { Scenario } from "@/lib/roleplay/scenarios";
 import { useSpeakTurn } from "./use-speak-turn";
+
+/** Tối đa một lượt nói (giây): đủ cho câu dài có lúc ngừng suy nghĩ; micro vẫn tự dừng sau 3 giây im lặng (`CONVERSATION_VAD`) và người học bấm dừng được bất cứ lúc nào. */
+const MAX_SPEAK_SEC = 30;
 
 export interface Feedback { issue: string; better: string; pinyin?: string }
 export interface Tip { zh: string; pinyin?: string }
@@ -46,10 +50,10 @@ export function useRoleplaySession(scenario: Scenario, level: number, openingPin
   const startRef = useRef<() => Promise<void>>(async () => {});
   const submitRef = useRef<(text: string, onsetMs: number | null) => Promise<void>>(async () => {});
 
-  const turnHook = useSpeakTurn(15, (r) => {
+  const turnHook = useSpeakTurn(MAX_SPEAK_SEC, (r) => {
     if (hanChars(r.text).length < 2) { setError("no_speech"); setStatus("your_turn"); return; }
     void submitRef.current(r.text, r.onsetMs);
-  });
+  }, CONVERSATION_VAD);
   useEffect(() => { startRef.current = turnHook.start; });
 
   const yourTurn = useCallback(() => { setStatus("your_turn"); if (!typingOnly) void startRef.current(); }, [typingOnly]);
