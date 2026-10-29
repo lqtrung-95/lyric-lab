@@ -197,7 +197,7 @@ export const TOOLS: readonly ToolEntry[] = [
   {
     href: "/courses/placement",
     title: "Kiểm tra trình độ HSK",
-    description: "Làm bài xếp lớp khoảng 30 câu để biết bạn đang ở cấp HSK nào và nên bắt đầu học từ đâu.",
+    description: "Làm bài xếp lớp nhiều dạng câu (tối đa 36 câu) để biết bạn đang ở cấp HSK nào và nên bắt đầu học từ đâu.",
     icon: "school",
     category: "hsk",
     inApp: true,
