@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button3d } from "@/components/ui/button-3d";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { savedItemForWord } from "@/lib/explore/saved-item";
 import { sfx } from "@/lib/games/arcade-sfx";
 import { PET_ADVENTURE_EVENT, PET_ADVENTURE_KEY, adventurePhase, minutesLeft, parseAdventure, startAdventure, type Adventure } from "@/lib/pet/pet-adventure";
@@ -34,15 +35,17 @@ const MOOD_OK = "Hôm nay bạn đã đạt mục tiêu, cho bạn nhỏ đi ch�
  */
 export function PetAdventure({ name, species, adventure, now, today, canGo, onChange, onFx }: {
   name: string; species: string; adventure: Adventure | null; now: number; today: string | null; canGo: boolean;
-  onChange: (a: Adventure) => void; onFx: (kind: "adopt" | "gift") => void;
+  /** `null` = gọi pet về sớm, hủy chuyến (không có quà, hôm nay được cho đi lại). */ onChange: (a: Adventure | null) => void; onFx: (kind: "adopt" | "gift") => void;
 }) {
   const { state, toggleSaved, markKnown } = useLearnerState();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
+  const [asking, setAsking] = useState<"go" | "recall" | null>(null);
   if (now === 0 || !today) return null;
   const phase = adventure ? adventurePhase(adventure, now) : null;
 
   const go = async () => {
+    setAsking(null);
     setBusy(true); setError(false); sfx.petBlip();
     try {
       const res = await fetch(`/api/pet/adventure?seed=${encodeURIComponent(`${today}:${species}`)}`);
@@ -54,7 +57,17 @@ export function PetAdventure({ name, species, adventure, now, today, canGo, onCh
   };
 
   if (phase === "away" && adventure) {
-    return <p role="status" className="basis-full rounded-2xl bg-surface-container-low p-space-sm text-body-md">{name} đang đi chơi ở <b>{adventure.title}</b>. Còn khoảng {minutesLeft(adventure, now)} phút nữa là về, mang quà cho bạn đấy!</p>;
+    return (
+      <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm">
+        <p role="status" className="text-body-md">{name} đang đi chơi ở <b>{adventure.title}</b>. Còn khoảng {minutesLeft(adventure, now)} phút nữa là về, mang quà cho bạn đấy!</p>
+        <button type="button" onClick={() => { sfx.petBlip(); setAsking("recall"); }} className="mt-1 min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-bold">Gọi {name} về sớm</button>
+        <ConfirmDialog
+          open={asking === "recall"} tone="primary" title={`Gọi ${name} về sớm?`} confirmLabel={`Gọi ${name} về`} cancelLabel="Để bạn ấy chơi tiếp"
+          body={`${name} sẽ về ngay nhưng chưa kịp mang quà. Hôm nay bạn vẫn cho ${name} đi chơi lại được.`}
+          onCancel={() => setAsking(null)} onConfirm={() => { setAsking(null); sfx.petCheer(); onChange(null); onFx("adopt"); }}
+        />
+      </div>
+    );
   }
   if (phase === "back" && adventure) {
     return (
@@ -89,7 +102,12 @@ export function PetAdventure({ name, species, adventure, now, today, canGo, onCh
   return (
     <div className="basis-full">
       <p className="text-body-md">{MOOD_OK}</p>
-      <Button3d type="button" variant="bright" className="mt-1" disabled={busy} onClick={() => void go()}>{busy ? "Đang chuẩn bị…" : `Cho ${name} đi phiêu lưu`}</Button3d>
+      <Button3d type="button" variant="bright" className="mt-1" disabled={busy} onClick={() => { sfx.petBlip(); setAsking("go"); }}>{busy ? "Đang chuẩn bị…" : `Cho ${name} đi phiêu lưu`}</Button3d>
+      <ConfirmDialog
+        open={asking === "go"} tone="primary" title={`Cho ${name} đi chơi?`} confirmLabel="Đồng ý cho đi" cancelLabel="Để sau"
+        body={`Khi ${name} đi chơi (khoảng một giờ), bạn sẽ không tương tác được với ${name}: không cho ăn, nói chuyện, dạy hay xem nhà. Bạn vẫn gọi ${name} về sớm được, nhưng khi đó ${name} chưa kịp mang quà.`}
+        onCancel={() => setAsking(null)} onConfirm={() => void go()}
+      />
       {error && <p role="alert" className="mt-1 text-label-md text-error">Chưa chuẩn bị được chuyến đi. Kiểm tra kết nối rồi thử lại nhé.</p>}
     </div>
   );

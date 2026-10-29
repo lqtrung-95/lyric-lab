@@ -8,6 +8,8 @@ interface ConfirmDialogProps {
   body: string;
   confirmLabel: string;
   cancelLabel?: string;
+  /** Hành động nguy hiểm (xóa, mất dữ liệu) dùng nút đỏ; việc bình thường cần xác nhận dùng nút chính. */
+  tone?: "danger" | "primary";
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -16,7 +18,7 @@ interface ConfirmDialogProps {
  * Hộp thoại xác nhận dùng phần tử <dialog> gốc của trình duyệt: có sẵn khóa focus, đóng bằng Esc, nền mờ phía sau và
  * trình đọc màn hình hiểu đây là hộp thoại. Focus ban đầu ở nút "Hủy" (thao tác an toàn), nút xác nhận là hành động nguy hiểm.
  */
-export function ConfirmDialog({ open, title, body, confirmLabel, cancelLabel = "Giữ lại", onConfirm, onCancel }: ConfirmDialogProps) {
+export function ConfirmDialog({ open, title, body, confirmLabel, cancelLabel = "Giữ lại", tone = "danger", onConfirm, onCancel }: ConfirmDialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export function ConfirmDialog({ open, title, body, confirmLabel, cancelLabel = "
           <button type="button" autoFocus onClick={onCancel}
             className="min-h-11 rounded-full px-5 text-label-md font-medium text-on-surface hover:bg-surface-container-high">{cancelLabel}</button>
           <button type="button" onClick={onConfirm}
-            className="min-h-11 rounded-full bg-error px-5 text-label-md font-semibold text-on-error hover:opacity-90">{confirmLabel}</button>
+            className={`min-h-11 rounded-full px-5 text-label-md font-semibold hover:opacity-90 ${tone === "danger" ? "bg-error text-on-error" : "bg-primary text-on-primary"}`}>{confirmLabel}</button>
         </div>
       </div>
     </dialog>
