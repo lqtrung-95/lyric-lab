@@ -14,6 +14,7 @@ import { useReviewSummary } from "@/components/review/use-review-summary";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { PetSnapshot } from "@/lib/pet/pet-reaction";
 import { reviewWordLabel, type PetReviewWord } from "@/lib/pet/pet-review-word";
+import { PetEcho } from "./pet-echo";
 import { PetFeed } from "./pet-feed";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
@@ -32,6 +33,8 @@ export function PetCard() {
   const streak = useStreak();
   const review = useReviewSummary();
   const [feeding, setFeeding] = useState(false);
+  const [echoing, setEchoing] = useState(false);
+  const echoWord = review?.peek[0] ?? null;
   const [chewKey, setChewKey] = useState(0);
   const growth = petGrowth(game?.xp.total ?? 0);
   // Gọi trước các lệnh return sớm để thứ tự hook không đổi giữa các lần vẽ.
@@ -62,10 +65,14 @@ export function PetCard() {
           </div>
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
-        {!feeding && (review?.total ?? 0) > 0 && (
-          <Button3d type="button" variant="bright" className="mt-space-sm" onClick={() => setFeeding(true)}>Cho {pet.name} ăn thẻ</Button3d>
+        {!feeding && !echoing && (
+          <div className="mt-space-sm flex flex-wrap gap-2">
+            {(review?.total ?? 0) > 0 && <Button3d type="button" variant="bright" onClick={() => setFeeding(true)}>Cho {pet.name} ăn thẻ</Button3d>}
+            {echoWord && <Button3d type="button" onClick={() => setEchoing(true)}>Tập nói cùng {pet.name}</Button3d>}
+          </div>
         )}
       </div>
+      {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={() => setChewKey((k) => k + 1)} onClose={() => setEchoing(false)} />}
       {feeding && <PetFeed name={pet.name} onEat={() => setChewKey((k) => k + 1)} onClose={() => setFeeding(false)} />}
     </section>
   );
