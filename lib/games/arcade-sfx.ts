@@ -87,6 +87,10 @@ export const sfx = {
   levelUp: () => play((c, t) => { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(c, t + i * 0.08, "triangle", f, f, 0.16, 0.2)); }),
   /** Đập trúng / chạm đúng: tiếng "pop" vui. */
   pop: (combo = 0) => play((c, t) => { const f = 520 + Math.min(combo, 8) * 60; tone(c, t, "sine", f, f * 2, 0.11, 0.25); tone(c, t + 0.02, "triangle", f * 1.5, f * 3, 0.08, 0.1); }),
+  /** Phát đạn tự động của Phi đội: tiếng "pew" rất nhỏ và ngắn để nghe 5 lần mỗi giây không mệt. */
+  pew: () => play((c, t) => { tone(c, t, "square", 880, 420, 0.07, 0.025); }),
+  /** Nhặt vật phẩm: quãng đi lên lấp lánh. */
+  power: () => play((c, t) => { [659.25, 880, 1318.5].forEach((f, i) => tone(c, t + i * 0.06, "square", f, f * 1.02, 0.1, 0.07)); }),
   /** Hết ván. */
   gameOver: () => play((c, t) => { [392, 330, 262, 196].forEach((f, i) => tone(c, t + i * 0.14, "triangle", f, f * 0.97, 0.22, 0.22)); }),
   // --- Linh vật (pet): mọi tương tác đều có tiếng, cùng công tắc với game giải trí. ---

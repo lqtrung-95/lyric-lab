@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function Page() {
   const bank = await loadGameWords();
   return (
-    <ArcadeShell title="Bắn chữ" intro="Từ Hán rơi từ trên xuống: nhìn chữ, gõ pinyin để bắn nổ trước khi chạm đáy. Càng bắn nhiều, từ rơi càng nhanh. Làm xong được tính điểm luyện tập (XP)." wide>
+    <ArcadeShell title="Bắn chữ" intro="Hai chế độ: Phi đội (lái tàu, bắn đúng máy bay mang chữ theo nghĩa hoặc pinyin, có vật phẩm và trùm) và Gõ pinyin (chữ rơi từ trên xuống, gõ pinyin để bắn nổ). Làm xong được tính điểm luyện tập (XP)." wide>
       <ArcadePlay kind="blaster" bank={bank} />
     </ArcadeShell>
   );
