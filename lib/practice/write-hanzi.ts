@@ -43,3 +43,9 @@ export function pickWriteTargets(cards: readonly WriteCardLike[], stats: WriteSt
   const key = (t: WriteTarget): [number, number, number] => { const s = stats[t.key]; return s ? [1, s.best, s.last] : [0, 0, 0]; };
   return pool.map((t) => ({ t, k: key(t), r: rand() })).sort((a, b) => a.k[0] - b.k[0] || a.k[1] - b.k[1] || a.k[2] - b.k[2] || a.r - b.r).slice(0, size).map((x) => x.t);
 }
+
+/** Sao viết → kết quả chấm lịch ôn: 3 sao Được, 2 sao Khó (còn lệch nét), 1 sao Quên. Không bao giờ "Dễ" (xem `gradeFromOutcome`). */
+export const outcomeFromStars = (stars: 1 | 2 | 3): "correct" | "partial" | "wrong" => (stars === 3 ? "correct" : stars === 2 ? "partial" : "wrong");
+
+/** Điểm XP của một từ theo sao (3 sao = 100 như một câu đúng ở các game khác; trần mỗi từ 100 nên không vượt trần server). */
+export const pointsFromStars = (stars: 1 | 2 | 3): number => (stars === 3 ? 100 : stars === 2 ? 70 : 40);
