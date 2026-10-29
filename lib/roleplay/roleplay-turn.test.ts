@@ -66,4 +66,12 @@ describe("kịch bản pet", () => {
     expect(pets(1)).toContain("KIỂU NHẬN XÉT LƯỢT NÀY");
     expect(buildRoleplayPrompt(findScenario("cafe")!, req)).not.toContain("KIỂU NHẬN XÉT");
   });
+  it("nhận xét viết bằng tiếng Trung bị loại và thử model sau", async () => {
+    const zhIssue = JSON.stringify({ reply: "好的，要热的吗？", replyVi: "Vâng, nóng không?", tips: [], feedback: { issue: "“过得很呢”这个“呢”是语气词，塞在后面不通顺，别硬凑哦。", better: "今天过得很好。" } });
+    const viIssue = JSON.stringify({ reply: "好的，要热的吗？", replyVi: "Vâng, nóng không?", tips: [], feedback: { issue: "Chữ '呢' là trợ từ, nhét sau '过得很' nghe cụt ngủn đó nha.", better: "今天过得很好。" } });
+    const chat = vi.fn().mockResolvedValueOnce(zhIssue).mockResolvedValueOnce(viIssue);
+    const out = await runRoleplayTurn(req, { chat, models: ["a", "b"] });
+    expect(out.model).toBe("b");
+    expect(out.feedback?.issue).toContain("trợ từ");
+  });
 });

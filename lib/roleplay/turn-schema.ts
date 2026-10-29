@@ -15,11 +15,18 @@ export const roleplayRequestSchema = z.object({
 });
 export type RoleplayRequest = z.infer<typeof roleplayRequestSchema>;
 
+/** Lời giải thích phải là tiếng Việt (được trích vài chữ Hán để chỉ ra lỗi): chữ Hán chiếm tối đa 35% số chữ cái và phải có chữ Latinh. Model đôi khi "nhập vai" quá đà và viết nhận xét bằng tiếng Trung. */
+export function mostlyVietnamese(text: string): boolean {
+  const han = (text.match(/\p{Script=Han}/gu) ?? []).length;
+  const latin = (text.match(/\p{Script=Latin}/gu) ?? []).length;
+  return latin >= 4 && han / (han + latin) <= 0.35;
+}
+
 export const roleplayOutputSchema = z.object({
   reply: z.string().trim().min(1).max(80).refine((s) => /\p{Script=Han}/u.test(s), "reply phải có chữ Hán"),
-  replyVi: z.string().trim().min(1).max(200),
+  replyVi: z.string().trim().min(1).max(200).refine(mostlyVietnamese, "replyVi phải là tiếng Việt"),
   /** Tối đa 2 mẫu câu người học có thể nói tiếp (chữ Hán). */
   tips: z.array(z.string().trim().min(1).max(40)).max(2).default([]),
-  feedback: z.object({ issue: z.string().trim().min(1).max(160), better: z.string().trim().min(1).max(80) }).nullable().default(null),
+  feedback: z.object({ issue: z.string().trim().min(1).max(160).refine(mostlyVietnamese, "issue phải là tiếng Việt"), better: z.string().trim().min(1).max(80) }).nullable().default(null),
 });
 export type RoleplayOutput = z.infer<typeof roleplayOutputSchema>;
