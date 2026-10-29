@@ -11,13 +11,14 @@ import { keyToDir, standPoint, type Interactable } from "@/lib/explore/player-mo
 import { playSfx } from "@/lib/feedback/sfx";
 import { answerPoints } from "@/lib/practice/scoring";
 import { submitRoundScore } from "@/lib/practice/submit-score";
-import { savedItemForWord } from "@/lib/explore/saved-item";
+import { savedItemForWord, wordHasSource } from "@/lib/explore/saved-item";
+import { itemKey } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { AvatarFx } from "./player-avatar";
 import { exitId, type ObjectMark } from "./scene-canvas";
-import type { CardState } from "./word-card";
+import type { WordActions } from "./word-card";
 import { useExploreProgress } from "./use-explore-progress";
 import { usePlayerMovement } from "./use-player-movement";
 import { useQuestRun } from "./use-quest-run";
@@ -43,7 +44,7 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
   const router = useRouter();
   const sceneId = scene.id;
   const { progress, ready, now, discover, answer, resetScene } = useExploreProgress();
-  const { state: learner, toggleSaved } = useLearnerState();
+  const { state: learner, toggleSaved, markKnown, unmarkKnown } = useLearnerState();
   const [panel, setPanel] = useState<Panel>(null);
   const [shakeId, setShakeId] = useState<string | null>(null);
   const [fx, setFx] = useState<AvatarFx>(null);
@@ -124,9 +125,7 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
     const o = words[id];
     if (!o) return;
     discover(progressKey(sceneId, id));
-    // Từ học ở đây vào bộ ôn (thẻ FSRS) nếu có câu thật làm nguồn; đã lưu rồi thì thôi (toggleSaved sẽ bỏ lưu nếu gọi lại).
-    const card = savedItemForWord(o);
-    if (card && !learner.saved.some((x) => x.key === card.key)) toggleSaved(card);
+    // Chạm chỉ để xem từ: KHÔNG tự thêm vào bộ ôn. Người học tự chọn "Thêm vào bộ ôn" hoặc "Mình đã biết" ở thẻ từ.
     setPanel({ kind: "word", word: o });
     void playChinese(o.term);
   }
@@ -153,10 +152,17 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
     if (it) walkTo(it.at, () => interactRef.current(id));
   }, [interactables, walkTo]);
 
-  const cardStateOf = (w: SceneWord): CardState => {
-    const card = savedItemForWord(w);
-    if (!card) return "no_example";
-    return learner.saved.some((x) => x.key === card.key) ? "saved" : "pending";
+  /** Trạng thái và hành động thẻ ôn của một từ, cho thẻ từ (WordCard). */
+  const wordActions = (w: SceneWord): WordActions => {
+    const key = itemKey({ type: "vocab", term: w.term });
+    const saved = learner.saved.some((x) => x.key === key);
+    return {
+      saved, known: learner.known.includes(key), hasSource: wordHasSource(w),
+      add: () => { if (!saved) toggleSaved(savedItemForWord(w)); },
+      remove: () => { if (saved) toggleSaved(savedItemForWord(w)); },
+      markKnown: (alsoRemoveCard) => { markKnown(key); if (alsoRemoveCard && saved) toggleSaved(savedItemForWord(w)); },
+      unmarkKnown: () => unmarkKnown(key),
+    };
   };
 
   const stageProps = {
@@ -174,7 +180,7 @@ export function useSceneController(scene: SceneDetail, opts: SceneControllerOpti
   };
 
   return {
-    ready, marks, words, cardStateOf, learnedWords, fadedWords, startRescue, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
+    ready, marks, words, wordActions, learnedWords, fadedWords, startRescue, canQuest, panel, setPanel, quest, player, fx, shakeId, stageProps,
     startQuest, activate, recordUse: (id: string, ok: boolean) => answer(progressKey(sceneId, id), ok), reset: () => resetScene(sceneId), learner, xpEarned: practiceRoundXp(firstTry, quest.rounds.length),
     highlightId: quest.active && (quest.phase === "correct" || quest.phase === "reveal") ? quest.round?.targetId ?? null : null,
     openWord: (w: SceneWord) => { setPanel({ kind: "word", word: w }); void playChinese(w.term); },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { savedItemForWord } from "./saved-item";
+import { savedItemForWord, wordHasSource } from "./saved-item";
 import type { SceneWord } from "./explore-types";
 
 const word: SceneWord = {
@@ -15,8 +15,15 @@ describe("savedItemForWord", () => {
       reading: "bēi zi", sinoViet: "bôi", level: 1, meaning: "cái cốc",
     });
   });
-  it("chưa có câu thật thì không tạo được thẻ", () => {
-    expect(savedItemForWord({ ...word, examples: [] })).toBeNull();
+  it("chưa có câu thật thì vẫn tạo được thẻ không nguồn (videoId rỗng) với đủ nội dung mặt thẻ", () => {
+    expect(savedItemForWord({ ...word, examples: [] }, 1000)).toEqual({
+      key: "vocab:杯子", videoId: "", type: "vocab", term: "杯子", lineIndex: 0, start: 0, savedAt: 1000,
+      reading: "bēi zi", sinoViet: "bôi", level: 1, meaning: "cái cốc",
+    });
+  });
+  it("wordHasSource: có câu thật mới có nguồn", () => {
+    expect(wordHasSource(word)).toBe(true);
+    expect(wordHasSource({ ...word, examples: [] })).toBe(false);
   });
   it("không có Hán Việt thì bỏ trường đó", () => {
     expect(savedItemForWord({ ...word, sinoViet: null })?.sinoViet).toBeUndefined();

@@ -39,6 +39,12 @@ describe("card rows", () => {
     expect(back).toMatchObject({ key: "vocab:城市", term: "城市", reading: "chéngshì", meaning: "thành phố", lineIndex: 2, savedAt: 1_700_000_000_000 });
   });
 
+  it("thẻ không có câu nguồn (videoId rỗng) lưu video_id và line_index là null, đọc lại vẫn ra videoId rỗng", () => {
+    const row = cardRowFromSaved(item("vocab:杯子", { videoId: "", lineIndex: 0 }))!;
+    expect(row).toMatchObject({ video_id: null, line_index: null });
+    expect(savedFromRow(row)).toMatchObject({ videoId: "", lineIndex: 0 });
+  });
+
   it("thẻ cũ không có nghĩa thì không tạo hàng", () => {
     expect(cardRowFromSaved(item("vocab:x", { meaning: undefined }))).toBeNull();
   });

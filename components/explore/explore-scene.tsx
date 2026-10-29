@@ -68,7 +68,7 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
       ) : inSummary ? (
         <QuestSummary results={quest.results} words={c.words} xp={c.xpEarned} onAgain={c.startQuest} onBack={quest.stop} />
       ) : c.panel?.kind === "word" ? (
-        <WordCard word={c.panel.word} cardState={c.cardStateOf(c.panel.word)} onClose={() => c.setPanel(null)} />
+        <WordCard word={c.panel.word} actions={c.wordActions(c.panel.word)} onClose={() => c.setPanel(null)} />
       ) : c.panel?.kind === "npc" ? (
         <NpcCard npc={scene.npc} learned={c.learnedWords.length} total={scene.objects.length} canQuest={c.canQuest} onStart={c.startQuest} onClose={() => c.setPanel(null)} />
       ) : story ? null : (

@@ -8,8 +8,20 @@ import { PronounceButton } from "@/components/ui/pronounce-button";
 import type { SceneWord } from "@/lib/explore/explore-types";
 import { snippetRange } from "@/lib/preview/preview-format";
 
-/** Trạng thái thẻ ôn của từ: đã vào bộ ôn, chưa có câu thật để làm nguồn thẻ, hoặc đang chờ lưu. */
-export type CardState = "saved" | "no_example" | "pending";
+/** Trạng thái và hành động thẻ ôn của một từ (do người học tự chọn, không tự thêm khi chạm). */
+export interface WordActions {
+  /** Đã có thẻ trong bộ ôn. */
+  saved: boolean;
+  /** Người học đã đánh dấu "đã biết" từ này. */
+  known: boolean;
+  /** Có câu thật làm nguồn (thẻ nghe lại được đoạn video/bài hát). */
+  hasSource: boolean;
+  add: () => void;
+  remove: () => void;
+  /** Đánh dấu đã biết; `alsoRemoveCard` = bỏ luôn thẻ đang có khỏi bộ ôn. */
+  markKnown: (alsoRemoveCard: boolean) => void;
+  unmarkKnown: () => void;
+}
 
 /** Tô đậm từ đang học trong câu (chỉ lần xuất hiện đầu tiên). */
 function Highlighted({ text, term }: { text: string; term: string }) {
@@ -22,8 +34,9 @@ function Highlighted({ text, term }: { text: string; term: string }) {
  * Thẻ từ hiện sau khi học một vật: chữ Hán lớn, pinyin, Hán Việt, nghĩa và nút nghe (pinyin, Hán Việt, cấp HSK lấy từ từ điển). Cầu nối sang bài nghe:
  * nếu từ xuất hiện trong video/bài hát đã duyệt thì hiện câu thật đó (nghe câu, xem đúng đoạn video ngay trong trang), không thì hiện câu ví dụ ta viết.
  */
-export function WordCard({ word, cardState, onClose }: { word: SceneWord; cardState: CardState; onClose: () => void }) {
+export function WordCard({ word, actions, onClose }: { word: SceneWord; actions: WordActions; onClose: () => void }) {
   const real = word.examples[0];
+  const [confirmKnown, setConfirmKnown] = useState(false);
   const [clip, setClip] = useState<{ videoId: string; request: SnippetRequest } | null>(null);
   const playClip = () => real && setClip((prev) => ({ videoId: real.videoId, request: { nonce: (prev?.request.nonce ?? 0) + 1, label: word.term, ...snippetRange({ start: real.start, end: real.end }) } }));
   return (
@@ -67,12 +80,42 @@ export function WordCard({ word, cardState, onClose }: { word: SceneWord; cardSt
       </div>
       {clip && <div className="mt-space-sm"><SnippetPlayer key={clip.videoId} videoId={clip.videoId} request={clip.request} /></div>}
 
-      <p role="status" className="mt-space-sm flex flex-wrap items-center gap-x-2 text-label-md text-on-surface-variant">
-        {cardState === "saved" && <><Icon name="check_circle" size={18} filled /> Đã thêm vào bộ ôn tập. <Link href="/review/cards" className="font-bold text-primary hover:underline">Ôn ngay</Link></>}
-        {cardState === "no_example" && "Từ này chưa có câu thật trong kho nên chưa tạo được thẻ ôn."}
-        {cardState === "pending" && "Đang thêm vào bộ ôn tập…"}
-      </p>
+      <CardChoice term={word.term} actions={actions} confirmKnown={confirmKnown} setConfirmKnown={setConfirmKnown} />
       <button type="button" onClick={onClose} className="mt-1 min-h-11 text-label-md font-extrabold text-primary hover:underline">Đóng</button>
     </section>
+  );
+}
+
+const PILL = "min-h-11 cursor-pointer rounded-full border-2 border-ink px-4 text-label-md font-bold";
+
+/** Chọn của người học về thẻ ôn: thêm vào bộ ôn, hoặc đánh dấu đã biết (có hỏi bỏ thẻ nếu đã lưu). */
+function CardChoice({ term, actions, confirmKnown, setConfirmKnown }: { term: string; actions: WordActions; confirmKnown: boolean; setConfirmKnown: (v: boolean) => void }) {
+  const { saved, known, hasSource } = actions;
+  return (
+    <div className="mt-space-sm space-y-2">
+      <p role="status" className="flex flex-wrap items-center gap-x-2 text-label-md text-on-surface-variant">
+        {saved && <><Icon name="check_circle" size={18} filled /> Đã thêm vào bộ ôn tập. <Link href="/review/cards" className="font-bold text-primary hover:underline">Ôn ngay</Link></>}
+        {!saved && known && <><Icon name="check_circle" size={18} /> Bạn đã đánh dấu từ này là đã biết nên không thêm vào bộ ôn.</>}
+        {!saved && !known && (hasSource
+          ? "Thẻ ôn sẽ nghe lại được câu thật trong bài hát/video ở trên."
+          : "Từ này chưa có câu thật trong kho. Vẫn thêm được thẻ ôn, mặt thẻ có chữ, pinyin, nghĩa và câu ví dụ của cảnh, nhưng không có nút nghe lại đoạn video.")}
+      </p>
+      {confirmKnown ? (
+        <div role="group" aria-label={`Đánh dấu ${term} đã biết`} className="flex flex-wrap items-center gap-2">
+          <span className="text-label-md font-bold">Bỏ thẻ này khỏi bộ ôn luôn?</span>
+          <button type="button" className={`${PILL} bg-primary-container`} onClick={() => { actions.markKnown(true); setConfirmKnown(false); }}>Bỏ thẻ</button>
+          <button type="button" className={`${PILL} bg-surface-container-low`} onClick={() => { actions.markKnown(false); setConfirmKnown(false); }}>Giữ thẻ</button>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {!saved && !known && <button type="button" className={`${PILL} bg-primary-container`} onClick={actions.add}>Thêm vào bộ ôn</button>}
+          {saved && <button type="button" className={`${PILL} bg-surface-container-low`} onClick={actions.remove}>Bỏ khỏi bộ ôn</button>}
+          {known
+            ? <button type="button" className={`${PILL} bg-surface-container-low`} onClick={actions.unmarkKnown}>Bỏ đánh dấu đã biết</button>
+            : <button type="button" className={`${PILL} bg-surface-container-low`} onClick={() => (saved ? setConfirmKnown(true) : actions.markKnown(false))}>Mình đã biết từ này</button>}
+          {known && !saved && <button type="button" className={`${PILL} bg-primary-container`} onClick={() => { actions.unmarkKnown(); actions.add(); }}>Thêm vào bộ ôn</button>}
+        </div>
+      )}
+    </div>
   );
 }
