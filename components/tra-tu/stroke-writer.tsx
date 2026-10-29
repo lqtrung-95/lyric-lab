@@ -12,9 +12,9 @@ const tab = "inline-flex min-h-11 items-center rounded-full border-2 border-ink 
  * Thứ tự nét và tập viết MỘT chữ. "Xem": hoạt hình từng nét (phát lại, tô màu nét bộ thủ nếu dữ liệu có). "Tập viết": ô trống, người học vẽ từng nét bằng chuột/ngón tay;
  * nét sai nhiều lần được gợi ý, viết xong có điểm (`scoreWriting`). Dữ liệu nét: Make Me a Hanzi qua hanzi-writer-data (Arphic Public License).
  */
-export function StrokeWriter({ char }: { char: string }) {
+export function StrokeWriter({ char, startMode = "watch", blind = false, onScore }: { char: string; /** Chế độ mở đầu (trang Tập viết vào thẳng chế độ viết). */ startMode?: Mode; /** Ẩn cả khung mờ ở chế độ viết (tập nhớ nét); nét sai nhiều lần vẫn được gợi ý. */ blind?: boolean; /** Gọi khi viết xong một chữ. */ onScore?: (score: WritingScore) => void }) {
   const target = useRef<HTMLDivElement>(null);
-  const [mode, setMode] = useState<Mode>("watch");
+  const [mode, setMode] = useState<Mode>(startMode);
   const [radical, setRadical] = useState(false);
   const [progress, setProgress] = useState<{ done: number; mistakes: number }>({ done: 0, mistakes: 0 });
   const [score, setScore] = useState<WritingScore | null>(null);
@@ -28,13 +28,15 @@ export function StrokeWriter({ char }: { char: string }) {
     setScore(null); setProgress({ done: 0, mistakes: 0 });
     if (mode === "watch") { writer.showCharacter(); writer.showOutline(); void writer.animateCharacter(); return; }
     writer.hideCharacter();
+    if (blind) writer.hideOutline();
     let mistakes = 0;
     writer.quiz({
       onMistake: () => { mistakes++; setProgress((p) => ({ ...p, mistakes })); },
       onCorrectStroke: (s) => setProgress((p) => ({ ...p, done: s.strokeNum + 1 })),
-      onComplete: (s) => setScore(scoreWriting(strokeCount ?? 1, s.totalMistakes)),
+      onComplete: (s) => { const sc = scoreWriting(strokeCount ?? 1, s.totalMistakes); setScore(sc); onScore?.(sc); },
     });
-  }, [writer, mode, strokeCount, char, attempt]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- onScore chỉ là callback báo kết quả, không được làm bắt đầu lại lượt viết
+  }, [writer, mode, strokeCount, char, attempt, blind]);
 
   useEffect(() => {
     if (!writer) return;
