@@ -8,8 +8,11 @@ export interface ReadingDef {
   id: string;
   title: { zh: string; vi: string };
   emoji: string;
-  sentences: ReadingSentence[];
+  /** Các đoạn văn, mỗi đoạn là một mảng câu. */
+  paragraphs: ReadingSentence[][];
   quiz: ReadingQuestion[];
 }
+
+export const allSentences = (r: ReadingDef): ReadingSentence[] => r.paragraphs.flat();
 
 export interface ReadingSummary { id: string; title: { zh: string; vi: string }; emoji: string; sentenceCount: number; level: LevelBand | null }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseWriteStats, pickWriteTargets, recordWrite } from "./write-hanzi";
+import { outcomeFromStars, parseWriteStats, pointsFromStars, pickWriteTargets, recordWrite } from "./write-hanzi";
 
 const card = (term: string, kind = "vocab") => ({ item_key: `k:${term}`, kind, term, pinyin: "x", meaning: "m" });
 const noRand = () => 0;
@@ -30,5 +30,12 @@ describe("write stats", () => {
   it("parse bỏ dữ liệu sai dạng", () => {
     expect(parseWriteStats({ a: { n: 1, best: 2, last: 5 }, b: { n: "x" }, c: null })).toEqual({ a: { n: 1, best: 2, last: 5 } });
     expect(parseWriteStats("x")).toEqual({});
+  });
+});
+
+describe("chấm theo sao", () => {
+  it("sao → kết quả và điểm", () => {
+    expect([1, 2, 3].map((n) => outcomeFromStars(n as 1 | 2 | 3))).toEqual(["wrong", "partial", "correct"]);
+    expect([1, 2, 3].map((n) => pointsFromStars(n as 1 | 2 | 3))).toEqual([40, 70, 100]);
   });
 });

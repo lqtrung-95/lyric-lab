@@ -6,8 +6,10 @@ import { ModeTabs } from "@/components/review/mode-tabs";
 import { StrokeWriter } from "@/components/tra-tu/stroke-writer";
 import { useLocalJson } from "@/components/pet/use-local-json-store";
 import { playChinese } from "@/lib/speech/play-chinese";
-import { emptyWriteStats, parseWriteStats, pickWriteTargets, recordWrite, type WriteTarget } from "@/lib/practice/write-hanzi";
+import { emptyWriteStats, outcomeFromStars, parseWriteStats, pickWriteTargets, pointsFromStars, recordWrite, type WriteTarget } from "@/lib/practice/write-hanzi";
 import type { WritingScore } from "@/lib/tra-tu/score-writing";
+import { useWordGameScore } from "./use-word-game-score";
+import { recordWeekly } from "@/lib/pet/weekly-store";
 import { PracticeFrame } from "./practice-frame";
 import { usePracticePool } from "./use-practice-pool";
 
@@ -20,7 +22,7 @@ const MIN_WORDS = 1;
  * (viết tay là luyện thêm, chưa có cột lịch riêng); chỉ ghi thống kê sao tốt nhất ở thiết bị này để lượt sau ưu tiên từ chưa viết hoặc viết còn yếu.
  */
 export function WritePractice() {
-  const { status, cards } = usePracticePool();
+  const { status, cards, grade } = usePracticePool();
   const [stats, setStats] = useLocalJson(STATS_KEY, STATS_EVENT, parseWriteStats, emptyWriteStats);
   const [round, setRound] = useState(0);
   const targets = useMemo(() => (status === "ready" ? pickWriteTargets(cards, stats) : []),
@@ -32,10 +34,16 @@ export function WritePractice() {
       <ModeTabs />
       <PracticeFrame
         title="Viết chữ Hán" status={status}
-        intro="Xem nghĩa, viết từng chữ theo đúng thứ tự nét bằng chuột hoặc ngón tay. Chế độ này chỉ để luyện thêm, không đổi lịch ôn."
+        intro="Xem nghĩa, viết từng chữ theo đúng thứ tự nét bằng chuột hoặc ngón tay. Từ đã học và đến hạn sẽ được chấm vào lịch ôn (tối đa mức “Được”)."
         blocked={targets.length < MIN_WORDS ? "Chưa có từ vựng nào để tập viết (từ 1–3 chữ Hán). Lưu thêm từ khi xem trước một bài hát nhé." : null}
       >
-        <WriteSession key={round} targets={targets} onWord={(t, stars) => setStats(recordWrite(stats, t.key, stars, Date.now()))} onAgain={() => setRound((r) => r + 1)} />
+        <WriteSession key={round} targets={targets} onWord={(t, stars) => {
+          setStats(recordWrite(stats, t.key, stars, Date.now()));
+          recordWeekly("write");
+          // Viết xong một từ đã học và đến hạn thì chấm lịch ôn (đúng quy tắc game: tối đa mức "Được").
+          const card = cards.find((c) => c.item_key === t.key);
+          if (card) grade(card, outcomeFromStars(stars));
+        }} onAgain={() => setRound((r) => r + 1)} />
       </PracticeFrame>
     </>
   );
@@ -48,12 +56,15 @@ function WriteSession({ targets, onWord, onAgain }: { targets: WriteTarget[]; on
   const [done, setDone] = useState<{ term: string; stars: number }[]>([]);
   const [last, setLast] = useState<WritingScore | null>(null);
   const t = targets[wi];
+  const doneStars = done.map((d) => d.stars as 1 | 2 | 3);
+  // Điểm XP khi xong lượt: "đúng" = từ đạt ≥ 2 sao; điểm theo sao từng từ.
+  const { saved } = useWordGameScore({ mode: "write", done: !t && done.length > 0, correct: doneStars.filter((n) => n >= 2).length, total: targets.length, points: doneStars.reduce((a, n) => a + pointsFromStars(n), 0) });
   if (!t) {
     const total = done.reduce((a, d) => a + d.stars, 0);
     return (
       <section aria-label="Kết quả" className="card-ink space-y-space-sm p-space-md text-center">
         <h2 className="text-headline-md">Xong {done.length} từ!</h2>
-        <p className="text-body-md">{total}/{done.length * 3} sao</p>
+        <p className="text-body-md">{total}/{done.length * 3} sao{saved ? " · đã ghi điểm XP" : ""}</p>
         <ul className="flex flex-wrap justify-center gap-2">
           {done.map((d) => <li key={d.term} lang="zh-Hans" className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-1 font-serif text-lg font-bold">{d.term} <span className="text-label-md text-primary">{"★".repeat(d.stars)}{"☆".repeat(3 - d.stars)}</span></li>)}
         </ul>

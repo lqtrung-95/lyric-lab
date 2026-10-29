@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useExploreProgress } from "@/components/explore/use-explore-progress";
 import { Button3d } from "@/components/ui/button-3d";
+import { WEEKLY_EVENT, WEEKLY_KEY } from "@/lib/pet/weekly-store";
+import { canClaim, claimWeek, emptyWeekly, mondayOf, parseWeekly, weeklyRows } from "@/lib/pet/weekly-goals";
 import { sfx } from "@/lib/games/arcade-sfx";
 import { completedJourneys } from "@/lib/explore/journeys";
 import { HOME_ITEMS, HOME_SLOTS, itemProgress, itemUnlocked, newlyUnlocked, parseHomeState, resolvePlacement, emptyHomeState, type HomeSlotId, type HomeStats } from "@/lib/pet/pet-home";
@@ -10,6 +12,7 @@ import type { PetBurstKind } from "@/lib/pet/pet-burst";
 import type { Pet, PetMood, PetStage } from "@/lib/pet/pet-logic";
 import { HomeItemArt } from "./pet-home-art";
 import { PetSprite } from "./pet-sprite";
+import { useNow } from "./use-now";
 import { useLocalJson } from "./use-local-json-store";
 
 const KEY = "lyric-lab-pet-home";
@@ -40,10 +43,16 @@ function useExploreStats(): { ready: boolean; visited: number; goldStamps: numbe
 }
 
 /** "Nhà" của pet: căn phòng nhỏ có 6 chỗ đặt đồ. Đồ mở khóa nhờ việc bạn đã làm (xem `lib/pet/pet-home.ts`), chỉ để ngắm; chỉ lưu cách sắp xếp trên thiết bị này. */
-export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; base: Pick<HomeStats, "streakLongest" | "level" | "daysTogether">; onFx: (kind: PetBurstKind) => void; onClose: () => void }) {
+export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; base: Pick<HomeStats, "streakLongest" | "level" | "daysTogether"> & { /** Số ngày đã học trong tuần này (từ chuỗi ngày). */ daysStudied: number }; onFx: (kind: PetBurstKind) => void; onClose: () => void }) {
   const ex = useExploreStats();
   const [state, write] = useLocalJson(KEY, EVENT, parseHomeState, emptyHomeState);
-  const stats: HomeStats = useMemo(() => ({ ...base, stage, visited: ex.visited, goldStamps: ex.goldStamps, journeys: ex.journeys }), [base, stage, ex.visited, ex.goldStamps, ex.journeys]);
+  const [weekly, writeWeekly] = useLocalJson(WEEKLY_KEY, WEEKLY_EVENT, parseWeekly, emptyWeekly);
+  const now = useNow();
+  const week = mondayOf(now);
+  const { streakLongest, level, daysTogether, daysStudied } = base;
+  const stats: HomeStats = useMemo(() => ({ streakLongest, level, daysTogether, stage, visited: ex.visited, goldStamps: ex.goldStamps, journeys: ex.journeys, weeksDone: weekly.claimed.length }), [streakLongest, level, daysTogether, stage, ex.visited, ex.goldStamps, ex.journeys, weekly.claimed.length]);
+  const rows = weeklyRows(weekly, week, daysStudied);
+  const claimable = canClaim(weekly, week, daysStudied);
   const placed = useMemo(() => resolvePlacement(state.placed, stats), [state.placed, stats]);
   const fresh = ex.ready ? newlyUnlocked(state.seen, stats) : [];
   const freshKey = fresh.map((i) => i.id).join(",");
@@ -70,6 +79,20 @@ export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: 
         </div>
       )}
       <div className="relative mt-space-sm overflow-hidden rounded-2xl">
+      <section aria-label="Mục tiêu tuần" className="mt-space-sm rounded-2xl border-2 border-ink bg-surface-container-lowest p-space-sm">
+        <h4 className="text-label-lg font-extrabold">Mục tiêu tuần này · huy hiệu đã nhận: {weekly.claimed.length}</h4>
+        <ul className="mt-1 flex flex-col gap-1">
+          {rows.map((r) => (
+            <li key={r.id} className="flex items-center justify-between gap-2 text-body-md">
+              <span>{r.done ? "✓ " : "○ "}{r.label}</span>
+              <span className="text-label-md font-bold">{r.have}/{r.target}</span>
+            </li>
+          ))}
+        </ul>
+        {claimable
+          ? <button type="button" onClick={() => { sfx.petCheer(); onFx("evolve"); writeWeekly(claimWeek(weekly, week)); }} className="mt-2 min-h-11 rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-extrabold">Nhận huy hiệu tuần</button>
+          : weekly.claimed.includes(week) && <p role="status" className="mt-1 text-label-md font-bold text-secondary">Đã nhận huy hiệu tuần này. Hẹn bạn tuần sau!</p>}
+      </section>
       <svg viewBox="0 0 400 260" role="img" aria-label={`Căn phòng của ${pet.name}: ${HOME_SLOTS.map((s) => `${s.label} ${HOME_ITEMS.find((i) => i.id === placed[s.id])?.label ?? "trống"}`).join(", ")}`} className="block w-full">
         <rect width="400" height="260" fill="#ffe9c9" />
         <rect y="170" width="400" height="90" fill="#d9a066" />

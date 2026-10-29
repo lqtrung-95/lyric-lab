@@ -15,6 +15,8 @@ export interface HomeStats {
   visited: number;
   goldStamps: number;
   journeys: number;
+  /** Số tuần đã nhận huy hiệu mục tiêu tuần. */
+  weeksDone: number;
 }
 export type HomeStatKey = keyof HomeStats;
 
@@ -34,6 +36,7 @@ export const HOME_ITEMS: readonly HomeItem[] = [
   { id: "shelf", label: "Kệ sách", kind: "wall", need: { stat: "stage", at: 2 }, how: "Pet lên giai đoạn thiếu niên" },
   { id: "medalframe", label: "Khung huy chương", kind: "wall", need: { stat: "goldStamps", at: 1 }, how: "Đạt 1 dấu Thổ địa ở hộ chiếu" },
   { id: "lanternwall", label: "Đèn lồng treo", kind: "wall", need: { stat: "streakLongest", at: 30 }, how: "Chuỗi ngày dài nhất đạt 30 ngày" },
+  { id: "scroll", label: "Tranh thư pháp", kind: "wall", need: { stat: "weeksDone", at: 1 }, how: "Nhận 1 huy hiệu mục tiêu tuần" },
   { id: "bed", label: "Ổ ngủ", kind: "floor", need: null, how: "Có sẵn" },
   { id: "rug", label: "Thảm tròn", kind: "floor", need: { stat: "streakLongest", at: 3 }, how: "Chuỗi ngày dài nhất đạt 3 ngày" },
   { id: "plant", label: "Chậu cây", kind: "floor", need: { stat: "level", at: 3 }, how: "Đạt cấp 3" },
@@ -41,11 +44,13 @@ export const HOME_ITEMS: readonly HomeItem[] = [
   { id: "kumquat", label: "Cây quất nhỏ", kind: "floor", need: { stat: "journeys", at: 2 }, how: "Hoàn thành 2 hành trình ở Khám phá" },
   { id: "telescope", label: "Kính thiên văn", kind: "floor", need: { stat: "visited", at: 20 }, how: "Ghé 20 cảnh ở Khám phá" },
   { id: "trophy", label: "Cúp lớn", kind: "floor", need: { stat: "level", at: 10 }, how: "Đạt cấp 10" },
+  { id: "bonsai", label: "Chậu bonsai", kind: "floor", need: { stat: "weeksDone", at: 4 }, how: "Nhận 4 huy hiệu mục tiêu tuần" },
   { id: "bowl", label: "Bát ăn", kind: "small", need: null, how: "Có sẵn" },
   { id: "ball", label: "Quả bóng", kind: "small", need: { stat: "daysTogether", at: 3 }, how: "Bên nhau 3 ngày" },
   { id: "lamp", label: "Đèn bàn", kind: "small", need: { stat: "streakLongest", at: 7 }, how: "Chuỗi ngày dài nhất đạt 7 ngày" },
   { id: "clock", label: "Đồng hồ nhỏ", kind: "small", need: { stat: "level", at: 5 }, how: "Đạt cấp 5" },
   { id: "globe", label: "Quả địa cầu", kind: "small", need: { stat: "visited", at: 5 }, how: "Ghé 5 cảnh ở Khám phá" },
+  { id: "teapot", label: "Ấm trà nhỏ", kind: "small", need: { stat: "weeksDone", at: 2 }, how: "Nhận 2 huy hiệu mục tiêu tuần" },
   { id: "inkset", label: "Bộ bút nghiên", kind: "small", need: { stat: "visited", at: 10 }, how: "Ghé 10 cảnh ở Khám phá" },
 ];
 
@@ -59,7 +64,7 @@ export const HOME_SLOTS = [
 ] as const satisfies readonly { id: string; kind: HomeItemKind; label: string }[];
 export type HomeSlotId = (typeof HOME_SLOTS)[number]["id"];
 
-export const emptyStats = (): HomeStats => ({ streakLongest: 0, level: 1, stage: 1, daysTogether: 0, visited: 0, goldStamps: 0, journeys: 0 });
+export const emptyStats = (): HomeStats => ({ streakLongest: 0, level: 1, stage: 1, daysTogether: 0, visited: 0, goldStamps: 0, journeys: 0, weeksDone: 0 });
 
 export function itemUnlocked(item: HomeItem, stats: HomeStats): boolean {
   return !item.need || stats[item.need.stat] >= item.need.at;
