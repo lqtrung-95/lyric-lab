@@ -24,11 +24,12 @@ export default function AppHomePage() {
   return (
     <>
       <AnnouncementBanner />
-      {/* Hai hàng hai ô: hàng trên là việc cần làm (hành động + nhiệm vụ, cao bằng nhau), hàng dưới là việc mới (dán bài + lộ trình). Điện thoại xếp một cột theo thứ tự đọc. */}
+      {/* Ba hàng: việc cần làm (hành động + nhiệm vụ, cao bằng nhau), linh vật (cả bề ngang, phản ứng với chính hàng trên), việc mới (dán bài + lộ trình). Điện thoại xếp một cột: hành động, linh vật, dán bài, nhiệm vụ, lộ trình. */}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-2">
         <div className="lg:col-start-1 lg:row-start-1"><NextActionPanel /></div>
-        <div className="lg:col-start-2 lg:row-start-1 max-lg:order-3"><HomeQuests /></div>
-        <div className="lg:col-start-1 lg:row-start-2">
+        <div className="lg:col-start-2 lg:row-start-1 max-lg:order-4"><HomeQuests /></div>
+        <div className="lg:col-span-2 lg:row-start-2 max-lg:order-2"><PetCard /></div>
+        <div className="lg:col-start-1 lg:row-start-3 max-lg:order-3">
           <section aria-labelledby="paste-heading" className="card-ink flex h-full flex-col px-space-md py-space-md">
             <h1 id="paste-heading" className="text-headline-md">Học từ bất kỳ bài hát nào</h1>
             <p className="mt-1 max-w-xl text-body-md text-on-surface-variant">Dán link YouTube, xem trước từ vựng và ngữ pháp đáng học, rồi nghe với lời chạy theo nhạc.</p>
@@ -39,9 +40,8 @@ export default function AppHomePage() {
             </div>
           </section>
         </div>
-        <div className="lg:col-start-2 lg:row-start-2 max-lg:order-4"><HomePathCard /></div>
+        <div className="lg:col-start-2 lg:row-start-3 max-lg:order-5"><HomePathCard /></div>
       </div>
-      <div className="mt-space-md"><PetCard /></div>
       <div className="mt-space-md"><HomeVersusCard /></div>
       <TodayPlan />
       <StreakCard />
