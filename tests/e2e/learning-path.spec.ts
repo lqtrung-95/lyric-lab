@@ -44,16 +44,21 @@ test("chọn cấp: HSK 1–6, mở HSK 2 qua liên kết có thể chia sẻ", 
   await expect(page.getByRole("note")).toHaveCount(0);
 });
 
-test("bài xếp lớp: 30 câu có lựa chọn Chưa biết, kết quả gợi ý cấp và mở đúng lộ trình", async ({ page }) => {
+test("bài xếp lớp: nhiều dạng câu, chọn Chưa biết hết thì dừng sớm sau hai cấp, gợi ý HSK 1 và mở đúng lộ trình", async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto("/courses/placement");
   await page.getByRole("button", { name: /Bắt đầu/ }).click();
-  for (let i = 0; i < 30; i++) {
-    await expect(page.getByText(new RegExp(`Câu ${i + 1}/30`))).toBeVisible({ timeout: 30_000 });
+  await expect(page.getByText(/Câu 1\/\d+/)).toBeVisible({ timeout: 30_000 });
+  let asked = 0;
+  while ((await page.getByTestId("placement-result").count()) === 0 && asked < 40) {
+    asked++;
     await page.getByRole("button", { name: "Chưa biết" }).click();
   }
+  // Hai cấp liên tiếp không được điểm nào (mỗi cấp 6 câu) thì bài tự dừng, không hỏi đủ 36 câu.
+  expect(asked).toBeLessThanOrEqual(12);
   // Chọn "Chưa biết" cho mọi câu thì chưa nắm cấp nào: gợi ý bắt đầu từ HSK 1.
   await expect(page.getByTestId("placement-result")).toContainText("Bắt đầu từ HSK 1");
+  await expect(page.getByTestId("placement-result")).toContainText("Theo kỹ năng");
   await page.getByRole("link", { name: /Mở lộ trình HSK 1/ }).click();
   await expect(page).toHaveURL(/\/courses\?course=hsk-1/);
 });
