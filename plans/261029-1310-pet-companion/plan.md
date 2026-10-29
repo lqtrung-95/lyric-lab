@@ -62,3 +62,4 @@ Mỗi mục xong: thêm test cho phần logic thuần, chạy `npx vitest run`, 
 
 9. **(XONG 2026-10-29) Dạy pet, phiêu lưu, thẻ khoe.** Dạy pet chọn nghĩa đúng, pet nhớ/quên theo mức; phiêu lưu một chuyến mỗi ngày mang 3 từ cảnh Khám phá; thẻ khoe hologram lưu PNG/chia sẻ. Chi tiết ở `docs/handoff-and-status.md`. Còn lại (ý tưởng): nhiệm vụ pet hằng ngày, karaoke với pet, đồng bộ sổ từ lên tài khoản.
 10. **(XONG 2026-10-29) Game cùng pet.** Đấu với pet (`/review/pet-duel`) và pet cổ vũ ở Đập chữ. Còn lại (ý tưởng): pet làm nhân vật trong Bắn chữ/Nhạc rơi.
+11. **(XONG 2026-10-29) Pet thăm nhà bạn bè (bản không cần DB).** Link mời mang ảnh chụp pet, khách chơi cùng; còn lại: bảng `pet_visits` để chủ pet nhận quà khách để lại.

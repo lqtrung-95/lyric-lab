@@ -6,6 +6,7 @@ import { Button3d } from "@/components/ui/button-3d";
 import { sfx } from "@/lib/games/arcade-sfx";
 import { PET_SPECIES_LABELS, type Pet, type PetStage } from "@/lib/pet/pet-logic";
 import type { PetBurst } from "@/lib/pet/pet-burst";
+import { buildVisitUrl } from "@/lib/pet/pet-visit";
 import { confetti, shareChips, shareFileName, sparkles, type ShareStats } from "@/lib/pet/pet-share";
 import { PetBurstFx } from "./pet-burst-fx";
 import { renderShareImage } from "./pet-share-image";
@@ -45,6 +46,14 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
     if (!svg) throw new Error("no_svg");
     const blob = await renderShareImage({ svg: svg as SVGSVGElement, name: pet.name, subtitle, stars: stage, chips, tint: TINT[pet.species] });
     return new File([blob], shareFileName(pet.name), { type: "image/png" });
+  };
+  const invite = async () => {
+    const url = buildVisitUrl(`${window.location.origin}/ghe-tham-pet`, { species: pet.species, name: pet.name, stage, accessories, level: stats.level, streak: stats.streak });
+    const text = `Ghé nhà ${pet.name} chơi nè! ${pet.name} đang học tiếng Trung cùng mình trên SongHanzi.`;
+    try {
+      if (navigator.share) await navigator.share({ title: `Ghé thăm ${pet.name}`, text, url });
+      else { await navigator.clipboard.writeText(`${text} ${url}`); setNote("Đã sao chép link mời bạn đến thăm."); }
+    } catch (e) { if (!(e instanceof DOMException && e.name === "AbortError")) setNote("Chưa chia sẻ được. Thử lại nhé."); }
   };
   const run = async (share: boolean) => {
     setBusy(true); setNote(null); sfx.petBlip();
@@ -102,7 +111,8 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
         </div>
         <div className="flex flex-wrap justify-center gap-2">
           <Button3d type="button" variant="bright" disabled={busy} onClick={() => void run(false)}>Lưu ảnh</Button3d>
-          <Button3d type="button" disabled={busy} onClick={() => void run(true)}>Chia sẻ</Button3d>
+          <Button3d type="button" disabled={busy} onClick={() => void run(true)}>Chia sẻ ảnh</Button3d>
+          <Button3d type="button" variant="tertiary" onClick={() => void invite()}>Mời bạn đến thăm</Button3d>
           <button type="button" onClick={() => { sfx.petBlip(); onClose(); }} className="min-h-11 rounded-full px-4 text-label-md font-bold text-on-surface-variant hover:bg-surface-container">Đóng</button>
         </div>
         {note && <p role="status" className="text-label-md font-bold">{note}</p>}
