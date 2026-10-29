@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { convertName, joinHan, splitName } from "./chinese-name";
-import { GIVEN, SURNAMES } from "./name-data";
+import { GIVEN, NAME_PINYIN, SURNAMES } from "./name-data";
 
 describe("splitName", () => {
   it("chuẩn hóa chữ hoa/khoảng trắng, bỏ ký tự lạ, giới hạn độ dài", () => {
@@ -35,5 +35,12 @@ describe("convertName", () => {
     const han = /^\p{Script=Han}$/u;
     for (const v of Object.values(SURNAMES)) expect(v).toMatch(han);
     for (const [k, v] of Object.entries(GIVEN)) { expect(v.han, k).toMatch(han); expect(v.meaning.length, k).toBeGreaterThan(2); }
+  });
+});
+
+describe("cách đọc ép cho chữ trong tên", () => {
+  it("叶 đọc yè (không phải xié) và mọi giá trị là pinyin có dấu thanh", () => {
+    expect(NAME_PINYIN["叶"]).toBe("yè");
+    for (const [k, v] of Object.entries(NAME_PINYIN)) { expect(k, k).toMatch(/^\p{Script=Han}$/u); expect(v, k).toMatch(/^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]+$/); }
   });
 });

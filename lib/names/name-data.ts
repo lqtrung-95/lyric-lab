@@ -74,3 +74,9 @@ export const GIVEN: Record<string, NameChar> = {
 
 /** Họ có chữ đa âm mà từ điển hay chọn cách đọc khác khi đứng riêng: ép cách đọc khi dùng làm họ. */
 export const SURNAME_PINYIN: Record<string, string> = { 曾: "zēng", 单: "shàn", 区: "ōu", 仇: "qiú", 查: "zhā", 解: "xiè", 朴: "piáo", 万: "wàn" };
+
+/** Chữ dùng trong tên mà từ điển hay chọn cách đọc hiếm khi đứng riêng (叶 hay ra xié, 长 ra zhǎng...): ép cách đọc thông dụng của tên người. Áp cho mọi vị trí trong tên. */
+export const NAME_PINYIN: Record<string, string> = {
+  ...SURNAME_PINYIN,
+  叶: "yè", 长: "cháng", 重: "zhòng", 和: "hé", 兴: "xīng", 丽: "lì", 陆: "lù", 何: "hé", 柏: "bǎi", 发: "fā", 禄: "lù", 乐: "lè", 都: "dū", 盛: "shèng", 朝: "zhāo", 行: "xíng", 蕃: "fān",
+};
