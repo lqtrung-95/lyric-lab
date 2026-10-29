@@ -42,6 +42,7 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
       { href: "/review/rain", label: "Nhạc rơi", desc: "Đọc pinyin, chạm đúng chữ như Piano Tiles", icon: "library_music" },
       { href: "/review/whack", label: "Đập chữ", desc: "30 giây đập đúng chữ trong chín hố", icon: "timer" },
       { href: "/review/daily", label: "Hán tự mỗi ngày", desc: "Mỗi ngày một từ, đoán kiểu Wordle", icon: "calendar_month" },
+      { href: "/review/pet-duel", label: "Đấu với pet", desc: "5 câu, bấm đúng chữ Hán trước bạn nhỏ của bạn", icon: "emoji_events" },
       { href: "/review/duel", label: "Đấu 1–1", desc: "Thách bạn gõ pinyin, ai nhanh hơn thắng", icon: "group" },
     ],
   },

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { GameKeyframes } from "./game-keyframes";
+import { GamePet, type GamePetEvent } from "./game-pet";
 import { HintToggles } from "./hint-toggles";
 import { useArcadeHints } from "./use-arcade-hints";
 import { SoundToggle } from "./sound-toggle";
@@ -32,6 +33,8 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const hints = useArcadeHints();
   const [flash, setFlash] = useState<number | null>(null);
   const [fx, setFx] = useState<{ cell: number; points: number } | null>(null);
+  const [petEv, setPetEv] = useState<GamePetEvent | null>(null);
+  const cheerPet = (kind: GamePetEvent["kind"]) => setPetEv((e) => ({ key: (e?.key ?? 0) + 1, kind }));
   const endAt = useRef(0);
   const roundStart = useRef(0);
   const win = windowMs(g.played);
@@ -48,11 +51,13 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
       const frac = 1 - msSince(roundStart.current) / win;
       const points = whackPoints(frac, g.combo);
       sfx.pop(g.combo);
+      cheerPet((g.combo + 1) % 5 === 0 ? "combo" : "hit");
       setFx({ cell, points });
       setG((c) => advance(c, true, points));
     } else {
       endAt.current -= PENALTY_MS;
       sfx.buzz();
+      cheerPet("miss");
       setFlash(cell);
       setG((c) => ({ ...c, combo: 0 }));
     }
@@ -96,6 +101,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
       <GameKeyframes />
       <div className="flex flex-wrap items-center justify-between gap-2 text-label-lg font-extrabold">
         <span>🔨 {g.score}</span>
+        <GamePet event={petEv} />
         <SoundToggle className="min-h-11 min-w-11 rounded-full bg-surface-container-low text-xl" />
         <HintToggles />
         <span role="timer" aria-label={`Còn ${left} giây`} className={`rounded-full border-2 border-ink px-3 py-1 ${left <= 5 && phase === "play" ? "animate-pulse bg-error text-on-error" : "bg-surface-container-lowest"}`}>⏱ {left}s</span>

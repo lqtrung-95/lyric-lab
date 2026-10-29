@@ -16,11 +16,11 @@ const FX_CSS = `
  * (tiếng theo công tắc âm thanh chung, mặc định bật). Hạt chỉ chuyển động khi không bật giảm chuyển động; người đó vẫn nghe tiếng.
  * Chỉ trang trí (aria-hidden): lời nói và trạng thái luôn có chữ ở chỗ khác.
  */
-export function PetBurstFx({ burst, species }: { burst: PetBurst | null; species: string }) {
+export function PetBurstFx({ burst, species, silent = false }: { burst: PetBurst | null; species: string; /** Chỉ hạt, không tiếng (game đã có tiếng riêng). */ silent?: boolean }) {
   const key = burst?.key;
   const kind = burst?.kind;
   useEffect(() => {
-    if (key === undefined || !kind) return;
+    if (key === undefined || !kind || silent) return;
     switch (burstSound(kind)) {
       case "chirp": sfx.petChirp(species); break;
       case "cheer": sfx.petCheer(); break;
@@ -33,7 +33,7 @@ export function PetBurstFx({ burst, species }: { burst: PetBurst | null; species
       case "evolve": sfx.petEvolve(); break;
       case "blip": sfx.pop(0); break;
     }
-  }, [key, kind, species]);
+  }, [key, kind, species, silent]);
   if (!burst) return null;
   return (
     <span aria-hidden="true" key={burst.key} className="pointer-events-none absolute inset-0 overflow-visible">

@@ -61,3 +61,4 @@ Gợi ý dùng lại: `components/layout/use-game-summary.ts` (XP/cấp/chuỗi)
 Mỗi mục xong: thêm test cho phần logic thuần, chạy `npx vitest run`, `npx tsc --noEmit` (bỏ qua lỗi types tự sinh cũ của Next), `npx eslint`, cập nhật `docs/handoff-and-status.md` (+ 3 tài liệu còn lại nếu đổi kiến trúc, biến môi trường, quy ước), rồi commit kiểu Conventional Commits.
 
 9. **(XONG 2026-10-29) Dạy pet, phiêu lưu, thẻ khoe.** Dạy pet chọn nghĩa đúng, pet nhớ/quên theo mức; phiêu lưu một chuyến mỗi ngày mang 3 từ cảnh Khám phá; thẻ khoe hologram lưu PNG/chia sẻ. Chi tiết ở `docs/handoff-and-status.md`. Còn lại (ý tưởng): nhiệm vụ pet hằng ngày, karaoke với pet, đồng bộ sổ từ lên tài khoản.
+10. **(XONG 2026-10-29) Game cùng pet.** Đấu với pet (`/review/pet-duel`) và pet cổ vũ ở Đập chữ. Còn lại (ý tưởng): pet làm nhân vật trong Bắn chữ/Nhạc rơi.
