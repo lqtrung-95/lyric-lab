@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compactXp, confetti, daysTogether, shareChips, shareFileName, sparkles } from "./pet-share";
+import { chipRows, compactXp, confetti, daysTogether, shareChips, shareFileName, sparkles } from "./pet-share";
 
 describe("số liệu thẻ khoe", () => {
   it("đếm ngày bên nhau, ngày nhận nuôi là ngày 1", () => {
@@ -36,5 +36,11 @@ describe("trang trí cố định", () => {
   it("tên tệp an toàn", () => {
     expect(shareFileName("Tiểu Long!")).toBe("songhanzi-tiểu-long.png");
     expect(shareFileName("???")).toBe("songhanzi-pet.png");
+  });
+});
+
+describe("chipRows", () => {
+  it("chia hàng cân đối, không để 3+1", () => {
+    expect([0, 1, 2, 3, 4, 5].map(chipRows)).toEqual([[], [1], [2], [3], [2, 2], [3, 2]]);
   });
 });

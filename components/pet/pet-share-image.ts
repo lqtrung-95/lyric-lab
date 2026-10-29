@@ -1,4 +1,4 @@
-import { confetti, sparkles, type ShareChip } from "@/lib/pet/pet-share";
+import { chipRows, confetti, sparkles, type ShareChip } from "@/lib/pet/pet-share";
 
 const W = 1080;
 const H = 1350;
@@ -111,11 +111,15 @@ export async function renderShareImage({ svg, name, subtitle, stars, chips, tint
   ctx.font = `700 54px ${font}`; ctx.fillStyle = "#f59e0b"; ctx.fillText("★".repeat(stars) + "☆".repeat(3 - stars), W / 2, 1026);
 
   // Ô số liệu.
-  const per = Math.min(chips.length, 3);
-  const cw = 280, gap = 24;
+  // Ô rộng theo số ô trong hàng (cùng cách chia với thẻ trên màn hình): hàng 3 ô hẹp hơn, hàng 2 ô rộng hơn nên 2×2 hoặc 3+2 đều cân.
+  const gap = 24;
+  const rows = chipRows(chips.length);
+  const bounds = rows.map((n, r) => ({ n, start: rows.slice(0, r).reduce((a, b) => a + b, 0) }));
   chips.forEach((c, i) => {
-    const row = Math.floor(i / per), inRow = Math.min(per, chips.length - row * per);
-    const x = (W - (inRow * cw + (inRow - 1) * gap)) / 2 + (i % per) * (cw + gap);
+    const row = bounds.findIndex((b) => i >= b.start && i < b.start + b.n);
+    const { n: inRow, start } = bounds[row];
+    const cw = inRow >= 3 ? 280 : 400;
+    const x = (W - (inRow * cw + (inRow - 1) * gap)) / 2 + (i - start) * (cw + gap);
     const y = 1066 + row * 96;
     ctx.fillStyle = "rgba(255,255,255,0.85)"; roundRect(ctx, x, y, cw, 80, 24); ctx.fill();
     ctx.lineWidth = 3; ctx.strokeStyle = "#3a2b2b"; ctx.stroke();

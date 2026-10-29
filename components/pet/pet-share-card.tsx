@@ -7,7 +7,7 @@ import { sfx } from "@/lib/games/arcade-sfx";
 import { PET_SPECIES_LABELS, type Pet, type PetStage } from "@/lib/pet/pet-logic";
 import type { PetBurst } from "@/lib/pet/pet-burst";
 import { buildVisitUrl } from "@/lib/pet/pet-visit";
-import { confetti, shareChips, shareFileName, sparkles, type ShareStats } from "@/lib/pet/pet-share";
+import { chipRows, confetti, shareChips, shareFileName, sparkles, type ShareStats } from "@/lib/pet/pet-share";
 import { PetBurstFx } from "./pet-burst-fx";
 import { renderShareImage } from "./pet-share-image";
 import { PetSprite, TINT } from "./pet-sprite";
@@ -27,6 +27,8 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const chips = shareChips(stats);
+  // Mỗi ô rộng bằng 6 chia số ô trong hàng của nó (6 cột): hàng 3 ô mỗi ô 2 cột, hàng 2 ô mỗi ô 3 cột, nên hàng ít ô vẫn đều và căn giữa.
+  const chipSpan = chipRows(chips.length).flatMap((n) => Array<string>(n).fill(n === 3 ? "col-span-2" : n === 2 ? "col-span-3" : "col-span-6"));
   const subtitle = `${PET_SPECIES_LABELS[pet.species]} · ${STAGE_NAMES[stage - 1]}`;
 
   const tilt = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -95,9 +97,9 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
                 <p className="mt-1 text-2xl text-[#f59e0b]" aria-label={`Giai đoạn ${stage} trên 3`}>
                   {[1, 2, 3].map((n) => <span key={n} aria-hidden="true" className="share-star" style={{ ["--d" as string]: `${0.5 + n * 0.18}s` }}>{n <= stage ? "★" : "☆"}</span>)}
                 </p>
-                <ul className="mt-2 grid w-full grid-cols-3 gap-2 pb-5">
-                  {chips.map((c) => (
-                    <li key={c.label} className="rounded-xl border-2 border-[#3a2b2b] bg-white/85 px-1 py-1 text-center">
+                <ul className="mt-2 grid w-full grid-cols-6 gap-2 pb-5">
+                  {chips.map((c, i) => (
+                    <li key={c.label} className={`${chipSpan[i]} rounded-xl border-2 border-[#3a2b2b] bg-white/85 px-1 py-1.5 text-center`}>
                       <span className="block text-base font-extrabold">{c.value}</span>
                       <span className="block text-[0.7rem] font-semibold leading-tight text-[#6b5b4b]">{c.label}</span>
                     </li>

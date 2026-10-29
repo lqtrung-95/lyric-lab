@@ -55,3 +55,12 @@ export function confetti(count = 26): Confetti[] {
 }
 
 export const shareFileName = (petName: string): string => `songhanzi-${petName.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "pet"}.png`;
+
+/**
+ * Chia các ô số liệu thành hàng cân đối: 2 ô một hàng, 3 ô một hàng, 4 ô thành 2×2 (không để 3+1 lệch), 5 ô thành 3+2. Trả số ô của từng hàng.
+ */
+export function chipRows(count: number): number[] {
+  if (count <= 3) return count > 0 ? [count] : [];
+  if (count === 4) return [2, 2];
+  return [3, count - 3];
+}
