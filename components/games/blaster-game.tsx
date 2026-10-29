@@ -9,6 +9,7 @@ import { BlasterScene } from "./blaster-scene";
 import { GameKeyframes } from "./game-keyframes";
 import { HintToggles } from "./hint-toggles";
 import { SoundToggle } from "./sound-toggle";
+import { SquadronGame } from "./squadron-game";
 import { useArcadeHints } from "./use-arcade-hints";
 import { useArcadeScore } from "./use-arcade-score";
 import { useBlasterSound } from "./use-blaster-sound";
@@ -16,10 +17,22 @@ import { useGameLoop } from "./use-game-loop";
 
 const chip = "rounded-full border border-white/15 bg-slate-900/70 px-3 py-1 text-sm font-bold text-white";
 
-/** Bắn chữ: từ Hán rơi từ trên xuống; nhìn chữ, nhớ pinyin rồi gõ các chữ cái (không cần thanh) để bắn nổ trước khi chạm đáy. Hết 3 mạng là thua; càng bắn nhiều, cấp càng cao, từ rơi càng nhanh. */
+/** Bắn chữ có hai chế độ: Phi đội (lái tàu, bắn đúng chữ — xem `SquadronGame`) và Gõ pinyin. Chế độ Gõ pinyin: từ Hán rơi từ trên xuống; nhìn chữ, nhớ pinyin rồi gõ các chữ cái (không cần thanh) để bắn nổ trước khi chạm đáy. Hết 3 mạng là thua; càng bắn nhiều, cấp càng cao, từ rơi càng nhanh. */
 export function BlasterGame({ words }: { words: GameWord[] }) {
   const [run, setRun] = useState(0);
-  return <Round key={run} words={words} onAgain={() => setRun((r) => r + 1)} />;
+  const [mode, setMode] = useState<"squadron" | "type">("squadron");
+  const again = () => setRun((r) => r + 1);
+  const pick = (m: typeof mode) => { setMode(m); setRun((r) => r + 1); };
+  return (
+    <div>
+      <div role="group" aria-label="Chế độ chơi" className="mb-space-sm flex flex-wrap gap-2">
+        {([["squadron", "✈️ Phi đội", "Lái tàu, bắn đúng chữ theo nghĩa hoặc pinyin"], ["type", "⌨️ Gõ pinyin", "Nhìn chữ, gõ pinyin để bắn"]] as const).map(([m, label, hint]) => (
+          <button key={m} type="button" aria-pressed={mode === m} title={hint} onClick={() => pick(m)} className={`min-h-11 rounded-full border-2 px-4 text-label-lg font-bold ${mode === m ? "border-ink bg-primary-container" : "border-outline-variant bg-surface-container-lowest"}`}>{label}</button>
+        ))}
+      </div>
+      {mode === "squadron" ? <SquadronGame key={run} words={words} onAgain={again} /> : <Round key={run} words={words} onAgain={again} />}
+    </div>
+  );
 }
 
 function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
