@@ -4,6 +4,7 @@ import { getServerEnv } from "@/lib/env/server-env";
 import { annotatePinyin } from "@/lib/explore/story/annotate-lines";
 import { consumeUsage, refundUsage } from "@/lib/rate-limit/consume-usage";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
+import { segmentReply } from "@/lib/roleplay/segment-reply";
 import { RoleplayError, runRoleplayTurn } from "@/lib/roleplay/roleplay-turn";
 import { roleplayRequestSchema } from "@/lib/roleplay/turn-schema";
 
@@ -34,7 +35,7 @@ export async function POST(req: Request) {
     });
     const pinyin = await annotatePinyin([out.reply, ...out.tips, ...(out.feedback ? [out.feedback.better] : [])]);
     console.info(JSON.stringify({ event: "roleplay_turn", scenario: parsed.data.scenarioId, level: parsed.data.level, model: out.model, ms: Date.now() - started }));
-    return Response.json({ reply: out.reply, replyVi: out.replyVi, tips: out.tips, feedback: out.feedback, pinyin });
+    return Response.json({ reply: out.reply, replyVi: out.replyVi, tips: out.tips, feedback: out.feedback, pinyin, tokens: segmentReply(out.reply) });
   } catch (error) {
     if (consumed && (error as { code?: string })?.code !== "rate_limited") await refundUsage(user, "roleplay");
     if (error instanceof RoleplayError) return Response.json({ error: error.code }, { status: error.code === "rate_limited" ? 429 : 502 });

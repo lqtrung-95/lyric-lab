@@ -163,3 +163,4 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Pane trình duyệt trong app không chạy `requestAnimationFrame`: khi tự kiểm game, ghi đè `requestAnimationFrame` bằng `setTimeout` trong trang trước khi bấm Bắt đầu.
 - Nghĩa ghi vào `user_cards.meaning` phải đi qua `cleanSavedMeaning`; không lưu câu giải thích dài hay cụm dẫn nhập.
 - Tương tác mới với pet phải có tiếng + hạt: thêm loại vào `lib/pet/pet-burst.ts` và bắn qua `PetBurstFx`, không gọi `sfx` rải rác; tôn trọng giảm chuyển động (hạt) và công tắc tiếng chung.
+- Câu tiếng Trung do AI sinh hiện trong giao diện nên cho bấm từng từ (server trả `tokens` bằng `segmentReply`), tra/lưu thẻ qua `GET /api/lookup/word`; thẻ ôn luôn cần một câu thật làm nguồn, không tạo thẻ không nguồn.

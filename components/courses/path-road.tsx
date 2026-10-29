@@ -46,7 +46,7 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
                 {done ? <Icon name="check" size={28} /> : current ? <Icon name="star" size={32} filled /> : review ? <Icon name={reviewIcon(u)} size={28} filled /> : u.idx}
                 {current && <span aria-hidden="true" className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-sm font-black">Đang học</span>}
               </button>
-              {current && <span className={`absolute top-1/2 -translate-y-1/2 ${labelRight ? "left-full ml-2" : "right-full mr-2"}`}><PetMini className="size-12" /></span>}
+              {current && <span className={`absolute top-1/2 -translate-y-1/2 ${labelRight ? "right-full mr-2" : "left-full ml-2"}`}><PetMini className="size-12" /></span>}
               {showTopic && <span aria-hidden="true" className={`pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full border-2 border-[var(--ink-soft)] bg-surface-container-lowest px-3 py-1 text-label-md font-extrabold text-on-surface-variant sm:block ${labelRight ? "left-full ml-3" : "right-full mr-3"}`}>{u.topic}</span>}
             </li>
           );
