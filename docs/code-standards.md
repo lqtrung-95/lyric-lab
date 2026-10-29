@@ -164,3 +164,4 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Nghĩa ghi vào `user_cards.meaning` phải đi qua `cleanSavedMeaning`; không lưu câu giải thích dài hay cụm dẫn nhập.
 - Tương tác mới với pet phải có tiếng + hạt: thêm loại vào `lib/pet/pet-burst.ts` và bắn qua `PetBurstFx`, không gọi `sfx` rải rác; tôn trọng giảm chuyển động (hạt) và công tắc tiếng chung.
 - Câu tiếng Trung do AI sinh hiện trong giao diện nên cho bấm từng từ (server trả `tokens` bằng `segmentReply`), tra/lưu thẻ qua `GET /api/lookup/word`; thẻ ôn có câu thật làm nguồn khi có, chưa có thì lưu thẻ không nguồn (videoId rỗng) và báo rõ cho người học.
+- Ẩn phần còn lại của trang khi in bằng `display: none` (hoặc `print:hidden`), KHÔNG dùng `visibility: hidden` vì phần bị ẩn vẫn chiếm chỗ và sinh trang trắng. Danh sách riêng để in thì portal ra `<body>` rồi ẩn các con khác của body.
