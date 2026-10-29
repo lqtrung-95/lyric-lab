@@ -113,7 +113,7 @@ export function VocabWorksheetGenerator() {
           </select>
           <button type="button" onClick={() => void loadHsk()} disabled={busy} className="min-h-11 rounded-full border-2 border-primary px-5 text-label-md font-semibold text-primary hover:bg-primary-container disabled:opacity-50">Lấy từ và tạo bài</button>
           <button type="button" onClick={() => void loadSaved()} disabled={busy} className="min-h-11 rounded-full border-2 border-primary px-5 text-label-md font-semibold text-primary hover:bg-primary-container disabled:opacity-50">Từ đã lưu của tôi</button>
-          <span className="text-label-md text-on-surface-variant">Từ HSK có nghĩa tiếng Anh; từ đã lưu dùng nghĩa bạn đã lưu. Bấm lại để có bộ từ khác.</span>
+          <span className="text-label-md text-on-surface-variant">Từ HSK có nghĩa tiếng Việt; từ đã lưu dùng nghĩa bạn đã lưu. Bấm lại để có bộ từ khác.</span>
         </div>
         <label className="flex flex-col gap-1 text-label-md font-medium text-on-surface">Tiêu đề tờ bài tập
           <input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={60} className="min-h-11 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 text-body-md font-normal" /></label>
