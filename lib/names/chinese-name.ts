@@ -23,7 +23,8 @@ export function convertName(input: string): NamePart[] {
     const role: NamePart["role"] = hasSurname && i === 0 ? "surname" : i === syllables.length - 1 ? "given" : "middle";
     if (role === "middle" && SKIPPED_MIDDLE.has(syllable)) return [];
     if (role === "surname") return [{ syllable, role, han: SURNAMES[syllable] ?? null, meaning: SURNAMES[syllable] ? "họ" : null }];
-    const c: NameChar | undefined = GIVEN[syllable];
+    // Âm không có trong bảng tên gọi nhưng là họ (Trịnh, Lương...) thì dùng chữ của họ; `meaning` "họ" để giao diện không dịch nghĩa.
+    const c: NameChar | undefined = GIVEN[syllable] ?? (SURNAMES[syllable] ? { han: SURNAMES[syllable], meaning: "họ" } : undefined);
     return [{ syllable, role, han: c?.han ?? null, meaning: c?.meaning ?? null }];
   });
 }

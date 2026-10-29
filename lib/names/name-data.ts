@@ -69,7 +69,7 @@ export const GIVEN: Record<string, NameChar> = {
   thăng: { han: "升", meaning: "thăng tiến" }, thiên: { han: "天", meaning: "trời" }, thư: { han: "书", meaning: "sách, thư thái" }, tĩnh: { han: "静", meaning: "tĩnh lặng" },
   trân: { han: "珍", meaning: "trân quý" }, trầm: { han: "沉", meaning: "trầm tĩnh" }, tuyền: { han: "泉", meaning: "dòng suối" }, tuyên: { han: "宣", meaning: "tuyên bố, rõ ràng" },
   vọng: { han: "望", meaning: "hy vọng" }, xuyên: { han: "川", meaning: "dòng sông" }, cát: { han: "吉", meaning: "cát tường" }, lĩnh: { han: "岭", meaning: "đỉnh núi" },
-  diệp: { han: "叶", meaning: "chiếc lá" }, lương: { han: "良", meaning: "lương thiện" }, phượng: { han: "凤", meaning: "chim phượng" }, quế: { han: "桂", meaning: "cây quế" },
+  thương: { han: "苍", meaning: "xanh thẫm, mênh mông" }, diệp: { han: "叶", meaning: "chiếc lá" }, lương: { han: "良", meaning: "lương thiện" }, phượng: { han: "凤", meaning: "chim phượng" }, quế: { han: "桂", meaning: "cây quế" },
 };
 
 /** Họ có chữ đa âm mà từ điển hay chọn cách đọc khác khi đứng riêng: ép cách đọc khi dùng làm họ. */
