@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { HskRow } from "./build-hsk-rows";
-import { DEFAULT_SAMPLE, cleanMeaning, MAX_SAMPLE, MIN_SAMPLE, clampSample, sampleHskWords, toWorksheetLine } from "./hsk-sample";
+import { DEFAULT_SAMPLE, cleanMeaning, vietnameseMeaning, MAX_SAMPLE, MIN_SAMPLE, clampSample, sampleHskWords, toWorksheetLine } from "./hsk-sample";
 
 const row = (word: string, meanings: string[] = ["m"], pinyin = "p"): HskRow => ({ word, pinyin, sinoViet: null, meanings, meaningVi: null });
 const rows = [row("你好"), row("谢谢"), row("再见"), row("老师"), row("学生"), row("A型"), row("一"), row("电视机"), row("没有", []), row("好", ["good"], ""), row("工作")];
@@ -36,3 +36,26 @@ describe("lấy mẫu từ HSK", () => {
     expect(toWorksheetLine(row("你好", ["hello, hi (greeting)"]))).toBe("你好, hello / hi (greeting)");
   });
 });
+
+describe("nghĩa tiếng Việt cho tờ bài tập", () => {
+  const vi = (word: string, meaningVi: string | null, meanings: string[] = ["english"]): HskRow => ({ ...row(word, meanings), meaningVi });
+
+  it("ưu tiên nghĩa Việt, cắt ở ranh giới ; hoặc , khi quá dài", () => {
+    expect(cleanMeaning(vi("朋友", "bạn bè"))).toBe("bạn bè");
+    expect(vietnameseMeaning(vi("x", "một nghĩa số một; nghĩa hai; nghĩa thứ ba khá là dài dòng")))
+      .toBe("một nghĩa số một; nghĩa hai");
+    expect(vietnameseMeaning(vi("x", "một nghĩa đầu tiên dài quá mức cho phép trên tờ bài tập in ra"))).toBeNull();
+    expect(cleanMeaning(vi("x", null, ["water"]))).toBe("water");
+  });
+
+  it("đủ từ có nghĩa Việt thì chỉ lấy từ đó; thiếu thì bổ sung từ nghĩa Anh", () => {
+    const pool = [vi("你好", "xin chào"), vi("谢谢", "cảm ơn"), vi("再见", "tạm biệt"), vi("老师", null)];
+    expect(sampleHskWords(pool, 3, () => 0.5).map((r) => r.word).sort()).toEqual(["你好", "再见", "谢谢"].sort());
+    expect(sampleHskWords(pool, 4, () => 0.5)).toHaveLength(4);
+  });
+
+  it("dòng bài tập dùng nghĩa Việt, đổi dấu phân cách thành /", () => {
+    expect(toWorksheetLine(vi("朋友", "bạn bè, bằng hữu"))).toBe("朋友, bạn bè / bằng hữu");
+  });
+});
+

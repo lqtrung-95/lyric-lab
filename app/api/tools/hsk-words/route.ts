@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 // Công cụ công khai, chỉ đọc từ điển đã nhớ sẵn (không gọi AI); giới hạn thô theo IP chỉ để chặn lạm dụng.
 const limiter = new InMemoryRateLimiter(60, 60 * 60 * 1000);
 
-/** GET /api/tools/hsk-words?level=1..6&count=5..20 → {lines: string[]}: các dòng "chữ Hán, nghĩa tiếng Anh" lấy ngẫu nhiên từ một cấp HSK, để nạp vào tờ bài tập từ vựng. */
+/** GET /api/tools/hsk-words?level=1..6&count=5..20 → {lines: string[]}: các dòng "chữ Hán, nghĩa tiếng Việt" (chưa có nghĩa Việt thì nghĩa Anh) lấy ngẫu nhiên từ một cấp HSK, để nạp vào tờ bài tập từ vựng. */
 export async function GET(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   if (!limiter.tryConsume(ip)) return Response.json({ error: "rate_limited" }, { status: 429 });
