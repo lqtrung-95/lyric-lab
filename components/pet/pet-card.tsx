@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useGameSummary } from "@/components/layout/use-game-summary";
 import { useStreak } from "@/components/streak/use-streak";
@@ -14,6 +15,7 @@ import { useReviewSummary } from "@/components/review/use-review-summary";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { PetSnapshot } from "@/lib/pet/pet-reaction";
 import { reviewWordLabel, type PetReviewWord } from "@/lib/pet/pet-review-word";
+import { usePetGift } from "./use-pet-gift";
 import { PetEcho } from "./pet-echo";
 import { PetFeed } from "./pet-feed";
 import { usePetEvolution } from "./use-pet-evolution";
@@ -35,6 +37,7 @@ export function PetCard() {
   const [feeding, setFeeding] = useState(false);
   const [echoing, setEchoing] = useState(false);
   const echoWord = review?.peek[0] ?? null;
+  const { gift, take } = usePetGift();
   const [chewKey, setChewKey] = useState(0);
   const growth = petGrowth(game?.xp.total ?? 0);
   // Gọi trước các lệnh return sớm để thứ tự hook không đổi giữa các lần vẽ.
@@ -72,6 +75,21 @@ export function PetCard() {
           </div>
         )}
       </div>
+      {gift && (
+        <div className="basis-full rounded-2xl bg-secondary-container p-space-sm text-on-secondary-container" role="group" aria-label={`Quà từ ${pet.name}`}>
+          <p className="text-label-md font-bold">{pet.name} mang quà về từ bài bạn vừa nghe!</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-3">
+            <span lang="zh" className="font-serif text-hanzi-display">{gift.term}</span>
+            {gift.pinyin && <span className="text-pinyin-reading">{gift.pinyin}</span>}
+            <span className="text-body-md">{gift.meaning}</span>
+          </div>
+          <div className="mt-1 flex flex-wrap gap-2">
+            <button type="button" onClick={() => void playChinese(gift.term)} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-bold">Nghe</button>
+            <Link href={`/learn/${gift.videoId}`} className="inline-flex min-h-11 items-center rounded-full px-4 text-label-md font-bold underline">Về bài hát</Link>
+            <button type="button" onClick={take} className="min-h-11 rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-bold">Nhận quà</button>
+          </div>
+        </div>
+      )}
       {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={() => setChewKey((k) => k + 1)} onClose={() => setEchoing(false)} />}
       {feeding && <PetFeed name={pet.name} onEat={() => setChewKey((k) => k + 1)} onClose={() => setFeeding(false)} />}
     </section>

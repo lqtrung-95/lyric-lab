@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLikedSongs } from "@/components/library/use-liked-songs";
 import { CompletedToast } from "./completed-toast";
 import { cleanSavedMeaning } from "@/lib/lookup/clean-saved-meaning";
+import { leavePetGift } from "@/components/pet/use-pet-gift";
+import { giftFromItem, pickGiftItem } from "@/lib/pet/pet-gift";
 import { Toast } from "@/components/ui/toast";
 import type { AnalyzedLine, PreviewItem, SongAnalysis } from "@/lib/analysis/analysis-types";
 import { useYouTubePlayer } from "@/components/player/use-youtube-player";
@@ -83,6 +85,12 @@ export function ListenScreen({ analysis, song, startAt }: ListenScreenProps) {
   const currentIndex = practiceLine ? practiceLine.index : liveIndex;
   const { result: explainResult, explain, reset: resetExplain } = useLineExplain(analysis.videoId);
   const { completed } = useSongProgress(analysis.videoId, lines, liveIndex);
+  // Nghe hết bài: pet mang về một từ trong bài làm quà (hiện ở thẻ pet trang chủ).
+  useEffect(() => {
+    if (!completed) return;
+    const item = pickGiftItem(analysis.items);
+    if (item) leavePetGift(giftFromItem(analysis.videoId, item, new Date().toLocaleDateString("sv"), cleanSavedMeaning));
+  }, [completed, analysis.items, analysis.videoId]);
   const lookup = useTermLookup(analysis.videoId, word);
   const wordItem = word?.itemId ? analysis.items.find((i) => i.id === word.itemId) ?? null : null;
 
