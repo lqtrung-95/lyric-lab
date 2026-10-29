@@ -475,4 +475,76 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 1, zh: "好的,我去搬砖头。", vi: "Vâng, tôi đi bê gạch." },
     ],
   },
+  "breakfast": {
+    speakers: ["Chủ quán", "Khách"],
+    lines: [
+      { who: 0, zh: "你想吃点什么?", vi: "Bạn muốn ăn gì?" },
+      { who: 1, zh: "来两个包子,再来一杯豆浆。", vi: "Cho hai cái bánh bao và một ly sữa đậu nành." },
+      { who: 0, zh: "一共八块。在这儿吃还是带走?", vi: "Tổng tám tệ. Ăn ở đây hay mang đi?" },
+      { who: 1, zh: "在这儿吃。", vi: "Ăn ở đây." },
+    ],
+  },
+  "nightmarket": {
+    speakers: ["Chủ sạp", "Khách"],
+    lines: [
+      { who: 0, zh: "欢迎光临!想吃点什么?", vi: "Chào mừng! Bạn muốn ăn gì?" },
+      { who: 1, zh: "来十个烤串,要辣的。", vi: "Cho mười xiên nướng, loại cay." },
+      { who: 0, zh: "好的,稍等一会儿,马上就好。", vi: "Vâng, chờ một chút, xong ngay." },
+      { who: 1, zh: "再加一个烤玉米。", vi: "Thêm một bắp ngô nướng nữa." },
+    ],
+  },
+  "teahouse": {
+    speakers: ["Phục vụ", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,喝什么茶?", vi: "Chào bạn, uống trà gì?" },
+      { who: 1, zh: "有什么好茶?", vi: "Có trà ngon nào?" },
+      { who: 0, zh: "今年的新茶很不错,您尝尝?", vi: "Trà mới năm nay rất ngon, bạn nếm thử nhé?" },
+      { who: 1, zh: "好,来一壶。", vi: "Được, cho một ấm." },
+    ],
+  },
+  "tcm": {
+    speakers: ["Thầy thuốc", "Bệnh nhân"],
+    lines: [
+      { who: 0, zh: "你哪里不舒服?", vi: "Bạn khó chịu ở đâu?" },
+      { who: 1, zh: "我最近睡不好,有点累。", vi: "Dạo này tôi ngủ không ngon, hơi mệt." },
+      { who: 0, zh: "请把手放在脉枕上,我给你把脉。", vi: "Mời đặt tay lên gối bắt mạch, tôi bắt mạch cho bạn." },
+      { who: 1, zh: "要吃中药吗?", vi: "Có phải uống thuốc Đông y không?" },
+    ],
+  },
+  "calligraphy": {
+    speakers: ["Thầy giáo", "Học trò"],
+    lines: [
+      { who: 0, zh: "先磨墨,再拿毛笔。", vi: "Mài mực trước rồi mới cầm bút lông." },
+      { who: 1, zh: "老师,这样握笔对吗?", vi: "Thầy ơi, cầm bút thế này có đúng không?" },
+      { who: 0, zh: "手要稳,心要静。", vi: "Tay phải vững, lòng phải tĩnh." },
+      { who: 1, zh: "我明白了,我再写一遍。", vi: "Em hiểu rồi, em viết lại một lần." },
+    ],
+  },
+  "courier": {
+    speakers: ["Nhân viên", "Khách"],
+    lines: [
+      { who: 0, zh: "您好,您要寄什么?", vi: "Chào bạn, bạn muốn gửi gì?" },
+      { who: 1, zh: "我想寄一个箱子到上海。", vi: "Tôi muốn gửi một thùng hàng đi Thượng Hải." },
+      { who: 0, zh: "请先称一下重量,再填面单。", vi: "Mời cân trọng lượng trước, rồi điền phiếu gửi." },
+      { who: 1, zh: "大概几天能到?", vi: "Khoảng mấy ngày thì đến?" },
+    ],
+  },
+  "ktv": {
+    speakers: ["Bạn A", "Bạn B"],
+    lines: [
+      { who: 0, zh: "你想唱哪首歌?", vi: "Bạn muốn hát bài nào?" },
+      { who: 1, zh: "我想唱那首很有名的老歌。", vi: "Mình muốn hát bài hát cũ rất nổi tiếng kia." },
+      { who: 0, zh: "好,我来点歌,你拿麦克风。", vi: "Được, mình chọn bài, bạn cầm micro." },
+      { who: 1, zh: "大家一起唱吧!", vi: "Mọi người cùng hát nào!" },
+    ],
+  },
+  "newyear": {
+    speakers: ["Bà", "Cháu"],
+    lines: [
+      { who: 0, zh: "新年好!给你一个红包。", vi: "Chúc mừng năm mới! Bà cho con một bao lì xì." },
+      { who: 1, zh: "谢谢奶奶,新年快乐!", vi: "Cảm ơn bà, chúc bà năm mới vui vẻ!" },
+      { who: 0, zh: "快来吃年糕,今年要长高啊。", vi: "Mau lại ăn bánh niangao, năm nay phải cao lên nhé." },
+      { who: 1, zh: "好的,我先去帮爸爸贴春联。", vi: "Vâng, con đi giúp bố dán câu đối trước." },
+    ],
+  },
 };

@@ -324,6 +324,7 @@ Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat
 
 - Chạy `supabase/migrations/20261028000003_arcade_game_modes.sql` trong Supabase SQL Editor (thêm chế độ điểm `blaster`, `rain`, `whack`, `daily`, `duel` vào `practice_scores_mode_check`). Chưa chạy thì game vẫn chơi được, chỉ điểm XP bị bỏ qua.
 - Chạy `supabase/migrations/20261029000002_user_pet.sql` trong Supabase SQL Editor (tạo bảng `user_pet`, RLS theo chủ sở hữu). Chưa chạy thì pet chỉ lưu ở trình duyệt.
+- Chạy `supabase/migrations/20261029000004_practice_mode_write.sql` trong Supabase SQL Editor (thêm chế độ điểm `write` của Viết chữ Hán vào `practice_scores_mode_check`). Chưa chạy thì viết chữ và chấm lịch ôn vẫn hoạt động, chỉ điểm XP bị bỏ qua.
 - Đấu 1–1 dùng Supabase Realtime (broadcast + presence), không cần bảng mới. Kho từ chung phụ thuộc bảng `dict_words`; tra lỗi thì các trang Hán tự mỗi ngày và Đấu 1–1 báo chưa tải được từ.
 
 ### Làm sạch nghĩa thẻ đã lưu (`scripts/clean-saved-meanings.mts`)
@@ -340,3 +341,5 @@ Chạy tay migration `supabase/migrations/20261029000002_user_pet.sql` (tạo `u
 Với chữ nhiều âm (和, 会, 要, 看, 吧, 没...), AI chọn cách đọc thông dụng nhất TRONG các mục từ điển (pinyin vẫn của từ điển, lưu ở cột `reading`) và viết nghĩa cho cách đọc đó; trang dùng cách đọc này thay cho cách chọn tự động. Bản sinh trước khi có cột `reading` được sinh lại tự động ở lần chạy sau.
 4. Từ đã có nghĩa trong bảng thì bỏ qua (`--force` để sinh lại); bản `reviewed = true` không bao giờ bị ghi đè. Bảng sửa tay `lib/courses/hsk1-gloss-overrides.ts` luôn thắng AI (HSK 1). Nghĩa AI sinh chưa rà: sửa trực tiếp trong bảng và đặt `reviewed = true`. Dữ liệu trang được nhớ 1 ngày (`unstable_cache` key `hsk-rows-v2`), nên sau khi ghi có thể chờ tối đa 1 ngày hoặc bump key.
 
+### Thêm cảnh Khám phá mới
+Sau khi thêm cảnh (xem danh sách các chỗ cần nối ở `docs/handoff-and-status.md`, mục 2026-10-29 "THÊM 8 CẢNH"): (1) `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/generate-coop-pinyin.mts` sinh lại `lib/explore/coop/coop-pinyin.generated.json` (test `coop-pinyin.test.ts` đỏ nếu thiếu); (2) `scripts/prewarm-explore-tts.mts` nạp sẵn giọng đọc cho câu mới. Kiểm trùng từ và trùng id sprite với cảnh cũ trước khi đăng ký.

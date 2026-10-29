@@ -4,6 +4,8 @@ import type { SceneDetail } from "@/lib/explore/explore-types";
 import { Button3d } from "@/components/ui/button-3d";
 import { ArtSprite } from "./art/art-sprite";
 import { FLAT_SPRITES } from "./art/flat/flat-sprites";
+import { JourneyBanner } from "./journey-banner";
+import { SceneStampChip } from "./scene-stamp-chip";
 import { MusicToggle } from "./music-toggle";
 import { NotebookChips } from "./notebook-chips";
 import { NpcCard } from "./npc-card";
@@ -46,10 +48,12 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
         <div>
           <h1 className="text-headline-lg">{scene.title}</h1>
           <p className="text-body-md text-on-surface-variant">{scene.subtitle}</p>
+          {!story && <div className="mt-1"><SceneStampChip scene={scene} title={scene.title} progress={c.progress} now={c.now} ready={c.ready} /></div>}
         </div>
         <MusicToggle enabled={music.enabled} onToggle={music.toggle} />
       </header>
 
+      {!story && !quest.active && c.ready && <JourneyBanner sceneId={scene.id} words={scene.objects} progress={c.progress} />}
       {story && sc && <ObjectiveBar title={story.payload.story.title} objective={sc.objective} done={sc.objectiveCount.done} total={sc.objectiveCount.total} solved={sc.solved} freeRoam={story.payload.story.freeRoam} clueCount={sc.progress.clues.length} spotHint={sc.spotHint} onCase={() => sc.setView({ kind: "case" })} onMap={() => sc.setView({ kind: "map" })} />}
       {story && sc && <StoryHintTip />}
 

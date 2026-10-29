@@ -13,6 +13,8 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
     modes: [
       { href: "/review/match", label: "Ghép cặp", desc: "Nối chữ Hán với nghĩa càng nhanh càng tốt", icon: "shuffle" },
       { href: "/review/pinyin", label: "Gõ pinyin", desc: "Nhìn chữ Hán, gõ pinyin có dấu thanh", icon: "keyboard" },
+      { href: "/review/hard", label: "Từ khó", desc: "Luyện riêng các từ bạn hay quên nhất", icon: "local_fire_department" },
+      { href: "/review/write", label: "Viết chữ Hán", desc: "Nghe nghĩa, viết từng nét theo thứ tự", icon: "brush" },
     ],
   },
   {
