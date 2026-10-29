@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo } from "react";
 import type { SongAnalysis } from "@/lib/analysis/analysis-types";
+import { SongScenesCard } from "@/components/explore/song-scenes-card";
 import { useDueCount } from "@/components/review/use-due-count";
 import { summarizeSong } from "@/lib/preview/summarize-song";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
@@ -36,6 +37,8 @@ export function SongSummaryScreen({ analysis, title }: { analysis: SongAnalysis;
         <div className="rounded-2xl bg-surface-container-low p-space-md"><dt className="text-label-md text-on-surface-variant">Đã lưu từ bài này</dt><dd className="font-serif text-headline-lg text-primary">{s.savedCount}</dd></div>
         <div className="rounded-2xl bg-surface-container-low p-space-md"><dt className="text-label-md text-on-surface-variant">Đánh dấu đã biết</dt><dd className="font-serif text-headline-lg text-secondary">{s.knownCount}</dd></div>
       </dl>
+
+      <SongScenesCard items={analysis.items} lines={analysis.lines} className="mt-space-lg text-left" />
 
       <div className="mt-space-lg flex flex-col justify-center gap-space-sm sm:flex-row">
         {dueCount ? (
