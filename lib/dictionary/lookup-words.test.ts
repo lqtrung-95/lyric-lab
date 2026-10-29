@@ -35,6 +35,22 @@ describe("lookupWords", () => {
   });
 });
 
+describe("pickPrimaryEntry cách đọc thông dụng", () => {
+  it("和, 会, 给 chọn hé, huì, gěi dù các mục khác cùng cấp đứng trước", () => {
+    expect(pickPrimaryEntry([row("和", "hú", 1), row("和", "hé", 1)])?.pinyin).toBe("hé");
+    expect(pickPrimaryEntry([row("会", "kuài", 1), row("会", "huì", 1)])?.pinyin).toBe("huì");
+    expect(pickPrimaryEntry([row("给", "jǐ", 1), row("给", "gěi", 1)])?.pinyin).toBe("gěi");
+  });
+  it("cách đọc ghi đè có cả mục biến thể thì lấy mục nghĩa thật", () => {
+    const variant: DictWordRow = { ...row("和", "hé", 1), meanings: ["old variant of 和[he2]"] };
+    const real: DictWordRow = { ...row("和", "hé", 1), meanings: ["and; together with"] };
+    expect(pickPrimaryEntry([variant, real])?.meanings[0]).toBe("and; together with");
+  });
+  it("mục họ người có cấp nhưng còn mục thường chưa gắn cấp thì chọn mục thường", () => {
+    expect(pickPrimaryEntry([row("也", "Yě", 1), row("也", "yě", null)])?.pinyin).toBe("yě");
+  });
+});
+
 describe("pickPrimaryEntry", () => {
   it("ưu tiên mục có cấp HSK thấp nhất", () => {
     expect(pickPrimaryEntry([row("行", "háng"), row("行", "xíng", 2), row("行", "x", 5)])?.pinyin).toBe("xíng");

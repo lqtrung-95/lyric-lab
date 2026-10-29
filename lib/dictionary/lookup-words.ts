@@ -44,6 +44,10 @@ export const COMMON_READING: Record<string, string> = {
   读: "dú",
   // Trợ từ "le" (hoàn thành/ngữ khí) phổ biến hơn hẳn "liǎo" (xong, có thể); thấy ở danh sách từ vựng HSK 1 và thẻ tra từ.
   了: "le",
+  // Trang từ vựng HSK: các mục của chữ nhiều âm cùng cấp, chọn cách đọc thông dụng.
+  和: "hé",
+  会: "huì",
+  给: "gěi",
 };
 const pinyinKey = (p: string) => p.replace(/\s+/g, "").toLowerCase();
 
@@ -55,7 +59,9 @@ export function pickPrimaryEntry(entries: DictWordRow[]): DictWordRow | null {
   if (entries.length === 0) return null;
   const override = COMMON_READING[entries[0].simplified];
   if (override) {
-    const forced = entries.find((e) => pinyinKey(e.pinyin) === pinyinKey(override));
+    // Cùng cách đọc có thể có nhiều mục (vd. 和 hé: mục nghĩa thật và mục "old variant of 和[he2]"): ưu tiên mục không phải biến thể.
+    const sameReading = entries.filter((e) => pinyinKey(e.pinyin) === pinyinKey(override));
+    const forced = sameReading.find((e) => !VARIANT.test(e.meanings[0] ?? "")) ?? sameReading[0];
     if (forced) return forced;
   }
   const nonVariant = entries.filter((e) => !VARIANT.test(e.meanings[0] ?? ""));

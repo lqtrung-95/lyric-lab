@@ -8,8 +8,8 @@ import ws from "ws";
 import { createDeployChat, DEPLOY_DEFAULT_MODEL } from "@/lib/analysis/deploy-chat";
 import { HSK1_GLOSS_OVERRIDES } from "@/lib/courses/hsk1-gloss-overrides";
 import { buildGlossPrompt, GLOSS_SYSTEM, parseGlosses, type GlossInput } from "@/lib/courses/vietnamese-glosses";
-import type { DictWordRow } from "@/lib/dictionary/build-dictionary-rows";
 import { buildHskRows, HSK_LEVELS } from "@/lib/tools/build-hsk-rows";
+import { loadHskDictRows } from "@/lib/tools/load-hsk-dict-rows";
 
 const GLOSS_PROMPT_VERSION = "hsk-vi-1";
 const args = process.argv.slice(2);
@@ -30,13 +30,7 @@ const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPAB
 const chat = createDeployChat(apiKey);
 
 async function loadLevel(level: number): Promise<GlossInput[]> {
-  const rows: DictWordRow[] = [];
-  for (let from = 0; ; from += 1000) {
-    const { data, error } = await sb.from("dict_words").select("simplified,traditional,pinyin,meanings,hsk_level,frequency").eq("hsk_level", level).order("simplified").range(from, from + 999);
-    if (error) throw new Error(`đọc dict_words HSK ${level}: ${error.message}`);
-    rows.push(...((data ?? []) as DictWordRow[]));
-    if ((data ?? []).length < 1000) break;
-  }
+  const rows = await loadHskDictRows(sb, level);
   return buildHskRows(rows, new Map()).map((r) => ({ term: r.word, pinyin: r.pinyin, meanings: r.meanings }));
 }
 
