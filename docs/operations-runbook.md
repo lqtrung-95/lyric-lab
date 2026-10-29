@@ -350,3 +350,6 @@ Sau khi thêm cảnh (xem danh sách các chỗ cần nối ở `docs/handoff-an
 
 ## Ngữ pháp: không có migration hay biến môi trường
 Nội dung nằm trong mã nguồn, chỉ cần deploy. Câu thật trên trang `/grammar/[id]` cần bảng `term_sentences` (cùng chỉ mục của trang Tra từ); thiếu thì phần "Gặp trong bài hát và video" tự ẩn. Sau khi sửa nội dung mẫu, chạy `npx vitest run lib/grammar`.
+
+## Ngữ pháp: migration thống kê
+Chạy `supabase/migrations/20261029000005_user_grammar_stats.sql` trong Supabase SQL Editor (chạy lại được). Chưa chạy thì thống kê ngữ pháp chỉ lưu ở trình duyệt, không báo lỗi.

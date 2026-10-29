@@ -1,9 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyLine } from "@/components/ui/ruby-text";
 import type { SceneConversation } from "@/lib/explore/explore-types";
+
+/** Nạp riêng vì kéo theo thư viện mẫu ngữ pháp. */
+const SceneGrammar = dynamic(() => import("./scene-grammar"), { ssr: false });
 
 interface Props {
   phrases: { zh: string; vi: string }[];
@@ -60,6 +64,7 @@ export function ScenePhrases({ phrases, conversation, pinyin, sceneId }: Props) 
           </ol>
         </div>
       )}
+      <SceneGrammar lines={[...phrases.map((p) => p.zh), ...(conversation?.lines.map((l) => l.zh) ?? [])]} />
     </section>
   );
 }
