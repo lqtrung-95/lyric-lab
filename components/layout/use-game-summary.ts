@@ -7,7 +7,7 @@ import type { GameSummary } from "@/lib/game/game-types";
 // Dùng chung cho mọi nơi trên trang (chip cấp ở thanh trên, trang Hôm nay...): một lần gọi cho cả trang, gọi lại sau 60 giây nếu cần.
 let cache: { at: number; promise: Promise<GameSummary | null> } | null = null;
 const TTL_MS = 60_000;
-const REFRESH_EVENT = "songhanzi:game-summary-refresh";
+export const REFRESH_EVENT = "songhanzi:game-summary-refresh";
 
 /** Bắt các nơi đang dùng `useGameSummary` tải lại ngay (sau khi nhận thưởng nhiệm vụ...). */
 export function refreshGameSummary(): void {
