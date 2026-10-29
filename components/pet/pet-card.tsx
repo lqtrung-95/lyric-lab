@@ -12,6 +12,7 @@ import { PET_SPECIES_READY, PetSprite } from "./pet-sprite";
 import { usePet } from "./use-pet";
 import { useReviewSummary } from "@/components/review/use-review-summary";
 import { playChinese } from "@/lib/speech/play-chinese";
+import type { PetSnapshot } from "@/lib/pet/pet-reaction";
 import { reviewWordLabel, type PetReviewWord } from "@/lib/pet/pet-review-word";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
@@ -39,9 +40,12 @@ export function PetCard() {
   const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
   const nextStage = (STAGE_NAMES[growth.stage] ?? "").toLowerCase();
   const accessories = unlockedAccessories(streak?.longest ?? 0);
+  // Dữ liệu game/chuỗi chưa tải xong thì chưa có ảnh chụp (không phản ứng với số tạm thời).
+  // Không cần useMemo: `usePetTalk` so từng trường chứ không so địa chỉ đối tượng.
+  const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
     <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} />
+      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} />
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
@@ -92,8 +96,8 @@ function AdoptPet({ onAdopt }: { onAdopt: (species: PetSpecies, name: string) =>
 const NO_WORDS: PetReviewWord[] = [];
 const BUBBLE = "rounded-2xl border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold shadow-[0_2px_0_var(--shadow-ink)]";
 
-function PetTouch({ pet, stage, mood, accessories, words }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; words: PetReviewWord[] }) {
-  const { tapKey, bubble, tap } = usePetTalk(mood, pet.name, words);
+function PetTouch({ pet, stage, mood, accessories, words, snapshot }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; words: PetReviewWord[]; snapshot: PetSnapshot | null }) {
+  const { tapKey, bubble, tap } = usePetTalk(mood, pet.name, words, snapshot);
   return (
     <div className="relative shrink-0">
       <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="block rounded-full">

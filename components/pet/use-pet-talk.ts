@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { sfx } from "@/lib/games/arcade-sfx";
 import type { PetMood } from "@/lib/pet/pet-logic";
+import { petReactionFor, petReactionLine, type PetSnapshot } from "@/lib/pet/pet-reaction";
 import { pickReviewWord, type PetReviewWord } from "@/lib/pet/pet-review-word";
 import { pickPetLine, spendSpeech, type PetSpeechBudget } from "@/lib/pet/pet-speech";
 
@@ -23,13 +24,33 @@ function readBudget(): PetSpeechBudget | null {
 
 export type PetBubble = { kind: "line"; text: string } | { kind: "word"; word: PetReviewWord };
 
-/** Chạm vào pet: nảy (tăng `tapKey`), kêu `pop`, và hiện một câu nói ngắn (tối đa vài lần mỗi ngày, quá thì chỉ nảy và kêu). */
-export function usePetTalk(mood: PetMood, name: string, words: readonly PetReviewWord[] = []) {
+/**
+ * Pet nói và nảy. (1) Chạm: nảy (tăng `tapKey`), kêu `pop`, hiện một câu hoặc một từ cần ôn (tối đa vài lần mỗi ngày, quá thì chỉ nảy và kêu).
+ * (2) Sự kiện: khi `snapshot` đổi (lên cấp, tăng chuỗi, đạt mục tiêu, mất chuỗi) pet nảy và nói một câu, KHÔNG kêu thêm
+ * (tiếng thưởng đã do `RewardSounds` phát) và không tính vào hạn mức chạm vì sự kiện hiếm và là phản hồi cho việc người dùng vừa làm.
+ */
+export function usePetTalk(mood: PetMood, name: string, words: readonly PetReviewWord[] = [], snapshot: PetSnapshot | null = null) {
   const [tapKey, setTapKey] = useState(0);
   const [bubble, setBubble] = useState<PetBubble | null>(null);
+  const [prevSnapshot, setPrevSnapshot] = useState(snapshot);
   const taps = useRef(0);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+
+  // Điều chỉnh state ngay lúc vẽ khi ảnh chụp đổi (React cho phép; lint cấm setState trực tiếp trong effect).
+  if (snapshot !== prevSnapshot && (snapshot?.level !== prevSnapshot?.level || snapshot?.streak !== prevSnapshot?.streak || snapshot?.mood !== prevSnapshot?.mood)) {
+    const reaction = petReactionFor(prevSnapshot, snapshot);
+    setPrevSnapshot(snapshot);
+    if (reaction) {
+      setTapKey((k) => k + 1);
+      setBubble({ kind: "line", text: petReactionLine(reaction, name) });
+    }
+  }
+
+  // Tự ẩn bóng thoại sau một lúc.
+  useEffect(() => {
+    if (!bubble) return;
+    const id = setTimeout(() => setBubble(null), bubble.kind === "word" ? WORD_BUBBLE_MS : BUBBLE_MS);
+    return () => clearTimeout(id);
+  }, [bubble]);
 
   const tap = useCallback(() => {
     setTapKey((k) => k + 1);
@@ -41,8 +62,6 @@ export function usePetTalk(mood: PetMood, name: string, words: readonly PetRevie
     // Lần chạm lẻ (khi pet không ngủ) mang theo một từ đang cần ôn; lần chẵn nói câu động viên.
     const word = mood !== "sleepy" && next.count % 2 === 1 ? pickReviewWord(words, (next.count - 1) / 2) : null;
     setBubble(word ? { kind: "word", word } : { kind: "line", text: pickPetLine(mood, name, next.count - 1) });
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setBubble(null), word ? WORD_BUBBLE_MS : BUBBLE_MS);
   }, [mood, name, words]);
 
   return { tapKey, bubble, tap };
