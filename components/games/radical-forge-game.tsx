@@ -25,6 +25,7 @@ export function RadicalForgeGame({ data }: { data: ForgeData }) {
   const [a, setA] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [fresh, setFresh] = useState<string[]>([]);
+  const [pair, setPair] = useState<[string, string]>(["", ""]);
   const [shake, setShake] = useState(0);
   const [petEv, setPetEv] = useState<GamePetEvent | null>(null);
   const [tip, setTip] = useState<Recipe | null>(null);
@@ -43,6 +44,7 @@ export function RadicalForgeGame({ data }: { data: ForgeData }) {
     if (added.length === 0) { setMsg(`${a} + ${c} = ${outs.join(", ")}: chữ này bạn có rồi.`); setFresh([]); sfx.petBlip(); return; }
     setFound([...found, ...added]);
     setFresh(added);
+    setPair([a, c]);
     setMsg(`${a} + ${c} = ${added.join(" và ")}!`);
     sfx.pop(added.length); react(added.length > 1 ? "combo" : "hit");
   };
@@ -73,13 +75,13 @@ export function RadicalForgeGame({ data }: { data: ForgeData }) {
         <span className="flex size-16 items-center justify-center rounded-2xl border-2 border-dashed border-ink">{a ?? "?"}</span>
         <span>+</span><span className="flex size-16 items-center justify-center rounded-2xl border-2 border-dashed border-ink">?</span>
       </div>
-      <p role="status" aria-live="polite" className="mt-1 min-h-6 text-center text-body-md font-bold">{tip ? `Gợi ý: thử ghép ${tip.a} với ${tip.b}.` : a ? `Đã chọn ${a}. Chọn mảnh thứ hai.` : (msg ?? "Chạm hai mảnh để ghép thành chữ mới.")}</p>
-      {fresh.length > 0 && <ul className="mt-space-sm flex flex-col gap-2">{fresh.map((c) => <ForgeCard key={c} han={c} info={data.info[c]} saved={state.saved.some((s) => s.key === itemKey({ type: "vocab", term: c }))} onToggleSave={toggleSaved} />)}</ul>}
+      <p role="status" aria-live="polite" className="mt-1 min-h-6 text-center text-body-md font-bold">{tip ? `Gợi ý: thử ghép ${tip.a} với ${tip.b}.` : a ? `Đã chọn ${a}${data.info[a] ? ` (${data.info[a].pinyin}: ${data.info[a].meaning})` : ""}. Chọn mảnh thứ hai.` : (msg ?? "Chạm hai mảnh để ghép thành chữ mới.")}</p>
+      {fresh.length > 0 && <ul className="mt-space-sm flex flex-col gap-2">{fresh.map((c) => <ForgeCard key={c} han={c} info={data.info[c]} parts={pair} infoOf={(x) => data.info[x]} ety={data.ety[c]} saved={state.saved.some((s) => s.key === itemKey({ type: "vocab", term: c }))} onToggleSave={toggleSaved} />)}</ul>}
       <h2 className="mt-space-md text-label-lg font-extrabold">Kho mảnh ghép ({items.length})</h2>
       <ul className="mt-1 grid grid-cols-[repeat(auto-fill,minmax(4rem,1fr))] gap-2">
         {items.map((c) => (
           <li key={c}>
-            <button type="button" lang="zh" aria-pressed={a === c} aria-label={`Chọn ${c}`} onClick={() => tap(c)} className={`flex min-h-16 w-full flex-col items-center justify-center rounded-2xl border-2 font-serif text-hanzi-display ${a === c ? "border-primary bg-primary-container" : "border-ink bg-surface-container-lowest"} ${fresh.includes(c) ? "forge-new" : ""}`}>
+            <button type="button" lang="zh" aria-pressed={a === c} aria-label={`Chọn ${c}${data.info[c] ? `, ${data.info[c].meaning}` : ""}`} title={data.info[c]?.meaning} onClick={() => tap(c)} className={`flex min-h-16 w-full flex-col items-center justify-center rounded-2xl border-2 font-serif text-hanzi-display ${a === c ? "border-primary bg-primary-container" : "border-ink bg-surface-container-lowest"} ${fresh.includes(c) ? "forge-new" : ""}`}>
               {c}
               {data.info[c] && <span className="font-sans text-[0.7rem] font-medium leading-none text-on-surface-variant">{data.info[c].pinyin}</span>}
             </button>

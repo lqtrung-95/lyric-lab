@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Ghép bộ thủ", robots: { index: 
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const data = await loadRadicalRecipes().catch(() => ({ start: [], recipes: [], info: {} }));
+  const data = await loadRadicalRecipes().catch(() => ({ start: [], recipes: [], info: {}, ety: {} }));
   return (
     <ArcadeShell title="Ghép bộ thủ" intro="Bắt đầu với vài bộ thủ cơ bản, ghép hai mảnh thành chữ mới (日 + 月 = 明), rồi lấy chữ mới ghép tiếp. Mỗi chữ tìm được có nghĩa, Hán Việt và nút thêm vào bộ ôn.">
       <RadicalForgeGame data={data} />
