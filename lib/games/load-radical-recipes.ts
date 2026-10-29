@@ -6,11 +6,13 @@ import { sinoVietForWord } from "@/lib/dictionary/sino-viet";
 import { cleanMeanings } from "@/lib/tools/build-hsk-rows";
 import type { HskLevel, HskRow } from "@/lib/tools/build-hsk-rows";
 import { getHskRows } from "@/lib/tools/hsk-vocab";
+import { RADICAL_NAMES } from "./radical-names";
+import type { ForgeEty } from "./radical-forge-why";
 import { parsePair, pickStart, type Recipe } from "./radical-forge";
 
 /** `meaningLang` = "en" khi chưa có nghĩa Việt và tạm dùng nghĩa tiếng Anh của từ điển (giao diện gắn nhãn). */
 export interface CharInfo { pinyin: string; sinoViet: string | null; meaning: string; meaningLang?: "vi" | "en" }
-export interface ForgeData { start: string[]; recipes: Recipe[]; info: Record<string, CharInfo> }
+export interface ForgeData { start: string[]; recipes: Recipe[]; info: Record<string, CharInfo>; /** Loại chữ (hội ý/hình thanh, phần chỉ nghĩa/âm) của chữ ghép được, để giải thích vì sao ghép được. */ ety: Record<string, ForgeEty> }
 
 const BATCH = 200;
 /** Số vòng lần theo cấu tạo của các mảnh trung gian (mảnh không phải chữ HSK nhưng cần để ghép tiếp). */
@@ -23,6 +25,20 @@ async function decompositions(chars: string[]): Promise<Map<string, string>> {
     const { data, error } = await sb.from("dict_hanzi_info").select("hanzi,decomposition").in("hanzi", chars.slice(i, i + BATCH));
     if (error) throw new Error(`radical forge: ${error.message}`);
     for (const r of data ?? []) if (r.decomposition) out.set(r.hanzi as string, r.decomposition as string);
+  }
+  return out;
+}
+
+/** Loại chữ và phần chỉ nghĩa/chỉ âm của các chữ đích (từ `dict_hanzi_info.etymology`); lỗi hoặc thiếu thì bỏ qua (lời giải thích rơi về dạng hội ý). */
+async function etymologies(chars: string[]): Promise<Record<string, ForgeEty>> {
+  const sb = createSupabaseServiceClient();
+  const out: Record<string, ForgeEty> = {};
+  for (let i = 0; i < chars.length; i += BATCH) {
+    const { data } = await sb.from("dict_hanzi_info").select("hanzi,etymology").in("hanzi", chars.slice(i, i + BATCH));
+    for (const r of data ?? []) {
+      const e = r.etymology as { type?: string; phonetic?: string; semantic?: string } | null;
+      if (e && (e.type === "ideographic" || e.type === "pictographic" || e.type === "pictophonetic")) out[r.hanzi as string] = { type: e.type, phonetic: e.phonetic, semantic: e.semantic };
+    }
   }
   return out;
 }
@@ -73,9 +89,13 @@ export async function buildForgeData(getRows: (level: HskLevel) => Promise<HskRo
     todo = [...next].filter((c) => !known.has(c));
   }
   const picked = pickStart(recipes);
-  await fillMissingInfo([...new Set(picked.recipes.map((r) => r.out))].filter((c) => !info[c]), info);
-  return { start: picked.start, recipes: picked.recipes, info };
+  // Mọi mảnh hiện ra (bộ ban đầu, hai mảnh của công thức, chữ đích) đều nên có pinyin: tra từ điển cho những mảnh chưa có, mảnh nào từ điển không có (bộ thủ như 亻 扌 艹) lấy từ bảng bộ thủ.
+  const pieces = new Set([...picked.start, ...picked.recipes.flatMap((r) => [r.a, r.b, r.out])]);
+  await fillMissingInfo([...pieces].filter((c) => !info[c]), info);
+  for (const c of pieces) if (!info[c] && RADICAL_NAMES[c]) info[c] = { pinyin: RADICAL_NAMES[c].pinyin, sinoViet: null, meaning: RADICAL_NAMES[c].meaning, meaningLang: "vi" };
+  const ety = await etymologies([...new Set(picked.recipes.map((r) => r.out))]).catch(() => ({}));
+  return { start: picked.start, recipes: picked.recipes, info, ety };
 }
 
 /** Cache một ngày: dữ liệu từ điển ít đổi và phép dựng cần hàng chục truy vấn. */
-export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v6"], { revalidate: 86400 });
+export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v8"], { revalidate: 86400 });

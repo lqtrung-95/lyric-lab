@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { emptyStats, HOME_ITEMS, HOME_SLOTS, itemProgress, itemUnlocked, newlyUnlocked, parseHomeState, resolvePlacement, type HomeStats } from "./pet-home";
+import { emptyStats, HOME_ITEMS, HOME_SLOTS, itemProgress, itemUnlocked, newlyUnlocked, parseHomeState, placeItem, resolvePlacement, type HomeStats } from "./pet-home";
 
 const stats = (o: Partial<HomeStats> = {}): HomeStats => ({ ...emptyStats(), ...o });
 const byId = (id: string) => HOME_ITEMS.find((i) => i.id === id)!;
@@ -67,5 +67,22 @@ describe("parseHomeState", () => {
   it("rác hoặc null thì rỗng", () => {
     expect(parseHomeState(null)).toEqual({ placed: {}, seen: [] });
     expect(parseHomeState("x")).toEqual({ placed: {}, seen: [] });
+  });
+});
+
+describe("placeItem", () => {
+  it("món đang ở chỗ khác được chuyển sang, chỗ cũ để trống", () => {
+    const st = stats({ streakLongest: 7, level: 5, visited: 10 });
+    const resolved = resolvePlacement({}, st);
+    expect(resolved.shelfL).toBe("inkset");
+    const next = placeItem({}, resolved, "shelfR", "inkset");
+    expect(next.shelfR).toBe("inkset");
+    expect(next.shelfL).toBeNull();
+    expect(resolvePlacement(next, st).shelfL).toBeNull();
+  });
+  it("món chưa dùng chỉ đặt vào chỗ được chọn", () => {
+    const next = placeItem({}, resolvePlacement({}, stats()), "floorL", "bed");
+    expect(next).toMatchObject({ floorL: "bed" });
+    expect(next.floorR).toBeUndefined();
   });
 });

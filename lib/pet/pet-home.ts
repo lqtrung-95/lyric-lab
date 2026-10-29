@@ -102,6 +102,16 @@ export function resolvePlacement(placed: Placement, stats: HomeStats): Record<Ho
   return out;
 }
 
+/**
+ * Đặt `itemId` vào `slot`. Món đang nằm ở chỗ khác (theo cách đang hiển thị `resolved`) được CHUYỂN sang đây: chỗ cũ để trống (không để tự chọn, vì tự chọn sẽ lấy lại đúng món đó).
+ */
+export function placeItem(placed: Placement, resolved: Record<HomeSlotId, string | null>, slot: HomeSlotId, itemId: string): Placement {
+  const next: Placement = { ...placed };
+  for (const s of HOME_SLOTS) if (s.id !== slot && resolved[s.id] === itemId) next[s.id] = null;
+  next[slot] = itemId;
+  return next;
+}
+
 /** Đồ đã mở khóa mà người dùng chưa từng "thấy" (để chúc mừng một lần). Đồ có sẵn không tính. */
 export function newlyUnlocked(seen: readonly string[], stats: HomeStats): HomeItem[] {
   const s = new Set(seen);

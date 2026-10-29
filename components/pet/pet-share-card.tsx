@@ -1,13 +1,16 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { SocialShareButtons } from "@/components/share/social-share-buttons";
 import { RoleplaySummaryModal } from "@/components/speaking/roleplay-summary-modal";
 import { Button3d } from "@/components/ui/button-3d";
 import { sfx } from "@/lib/games/arcade-sfx";
+import { socialNetworks } from "@/lib/share/social-networks";
+import { isMobileDevice } from "@/lib/streak/share-card";
 import { PET_SPECIES_LABELS, type Pet, type PetStage } from "@/lib/pet/pet-logic";
 import type { PetBurst } from "@/lib/pet/pet-burst";
 import { buildVisitUrl } from "@/lib/pet/pet-visit";
-import { confetti, shareChips, shareFileName, sparkles, type ShareStats } from "@/lib/pet/pet-share";
+import { chipRows, confetti, shareChips, shareFileName, sparkles, type ShareStats } from "@/lib/pet/pet-share";
 import { PetBurstFx } from "./pet-burst-fx";
 import { renderShareImage } from "./pet-share-image";
 import { PetSprite, TINT } from "./pet-sprite";
@@ -27,6 +30,8 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const chips = shareChips(stats);
+  // Mỗi ô rộng bằng 6 chia số ô trong hàng của nó (6 cột): hàng 3 ô mỗi ô 2 cột, hàng 2 ô mỗi ô 3 cột, nên hàng ít ô vẫn đều và căn giữa.
+  const chipSpan = chipRows(chips.length).flatMap((n) => Array<string>(n).fill(n === 3 ? "col-span-2" : n === 2 ? "col-span-3" : "col-span-6"));
   const subtitle = `${PET_SPECIES_LABELS[pet.species]} · ${STAGE_NAMES[stage - 1]}`;
 
   const tilt = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -55,6 +60,10 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
       else { await navigator.clipboard.writeText(`${text} ${url}`); setNote("Đã sao chép link mời bạn đến thăm."); }
     } catch (e) { if (!(e instanceof DOMException && e.name === "AbortError")) setNote("Chưa chia sẻ được. Thử lại nhé."); }
   };
+  // Máy tính không có share sheet của hệ điều hành: thêm nút các mạng xã hội, chia sẻ link mời ghé thăm (trang công khai có ảnh xem trước), ảnh thẻ thì lưu về để đính kèm.
+  const desktop = !isMobileDevice();
+  const visitUrl = buildVisitUrl(`${window.location.origin}/ghe-tham-pet`, { species: pet.species, name: pet.name, stage, accessories, level: stats.level, streak: stats.streak });
+  const networks = socialNetworks("SongHanzi", `Ghé nhà ${pet.name} chơi nè! ${pet.name} đang học tiếng Trung cùng mình trên SongHanzi.`);
   const run = async (share: boolean) => {
     setBusy(true); setNote(null); sfx.petBlip();
     try {
@@ -95,9 +104,9 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
                 <p className="mt-1 text-2xl text-[#f59e0b]" aria-label={`Giai đoạn ${stage} trên 3`}>
                   {[1, 2, 3].map((n) => <span key={n} aria-hidden="true" className="share-star" style={{ ["--d" as string]: `${0.5 + n * 0.18}s` }}>{n <= stage ? "★" : "☆"}</span>)}
                 </p>
-                <ul className="mt-2 grid w-full grid-cols-3 gap-2 pb-5">
-                  {chips.map((c) => (
-                    <li key={c.label} className="rounded-xl border-2 border-[#3a2b2b] bg-white/85 px-1 py-1 text-center">
+                <ul className="mt-2 grid w-full grid-cols-6 gap-2 pb-5">
+                  {chips.map((c, i) => (
+                    <li key={c.label} className={`${chipSpan[i]} rounded-xl border-2 border-[#3a2b2b] bg-white/85 px-1 py-1.5 text-center`}>
                       <span className="block text-base font-extrabold">{c.value}</span>
                       <span className="block text-[0.7rem] font-semibold leading-tight text-[#6b5b4b]">{c.label}</span>
                     </li>
@@ -115,6 +124,12 @@ export function PetShareCard({ pet, stage, accessories, stats, onClose }: { pet:
           <Button3d type="button" variant="tertiary" onClick={() => void invite()}>Mời bạn đến thăm</Button3d>
           <button type="button" onClick={() => { sfx.petBlip(); onClose(); }} className="min-h-11 rounded-full px-4 text-label-md font-bold text-on-surface-variant hover:bg-surface-container">Đóng</button>
         </div>
+        {desktop && (
+          <div className="w-full max-w-md">
+            <p className="mb-1 text-center text-label-md font-bold">Đăng link mời bạn bè ghé thăm {pet.name}</p>
+            <SocialShareButtons networks={networks} url={visitUrl} />
+          </div>
+        )}
         {note && <p role="status" className="text-label-md font-bold">{note}</p>}
       </div>
     </RoleplaySummaryModal>

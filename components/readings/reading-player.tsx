@@ -54,8 +54,9 @@ export function ReadingPlayer({ reading, pinyin, tokens, level }: { reading: Rea
           const vi = showAllVi || open.has(pi);
           const from = starts[pi];
           return (
-            <section key={pi} aria-label={`Đoạn ${pi + 1}`} className="flex flex-col gap-2">
-              {READING_SCENES[reading.id]?.[pi] && <ReadingSceneArt scene={READING_SCENES[reading.id][pi]} />}
+            <section key={pi} aria-label={`Đoạn ${pi + 1}`} className="flex flex-col gap-3 md:flex-row md:items-start md:gap-4">
+              {READING_SCENES[reading.id]?.[pi] && <div className="mx-auto w-full max-w-[15rem] shrink-0 md:order-2 md:mx-0 md:w-52"><ReadingSceneArt scene={READING_SCENES[reading.id][pi]} /></div>}
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
               <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.9] [--rt-gap:0.7em]">
                 {para.map((s, si) => (
                   <span key={si} aria-current={from + si === playing ? "true" : undefined} className={`rounded-md ${from + si === playing ? "bg-primary-container" : ""}`}>
@@ -67,6 +68,7 @@ export function ReadingPlayer({ reading, pinyin, tokens, level }: { reading: Rea
               <div className="flex flex-wrap items-center gap-2">
                 <button type="button" onClick={() => play(from, from + para.length)} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-bold">{playing >= 0 ? "Dừng" : "Nghe đoạn"}</button>
                 {!showAllVi && <button type="button" aria-pressed={open.has(pi)} onClick={() => toggle(pi)} className="min-h-11 rounded-full px-3 text-label-md font-bold underline">{open.has(pi) ? "Ẩn nghĩa" : "Nghĩa đoạn này"}</button>}
+              </div>
               </div>
             </section>
           );
