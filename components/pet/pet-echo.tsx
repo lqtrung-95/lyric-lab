@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { AssessmentResultView } from "@/components/pronunciation/assessment-result-view";
 import { usePronunciationAssess } from "@/components/pronunciation/use-pronunciation-assess";
 import { Icon } from "@/components/ui/icon";
-import { echoLine, echoTier } from "@/lib/pet/pet-echo";
+import { echoLine, echoTier, type EchoTier } from "@/lib/pet/pet-echo";
 import type { PetReviewWord } from "@/lib/pet/pet-review-word";
 import { startMicRecording, type MicRecording } from "@/lib/practice/mic-recording";
 import { toReferenceText } from "@/lib/pronunciation/assess-request-schema";
@@ -21,7 +21,7 @@ const ERROR_TEXT = {
  * Pet đọc mẫu một từ cần ôn (giọng TTS), người dùng đọc lại, pet phản ứng theo điểm (cùng dịch vụ chấm của "Luyện phát âm", tính hạn mức `voice`).
  * Micro chỉ mở khi bấm; bị từ chối thì báo rõ và vẫn nghe mẫu được (đường lui). `onReact` gọi khi có điểm để pet nảy.
  */
-export function PetEcho({ name, word, onReact, onClose }: { name: string; word: PetReviewWord; onReact: () => void; onClose: () => void }) {
+export function PetEcho({ name, word, onReact, onClose }: { name: string; word: PetReviewWord; onReact: (tier: EchoTier) => void; onClose: () => void }) {
   const [recording, setRecording] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
   const [said, setSaid] = useState<string | null>(null);
@@ -45,8 +45,9 @@ export function PetEcho({ name, word, onReact, onClose }: { name: string; word: 
   const [shownFor, setShownFor] = useState<unknown>(null);
   if (resultKey && shownFor !== resultKey) {
     setShownFor(resultKey);
-    setSaid(echoLine(echoTier(resultKey.overall), name));
-    onReact();
+    const tier = echoTier(resultKey.overall);
+    setSaid(echoLine(tier, name));
+    onReact(tier);
   }
 
   return (

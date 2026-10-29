@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { playSfx } from "@/lib/feedback/sfx";
 import { evolvedStage, type PetStage } from "@/lib/pet/pet-logic";
 
 const SEEN_KEY = "lyric-lab-pet-stage";
@@ -16,8 +15,8 @@ function readSeen(): number | null {
 }
 
 /**
- * Giai đoạn vừa tiến hóa (hoặc null). Nhớ giai đoạn đã thấy ở localStorage: lên giai đoạn mới thì phát tiếng `levelup` và trả giai đoạn đó
- * một lần (tải lại trang thì không báo nữa). Lần đầu chỉ ghi lại, không báo, để pet vừa nhận nuôi không "tiến hóa" ngay.
+ * Giai đoạn vừa tiến hóa (hoặc null). Nhớ giai đoạn đã thấy ở localStorage: lên giai đoạn mới thì trả giai đoạn đó
+ * một lần (tiếng và hạt do thẻ pet phát qua `PetBurstFx`) (tải lại trang thì không báo nữa). Lần đầu chỉ ghi lại, không báo, để pet vừa nhận nuôi không "tiến hóa" ngay.
  * `ready` = đã có XP thật (chưa có thì giai đoạn 1 tạm thời, không được ghi nhận).
  */
 export function usePetEvolution(stage: PetStage, ready: boolean): PetStage | null {
@@ -38,8 +37,5 @@ export function usePetEvolution(stage: PetStage, ready: boolean): PetStage | nul
       // Không lưu được thì lần sau có thể báo lại; chấp nhận.
     }
   }, [handled]);
-  useEffect(() => {
-    if (evolved) playSfx("levelup");
-  }, [evolved]);
   return evolved;
 }

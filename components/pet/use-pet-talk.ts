@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { sfx } from "@/lib/games/arcade-sfx";
+import type { PetBurst, PetBurstKind } from "@/lib/pet/pet-burst";
 import type { PetMood } from "@/lib/pet/pet-logic";
-import { petReactionFor, petReactionLine, type PetSnapshot } from "@/lib/pet/pet-reaction";
+import { petReactionFor, petReactionLine, type PetReaction, type PetSnapshot } from "@/lib/pet/pet-reaction";
 import { pickReviewWord, type PetReviewWord } from "@/lib/pet/pet-review-word";
 import { pickPetLine, spendSpeech, type PetSpeechBudget } from "@/lib/pet/pet-speech";
 
@@ -11,6 +11,7 @@ const BUDGET_KEY = "lyric-lab-pet-speech";
 const BUBBLE_MS = 4500;
 /** Bóng thoại mang từ cần bấm để nghe nên ở lâu hơn. */
 const WORD_BUBBLE_MS = 8000;
+const REACTION_BURST: Record<PetReaction, PetBurstKind> = { levelUp: "cheer", streakUp: "cheer", goalDone: "goal", streakLost: "sad" };
 const todayKey = () => new Date().toLocaleDateString("sv");
 
 function readBudget(): PetSpeechBudget | null {
@@ -25,13 +26,14 @@ function readBudget(): PetSpeechBudget | null {
 export type PetBubble = { kind: "line"; text: string } | { kind: "word"; word: PetReviewWord };
 
 /**
- * Pet nói và nảy. (1) Chạm: nảy (tăng `tapKey`), kêu `pop`, hiện một câu hoặc một từ cần ôn (tối đa vài lần mỗi ngày, quá thì chỉ nảy và kêu).
- * (2) Sự kiện: khi `snapshot` đổi (lên cấp, tăng chuỗi, đạt mục tiêu, mất chuỗi) pet nảy và nói một câu, KHÔNG kêu thêm
- * (tiếng thưởng đã do `RewardSounds` phát) và không tính vào hạn mức chạm vì sự kiện hiếm và là phản hồi cho việc người dùng vừa làm.
+ * Pet nói và nảy. (1) Chạm: nảy (tăng `tapKey`), kêu (tiếng riêng từng loài, phát bởi `PetBurstFx`), hiện một câu hoặc một từ cần ôn (tối đa vài lần mỗi ngày, quá thì chỉ nảy và kêu).
+ * (2) Sự kiện: khi `snapshot` đổi (lên cấp, tăng chuỗi, đạt mục tiêu, mất chuỗi) pet nảy, bắn hạt kèm tiếng riêng (`burst`) và nói một câu;
+ * không tính vào hạn mức chạm vì sự kiện hiếm và là phản hồi cho việc người dùng vừa làm.
  */
 export function usePetTalk(mood: PetMood, name: string, words: readonly PetReviewWord[] = [], snapshot: PetSnapshot | null = null) {
   const [tapKey, setTapKey] = useState(0);
   const [bubble, setBubble] = useState<PetBubble | null>(null);
+  const [burst, setBurst] = useState<PetBurst | null>(null);
   const [prevSnapshot, setPrevSnapshot] = useState(snapshot);
   const taps = useRef(0);
 
@@ -41,6 +43,7 @@ export function usePetTalk(mood: PetMood, name: string, words: readonly PetRevie
     setPrevSnapshot(snapshot);
     if (reaction) {
       setTapKey((k) => k + 1);
+      setBurst((b) => ({ key: (b?.key ?? 0) + 1, kind: REACTION_BURST[reaction] }));
       setBubble({ kind: "line", text: petReactionLine(reaction, name) });
     }
   }
@@ -54,7 +57,7 @@ export function usePetTalk(mood: PetMood, name: string, words: readonly PetRevie
 
   const tap = useCallback(() => {
     setTapKey((k) => k + 1);
-    sfx.pop(taps.current % 4);
+    setBurst((b) => ({ key: (b?.key ?? 0) + 1, kind: "tap" }));
     const { allowed, next } = spendSpeech(readBudget(), todayKey());
     taps.current += 1;
     if (!allowed) return;
@@ -64,5 +67,5 @@ export function usePetTalk(mood: PetMood, name: string, words: readonly PetRevie
     setBubble(word ? { kind: "word", word } : { kind: "line", text: pickPetLine(mood, name, next.count - 1) });
   }, [mood, name, words]);
 
-  return { tapKey, bubble, tap };
+  return { tapKey, bubble, burst, tap };
 }

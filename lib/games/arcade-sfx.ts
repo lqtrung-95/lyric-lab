@@ -69,4 +69,32 @@ export const sfx = {
   pop: (combo = 0) => play((c, t) => { const f = 520 + Math.min(combo, 8) * 60; tone(c, t, "sine", f, f * 2, 0.11, 0.25); tone(c, t + 0.02, "triangle", f * 1.5, f * 3, 0.08, 0.1); }),
   /** Hết ván. */
   gameOver: () => play((c, t) => { [392, 330, 262, 196].forEach((f, i) => tone(c, t + i * 0.14, "triangle", f, f * 0.97, 0.22, 0.22)); }),
+  // --- Linh vật (pet): mọi tương tác đều có tiếng, cùng công tắc với game giải trí. ---
+  /** Chạm vào pet: tiếng kêu riêng từng loài (rồng gừ-chíp, mèo meo, cún gâu nhỏ, gấu trúc chút chít, cú hú). */
+  petChirp: (species: string) => play((c, t) => {
+    switch (species) {
+      case "dragon": tone(c, t, "sawtooth", 200, 320, 0.16, 0.1); tone(c, t + 0.1, "triangle", 520, 800, 0.1, 0.14); break;
+      case "cat": tone(c, t, "sine", 620, 1000, 0.14, 0.2); tone(c, t + 0.14, "sine", 1000, 560, 0.2, 0.18); break;
+      case "dog": tone(c, t, "square", 480, 720, 0.07, 0.1); tone(c, t + 0.11, "square", 520, 760, 0.08, 0.1); break;
+      case "panda": tone(c, t, "triangle", 820, 1300, 0.09, 0.2); tone(c, t + 0.1, "triangle", 900, 1400, 0.09, 0.16); break;
+      case "owl": tone(c, t, "sine", 390, 340, 0.22, 0.22); tone(c, t + 0.26, "sine", 370, 320, 0.26, 0.2); break;
+      default: tone(c, t, "sine", 520, 1040, 0.11, 0.25);
+    }
+  }),
+  /** Bấm mở/đóng khung của pet (cho ăn, tập nói): tiếng "tít" nhẹ. */
+  petBlip: () => play((c, t) => { tone(c, t, "sine", 660, 880, 0.06, 0.12); }),
+  /** Pet nhai: hai tiếng "rộp" ngắn. */
+  petCrunch: () => play((c, t) => { noise(c, t, 0.08, 0.22, 3200, 700); noise(c, t + 0.12, 0.08, 0.2, 3000, 650); tone(c, t, "sine", 180, 120, 0.08, 0.12); }),
+  /** Pet vui (đạt mục tiêu, ăn no): vài nốt lấp lánh đi lên. */
+  petHappy: () => play((c, t) => { [784, 988, 1175, 1568].forEach((f, i) => tone(c, t + i * 0.06, "sine", f, f, 0.14, 0.14)); }),
+  /** Pet reo mừng (lên cấp, tăng chuỗi, đọc chuẩn): arpeggio đi lên có đuôi sáng. */
+  petCheer: () => play((c, t) => { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(c, t + i * 0.07, "triangle", f, f, 0.16, 0.16)); tone(c, t + 0.4, "sine", 2093, 2093, 0.25, 0.08); }),
+  /** Pet buồn nhẹ (mất chuỗi): hai nốt đi xuống, êm, không gắt. */
+  petSad: () => play((c, t) => { tone(c, t, "triangle", 440, 392, 0.3, 0.12); tone(c, t + 0.28, "triangle", 349, 294, 0.4, 0.11); }),
+  /** Quà đến: ba nốt lấp lánh cao. */
+  petGift: () => play((c, t) => { [1318.5, 1760, 2093].forEach((f, i) => tone(c, t + i * 0.08, "sine", f, f, 0.2, 0.1)); }),
+  /** Nhận nuôi: khúc chào mừng ngắn kết bằng hợp âm. */
+  petAdopt: () => play((c, t) => { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(c, t + i * 0.1, "triangle", f, f, 0.18, 0.18)); [523.25, 659.25, 783.99, 1046.5].forEach((f) => tone(c, t + 0.45, "sine", f, f, 0.6, 0.07)); }),
+  /** Tiến hóa: arpeggio dài rộng dần và tiếng "thăng hoa" cuối. */
+  petEvolve: () => play((c, t) => { [392, 523.25, 659.25, 783.99, 1046.5, 1318.5, 1568].forEach((f, i) => tone(c, t + i * 0.09, "triangle", f, f, 0.2, 0.17)); tone(c, t + 0.7, "sine", 1568, 3136, 0.6, 0.1); }),
 };

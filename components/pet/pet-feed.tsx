@@ -13,9 +13,9 @@ import { previewIntervals } from "@/lib/srs/fsrs-scheduler";
 /**
  * Cho pet ăn: ôn nhanh 1–3 thẻ đến hạn ngay trong thẻ pet. Dùng đúng `useReviewSession` của màn Ôn nên lịch FSRS, nhật ký ôn và XP tính
  * như ôn thường (pet không ghi XP riêng). Chỉ được mount khi người dùng bấm "Cho ăn" để trang chủ không tải thêm hàng đợi.
- * `onEat` gọi mỗi lần chấm một thẻ (pet nhai); `onClose` đóng khung.
+ * `onEat` gọi mỗi lần chấm một thẻ (pet nhai), `onFull` khi ăn đủ, `onClose` đóng khung.
  */
-export function PetFeed({ name, onEat, onClose }: { name: string; onEat: () => void; onClose: () => void }) {
+export function PetFeed({ name, onEat, onFull, onClose }: { name: string; onEat: () => void; onFull: () => void; onClose: () => void }) {
   const s = useReviewSession();
   const [flipped, setFlipped] = useState(false);
   const [ate, setAte] = useState(0);
@@ -32,7 +32,7 @@ export function PetFeed({ name, onEat, onClose }: { name: string; onEat: () => v
     onEat();
     const nextAte = ate + 1;
     setAte(nextAte);
-    if (feedDone(nextAte, limit)) refreshGameSummary();
+    if (feedDone(nextAte, limit)) { refreshGameSummary(); onFull(); }
   };
 
   let body;
