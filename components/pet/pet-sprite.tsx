@@ -4,6 +4,7 @@ import { Dog } from "./pet-art-dog";
 import { Dragon } from "./pet-art-dragon";
 import { Owl } from "./pet-art-owl";
 import { Panda } from "./pet-art-panda";
+import { PetAccessories } from "./pet-accessories";
 
 /** Loài đã có hình. Hình phẳng kiểu hoạt hình: không viền, màu tươi, mắt to có chấm sáng. */
 export const PET_SPECIES_READY: readonly PetSpecies[] = ["dragon", "panda", "cat", "dog", "owl"];
@@ -36,7 +37,7 @@ const PET_CSS = `
 const TINT: Record<PetSpecies, string> = { dragon: "#dff6e6", panda: "#dcecff", cat: "#ffe9d6", dog: "#f3e6d4", owl: "#e8e1ff" };
 
 /** Hình linh vật. Chỉ trang trí (aria-hidden): thông tin tên, giai đoạn, tâm trạng luôn có chữ bên cạnh. */
-export function PetSprite({ species, stage, mood, className = "size-28" }: { species: PetSpecies; stage: PetStage; mood: PetMood; className?: string }) {
+export function PetSprite({ species, stage, mood, accessories = [], className = "size-28" }: { species: PetSpecies; stage: PetStage; mood: PetMood; accessories?: readonly string[]; className?: string }) {
   return (
     <>
       <style>{PET_CSS}</style>
@@ -49,6 +50,7 @@ export function PetSprite({ species, stage, mood, className = "size-28" }: { spe
           {species === "cat" && <Cat stage={stage} mood={mood} />}
           {species === "dog" && <Dog stage={stage} mood={mood} />}
           {species === "owl" && <Owl stage={stage} mood={mood} />}
+          <PetAccessories ids={accessories} stage={stage} />
         </g>
       </svg>
     </>

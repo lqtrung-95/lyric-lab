@@ -56,6 +56,14 @@ export function petGrowth(totalXp: number): PetGrowth {
   return { stage, progressXp: xp - PET_STAGE_XP[stage - 1], nextXp: maxed ? 0 : PET_STAGE_XP[stage] - PET_STAGE_XP[stage - 1], maxed };
 }
 
+/**
+ * Có vừa tiến hóa không: `seen` là giai đoạn lần trước đã cho người dùng thấy (null = chưa từng ghi).
+ * Trả giai đoạn mới nếu cao hơn `seen`; lần đầu (null) và khi không đổi hoặc tụt thì null, để không "tiến hóa" lúc vừa nhận nuôi.
+ */
+export function evolvedStage(seen: number | null, current: PetStage): PetStage | null {
+  return seen !== null && current > seen ? current : null;
+}
+
 export type PetMood = "happy" | "hungry" | "sleepy";
 /** Bỏ học từng này ngày liên tiếp thì pet "ngủ" (không phạt, không mất gì). */
 export const PET_SLEEP_AFTER_DAYS = 3;

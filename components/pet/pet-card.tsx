@@ -9,6 +9,7 @@ import { PET_NAME_MAX, PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrow
 import { dailyGoalProgress } from "@/lib/streak/daily-goal";
 import { PET_SPECIES_READY, PetSprite } from "./pet-sprite";
 import { usePet } from "./use-pet";
+import { usePetEvolution } from "./use-pet-evolution";
 
 const STAGE_NAMES: readonly string[] = ["Con non", "Thiếu niên", "Trưởng thành"];
 const MOOD_TEXT: Record<PetMood, (name: string) => string> = {
@@ -22,19 +23,22 @@ export function PetCard() {
   const { pet, adopt } = usePet();
   const game = useGameSummary();
   const streak = useStreak();
+  const growth = petGrowth(game?.xp.total ?? 0);
+  // Gọi trước các lệnh return sớm để thứ tự hook không đổi giữa các lần vẽ.
+  const evolved = usePetEvolution(growth.stage, game !== null && game !== undefined && pet != null);
   if (pet === undefined) return null;
   if (pet === null) return <AdoptPet onAdopt={(species, name) => adopt({ species, name, adoptedAt: new Date().toISOString() })} />;
 
-  const growth = petGrowth(game?.xp.total ?? 0);
   const goal = dailyGoalProgress(streak?.todayItems ?? 0, streak?.dailyGoal ?? 0);
   const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
   const nextStage = (STAGE_NAMES[growth.stage] ?? "").toLowerCase();
   const accessories = unlockedAccessories(streak?.longest ?? 0);
   return (
     <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetSprite species={pet.species} stage={growth.stage} mood={mood} className="size-28 shrink-0" />
+      <PetSprite species={pet.species} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} className="size-28 shrink-0" />
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
+        {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
         <p role="status" className="mt-1 text-body-md">{MOOD_TEXT[mood](pet.name)}</p>
         {growth.maxed ? (
           <p className="mt-2 text-label-md font-bold text-secondary">{pet.name} đã trưởng thành!</p>

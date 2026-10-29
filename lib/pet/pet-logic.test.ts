@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { dailyGoalProgress } from "@/lib/streak/daily-goal";
-import { PET_NAME_MAX, cleanPetName, daysSinceStudy, parsePet, petGrowth, petMood, unlockedAccessories } from "./pet-logic";
+import { PET_NAME_MAX, cleanPetName, daysSinceStudy, evolvedStage, parsePet, petGrowth, petMood, unlockedAccessories } from "./pet-logic";
 
 describe("cleanPetName", () => {
   it("bỏ khoảng trắng thừa và cắt theo số ký tự", () => {
@@ -79,5 +79,17 @@ describe("daysSinceStudy", () => {
   it("không thấy ngày học trong tuần thì 7; chưa từng học thì null", () => {
     expect(daysSinceStudy({ studiedToday: false, current: 0, longest: 5, week: week([], 3) })).toBe(7);
     expect(daysSinceStudy({ studiedToday: false, current: 0, longest: 0, week: week([], 3) })).toBeNull();
+  });
+});
+
+describe("evolvedStage", () => {
+  it("chỉ báo khi giai đoạn cao hơn lần đã thấy", () => {
+    expect(evolvedStage(1, 2)).toBe(2);
+    expect(evolvedStage(1, 3)).toBe(3);
+  });
+  it("lần đầu, không đổi hoặc tụt thì không báo", () => {
+    expect(evolvedStage(null, 3)).toBeNull();
+    expect(evolvedStage(2, 2)).toBeNull();
+    expect(evolvedStage(3, 2)).toBeNull();
   });
 });
