@@ -284,3 +284,7 @@ Không có bảng mới: dấu hộ chiếu và danh hiệu luôn TÍNH LẠI t�
 
 - **Bắn chữ / Phi đội**: engine thuần (`lib/games/squadron-engine.ts`, `squadron-wave.ts`) bước theo `dt` do `useGameLoop` cấp; điều khiển (phím + con trỏ) đọc từ ref rồi truyền vào `stepSquadron`; không có state ngoài client, XP ghi qua `useArcadeScore("blaster")`.
 - **Pet thủ thành**: engine thuần `lib/games/tower-engine.ts` (+ `tone-options.ts` sinh lựa chọn khác thanh) bước theo `dt`; thông tin pet lấy từ `usePetView`, kỷ lục qua `useLocalJson`; không gọi máy chủ, không ghi XP.
+
+## Ngữ pháp (`lib/grammar`, `components/grammar`, `app/(main)/grammar`)
+
+Nội dung tĩnh tự viết (không LLM, không DB): `patterns-hsk1..4.ts` → `grammar-patterns.ts`. Ví dụ ghi dạng "我|把|书…" (dấu "|" ngăn từ) để sinh bài xếp từ/điền chỗ trống mà không cần tách từ lúc chạy; pinyin hiển thị lấy từ từ điển qua `annotatePinyin` ở server (quy tắc 2). `drills.ts` sinh bài (xếp từ, điền chỗ trống, chọn câu đúng) và chấm; `grammar-stats.ts` là thống kê thuần ở localStorage (`useGrammarStats` qua `useLocalJson`), dùng cho "mẫu hay sai", tiến độ cấp và nhắc của pet. `detect-grammar.ts` nhận mẫu trong một dòng lời bằng regex `detect`, nạp qua `next/dynamic` (`components/listen/grammar-tags.tsx`) để gói màn nghe không phình. Lưu mẫu vào ôn tập dùng `toggleSaved` với `grammarSavedItem` (type "grammar", videoId rỗng) nên đi qua cùng đường FSRS/đồng bộ như thẻ từ. Câu thật cho mẫu lấy từ chỉ mục `term_sentences` theo `term ?? key[0]`; chưa có chỉ mục thì phần đó tự ẩn.

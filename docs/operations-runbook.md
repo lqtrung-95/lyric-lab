@@ -347,3 +347,6 @@ Với chữ nhiều âm (和, 会, 要, 看, 吧, 没...), AI chọn cách đọ
 
 ### Thêm cảnh Khám phá mới
 Sau khi thêm cảnh (xem danh sách các chỗ cần nối ở `docs/handoff-and-status.md`, mục 2026-10-29 "THÊM 8 CẢNH"): (1) `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/generate-coop-pinyin.mts` sinh lại `lib/explore/coop/coop-pinyin.generated.json` (test `coop-pinyin.test.ts` đỏ nếu thiếu); (2) `scripts/prewarm-explore-tts.mts` nạp sẵn giọng đọc cho câu mới. Kiểm trùng từ và trùng id sprite với cảnh cũ trước khi đăng ký.
+
+## Ngữ pháp: không có migration hay biến môi trường
+Nội dung nằm trong mã nguồn, chỉ cần deploy. Câu thật trên trang `/grammar/[id]` cần bảng `term_sentences` (cùng chỉ mục của trang Tra từ); thiếu thì phần "Gặp trong bài hát và video" tự ẩn. Sau khi sửa nội dung mẫu, chạy `npx vitest run lib/grammar`.

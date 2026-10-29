@@ -1,0 +1,96 @@
+import type { GrammarPattern } from "./grammar-types";
+
+const L = 1 as const;
+export const HSK1_PATTERNS: GrammarPattern[] = [
+  {
+    id: "shi", level: L, title: "Câu với 是", pattern: "A 是 B", key: ["是"],
+    explain: "是 nối hai danh từ, nghĩa là “là”: A là B. Dùng để giới thiệu tên, nghề nghiệp, quốc tịch. Phủ định là 不是.",
+    vsVi: "Giống tiếng Việt “A là B”. Khác: 是 không đứng trước tính từ (không nói “我是高”, phải nói 我很高).",
+    mistakes: [{ wrong: "我是很忙。", right: "我很忙。", why: "Trước tính từ không dùng 是; dùng 很 thay thế." }],
+    examples: [{ zh: "我|是|学生。", vi: "Tôi là học sinh." }, { zh: "他|不|是|老师。", vi: "Anh ấy không phải giáo viên." }, { zh: "这|是|我|的|书。", vi: "Đây là sách của tôi." }],
+  },
+  {
+    id: "you-meiyou", level: L, title: "有 và 没有", pattern: "A 有 / 没有 B", key: ["有", "没有"],
+    explain: "有 nghĩa là “có” (sở hữu hoặc tồn tại). Phủ định luôn là 没有, không dùng 不有.",
+    vsVi: "Giống “có / không có”. Điểm cần nhớ: phủ định của 有 là 没, không phải 不.",
+    mistakes: [{ wrong: "我不有钱。", right: "我没有钱。", why: "Phủ định của 有 là 没有." }],
+    examples: [{ zh: "我|有|一|个|哥哥。", vi: "Tôi có một người anh." }, { zh: "他|没有|手机。", vi: "Anh ấy không có điện thoại." }, { zh: "你|有|时间|吗？", vi: "Bạn có thời gian không?" }],
+  },
+  {
+    id: "ma", level: L, title: "Câu hỏi với 吗", pattern: "Câu trần thuật + 吗？", key: ["吗"],
+    explain: "Thêm 吗 vào cuối câu trần thuật để biến thành câu hỏi có/không. Trả lời bằng cách lặp lại động từ hoặc nói 不/没.",
+    vsVi: "Giống “…không?” ở cuối câu Việt. Khác: câu đã có từ để hỏi (谁, 什么…) thì không thêm 吗.",
+    mistakes: [{ wrong: "你是谁吗？", right: "你是谁？", why: "Câu có từ để hỏi 谁 thì không thêm 吗." }],
+    examples: [{ zh: "你|好|吗？", vi: "Bạn khỏe không?" }, { zh: "你|喜欢|唱歌|吗？", vi: "Bạn thích hát không?" }, { zh: "他|是|你|朋友|吗？", vi: "Anh ấy là bạn của bạn à?" }],
+  },
+  {
+    id: "bu", level: L, title: "Phủ định với 不", pattern: "不 + động từ / tính từ", key: ["不"],
+    explain: "不 đặt trước động từ hoặc tính từ để phủ định ở hiện tại và tương lai, hoặc ý muốn, thói quen. 不 đọc thanh 2 (bú) khi đứng trước chữ thanh 4.",
+    vsVi: "Giống “không”. Khác: quá khứ và 有 dùng 没, không dùng 不.",
+    mistakes: [{ wrong: "我昨天不去学校。", right: "我昨天没去学校。", why: "Phủ định hành động đã xảy ra (quá khứ) dùng 没, không dùng 不." }],
+    examples: [{ zh: "我|不|喝|咖啡。", vi: "Tôi không uống cà phê." }, { zh: "今天|不|冷。", vi: "Hôm nay không lạnh." }, { zh: "他|不|想|去。", vi: "Anh ấy không muốn đi." }],
+  },
+  {
+    id: "le-done", level: L, title: "了 báo việc đã xong", pattern: "Động từ + 了", key: ["了"],
+    explain: "了 đặt sau động từ để cho biết hành động đã hoàn thành. Đặt cuối câu thì báo tình huống mới hoặc thay đổi.",
+    vsVi: "Gần với “đã / rồi” nhưng 了 không đánh dấu thì quá khứ mà đánh dấu “xong” hoặc “có thay đổi”.",
+    mistakes: [{ wrong: "我昨天了去学校。", right: "我昨天去学校了。", why: "了 theo sau động từ hoặc ở cuối câu, không đứng trước động từ." }],
+    examples: [{ zh: "我|吃|了|饭。", vi: "Tôi đã ăn cơm." }, { zh: "他|来|了。", vi: "Anh ấy đến rồi." }, { zh: "天|黑|了。", vi: "Trời tối rồi." }],
+  },
+  {
+    id: "zai-doing", level: L, title: "在 + động từ: đang làm", pattern: "A 在 + động từ (+ tân ngữ)", key: ["在"],
+    explain: "在 trước động từ diễn tả hành động đang diễn ra. Có thể thêm 正 hoặc 呢 để nhấn mạnh.",
+    vsVi: "Giống “đang”. Không đổi dạng động từ như tiếng Anh, chỉ thêm 在 phía trước.",
+    mistakes: [{ wrong: "我吃饭在。", right: "我在吃饭。", why: "在 phải đứng trước động từ." }],
+    examples: [{ zh: "我|在|看|书。", vi: "Tôi đang đọc sách." }, { zh: "他们|在|唱歌。", vi: "Họ đang hát." }, { zh: "妈妈|在|做|饭。", vi: "Mẹ đang nấu cơm." }],
+  },
+  {
+    id: "de-possess", level: L, title: "的 chỉ sở hữu", pattern: "Người / vật + 的 + danh từ", key: ["的"],
+    explain: "的 nối từ chỉ người sở hữu với vật được sở hữu, như “của”. Với người thân gần gũi, thường bỏ 的 (我妈妈, 我家).",
+    vsVi: "Giống “của”, nhưng thứ tự khác: tiếng Trung đặt người sở hữu TRƯỚC (我的书), tiếng Việt đặt sau (sách của tôi).",
+    mistakes: [{ wrong: "书我的。", right: "我的书。", why: "Người sở hữu đứng trước 的, vật sở hữu đứng sau." }],
+    examples: [{ zh: "这|是|我|的|手机。", vi: "Đây là điện thoại của tôi." }, { zh: "他|的|朋友|很|多。", vi: "Bạn của anh ấy rất nhiều." }, { zh: "老师|的|声音|很|好听。", vi: "Giọng của cô giáo rất hay." }],
+  },
+  {
+    id: "question-words", level: L, title: "Từ để hỏi", pattern: "什么 / 谁 / 哪 / 几 / 怎么 / 为什么", key: ["什么", "谁", "哪", "几"],
+    explain: "Từ để hỏi đứng đúng vị trí của thông tin cần hỏi, không đảo lên đầu câu. Câu có từ để hỏi không dùng 吗.",
+    vsVi: "Khác tiếng Việt, vị trí của từ để hỏi trùng với vị trí của câu trả lời: 你吃什么？ → 我吃面条。",
+    mistakes: [{ wrong: "什么你吃？", right: "你吃什么？", why: "Từ để hỏi ở đúng vị trí của câu trả lời, không đưa lên đầu câu." }],
+    examples: [{ zh: "你|叫|什么|名字？", vi: "Bạn tên là gì?" }, { zh: "他|是|谁？", vi: "Anh ấy là ai?" }, { zh: "你|有|几|个|朋友？", vi: "Bạn có mấy người bạn?" }, { zh: "你|喜欢|哪|个？", vi: "Bạn thích cái nào?" }],
+  },
+  {
+    id: "hen-adj", level: L, title: "很 + tính từ", pattern: "A 很 + tính từ", key: ["很"],
+    explain: "Tính từ làm vị ngữ thường có 很 đứng trước, dù không mang nghĩa “rất” mạnh. Thiếu 很 câu nghe như đang so sánh ngầm.",
+    vsVi: "Tiếng Việt nói “tôi bận” là xong, còn tiếng Trung quen nói 我很忙. Khi cần “rất” mạnh thì nhấn 很 hoặc dùng 非常.",
+    mistakes: [{ wrong: "我高。", right: "我很高。", why: "Câu tính từ trần thuật thường cần 很 đứng trước tính từ." }],
+    examples: [{ zh: "我|很|高兴。", vi: "Tôi rất vui." }, { zh: "今天|很|热。", vi: "Hôm nay rất nóng." }, { zh: "这|个|很|好吃。", vi: "Cái này rất ngon." }],
+  },
+  {
+    id: "mei-past", level: L, title: "没 phủ định quá khứ", pattern: "A 没(有) + động từ", key: ["没"],
+    explain: "没 (hoặc 没有) phủ định việc chưa xảy ra hoặc chưa làm. Khi dùng 没 thì động từ không thêm 了.",
+    vsVi: "Giống “chưa / không có” trong tiếng Việt. Câu phủ định với 没 bỏ 了: 我没去, không nói 我没去了.",
+    mistakes: [{ wrong: "我没吃了饭。", right: "我没吃饭。", why: "Đã phủ định bằng 没 thì không thêm 了." }],
+    examples: [{ zh: "我|没|吃|早饭。", vi: "Tôi chưa ăn sáng." }, { zh: "他|没有|来。", vi: "Anh ấy không đến." }, { zh: "我|没|看|过|这|部|电影。", vi: "Tôi chưa xem bộ phim này." }],
+  },
+  {
+    id: "xiang-yao", level: L, title: "想 và 要", pattern: "A 想 / 要 + động từ", key: ["想", "要"],
+    explain: "想 là “muốn / nghĩ”, nói mong muốn nhẹ nhàng. 要 là “muốn / cần / sẽ”, mạnh hơn. Cả hai đứng trước động từ.",
+    vsVi: "想 ≈ “muốn, định”; 要 ≈ “cần, nhất định muốn”. Phủ định của 要 (muốn) thường là 不想, chứ không phải 不要 (nghĩa là “đừng”).",
+    mistakes: [{ wrong: "我不要去。", right: "我不想去。", why: "Từ chối nhẹ nhàng dùng 不想; 不要 nghe như “đừng/không cần” rất gắt." }],
+    examples: [{ zh: "我|想|喝|水。", vi: "Tôi muốn uống nước." }, { zh: "我|要|一|杯|茶。", vi: "Tôi muốn một ly trà." }, { zh: "你|想|去|哪儿？", vi: "Bạn muốn đi đâu?" }],
+  },
+  {
+    id: "measure-word", level: L, title: "Số từ + lượng từ + danh từ", pattern: "Số + lượng từ + danh từ", key: ["个", "本", "杯"],
+    explain: "Khi đếm hoặc chỉ định, giữa số và danh từ phải có lượng từ. 个 dùng được cho rất nhiều thứ; vật khác có lượng từ riêng (本 cho sách, 杯 cho ly...).",
+    vsVi: "Giống tiếng Việt có loại từ (một con mèo, một cuốn sách). Khác: tiếng Trung bắt buộc phải có lượng từ.",
+    mistakes: [{ wrong: "我有三书。", right: "我有三本书。", why: "Giữa số và danh từ phải có lượng từ." }],
+    examples: [{ zh: "我|有|三|本|书。", vi: "Tôi có ba cuốn sách." }, { zh: "请|给|我|一|杯|水。", vi: "Cho tôi một ly nước." }, { zh: "他|有|两|个|孩子。", vi: "Anh ấy có hai đứa con." }],
+  },
+  {
+    id: "word-order-basic", level: L, title: "Thứ tự: thời gian – nơi chốn – hành động", pattern: "Chủ ngữ + thời gian + nơi chốn + động từ", key: ["在"],
+    explain: "Trạng ngữ chỉ thời gian đứng trước nơi chốn, cả hai đứng trước động từ chính. Khác tiếng Việt vốn đặt nơi chốn sau động từ.",
+    vsVi: "Tiếng Việt: “Tôi học ở trường hôm nay”. Tiếng Trung: 我今天在学校学习 (tôi / hôm nay / ở trường / học).",
+    mistakes: [{ wrong: "我学习在学校。", right: "我在学校学习。", why: "Cụm nơi chốn 在 + địa điểm phải đứng trước động từ." }],
+    examples: [{ zh: "我|今天|在|家|学习。", vi: "Hôm nay tôi học ở nhà." }, { zh: "他|明天|在|公司|开会。", vi: "Ngày mai anh ấy họp ở công ty." }, { zh: "我们|晚上|在|家|吃饭。", vi: "Buổi tối chúng tôi ăn cơm ở nhà." }],
+  },
+];

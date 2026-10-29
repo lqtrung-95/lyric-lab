@@ -1,10 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { memo } from "react";
 import type { AnalyzedLine } from "@/lib/analysis/analysis-types";
 import { buildLineSegments, type HighlightSets } from "@/lib/listen/line-segments";
 import { Icon } from "@/components/ui/icon";
 import { TranslationSuggestionButton } from "./translation-suggestion-button";
+
+/** Nhãn ngữ pháp chỉ nạp khi có dòng đang hát: không làm nặng gói của màn nghe. */
+const GrammarTags = dynamic(() => import("./grammar-tags"), { ssr: false });
 
 export type LineState = "past" | "active" | "upcoming";
 
@@ -120,6 +124,7 @@ function LyricLineRowImpl({ videoId, promptVersion, line, state, showPinyin, sho
             {allowTranslationSuggestion && <TranslationSuggestionButton videoId={videoId} promptVersion={promptVersion} lineIndex={line.index} currentTranslation={line.translation} onPauseSong={onPauseSong} />}
           </div>
         )}
+        {active && <GrammarTags text={line.text} />}
       </div>
       {hasActions && (
         <div className={`-mr-3 ml-auto mt-0.5 shrink-0 flex-col md:mr-0 md:flex md:flex-row md:opacity-0 md:transition-opacity md:focus-within:opacity-100 md:group-hover/line:opacity-100 md:[@media(hover:none)]:opacity-60 ${active ? "flex" : "hidden"}`}>

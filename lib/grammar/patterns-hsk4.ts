@@ -1,0 +1,77 @@
+import type { GrammarPattern } from "./grammar-types";
+
+const L = 4 as const;
+export const HSK4_PATTERNS: GrammarPattern[] = [
+  {
+    id: "jishi-ye", level: L, title: "即使…也…", pattern: "即使 A，也 B", key: ["即使", "也"],
+    explain: "Dù cho A xảy ra (giả thiết, có thể chưa xảy ra), kết quả B vẫn không đổi.",
+    vsVi: "Giống “dù cho… cũng…”, “kể cả… vẫn…”.",
+    mistakes: [{ wrong: "即使下雨，所以我去。", right: "即使下雨，我也去。", why: "Vế sau dùng 也, không dùng 所以." }],
+    examples: [{ zh: "即使|下雨，|我|也|要|去。", vi: "Dù mưa tôi cũng phải đi." }, { zh: "即使|很|累，|他|也|不|休息。", vi: "Dù rất mệt anh ấy cũng không nghỉ." }, { zh: "即使|你|不|说，|我|也|明白。", vi: "Dù bạn không nói tôi cũng hiểu." }],
+    detect: "即使|就算|哪怕",
+  },
+  {
+    id: "ji-you", level: L, title: "既…又…", pattern: "既 A 又 B", key: ["既", "又"],
+    explain: "Vừa A vừa B: hai tính chất hoặc hai việc cùng tồn tại; A và B cùng loại.",
+    vsVi: "Giống “vừa… vừa…”, “không những… mà còn…” (văn viết hơn).",
+    mistakes: [{ wrong: "这个菜既好吃又贵得多。", right: "这个菜既好吃又便宜。", why: "A và B phải cùng kiểu (cùng ưu hoặc cùng khuyết)." }],
+    examples: [{ zh: "这|个|菜|既|好吃|又|便宜。", vi: "Món này vừa ngon vừa rẻ." }, { zh: "她|既|聪明|又|漂亮。", vi: "Cô ấy vừa thông minh vừa xinh." }, { zh: "他|既|会|唱，|又|会|跳。", vi: "Anh ấy vừa biết hát vừa biết nhảy." }],
+    detect: "既.+又",
+  },
+  {
+    id: "shenzhi", level: L, title: "甚至: thậm chí", pattern: "A，甚至 B (còn hơn)", key: ["甚至"],
+    explain: "Nêu mức độ cao hơn, bất ngờ hơn: thậm chí B. Thường đi với 都/也 ở phía sau.",
+    vsVi: "Giống “thậm chí”.",
+    mistakes: [{ wrong: "甚至他不来。", right: "他甚至不来。", why: "甚至 đứng trước vị ngữ mà nó nhấn mạnh, thường sau chủ ngữ." }],
+    examples: [{ zh: "他|很|忙，|甚至|没|时间|吃饭。", vi: "Anh ấy rất bận, thậm chí không có thời gian ăn cơm." }, { zh: "她|甚至|忘|了|自己|的|名字。", vi: "Cô ấy thậm chí quên cả tên mình." }, { zh: "这|个|字|甚至|老师|也|不|认识。", vi: "Chữ này thậm chí cô giáo cũng không biết." }],
+    detect: "甚至",
+  },
+  {
+    id: "buguan-dou", level: L, title: "不管…都…", pattern: "不管 A，都 B", key: ["不管", "都"],
+    explain: "Dù A thế nào (thường có từ để hỏi hoặc cặp đối lập), kết quả B vẫn như nhau.",
+    vsVi: "Giống “bất kể… đều…”, “dù… thì cũng…”.",
+    mistakes: [{ wrong: "不管天气好，我去。", right: "不管天气好不好，我都去。", why: "不管 đi với từ để hỏi hoặc cặp đối lập, vế sau cần 都." }],
+    examples: [{ zh: "不管|天气|怎么样，|我|都|去。", vi: "Bất kể thời tiết thế nào tôi đều đi." }, { zh: "不管|多|忙，|他|都|会|回|家。", vi: "Dù bận thế nào anh ấy cũng về nhà." }, { zh: "不管|谁|来，|我|都|欢迎。", vi: "Dù ai đến tôi cũng chào đón." }],
+    detect: "不管|无论",
+  },
+  {
+    id: "jinguan-danshi", level: L, title: "尽管…但是…", pattern: "尽管 A，但是 / 可是 B", key: ["尽管", "但是"],
+    explain: "Dù A là sự thật (đã xảy ra), B vẫn xảy ra. Khác 即使 ở chỗ 尽管 nói sự thật có thật.",
+    vsVi: "Giống “mặc dù… nhưng…”.",
+    mistakes: [{ wrong: "尽管下雨，所以他来了。", right: "尽管下雨，但是他还是来了。", why: "Quan hệ nhượng bộ dùng 但是/可是, không dùng 所以." }],
+    examples: [{ zh: "尽管|很|累，|但是|他|还是|来|了。", vi: "Mặc dù rất mệt nhưng anh ấy vẫn đến." }, { zh: "尽管|没|钱，|他|也|很|快乐。", vi: "Dù không có tiền anh ấy vẫn rất vui." }, { zh: "尽管|路|很|远，|可是|我们|不|怕。", vi: "Mặc dù đường rất xa nhưng chúng tôi không sợ." }],
+    detect: "尽管",
+  },
+  {
+    id: "yuqi-buru", level: L, title: "与其…不如…", pattern: "与其 A，不如 B", key: ["与其", "不如"],
+    explain: "So sánh hai lựa chọn: thay vì A thì chọn B còn hơn.",
+    vsVi: "Giống “thà… còn hơn…”, “thay vì… chi bằng…”.",
+    mistakes: [{ wrong: "与其在家，不如出去走走。", right: "与其待在家里，不如出去走走。", why: "Vế 与其 nêu phương án bị bỏ, 不如 nêu phương án chọn." }],
+    examples: [{ zh: "与其|等|他，|不如|自己|去。", vi: "Thay vì đợi anh ấy chi bằng tự đi." }, { zh: "与其|看|电视，|不如|看|书。", vi: "Thay vì xem tivi chi bằng đọc sách." }, { zh: "与其|生气，|不如|想|办法。", vi: "Thay vì tức giận chi bằng nghĩ cách." }],
+    detect: "与其",
+  },
+  {
+    id: "zhisuoyi", level: L, title: "之所以…是因为…", pattern: "之所以 kết quả，是因为 nguyên nhân", key: ["之所以", "是因为"],
+    explain: "Đảo thứ tự so với 因为…所以…: nêu kết quả trước, rồi giải thích nguyên nhân sau. Nhấn mạnh nguyên nhân.",
+    vsVi: "Giống “sở dĩ… là vì…”.",
+    mistakes: [{ wrong: "之所以他迟到，所以堵车。", right: "之所以他迟到，是因为堵车。", why: "之所以 đi với 是因为, không dùng 所以." }],
+    examples: [{ zh: "他|之所以|迟到，|是因为|堵车。", vi: "Sở dĩ anh ấy đến muộn là vì tắc đường." }, { zh: "我|之所以|学|中文，|是因为|喜欢|歌。", vi: "Sở dĩ tôi học tiếng Trung là vì thích bài hát." }, { zh: "之所以|成功，|是因为|努力。", vi: "Sở dĩ thành công là vì nỗ lực." }],
+    detect: "之所以",
+  },
+  {
+    id: "fouze", level: L, title: "否则: nếu không thì", pattern: "A，否则 B", key: ["否则"],
+    explain: "Nêu hậu quả nếu điều kiện A không được đáp ứng. 否则 mở vế sau, tương tự 不然.",
+    vsVi: "Giống “nếu không thì”, “bằng không”.",
+    mistakes: [{ wrong: "快走，否则我们迟到了。", right: "快走，否则我们会迟到。", why: "Hậu quả chưa xảy ra nên dùng 会, không dùng 了." }],
+    examples: [{ zh: "快|走，|否则|我们|会|迟到。", vi: "Đi nhanh lên, nếu không chúng ta sẽ muộn." }, { zh: "你|得|休息，|否则|会|生病。", vi: "Bạn phải nghỉ ngơi, nếu không sẽ bệnh." }, { zh: "要|早|点|睡，|否则|明天|起|不来。", vi: "Phải ngủ sớm, nếu không mai không dậy nổi." }],
+    detect: "否则|不然",
+  },
+  {
+    id: "bujin-hai", level: L, title: "不仅…还 / 而且…", pattern: "不仅 A，还 / 也 / 而且 B", key: ["不仅", "还"],
+    explain: "Không chỉ A mà còn B. Cùng nghĩa với 不但…而且…, nhưng 不仅 hơi trang trọng; 还/也 hay đi ở vế sau.",
+    vsVi: "Giống “không chỉ… mà còn…”.",
+    mistakes: [{ wrong: "他不仅会英语，可是会法语。", right: "他不仅会英语，还会法语。", why: "Ý bổ sung dùng 还/也/而且, không dùng 可是." }],
+    examples: [{ zh: "他|不仅|会|英语，|还|会|法语。", vi: "Anh ấy không chỉ biết tiếng Anh mà còn biết tiếng Pháp." }, { zh: "这|里|不仅|风景|美，|还|很|安静。", vi: "Ở đây không chỉ phong cảnh đẹp mà còn yên tĩnh." }, { zh: "她|不仅|聪明，|而且|善良。", vi: "Cô ấy không chỉ thông minh mà còn tốt bụng." }],
+    detect: "不仅",
+  },
+];

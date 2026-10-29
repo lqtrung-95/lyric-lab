@@ -171,3 +171,8 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Ẩn phần còn lại của trang khi in bằng `display: none` (hoặc `print:hidden`), KHÔNG dùng `visibility: hidden` vì phần bị ẩn vẫn chiếm chỗ và sinh trang trắng. Danh sách riêng để in thì portal ra `<body>` rồi ẩn các con khác của body.
 - Cảnh Khám phá mới: từ không trùng cảnh khác, id sprite không trùng sprite/alias cũ (đăng ký sau đè sprite trước), tên chơi chung là nơi chốn bằng chữ Hán thuần, vật treo tường dùng `wall: true`.
 - Tính năng mới của Khám phá dựa trên tiến độ học thì viết hàm thuần đọc `ExploreProgress` (như `passport.ts`), không lưu thêm trạng thái; mở cảnh/bản đồ phải đi qua `SCENES` và `town-layout`, và nhắc dữ liệu cảnh nặng thì tải động (`import()`), không kéo vào gói của trang bài hát.
+
+## Ngữ pháp
+- Mẫu mới thêm vào `patterns-hsk{n}.ts`: `id` kebab-case duy nhất, `key` là các từ khoá thật sự xuất hiện trong ví dụ (đúng nguyên một đoạn giữa hai dấu "|" để bài điền chỗ trống che được), ví dụ ≥3 câu và lỗi hay gặp ≥1. Tự viết, không chép lời bài hát hay sách (quy tắc 7). `detect` chỉ khi mẫu đủ đặc trưng (nhiều phần hoặc chữ ít gặp); chữ quá phổ biến để trống.
+- Khoá thẻ ôn lấy từ `grammarCardTerm` (khung mẫu); hai mẫu không được cho cùng khoá (đã có test); đổi khoá một mẫu là làm mất thẻ đã lưu của người dùng.
+- Trạng thái học ngữ pháp ở thiết bị dùng `useGrammarStats`, không đọc `localStorage` rải rác.
