@@ -1,5 +1,5 @@
 import { convertName, joinHan } from "@/lib/names/chinese-name";
-import { SURNAME_PINYIN } from "@/lib/names/name-data";
+import { NAME_PINYIN } from "@/lib/names/name-data";
 import { lookupTermEntry } from "@/lib/lookup/server-lookup";
 import { createChat } from "@/lib/analysis/server-deps";
 import { getServerEnv } from "@/lib/env/server-env";
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   if (parts.length === 0) return Response.json({ error: "bad_name" }, { status: 400 });
   const withPinyin = await Promise.all(parts.map(async (p) => {
     if (!p.han) return { ...p, pinyin: null };
-    if (p.role === "surname" && SURNAME_PINYIN[p.han]) return { ...p, pinyin: SURNAME_PINYIN[p.han] };
+    if (NAME_PINYIN[p.han]) return { ...p, pinyin: NAME_PINYIN[p.han] };
     const entry = await lookupTermEntry(p.han).catch(() => null);
     return { ...p, pinyin: entry?.pinyin ?? null };
   }));
@@ -43,7 +43,7 @@ async function summaryFor(request: Request, han: string, parts: ReturnType<typeo
   if (!ipLimiter.tryConsume(ip)) return fallbackSummary(parts);
   try {
     const out = await Promise.race([
-      summarizeName(parts, createChat(getServerEnv()), EXPLAIN_MODELS.slice(0, 4)),
+      summarizeName(parts, createChat(getServerEnv()), EXPLAIN_MODELS),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), SUMMARY_TIMEOUT_MS)),
     ]);
     if (!out) return fallbackSummary(parts);

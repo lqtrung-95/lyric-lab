@@ -10,6 +10,9 @@ import { renderNameImage } from "./chinese-name-image";
 
 interface Result { parts: (NamePart & { pinyin: string | null })[]; han: string | null; pinyin: string | null; summary: string | null; vietnamese: string }
 
+/** Số cột theo số chữ của tên: tên 3 chữ (phổ biến nhất) chia đúng 3 cột cân đối, kể cả trên điện thoại. */
+const COLS: Record<number, string> = { 1: "mx-auto grid-cols-1 max-w-[12rem]", 2: "grid-cols-2", 3: "grid-cols-3", 4: "grid-cols-2 sm:grid-cols-4" };
+
 const ROLE: Record<NamePart["role"], string> = { surname: "Họ", middle: "Đệm", given: "Tên" };
 
 /** Nhập tên Việt, ra tên Hán gợi ý theo âm Hán Việt kèm pinyin và nghĩa từng chữ; lưu thẻ PNG hoặc chia sẻ. Gửi bằng POST (tên không nằm trong URL). */
@@ -64,32 +67,33 @@ export function ChineseNameTool() {
           text={`Tên tiếng Trung của mình là ${res.han}! Thử của bạn tại songhanzi.com/ten-tieng-trung`} shareUrl={`${SITE_URL}/ten-tieng-trung`} onClose={() => setSharing(false)} />
       )}
       {res && (
-        <section aria-live="polite" className="rounded-3xl border-4 border-[#b3261e] bg-surface-container-lowest p-space-md text-center">
+        <section aria-live="polite" className="flex flex-col items-center gap-space-lg rounded-3xl border-4 border-[#b3261e] bg-surface-container-lowest px-space-md py-space-lg text-center">
           {res.han ? (
-            <>
+            <div className="flex flex-col items-center gap-space-sm">
               <p lang="zh" className="font-serif text-[clamp(3rem,16vw,6rem)] font-bold leading-tight text-[#b3261e]">{res.han}</p>
               {res.pinyin && <p className="text-headline-md font-bold">{res.pinyin}</p>}
-              <div className="mt-1 flex justify-center"><PronounceButton text={res.han} /></div>
-            </>
+              <PronounceButton text={res.han} />
+            </div>
           ) : <p className="text-body-md">Có âm chưa có chữ gợi ý nên chưa ghép được cả tên: {missing.map((p) => p.syllable).join(", ")}.</p>}
-          {res.han && res.summary && <p className="mx-auto mt-space-sm max-w-xl rounded-2xl bg-surface-container-low px-space-md py-space-sm text-body-lg italic">“{res.summary}”</p>}
-          <ul className="mt-space-sm grid gap-2 text-left sm:grid-cols-2">
+          {res.han && res.summary && <p className="max-w-xl rounded-2xl bg-surface-container-low px-space-md py-space-md text-body-lg italic">“{res.summary}”</p>}
+          <ul className={`grid w-full gap-3 ${COLS[Math.min(res.parts.length, 4)] ?? COLS[2]}`}>
             {res.parts.map((p, i) => (
-              <li key={i} className="rounded-xl bg-surface-container-low px-3 py-2">
-                <span className="text-label-md font-bold text-on-surface-variant">{ROLE[p.role]} · {p.syllable}</span>
-                <span className="block"><span lang="zh" className="font-serif text-hanzi-display">{p.han ?? "?"}</span> {p.pinyin && <span className="text-primary">{p.pinyin}</span>}</span>
-                {p.meaning && p.meaning !== "họ" && <span className="text-body-md">{p.meaning}</span>}
+              <li key={i} className="flex flex-col items-center gap-1 rounded-2xl bg-surface-container-low px-3 py-space-md">
+                <span className="flex flex-col text-label-md font-bold text-on-surface-variant"><span>{ROLE[p.role]}</span><span className="text-on-surface">{p.syllable}</span></span>
+                <span lang="zh" className="font-serif text-[2.75rem] font-bold leading-none">{p.han ?? "?"}</span>
+                {p.pinyin && <span className="text-label-lg font-semibold text-primary">{p.pinyin}</span>}
+                <span className="min-h-6 text-body-md">{p.meaning && p.meaning !== "họ" ? p.meaning : ""}</span>
               </li>
             ))}
           </ul>
           {res.han && (
-            <div className="mt-space-sm flex flex-wrap justify-center gap-2">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button3d type="button" variant="bright" onClick={() => void save()}>Lưu thẻ ảnh</Button3d>
               <Button3d type="button" onClick={() => setSharing(true)}>Chia sẻ</Button3d>
             </div>
           )}
-          {note && <p role="status" className="mt-2 text-label-md font-bold">{note}</p>}
-          <p className="mt-space-sm text-label-md text-on-surface-variant">Đây là gợi ý theo âm Hán Việt, mỗi âm có thể có nhiều chữ Hán khác. Tên chính thức nên hỏi thêm người bản ngữ.</p>
+          {note && <p role="status" className="text-label-md font-bold">{note}</p>}
+          <p className="text-label-md text-on-surface-variant">Đây là gợi ý theo âm Hán Việt, mỗi âm có thể có nhiều chữ Hán khác. Tên chính thức nên hỏi thêm người bản ngữ.</p>
         </section>
       )}
     </div>

@@ -29,7 +29,9 @@ export function parseSummary(raw: string): string | null {
 /** Câu dự phòng khi không gọi được model: ghép nghĩa từng chữ, không tự nhiên bằng nhưng luôn đúng. Rỗng nếu không có chữ nào có nghĩa. */
 export function fallbackSummary(parts: readonly NamePart[]): string | null {
   const m = meaningfulParts(parts).map((p) => p.meaning!);
-  return m.length === 0 ? null : `Ghép lại, tên mang ý nghĩa: ${m.join(", ")}.`;
+  if (m.length === 0) return null;
+  const list = m.length === 1 ? m[0] : `${m.slice(0, -1).join(", ")} và ${m[m.length - 1]}`;
+  return `Một cái tên mang ý nghĩa ${list}.`;
 }
 
 export async function summarizeName(parts: readonly NamePart[], chat: ChatFn, models: readonly string[]): Promise<{ text: string; ai: boolean } | null> {
