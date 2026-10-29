@@ -41,7 +41,7 @@ const PET_CSS = `
 }`;
 
 /** Màu nền tròn của từng loài (pastel phẳng); cũng giúp phần đen/xanh đậm không chìm vào giao diện tối. */
-const TINT: Record<PetSpecies, string> = { dragon: "#dff6e6", panda: "#dcecff", cat: "#ffe9d6", dog: "#f3e6d4", owl: "#e8e1ff", rabbit: "#ffe9ee", fox: "#fff0c9", penguin: "#dff7f5" };
+export const TINT: Record<PetSpecies, string> = { dragon: "#dff6e6", panda: "#dcecff", cat: "#ffe9d6", dog: "#f3e6d4", owl: "#e8e1ff", rabbit: "#ffe9ee", fox: "#fff0c9", penguin: "#dff7f5" };
 
 /** Hình linh vật. Chỉ trang trí (aria-hidden): thông tin tên, giai đoạn, tâm trạng luôn có chữ bên cạnh. */
 export function PetSprite({ species, stage, mood, accessories = [], tapKey = 0, chewKey = 0, className = "size-28" }: { species: PetSpecies; stage: PetStage; mood: PetMood; accessories?: readonly string[]; /** Tăng mỗi lần chạm để phát lại hoạt ảnh nảy. */ tapKey?: number; /** Tăng mỗi lần cho ăn để pet nhai (co giãn nhanh vài nhịp). */ chewKey?: number; className?: string }) {

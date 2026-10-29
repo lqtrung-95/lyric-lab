@@ -7,9 +7,9 @@ import { useStreak } from "@/components/streak/use-streak";
 import { SoundToggle } from "@/components/games/sound-toggle";
 import { Button3d } from "@/components/ui/button-3d";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { PET_NAME_MAX, PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrowth, petMood, unlockedAccessories, type Pet, type PetMood, type PetSpecies, type PetStage } from "@/lib/pet/pet-logic";
+import { PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrowth, petMood, unlockedAccessories, type Pet, type PetMood, type PetSpecies, type PetStage } from "@/lib/pet/pet-logic";
 import { dailyGoalProgress } from "@/lib/streak/daily-goal";
-import { PET_SPECIES_READY, PetSprite } from "./pet-sprite";
+import { PetSprite } from "./pet-sprite";
 import { usePet } from "./use-pet";
 import { useReviewSummary } from "@/components/review/use-review-summary";
 import { playChinese } from "@/lib/speech/play-chinese";
@@ -23,7 +23,13 @@ import { PetBurstFx } from "./pet-burst-fx";
 import { PetChat } from "./pet-chat";
 import { PetEcho } from "./pet-echo";
 import { PetEdit } from "./pet-edit";
-import { SpeciesPicker } from "./pet-species-picker";
+import { AdoptPet } from "./pet-adopt";
+import { AwayPlaceholder, PetAdventure, usePetAdventure } from "./pet-adventure";
+import { PetShareCard } from "./pet-share-card";
+import { PetTeach, forgottenCount, usePetTaught } from "./pet-teach";
+import { useNow } from "./use-now";
+import { adventurePhase, canStartAdventure } from "@/lib/pet/pet-adventure";
+import { daysTogether } from "@/lib/pet/pet-share";
 import { PetFeed } from "./pet-feed";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
@@ -50,6 +56,12 @@ export function PetCard() {
   const echoWord = review?.peek[0] ?? null;
   const { gift, take } = usePetGift();
   const [chewKey, setChewKey] = useState(0);
+  const [teaching, setTeaching] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const now = useNow();
+  const { adventure, setAdventure } = usePetAdventure();
+  const { taught } = usePetTaught();
+  const [seenBack, setSeenBack] = useState<string | null>(null);
   // Hiệu ứng hạt + tiếng cho tương tác ngoài hình pet (cho ăn, tập nói, quà, nhận nuôi, tiến hóa).
   const [extra, setExtra] = useState<PetBurst | null>(null);
   const fx = (kind: PetBurstKind) => setExtra((b) => ({ key: (b?.key ?? 0) + 1, kind }));
@@ -64,6 +76,9 @@ export function PetCard() {
   // Kích hiệu ứng ngay lúc vẽ khi có thay đổi (lint cấm setState trong effect): quà mới, vừa nhận nuôi, vừa tiến hóa.
   const giftId = gift ? `${gift.videoId}:${gift.term}` : null;
   if (giftId !== seenGift) { setSeenGift(giftId); if (giftId) fx("gift"); }
+  // Pet đi phiêu lưu về mang quà: nổ hiệu ứng quà một lần cho mỗi chuyến.
+  const phase = adventure && now ? adventurePhase(adventure, now) : null;
+  if (phase === "back" && adventure && seenBack !== adventure.day) { setSeenBack(adventure.day); fx("gift"); }
   if (pet === null && !wasEmpty) setWasEmpty(true);
   if (pet && wasEmpty && !adoptFxDone) { setAdoptFxDone(true); fx("adopt"); }
   if (evolved && evolved !== seenEvolved) { setSeenEvolved(evolved); fx("evolve"); }
@@ -71,6 +86,10 @@ export function PetCard() {
   if (pet === null) return <AdoptPet ready={game !== undefined} onAdopt={(species, name) => adopt({ species, name, adoptedAt: new Date().toISOString(), baseXp: game?.xp.total ?? 0 })} />;
 
   const goal = dailyGoalProgress(streak?.todayItems ?? 0, streak?.dailyGoal ?? 0);
+  const goalDone = goal.done || (!goal.enabled && (streak?.todayItems ?? 0) > 0);
+  const today = now ? (streak?.week.find((d) => d.isToday)?.day ?? null) : null;
+  const away = phase === "away";
+  const forgot = forgottenCount(taught, now);
   const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
   const shown: Pet = draft ? { ...pet, species: draft.species, name: cleanPetName(draft.name) ?? pet.name } : pet;
   const previewing = draft !== null && (shown.species !== pet.species || shown.name !== pet.name);
@@ -81,7 +100,7 @@ export function PetCard() {
   const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
     <section aria-labelledby="pet-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetTouch pet={shown} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />
+      {away && adventure ? <AwayPlaceholder title={adventure.title} /> : <PetTouch pet={shown} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />}
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{shown.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[shown.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
@@ -96,11 +115,14 @@ export function PetCard() {
           </div>
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
-        {!feeding && !echoing && !chatting && !editing && (
+        {forgot > 0 && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} đang quên {forgot} từ bạn đã dạy. Dạy lại nhé!</p>}
+        {!feeding && !echoing && !chatting && !editing && !teaching && !away && (
           <div className="mt-space-sm flex flex-wrap gap-2">
             {(review?.total ?? 0) > 0 && <Button3d type="button" variant="bright" onClick={() => { sfx.petBlip(); setFeeding(true); }}>Cho {pet.name} ăn thẻ</Button3d>}
             <Button3d type="button" onClick={() => { sfx.petBlip(); fx("tap"); setChatting(true); }}>Nói chuyện với {pet.name}</Button3d>
+            <Button3d type="button" onClick={() => { sfx.petBlip(); setTeaching(true); }}>Dạy {pet.name}</Button3d>
             {echoWord && <Button3d type="button" onClick={() => { sfx.petBlip(); setEchoing(true); }}>Tập nói cùng {pet.name}</Button3d>}
+            <Button3d type="button" variant="tertiary" onClick={() => { sfx.petBlip(); setSharing(true); }}>Khoe {pet.name}</Button3d>
             <button type="button" onClick={() => { sfx.petBlip(); setDraft({ species: pet.species, name: pet.name }); }} className="min-h-11 rounded-full px-3 text-label-md font-bold text-on-surface-variant underline">Đổi tên / đổi bạn nhỏ</button>
           </div>
         )}
@@ -120,32 +142,13 @@ export function PetCard() {
           </div>
         </div>
       )}
+      <PetAdventure name={pet.name} species={pet.species} adventure={adventure} now={now} today={today} canGo={canStartAdventure(goalDone, adventure, today ?? "")} onChange={setAdventure} onFx={fx} />
+      {teaching && <PetTeach name={pet.name} onReact={fx} onClose={() => { sfx.petBlip(); setTeaching(false); }} />}
+      {sharing && <PetShareCard pet={pet} stage={growth.stage} accessories={accessories.map((a) => a.id)} stats={{ level: game?.level.n ?? 1, streak: game?.streak.current ?? 0, xpSince: Math.max(0, (game?.xp.total ?? 0) - pet.baseXp), daysTogether: daysTogether(pet.adoptedAt, now), taughtWords: taught.length }} onClose={() => setSharing(false)} />}
       {draft && <PetEdit pet={pet} draft={draft} onDraft={setDraft} onSave={(next) => { adopt(next); sfx.petAdopt(); fx("adopt"); setDraft(null); }} onClose={() => { sfx.petBlip(); setDraft(null); }} />}
       {chatting && <PetChat name={pet.name} onClose={() => { sfx.petBlip(); setChatting(false); }} />}
       {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={(tier: EchoTier) => fx(tier === "great" ? "cheer" : tier === "good" ? "tap" : "try")} onClose={() => { sfx.petBlip(); setEchoing(false); }} />}
       {feeding && <PetFeed name={pet.name} onEat={() => { setChewKey((k) => k + 1); fx("crunch"); }} onFull={() => fx("full")} onClose={() => { sfx.petBlip(); setFeeding(false); }} />}
-    </section>
-  );
-}
-
-/** Màn nhận nuôi: chọn loài, đặt tên, lưu một lần. `ready` = đã biết tổng XP hiện tại (cần để tính XP lúc nhận nuôi), nên nút chờ tới lúc đó. */
-function AdoptPet({ onAdopt, ready }: { onAdopt: (species: PetSpecies, name: string) => void; ready: boolean }) {
-  const [species, setSpecies] = useState<PetSpecies>(PET_SPECIES_READY[0]);
-  const [name, setName] = useState("");
-  const clean = cleanPetName(name);
-  return (
-    <section aria-labelledby="adopt-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetSprite species={species} stage={1} mood="happy" className="size-28 shrink-0" />
-      <form className="min-w-[14rem] flex-1" onSubmit={(e) => { e.preventDefault(); if (clean && ready) onAdopt(species, clean); }}>
-        <h2 id="adopt-heading" className="text-headline-md">Nhận nuôi một người bạn học</h2>
-        <p className="mt-1 text-body-md text-on-surface-variant">Bạn học càng đều, bạn nhỏ càng lớn nhanh. {PET_SPECIES_LABELS[species]} sẽ lớn thêm sau mỗi buổi học.</p>
-        <SpeciesPicker value={species} onChange={setSpecies} />
-        <div className="mt-space-sm flex flex-wrap items-center gap-2">
-          <label className="sr-only" htmlFor="pet-name">Tên bạn nhỏ</label>
-          <input id="pet-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={PET_NAME_MAX * 2} placeholder="Đặt tên, ví dụ Tiểu Long" autoComplete="off" className="min-h-11 min-w-[12rem] flex-1 rounded-xl border-2 border-ink bg-surface-container-lowest px-3 text-body-md" />
-          <Button3d type="submit" variant="bright" disabled={!clean || !ready}>Nhận nuôi</Button3d>
-        </div>
-      </form>
     </section>
   );
 }
