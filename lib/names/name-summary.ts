@@ -38,21 +38,15 @@ export function parseSummary(raw: string): string | null {
   }
 }
 
-/** Khung câu dự phòng (không phụ thuộc loại từ của nghĩa: danh từ hay tính từ đều đọc được), chọn cố định theo nội dung để cùng tên luôn ra cùng câu. */
-const FALLBACK_FRAMES: readonly ((list: string) => string)[] = [
-  (l) => `Gửi gắm trong tên là ${l}.`,
-  (l) => `Mỗi chữ một lời chúc: ${l}.`,
-  (l) => `Ghép lại thành ${l}, nghe thật đẹp.`,
-  (l) => `${l[0].toUpperCase()}${l.slice(1)}: những điều đẹp được gửi vào tên bạn.`,
-];
-
-/** Câu dự phòng khi không gọi được model: ghép nghĩa từng chữ vào một khung câu (không mở bằng "Một cái tên…"). Rỗng nếu không có chữ nào có nghĩa. */
+/**
+ * Câu dự phòng khi không gọi được model: chỉ liệt kê nghĩa từng chữ, cách nhau bằng dấu chấm giữa, viết hoa chữ đầu ("Ngọc quý · biển cả · tinh anh, tài giỏi").
+ * Không ghép thành câu có khung ("ghép lại thành…", "mang ý nghĩa…") vì nghĩa có thể là danh từ hay tính từ nên khung nào cũng dễ gượng. Rỗng nếu không có chữ nào có nghĩa.
+ */
 export function fallbackSummary(parts: readonly NamePart[]): string | null {
   const m = meaningfulParts(parts).map((p) => p.meaning!);
   if (m.length === 0) return null;
-  const list = m.length === 1 ? m[0] : `${m.slice(0, -1).join(", ")} và ${m[m.length - 1]}`;
-  const seed = [...list].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
-  return FALLBACK_FRAMES[seed % FALLBACK_FRAMES.length](list);
+  const list = m.join(" · ");
+  return `${list.charAt(0).toLocaleUpperCase("vi")}${list.slice(1)}`;
 }
 
 export async function summarizeName(parts: readonly NamePart[], chat: ChatFn, models: readonly string[]): Promise<{ text: string; ai: boolean } | null> {

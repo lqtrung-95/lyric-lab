@@ -16,10 +16,9 @@ describe("name summary", () => {
     expect(parseSummary('{"summary":"ngắn"}')).toBeNull();
   });
   it("dự phòng ghép nghĩa; không có chữ có nghĩa thì null", () => {
-    expect(fallbackSummary(parts)).toContain("quốc gia và trung thành");
-    expect(fallbackSummary(convertName("Phạm Thị Minh Huyền"))).toContain("sáng suốt và huyền diệu, sâu xa");
-    expect(fallbackSummary(convertName("Lê Linh"))?.toLowerCase()).toContain("linh hoạt, thông tuệ");
-    expect(fallbackSummary(parts)).toBe(fallbackSummary(parts)); // cùng tên luôn ra cùng câu
+    expect(fallbackSummary(parts)).toBe("Quốc gia · trung thành");
+    expect(fallbackSummary(convertName("Phạm Thị Minh Huyền"))).toBe("Sáng suốt · huyền diệu, sâu xa");
+    expect(fallbackSummary(convertName("Lê Linh"))).toBe("Linh hoạt, thông tuệ");
     expect(fallbackSummary(convertName("Trần"))).toBeNull();
     expect(fallbackSummary(convertName("Trần Xyz"))).toBeNull();
   });
