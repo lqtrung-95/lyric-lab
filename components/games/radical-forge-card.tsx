@@ -14,7 +14,7 @@ export function ForgeCard({ han, info, saved, onToggleSave }: { han: string; inf
         <>
           <span className="text-pinyin-reading">{info.pinyin}</span>
           {info.sinoViet && <span className="text-label-md font-bold">{info.sinoViet}</span>}
-          <span className="text-body-md">{info.meaning}</span>
+          <span className="text-body-md">{info.meaning}{info.meaningLang === "en" && <span className="ml-1 text-label-md text-on-surface-variant">(nghĩa tiếng Anh)</span>}</span>
           <PronounceButton text={han} />
           <button type="button" aria-pressed={saved} onClick={() => onToggleSave(item())} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-3 text-label-md font-bold">{saved ? "Đã thêm vào bộ ôn" : "Thêm vào bộ ôn"}</button>
         </>
