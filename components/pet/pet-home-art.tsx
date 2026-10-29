@@ -60,6 +60,16 @@ const ART: Record<string, ReactNode> = {
       <text x="32" y="38" textAnchor="middle" fontSize="14" fontWeight="800" fill={GOLD} fontFamily="serif">春</text>
     </g>
   ),
+  scroll: (
+    <g>
+      <rect x="14" y="3" width="36" height="5" rx="2.5" fill={WOOD_DARK} />
+      <path d="M17 8h30v44h-30z" fill={CREAM} />
+      <rect x="14" y="50" width="36" height="6" rx="3" fill={WOOD_DARK} />
+      <text x="32" y="30" textAnchor="middle" fontSize="17" fontWeight="800" fill={INK} fontFamily="serif">学</text>
+      <text x="32" y="46" textAnchor="middle" fontSize="12" fontWeight="800" fill={RED} fontFamily="serif">书</text>
+      <path d="M30 3V0M34 3V0" stroke={WOOD_DARK} strokeWidth="2" />
+    </g>
+  ),
   bed: (
     <g>
       <ellipse cx="32" cy="52" rx="29" ry="8" fill="#3a2b2b" opacity="0.14" />
@@ -123,6 +133,14 @@ const ART: Record<string, ReactNode> = {
       <path d="M32 15l2.4 4.8l5.3 .8l-3.8 3.7l.9 5.3l-4.8 -2.5l-4.8 2.5l.9 -5.3l-3.8 -3.7l5.3 -.8z" fill={CREAM} />
     </g>
   ),
+  bonsai: (
+    <g>
+      <ellipse cx="32" cy="59" rx="18" ry="3" fill="#3a2b2b" opacity="0.14" />
+      <path d="M30 44c-2 -8 4 -12 2 -22" stroke={WOOD_DARK} strokeWidth="5" fill="none" strokeLinecap="round" />
+      <ellipse cx="22" cy="22" rx="14" ry="9" fill={GREEN} /><ellipse cx="42" cy="16" rx="13" ry="8" fill={GREEN_DARK} /><ellipse cx="34" cy="8" rx="11" ry="6" fill="#7be22b" />
+      <path d="M16 44h32l-4 14h-24z" fill="#3b6fa8" /><rect x="14" y="41" width="36" height="6" rx="3" fill={BLUE} />
+    </g>
+  ),
   bowl: (
     <g>
       <ellipse cx="32" cy="56" rx="20" ry="4" fill="#3a2b2b" opacity="0.14" />
@@ -164,6 +182,16 @@ const ART: Record<string, ReactNode> = {
       <circle cx="32" cy="30" r="22" fill={BLUE} />
       <path d="M18 24q8 -8 14 -2q-2 8 -10 8zM34 34q10 -4 12 4q-4 8 -12 6z" fill={GREEN} />
       <ellipse cx="32" cy="30" rx="22" ry="22" fill="none" stroke={GOLD_DARK} strokeWidth="2.5" strokeDasharray="0" opacity="0.5" />
+    </g>
+  ),
+  teapot: (
+    <g>
+      <ellipse cx="32" cy="58" rx="20" ry="3.5" fill="#3a2b2b" opacity="0.14" />
+      <path d="M46 30q12 2 8 12q-2 4 -8 4" fill="none" stroke="#2f86dc" strokeWidth="4" />
+      <path d="M14 32l-9 -6" stroke="#2f86dc" strokeWidth="5" strokeLinecap="round" />
+      <ellipse cx="30" cy="40" rx="19" ry="15" fill={BLUE} />
+      <ellipse cx="30" cy="28" rx="12" ry="4" fill="#2f86dc" /><circle cx="30" cy="23" r="3.5" fill={GOLD} />
+      <path d="M20 40q10 6 20 0" fill="none" stroke={CREAM} strokeWidth="2.5" opacity="0.7" />
     </g>
   ),
   inkset: (

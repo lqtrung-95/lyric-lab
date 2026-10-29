@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WordTapPanel } from "@/components/speaking/word-tap-panel";
 import { RubyChars, RubyLine } from "@/components/ui/ruby-text";
+import { recordWeekly } from "@/lib/pet/weekly-store";
 import { alignPinyin } from "@/lib/pinyin/align-ruby";
 import type { ReplyToken } from "@/lib/roleplay/segment-reply";
 import type { LevelBand } from "@/lib/dialogues/dialogue-types";
@@ -102,6 +103,9 @@ function Quiz({ reading }: { reading: ReadingDef }) {
   const [picked, setPicked] = useState<(number | null)[]>(() => reading.quiz.map(() => null));
   const done = picked.every((p) => p !== null);
   const right = picked.filter((p, i) => p === reading.quiz[i].answer).length;
+  // Trả lời hết câu hỏi = đã đọc xong truyện (tính một lần mỗi tuần cho mục tiêu tuần của linh vật).
+  const [counted, setCounted] = useState(false);
+  if (done && !counted) { setCounted(true); recordWeekly("read", reading.id); }
   return (
     <section aria-label="Đọc hiểu" className="card-ink flex flex-col gap-space-sm p-space-md">
       <h2 className="text-headline-md">Bạn hiểu bao nhiêu?</h2>

@@ -99,7 +99,7 @@ export function PetCard() {
   const accessories = unlockedAccessories(streak?.longest ?? 0);
   // Dữ liệu game/chuỗi chưa tải xong thì chưa có ảnh chụp (không phản ứng với số tạm thời).
   // Không cần useMemo: `usePetTalk` so từng trường chứ không so địa chỉ đối tượng.
-  const homeBase = { streakLongest: streak?.longest ?? 0, level: game?.level.n ?? 1, daysTogether: daysTogether(pet.adoptedAt, now) };
+  const homeBase = { streakLongest: streak?.longest ?? 0, level: game?.level.n ?? 1, daysTogether: daysTogether(pet.adoptedAt, now), daysStudied: streak?.weekCount ?? 0 };
   const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
     <section aria-labelledby="pet-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">

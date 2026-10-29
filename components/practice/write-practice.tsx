@@ -9,6 +9,7 @@ import { playChinese } from "@/lib/speech/play-chinese";
 import { emptyWriteStats, outcomeFromStars, parseWriteStats, pickWriteTargets, pointsFromStars, recordWrite, type WriteTarget } from "@/lib/practice/write-hanzi";
 import type { WritingScore } from "@/lib/tra-tu/score-writing";
 import { useWordGameScore } from "./use-word-game-score";
+import { recordWeekly } from "@/lib/pet/weekly-store";
 import { PracticeFrame } from "./practice-frame";
 import { usePracticePool } from "./use-practice-pool";
 
@@ -38,6 +39,7 @@ export function WritePractice() {
       >
         <WriteSession key={round} targets={targets} onWord={(t, stars) => {
           setStats(recordWrite(stats, t.key, stars, Date.now()));
+          recordWeekly("write");
           // Viết xong một từ đã học và đến hạn thì chấm lịch ôn (đúng quy tắc game: tối đa mức "Được").
           const card = cards.find((c) => c.item_key === t.key);
           if (card) grade(card, outcomeFromStars(stars));
