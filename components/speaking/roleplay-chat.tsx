@@ -75,7 +75,7 @@ function LookedRow({ w }: { w: TappedWord }) {
       <span className="min-w-0 flex-1 text-body-md">{w.meaning}</span>
       <PronounceButton text={w.term} />
       <button type="button" aria-pressed={saved} disabled={!w.item && !saved} onClick={() => w.item && toggleSaved(w.item)}
-        className="min-h-11 rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-bold disabled:opacity-60">{saved ? "Đã lưu" : w.item ? "Lưu thẻ ôn" : "Chưa có câu nguồn"}</button>
+        className="min-h-11 rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-bold disabled:opacity-60">{saved ? "Đã lưu" : w.item ? "Lưu thẻ ôn" : "Chưa lưu được"}</button>
     </li>
   );
 }

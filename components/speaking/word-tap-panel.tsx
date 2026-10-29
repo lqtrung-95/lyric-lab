@@ -13,8 +13,8 @@ interface Detail { term: string; pinyin: string; sinoViet: string | null; hskLev
 type State = { status: "loading" } | { status: "ok"; detail: Detail; item: SavedItem | null } | { status: "none" } | { status: "error" };
 
 /**
- * Tra nhanh một từ vừa bấm trong câu của AI: pinyin, Hán Việt, cấp HSK, nghĩa (từ từ điển) và nút Lưu thẻ ôn. Thẻ ôn cần một câu thật làm nguồn
- * (cùng quy tắc trang Tra từ) nên từ chưa có câu thật thì không lưu được và nói rõ lý do. Dùng `key={term}` ở chỗ gọi để mỗi từ có trạng thái riêng.
+ * Tra nhanh một từ vừa bấm trong câu của AI: pinyin, Hán Việt, cấp HSK, nghĩa (từ từ điển) và nút Lưu thẻ ôn. Từ có câu thật trong kho video thì thẻ
+ * nghe lại được đúng đoạn đó; chưa có thì vẫn lưu được thẻ không nguồn (chỉ chữ, pinyin, nghĩa) và nói rõ điều đó. Dùng `key={term}` ở chỗ gọi để mỗi từ có trạng thái riêng.
  * `onLooked` báo từ đã tra xong (để màn tổng kết liệt kê "Từ bạn đã tra").
  */
 export function WordTapPanel({ term, onLooked, onClose }: { term: string; onLooked: (w: TappedWord) => void; onClose: () => void }) {
@@ -68,7 +68,8 @@ export function WordTapPanel({ term, onLooked, onClose }: { term: string; onLook
         )}
         <Link href={`/dictionary/${encodeURIComponent(term)}`} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-full px-3 text-label-md font-bold underline">Xem chi tiết</Link>
       </div>
-      {state.status === "ok" && !state.item && !saved && <p className="mt-1 text-body-sm text-on-surface-variant">Từ này chưa có câu thật trong kho video để làm nguồn thẻ ôn nên chưa lưu được. Bạn vẫn xem được chi tiết ở trang Tra từ.</p>}
+      {state.status === "ok" && state.item && !state.item.videoId && <p className="mt-1 text-body-sm text-on-surface-variant">Từ này chưa có câu thật trong kho video nên thẻ ôn chỉ có chữ, pinyin và nghĩa, chưa nghe lại được đoạn nguồn.</p>}
+      {state.status === "ok" && !state.item && !saved && <p className="mt-1 text-body-sm text-on-surface-variant">Từ này chưa có nghĩa trong từ điển nên chưa lưu được thẻ.</p>}
     </div>
   );
 }
