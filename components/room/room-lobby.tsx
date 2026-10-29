@@ -4,7 +4,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AvatarCircle } from "@/components/leaderboard/avatar-circle";
+import { LinkShareDialog } from "@/components/share/link-share-dialog";
 import { Icon } from "@/components/ui/icon";
+import { isMobileDevice } from "@/lib/streak/share-card";
 import { Toast } from "@/components/ui/toast";
 import { buildRoomLink } from "@/lib/rooms/room-code-format";
 import { roomErrorMessage } from "@/lib/rooms/room-messages";
@@ -44,6 +46,7 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
   const [toast, setToast] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [sharing, setSharing] = useState<{ text: string; url: string } | null>(null);
   const view = room.view!;
   const me = view.players.find((p) => p.isMe);
   const other = view.players.find((p) => !p.isMe && !p.left);
@@ -56,6 +59,8 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
   }
   async function share() {
     const url = buildRoomLink(window.location.origin, view.code);
+    // Máy tính: hộp thoại có nút các mạng xã hội và sao chép link; điện thoại: share sheet của hệ điều hành.
+    if (!isMobileDevice()) { setSharing({ text: `Vào phòng thi đấu của mình nhé! Mã phòng ${view.code}`, url }); return; }
     if (navigator.share) {
       try {
         await navigator.share({ title: "Thi đấu SongHanzi", text: `Vào phòng thi đấu của mình nhé! Mã phòng ${view.code}`, url });
@@ -80,6 +85,7 @@ export function RoomLobby({ room }: { room: ReturnType<typeof useRoom> }) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-space-md">
+      {sharing && <LinkShareDialog heading="Mời bạn vào phòng" text={sharing.text} url={sharing.url} onClose={() => setSharing(null)} />}
       <div className="flex items-center justify-between gap-3">
         <h1 className="font-serif text-headline-md md:text-headline-lg">Phòng chờ <span className="font-mono text-primary">#{view.code}</span></h1>
         <span role="timer" aria-label="Thời gian còn lại của phòng" className="inline-flex min-h-8 items-center gap-1 rounded-full bg-surface-container-high px-3 text-label-md font-medium text-on-surface">

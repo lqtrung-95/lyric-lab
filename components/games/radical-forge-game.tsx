@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { LinkShareDialog } from "@/components/share/link-share-dialog";
+import { isMobileDevice } from "@/lib/streak/share-card";
 import { GamePet, type GamePetEvent } from "@/components/games/game-pet";
 import { useLocalJson } from "@/components/pet/use-local-json-store";
 import { Button3d } from "@/components/ui/button-3d";
@@ -29,6 +31,7 @@ export function RadicalForgeGame({ data }: { data: ForgeData }) {
   const [shake, setShake] = useState(0);
   const [petEv, setPetEv] = useState<GamePetEvent | null>(null);
   const [tip, setTip] = useState<Recipe | null>(null);
+  const [sharing, setSharing] = useState<{ text: string; url: string } | null>(null);
   const have = useMemo(() => new Set([...data.start, ...found]), [data.start, found]);
   const items = useMemo(() => [...data.start, ...found.filter((c) => !data.start.includes(c))], [data.start, found]);
   const { done, total } = forgeProgress(data.recipes, have);
@@ -49,19 +52,20 @@ export function RadicalForgeGame({ data }: { data: ForgeData }) {
     sfx.pop(added.length); react(added.length > 1 ? "combo" : "hit");
   };
   const showHint = () => { const r = hint(data.recipes, have, (n) => Math.floor(Math.random() * n)); setTip(r); setMsg(r ? null : "Bạn đã ghép hết các chữ ghép được từ bộ hiện có. Giỏi quá!"); };
+  // Điện thoại dùng share sheet của hệ điều hành; máy tính mở hộp thoại có nút các mạng xã hội và sao chép link.
   const share = async () => {
     const text = `Mình đã ghép được ${done}/${total} chữ Hán từ các bộ thủ trên SongHanzi. Thử xem bạn ghép được bao nhiêu!`;
     const url = `${window.location.origin}/review/ghep-bo-thu`;
-    try {
-      if (navigator.share) await navigator.share({ title: "Ghép bộ thủ", text, url });
-      else { await navigator.clipboard.writeText(`${text} ${url}`); setMsg("Đã sao chép lời mời."); }
-    } catch (e) { if (!(e instanceof DOMException && e.name === "AbortError")) setMsg("Chưa chia sẻ được. Thử lại nhé."); }
+    if (!isMobileDevice() || !navigator.share) { setSharing({ text, url }); return; }
+    try { await navigator.share({ title: "Ghép bộ thủ", text, url }); }
+    catch (e) { if (!(e instanceof DOMException && e.name === "AbortError")) setMsg("Chưa chia sẻ được. Thử lại nhé."); }
   };
 
   if (data.recipes.length === 0) return <p role="alert" className="py-space-lg text-body-md text-error">Chưa tải được dữ liệu chữ. Thử tải lại trang nhé.</p>;
   return (
     <div className="mx-auto max-w-2xl">
       <style>{FORGE_CSS}</style>
+      {sharing && <LinkShareDialog heading="Chia sẻ tiến độ ghép chữ" text={sharing.text} url={sharing.url} onClose={() => setSharing(null)} />}
       <div className="flex flex-wrap items-center gap-3">
         <GamePet event={petEv} />
         <div className="min-w-[10rem] flex-1">

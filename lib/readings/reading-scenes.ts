@@ -21,7 +21,7 @@ export const READING_SCENES: Record<string, ReadingScene[]> = {
   "my-day": [s("indoor", "bed", "bread", "milk", "clock"), s("day", "subwaytrain", "blackboard", "book", "pen"), s("night", "dumpling", "plate", "book", "lamp", "moon")],
   "rabbit-birthday": [s("day", "rabbit", "cat", "dog", "duck", "balloon"), s("day", "book", "star", "flower", "rabbit"), s("indoor", "cake", "candle", "rabbit", "cat", "dog")],
   "supermarket": [s("indoor", "cart", "basket", "notebook"), s("indoor", "apple", "banana", "milk", "bread", "watermelon"), s("day", "bag", "milk", "bread", "car")],
-  "lost-panda": [s("day", "tree", "flower", "pandaanimal", "tree"), s("night", "moon", "tree", "pandaanimal", "bird"), s("night", "door", "pandaanimal", "bird", "star")],
+  "lost-panda": [s("day", "tree", "flower", "guide", "tree"), s("night", "moon", "tree", "guide", "bird"), s("night", "door", "guide", "bird", "star")],
   "snowman": [s("snow", "hat", "tree", "door"), s("snow", "hat", "tree", "bench"), s("day", "sun", "hat", "tree", "bench")],
   "deskmate": [s("indoor", "desk", "chair", "blackboard", "book"), s("indoor", "pen", "notebook", "desk"), s("day", "bicycle", "book", "tree", "sun")],
   "mooncake": [s("indoor", "flour", "rollingpin", "egg", "table"), s("indoor", "wok", "ricecake", "plate", "pot"), s("night", "moon", "ricecake", "teapot", "redlantern")],
