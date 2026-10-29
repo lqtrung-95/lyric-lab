@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { LinkShareDialog } from "@/components/share/link-share-dialog";
+import { isMobileDevice } from "@/lib/streak/share-card";
 import { GamePet, type GamePetEvent } from "@/components/games/game-pet";
 import { usePetView } from "@/components/pet/use-pet-view";
 import { Button3d } from "@/components/ui/button-3d";
@@ -32,6 +34,7 @@ export function HanVietGame({ words, challenge }: { words: HanVietWord[]; challe
   const [over, setOver] = useState(false);
   const [petEv, setPetEv] = useState<GamePetEvent | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [sharing, setSharing] = useState<{ text: string; url: string } | null>(null);
 
   const start = (useChallenge: boolean) => {
     const s = useChallenge && challenge ? challenge.seed : newSeed();
@@ -52,9 +55,10 @@ export function HanVietGame({ words, challenge }: { words: HanVietWord[]; challe
   const share = async () => {
     const url = buildChallengeUrl(`${window.location.origin}/review/han-viet`, { seed, score, total: qs.length, from: data?.pet.name ?? "" });
     const text = `Mình đoán đúng ${score}/${qs.length} từ tiếng Trung chỉ nhờ biết Hán Việt (${hanVietTitle(score, qs.length)}). Thử vượt mình đi!`;
+    // Máy tính: hộp thoại có nút các mạng xã hội; điện thoại: share sheet của hệ điều hành.
+    if (!isMobileDevice() || !navigator.share) { setSharing({ text, url }); return; }
     try {
-      if (navigator.share) await navigator.share({ title: "Đoán chữ Hán từ Hán Việt", text, url });
-      else { await navigator.clipboard.writeText(`${text} ${url}`); setNote("Đã sao chép link thách bạn bè."); }
+      await navigator.share({ title: "Đoán chữ Hán từ Hán Việt", text, url });
     } catch (e) {
       if (!(e instanceof DOMException && e.name === "AbortError")) setNote("Chưa chia sẻ được. Thử lại nhé.");
     }
@@ -78,6 +82,7 @@ export function HanVietGame({ words, challenge }: { words: HanVietWord[]; challe
           <Button3d type="button" onClick={() => start(false)}>Chơi lại</Button3d>
         </div>
         {note && <p role="status" className="mt-2 text-label-md font-bold">{note}</p>}
+        {sharing && <LinkShareDialog heading="Thách bạn bè" text={sharing.text} url={sharing.url} onClose={() => setSharing(null)} />}
       </div>
     );
   }
