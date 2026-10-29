@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { HskRow } from "./build-hsk-rows";
 import { DEFAULT_SAMPLE, cleanMeaning, MAX_SAMPLE, MIN_SAMPLE, clampSample, sampleHskWords, toWorksheetLine } from "./hsk-sample";
 
-const row = (word: string, meanings: string[] = ["m"], pinyin = "p"): HskRow => ({ word, pinyin, sinoViet: null, meanings });
+const row = (word: string, meanings: string[] = ["m"], pinyin = "p"): HskRow => ({ word, pinyin, sinoViet: null, meanings, meaningVi: null });
 const rows = [row("你好"), row("谢谢"), row("再见"), row("老师"), row("学生"), row("A型"), row("一"), row("电视机"), row("没有", []), row("好", ["good"], ""), row("工作")];
 
 describe("lấy mẫu từ HSK", () => {

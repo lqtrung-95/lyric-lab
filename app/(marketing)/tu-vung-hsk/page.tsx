@@ -31,7 +31,7 @@ export default async function HskVocabIndexPage() {
       <Link href="/tools" className="inline-flex min-h-11 items-center text-label-md font-medium text-primary hover:underline">← Tất cả công cụ</Link>
       <header>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">Từ vựng HSK có âm Hán Việt</h1>
-        <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">Chọn một cấp để xem danh sách từ kèm pinyin, âm Hán Việt và nghĩa tiếng Anh, xếp từ từ thường gặp nhất. Tìm nhanh trong từng cấp và tải CSV để nạp vào Anki.</p>
+        <p className="mt-2 max-w-2xl text-body-lg text-on-surface-variant">Chọn một cấp để xem danh sách từ kèm pinyin, âm Hán Việt và nghĩa tiếng Việt, xếp từ từ thường gặp nhất. Tìm nhanh trong từng cấp và tải CSV để nạp vào Anki.</p>
       </header>
       <ul className="grid gap-gutter sm:grid-cols-2 lg:grid-cols-3">
         {counts.map(([l, n]) => (
@@ -43,7 +43,7 @@ export default async function HskVocabIndexPage() {
           </li>
         ))}
       </ul>
-      <p className="text-label-md text-on-surface-variant">Nghĩa lấy từ từ điển CC-CEDICT (CC BY-SA 4.0), cấp độ theo danh sách HSK 3.0, âm Hán Việt ghép từ bảng Unihan (chữ nào chưa có trong bảng thì để trống).</p>
+      <p className="text-label-md text-on-surface-variant">Nghĩa tiếng Việt do AI soạn dựa trên từ điển CC-CEDICT (CC BY-SA 4.0, nghĩa tiếng Anh) và chưa rà hết, từ nào chưa có thì hiện nghĩa tiếng Anh, cấp độ theo danh sách HSK 3.0, âm Hán Việt ghép từ bảng Unihan (chữ nào chưa có trong bảng thì để trống).</p>
     </div>
   );
 }

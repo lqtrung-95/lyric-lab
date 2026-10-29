@@ -14,6 +14,8 @@ export interface HskRow {
   sinoViet: string | null;
   /** Tối đa 3 nghĩa tiếng Anh đã lọc bỏ ghi chú kỹ thuật của CC-CEDICT. */
   meanings: string[];
+  /** Nghĩa tiếng Việt ngắn (bảng `dict_word_vi`, AI sinh rồi người duyệt); null khi chưa có. */
+  meaningVi: string | null;
 }
 
 const MAX_MEANINGS = 3;
@@ -33,7 +35,7 @@ export function cleanMeanings(meanings: string[]): string[] {
  * Dựng bảng từ vựng của một cấp từ các dòng từ điển cùng cấp: gom theo từ (từ nhiều âm hoặc có mục biến thể chỉ lấy một mục chính qua `pickPrimaryEntry`),
  * xếp theo độ thường gặp (số thứ tự nhỏ = thường gặp hơn; thiếu thì xuống cuối, rồi theo chữ).
  */
-export function buildHskRows(rows: DictWordRow[], sinoViet: ReadonlyMap<string, string[]>): HskRow[] {
+export function buildHskRows(rows: DictWordRow[], sinoViet: ReadonlyMap<string, string[]>, vietnamese: ReadonlyMap<string, string> = new Map()): HskRow[] {
   const byWord = new Map<string, DictWordRow[]>();
   for (const r of rows) byWord.set(r.simplified, [...(byWord.get(r.simplified) ?? []), r]);
   const picked = [...byWord.values()].flatMap((group) => {
@@ -41,5 +43,5 @@ export function buildHskRows(rows: DictWordRow[], sinoViet: ReadonlyMap<string, 
     return entry ? [entry] : [];
   });
   picked.sort((a, b) => (a.frequency ?? Infinity) - (b.frequency ?? Infinity) || a.simplified.localeCompare(b.simplified, "zh"));
-  return picked.map((e) => ({ word: e.simplified, pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sinoViet), meanings: cleanMeanings(e.meanings) }));
+  return picked.map((e) => ({ word: e.simplified, pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sinoViet), meanings: cleanMeanings(e.meanings), meaningVi: vietnamese.get(e.simplified) ?? null }));
 }
