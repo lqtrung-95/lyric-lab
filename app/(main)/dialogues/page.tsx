@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Hội thoại", robots: { index: fal
 export default async function DialoguesPage() {
   const dialogues = await loadDialogueSummaries();
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-space-md">
+    <div className="flex w-full flex-col gap-space-md">
       <ListenSwitch current="dialogues" />
       <header>
         <h1 className="text-headline-lg">Hội thoại</h1>
