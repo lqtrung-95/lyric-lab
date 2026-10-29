@@ -3,7 +3,7 @@ import type { ChatFn } from "@/lib/analysis/groq-chat";
 import type { NamePart } from "./chinese-name";
 
 /** Các chữ có nghĩa của tên (bỏ họ): chỉ những mục này được đưa cho model, KHÔNG gửi tên người dùng gõ vào (không có chỗ để chèn lệnh). */
-export const meaningfulParts = (parts: readonly NamePart[]): NamePart[] => parts.filter((p) => p.role !== "surname" && p.han && p.meaning);
+export const meaningfulParts = (parts: readonly NamePart[]): NamePart[] => parts.filter((p) => p.role !== "surname" && p.han && p.meaning && p.meaning !== "họ");
 
 export const SUMMARY_SYSTEM_PROMPT = `Bạn là người bạn sành tiếng Trung, viết lời giải nghĩa cho tên tiếng Trung của một người Việt đang học tiếng Trung.
 Bạn nhận các chữ Hán trong tên kèm nghĩa tiếng Việt đã được duyệt. Hãy viết 1 đến 2 câu tiếng Việt, tổng cộng tối đa 30 từ: gom các nghĩa thành MỘT hình ảnh hoặc MỘT lời chúc liền mạch, như đang nói thẳng với người mang tên (xưng "bạn" hoặc để chủ ngữ ẩn).

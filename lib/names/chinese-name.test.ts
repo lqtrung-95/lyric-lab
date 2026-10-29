@@ -22,6 +22,12 @@ describe("convertName", () => {
   it("tên có chữ Huyền (phản hồi người dùng) ghép được đủ", () => {
     expect(joinHan(convertName("Phạm Thị Minh Huyền"))).toBe("范明玄");
   });
+  it("âm đệm là họ (Trịnh) dùng chữ của họ; Thương có chữ", () => {
+    const p = convertName("Lê Trịnh Ái Thương");
+    expect(p.map((x) => x.han)).toEqual(["黎", "郑", "爱", "苍"]);
+    expect(joinHan(p)).toBe("黎郑爱苍");
+    expect(p[1].meaning).toBe("họ");
+  });
   it("tên chỉ một âm là tên gọi, không có họ", () => {
     expect(convertName("Linh")).toEqual([{ syllable: "linh", role: "given", han: "灵", meaning: "linh hoạt, thông tuệ" }]);
   });
