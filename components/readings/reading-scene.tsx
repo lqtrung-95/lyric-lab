@@ -27,13 +27,14 @@ export function ReadingSceneArt({ scene, className = "" }: { scene: ReadingScene
   const slot = (W - 40) / Math.max(1, ground.length);
   const gid = `sky-${scene.sky}`;
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className={`block w-full rounded-2xl ${className}`}>
+    <svg viewBox={`0 0 ${W} ${H}`} aria-hidden="true" className={`block w-full rounded-2xl border-2 border-ink shadow-[0_3px_0_var(--shadow-ink)] ${className}`}>
       <defs><linearGradient id={gid} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={c.top} /><stop offset="1" stopColor={c.bottom} /></linearGradient></defs>
       <rect width={W} height={H} fill={`url(#${gid})`} />
       {scene.sky === "night" && [[40, 24], [110, 50], [200, 18], [290, 44], [350, 22], [250, 70]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.8" fill="#fff6d6" />)}
       {(scene.sky === "day" || scene.sky === "sunset") && <g fill="#fff" opacity="0.85"><ellipse cx="90" cy="34" rx="26" ry="9" /><ellipse cx="110" cy="28" rx="16" ry="8" /><ellipse cx="300" cy="48" rx="24" ry="8" /></g>}
       {scene.sky === "rain" && <g fill="#8296ab" opacity="0.8"><ellipse cx="100" cy="26" rx="40" ry="12" /><ellipse cx="290" cy="34" rx="46" ry="13" />{Array.from({ length: 22 }, (_, i) => <path key={i} d={`M${20 + i * 17} ${50 + (i % 4) * 22}l-4 12`} stroke="#6f86a0" strokeWidth="1.6" fill="none" />)}</g>}
       {scene.sky === "snow" && Array.from({ length: 18 }, (_, i) => <circle key={i} cx={14 + i * 22} cy={12 + ((i * 37) % 100)} r="2.2" fill="#fff" />)}
+      {scene.sky !== "indoor" && <g fill={c.line} opacity="0.55"><ellipse cx="70" cy={GROUND_Y - 6} rx="120" ry="34" /><ellipse cx="300" cy={GROUND_Y - 4} rx="150" ry="42" /></g>}
       <rect y={GROUND_Y - 10} width={W} height={H - GROUND_Y + 10} fill={c.ground} />
       <rect y={GROUND_Y - 10} width={W} height="3" fill={c.line} />
       {floating.map((id, i) => {
@@ -46,9 +47,14 @@ export function ReadingSceneArt({ scene, className = "" }: { scene: ReadingScene
       })}
       {ground.map((id, i) => {
         const sp = FLAT_SPRITES[id];
-        const k = Math.min(1.5, (slot * 0.85) / sp.w, 112 / sp.h);
+        const k = Math.min(1.3, (slot * 0.8) / sp.w, 100 / sp.h);
         const cx = 20 + slot * (i + 0.5);
-        return <g key={`${id}${i}`} transform={`translate(${cx - (sp.w * k) / 2} ${GROUND_Y + 2 - sp.h * k}) scale(${k})`}>{sp.node}</g>;
+        return (
+          <g key={`${id}${i}`}>
+            <ellipse cx={cx} cy={GROUND_Y + 3} rx={(sp.w * k) / 2.2} ry="4" fill="#000" opacity="0.14" />
+            <g transform={`translate(${cx - (sp.w * k) / 2} ${GROUND_Y + 2 - sp.h * k}) scale(${k})`}>{sp.node}</g>
+          </g>
+        );
       })}
     </svg>
   );
