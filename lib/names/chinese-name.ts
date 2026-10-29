@@ -32,3 +32,9 @@ export function convertName(input: string): NamePart[] {
 export function joinHan(parts: readonly NamePart[]): string | null {
   return parts.length > 0 && parts.every((p) => p.han) ? parts.map((p) => p.han).join("") : null;
 }
+
+/** Viết hoa chữ cái đầu của một âm tiết để hiển thị ("trần" → "Trần"). */
+export const capitalizeSyllable = (s: string): string => (s ? `${s.charAt(0).toLocaleUpperCase("vi")}${s.slice(1)}` : s);
+
+/** Tên người dùng gõ, viết hoa chữ cái đầu mỗi âm ("nguyễn văn an" → "Nguyễn Văn An"); chuẩn hóa khoảng trắng. */
+export const titleCaseName = (name: string): string => name.normalize("NFC").trim().split(/\s+/).map((w) => capitalizeSyllable(w.toLocaleLowerCase("vi"))).join(" ");

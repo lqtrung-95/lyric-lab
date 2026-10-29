@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertName, joinHan, splitName } from "./chinese-name";
+import { capitalizeSyllable, convertName, joinHan, splitName, titleCaseName } from "./chinese-name";
 import { GIVEN, NAME_PINYIN, SURNAMES } from "./name-data";
 
 describe("splitName", () => {
@@ -42,5 +42,14 @@ describe("cách đọc ép cho chữ trong tên", () => {
   it("叶 đọc yè (không phải xié) và mọi giá trị là pinyin có dấu thanh", () => {
     expect(NAME_PINYIN["叶"]).toBe("yè");
     for (const [k, v] of Object.entries(NAME_PINYIN)) { expect(k, k).toMatch(/^\p{Script=Han}$/u); expect(v, k).toMatch(/^[a-zāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]+$/); }
+  });
+});
+
+describe("viết hoa khi hiển thị", () => {
+  it("viết hoa chữ cái đầu âm tiết có dấu và cả tên", () => {
+    expect(capitalizeSyllable("trần")).toBe("Trần");
+    expect(capitalizeSyllable("đức")).toBe("Đức");
+    expect(capitalizeSyllable("")).toBe("");
+    expect(titleCaseName("  nguyễn  văn AN ")).toBe("Nguyễn Văn An");
   });
 });
