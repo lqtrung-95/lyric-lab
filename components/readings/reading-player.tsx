@@ -9,6 +9,8 @@ import { alignPinyin } from "@/lib/pinyin/align-ruby";
 import type { ReplyToken } from "@/lib/roleplay/segment-reply";
 import type { LevelBand } from "@/lib/dialogues/dialogue-types";
 import { playChineseSequence, stopChinese } from "@/lib/speech/play-chinese";
+import { ReadingSceneArt } from "./reading-scene";
+import { READING_SCENES } from "@/lib/readings/reading-scenes";
 import { allSentences, type ReadingDef } from "@/lib/readings/reading-types";
 
 const chip = "inline-flex min-h-11 items-center rounded-full border-2 border-ink px-4 text-label-md font-bold";
@@ -53,6 +55,7 @@ export function ReadingPlayer({ reading, pinyin, tokens, level }: { reading: Rea
           const from = starts[pi];
           return (
             <section key={pi} aria-label={`Đoạn ${pi + 1}`} className="flex flex-col gap-2">
+              {READING_SCENES[reading.id]?.[pi] && <ReadingSceneArt scene={READING_SCENES[reading.id][pi]} />}
               <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.9] [--rt-gap:0.7em]">
                 {para.map((s, si) => (
                   <span key={si} aria-current={from + si === playing ? "true" : undefined} className={`rounded-md ${from + si === playing ? "bg-primary-container" : ""}`}>
