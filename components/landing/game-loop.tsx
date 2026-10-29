@@ -2,7 +2,7 @@ import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
-  { icon: "school", title: "Lộ trình HSK 1–6, hơn 700 chặng", body: "Khoảng 5.300 từ chia thành chặng ≤ 10 từ theo chủ đề, có chặng ôn tập và bài kiểm tra cuối cấp. Chưa biết bắt đầu từ đâu? Làm bài xếp lớp 3 phút (HSK 6 vẫn đang phát triển)." },
+  { icon: "school", title: "Lộ trình HSK 1–6, hơn 700 chặng", body: "Khoảng 5.300 từ chia thành chặng ≤ 10 từ theo chủ đề, có chặng ôn tập và bài kiểm tra cuối cấp. Chưa biết bắt đầu từ đâu? Làm bài xếp lớp 5 phút (HSK 6 vẫn đang phát triển)." },
   { icon: "smart_display", title: "Mỗi chặng học bằng nhiều giác quan", body: "Học từng thẻ và tự đoán nghĩa trước khi lật, xem đúng đoạn video thật có từ đó, đọc to cho máy chấm từng chữ, rồi làm quiz có phản hồi ngay." },
   { icon: "emoji_events", title: "XP, cấp độ và huy hiệu", body: "Ôn thẻ, luyện tập, qua chặng đều tích XP (có trần mỗi ngày để học đều). Huy hiệu bốn bậc đồng, bạc, vàng, kim cương; vài huy hiệu ẩn chờ bạn tự gặp." },
   { icon: "local_fire_department", title: "Nhiệm vụ, chuỗi ngày, thi đấu", body: "Nhiệm vụ nhỏ mỗi ngày và mỗi tuần, lượt đóng băng chuỗi phòng hôm bận, thi đấu 1v1 với bạn bè. Âm thanh hiệu ứng có thể tắt trong Cài đặt." },
