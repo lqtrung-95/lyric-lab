@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { Grade } from "ts-fsrs";
+import { PetMini } from "@/components/pet/pet-mini";
 import { Icon } from "@/components/ui/icon";
 import { SnippetPlayer, type SnippetRequest } from "@/components/player/snippet-player";
 import { shiftLines } from "@/lib/listen/lyric-offset";
@@ -71,12 +72,12 @@ export function ReviewScreen() {
             </div>
           </ReviewMessage>
         )
-        : <ReviewMessage icon="check_circle" title="Hôm nay bạn đã ôn xong" body="Không còn thẻ nào đến hạn. Quay lại vào ngày mai nhé." action={{ href: "/app", label: "Học bài mới" }} />;
+        : <ReviewMessage cheer icon="check_circle" title="Hôm nay bạn đã ôn xong" body="Không còn thẻ nào đến hạn. Quay lại vào ngày mai nhé." action={{ href: "/app", label: "Học bài mới" }} />;
   }
   if (s.status === "finished" || !card) {
     return (
       <div>
-        <ReviewMessage icon="check_circle" title="Xong buổi ôn hôm nay" body={`Bạn đã ôn ${s.initialTotal} thẻ. Lịch ôn kế tiếp đã được FSRS xếp cho từng thẻ.`} action={{ href: "/app", label: "Học bài mới" }} />
+        <ReviewMessage cheer icon="check_circle" title="Xong buổi ôn hôm nay" body={`Bạn đã ôn ${s.initialTotal} thẻ. Lịch ôn kế tiếp đã được FSRS xếp cho từng thẻ.`} action={{ href: "/app", label: "Học bài mới" }} />
         {s.canUndo && <UndoButton onClick={() => { setFlipped(false); void s.undo(); }} />}
       </div>
     );
@@ -92,6 +93,7 @@ export function ReviewScreen() {
             <Icon name="close" size={18} />
             Thoát
           </Link>
+          <PetMini className="size-10" />
           <p className="rounded-full bg-surface-container-high px-3 py-1 text-label-md font-medium text-on-surface">
             Còn <strong className="text-primary">{s.remaining}</strong> thẻ
           </p>

@@ -5,6 +5,9 @@ import { ensureAnonymousSession } from "@/lib/auth/ensure-anonymous-session";
 import { parsePet, type Pet } from "@/lib/pet/pet-logic";
 import { PET_EVENT, PET_STORAGE_KEY, loadRemotePet, saveRemotePet, writeLocalPet } from "@/lib/pet/pet-repo";
 
+// Mỗi trang chỉ đồng bộ với tài khoản một lần dù có nhiều thành phần dùng `usePet` (thẻ pet, pet thu nhỏ ở màn học).
+let synced = false;
+
 function subscribe(onChange: () => void) {
   window.addEventListener("storage", onChange);
   window.addEventListener(PET_EVENT, onChange);
@@ -35,6 +38,8 @@ export function usePet() {
 
   // Đồng bộ một lần khi mở trang: tài khoản đã có pet thì lấy về; chỉ có ở trình duyệt thì đẩy lên.
   useEffect(() => {
+    if (synced) return;
+    synced = true;
     let cancelled = false;
     (async () => {
       try {

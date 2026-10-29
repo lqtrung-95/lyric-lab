@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { PetMini } from "@/components/pet/pet-mini";
 import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/components/ui/icon-names";
 
 /** Màn trạng thái của trang Ôn tập: chưa có thẻ, đã ôn xong, hoặc lỗi. */
-export function ReviewMessage({ icon, title, body, action, children }: { icon: IconName; title: string; body: string; action?: { href: string; label: string }; children?: React.ReactNode }) {
+export function ReviewMessage({ icon, title, body, action, cheer, children }: { icon: IconName; title: string; body: string; action?: { href: string; label: string }; /** Hiện pet ăn mừng phía trên (khi xong buổi ôn). */ cheer?: boolean; children?: React.ReactNode }) {
   return (
     <div className="mx-auto mt-space-lg max-w-xl rounded-2xl bg-surface-container-low p-space-lg text-center">
+      {cheer && <PetMini cheer className="mx-auto mb-1 size-16" />}
       <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-container-high text-primary">
         <Icon name={icon} size={28} />
       </span>

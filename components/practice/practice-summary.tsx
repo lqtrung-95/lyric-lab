@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PetMini } from "@/components/pet/pet-mini";
 import { Icon } from "@/components/ui/icon";
 import { DAILY_CAPS, PERFECT_ROUND_MIN_ITEMS, XP_PERFECT_ROUND_BONUS, XP_PER_CORRECT_ANSWER } from "@/lib/game/xp-rules";
 
@@ -24,6 +25,7 @@ interface PracticeSummaryProps {
 export function PracticeSummary({ title, stats, missed, scheduled, xp, onAgain }: PracticeSummaryProps) {
   return (
     <section aria-labelledby="summary-heading" className="rounded-3xl bg-surface-container-lowest p-space-lg text-center shadow-[0_1px_10px_rgba(30,26,22,0.08)]">
+      <PetMini cheer className="mx-auto mb-1 size-16" />
       <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container"><Icon name="check_circle" filled size={30} /></span>
       <h2 id="summary-heading" className="mt-space-sm font-serif text-headline-md">{title}</h2>
       {/* flex-wrap + justify-center thay vì grid-cols cố định: 2 hay 4 mục đều tự dồn về giữa hàng,
