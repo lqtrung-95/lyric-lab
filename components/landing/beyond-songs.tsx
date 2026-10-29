@@ -3,27 +3,42 @@ import Link from "next/link";
 const CARDS = [
   {
     emoji: "🧭", title: "Khám phá: học từ bằng cách đi dạo",
-    body: "Bước vào quán ăn, bệnh viện, tiệm may, công ty phần mềm… Chạm đồ vật để nghe và học tên tiếng Trung, làm nhiệm vụ cho nhân vật dẫn đường, đọc truyện ngắn hoặc phá một vụ án bằng tiếng Trung.",
-    chips: ["60 cảnh", "Phá án", "Nhiệm vụ nghe lệnh"], href: "/explore", cta: "Vào Khám phá", accent: true,
+    body: "Bước vào quán ăn, bệnh viện, tiệm may, trạm chuyển phát… Chạm đồ vật để nghe và học tên tiếng Trung, làm nhiệm vụ cho nhân vật dẫn đường, phá một vụ án bằng tiếng Trung, rồi đi trọn một hành trình trong ngày qua nhiều cảnh và đóng dấu vào hộ chiếu.",
+    chips: ["60 cảnh", "Hành trình trong ngày", "Hộ chiếu", "Phá án"], href: "/explore", cta: "Vào Khám phá", accent: true,
+  },
+  {
+    emoji: "🐾", title: "Bạn nhỏ đồng hành: nuôi pet bằng việc học",
+    body: "Nhận nuôi một bạn nhỏ, học đều thì bạn lớn lên, tiến hóa và có phụ kiện mới. Cho ăn bằng thẻ ôn, dạy bạn từ mới, cho bạn đi phiêu lưu mang quà về, trang trí ngôi nhà bằng đồ mở khóa nhờ chuỗi ngày và mục tiêu tuần. Không phạt, không phải trả tiền.",
+    chips: ["8 loài", "Phiêu lưu", "Nhà để trang trí", "Mục tiêu tuần"], href: "/app", cta: "Nhận nuôi bạn nhỏ",
+  },
+  {
+    emoji: "📖", title: "Truyện ngắn có cấp độ",
+    body: "Hơn 15 truyện ngắn từ HSK 1 đến HSK 5, chia đoạn như bài văn và có tranh minh họa. Bật pinyin, nghe từng đoạn, bấm bất kỳ từ nào để tra nghĩa và lưu thẻ, rồi trả lời câu hỏi đọc hiểu.",
+    chips: ["Bấm từ để tra", "Nghe cả bài", "Đọc hiểu"], href: "/readings", cta: "Đọc thử",
   },
   {
     emoji: "💬", title: "Hội thoại: đóng vai một bên",
-    body: "Hơn 60 hội thoại hai người theo chủ đề và cấp HSK. Nghe từng câu có pinyin và nghĩa Việt, chọn một vai để tập nói, rồi ghi âm giọng mình và nghe lại cả cuộc trò chuyện.",
+    body: "Hơn 70 hội thoại hai người theo chủ đề và cấp HSK. Nghe từng câu có pinyin và nghĩa Việt, chọn một vai để tập nói, rồi ghi âm giọng mình và nghe lại cả cuộc trò chuyện.",
     chips: ["Theo cấp HSK", "Đóng vai", "Ghi âm (thử nghiệm)"], href: "/dialogues", cta: "Thử hội thoại",
   },
   {
+    emoji: "✍️", title: "Viết chữ và ghép bộ thủ",
+    body: "Nghe nghĩa rồi viết từng chữ theo đúng thứ tự nét, được chấm sao và tính vào lịch ôn. Ghép các bộ thủ thành chữ mới (日 + 月 = 明) và xem vì sao ghép được. Có thêm mục Từ khó gom những từ bạn hay quên để luyện riêng.",
+    chips: ["Thứ tự nét", "Ghép bộ thủ", "Từ khó"], href: "/review/write", cta: "Tập viết",
+  },
+  {
     emoji: "🛠️", title: "Công cụ miễn phí, không cần đăng ký",
-    body: "Bảng pinyin có hình vị trí đặt lưỡi cho người Việt, kiểm tra ngữ pháp bằng AI, đổi giản thể và phồn thể, giấy tập viết chữ Hán và nhiều công cụ khác.",
-    chips: ["Hình đặt lưỡi", "Ngữ pháp AI", "In giấy tập viết"], href: "/tools", cta: "Xem công cụ",
+    body: "Đổi tên Việt sang tên tiếng Trung kèm thẻ ảnh để khoe, bảng pinyin có hình vị trí đặt lưỡi cho người Việt, kiểm tra ngữ pháp bằng AI, đổi giản thể và phồn thể, giấy tập viết chữ Hán và nhiều công cụ khác.",
+    chips: ["Tên tiếng Trung", "Hình đặt lưỡi", "Ngữ pháp AI", "In giấy tập viết"], href: "/tools", cta: "Xem công cụ",
   },
 ];
 
-/** Khối "Ngoài bài hát": ba tính năng ngoài lõi bài hát (Khám phá, Hội thoại, Công cụ), mỗi thẻ có một nút vào thẳng. */
+/** Khối "Ngoài bài hát": sáu tính năng ngoài lõi bài hát (Khám phá, Bạn nhỏ đồng hành, Truyện ngắn, Hội thoại, Viết chữ, Công cụ), mỗi thẻ có một nút vào thẳng. */
 export function BeyondSongs() {
   return (
     <section id="beyond-songs" aria-labelledby="beyond-heading" className="mt-24 scroll-mt-24">
       <p className="text-label-md font-semibold uppercase tracking-widest text-secondary">Ngoài bài hát</p>
-      <h2 id="beyond-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Học tiếp bằng trò chơi, hội thoại và công cụ miễn phí</h2>
+      <h2 id="beyond-heading" className="mt-2 max-w-2xl font-serif text-headline-lg-mobile md:text-headline-xl">Học tiếp bằng trò chơi, truyện, hội thoại và một người bạn nhỏ đồng hành</h2>
       <ul className="mt-space-lg grid gap-space-md lg:grid-cols-3">
         {CARDS.map((c) => (
           <li key={c.title} className={`card-ink flex flex-col p-space-md ${c.accent ? "!bg-secondary-container text-on-secondary-container" : ""}`}>
