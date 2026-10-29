@@ -1,7 +1,7 @@
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser-client";
 import { dayBounds } from "@/lib/srs/day-bounds";
 import type { ReviewLogFields, SrsFields } from "@/lib/srs/fsrs-scheduler";
-import { buildReviewQueue } from "@/lib/srs/review-queue";
+import { MAX_REVIEWS_PER_DAY, buildReviewQueue } from "@/lib/srs/review-queue";
 import type { CardRow } from "./learner-sync";
 
 export type ReviewCard = CardRow & SrsFields;
@@ -36,18 +36,21 @@ export async function loadReviewSession(now = new Date(), bonusNew = 0): Promise
   const { start, end } = dayBounds(now, profile.data?.timezone ?? DEFAULT_TIMEZONE);
 
   const limit = newPerDay + bonusNew;
-  const [due, fresh, started, all, newTotal] = await Promise.all([
-    sb.from("user_cards").select(CARD_COLUMNS).neq("state", 0).lte("due", now.toISOString()),
+  const [due, fresh, started, all, newTotal, reviewed] = await Promise.all([
+    // Lấy cả thẻ Review hạn rơi trong hôm nay (đến hết ngày); `buildReviewQueue` lọc lại: thẻ đang học vẫn theo giờ phút.
+    sb.from("user_cards").select(CARD_COLUMNS).neq("state", 0).lte("due", end.toISOString()),
     sb.from("user_cards").select(CARD_COLUMNS).eq("state", 0).order("created_at").limit(Math.max(limit, 1)),
     sb.from("review_logs").select("id", { count: "exact", head: true }).eq("state", 0).gte("reviewed_at", start.toISOString()).lt("reviewed_at", end.toISOString()),
     sb.from("user_cards").select("item_key", { count: "exact", head: true }),
     sb.from("user_cards").select("item_key", { count: "exact", head: true }).eq("state", 0),
+    // Số lần ôn thẻ Review hôm nay (nhật ký ghi trạng thái TRƯỚC khi chấm), để áp trần số thẻ ôn mỗi ngày.
+    sb.from("review_logs").select("id", { count: "exact", head: true }).eq("state", 2).gte("reviewed_at", start.toISOString()).lt("reviewed_at", end.toISOString()),
   ]);
-  const error = due.error ?? fresh.error ?? started.error ?? all.error ?? newTotal.error;
+  const error = due.error ?? fresh.error ?? started.error ?? all.error ?? newTotal.error ?? reviewed.error;
   if (error) throw new Error(error.message);
 
   const cards = [...(due.data ?? []), ...(fresh.data ?? [])] as ReviewCard[];
-  const queue = buildReviewQueue({ cards, now, newPerDay: limit, newStartedToday: started.count ?? 0 });
+  const queue = buildReviewQueue({ cards, now, newPerDay: limit, newStartedToday: started.count ?? 0, dayEnd: end, reviewRoom: MAX_REVIEWS_PER_DAY - (reviewed.count ?? 0) });
   const queuedNew = queue.filter((c) => c.state === 0).length;
   return {
     queue, newPerDay, total: queue.length, cardCount: all.count ?? 0, newStartedToday: started.count ?? 0,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Rating } from "ts-fsrs";
-import { FIRST_REVIEW_DAYS, fromCard, gradeCard, newCardFields, previewIntervals, toCard } from "./fsrs-scheduler";
+import { fromCard, gradeCard, newCardFields, previewIntervals, toCard } from "./fsrs-scheduler";
 import { formatInterval } from "./interval-label";
 
 const NOW = new Date("2026-03-10T08:00:00Z");
@@ -12,15 +12,18 @@ describe("newCardFields", () => {
   });
 });
 
-describe("gradeCard", () => {
-  it("lần chấm đầu của thẻ mới cho đúng 1 / 2 / 5 / 10 ngày (Quên / Khó / Được / Dễ), không có bước học tính bằng phút", () => {
-    const days = ([Rating.Again, Rating.Hard, Rating.Good, Rating.Easy] as const).map((r) => {
-      const { next } = gradeCard(newCardFields(NOW), r, NOW);
-      expect(next.state).toBe(2); // vào thẳng trạng thái Review
-      return (Date.parse(next.due) - NOW.getTime()) / DAY;
-    });
-    expect(days).toEqual([FIRST_REVIEW_DAYS.again, FIRST_REVIEW_DAYS.hard, FIRST_REVIEW_DAYS.good, FIRST_REVIEW_DAYS.easy]);
-    expect(days).toEqual([1, 2, 5, 10]);
+const MIN = 60_000;
+const delay = (next: { due: string }, from: Date) => Date.parse(next.due) - from.getTime();
+
+describe("gradeCard (tham số chuẩn như Anki)", () => {
+  it("thẻ mới chấm lần đầu: Quên 1 phút, Khó 6 phút, Được 10 phút (đang học); Dễ tốt nghiệp sang lịch theo ngày", () => {
+    const first = (r: 1 | 2 | 3 | 4) => gradeCard(newCardFields(NOW), r, NOW).next;
+    expect([delay(first(Rating.Again), NOW), delay(first(Rating.Hard), NOW), delay(first(Rating.Good), NOW)]).toEqual([1 * MIN, 6 * MIN, 10 * MIN]);
+    for (const r of [Rating.Again, Rating.Hard, Rating.Good] as const) expect(first(r).state).toBe(1); // Learning
+    const easy = first(Rating.Easy);
+    expect(easy.state).toBe(2); // Review
+    expect(delay(easy, NOW) / DAY).toBeGreaterThanOrEqual(5);
+    expect(delay(easy, NOW) / DAY).toBeLessThanOrEqual(12);
   });
 
   it("log ghi trạng thái TRƯỚC khi chấm", () => {
@@ -29,24 +32,28 @@ describe("gradeCard", () => {
     expect(log).toMatchObject({ rating: 3, state: 0, stability: 0, reviewed_at: NOW.toISOString() });
   });
 
-  it("chấm Được đúng hạn nhiều lần: khoảng ôn giãn dần và không vượt trần 180 ngày", () => {
+  it("chấm Được hai lần: hết bước học, sang Review với khoảng từ 1 ngày trở lên; sau đó giãn dần", () => {
     let card = newCardFields(NOW);
     let t = NOW;
-    const gaps: number[] = [];
-    for (let i = 0; i < 6; i++) {
-      card = gradeCard(card, Rating.Good, t).next;
-      gaps.push((Date.parse(card.due) - t.getTime()) / DAY);
+    card = gradeCard(card, Rating.Good, t).next;
+    t = new Date(card.due);
+    card = gradeCard(card, Rating.Good, t).next;
+    expect(card.state).toBe(2);
+    const gaps = [delay(card, t) / DAY];
+    for (let i = 0; i < 5; i++) {
       t = new Date(card.due);
+      card = gradeCard(card, Rating.Good, t).next;
+      gaps.push(delay(card, t) / DAY);
     }
-    for (let i = 1; i < gaps.length; i++) expect(gaps[i]).toBeGreaterThanOrEqual(gaps[i - 1]);
-    expect(gaps[0]).toBe(5);
-    expect(Math.max(...gaps)).toBeLessThanOrEqual(180);
+    expect(gaps[0]).toBeGreaterThanOrEqual(1);
+    expect(gaps[gaps.length - 1]).toBeGreaterThan(gaps[0] * 5);
+    expect(Math.max(...gaps)).toBeLessThanOrEqual(36500);
   });
 
   it("khoảng ôn kế dài hơn khi nhớ tốt hơn (Dễ > Được > Khó > Quên) với thẻ đang ôn", () => {
     let card = newCardFields(NOW);
     let t = NOW;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       card = gradeCard(card, Rating.Good, t).next;
       t = new Date(Math.max(Date.parse(card.due), t.getTime()));
     }
@@ -57,18 +64,17 @@ describe("gradeCard", () => {
     expect(due(Rating.Hard)).toBeGreaterThan(due(Rating.Again));
   });
 
-  it("quên thẻ đang ôn: tăng lapses và hẹn lại 1 ngày (không học lại trong ngày)", () => {
+  it("quên thẻ đang ôn: tăng lapses, vào học lại và quay lại sau 10 phút (trong cùng buổi)", () => {
     let card = newCardFields(NOW);
     let t = NOW;
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
       card = gradeCard(card, Rating.Good, t).next;
       t = new Date(Math.max(Date.parse(card.due), t.getTime()));
     }
     const lapsed = gradeCard(card, Rating.Again, t).next;
     expect(lapsed.lapses).toBe(card.lapses + 1);
-    expect(lapsed.state).toBe(2); // không có bước học lại tính bằng phút: ở lại trạng thái Review
-    expect((Date.parse(lapsed.due) - t.getTime()) / DAY).toBeGreaterThanOrEqual(1);
-    expect((Date.parse(lapsed.due) - t.getTime()) / DAY).toBeLessThan(5);
+    expect(lapsed.state).toBe(3); // Relearning
+    expect(delay(lapsed, t)).toBe(10 * MIN);
   });
 
   it("toCard/fromCard là nghịch đảo", () => {
@@ -78,15 +84,16 @@ describe("gradeCard", () => {
 });
 
 describe("previewIntervals", () => {
-  it("thẻ mới: nhãn bốn nút là 1 ngày, 2 ngày, 5 ngày, 10 ngày", () => {
-    expect(previewIntervals(newCardFields(NOW), NOW)).toEqual({ 1: "1 ngày", 2: "2 ngày", 3: "5 ngày", 4: "10 ngày" });
+  it("thẻ mới: nhãn ba nút đầu là 1 phút, 6 phút, 10 phút; nút Dễ tính bằng ngày", () => {
+    const labels = previewIntervals(newCardFields(NOW), NOW);
+    expect([labels[1], labels[2], labels[3]]).toEqual(["1 phút", "6 phút", "10 phút"]);
+    expect(labels[4]).toMatch(/ngày$/);
   });
 
-  it("khớp với lịch thật khi chấm (không fuzz)", () => {
+  it("nhãn các nút học khớp lịch thật khi chấm", () => {
     const card = newCardFields(NOW);
     const labels = previewIntervals(card, NOW);
-    const actual = formatInterval(Date.parse(gradeCard(card, Rating.Easy, NOW).next.due) - NOW.getTime());
-    expect(labels[Rating.Easy]).toBe(actual);
+    expect(labels[Rating.Good]).toBe(formatInterval(delay(gradeCard(card, Rating.Good, NOW).next, NOW)));
     expect(Object.keys(labels)).toHaveLength(4);
   });
 });

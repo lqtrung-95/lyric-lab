@@ -1,4 +1,4 @@
-import { Rating, State, createEmptyCard, default_w, fsrs, generatorParameters, type Card, type Grade } from "ts-fsrs";
+import { Rating, State, createEmptyCard, fsrs, generatorParameters, type Card, type Grade } from "ts-fsrs";
 import { formatInterval } from "./interval-label";
 
 /** Cột FSRS của một thẻ trong bảng `user_cards` (ISO string cho thời điểm). */
@@ -34,21 +34,15 @@ export const RATINGS = [
   { rating: Rating.Easy, label: "Dễ" },
 ] as const;
 
-// Lịch ôn tính theo NGÀY, không có bước học trong ngày (phút): người học ôn mỗi ngày một buổi.
-// Lần chấm đầu tiên của thẻ mới cho đúng 1 / 2 / 5 / 10 ngày (Quên / Khó / Được / Dễ): ghi đè 4 độ ổn định ban đầu của FSRS
-// (w[0..3], với retention 0,9 thì khoảng ôn bằng độ ổn định). Từ lần sau FSRS tự tính và giãn dần theo trí nhớ từng thẻ.
-// Trần 180 ngày để từ đã "Dễ" nhiều lần vẫn quay lại vài lần mỗi năm. Tắt fuzz để khoảng hiện trên nút đúng bằng lịch thật.
-export const FIRST_REVIEW_DAYS = { again: 1, hard: 2, good: 5, easy: 10 } as const;
-// ts-fsrs cho khoảng ôn lớn nhất là `maximum_interval + 1` ngày (đã kiểm tra bằng test), nên đặt 179 để trần thật là 180.
-const MAX_INTERVAL_DAYS = 179;
-const weights = [...default_w];
-weights[0] = FIRST_REVIEW_DAYS.again;
-weights[1] = FIRST_REVIEW_DAYS.hard;
-weights[2] = FIRST_REVIEW_DAYS.good;
-weights[3] = FIRST_REVIEW_DAYS.easy;
-const scheduler = fsrs(generatorParameters({
-  w: weights, learning_steps: [], relearning_steps: [], enable_short_term: false, enable_fuzz: false, maximum_interval: MAX_INTERVAL_DAYS,
+// Tham số chuẩn như Anki: giữ lại 90% (request_retention), bộ trọng số FSRS mặc định, bước học 1 phút và 10 phút, bước học lại 10 phút,
+// khoảng ôn tối đa 36500 ngày, bật fuzz (xê dịch nhẹ các khoảng dài để thẻ học cùng ngày không dồn về cùng một ngày).
+// Thẻ mới / thẻ quên vì thế quay lại trong cùng buổi (hàng đợi đưa lại sau vài thẻ, xem `requeueAfterGrade`) rồi mới "tốt nghiệp" sang lịch theo ngày.
+const buildScheduler = (fuzz: boolean) => fsrs(generatorParameters({
+  request_retention: 0.9, maximum_interval: 36500, enable_short_term: true, learning_steps: ["1m", "10m"], relearning_steps: ["10m"], enable_fuzz: fuzz,
 }));
+const scheduler = buildScheduler(true);
+// Nhãn dưới nút chấm tính không fuzz: lịch thật lệch vài phần trăm với khoảng dài, nhưng nhãn không đổi mỗi lần vẽ.
+const previewScheduler = buildScheduler(false);
 
 export const toCard = (f: SrsFields): Card => ({
   due: new Date(f.due), stability: f.stability, difficulty: f.difficulty, elapsed_days: f.elapsed_days,
@@ -65,9 +59,9 @@ export const fromCard = (c: Card): SrsFields => ({
 /** Trạng thái FSRS của thẻ mới tinh. */
 export const newCardFields = (now: Date): SrsFields => fromCard(createEmptyCard(now));
 
-/** Khoảng tới lần ôn kế cho từng nút chấm, để hiện dưới nút (khoảng thật do FSRS tính, khác nhau theo thẻ). */
+/** Khoảng tới lần ôn kế cho từng nút chấm, để hiện dưới nút (do FSRS tính, khác nhau theo thẻ; không fuzz). */
 export function previewIntervals(card: SrsFields, now: Date): Record<Grade, string> {
-  const result = scheduler.repeat(toCard(card), now);
+  const result = previewScheduler.repeat(toCard(card), now);
   const label = (g: Grade) => formatInterval(result[g].card.due.getTime() - now.getTime());
   return { [Rating.Again]: label(Rating.Again), [Rating.Hard]: label(Rating.Hard), [Rating.Good]: label(Rating.Good), [Rating.Easy]: label(Rating.Easy) };
 }

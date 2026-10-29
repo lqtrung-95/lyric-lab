@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildReviewQueue, countDueToday, requeueAfterGrade, type QueueCard } from "./review-queue";
+import { MAX_REVIEWS_PER_DAY, buildReviewQueue, countDueToday, isDue, requeueAfterGrade, type QueueCard } from "./review-queue";
 
 const NOW = new Date("2026-03-10T08:00:00Z");
 const at = (mins: number) => new Date(NOW.getTime() + mins * 60_000).toISOString();
@@ -37,6 +37,36 @@ describe("buildReviewQueue", () => {
     const input = { cards: [card("d", 2, -1), card("n", 0, 0)], now: NOW, newPerDay: 15, newStartedToday: 0 };
     expect(countDueToday(input)).toBe(2);
   });
+});
+
+describe("hạn theo ngày và trần số thẻ ôn", () => {
+  const END = new Date(NOW.getTime() + 6 * 3_600_000); // 14:00 UTC: hết ngày hôm nay theo múi giờ giả định
+  const endCard = (key: string, state: number, hoursAfterNow: number): QueueCard => ({ item_key: key, state, due: new Date(NOW.getTime() + hoursAfterNow * 3_600_000).toISOString(), created_at: at(-1000) });
+
+  it("thẻ Review hạn rơi tối nay đã hiện từ sáng; thẻ hạn ngày mai thì chưa", () => {
+    const cards = [endCard("tonight", 2, 5), endCard("tomorrow", 2, 7)];
+    expect(keys(buildReviewQueue({ cards, now: NOW, newPerDay: 0, newStartedToday: 0, dayEnd: END }))).toEqual(["tonight"]);
+    expect(keys(buildReviewQueue({ cards, now: NOW, newPerDay: 0, newStartedToday: 0 }))).toEqual([]);
+  });
+
+  it("thẻ đang học vẫn theo giờ phút, không theo ngày", () => {
+    expect(isDue(endCard("l", 1, 5), NOW, END)).toBe(false);
+    expect(isDue(endCard("r", 3, 5), NOW, END)).toBe(false);
+    expect(isDue(card("l2", 1, -1), NOW, END)).toBe(true);
+  });
+
+  it("thẻ mới không bao giờ tính là đến hạn", () => {
+    expect(isDue(card("n", 0, -100), NOW, END)).toBe(false);
+  });
+
+  it("trần số thẻ ôn lấy thẻ cũ nhất trước; thẻ mới không bị tính vào trần", () => {
+    const cards = [card("d3", 2, -10), card("d1", 2, -300), card("d2", 2, -100), card("n", 0, 0)];
+    expect(keys(buildReviewQueue({ cards, now: NOW, newPerDay: 5, newStartedToday: 0, reviewRoom: 2 }))).toEqual(["d1", "d2", "n"]);
+    expect(keys(buildReviewQueue({ cards, now: NOW, newPerDay: 5, newStartedToday: 0, reviewRoom: 0 }))).toEqual(["n"]);
+    expect(keys(buildReviewQueue({ cards, now: NOW, newPerDay: 5, newStartedToday: 0, reviewRoom: -3 }))).toEqual(["n"]);
+  });
+
+  it("trần mặc định 200 thẻ mỗi ngày", () => expect(MAX_REVIEWS_PER_DAY).toBe(200));
 });
 
 describe("requeueAfterGrade", () => {
