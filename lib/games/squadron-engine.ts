@@ -3,7 +3,7 @@ import { makeWave } from "./squadron-wave";
 import { BOOM_SECONDS, ENEMY_H, LIVES, SHIP_Y, halfWidth, type Enemy, type PowerKind, type SquadronInput, type SquadronState } from "./squadron-types";
 
 const KILLS_PER_LEVEL = 4;
-const FIRE_GAP = 0.2;
+const FIRE_GAP = 0.25;
 const BULLET_SPEED = 1.15;
 const KEY_SPEED = 0.9;
 const FOLLOW_SPEED = 2.4;
@@ -101,7 +101,7 @@ function collectPickups(s: SquadronState): void {
   });
 }
 
-/** Tiến `dt` giây: tàu bám theo tay điều khiển và tự bắn, đạn bay, máy bay rơi, xử lý trúng đạn / lọt đáy / nhặt vật phẩm, rồi mở đợt mới khi đợt cũ xong. */
+/** Tiến `dt` giây: tàu bám theo tay điều khiển và chỉ bắn khi người chơi bấm/giữ nút bắn (cách nhau FIRE_GAP giây), đạn bay, máy bay rơi, xử lý trúng đạn / lọt đáy / nhặt vật phẩm, rồi mở đợt mới khi đợt cũ xong. */
 export function stepSquadron(state: SquadronState, dt: number, input: SquadronInput, pool: readonly GameWord[], rng: () => number): SquadronState {
   if (state.over) return state;
   const s: SquadronState = {
@@ -114,7 +114,7 @@ export function stepSquadron(state: SquadronState, dt: number, input: SquadronIn
     spread: Math.max(0, state.spread - dt), slow: Math.max(0, state.slow - dt), shake: Math.max(0, state.shake - dt), levelUp: Math.max(0, state.levelUp - dt),
   };
   moveShip(s, dt, input);
-  if (s.fire <= 0) shoot(s);
+  if (input.fire && s.fire <= 0) shoot(s);
   const speed = fallSpeed(s.level) * (s.slow > 0 ? 0.5 : 1) * dt;
   for (const e of s.enemies) e.y += e.boss ? speed * 0.7 : speed;
   hitEnemies(s, rng);

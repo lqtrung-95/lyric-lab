@@ -20,8 +20,8 @@ export interface SquadronState {
   missed: GameWord[]; nextId: number; over: boolean;
 }
 
-/** Tay điều khiển: `dir` từ phím mũi tên/A/D (ưu tiên), `targetX` từ chuột hoặc ngón tay (0..1 theo bề ngang sân). */
-export interface SquadronInput { dir: -1 | 0 | 1; targetX: number | null }
+/** Tay điều khiển: `dir` từ phím mũi tên/A/D (ưu tiên), `targetX` từ chuột hoặc ngón tay (0..1 theo bề ngang sân), `fire` = đang bấm/giữ nút bắn (chuột, chạm, Space). */
+export interface SquadronInput { dir: -1 | 0 | 1; targetX: number | null; fire: boolean }
 
 export const SHIP_Y = 0.86;
 export const ENEMY_H = 0.1;

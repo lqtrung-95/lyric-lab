@@ -5,7 +5,7 @@ import { SHIP_Y, type Enemy, type SquadronState } from "./squadron-types";
 import { makeWave } from "./squadron-wave";
 
 const POOL: GameWord[] = ["猫:māo:con mèo", "狗:gǒu:con chó", "鱼:yú:con cá", "鸟:niǎo:con chim", "水:shuǐ:nước", "火:huǒ:lửa", "山:shān:núi", "人:rén:người"].map((l) => { const [han, pinyin, meaning] = l.split(":"); return { han, pinyin, meaning }; });
-const still = { dir: 0 as const, targetX: null };
+const still = { dir: 0 as const, targetX: null, fire: false };
 const seq = (vals: number[]) => { let i = 0; return () => vals[i++ % vals.length]; };
 
 function withWave(extra: Partial<SquadronState> = {}): SquadronState {
@@ -80,13 +80,22 @@ describe("chơi", () => {
   });
   it("tàu bị chặn trong sân và phím ưu tiên hơn chuột", () => {
     let s = initSquadron();
-    for (let i = 0; i < 100; i++) s = stepSquadron(s, 0.05, { dir: 1, targetX: 0 }, POOL, Math.random);
+    for (let i = 0; i < 100; i++) s = stepSquadron(s, 0.05, { dir: 1, targetX: 0, fire: false }, POOL, Math.random);
     expect(s.shipX).toBeCloseTo(0.94);
   });
   it("hết mạng thì kết thúc, đủ cấp thì lên cấp", () => {
     expect(stepSquadron({ ...withWave(), lives: 0, enemies: [], question: null, waveGap: 9 }, 0.01, still, POOL, Math.random).over).toBe(true);
     expect(levelOf(0)).toBe(1); expect(levelOf(4)).toBe(2);
     expect(fallSpeed(30)).toBeLessThanOrEqual(0.17);
+  });
+  it("chỉ bắn khi bấm nút, và cách nhau một nhịp", () => {
+    const idle = stepSquadron({ ...initSquadron(), waveGap: 9 }, 0.1, still, POOL, Math.random);
+    expect(idle.bullets).toHaveLength(0); expect(idle.fired).toBe(0);
+    const shot = stepSquadron({ ...initSquadron(), waveGap: 9 }, 0.01, { ...still, fire: true }, POOL, Math.random);
+    expect(shot.bullets).toHaveLength(1); expect(shot.fired).toBe(1);
+    const held = stepSquadron(shot, 0.01, { ...still, fire: true }, POOL, Math.random);
+    expect(held.fired).toBe(1);
+    expect(stepSquadron(held, 0.3, { ...still, fire: true }, POOL, Math.random).fired).toBe(2);
   });
   it("tự mở đợt đầu sau khoảng nghỉ", () => {
     const s = stepSquadron({ ...initSquadron(), waveGap: 0 }, 0.01, still, POOL, Math.random);
