@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { Icon } from "@/components/ui/icon";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import type { HskRow } from "@/lib/tools/build-hsk-rows";
@@ -9,11 +10,15 @@ import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useKnownWords } from "./use-known-words";
 
+const noopSubscribe = () => () => {};
+
 /** Bỏ dấu và đ→d để gõ "hao" tìm được cả "hǎo" lẫn "hảo" (Hán Việt). */
 const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").toLowerCase();
 
 /** Bảng từ vựng một cấp HSK: ô tìm (chữ Hán, pinyin có hoặc không dấu, Hán Việt, nghĩa Việt hoặc Anh), nút thêm từ vào bộ ôn (cần có nghĩa Việt) và nút tải CSV cho Anki. Bảng cũng được dựng sẵn ở server để công cụ tìm kiếm đọc được. */
 export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }) {
+  // Chỉ dựng khối in sau khi đã ở trình duyệt (portal cần document.body); server không dựng nó.
+  const canPortal = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const [query, setQuery] = useState("");
   const [hideKnown, setHideKnown] = useState(false);
   const [showEnglish, setShowEnglish] = useState(false);
@@ -48,9 +53,11 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
 
   return (
     <div className="space-y-space-sm">
-      {/* Khi in chỉ hiện khối #hsk-print (danh sách gọn hai cột có ô tích), ẩn mọi thứ còn lại của trang. */}
-      <style>{`@media print { @page { size: A4; margin: 12mm; } body * { visibility: hidden !important; } #hsk-print, #hsk-print * { visibility: visible !important; } #hsk-print { position: absolute; left: 0; top: 0; width: 100%; color: #000; background: #fff; } }`}</style>
-      <section id="hsk-print" aria-hidden="true" className="hidden print:block">
+      {/* Khi in chỉ còn khối #hsk-print (danh sách gọn hai cột có ô tích). Khối này được đưa thẳng ra <body> (portal) và MỌI phần tử khác của body bị `display: none`:
+          cách cũ `visibility: hidden` vẫn giữ chỗ của bảng màn hình nên sinh hàng chục trang trắng sau các trang danh sách. */}
+      <style>{`@media screen { #hsk-print { display: none; } } @media print { @page { size: A4; margin: 12mm; } html, body { height: auto !important; overflow: visible !important; background: #fff !important; } body > *:not(#hsk-print) { display: none !important; } #hsk-print { display: block; color: #000; background: #fff; } }`}</style>
+      {canPortal && createPortal(
+      <section id="hsk-print" aria-hidden="true">
         <h1 style={{ fontSize: "16pt", fontWeight: 700 }}>Từ vựng HSK {level} ({shown.length} từ)</h1>
         <p style={{ fontSize: "9pt", color: "#555", marginBottom: "6pt" }}>songhanzi.com/tu-vung-hsk/{level} · Tích vào ô khi bạn đã thuộc từ.</p>
         <ul style={{ columnCount: 2, columnGap: "10mm", listStyle: "none", padding: 0, margin: 0 }}>
@@ -65,6 +72,7 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
           ))}
         </ul>
       </section>
+      , document.body)}
       <div className="flex flex-wrap items-center gap-3">
         <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-surface-container-high px-4 text-on-surface-variant focus-within:ring-2 focus-within:ring-primary">
           <Icon name="search" size={20} />
