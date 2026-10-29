@@ -30,10 +30,10 @@ export const ENEMY_H = 0.1;
 export const BOOM_SECONDS = 0.7;
 export const LIVES = 3;
 export const BOSS_EVERY = 5;
-export const BOSS_HP = 4;
+export const BOSS_HP = 5;
 /** Điểm bị trừ mỗi lần bắn nhầm, số lần nhầm trong một đợt thì mất một mạng, và thời gian chỉ đáp án đúng. */
 export const WRONG_PENALTY = 50;
 export const STRIKES_PER_LIFE = 3;
 export const REVEAL_SECONDS = 2.5;
 /** Nửa bề ngang vùng trúng đạn của một máy bay (theo bề ngang sân); trùm to hơn. */
-export const halfWidth = (e: Pick<Enemy, "boss">): number => (e.boss ? 0.12 : 0.085);
+export const halfWidth = (e: Pick<Enemy, "boss">): number => (e.boss ? 0.11 : 0.075);
