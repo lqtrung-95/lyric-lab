@@ -2,13 +2,17 @@
 // Mặc định chỉ in thử (dry-run, không ghi DB, mặc định 40 từ); --apply mới ghi. Từ đã có nghĩa trong bảng thì bỏ qua (--force để sinh lại, trừ bản đã `reviewed`).
 // Biến môi trường (.env.local): DEPLOY_API_KEY (bắt buộc), DEPLOY_MODEL (tuỳ chọn), NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 //   NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/gloss-hsk-vocab.mts --level 1 [--limit 40] [--batch 40] [--concurrency 3] [--force] [--apply]
+//   --forge: thay vì theo cấp HSK, sinh nghĩa Việt cho các chữ của game Ghép bộ thủ còn thiếu nghĩa Việt (chữ trung gian như 林, 苗).
 //   Dùng --level all để chạy cả 6 cấp (kèm --limit 100000 --apply khi đã duyệt mẫu).
 import { createClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { createDeployChat, DEPLOY_DEFAULT_MODEL } from "@/lib/analysis/deploy-chat";
 import { HSK1_GLOSS_OVERRIDES } from "@/lib/courses/hsk1-gloss-overrides";
+import { buildForgeData } from "@/lib/games/load-radical-recipes";
+import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { buildHskRows, HSK_LEVELS } from "@/lib/tools/build-hsk-rows";
 import { buildHskGlossPrompt, HSK_GLOSS_SYSTEM, parseHskGlosses, readingCandidates, type HskGloss, type HskGlossInput } from "@/lib/tools/hsk-gloss";
+import { loadHskRowsUncached } from "@/lib/tools/hsk-vocab";
 import { loadHskDictRows } from "@/lib/tools/load-hsk-dict-rows";
 
 const GLOSS_PROMPT_VERSION = "hsk-vi-2";
@@ -17,7 +21,8 @@ const opt = (name: string) => { const i = args.indexOf(`--${name}`); return i >=
 const apply = args.includes("--apply");
 const force = args.includes("--force");
 const levelArg = opt("level") ?? "1";
-const levels = levelArg === "all" ? [...HSK_LEVELS] : [Number(levelArg)];
+const forge = args.includes("--forge");
+const levels = forge ? [] : levelArg === "all" ? [...HSK_LEVELS] : [Number(levelArg)];
 const limit = Number(opt("limit") ?? 40);
 const batchSize = Number(opt("batch") ?? 30);
 const concurrency = Number(opt("concurrency") ?? 3);
@@ -64,8 +69,17 @@ async function glossBatch(items: HskGlossInput[]): Promise<{ glosses: Record<str
   return { glosses, missing: pending.map((i) => i.term) };
 }
 
+/** Các chữ của game Ghép bộ thủ chưa có nghĩa Việt (chữ ghép ra không phải chữ HSK có nghĩa Việt), kèm cách đọc ứng viên từ từ điển. */
+async function loadForgeChars(): Promise<HskGlossInput[]> {
+  const data = await buildForgeData(loadHskRowsUncached);
+  const chars = [...new Set(data.recipes.map((r) => r.out))].filter((c) => !data.info[c] || data.info[c].meaningLang === "en");
+  const entries = await lookupWords(sb as never, chars);
+  return chars.flatMap((c) => (entries.get(c)?.length ? [{ term: c, candidates: readingCandidates(entries.get(c)!) }] : []));
+}
+
 const have = await existing();
 const todo: HskGlossInput[] = [];
+if (forge) for (const w of await loadForgeChars()) { const cur = have.get(w.term); if (cur?.reviewed || (cur && cur.hasReading && !force)) continue; todo.push(w); }
 for (const level of levels) {
   for (const w of await loadLevel(level)) {
     const cur = have.get(w.term);

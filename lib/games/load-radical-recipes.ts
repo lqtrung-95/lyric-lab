@@ -4,6 +4,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { lookupWords, pickPrimaryEntry } from "@/lib/dictionary/lookup-words";
 import { sinoVietForWord } from "@/lib/dictionary/sino-viet";
 import { cleanMeanings } from "@/lib/tools/build-hsk-rows";
+import type { HskLevel, HskRow } from "@/lib/tools/build-hsk-rows";
 import { getHskRows } from "@/lib/tools/hsk-vocab";
 import { parsePair, pickStart, type Recipe } from "./radical-forge";
 
@@ -49,9 +50,12 @@ async function fillMissingInfo(chars: string[], info: Record<string, CharInfo>):
   }
 }
 
-/** Dựng dữ liệu trò chơi: chữ đích là chữ HSK một chữ có nghĩa Việt (có pinyin, Hán Việt từ từ điển); công thức từ cấu tạo thật của chữ. */
-async function build(): Promise<ForgeData> {
-  const rows = (await Promise.all([1, 2, 3, 4, 5, 6].map((l) => getHskRows(l as 1).catch(() => [])))).flat();
+/**
+ * Dựng dữ liệu trò chơi: chữ đích là chữ HSK một chữ có nghĩa Việt (có pinyin, Hán Việt từ từ điển); công thức từ cấu tạo thật của chữ.
+ * `getRows` tách ra để script (ngoài Next) truyền bản không qua bộ nhớ đệm.
+ */
+export async function buildForgeData(getRows: (level: HskLevel) => Promise<HskRow[]>): Promise<ForgeData> {
+  const rows = (await Promise.all(([1, 2, 3, 4, 5, 6] as const).map((l) => getRows(l).catch(() => [] as HskRow[])))).flat();
   const info: Record<string, CharInfo> = {};
   for (const r of rows) if ([...r.word].length === 1 && r.meaningVi && !info[r.word]) info[r.word] = { pinyin: r.pinyin, sinoViet: r.sinoViet, meaning: r.meaningVi };
   const known = new Set<string>();
@@ -74,4 +78,4 @@ async function build(): Promise<ForgeData> {
 }
 
 /** Cache một ngày: dữ liệu từ điển ít đổi và phép dựng cần hàng chục truy vấn. */
-export const loadRadicalRecipes = unstable_cache(build, ["radical-forge-v5"], { revalidate: 86400 });
+export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v6"], { revalidate: 86400 });

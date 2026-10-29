@@ -145,6 +145,9 @@ NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-fi
 ```
 File danh sách là mã video cách nhau bằng khoảng trắng/xuống dòng (`tmp/` bị git bỏ qua, chỉ nằm trên máy). Mặc định dry-run (in số video còn lại); `--apply` mới nạp. Mỗi lần chạy bỏ qua video đã có trong kho, thử một yêu cầu video nhỏ để biết còn hạn mức không (hết thì thoát ngay, mã thoát 2), nạp tối đa `--limit` video và dừng sớm nếu 3 video liên tiếp lỗi; chạy lại hôm sau để nạp tiếp. Mỗi video chạy `transcribe-video.mts` (nghe, đổi giản thể, dịch, gán thẻ chủ đề). Khóa Gemini trả 403 "project has been denied access" là dự án bị Google từ chối: nên gỡ khỏi `GEMINI_API_KEYS`.
 
+### Nghĩa Việt cho chữ của game Ghép bộ thủ
+`scripts/gloss-hsk-vocab.mts --forge [--limit 200] [--apply]` sinh nghĩa Việt (API Deploy, ghi `dict_word_vi`) cho các chữ ghép ra mà không phải chữ HSK có nghĩa Việt (chữ trung gian như 林, 苗); mặc định dry-run, không ghi đè bản `reviewed`. Chạy lại khi cấu tạo chữ hoặc danh sách HSK đổi, rồi bump khóa cache `radical-forge-vN` trong `lib/games/load-radical-recipes.ts`. Đã chạy 2026-10-29: 32 chữ, kết quả là 139/139 chữ có nghĩa Việt (2 chữ không có trong từ điển chỉ hiện chữ).
+
 ### Mốc thời gian mili giây của video (kiểm tra và lấy lại, 2026-10-29)
 Video thêm bằng cách đọc bảng "Bản chép lời" của YouTube chỉ có mốc GIÂY NGUYÊN (câu shadowing/chép chính tả bị cụt hoặc lệch tới ~1 giây); dấu trang mới (từ 22/10) và SRT/VTT/Supadata cho mili giây.
 - **Kiểm tra** (chỉ đọc): `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/audit-video-timestamps.mts [--list seconds|mixed|ms|none] [--captions-only] [--csv ra.csv]`. In bảng chéo theo nguồn và danh sách video theo loại (`lib/video/timestamp-precision.ts`: `ms` khi ≥ 30% câu có mốc lẻ, `seconds` khi mọi mốc nguyên). Bản AI nghe (`transcript_source = 'auto'`) có mốc do nhận dạng giọng nói nên không tính là "lỗi giây".
