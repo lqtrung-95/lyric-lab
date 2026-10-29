@@ -1,8 +1,8 @@
 /** Hiệu ứng hạt + tiếng đi kèm mỗi tương tác với pet. Một "burst" = một đợt hạt bay ra từ pet kèm một tiếng. */
-export type PetBurstKind = "tap" | "cheer" | "goal" | "sad" | "crunch" | "full" | "gift" | "adopt" | "evolve" | "try";
+export type PetBurstKind = "tap" | "cheer" | "goal" | "sad" | "crunch" | "full" | "gift" | "adopt" | "evolve" | "try" | "tapSleepy";
 export interface PetBurst { key: number; kind: PetBurstKind }
 
-export type PetBurstSound = "chirp" | "cheer" | "happy" | "sad" | "crunch" | "gift" | "adopt" | "evolve" | "blip";
+export type PetBurstSound = "chirp" | "cheer" | "happy" | "sad" | "crunch" | "gift" | "adopt" | "evolve" | "blip" | "sleepy";
 
 interface Spec { glyphs: readonly string[]; count: number; sound: PetBurstSound; /** Bay lên (true) hay rơi xuống (false). */ rise: boolean }
 
@@ -16,6 +16,7 @@ const SPECS: Record<PetBurstKind, Spec> = {
   gift: { glyphs: ["🎁", "✨"], count: 8, sound: "gift", rise: true },
   adopt: { glyphs: ["💖", "🎉", "✨"], count: 12, sound: "adopt", rise: true },
   evolve: { glyphs: ["🌟", "✨", "⭐"], count: 14, sound: "evolve", rise: true },
+  tapSleepy: { glyphs: ["💤"], count: 3, sound: "sleepy", rise: true },
   try: { glyphs: ["💭", "✨"], count: 4, sound: "blip", rise: true },
 };
 

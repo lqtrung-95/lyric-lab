@@ -1,10 +1,10 @@
 import type { DailyGoalProgress } from "@/lib/streak/daily-goal";
 
 /** Linh vật đồng hành: chỉ lưu loài, tên, ngày nhận nuôi. Giai đoạn và tâm trạng luôn tính lại từ XP và tiến độ hôm nay, không lưu. */
-export const PET_SPECIES = ["dragon", "cat", "dog", "panda", "owl"] as const;
+export const PET_SPECIES = ["dragon", "cat", "dog", "panda", "owl", "rabbit", "fox", "penguin"] as const;
 export type PetSpecies = (typeof PET_SPECIES)[number];
 
-export const PET_SPECIES_LABELS: Record<PetSpecies, string> = { dragon: "Rồng", cat: "Mèo", dog: "Cún", panda: "Gấu trúc", owl: "Cú" };
+export const PET_SPECIES_LABELS: Record<PetSpecies, string> = { dragon: "Rồng", cat: "Mèo", dog: "Cún", panda: "Gấu trúc", owl: "Cú", rabbit: "Thỏ", fox: "Cáo", penguin: "Cánh cụt" };
 
 export interface Pet {
   species: PetSpecies;

@@ -3,7 +3,7 @@
 -- Chạy bằng Supabase SQL Editor; chạy lại được. Chưa chạy thì pet vẫn dùng được, chỉ lưu ở trình duyệt.
 create table if not exists public.user_pet (
   user_id uuid primary key references auth.users (id) on delete cascade,
-  species text not null check (species in ('dragon', 'cat', 'dog', 'panda', 'owl')),
+  species text not null check (species in ('dragon', 'cat', 'dog', 'panda', 'owl', 'rabbit', 'fox', 'penguin')),
   name text not null check (char_length(name) between 1 and 16),
   adopted_at timestamptz not null default now(),
   -- Tổng XP lúc nhận nuôi: pet chỉ lớn nhờ XP kiếm được từ đó.
@@ -13,6 +13,10 @@ create table if not exists public.user_pet (
 
 -- Bảng đã tạo từ bản cũ chưa có cột base_xp thì thêm vào.
 alter table public.user_pet add column if not exists base_xp integer not null default 0 check (base_xp >= 0);
+
+-- Bảng tạo từ bản cũ thì mở rộng danh sách loài (thêm thỏ, cáo, cánh cụt).
+alter table public.user_pet drop constraint if exists user_pet_species_check;
+alter table public.user_pet add constraint user_pet_species_check check (species in ('dragon', 'cat', 'dog', 'panda', 'owl', 'rabbit', 'fox', 'penguin'));
 
 alter table public.user_pet enable row level security;
 

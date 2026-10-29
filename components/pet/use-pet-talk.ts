@@ -57,7 +57,7 @@ export function usePetTalk(mood: PetMood, name: string, words: readonly PetRevie
 
   const tap = useCallback(() => {
     setTapKey((k) => k + 1);
-    setBurst((b) => ({ key: (b?.key ?? 0) + 1, kind: "tap" }));
+    setBurst((b) => ({ key: (b?.key ?? 0) + 1, kind: mood === "sleepy" ? "tapSleepy" : "tap" }));
     const { allowed, next } = spendSpeech(readBudget(), todayKey());
     taps.current += 1;
     if (!allowed) return;

@@ -24,7 +24,8 @@ export function PetBurstFx({ burst, species }: { burst: PetBurst | null; species
     switch (burstSound(kind)) {
       case "chirp": sfx.petChirp(species); break;
       case "cheer": sfx.petCheer(); break;
-      case "happy": sfx.petHappy(); break;
+      case "happy": sfx.petHappy(species); break;
+      case "sleepy": sfx.petSleepy(species); break;
       case "sad": sfx.petSad(); break;
       case "crunch": sfx.petCrunch(); break;
       case "gift": sfx.petGift(); break;

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { burstParticles, burstSound, type PetBurstKind } from "./pet-burst";
 
-const KINDS: PetBurstKind[] = ["tap", "cheer", "goal", "sad", "crunch", "full", "gift", "adopt", "evolve", "try"];
+const KINDS: PetBurstKind[] = ["tap", "cheer", "goal", "sad", "crunch", "full", "gift", "adopt", "evolve", "try", "tapSleepy"];
 
 describe("burstParticles", () => {
   it("mọi loại đều có hạt, cố định theo loại và có kèm tiếng", () => {

@@ -3,11 +3,14 @@ import { Cat } from "./pet-art-cat";
 import { Dog } from "./pet-art-dog";
 import { Dragon } from "./pet-art-dragon";
 import { Owl } from "./pet-art-owl";
+import { Penguin } from "./pet-art-penguin";
+import { Rabbit } from "./pet-art-rabbit";
+import { Fox } from "./pet-art-fox";
 import { Panda } from "./pet-art-panda";
 import { PetAccessories } from "./pet-accessories";
 
 /** Loài đã có hình. Hình phẳng kiểu hoạt hình: không viền, màu tươi, mắt to có chấm sáng. */
-export const PET_SPECIES_READY: readonly PetSpecies[] = ["dragon", "panda", "cat", "dog", "owl"];
+export const PET_SPECIES_READY: readonly PetSpecies[] = ["dragon", "panda", "cat", "dog", "owl", "rabbit", "fox", "penguin"];
 
 /**
  * Hoạt ảnh của linh vật (CSS thuần). Nằm trong `prefers-reduced-motion: no-preference`: người chọn giảm chuyển động thấy hình tĩnh.
@@ -38,7 +41,7 @@ const PET_CSS = `
 }`;
 
 /** Màu nền tròn của từng loài (pastel phẳng); cũng giúp phần đen/xanh đậm không chìm vào giao diện tối. */
-const TINT: Record<PetSpecies, string> = { dragon: "#dff6e6", panda: "#dcecff", cat: "#ffe9d6", dog: "#f3e6d4", owl: "#e8e1ff" };
+const TINT: Record<PetSpecies, string> = { dragon: "#dff6e6", panda: "#dcecff", cat: "#ffe9d6", dog: "#f3e6d4", owl: "#e8e1ff", rabbit: "#ffe9ee", fox: "#fff0c9", penguin: "#dff7f5" };
 
 /** Hình linh vật. Chỉ trang trí (aria-hidden): thông tin tên, giai đoạn, tâm trạng luôn có chữ bên cạnh. */
 export function PetSprite({ species, stage, mood, accessories = [], tapKey = 0, chewKey = 0, className = "size-28" }: { species: PetSpecies; stage: PetStage; mood: PetMood; accessories?: readonly string[]; /** Tăng mỗi lần chạm để phát lại hoạt ảnh nảy. */ tapKey?: number; /** Tăng mỗi lần cho ăn để pet nhai (co giãn nhanh vài nhịp). */ chewKey?: number; className?: string }) {
@@ -56,6 +59,9 @@ export function PetSprite({ species, stage, mood, accessories = [], tapKey = 0, 
           {species === "cat" && <Cat stage={stage} mood={mood} />}
           {species === "dog" && <Dog stage={stage} mood={mood} />}
           {species === "owl" && <Owl stage={stage} mood={mood} />}
+          {species === "rabbit" && <Rabbit stage={stage} mood={mood} />}
+          {species === "fox" && <Fox stage={stage} mood={mood} />}
+          {species === "penguin" && <Penguin stage={stage} mood={mood} />}
           <PetAccessories ids={accessories} stage={stage} />
         </g>
         </g>

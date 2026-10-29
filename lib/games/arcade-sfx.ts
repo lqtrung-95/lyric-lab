@@ -54,6 +54,26 @@ function play(fn: (ctx: AudioContext, t: number) => void): void {
   } catch { /* bỏ qua */ }
 }
 
+/** Một nốt: [trễ (giây), tần số đầu, tần số cuối, độ dài (giây), âm lượng]. Chỉ dùng sóng sine để tiếng tròn, mềm như thú nhồi bông. */
+type Note = readonly [number, number, number, number, number];
+interface Voice { chirp: readonly Note[]; happy: readonly Note[]; sleepy: readonly Note[] }
+const PET_VOICES: Record<string, Voice> = {
+  dragon: { chirp: [[0, 330, 520, 0.1, 0.16], [0.09, 780, 1180, 0.08, 0.14], [0.17, 1180, 900, 0.1, 0.1]], happy: [[0, 330, 520, 0.1, 0.14], [0.1, 520, 780, 0.1, 0.14], [0.2, 780, 1180, 0.14, 0.14]], sleepy: [[0, 300, 190, 0.5, 0.14]] },
+  cat: { chirp: [[0, 700, 1150, 0.09, 0.16], [0.08, 1150, 720, 0.2, 0.15]], happy: [[0, 520, 560, 0.05, 0.13], [0.05, 600, 640, 0.05, 0.13], [0.1, 520, 560, 0.05, 0.13], [0.15, 640, 720, 0.05, 0.13], [0.2, 900, 1250, 0.14, 0.14]], sleepy: [[0, 650, 380, 0.45, 0.13]] },
+  dog: { chirp: [[0, 520, 820, 0.06, 0.16], [0.09, 540, 860, 0.06, 0.16], [0.18, 900, 640, 0.1, 0.1]], happy: [[0, 600, 950, 0.06, 0.15], [0.1, 650, 1000, 0.06, 0.15], [0.2, 700, 1100, 0.06, 0.15], [0.3, 1000, 1500, 0.12, 0.13]], sleepy: [[0, 520, 300, 0.5, 0.12]] },
+  panda: { chirp: [[0, 1000, 1500, 0.06, 0.15], [0.085, 1080, 1580, 0.06, 0.15], [0.17, 1160, 1660, 0.06, 0.15]], happy: [[0, 1000, 1500, 0.06, 0.15], [0.09, 1100, 1600, 0.06, 0.15], [0.18, 1200, 1750, 0.06, 0.15], [0.27, 1500, 2100, 0.12, 0.12]], sleepy: [[0, 760, 420, 0.5, 0.12]] },
+  owl: { chirp: [[0, 520, 440, 0.17, 0.17], [0.2, 500, 410, 0.2, 0.15]], happy: [[0, 440, 420, 0.14, 0.16], [0.18, 480, 450, 0.14, 0.16], [0.36, 620, 560, 0.22, 0.15]], sleepy: [[0, 400, 300, 0.6, 0.14]] },
+  rabbit: { chirp: [[0, 1300, 1700, 0.04, 0.13], [0.07, 1300, 1700, 0.04, 0.13], [0.16, 1500, 1900, 0.05, 0.1]], happy: [[0, 900, 1400, 0.05, 0.14], [0.09, 1000, 1500, 0.05, 0.14], [0.18, 1100, 1700, 0.05, 0.14], [0.27, 1500, 2000, 0.1, 0.12]], sleepy: [[0, 900, 500, 0.4, 0.1]] },
+  fox: { chirp: [[0, 900, 1300, 0.06, 0.14], [0.1, 1300, 800, 0.16, 0.14]], happy: [[0, 700, 1100, 0.07, 0.15], [0.1, 900, 1400, 0.07, 0.15], [0.2, 1200, 1800, 0.12, 0.14]], sleepy: [[0, 620, 360, 0.5, 0.12]] },
+  penguin: { chirp: [[0, 620, 700, 0.08, 0.15], [0.1, 500, 420, 0.14, 0.15]], happy: [[0, 600, 720, 0.08, 0.15], [0.12, 660, 800, 0.08, 0.15], [0.24, 800, 1000, 0.16, 0.14]], sleepy: [[0, 480, 330, 0.5, 0.12]] },
+};
+/** Phát các nốt của một giọng; `sparkle` thêm tiếng lấp lánh nhỏ ở cuối. */
+function voice(c: AudioContext, t: number, notes: readonly Note[], sparkle: boolean): void {
+  let end = 0;
+  for (const [at, from, to, dur, vol] of notes) { tone(c, t + at, "sine", from, to, dur, vol); end = Math.max(end, at + dur); }
+  if (sparkle) tone(c, t + end, "sine", 2400, 3000, 0.09, 0.04);
+}
+
 export const sfx = {
   /** Mỗi phím gõ đúng: tia laser ngắn; `step` (số chữ đã gõ) làm âm cao dần. */
   laser: (step = 0) => play((c, t) => { tone(c, t, "square", 1100 + step * 90, 260, 0.13, 0.08); tone(c, t, "sawtooth", 600 + step * 60, 150, 0.1, 0.05); }),
@@ -70,27 +90,16 @@ export const sfx = {
   /** Hết ván. */
   gameOver: () => play((c, t) => { [392, 330, 262, 196].forEach((f, i) => tone(c, t + i * 0.14, "triangle", f, f * 0.97, 0.22, 0.22)); }),
   // --- Linh vật (pet): mọi tương tác đều có tiếng, cùng công tắc với game giải trí. ---
-  /**
-   * Chạm vào pet: tiếng kêu riêng từng loài, mềm và tròn kiểu thú nhồi bông (chỉ dùng sóng sine, nốt lướt lên rồi xuống như tiếng "bíp" bong bóng),
-   * kết bằng một tiếng lấp lánh nhỏ. Âm lượng thấp để không chói khi chạm liên tục.
-   */
-  petChirp: (species: string) => play((c, t) => {
-    const sparkle = (at: number) => tone(c, t + at, "sine", 2400, 3000, 0.09, 0.04);
-    switch (species) {
-      case "dragon": tone(c, t, "sine", 330, 520, 0.1, 0.16); tone(c, t + 0.09, "sine", 780, 1180, 0.08, 0.14); tone(c, t + 0.17, "sine", 1180, 900, 0.1, 0.1); sparkle(0.22); break;
-      case "cat": tone(c, t, "sine", 700, 1150, 0.09, 0.16); tone(c, t + 0.08, "sine", 1150, 720, 0.2, 0.15); sparkle(0.24); break;
-      case "dog": tone(c, t, "sine", 520, 820, 0.06, 0.16); tone(c, t + 0.09, "sine", 540, 860, 0.06, 0.16); tone(c, t + 0.18, "sine", 900, 640, 0.1, 0.1); sparkle(0.24); break;
-      case "panda": [0, 0.085, 0.17].forEach((d, i) => tone(c, t + d, "sine", 1000 + i * 80, 1500 + i * 80, 0.06, 0.15)); sparkle(0.25); break;
-      case "owl": tone(c, t, "sine", 520, 440, 0.17, 0.17); tone(c, t + 0.2, "sine", 500, 410, 0.2, 0.15); sparkle(0.42); break;
-      default: tone(c, t, "sine", 700, 1100, 0.09, 0.16); tone(c, t + 0.08, "sine", 1100, 760, 0.16, 0.12); sparkle(0.22);
-    }
-  }),
+  /** Chạm vào pet: tiếng kêu riêng từng loài (xem `PET_VOICES`), mềm và tròn, kết bằng một tiếng lấp lánh nhỏ. */
+  petChirp: (species: string) => play((c, t) => voice(c, t, (PET_VOICES[species] ?? PET_VOICES.cat).chirp, true)),
+  /** Pet vui (đạt mục tiêu, ăn no): chuỗi nốt riêng từng loài đi lên rồi một tiếng lấp lánh. */
+  petHappy: (species?: string) => play((c, t) => voice(c, t, (PET_VOICES[species ?? ""] ?? PET_VOICES.cat).happy, true)),
+  /** Chạm vào pet đang ngủ: tiếng ngáp ngái ngủ riêng từng loài, trượt xuống chậm, không lấp lánh. */
+  petSleepy: (species?: string) => play((c, t) => voice(c, t, (PET_VOICES[species ?? ""] ?? PET_VOICES.cat).sleepy, false)),
   /** Bấm mở/đóng khung của pet (cho ăn, tập nói): tiếng "tít" nhẹ. */
   petBlip: () => play((c, t) => { tone(c, t, "sine", 660, 880, 0.06, 0.12); }),
   /** Pet nhai: hai tiếng "rộp" ngắn. */
   petCrunch: () => play((c, t) => { noise(c, t, 0.08, 0.22, 3200, 700); noise(c, t + 0.12, 0.08, 0.2, 3000, 650); tone(c, t, "sine", 180, 120, 0.08, 0.12); }),
-  /** Pet vui (đạt mục tiêu, ăn no): vài nốt lấp lánh đi lên. */
-  petHappy: () => play((c, t) => { [784, 988, 1175, 1568].forEach((f, i) => tone(c, t + i * 0.06, "sine", f, f, 0.14, 0.14)); }),
   /** Pet reo mừng (lên cấp, tăng chuỗi, đọc chuẩn): arpeggio đi lên có đuôi sáng. */
   petCheer: () => play((c, t) => { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(c, t + i * 0.07, "triangle", f, f, 0.16, 0.16)); tone(c, t + 0.4, "sine", 2093, 2093, 0.25, 0.08); }),
   /** Pet buồn nhẹ (mất chuỗi): hai nốt đi xuống, êm, không gắt. */
