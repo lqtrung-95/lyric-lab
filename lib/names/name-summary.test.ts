@@ -16,16 +16,23 @@ describe("name summary", () => {
     expect(parseSummary('{"summary":"ngắn"}')).toBeNull();
   });
   it("dự phòng ghép nghĩa; không có chữ có nghĩa thì null", () => {
-    expect(fallbackSummary(parts)).toBe("Một cái tên mang ý nghĩa quốc gia và trung thành.");
-    expect(fallbackSummary(convertName("Phạm Thị Minh Huyền"))).toBe("Một cái tên mang ý nghĩa sáng suốt và huyền diệu, sâu xa.");
-    expect(fallbackSummary(convertName("Lê Linh"))).toBe("Một cái tên mang ý nghĩa linh hoạt, thông tuệ.");
+    expect(fallbackSummary(parts)).toContain("quốc gia và trung thành");
+    expect(fallbackSummary(convertName("Phạm Thị Minh Huyền"))).toContain("sáng suốt và huyền diệu, sâu xa");
+    expect(fallbackSummary(convertName("Lê Linh"))?.toLowerCase()).toContain("linh hoạt, thông tuệ");
+    expect(fallbackSummary(parts)).toBe(fallbackSummary(parts)); // cùng tên luôn ra cùng câu
     expect(fallbackSummary(convertName("Trần"))).toBeNull();
     expect(fallbackSummary(convertName("Trần Xyz"))).toBeNull();
+  });
+  it("không bao giờ mở bằng \"Một cái tên…\": câu AI kiểu đó bị bỏ, câu dự phòng không dùng lối đó", () => {
+    expect(parseSummary('{"summary":"Một cái tên mang ý nghĩa quốc gia và trung thành."}')).toBeNull();
+    expect(parseSummary('{"summary":"Tên của bạn có nghĩa là trung thành với quê hương."}')).toBeNull();
+    expect(parseSummary('{"summary":"Mong bạn luôn trung thành với quê hương."}')).toBe("Mong bạn luôn trung thành với quê hương.");
+    for (const n of ["Lê Quốc Trung", "Trần Thu Hà", "Phạm Gia Bảo", "Hoàng Thị Phương Linh"]) expect(fallbackSummary(convertName(n))).not.toMatch(/^Một cái tên|mang ý nghĩa/);
   });
   it("model lỗi thì thử model sau rồi rơi về câu dự phòng", async () => {
     let calls = 0;
     const chat = async () => { calls++; if (calls === 1) throw new Error("x"); return '{"summary":"Một người trung thành với quê hương."}'; };
     expect(await summarizeName(parts, chat, ["a", "b"])).toEqual({ text: "Một người trung thành với quê hương.", ai: true });
-    expect(await summarizeName(parts, async () => { throw new Error("x"); }, ["a"])).toEqual({ text: "Một cái tên mang ý nghĩa quốc gia và trung thành.", ai: false });
+    expect(await summarizeName(parts, async () => { throw new Error("x"); }, ["a"])).toEqual({ text: fallbackSummary(parts), ai: false });
   });
 });

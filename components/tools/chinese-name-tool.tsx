@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Button3d } from "@/components/ui/button-3d";
 import { PronounceButton } from "@/components/ui/pronounce-button";
-import { NAME_MAX_CHARS, type NamePart } from "@/lib/names/chinese-name";
+import { NAME_MAX_CHARS, capitalizeSyllable, titleCaseName, type NamePart } from "@/lib/names/chinese-name";
 import { ImageShareDialog } from "@/components/share/image-share-dialog";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { renderNameImage } from "./chinese-name-image";
@@ -39,7 +39,7 @@ export function ChineseNameTool() {
   const renderCard = useMemo(() => {
     if (!res?.han) return null;
     const r = res;
-    return () => renderNameImage({ vietnamese: r.vietnamese, han: r.han!, pinyin: r.pinyin, summary: r.summary, lines: r.parts.filter((p) => p.han && p.meaning !== "họ").map((p) => `${p.han} ${p.syllable}: ${p.meaning}`) });
+    return () => renderNameImage({ vietnamese: titleCaseName(r.vietnamese), han: r.han!, pinyin: r.pinyin, summary: r.summary, lines: r.parts.filter((p) => p.han && p.meaning !== "họ").map((p) => `${p.han} ${capitalizeSyllable(p.syllable)}: ${p.meaning}`) });
   }, [res]);
   const save = async () => {
     if (!renderCard) return;
@@ -74,12 +74,12 @@ export function ChineseNameTool() {
               {res.pinyin && <p className="text-headline-md font-bold">{res.pinyin}</p>}
               <PronounceButton text={res.han} />
             </div>
-          ) : <p className="text-body-md">Có âm chưa có chữ gợi ý nên chưa ghép được cả tên: {missing.map((p) => p.syllable).join(", ")}.</p>}
+          ) : <p className="text-body-md">Có âm chưa có chữ gợi ý nên chưa ghép được cả tên: {missing.map((p) => capitalizeSyllable(p.syllable)).join(", ")}.</p>}
           {res.han && res.summary && <p className="max-w-xl rounded-2xl bg-surface-container-low px-space-md py-space-md text-body-lg italic">“{res.summary}”</p>}
           <ul className={`grid w-full gap-3 ${COLS[Math.min(res.parts.length, 4)] ?? COLS[2]}`}>
             {res.parts.map((p, i) => (
               <li key={i} className="flex flex-col items-center gap-1 rounded-2xl bg-surface-container-low px-3 py-space-md">
-                <span className="flex flex-col text-label-md font-bold text-on-surface-variant"><span>{ROLE[p.role]}</span><span className="text-on-surface">{p.syllable}</span></span>
+                <span className="flex flex-col text-label-md font-bold text-on-surface-variant"><span>{ROLE[p.role]}</span><span className="text-on-surface">{capitalizeSyllable(p.syllable)}</span></span>
                 <span lang="zh" className="font-serif text-[2.75rem] font-bold leading-none">{p.han ?? "?"}</span>
                 {p.pinyin && <span className="text-label-lg font-semibold text-primary">{p.pinyin}</span>}
                 <span className="min-h-6 text-body-md">{p.meaning && p.meaning !== "họ" ? p.meaning : ""}</span>
