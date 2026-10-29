@@ -43,6 +43,7 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
       { href: "/review/whack", label: "Đập chữ", desc: "30 giây đập đúng chữ trong chín hố", icon: "timer" },
       { href: "/review/daily", label: "Hán tự mỗi ngày", desc: "Mỗi ngày một từ, đoán kiểu Wordle", icon: "calendar_month" },
       { href: "/review/han-viet", label: "Đoán chữ Hán từ Hán Việt", desc: "Xem âm Hán Việt, chọn đúng chữ Hán, thách bạn bè", icon: "translate" },
+      { href: "/review/ghep-bo-thu", label: "Ghép bộ thủ", desc: "Ghép hai mảnh thành chữ mới, như 日 + 月 = 明", icon: "build" },
       { href: "/review/pet-duel", label: "Đấu với pet", desc: "5 câu, bấm đúng chữ Hán trước bạn nhỏ của bạn", icon: "emoji_events" },
       { href: "/review/duel", label: "Đấu 1–1", desc: "Thách bạn gõ pinyin, ai nhanh hơn thắng", icon: "group" },
     ],
