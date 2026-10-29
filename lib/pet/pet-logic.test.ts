@@ -17,7 +17,7 @@ describe("cleanPetName", () => {
 
 describe("parsePet", () => {
   it("nhận dữ liệu đúng dạng", () => {
-    expect(parsePet({ species: "panda", name: " Bo ", adoptedAt: "2026-10-29T00:00:00.000Z" })).toEqual({ species: "panda", name: "Bo", adoptedAt: "2026-10-29T00:00:00.000Z" });
+    expect(parsePet({ species: "panda", name: " Bo ", adoptedAt: "2026-10-29T00:00:00.000Z" })).toEqual({ species: "panda", name: "Bo", adoptedAt: "2026-10-29T00:00:00.000Z", baseXp: 0 });
   });
   it("loài lạ, thiếu tên hoặc không phải object thì null", () => {
     expect(parsePet({ species: "unicorn", name: "A" })).toBeNull();
@@ -26,6 +26,24 @@ describe("parsePet", () => {
   });
   it("ngày hỏng thì dùng mốc 1970, không làm hỏng pet", () => {
     expect(parsePet({ species: "cat", name: "A", adoptedAt: "xx" })?.adoptedAt).toBe(new Date(0).toISOString());
+  });
+});
+
+describe("parsePet baseXp", () => {
+  it("giữ XP lúc nhận nuôi; thiếu, âm hoặc sai kiểu thì 0", () => {
+    expect(parsePet({ species: "cat", name: "A", baseXp: 1234.7 })?.baseXp).toBe(1234);
+    for (const v of [undefined, -5, "9", Number.NaN]) expect(parsePet({ species: "cat", name: "A", baseXp: v })?.baseXp).toBe(0);
+  });
+});
+
+describe("petGrowth theo XP kể từ lúc nhận nuôi", () => {
+  it("người đã có 3000 XP nhận nuôi thì pet vẫn bắt đầu từ con non", () => {
+    expect(petGrowth(3000, 3000)).toMatchObject({ stage: 1, progressXp: 0 });
+    expect(petGrowth(3300, 3000).stage).toBe(2);
+    expect(petGrowth(4500, 3000).stage).toBe(3);
+  });
+  it("XP tổng giảm xuống dưới mốc nhận nuôi (hoàn tác) không làm âm", () => {
+    expect(petGrowth(100, 500)).toMatchObject({ stage: 1, progressXp: 0 });
   });
 });
 
