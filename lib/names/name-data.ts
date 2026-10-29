@@ -53,6 +53,23 @@ export const GIVEN: Record<string, NameChar> = {
   vũ: { han: "宇", meaning: "vũ trụ" }, vượng: { han: "旺", meaning: "thịnh vượng" }, xuân: { han: "春", meaning: "mùa xuân" }, yến: { han: "燕", meaning: "chim én" },
   ý: { han: "意", meaning: "ý chí" }, oanh: { han: "莺", meaning: "chim oanh" }, diệu: { han: "妙", meaning: "kỳ diệu" }, diễm: { han: "艳", meaning: "kiều diễm" },
   yên: { han: "安", meaning: "bình yên" },
+  // Bổ sung các âm hay gặp (huyền, nguyệt, nhiên, trân, thư...). Mỗi âm chọn MỘT chữ đẹp, nghĩa tốt.
+  huyền: { han: "玄", meaning: "huyền diệu, sâu xa" }, hiển: { han: "显", meaning: "hiển đạt, rõ ràng" }, hoan: { han: "欢", meaning: "vui vẻ" }, hạ: { han: "夏", meaning: "mùa hạ" },
+  hào: { han: "豪", meaning: "hào kiệt" }, kiệt: { han: "杰", meaning: "kiệt xuất" }, luân: { han: "伦", meaning: "đạo lý, luân thường" }, mộc: { han: "木", meaning: "cây gỗ" },
+  mộng: { han: "梦", meaning: "giấc mộng đẹp" }, nguyệt: { han: "月", meaning: "ánh trăng" }, nhã: { han: "雅", meaning: "thanh nhã" }, nhiên: { han: "然", meaning: "tự nhiên" },
+  nhu: { han: "柔", meaning: "dịu dàng" }, sâm: { han: "森", meaning: "rừng cây xanh tốt" }, tiểu: { han: "小", meaning: "nhỏ nhắn đáng yêu" }, tình: { han: "情", meaning: "tình cảm" },
+  trà: { han: "茶", meaning: "hoa trà" }, trâm: { han: "簪", meaning: "cây trâm cài tóc" }, triết: { han: "哲", meaning: "hiền triết, thông thái" }, trọng: { han: "重", meaning: "coi trọng" },
+  trường: { han: "长", meaning: "dài lâu" }, tư: { han: "思", meaning: "suy nghĩ, nhớ nhung" }, uy: { han: "威", meaning: "uy nghiêm" }, uyển: { han: "婉", meaning: "dịu dàng uyển chuyển" },
+  vạn: { han: "万", meaning: "muôn vàn" }, ân: { han: "恩", meaning: "ân nghĩa" }, ái: { han: "爱", meaning: "yêu thương" }, băng: { han: "冰", meaning: "băng trong" },
+  bích: { han: "碧", meaning: "ngọc xanh biếc" }, cầm: { han: "琴", meaning: "đàn cầm" }, cúc: { han: "菊", meaning: "hoa cúc" }, chiến: { han: "战", meaning: "chiến đấu" },
+  chân: { han: "真", meaning: "chân thật" }, dạ: { han: "夜", meaning: "đêm" }, di: { han: "怡", meaning: "vui vẻ thư thái" }, dĩnh: { han: "颖", meaning: "thông minh sáng dạ" },
+  đoan: { han: "端", meaning: "đoan chính" }, đồng: { han: "桐", meaning: "cây ngô đồng" }, hiên: { han: "轩", meaning: "khí độ ung dung" }, huân: { han: "勋", meaning: "công huân" },
+  khuê: { han: "奎", meaning: "sao Khuê, văn chương" }, kha: { han: "柯", meaning: "cành cây" }, liễu: { han: "柳", meaning: "cây liễu" }, ly: { han: "璃", meaning: "lưu ly, ngọc trong" },
+  nghi: { han: "仪", meaning: "phong thái" }, ngôn: { han: "言", meaning: "lời nói" }, san: { han: "珊", meaning: "san hô" }, sa: { han: "沙", meaning: "cát" },
+  thăng: { han: "升", meaning: "thăng tiến" }, thiên: { han: "天", meaning: "trời" }, thư: { han: "书", meaning: "sách, thư thái" }, tĩnh: { han: "静", meaning: "tĩnh lặng" },
+  trân: { han: "珍", meaning: "trân quý" }, trầm: { han: "沉", meaning: "trầm tĩnh" }, tuyền: { han: "泉", meaning: "dòng suối" }, tuyên: { han: "宣", meaning: "tuyên bố, rõ ràng" },
+  vọng: { han: "望", meaning: "hy vọng" }, xuyên: { han: "川", meaning: "dòng sông" }, cát: { han: "吉", meaning: "cát tường" }, lĩnh: { han: "岭", meaning: "đỉnh núi" },
+  diệp: { han: "叶", meaning: "chiếc lá" }, lương: { han: "良", meaning: "lương thiện" }, phượng: { han: "凤", meaning: "chim phượng" }, quế: { han: "桂", meaning: "cây quế" },
 };
 
 /** Họ có chữ đa âm mà từ điển hay chọn cách đọc khác khi đứng riêng: ép cách đọc khi dùng làm họ. */

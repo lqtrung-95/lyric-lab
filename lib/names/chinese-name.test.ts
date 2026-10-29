@@ -19,6 +19,9 @@ describe("convertName", () => {
     expect(p[0].role).toBe("surname");
     expect(p[2].role).toBe("given");
   });
+  it("tên có chữ Huyền (phản hồi người dùng) ghép được đủ", () => {
+    expect(joinHan(convertName("Phạm Thị Minh Huyền"))).toBe("范明玄");
+  });
   it("tên chỉ một âm là tên gọi, không có họ", () => {
     expect(convertName("Linh")).toEqual([{ syllable: "linh", role: "given", han: "灵", meaning: "linh hoạt, thông tuệ" }]);
   });
