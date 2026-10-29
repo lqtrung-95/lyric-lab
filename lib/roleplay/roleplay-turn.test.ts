@@ -53,4 +53,10 @@ describe("kịch bản pet", () => {
     expect(p).toContain("không phù hợp");
     expect(p).toContain("HSK 1");
   });
+  it("linh vật đanh đá: prompt có giọng cà khịa và cho phép sửa lỗi nhỏ; tình huống thường thì không", () => {
+    const pet = buildRoleplayPrompt(findScenario("pet")!, { ...req, scenarioId: "pet" });
+    expect(pet).toContain("đanh đá");
+    expect(pet).toContain("không xúc phạm");
+    expect(buildRoleplayPrompt(findScenario("cafe")!, req)).not.toContain("đanh đá");
+  });
 });

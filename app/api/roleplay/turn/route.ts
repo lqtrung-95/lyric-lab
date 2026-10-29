@@ -33,8 +33,9 @@ export async function POST(req: Request) {
       chat: createChat(getServerEnv()),
       allowLlmCall: async () => (consumed = ipLimiter.tryConsume(ip) && (await consumeUsage(user, "roleplay"))),
     });
+    const llmMs = Date.now() - started;
     const pinyin = await annotatePinyin([out.reply, ...out.tips, ...(out.feedback ? [out.feedback.better] : [])]);
-    console.info(JSON.stringify({ event: "roleplay_turn", scenario: parsed.data.scenarioId, level: parsed.data.level, model: out.model, ms: Date.now() - started }));
+    console.info(JSON.stringify({ event: "roleplay_turn", scenario: parsed.data.scenarioId, level: parsed.data.level, model: out.model, llmMs, ms: Date.now() - started }));
     return Response.json({ reply: out.reply, replyVi: out.replyVi, tips: out.tips, feedback: out.feedback, pinyin, tokens: segmentReply(out.reply) });
   } catch (error) {
     if (consumed && (error as { code?: string })?.code !== "rate_limited") await refundUsage(user, "roleplay");
