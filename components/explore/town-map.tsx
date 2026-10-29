@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SCENES } from "@/lib/explore/scenes";
 import { SCENE_EMOJI, TOWN_DISTRICTS } from "@/lib/explore/town-layout";
+import { STAMP_MEDALS, STAMP_LABELS, type StampTier } from "@/lib/explore/passport";
 import type { CaseSummary } from "./explore-hub";
 
 interface Props {
@@ -12,6 +13,8 @@ interface Props {
   caseState: Record<string, { done: number; solved: boolean }>;
   /** Cảnh người chơi ghé gần nhất (để đặt dấu "bạn ở đây"). */
   lastScene: string | null;
+  /** Bậc dấu hộ chiếu của từng cảnh (huy chương nhỏ ở góc tòa nhà). */
+  tiers?: Record<string, StampTier>;
 }
 
 const DIFF_DOT: Record<string, string> = { easy: "#4caf50", medium: "#f2b01e", hard: "#e0533d" };
@@ -20,7 +23,7 @@ const DIFF_DOT: Record<string, string> = { easy: "#4caf50", medium: "#f2b01e", h
  * Thị trấn Khám phá: các khu phố như những khối nền màu, mỗi cảnh là một "tòa nhà" (biểu tượng + mái màu) kèm tiến độ từ đã học.
  * Cảnh chưa ghé thì phủ "sương mù" (mờ, dấu ?) để gợi tò mò; từ đang phai hiện 👻; chỗ vụ án bắt đầu có ghim 🕵️ (✓ khi đã giải) bấm thẳng vào vụ án.
  */
-export function TownMap({ cases, learned, fading, caseState, lastScene }: Props) {
+export function TownMap({ cases, learned, fading, caseState, lastScene, tiers = {} }: Props) {
   const casesAt: Record<string, CaseSummary[]> = {};
   for (const c of cases) (casesAt[c.startScene] ??= []).push(c);
   const visited = Object.values(SCENES).filter((s) => (learned[s.id] ?? 0) > 0).length;
@@ -47,7 +50,7 @@ export function TownMap({ cases, learned, fading, caseState, lastScene }: Props)
                   const pins = casesAt[id] ?? [];
                   return (
                     <li key={id} className="relative">
-                      <Link href={`/explore/${id}`} aria-label={`${s.title}, ${n}/${s.objects.length} từ đã học${fading[id] ? `, ${fading[id]} từ đang phai` : ""}`}
+                      <Link href={`/explore/${id}`} aria-label={`${s.title}, ${n}/${s.objects.length} từ đã học${tiers[id] ? `, dấu ${STAMP_LABELS[tiers[id]]}` : ""}${fading[id] ? `, ${fading[id]} từ đang phai` : ""}`}
                         className="group flex min-h-[5.5rem] flex-col items-center overflow-hidden rounded-xl border-2 border-ink bg-white text-center transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary">
                         <span className="h-2.5 w-full" style={{ background: d.roof }} />
                         <span aria-hidden="true" className={`mt-1 text-2xl transition ${foggy ? "opacity-35 brightness-0" : ""}`}>{SCENE_EMOJI[id]}</span>
@@ -56,6 +59,7 @@ export function TownMap({ cases, learned, fading, caseState, lastScene }: Props)
                           <span className="block h-full rounded-full" style={{ width: `${(n / s.objects.length) * 100}%`, background: d.roof }} />
                         </span>
                       </Link>
+                      {(tiers[id] ?? 0) > 0 && <span aria-hidden="true" className="pointer-events-none absolute -bottom-1.5 -left-1 text-base drop-shadow">{STAMP_MEDALS[tiers[id]]}</span>}
                       {fading[id] > 0 && <span aria-hidden="true" className="anim-float pointer-events-none absolute -left-1 -top-2 text-lg">👻</span>}
                       {lastScene === id && <span className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-ink bg-primary-container px-1.5 text-[10px] font-extrabold leading-4 text-on-primary-container">📍 Bạn ở đây</span>}
                       {pins.map((c, i) => (
