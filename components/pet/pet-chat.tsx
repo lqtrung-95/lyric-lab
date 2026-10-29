@@ -46,12 +46,12 @@ export function PetChat({ name, onClose }: { name: string; onClose: () => void }
       </div>
     );
   } else if (mic === null) {
-    body = <MicIntro title={`🐾 Nói chuyện với ${name}`} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời, rồi micro tự bật: bạn nói bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} />;
+    body = <MicIntro title={`🐾 Nói chuyện với ${name}`} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời hỏi một ngày của bạn thế nào, rồi micro tự bật: bạn kể bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Bấm vào từ trong câu của bạn nhỏ để tra nghĩa hoặc lưu thẻ ôn. Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} />;
   } else if (openingPinyin === undefined) {
     // Chờ pinyin một lát rồi mới vào buổi nói: câu mở đầu chỉ đọc pinyin lúc khởi tạo.
     body = <p role="status" className="text-body-md text-on-surface-variant">Đang chuẩn bị…</p>;
   } else {
-    body = <RoleplayChat scenario={PET_SCENARIO} level={level} openingPinyin={openingPinyin || undefined} typingOnly={mic !== "ok"} onExit={onClose} />;
+    body = <RoleplayChat scenario={PET_SCENARIO} level={level} openingPinyin={openingPinyin || undefined} typingOnly={mic !== "ok"} onExit={onClose} exitLabel="Xong" />;
   }
   return (
     <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm" role="group" aria-label={`Nói chuyện với ${name}`}>

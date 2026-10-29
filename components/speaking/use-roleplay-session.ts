@@ -10,11 +10,13 @@ import { useSpeakTurn } from "./use-speak-turn";
 
 export interface Feedback { issue: string; better: string; pinyin?: string }
 export interface Tip { zh: string; pinyin?: string }
-export interface Msg { id: number; role: "ai" | "user"; zh: string; vi?: string; pinyin?: string; feedback?: Feedback | null; tips?: Tip[] }
+/** Một từ của câu đáp (jieba, từ server): từ có chữ Hán bấm được để tra nghĩa/lưu thẻ. */
+export interface ReplyToken { text: string; han: boolean }
+export interface Msg { id: number; role: "ai" | "user"; zh: string; vi?: string; pinyin?: string; feedback?: Feedback | null; tips?: Tip[]; tokens?: ReplyToken[] }
 export type Status = "ai_speaking" | "your_turn" | "thinking" | "ended";
 export type SessionError = "rate_limited" | "account_required" | "failed" | "no_speech";
 
-interface TurnResponse { reply: string; replyVi: string; tips: string[]; feedback: { issue: string; better: string } | null; pinyin: Record<string, string> }
+interface TurnResponse { reply: string; replyVi: string; tips: string[]; feedback: { issue: string; better: string } | null; pinyin: Record<string, string>; tokens?: ReplyToken[] }
 
 async function fetchTurn(body: unknown): Promise<{ ok: true; data: TurnResponse } | { ok: false; error: SessionError }> {
   try {
@@ -74,7 +76,7 @@ export function useRoleplaySession(scenario: Scenario, level: number, openingPin
     setShown({ ...stats.current });
     const withPy = (zh: string) => data.pinyin[zh];
     const user: Msg = { id: nextId.current++, role: "user", zh: text, feedback: data.feedback ? { ...data.feedback, pinyin: withPy(data.feedback.better) } : null };
-    const ai: Msg = { id: nextId.current++, role: "ai", zh: data.reply, vi: data.replyVi, pinyin: withPy(data.reply), tips: data.tips.map((t) => ({ zh: t, pinyin: withPy(t) })) };
+    const ai: Msg = { id: nextId.current++, role: "ai", zh: data.reply, vi: data.replyVi, pinyin: withPy(data.reply), tips: data.tips.map((t) => ({ zh: t, pinyin: withPy(t) })), tokens: data.tokens };
     setMsgs((m) => [...m, user, ai]);
     setStatus("ai_speaking");
     await playAndWait(data.reply);
