@@ -17,10 +17,22 @@ const delay = arg("--delay", 300);
 const limit = arg("--limit", Infinity);
 
 const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false }, realtime: { transport: ws as never } });
+/** Storage thỉnh thoảng trả 502/503 tạm thời: thử lại vài lần (đợi tăng dần) trước khi bỏ cuộc. */
+async function withRetry<T>(fn: () => Promise<T>, tries = 4): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try { return await fn(); } catch (e) {
+      const status = (e as { status?: number }).status ?? 0;
+      if (attempt >= tries || (status !== 0 && status < 500)) throw e;
+      console.log(`Storage lỗi ${status || "mạng"}, thử lại lần ${attempt}/${tries - 1} sau ${attempt * 3} giây…`);
+      await new Promise((r) => setTimeout(r, attempt * 3000));
+    }
+  }
+}
+
 const texts = collectExploreTtsTexts();
 const missing: string[] = [];
 for (const t of texts) {
-  const { data } = await sb.storage.from(TTS_BUCKET).exists(ttsStoragePath(t));
+  const { data } = await withRetry(() => sb.storage.from(TTS_BUCKET).exists(ttsStoragePath(t)));
   if (!data) missing.push(t);
 }
 const chars = missing.reduce((n, t) => n + t.length, 0);
