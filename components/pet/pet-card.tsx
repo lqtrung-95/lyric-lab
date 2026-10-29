@@ -22,6 +22,8 @@ import type { EchoTier } from "@/lib/pet/pet-echo";
 import { PetBurstFx } from "./pet-burst-fx";
 import { PetChat } from "./pet-chat";
 import { PetEcho } from "./pet-echo";
+import { PetEdit } from "./pet-edit";
+import { SpeciesPicker } from "./pet-species-picker";
 import { PetFeed } from "./pet-feed";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
@@ -42,6 +44,7 @@ export function PetCard() {
   const [feeding, setFeeding] = useState(false);
   const [echoing, setEchoing] = useState(false);
   const [chatting, setChatting] = useState(false);
+  const [editing, setEditing] = useState(false);
   const echoWord = review?.peek[0] ?? null;
   const { gift, take } = usePetGift();
   const [chewKey, setChewKey] = useState(0);
@@ -73,7 +76,7 @@ export function PetCard() {
   // Không cần useMemo: `usePetTalk` so từng trường chứ không so địa chỉ đối tượng.
   const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
-    <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
+    <section aria-labelledby="pet-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
       <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
@@ -88,11 +91,12 @@ export function PetCard() {
           </div>
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
-        {!feeding && !echoing && !chatting && (
+        {!feeding && !echoing && !chatting && !editing && (
           <div className="mt-space-sm flex flex-wrap gap-2">
             {(review?.total ?? 0) > 0 && <Button3d type="button" variant="bright" onClick={() => { sfx.petBlip(); setFeeding(true); }}>Cho {pet.name} ăn thẻ</Button3d>}
             <Button3d type="button" onClick={() => { sfx.petBlip(); fx("tap"); setChatting(true); }}>Nói chuyện với {pet.name}</Button3d>
             {echoWord && <Button3d type="button" onClick={() => { sfx.petBlip(); setEchoing(true); }}>Tập nói cùng {pet.name}</Button3d>}
+            <button type="button" onClick={() => { sfx.petBlip(); setEditing(true); }} className="min-h-11 rounded-full px-3 text-label-md font-bold text-on-surface-variant underline">Đổi tên / đổi bạn nhỏ</button>
           </div>
         )}
       </div>
@@ -111,6 +115,7 @@ export function PetCard() {
           </div>
         </div>
       )}
+      {editing && <PetEdit pet={pet} onSave={(next) => { adopt(next); sfx.petAdopt(); fx("adopt"); setEditing(false); }} onClose={() => { sfx.petBlip(); setEditing(false); }} />}
       {chatting && <PetChat name={pet.name} onClose={() => { sfx.petBlip(); setChatting(false); }} />}
       {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={(tier: EchoTier) => fx(tier === "great" ? "cheer" : tier === "good" ? "tap" : "try")} onClose={() => { sfx.petBlip(); setEchoing(false); }} />}
       {feeding && <PetFeed name={pet.name} onEat={() => { setChewKey((k) => k + 1); fx("crunch"); }} onFull={() => fx("full")} onClose={() => { sfx.petBlip(); setFeeding(false); }} />}
@@ -124,18 +129,12 @@ function AdoptPet({ onAdopt, ready }: { onAdopt: (species: PetSpecies, name: str
   const [name, setName] = useState("");
   const clean = cleanPetName(name);
   return (
-    <section aria-labelledby="adopt-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
+    <section aria-labelledby="adopt-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
       <PetSprite species={species} stage={1} mood="happy" className="size-28 shrink-0" />
       <form className="min-w-[14rem] flex-1" onSubmit={(e) => { e.preventDefault(); if (clean && ready) onAdopt(species, clean); }}>
         <h2 id="adopt-heading" className="text-headline-md">Nhận nuôi một người bạn học</h2>
         <p className="mt-1 text-body-md text-on-surface-variant">Bạn học càng đều, bạn nhỏ càng lớn nhanh. {PET_SPECIES_LABELS[species]} sẽ lớn thêm sau mỗi buổi học.</p>
-        {PET_SPECIES_READY.length > 1 && (
-          <div role="radiogroup" aria-label="Chọn loài" className="mt-2 flex flex-wrap gap-2">
-            {PET_SPECIES_READY.map((s) => (
-              <button key={s} type="button" role="radio" aria-checked={s === species} onClick={() => { setSpecies(s); sfx.petChirp(s); }} className={`min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-bold ${s === species ? "bg-primary-container" : "bg-surface-container-low"}`}>{PET_SPECIES_LABELS[s]}</button>
-            ))}
-          </div>
-        )}
+        <SpeciesPicker value={species} onChange={setSpecies} />
         <div className="mt-space-sm flex flex-wrap items-center gap-2">
           <label className="sr-only" htmlFor="pet-name">Tên bạn nhỏ</label>
           <input id="pet-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={PET_NAME_MAX * 2} placeholder="Đặt tên, ví dụ Tiểu Long" autoComplete="off" className="min-h-11 min-w-[12rem] flex-1 rounded-xl border-2 border-ink bg-surface-container-lowest px-3 text-body-md" />
@@ -154,7 +153,7 @@ function PetTouch({ pet, stage, mood, accessories, words, snapshot, chewKey, ext
   const { tapKey, bubble, burst, tap } = usePetTalk(mood, pet.name, words, snapshot);
   return (
     <div className="relative shrink-0">
-      <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="block rounded-full">
+      <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="cursor-pointer block rounded-full">
         <PetSprite species={pet.species} stage={stage} mood={mood} accessories={accessories} tapKey={tapKey} chewKey={chewKey} className="size-28" />
       </button>
       <PetBurstFx burst={burst} species={pet.species} />

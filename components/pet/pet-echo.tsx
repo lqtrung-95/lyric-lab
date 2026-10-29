@@ -72,7 +72,7 @@ export function PetEcho({ name, word, onReact, onClose }: { name: string; word: 
       {state.status === "error" && <p role="alert" className="mt-2 text-body-md text-error">{ERROR_TEXT[state.reason]}</p>}
       {said && <p role="status" className="mt-2 text-body-md font-bold text-secondary">{said}</p>}
       {state.status === "ok" && <div className="mt-2"><AssessmentResultView result={state.value} /></div>}
-      <button type="button" onClick={onClose} className="mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Xong</button>
+      <button type="button" onClick={onClose} className="cursor-pointer mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Xong</button>
     </div>
   );
 }

@@ -514,3 +514,6 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
   :is(button, a).bg-primary.text-on-primary, :is(button, a).rounded-full.border.border-outline-variant { transition: none; }
   :is(button, a).bg-primary.text-on-primary:active:not(:disabled), :is(button, a).rounded-full.border.border-outline-variant:active:not(:disabled) { transform: none; }
 }
+
+/* Mọi nút và liên kết trong thẻ linh vật (hình pet, chọn loài, đổi tên...) hiện con trỏ bàn tay để biết bấm được. */
+.pet-ui :is(button, a):not(:disabled) { cursor: pointer; }

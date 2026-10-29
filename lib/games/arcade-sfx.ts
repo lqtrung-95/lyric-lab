@@ -70,15 +70,19 @@ export const sfx = {
   /** Hết ván. */
   gameOver: () => play((c, t) => { [392, 330, 262, 196].forEach((f, i) => tone(c, t + i * 0.14, "triangle", f, f * 0.97, 0.22, 0.22)); }),
   // --- Linh vật (pet): mọi tương tác đều có tiếng, cùng công tắc với game giải trí. ---
-  /** Chạm vào pet: tiếng kêu riêng từng loài (rồng gừ-chíp, mèo meo, cún gâu nhỏ, gấu trúc chút chít, cú hú). */
+  /**
+   * Chạm vào pet: tiếng kêu riêng từng loài, mềm và tròn kiểu thú nhồi bông (chỉ dùng sóng sine, nốt lướt lên rồi xuống như tiếng "bíp" bong bóng),
+   * kết bằng một tiếng lấp lánh nhỏ. Âm lượng thấp để không chói khi chạm liên tục.
+   */
   petChirp: (species: string) => play((c, t) => {
+    const sparkle = (at: number) => tone(c, t + at, "sine", 2400, 3000, 0.09, 0.04);
     switch (species) {
-      case "dragon": tone(c, t, "sawtooth", 200, 320, 0.16, 0.1); tone(c, t + 0.1, "triangle", 520, 800, 0.1, 0.14); break;
-      case "cat": tone(c, t, "sine", 620, 1000, 0.14, 0.2); tone(c, t + 0.14, "sine", 1000, 560, 0.2, 0.18); break;
-      case "dog": tone(c, t, "square", 480, 720, 0.07, 0.1); tone(c, t + 0.11, "square", 520, 760, 0.08, 0.1); break;
-      case "panda": tone(c, t, "triangle", 820, 1300, 0.09, 0.2); tone(c, t + 0.1, "triangle", 900, 1400, 0.09, 0.16); break;
-      case "owl": tone(c, t, "sine", 390, 340, 0.22, 0.22); tone(c, t + 0.26, "sine", 370, 320, 0.26, 0.2); break;
-      default: tone(c, t, "sine", 520, 1040, 0.11, 0.25);
+      case "dragon": tone(c, t, "sine", 330, 520, 0.1, 0.16); tone(c, t + 0.09, "sine", 780, 1180, 0.08, 0.14); tone(c, t + 0.17, "sine", 1180, 900, 0.1, 0.1); sparkle(0.22); break;
+      case "cat": tone(c, t, "sine", 700, 1150, 0.09, 0.16); tone(c, t + 0.08, "sine", 1150, 720, 0.2, 0.15); sparkle(0.24); break;
+      case "dog": tone(c, t, "sine", 520, 820, 0.06, 0.16); tone(c, t + 0.09, "sine", 540, 860, 0.06, 0.16); tone(c, t + 0.18, "sine", 900, 640, 0.1, 0.1); sparkle(0.24); break;
+      case "panda": [0, 0.085, 0.17].forEach((d, i) => tone(c, t + d, "sine", 1000 + i * 80, 1500 + i * 80, 0.06, 0.15)); sparkle(0.25); break;
+      case "owl": tone(c, t, "sine", 520, 440, 0.17, 0.17); tone(c, t + 0.2, "sine", 500, 410, 0.2, 0.15); sparkle(0.42); break;
+      default: tone(c, t, "sine", 700, 1100, 0.09, 0.16); tone(c, t + 0.08, "sine", 1100, 760, 0.16, 0.12); sparkle(0.22);
     }
   }),
   /** Bấm mở/đóng khung của pet (cho ăn, tập nói): tiếng "tít" nhẹ. */

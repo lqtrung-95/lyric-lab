@@ -56,7 +56,7 @@ export function PetChat({ name, onClose }: { name: string; onClose: () => void }
   return (
     <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm" role="group" aria-label={`Nói chuyện với ${name}`}>
       {body}
-      <button type="button" onClick={onClose} className="mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Đóng</button>
+      <button type="button" onClick={onClose} className="cursor-pointer mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Đóng</button>
     </div>
   );
 }

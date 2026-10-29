@@ -63,7 +63,7 @@ export function PetFeed({ name, onEat, onFull, onClose }: { name: string; onEat:
   return (
     <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm" aria-label={`Cho ${name} ăn`} role="group">
       {body}
-      <button type="button" onClick={onClose} className="mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">{finished || s.status === "finished" ? "Xong" : "Để lúc khác"}</button>
+      <button type="button" onClick={onClose} className="cursor-pointer mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">{finished || s.status === "finished" ? "Xong" : "Để lúc khác"}</button>
     </div>
   );
 }
