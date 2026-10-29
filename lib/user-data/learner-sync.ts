@@ -56,7 +56,7 @@ export function cardRowFromSaved(item: SavedItem): (CardRow & Record<string, unk
   return {
     item_key: item.key, kind: item.type, term: item.term,
     pinyin: item.reading ?? null, han_viet: item.sinoViet ?? null, hsk_level: item.level ?? null,
-    meaning: cleanSavedMeaning(item.meaning, item.term), video_id: item.videoId, line_index: item.lineIndex,
+    meaning: cleanSavedMeaning(item.meaning, item.term), video_id: item.videoId || null, line_index: item.videoId ? item.lineIndex : null,
     created_at: new Date(item.savedAt).toISOString(),
   };
 }

@@ -5,17 +5,31 @@ import { Icon } from "@/components/ui/icon";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import type { HskRow } from "@/lib/tools/build-hsk-rows";
 import { buildHskCsv } from "@/lib/tools/hsk-csv";
+import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
+import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useKnownWords } from "./use-known-words";
 
 /** Bỏ dấu và đ→d để gõ "hao" tìm được cả "hǎo" lẫn "hảo" (Hán Việt). */
 const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").toLowerCase();
 
-/** Bảng từ vựng một cấp HSK: ô tìm (chữ Hán, pinyin có hoặc không dấu, Hán Việt, nghĩa tiếng Anh) và nút tải CSV cho Anki. Bảng cũng được dựng sẵn ở server để công cụ tìm kiếm đọc được. */
+/** Bảng từ vựng một cấp HSK: ô tìm (chữ Hán, pinyin có hoặc không dấu, Hán Việt, nghĩa Việt hoặc Anh), nút thêm từ vào bộ ôn (cần có nghĩa Việt) và nút tải CSV cho Anki. Bảng cũng được dựng sẵn ở server để công cụ tìm kiếm đọc được. */
 export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }) {
   const [query, setQuery] = useState("");
   const [hideKnown, setHideKnown] = useState(false);
-  const { known, toggle } = useKnownWords();
-  const index = useMemo(() => rows.map((r) => fold(`${r.word} ${r.pinyin} ${r.sinoViet ?? ""} ${r.meanings.join(" ")}`)), [rows]);
+  const { known: legacyKnown, toggle: toggleLegacy } = useKnownWords();
+  const { state: learner, toggleSaved, markKnown, unmarkKnown } = useLearnerState();
+  // "Đã biết" dùng chung danh sách của app (Khám phá, xem trước bài); kho riêng cũ của trang này vẫn được đọc để không mất dấu cũ.
+  const known = useMemo(() => ({ has: (w: string) => legacyKnown.has(w) || learner.known.includes(itemKey({ type: "vocab", term: w })) }), [legacyKnown, learner.known]);
+  const toggle = (w: string) => {
+    if (known.has(w)) { if (legacyKnown.has(w)) toggleLegacy(w); unmarkKnown(itemKey({ type: "vocab", term: w })); } else markKnown(itemKey({ type: "vocab", term: w }));
+  };
+  const savedByKey = useMemo(() => new Map(learner.saved.map((s) => [s.key, s])), [learner.saved]);
+  // Thẻ không có câu nguồn (chữ, pinyin, nghĩa Việt): chỉ thêm được khi đã có nghĩa tiếng Việt, vì mặt sau thẻ cho người Việt.
+  // Trả hàm dựng thẻ (đặt `savedAt` lúc bấm, không phải lúc vẽ); null khi chưa có nghĩa Việt.
+  const cardFor = (r: HskRow): (() => SavedItem) | null => r.meaningVi
+    ? () => ({ key: itemKey({ type: "vocab", term: r.word }), videoId: "", type: "vocab", term: r.word, lineIndex: 0, start: 0, savedAt: Date.now(), reading: r.pinyin, sinoViet: r.sinoViet ?? undefined, level, meaning: r.meaningVi as string })
+    : null;
+  const index = useMemo(() => rows.map((r) => fold(`${r.word} ${r.pinyin} ${r.sinoViet ?? ""} ${r.meaningVi ?? ""} ${r.meanings.join(" ")}`)), [rows]);
   const q = fold(query.trim());
   const knownHere = rows.filter((r) => known.has(r.word)).length;
   const shown = useMemo(() => rows.filter((r, i) => (!q || index[i].includes(q)) && !(hideKnown && known.has(r.word))), [q, rows, index, hideKnown, known]);
@@ -45,7 +59,7 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
               <span lang="zh" style={{ fontSize: "13pt", fontWeight: 700, marginRight: "5pt" }}>{r.word}</span>
               <span style={{ marginRight: "5pt" }}>{r.pinyin}</span>
               {r.sinoViet && <span style={{ textTransform: "uppercase", fontWeight: 600, marginRight: "5pt" }}>{r.sinoViet}</span>}
-              <span style={{ color: "#444" }}>{r.meanings.slice(0, 2).join("; ")}</span>
+              <span style={{ color: "#444" }}>{r.meaningVi ?? r.meanings.slice(0, 2).join("; ")}</span>
             </li>
           ))}
         </ul>
@@ -75,7 +89,7 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
         <table className="w-full text-left">
           <caption className="sr-only">Từ vựng HSK {level} kèm pinyin, âm Hán Việt và nghĩa</caption>
           <thead className="bg-surface-container-low text-label-md text-on-surface-variant">
-            <tr><th scope="col" className="w-12 px-3 py-3 font-medium"><span className="sr-only">Đã biết</span></th><th scope="col" className="px-4 py-3 font-medium">Từ</th><th scope="col" className="px-4 py-3 font-medium">Hán Việt</th><th scope="col" className="px-4 py-3 font-medium">Nghĩa</th></tr>
+            <tr><th scope="col" className="w-12 px-3 py-3 font-medium"><span className="sr-only">Đã biết</span></th><th scope="col" className="px-4 py-3 font-medium">Từ</th><th scope="col" className="px-4 py-3 font-medium">Hán Việt</th><th scope="col" className="px-4 py-3 font-medium">Nghĩa</th><th scope="col" className="px-3 py-3 font-medium">Thẻ ôn</th></tr>
           </thead>
           <tbody className="divide-y divide-outline-variant/40">
             {shown.map((r) => (
@@ -83,7 +97,10 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
                 <td className="px-3 py-3"><input type="checkbox" aria-label={`Đã biết từ ${r.word}`} className="h-6 w-6 accent-[var(--color-primary)]" checked={known.has(r.word)} onChange={() => toggle(r.word)} /></td>
                 <td className="px-4 py-3"><span className="flex items-center gap-2"><span lang="zh" className="font-serif text-headline-md leading-tight text-on-surface">{r.word}</span><PronounceButton text={r.word} className="size-9" /></span><span className="block text-label-md text-primary">{r.pinyin}</span></td>
                 <td className="px-4 py-3 text-body-md font-medium uppercase tracking-wide text-on-surface">{r.sinoViet ?? <span className="font-normal text-on-surface-variant">—</span>}</td>
-                <td className="px-4 py-3 text-body-md text-on-surface-variant">{r.meanings.join("; ")}</td>
+                <td className="px-4 py-3 text-body-md text-on-surface-variant">
+                  {r.meaningVi ? <><span className="font-medium text-on-surface">{r.meaningVi}</span><span lang="en" className="block text-label-md">{r.meanings.join("; ")}</span></> : <span lang="en">{r.meanings.join("; ")}</span>}
+                </td>
+                <td className="px-3 py-3"><CardButton word={r.word} card={cardFor(r)} saved={savedByKey.get(itemKey({ type: "vocab", term: r.word })) ?? null} onToggle={toggleSaved} /></td>
               </tr>
             ))}
           </tbody>
@@ -91,5 +108,16 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
         {shown.length === 0 && <p className="p-space-md text-center text-body-md text-on-surface-variant">Không có từ nào khớp “{query}”.</p>}
       </div>
     </div>
+  );
+}
+
+/** Nút thêm/bỏ thẻ ôn của một dòng: khóa (kèm lời giải thích) khi từ chưa có nghĩa tiếng Việt. */
+function CardButton({ word, card, saved, onToggle }: { word: string; card: (() => SavedItem) | null; saved: SavedItem | null; onToggle: (c: SavedItem) => void }) {
+  if (!card && !saved) return <span className="text-label-md text-on-surface-variant" title="Từ này chưa có nghĩa tiếng Việt nên chưa thêm được thẻ ôn">—</span>;
+  return (
+    <button type="button" aria-pressed={saved !== null} aria-label={`${saved ? "Bỏ thẻ ôn" : "Thêm thẻ ôn"} ${word}`} onClick={() => { const item = saved ?? card?.(); if (item) onToggle(item); }}
+      className={`inline-flex min-h-11 cursor-pointer items-center gap-1 whitespace-nowrap rounded-full border-2 border-ink px-3 text-label-md font-bold ${saved ? "bg-secondary-container" : "bg-primary-container"}`}>
+      <Icon name={saved ? "check_circle" : "bookmark_add"} size={18} filled={saved !== null} />{saved ? "Đã thêm" : "Thêm"}
+    </button>
   );
 }

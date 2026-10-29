@@ -20,6 +20,22 @@ describe("cleanMeanings", () => {
   });
 });
 
+describe("buildHskRows nghĩa tiếng Việt", () => {
+  it("gắn nghĩa Việt theo từ giản thể; từ chưa có thì null", () => {
+    const rows = buildHskRows([row("学生", "學生", "xué sheng", ["student"]), row("深", "深", "shēn", ["deep"])], READINGS, new Map([["学生", { meaning: "học sinh", reading: null }]]));
+    expect(rows.find((r) => r.word === "学生")?.meaningVi).toBe("học sinh");
+    expect(rows.find((r) => r.word === "深")?.meaningVi).toBeNull();
+  });
+});
+
+describe("buildHskRows cách đọc đã chọn", () => {
+  it("cách đọc lưu cùng nghĩa Việt thắng cách chọn tự động; không khớp thì chọn như cũ", () => {
+    const rows = [row("和", "和", "hú", ["mahjong"]), row("和", "和", "hé", ["and"])];
+    expect(buildHskRows(rows, READINGS, new Map([["和", { meaning: "và", reading: "hé" }]]))[0]).toMatchObject({ pinyin: "hé", meaningVi: "và" });
+    expect(buildHskRows(rows, READINGS, new Map([["和", { meaning: "và", reading: "xyz" }]]))[0].pinyin).toBe("hé");
+  });
+});
+
 describe("buildHskRows", () => {
   it("gom theo từ, bỏ mục biến thể (深 trỏ tới chữ 㴱), ghép Hán Việt theo chữ phồn thể", () => {
     const rows = buildHskRows([
@@ -28,7 +44,7 @@ describe("buildHskRows", () => {
       row("学生", "學生", "xué sheng", ["student", "CL:個|个[ge4]"], 200),
     ], READINGS);
     expect(rows.map((r) => r.word)).toEqual(["学生", "深"]);
-    expect(rows[0]).toEqual({ word: "学生", pinyin: "xué sheng", sinoViet: "học sinh", meanings: ["student"] });
+    expect(rows[0]).toEqual({ word: "学生", pinyin: "xué sheng", sinoViet: "học sinh", meanings: ["student"], meaningVi: null });
     expect(rows[1]).toMatchObject({ word: "深", sinoViet: "thâm", meanings: ["deep", "profound"] });
   });
   it("xếp theo độ thường gặp (số nhỏ trước), thiếu số xuống cuối", () => {
@@ -48,7 +64,7 @@ describe("isHskLevel", () => {
 
 describe("buildHskCsv", () => {
   it("có dòng tiêu đề, nghĩa ngăn bằng '; ' và ô chứa dấu phẩy hoặc nháy được bọc nháy kép", () => {
-    const csv = buildHskCsv([{ word: "好", pinyin: "hǎo", sinoViet: "hảo", meanings: ["good", "well, fine"] }, { word: "龘", pinyin: "dá", sinoViet: null, meanings: ['say "dragon"'] }]);
-    expect(csv.split("\r\n")).toEqual(["Từ,Pinyin,Hán Việt,Nghĩa", '好,hǎo,hảo,"good; well, fine"', '龘,dá,,"say ""dragon"""']);
+    const csv = buildHskCsv([{ word: "好", pinyin: "hǎo", sinoViet: "hảo", meanings: ["good", "well, fine"], meaningVi: "tốt, hay" }, { word: "龘", pinyin: "dá", sinoViet: null, meanings: ['say "dragon"'], meaningVi: null }]);
+    expect(csv.split("\r\n")).toEqual(["Từ,Pinyin,Hán Việt,Nghĩa tiếng Việt,Nghĩa tiếng Anh", '好,hǎo,hảo,"tốt, hay","good; well, fine"', '龘,dá,,,"say ""dragon"""']);
   });
 });

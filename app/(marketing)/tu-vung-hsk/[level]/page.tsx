@@ -48,7 +48,7 @@ export default async function HskLevelPage({ params }: Props) {
       </nav>
       <HskVocabTable level={level} rows={rows} />
       <p className="text-label-md text-on-surface-variant">
-        Nghĩa lấy từ từ điển CC-CEDICT (CC BY-SA 4.0), cấp độ theo danh sách HSK 3.0, âm Hán Việt ghép từ bảng Unihan (chữ nào chưa có trong bảng thì để trống).{" "}
+        Nghĩa tiếng Việt do AI soạn dựa trên từ điển CC-CEDICT (CC BY-SA 4.0, nghĩa tiếng Anh) và chưa rà hết, từ nào chưa có thì hiện nghĩa tiếng Anh, cấp độ theo danh sách HSK 3.0, âm Hán Việt ghép từ bảng Unihan (chữ nào chưa có trong bảng thì để trống).{" "}
         Muốn học các từ này qua bài hát và video thật? <Link href="/app" className="font-semibold text-primary underline underline-offset-2">Mở SongHanzi</Link>
       </p>
     </div>
