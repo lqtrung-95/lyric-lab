@@ -61,7 +61,8 @@ async function fillMissingInfo(chars: string[], info: Record<string, CharInfo>):
     if (!e) continue;
     // Bỏ ghi chú ngữ pháp ở đầu nghĩa ("(bound form) woods" → "woods").
     const english = cleanMeanings(e.meanings)[0]?.replace(/^\([^)]*\)\s+(?=\S)/, "");
-    const meaning = vi.get(c) ?? english;
+    // Nghĩa tiếng Anh dài là ghi chú kỹ thuật của từ điển ("radical in Chinese characters (Kangxi radical 85)…"), không dùng làm nghĩa hiển thị.
+    const meaning = vi.get(c) ?? (english && english.length <= 40 ? english : undefined);
     if (meaning) info[c] = { pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sv, c), meaning, meaningLang: vi.has(c) ? "vi" : "en" };
   }
 }
@@ -92,10 +93,11 @@ export async function buildForgeData(getRows: (level: HskLevel) => Promise<HskRo
   // Mọi mảnh hiện ra (bộ ban đầu, hai mảnh của công thức, chữ đích) đều nên có pinyin: tra từ điển cho những mảnh chưa có, mảnh nào từ điển không có (bộ thủ như 亻 扌 艹) lấy từ bảng bộ thủ.
   const pieces = new Set([...picked.start, ...picked.recipes.flatMap((r) => [r.a, r.b, r.out])]);
   await fillMissingInfo([...pieces].filter((c) => !info[c]), info);
-  for (const c of pieces) if (!info[c] && RADICAL_NAMES[c]) info[c] = { pinyin: RADICAL_NAMES[c].pinyin, sinoViet: null, meaning: RADICAL_NAMES[c].meaning, meaningLang: "vi" };
+  // Bảng bộ thủ tiếng Việt (viết tay) đứng TRƯỚC nghĩa tiếng Anh thô của từ điển (vd. 氵 trong CC-CEDICT là một đoạn giải thích dài về bộ thủ Khang Hy).
+  for (const c of pieces) if (RADICAL_NAMES[c] && (!info[c] || info[c].meaningLang === "en")) info[c] = { pinyin: info[c]?.pinyin ?? RADICAL_NAMES[c].pinyin, sinoViet: info[c]?.sinoViet ?? null, meaning: RADICAL_NAMES[c].meaning, meaningLang: "vi" };
   const ety = await etymologies([...new Set(picked.recipes.map((r) => r.out))]).catch(() => ({}));
   return { start: picked.start, recipes: picked.recipes, info, ety };
 }
 
 /** Cache một ngày: dữ liệu từ điển ít đổi và phép dựng cần hàng chục truy vấn. */
-export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v8"], { revalidate: 86400 });
+export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v9"], { revalidate: 86400 });

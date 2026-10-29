@@ -3,7 +3,8 @@ import type { EtymologyType } from "@/lib/tra-tu/parse-hanzi-dictionary";
 export interface ForgeEty { type: EtymologyType; phonetic?: string; semantic?: string }
 export interface PieceLabel { pinyin?: string; meaning?: string }
 
-const gloss = (l: PieceLabel | undefined) => (l?.meaning ? ` (${l.meaning})` : "");
+/** Nghĩa trong ngoặc; ngoặc có sẵn trong nghĩa ("bộ thủy (nước)") đổi thành dấu phẩy để không lồng ngoặc ("bộ thủy, nước"). */
+const gloss = (l: PieceLabel | undefined) => (l?.meaning ? ` (${l.meaning.replace(/\s*\(([^)]*)\)/g, ", $1")})` : "");
 
 /**
  * Câu tiếng Việt giải thích VÌ SAO hai mảnh ghép thành chữ này, dựng từ dữ kiện có cấu trúc (loại chữ, phần chỉ nghĩa, phần chỉ âm của Make Me a Hanzi) và nghĩa/pinyin từ điển, không qua AI.

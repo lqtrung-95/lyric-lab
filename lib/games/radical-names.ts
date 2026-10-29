@@ -21,4 +21,5 @@ export const RADICAL_NAMES: Record<string, RadicalName> = {
   "耂": { pinyin: "lǎo", meaning: "bộ lão (già)" }, "虍": { pinyin: "hū", meaning: "bộ hô (vằn hổ)" }, "⺈": { pinyin: "dāo", meaning: "biến thể của bộ đao (dao)" },
   "厶": { pinyin: "sī", meaning: "bộ tư (riêng tư)" }, "匕": { pinyin: "bǐ", meaning: "bộ tỷ (cái thìa)" }, "月": { pinyin: "yuè", meaning: "trăng, tháng (cũng là bộ nhục: thịt)" },
   "门": { pinyin: "mén", meaning: "cửa" },
+  "⺼": { pinyin: "ròu", meaning: "bộ nhục (thịt)" },
 };

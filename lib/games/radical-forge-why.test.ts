@@ -18,4 +18,8 @@ describe("forgeWhy", () => {
     expect(forgeWhy("日", "月", "明", label, { type: "pictophonetic", semantic: "木", phonetic: "目" })).toContain("Hội ý");
     expect(forgeWhy("一", "二", "三", () => undefined, undefined)).toBe("Hội ý: ghép “一” với “二” để gợi ra “三”.");
   });
+  it("không lồng ngoặc khi nghĩa của mảnh đã có ngoặc", () => {
+    const label = (c: string) => (c === "氵" ? { pinyin: "shuǐ", meaning: "bộ thủy (nước)" } : c === "干" ? { pinyin: "gàn", meaning: "làm" } : { pinyin: "hàn", meaning: "mồ hôi" });
+    expect(forgeWhy("氵", "干", "汗", label, { type: "pictophonetic", semantic: "氵", phonetic: "干" })).toContain("“氵” (bộ thủy, nước) chỉ phần nghĩa");
+  });
 });

@@ -2,13 +2,14 @@
 // Mặc định chỉ in thử (dry-run, không ghi DB, mặc định 40 từ); --apply mới ghi. Từ đã có nghĩa trong bảng thì bỏ qua (--force để sinh lại, trừ bản đã `reviewed`).
 // Biến môi trường (.env.local): DEPLOY_API_KEY (bắt buộc), DEPLOY_MODEL (tuỳ chọn), NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY.
 //   NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/gloss-hsk-vocab.mts --level 1 [--limit 40] [--batch 40] [--concurrency 3] [--force] [--apply]
-//   --forge: thay vì theo cấp HSK, sinh nghĩa Việt cho các chữ của game Ghép bộ thủ còn thiếu nghĩa Việt (chữ trung gian như 林, 苗).
+//   --forge: thay vì theo cấp HSK, sinh nghĩa Việt cho các chữ của game Ghép bộ thủ còn thiếu nghĩa Việt (chữ trung gian như 林, 苗, và các mảnh như 木).
 //   Dùng --level all để chạy cả 6 cấp (kèm --limit 100000 --apply khi đã duyệt mẫu).
 import { createClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { createDeployChat, DEPLOY_DEFAULT_MODEL } from "@/lib/analysis/deploy-chat";
 import { HSK1_GLOSS_OVERRIDES } from "@/lib/courses/hsk1-gloss-overrides";
 import { buildForgeData } from "@/lib/games/load-radical-recipes";
+import { RADICAL_NAMES } from "@/lib/games/radical-names";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { buildHskRows, HSK_LEVELS } from "@/lib/tools/build-hsk-rows";
 import { buildHskGlossPrompt, HSK_GLOSS_SYSTEM, parseHskGlosses, readingCandidates, type HskGloss, type HskGlossInput } from "@/lib/tools/hsk-gloss";
@@ -72,7 +73,9 @@ async function glossBatch(items: HskGlossInput[]): Promise<{ glosses: Record<str
 /** Các chữ của game Ghép bộ thủ chưa có nghĩa Việt (chữ ghép ra không phải chữ HSK có nghĩa Việt), kèm cách đọc ứng viên từ từ điển. */
 async function loadForgeChars(): Promise<HskGlossInput[]> {
   const data = await buildForgeData(loadHskRowsUncached);
-  const chars = [...new Set(data.recipes.map((r) => r.out))].filter((c) => !data.info[c] || data.info[c].meaningLang === "en");
+  // Cả chữ ghép ra lẫn các mảnh (bộ ban đầu, hai mảnh của công thức); bộ thủ đã có tên Việt viết tay (RADICAL_NAMES) thì bỏ qua.
+  const all = new Set([...data.start, ...data.recipes.flatMap((r) => [r.a, r.b, r.out])]);
+  const chars = [...all].filter((c) => !RADICAL_NAMES[c] && (!data.info[c] || data.info[c].meaningLang === "en"));
   const entries = await lookupWords(sb as never, chars);
   return chars.flatMap((c) => (entries.get(c)?.length ? [{ term: c, candidates: readingCandidates(entries.get(c)!) }] : []));
 }
