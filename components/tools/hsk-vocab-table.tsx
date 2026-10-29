@@ -16,6 +16,7 @@ const fold = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/
 export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }) {
   const [query, setQuery] = useState("");
   const [hideKnown, setHideKnown] = useState(false);
+  const [showEnglish, setShowEnglish] = useState(false);
   const { known: legacyKnown, toggle: toggleLegacy } = useKnownWords();
   const { state: learner, toggleSaved, markKnown, unmarkKnown } = useLearnerState();
   // "Đã biết" dùng chung danh sách của app (Khám phá, xem trước bài); kho riêng cũ của trang này vẫn được đọc để không mất dấu cũ.
@@ -83,6 +84,7 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 print:hidden">
         <p role="status" className="text-label-md text-on-surface-variant">{q || hideKnown ? `${shown.length}/${rows.length} từ hiển thị` : `${rows.length} từ`} · Đã biết {knownHere}/{rows.length}</p>
         <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface"><input type="checkbox" className="h-5 w-5 accent-[var(--color-primary)]" checked={hideKnown} onChange={(e) => setHideKnown(e.target.checked)} />Ẩn từ đã biết</label>
+        <label className="flex min-h-11 items-center gap-2 text-label-md text-on-surface"><input type="checkbox" className="h-5 w-5 accent-[var(--color-primary)]" checked={showEnglish} onChange={(e) => setShowEnglish(e.target.checked)} />Hiện nghĩa tiếng Anh</label>
       </div>
       <div className="h-2 w-full overflow-hidden rounded-full bg-surface-container-high print:hidden" role="progressbar" aria-label="Tiến độ từ đã biết" aria-valuemin={0} aria-valuemax={rows.length} aria-valuenow={knownHere}><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${rows.length ? (100 * knownHere) / rows.length : 0}%` }} /></div>
       <div className="overflow-x-auto rounded-2xl bg-surface-container-lowest shadow-[0_1px_10px_rgba(30,26,22,0.06)]">
@@ -98,7 +100,7 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
                 <td className="px-4 py-3"><span className="flex items-center gap-2"><span lang="zh" className="font-serif text-headline-md leading-tight text-on-surface">{r.word}</span><PronounceButton text={r.word} className="size-9" /></span><span className="block text-label-md text-primary">{r.pinyin}</span></td>
                 <td className="px-4 py-3 text-body-md font-medium uppercase tracking-wide text-on-surface">{r.sinoViet ?? <span className="font-normal text-on-surface-variant">—</span>}</td>
                 <td className="px-4 py-3 text-body-md text-on-surface-variant">
-                  {r.meaningVi ? <><span className="font-medium text-on-surface">{r.meaningVi}</span><span lang="en" className="block text-label-md">{r.meanings.join("; ")}</span></> : <span lang="en">{r.meanings.join("; ")}</span>}
+                  {r.meaningVi ? <><span className="font-medium text-on-surface">{r.meaningVi}</span>{showEnglish && <span lang="en" className="block text-label-md">{r.meanings.join("; ")}</span>}</> : <span lang="en">{r.meanings.join("; ")}</span>}
                 </td>
                 <td className="px-3 py-3"><CardButton word={r.word} card={cardFor(r)} saved={savedByKey.get(itemKey({ type: "vocab", term: r.word })) ?? null} onToggle={toggleSaved} /></td>
               </tr>
