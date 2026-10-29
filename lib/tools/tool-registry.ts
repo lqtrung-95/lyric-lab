@@ -138,6 +138,15 @@ export const TOOLS: readonly ToolEntry[] = [
     keywords: ["thang", "ngay thang", "nam", "date", "month", "yuehao"],
   },
   {
+    href: "/ten-tieng-trung",
+    title: "Tên tiếng Trung của bạn",
+    description: "Nhập tên Việt, nhận tên chữ Hán gợi ý theo âm Hán Việt kèm pinyin, nghĩa từng chữ và thẻ ảnh để khoe.",
+    icon: "person",
+    category: "everyday",
+    popular: true,
+    keywords: ["ten", "ten tieng trung", "doi ten", "ten han", "ho", "nguyen", "han viet", "name"],
+  },
+  {
     href: "/cam-on-tieng-trung",
     title: "Cảm ơn trong tiếng Trung",
     description: "谢谢 và 10 cách nói cảm ơn khác, cách đáp lại (不客气…), có nghe, nghĩa tiếng Việt và quiz.",
