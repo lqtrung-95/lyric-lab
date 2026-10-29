@@ -12,6 +12,7 @@ function withWave(extra: Partial<SquadronState> = {}): SquadronState {
   const w = makeWave(POOL, seq([0.9, 0.1, 0.3, 0.6]), 0, "", 1)!;
   return { ...initSquadron(), question: w.question, enemies: w.enemies.map((e) => ({ ...e, y: 0.3 })), nextId: w.nextId, asked: 1, fire: 99, waveGap: 9, ...extra };
 }
+const withMistakeSetup = () => withWave({ combo: 4, score: 500 });
 const correct = (s: SquadronState): Enemy => s.enemies.find((e) => e.correct)!;
 /** Đặt đạn ngay trên máy bay để lượt tiếp theo chắc chắn trúng. */
 const aim = (s: SquadronState, e: Enemy): SquadronState => ({ ...s, bullets: [{ id: 999, x: e.x, y: e.y + 0.05, vx: 0 }] });
@@ -41,12 +42,30 @@ describe("chơi", () => {
     expect(s.kills).toBe(1); expect(s.combo).toBe(1); expect(s.score).toBe(100);
     expect(s.enemies).toHaveLength(0); expect(s.question).toBeNull();
   });
-  it("bắn nhầm: mất combo, đếm lỗi, không mất mạng", () => {
-    const s0 = withWave({ combo: 4 });
+  it("bắn nhầm: trừ điểm, mất combo, chỉ đáp án đúng, chưa mất mạng", () => {
+    const s0 = withMistakeSetup();
     const wrong = s0.enemies.find((e) => !e.correct)!;
     const s = stepSquadron(aim(s0, wrong), 0.01, still, POOL, Math.random);
-    expect(s.combo).toBe(0); expect(s.wrong).toBe(1); expect(s.lives).toBe(3);
+    expect(s.combo).toBe(0); expect(s.wrong).toBe(1); expect(s.lives).toBe(3); expect(s.strikes).toBe(1);
+    expect(s.score).toBe(450); expect(s.revealLeft).toBeGreaterThan(2);
     expect(s.missed.map((m) => m.han)).toContain(s.question!.answer.han);
+  });
+  it("điểm không âm khi bị trừ", () => {
+    const s0 = withWave({ score: 20 });
+    expect(stepSquadron(aim(s0, s0.enemies.find((e) => !e.correct)!), 0.01, still, POOL, Math.random).score).toBe(0);
+  });
+  it("nhầm ba lần trong một đợt thì mất một mạng; khiên đỡ; sang đợt mới thì đếm lại", () => {
+    const run = (extra: Partial<SquadronState>) => {
+      let s = withWave(extra);
+      for (const w of s.enemies.filter((e) => !e.correct)) s = stepSquadron(aim(s, s.enemies.find((e) => e.id === w.id)!), 0.001, still, POOL, Math.random);
+      return s;
+    };
+    const lost = run({});
+    expect(lost.wrong).toBe(3); expect(lost.lives).toBe(2); expect(lost.strikes).toBe(0);
+    const shielded = run({ shield: true });
+    expect(shielded.lives).toBe(3); expect(shielded.shield).toBe(false);
+    const after = withWave({ strikes: 2 });
+    expect(stepSquadron(aim(after, correct(after)), 0.01, still, POOL, Math.random).strikes).toBe(0);
   });
   it("chữ đúng lọt xuống đáy: mất mạng, ghi từ sai; khiên đỡ thay", () => {
     const base = withWave();

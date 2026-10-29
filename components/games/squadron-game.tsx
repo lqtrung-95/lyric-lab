@@ -19,7 +19,7 @@ const FIRE_KEY = " ";
 
 /**
  * Phi đội: di chuột / kéo ngón tay (hoặc phím ←/→, A/D) để lái tàu và canh chữ; bấm chuột, chạm hoặc nhấn Space để bắn (giữ thì bắn liên tiếp). Mỗi đợt có một câu hỏi (nghĩa Việt hoặc pinyin) và bốn máy bay mang chữ Hán: bắn đúng chữ để ghi điểm,
- * bắn nhầm là mất combo, để chữ đúng lọt xuống hoặc va phải chữ sai là mất mạng. Combo nhiều thì có vật phẩm rơi (đạn ba, khiên, làm chậm); cứ năm đợt có một trùm nhiều máu.
+ * bắn nhầm bị trừ điểm và mất combo (nhầm 3 lần trong một đợt thì mất một mạng), để chữ đúng lọt xuống hoặc va phải chữ sai là mất mạng. Combo nhiều thì có vật phẩm rơi (đạn ba, khiên, làm chậm); cứ năm đợt có một trùm nhiều máu.
  */
 export function SquadronGame({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const [s, setS] = useState<SquadronState>(initSquadron);
@@ -77,6 +77,7 @@ export function SquadronGame({ words, onAgain }: { words: GameWord[]; onAgain: (
         <span className={chip}>🏆 {s.score}</span>
         <span className={chip}>Cấp {s.level}</span>
         <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join(" ")}</span>
+        <span className={chip} title="Nhầm 3 lần trong một đợt thì mất 1 mạng" aria-label={`${s.strikes} trên 3 lần nhầm`}>✗ {s.strikes}/3</span>
         {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-primary`}>🔥 ×{s.combo}</span>}
         {s.spread > 0 && <span className={chip}>{POWER_ICON.spread.icon} {Math.ceil(s.spread)}s</span>}
         {s.slow > 0 && <span className={chip}>{POWER_ICON.slow.icon} {Math.ceil(s.slow)}s</span>}
@@ -88,7 +89,7 @@ export function SquadronGame({ words, onAgain }: { words: GameWord[]; onAgain: (
         {!started && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 bg-black/60 px-6 text-center text-white">
             <p className="text-xl font-bold">Lái tàu, canh đúng máy bay rồi bắn</p>
-            <p className="max-w-sm text-sm text-white/80">Di chuột hoặc kéo ngón tay (cũng được ←/→, A/D) để lái. Bấm chuột, chạm hoặc nhấn Space để bắn, giữ thì bắn liên tiếp. Chỉ bắn chữ đúng theo đề bài, tránh chữ sai, đừng để chữ đúng lọt xuống.</p>
+            <p className="max-w-sm text-sm text-white/80">Di chuột hoặc kéo ngón tay (cũng được ←/→, A/D) để lái. Bấm chuột, chạm hoặc nhấn Space để bắn, giữ thì bắn liên tiếp. Chỉ bắn chữ đúng theo đề bài: bắn nhầm bị trừ điểm, nhầm 3 lần trong một đợt là mất 1 mạng. Đừng để chữ đúng lọt xuống.</p>
             <button type="button" onClick={() => setStarted(true)} className="min-h-12 rounded-full bg-cyan-400 px-8 text-base font-extrabold text-slate-900 hover:brightness-110">Cất cánh</button>
           </div>
         )}

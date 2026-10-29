@@ -1,6 +1,6 @@
 import type { GameWord } from "./game-word";
 import { makeWave } from "./squadron-wave";
-import { BOOM_SECONDS, ENEMY_H, LIVES, SHIP_Y, halfWidth, type Enemy, type PowerKind, type SquadronInput, type SquadronState } from "./squadron-types";
+import { BOOM_SECONDS, ENEMY_H, LIVES, REVEAL_SECONDS, SHIP_Y, STRIKES_PER_LIFE, WRONG_PENALTY, halfWidth, type Enemy, type PowerKind, type SquadronInput, type SquadronState } from "./squadron-types";
 
 const KILLS_PER_LEVEL = 4;
 const FIRE_GAP = 0.25;
@@ -16,7 +16,7 @@ export const fallSpeed = (level: number): number => Math.min(0.17, 0.07 + 0.009 
 
 export const initSquadron = (): SquadronState => ({
   shipX: 0.5, enemies: [], bullets: [], pickups: [], booms: [], question: null, asked: 0, lastHan: "", fire: 0, waveGap: 0.6, spread: 0, slow: 0, shield: false,
-  score: 0, combo: 0, bestCombo: 0, kills: 0, wrong: 0, lives: LIVES, level: 1, shake: 0, levelUp: 0, fired: 0, got: 0, missed: [], nextId: 1, over: false,
+  score: 0, combo: 0, bestCombo: 0, kills: 0, wrong: 0, lives: LIVES, level: 1, strikes: 0, revealLeft: 0, shake: 0, levelUp: 0, fired: 0, got: 0, missed: [], nextId: 1, over: false,
 });
 
 const boom = (s: SquadronState, x: number, y: number, points: number, good: boolean): void => { s.booms.push({ id: s.nextId++, x, y, age: 0, points, good }); };
@@ -29,12 +29,16 @@ function hurt(s: SquadronState): void {
   s.lives -= 1; s.shake = 0.5;
 }
 
-function endWave(s: SquadronState): void { s.question = null; s.waveGap = WAVE_GAP; }
+function endWave(s: SquadronState): void { s.question = null; s.waveGap = WAVE_GAP; s.strikes = 0; s.revealLeft = 0; }
 
+/** Bắn nhầm: máy bay sai nổ đỏ, trừ điểm, mất combo, chỉ ra đáp án đúng; nhầm đủ STRIKES_PER_LIFE lần trong một đợt thì mất một mạng (khiên đỡ được). */
 function wrongHit(s: SquadronState, e: Enemy): void {
-  boom(s, e.x, e.y, 0, false); removeEnemy(s, e);
-  s.combo = 0; s.wrong += 1; s.shake = 0.25;
+  const loss = Math.min(WRONG_PENALTY, s.score);
+  s.score -= loss;
+  boom(s, e.x, e.y, -loss, false); removeEnemy(s, e);
+  s.combo = 0; s.wrong += 1; s.shake = 0.25; s.revealLeft = REVEAL_SECONDS; s.strikes += 1;
   if (s.question) noteMissed(s, s.question.answer);
+  if (s.strikes >= STRIKES_PER_LIFE) { s.strikes = 0; hurt(s); }
 }
 
 function rightKill(s: SquadronState, e: Enemy, rng: () => number): void {
@@ -111,7 +115,7 @@ export function stepSquadron(state: SquadronState, dt: number, input: SquadronIn
     pickups: state.pickups.map((p) => ({ ...p, y: p.y + 0.2 * dt })),
     booms: state.booms.map((b) => ({ ...b, age: b.age + dt })).filter((b) => b.age < BOOM_SECONDS),
     missed: [...state.missed], fire: state.fire - dt, waveGap: state.waveGap - dt,
-    spread: Math.max(0, state.spread - dt), slow: Math.max(0, state.slow - dt), shake: Math.max(0, state.shake - dt), levelUp: Math.max(0, state.levelUp - dt),
+    revealLeft: Math.max(0, state.revealLeft - dt), spread: Math.max(0, state.spread - dt), slow: Math.max(0, state.slow - dt), shake: Math.max(0, state.shake - dt), levelUp: Math.max(0, state.levelUp - dt),
   };
   moveShip(s, dt, input);
   if (input.fire && s.fire <= 0) shoot(s);

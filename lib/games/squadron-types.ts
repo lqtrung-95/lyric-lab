@@ -16,6 +16,8 @@ export interface SquadronState {
   question: Question | null; asked: number; lastHan: string;
   fire: number; waveGap: number; spread: number; slow: number; shield: boolean;
   score: number; combo: number; bestCombo: number; kills: number; wrong: number; lives: number; level: number;
+  /** `strikes`: số lần bắn nhầm trong đợt hiện tại; `revealLeft`: giây còn lại làm nổi máy bay đáp án đúng sau khi bắn nhầm. */
+  strikes: number; revealLeft: number;
   shake: number; levelUp: number; fired: number; got: number;
   missed: GameWord[]; nextId: number; over: boolean;
 }
@@ -29,5 +31,9 @@ export const BOOM_SECONDS = 0.7;
 export const LIVES = 3;
 export const BOSS_EVERY = 5;
 export const BOSS_HP = 4;
+/** Điểm bị trừ mỗi lần bắn nhầm, số lần nhầm trong một đợt thì mất một mạng, và thời gian chỉ đáp án đúng. */
+export const WRONG_PENALTY = 50;
+export const STRIKES_PER_LIFE = 3;
+export const REVEAL_SECONDS = 2.5;
 /** Nửa bề ngang vùng trúng đạn của một máy bay (theo bề ngang sân); trùm to hơn. */
 export const halfWidth = (e: Pick<Enemy, "boss">): number => (e.boss ? 0.12 : 0.085);
