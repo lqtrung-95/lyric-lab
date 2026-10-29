@@ -14,6 +14,7 @@ import { useReviewSummary } from "@/components/review/use-review-summary";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { PetSnapshot } from "@/lib/pet/pet-reaction";
 import { reviewWordLabel, type PetReviewWord } from "@/lib/pet/pet-review-word";
+import { PetFeed } from "./pet-feed";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
 
@@ -30,6 +31,8 @@ export function PetCard() {
   const game = useGameSummary();
   const streak = useStreak();
   const review = useReviewSummary();
+  const [feeding, setFeeding] = useState(false);
+  const [chewKey, setChewKey] = useState(0);
   const growth = petGrowth(game?.xp.total ?? 0);
   // Gọi trước các lệnh return sớm để thứ tự hook không đổi giữa các lần vẽ.
   const evolved = usePetEvolution(growth.stage, game !== null && game !== undefined && pet != null);
@@ -45,7 +48,7 @@ export function PetCard() {
   const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
     <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} />
+      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} />
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
@@ -59,7 +62,11 @@ export function PetCard() {
           </div>
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
+        {!feeding && (review?.total ?? 0) > 0 && (
+          <Button3d type="button" variant="bright" className="mt-space-sm" onClick={() => setFeeding(true)}>Cho {pet.name} ăn thẻ</Button3d>
+        )}
       </div>
+      {feeding && <PetFeed name={pet.name} onEat={() => setChewKey((k) => k + 1)} onClose={() => setFeeding(false)} />}
     </section>
   );
 }
@@ -96,12 +103,12 @@ function AdoptPet({ onAdopt }: { onAdopt: (species: PetSpecies, name: string) =>
 const NO_WORDS: PetReviewWord[] = [];
 const BUBBLE = "rounded-2xl border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold shadow-[0_2px_0_var(--shadow-ink)]";
 
-function PetTouch({ pet, stage, mood, accessories, words, snapshot }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; words: PetReviewWord[]; snapshot: PetSnapshot | null }) {
+function PetTouch({ pet, stage, mood, accessories, words, snapshot, chewKey }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; words: PetReviewWord[]; snapshot: PetSnapshot | null; chewKey: number }) {
   const { tapKey, bubble, tap } = usePetTalk(mood, pet.name, words, snapshot);
   return (
     <div className="relative shrink-0">
       <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="block rounded-full">
-        <PetSprite species={pet.species} stage={stage} mood={mood} accessories={accessories} tapKey={tapKey} className="size-28" />
+        <PetSprite species={pet.species} stage={stage} mood={mood} accessories={accessories} tapKey={tapKey} chewKey={chewKey} className="size-28" />
       </button>
       <SoundToggle className="absolute -bottom-1 -right-2 flex size-11 items-center justify-center rounded-full text-lg hover:bg-surface-container" />
       <div aria-live="polite" className={bubble ? "absolute -top-4 left-2 z-10 w-max max-w-[11rem]" : "sr-only"}>
