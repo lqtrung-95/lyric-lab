@@ -13,6 +13,7 @@ import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import type { ClozeCandidate } from "./cloze-questions";
 import { ClozeLine } from "./cloze-line";
+import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { PracticeSummary } from "./practice-summary";
 import { playSfx } from "@/lib/feedback/sfx";
 
@@ -83,6 +84,7 @@ export function ClozeGame({ candidates, poolTerms, grade, onRoundEnd }: Props) {
   if (finished) {
     return (
       <PracticeSummary
+        xp={practiceRoundXp(correct, questions.length)}
         title="Xong lượt điền lời"
         stats={[{ label: "Điểm", value: String(score) }, { label: "Đúng", value: `${correct}/${questions.length}` }]}
         missed={missed.map((c) => ({ key: c.item_key, term: c.term, pinyin: c.pinyin, meaning: c.meaning }))}
