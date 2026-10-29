@@ -1,9 +1,12 @@
 import type { PetMood, PetSpecies, PetStage } from "@/lib/pet/pet-logic";
+import { Cat } from "./pet-art-cat";
+import { Dog } from "./pet-art-dog";
 import { Dragon } from "./pet-art-dragon";
+import { Owl } from "./pet-art-owl";
 import { Panda } from "./pet-art-panda";
 
-/** Loài đã có hình. Hình phẳng kiểu hoạt hình: không viền, màu tươi, mắt to có chấm sáng. Các loài khác (mèo, cún, cú) chờ duyệt phong cách rồi mới vẽ. */
-export const PET_SPECIES_READY: readonly PetSpecies[] = ["dragon", "panda"];
+/** Loài đã có hình. Hình phẳng kiểu hoạt hình: không viền, màu tươi, mắt to có chấm sáng. */
+export const PET_SPECIES_READY: readonly PetSpecies[] = ["dragon", "panda", "cat", "dog", "owl"];
 
 /**
  * Hoạt ảnh của linh vật (CSS thuần). Nằm trong `prefers-reduced-motion: no-preference`: người chọn giảm chuyển động thấy hình tĩnh.
@@ -43,6 +46,9 @@ export function PetSprite({ species, stage, mood, className = "size-28" }: { spe
         <g className={`pet-body pet-body-${mood}`}>
           {species === "dragon" && <Dragon stage={stage} mood={mood} />}
           {species === "panda" && <Panda stage={stage} mood={mood} />}
+          {species === "cat" && <Cat stage={stage} mood={mood} />}
+          {species === "dog" && <Dog stage={stage} mood={mood} />}
+          {species === "owl" && <Owl stage={stage} mood={mood} />}
         </g>
       </svg>
     </>
