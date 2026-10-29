@@ -10,6 +10,9 @@ import { PET_NAME_MAX, PET_SPECIES_LABELS, cleanPetName, daysSinceStudy, petGrow
 import { dailyGoalProgress } from "@/lib/streak/daily-goal";
 import { PET_SPECIES_READY, PetSprite } from "./pet-sprite";
 import { usePet } from "./use-pet";
+import { useReviewSummary } from "@/components/review/use-review-summary";
+import { playChinese } from "@/lib/speech/play-chinese";
+import { reviewWordLabel, type PetReviewWord } from "@/lib/pet/pet-review-word";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
 
@@ -25,6 +28,7 @@ export function PetCard() {
   const { pet, adopt } = usePet();
   const game = useGameSummary();
   const streak = useStreak();
+  const review = useReviewSummary();
   const growth = petGrowth(game?.xp.total ?? 0);
   // Gọi trước các lệnh return sớm để thứ tự hook không đổi giữa các lần vẽ.
   const evolved = usePetEvolution(growth.stage, game !== null && game !== undefined && pet != null);
@@ -37,7 +41,7 @@ export function PetCard() {
   const accessories = unlockedAccessories(streak?.longest ?? 0);
   return (
     <section aria-labelledby="pet-heading" className="card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} />
+      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} />
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
@@ -85,15 +89,27 @@ function AdoptPet({ onAdopt }: { onAdopt: (species: PetSpecies, name: string) =>
 }
 
 /** Hình pet có thể chạm: là `<button>` thật (vùng bấm lớn), có nhãn cho trình đọc màn hình; bóng thoại đọc to bằng aria-live; có công tắc tiếng. */
-function PetTouch({ pet, stage, mood, accessories }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[] }) {
-  const { tapKey, bubble, tap } = usePetTalk(mood, pet.name);
+const NO_WORDS: PetReviewWord[] = [];
+const BUBBLE = "rounded-2xl border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold shadow-[0_2px_0_var(--shadow-ink)]";
+
+function PetTouch({ pet, stage, mood, accessories, words }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; words: PetReviewWord[] }) {
+  const { tapKey, bubble, tap } = usePetTalk(mood, pet.name, words);
   return (
     <div className="relative shrink-0">
       <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="block rounded-full">
         <PetSprite species={pet.species} stage={stage} mood={mood} accessories={accessories} tapKey={tapKey} className="size-28" />
       </button>
       <SoundToggle className="absolute -bottom-1 -right-2 flex size-11 items-center justify-center rounded-full text-lg hover:bg-surface-container" />
-      <p aria-live="polite" className={bubble ? "absolute -top-4 left-2 z-10 w-max max-w-[11rem] rounded-2xl border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold shadow-[0_2px_0_var(--shadow-ink)]" : "sr-only"}>{bubble}</p>
+      <div aria-live="polite" className={bubble ? "absolute -top-4 left-2 z-10 w-max max-w-[11rem]" : "sr-only"}>
+        {bubble?.kind === "line" && <p className={BUBBLE}>{bubble.text}</p>}
+        {bubble?.kind === "word" && (
+          <button type="button" onClick={() => void playChinese(bubble.word.term)} aria-label={reviewWordLabel(bubble.word)} className={`${BUBBLE} min-h-11 text-left`}>
+            <span lang="zh" className="font-serif text-lg">{bubble.word.term}</span>
+            {bubble.word.pinyin && <span className="ml-1 text-primary">{bubble.word.pinyin}</span>}
+            <span className="block font-medium">{bubble.word.meaning}</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 }
