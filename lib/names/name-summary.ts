@@ -49,13 +49,14 @@ export function fallbackSummary(parts: readonly NamePart[]): string | null {
   return `${list.charAt(0).toLocaleUpperCase("vi")}${list.slice(1)}`;
 }
 
-export async function summarizeName(parts: readonly NamePart[], chat: ChatFn, models: readonly string[]): Promise<{ text: string; ai: boolean } | null> {
+export async function summarizeName(parts: readonly NamePart[], chat: ChatFn, models: readonly string[], onError?: (model: string, message: string) => void): Promise<{ text: string; ai: boolean; model?: string } | null> {
   if (meaningfulParts(parts).length === 0) return null;
   for (const model of models) {
     try {
       const s = parseSummary(await chat({ model, system: SUMMARY_SYSTEM_PROMPT, user: buildSummaryUser(parts), maxTokens: 200 }));
-      if (s) return { text: s, ai: true };
-    } catch { /* thử model kế tiếp */ }
+      if (s) return { text: s, ai: true, model };
+      onError?.(model, "câu bị loại (sai dạng hoặc dùng lối cấm)");
+    } catch (e) { onError?.(model, e instanceof Error ? e.message : String(e)); /* thử model kế tiếp */ }
   }
   const f = fallbackSummary(parts);
   return f ? { text: f, ai: false } : null;

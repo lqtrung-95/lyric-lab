@@ -31,26 +31,32 @@ export async function POST(request: Request) {
     return { ...p, pinyin: entry?.pinyin ?? null };
   }));
   const han = joinHan(parts);
-  const summary = han ? await summaryFor(request, han, parts) : null;
-  return Response.json({ parts: withPinyin, han, pinyin: withPinyin.every((p) => p.pinyin) ? withPinyin.map((p) => p.pinyin).join(" ") : null, summary }, { headers: { "Cache-Control": "no-store" } });
+  const summary = han ? await summaryFor(request, han, parts) : { text: null, source: "none" };
+  return Response.json({ parts: withPinyin, han, pinyin: withPinyin.every((p) => p.pinyin) ? withPinyin.map((p) => p.pinyin).join(" ") : null, summary: summary.text, summarySource: summary.source }, { headers: { "Cache-Control": "no-store" } });
 }
 
-/** Một câu tóm tắt ý nghĩa cả tên. Có cache theo chữ Hán; hết lượt theo IP, quá thời gian hoặc model lỗi thì dùng câu ghép nghĩa dự phòng (luôn có chữ để hiện). */
-async function summaryFor(request: Request, han: string, parts: ReturnType<typeof convertName>): Promise<string | null> {
+/** Nguồn của câu tóm tắt để chẩn đoán (không chứa dữ liệu người dùng): model đã trả lời, bộ nhớ đệm, hoặc lý do dùng câu dự phòng. */
+interface Summary { text: string | null; source: string }
+
+/**
+ * Một câu tóm tắt ý nghĩa cả tên. Có cache theo chữ Hán; hết lượt theo IP, quá thời gian hoặc model lỗi thì dùng câu liệt kê nghĩa dự phòng (luôn có chữ để hiện).
+ * Lỗi từng model được ghi log có cấu trúc (chỉ tên model và thông báo lỗi đã cắt ngắn, không có khóa hay tên người dùng) để xem trên Vercel.
+ */
+async function summaryFor(request: Request, han: string, parts: ReturnType<typeof convertName>): Promise<Summary> {
   const cached = summaryCache.get(han);
-  if (cached) return cached;
+  if (cached) return { text: cached, source: "cache" };
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (!ipLimiter.tryConsume(ip)) return fallbackSummary(parts);
+  if (!ipLimiter.tryConsume(ip)) return { text: fallbackSummary(parts), source: "fallback:rate_limited" };
   try {
     const env = getServerEnv();
     const out = await Promise.race([
-      summarizeName(parts, createChat(env), nameSummaryModels(env)),
+      summarizeName(parts, createChat(env), nameSummaryModels(env), (model, message) => console.error(JSON.stringify({ event: "name_summary_model_error", model, message: message.slice(0, 160) }))),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), SUMMARY_TIMEOUT_MS)),
     ]);
-    if (!out) return fallbackSummary(parts);
+    if (!out) { console.error(JSON.stringify({ event: "name_summary_timeout", ms: SUMMARY_TIMEOUT_MS })); return { text: fallbackSummary(parts), source: "fallback:timeout" }; }
     if (out.ai) { if (summaryCache.size >= SUMMARY_CACHE_MAX) summaryCache.clear(); summaryCache.set(han, out.text); }
-    return out.text;
+    return { text: out.text, source: out.ai ? `ai:${out.model}` : "fallback:no_model" };
   } catch {
-    return fallbackSummary(parts);
+    return { text: fallbackSummary(parts), source: "fallback:error" };
   }
 }

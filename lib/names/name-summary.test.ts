@@ -31,7 +31,9 @@ describe("name summary", () => {
   it("model lỗi thì thử model sau rồi rơi về câu dự phòng", async () => {
     let calls = 0;
     const chat = async () => { calls++; if (calls === 1) throw new Error("x"); return '{"summary":"Một người trung thành với quê hương."}'; };
-    expect(await summarizeName(parts, chat, ["a", "b"])).toEqual({ text: "Một người trung thành với quê hương.", ai: true });
+    const errors: string[] = [];
+    expect(await summarizeName(parts, chat, ["a", "b"], (m, msg) => errors.push(`${m}:${msg}`))).toEqual({ text: "Một người trung thành với quê hương.", ai: true, model: "b" });
+    expect(errors).toEqual(["a:x"]);
     expect(await summarizeName(parts, async () => { throw new Error("x"); }, ["a"])).toEqual({ text: fallbackSummary(parts), ai: false });
   });
 });
