@@ -283,3 +283,4 @@ Nhiều dạng câu, thiết kế chống đoán mò/loại trừ (2026-10-29): 
 Không có bảng mới: dấu hộ chiếu và danh hiệu luôn TÍNH LẠI từ tiến độ khám phá (`songhanzi-explore-v1` + `user_explore_state` đã đồng bộ) bằng `lib/explore/passport.ts`; cầu nối bài hát → cảnh tính ở trình duyệt bằng `lib/explore/song-scenes.ts` trên từ của bài đã có (không gọi AI, không thêm API). Cả hai chỉ đọc, nên "Học lại từ đầu" của một cảnh tự hạ dấu của cảnh đó.
 
 - **Bắn chữ / Phi đội**: engine thuần (`lib/games/squadron-engine.ts`, `squadron-wave.ts`) bước theo `dt` do `useGameLoop` cấp; điều khiển (phím + con trỏ) đọc từ ref rồi truyền vào `stepSquadron`; không có state ngoài client, XP ghi qua `useArcadeScore("blaster")`.
+- **Pet thủ thành**: engine thuần `lib/games/tower-engine.ts` (+ `tone-options.ts` sinh lựa chọn khác thanh) bước theo `dt`; thông tin pet lấy từ `usePetView`, kỷ lục qua `useLocalJson`; không gọi máy chủ, không ghi XP.
