@@ -42,6 +42,23 @@ function TappableLine({ m, showPinyin, onWord, active }: { m: Msg; showPinyin: b
   );
 }
 
+/**
+ * AI đang nghĩ: bong bóng có ba chấm nhún nhảy (như đang gõ) để người học thấy hệ thống đang làm việc chứ không treo. Hoạt ảnh chỉ chạy khi người dùng không chọn giảm chuyển động;
+ * chữ cho trình đọc màn hình luôn có (`role=status`).
+ */
+function ThinkingBubble({ said }: { said: string }) {
+  return (
+    <div role="status" className="flex flex-col gap-1">
+      <style>{`@media (prefers-reduced-motion: no-preference) { @keyframes think-dot { 0%,80%,100% { transform: translateY(0); opacity: .45 } 40% { transform: translateY(-6px); opacity: 1 } } .think-dot { animation: think-dot 1.1s ease-in-out infinite } }`}</style>
+      <p className="text-body-md text-on-surface-variant">Bạn nói: <span lang="zh-Hans" className="font-bold">{said}</span></p>
+      <div className="flex w-fit items-center gap-1.5 rounded-2xl rounded-bl-sm border-2 border-ink bg-surface-container-lowest px-4 py-3 shadow-[0_2px_0_var(--shadow-ink)]">
+        {[0, 0.18, 0.36].map((d) => <span key={d} aria-hidden="true" className="think-dot size-2.5 rounded-full bg-primary" style={{ animationDelay: `${d}s` }} />)}
+        <span className="sr-only">AI đang nghĩ…</span>
+      </div>
+    </div>
+  );
+}
+
 function Bubble({ m, showPinyin, onWord, active }: { m: Msg; showPinyin: boolean; onWord?: (term: string) => void; active?: string | null }) {
   const ai = m.role === "ai";
   const tappable = ai && onWord && m.tokens && m.tokens.length > 0;
@@ -155,7 +172,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
       </div>
       <ul className="flex flex-col gap-2" aria-live="polite">{s.msgs.map((m) => <Bubble key={m.id} m={m} showPinyin={showPinyin} onWord={setTapped} active={tapped} />)}</ul>
       {tapped && <WordTapPanel key={tapped} term={tapped} onLooked={onLooked} onClose={() => setTapped(null)} />}
-      {s.pending && s.status === "thinking" && <p role="status" className="text-body-md text-on-surface-variant">Bạn nói: <span lang="zh-Hans" className="font-bold">{s.pending}</span>. AI đang nghĩ…</p>}
+      {s.pending && s.status === "thinking" && <ThinkingBubble said={s.pending} />}
       {s.error && <p role="alert" className="text-center text-body-md text-error">{ERROR_TEXT[s.error]}{s.error === "failed" && s.pending && <> <button type="button" onClick={s.retry} className="ml-1 min-h-11 font-bold underline">Thử lại</button></>}</p>}
       {typingNow && !(s.error === "rate_limited" || s.error === "account_required") && (
         <>

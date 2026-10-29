@@ -13,6 +13,12 @@ const LEVEL_RULE: Record<number, string> = {
   4: "HSK 4: từ vựng HSK 1-4, câu 10-20 chữ, ngữ pháp thông dụng, tự nhiên như người bản xứ nói chuyện hằng ngày",
 };
 
+/** Giọng đanh đá cho linh vật: chê thẳng và trêu vui, nhưng không xúc phạm. Áp cho cả lời đáp (replyVi) lẫn lời sửa (issue). */
+const SASSY_RULE =
+  "GIỌNG ĐIỆU: bạn đanh đá, hay cà khịa và trêu người học như một người bạn thân tinh nghịch, nhưng luôn vui vẻ và đáng yêu (có thể dùng 'hứ', 'trời ơi', 'haizz'). " +
+  "Khi người học nói sai hoặc dùng từ chưa tự nhiên (kể cả lỗi nhỏ về từ dùng hay trật tự từ) thì PHẢI trả feedback: 'issue' nói thẳng và trêu một câu ngắn bằng tiếng Việt rồi chỉ ra lỗi, 'better' là câu đúng. Nói đúng thì khen ngắn kiểu miễn cưỡng, không cần feedback. " +
+  "Tuyệt đối không xúc phạm cá nhân, không chê ngoại hình, gia đình, giới tính hay chuyện nhạy cảm, không tục. ";
+
 /** Prompt một lượt trò chuyện: vai AI, trình độ, lịch sử hội thoại và câu vừa nói của người học. */
 export function buildRoleplayPrompt(s: Scenario, req: RoleplayRequest): string {
   const talk = req.history.map((l) => `${l.role === "ai" ? "AI" : "Người học"}: ${l.zh}`).join("\n");
@@ -24,5 +30,6 @@ export function buildRoleplayPrompt(s: Scenario, req: RoleplayRequest): string {
     "replyVi: nghĩa tiếng Việt của reply. " +
     "tips: 0-2 câu mẫu ngắn (chữ Hán, đúng trình độ) mà người học có thể nói tiếp, chỉ gợi ý khi câu của bạn đặt ra một câu hỏi. " +
     'feedback: null nếu câu người học đúng và tự nhiên; chỉ khi có lỗi ngữ pháp/từ dùng không tự nhiên rõ ràng mới trả {"issue": "giải thích ngắn bằng tiếng Việt (1 câu)", "better": "câu sửa lại bằng chữ Hán"}. ' +
-    "Không sửa lỗi nhỏ về dấu câu hay cách nói thân mật. Không dùng pinyin, không dùng ngôn ngữ nào khác ngoài chữ Hán và tiếng Việt.";
+    (s.sassy ? SASSY_RULE : "Không sửa lỗi nhỏ về dấu câu hay cách nói thân mật. ") +
+    "Không dùng pinyin, không dùng ngôn ngữ nào khác ngoài chữ Hán và tiếng Việt.";
 }

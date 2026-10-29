@@ -10,6 +10,8 @@ export interface Scenario {
   opening: { zh: string; vi: string };
   /** Không hiện ở màn chọn tình huống chung (dùng riêng, ví dụ trò chuyện với linh vật). */
   hidden?: boolean;
+  /** Giọng và mức nhận xét riêng (ví dụ linh vật đanh đá): thêm vào prompt, kèm cho phép sửa cả lỗi nhỏ. */
+  sassy?: boolean;
 }
 
 export const SCENARIOS: Scenario[] = [
@@ -24,7 +26,7 @@ export const SCENARIOS: Scenario[] = [
   { id: "weekend", emoji: "🎬", title: "Hẹn bạn cuối tuần", aiRole: "một người bạn đang rủ đi chơi cuối tuần", goal: "Rủ/nhận lời, chọn việc làm, hẹn giờ và địa điểm", opening: { zh: "喂，这个周末你有空吗？我们一起出去玩吧！", vi: "Alo, cuối tuần này bạn rảnh không? Mình đi chơi nhé!" } },
   { id: "work", emoji: "💼", title: "Nói chuyện với đồng nghiệp", aiRole: "đồng nghiệp thân thiện giờ nghỉ trưa", goal: "Kể về công việc hôm nay, hỏi thăm, rủ đi ăn trưa", opening: { zh: "中午了，你今天忙不忙？", vi: "Trưa rồi, hôm nay bạn có bận không?" } },
   // Dùng riêng cho khung "Nói chuyện với pet" ở trang chủ. Tên pet do giao diện thêm, server không biết. An toàn: chỉ chuyện học tập/đời thường nhẹ nhàng.
-  { id: "pet", emoji: "🐾", title: "Trò chuyện với linh vật", hidden: true, aiRole: "một linh vật nhỏ đáng yêu đang học tiếng Trung cùng người học, nói rất ngắn và đơn giản, giọng dễ thương, khích lệ, hay hỏi về một ngày của người học, những điều thú vị và sở thích nhẹ nhàng (đôi khi nhắc việc học); nếu người học nói chuyện nhạy cảm hoặc không phù hợp thì nhẹ nhàng đổi chủ đề về việc học", goal: "Kể hôm nay của bạn thế nào, vài điều thú vị, sở thích; hỏi lại bạn nhỏ", opening: { zh: "嗨！今天过得怎么样？跟我说说有趣的事吧！", vi: "Chào! Hôm nay của bạn thế nào? Kể cho mình nghe vài điều thú vị nhé!" } },
+  { id: "pet", emoji: "🐾", title: "Trò chuyện với linh vật", hidden: true, sassy: true, aiRole: "một linh vật nhỏ tinh nghịch, hơi đanh đá và hay cà khịa đáng yêu, đang học tiếng Trung cùng người học, nói rất ngắn và đơn giản, hay hỏi về một ngày của người học, những điều thú vị và sở thích nhẹ nhàng (đôi khi nhắc việc học); nếu người học nói chuyện nhạy cảm hoặc không phù hợp thì nhẹ nhàng đổi chủ đề về việc học", goal: "Kể hôm nay của bạn thế nào, vài điều thú vị, sở thích; hỏi lại bạn nhỏ", opening: { zh: "嗨！今天过得怎么样？跟我说说有趣的事吧！", vi: "Chào! Hôm nay của bạn thế nào? Kể cho mình nghe vài điều thú vị nhé!" } },
 ];
 
 export const SCENARIO_IDS = SCENARIOS.map((s) => s.id);
