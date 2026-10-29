@@ -66,45 +66,45 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
     setNow(Date.now());
   }, [cases]);
 
-  const tabCls = (on: boolean) => `min-h-11 flex-1 rounded-full px-4 text-label-md font-extrabold transition-colors ${on ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:bg-surface-container-high"}`;
+  const tabCls = (on: boolean) => `min-h-11 flex-1 whitespace-nowrap rounded-full px-1 text-[13px] sm:px-4 sm:text-label-md font-extrabold transition-colors ${on ? "bg-primary-container text-on-primary-container" : "text-on-surface-variant hover:bg-surface-container-high"}`;
   const card = "card-ink group flex h-full flex-col overflow-hidden transition-transform hover:-translate-y-0.5";
 
   return (
     <div className="flex flex-col gap-space-md">
-      <div role="tablist" aria-label="Khám phá" className="flex gap-1 rounded-full border-2 border-ink bg-surface-container-lowest p-1">
+      <div role="tablist" aria-label="Khám phá" className="flex gap-0.5 overflow-x-auto sm:gap-1 rounded-full border-2 border-ink bg-surface-container-lowest p-1">
         <button type="button" role="tab" aria-selected={tab === "map"} onClick={() => setTab("map")} className={tabCls(tab === "map")}>Bản đồ</button>
         <button type="button" role="tab" aria-selected={tab === "passport"} onClick={() => setTab("passport")} className={tabCls(tab === "passport")}>Hộ chiếu</button>
         <button type="button" role="tab" aria-selected={tab === "journeys"} onClick={() => setTab("journeys")} className={tabCls(tab === "journeys")}>Hành trình</button>
-        <button type="button" role="tab" aria-selected={tab === "cases"} onClick={() => setTab("cases")} className={tabCls(tab === "cases")}>Phá án ({cases.length})</button>
-        <button type="button" role="tab" aria-selected={tab === "scenes"} onClick={() => setTab("scenes")} className={tabCls(tab === "scenes")}>Học từ theo cảnh ({Object.keys(SCENES).length})</button>
+        <button type="button" role="tab" aria-selected={tab === "cases"} onClick={() => setTab("cases")} className={tabCls(tab === "cases")}>Phá án<span className="hidden sm:inline"> ({cases.length})</span></button>
+        <button type="button" role="tab" aria-selected={tab === "scenes"} onClick={() => setTab("scenes")} className={tabCls(tab === "scenes")}><span className="sm:hidden">Cảnh</span><span className="hidden sm:inline">Học từ theo cảnh</span><span className="hidden sm:inline"> ({Object.keys(SCENES).length})</span></button>
       </div>
 
-      <Link href="/explore/coop" className="card-ink flex items-center gap-space-sm bg-secondary-container p-space-sm text-on-secondary-container transition-transform hover:-translate-y-0.5">
+      <Link href="/explore/coop" className="card-ink flex flex-wrap items-center gap-space-sm bg-secondary-container p-space-sm text-on-secondary-container transition-transform hover:-translate-y-0.5">
         <span aria-hidden="true" className="text-3xl">🕵️‍♀️🕵️</span>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-[10rem] flex-1">
           <span className="block text-label-lg font-extrabold">Phá án cùng bạn</span>
           <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Manh mối là riêng: báo nhau bằng tiếng Trung rồi cùng buộc tội. Thưởng XP x1,5.</span>
         </span>
-        <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-secondary">Mời bạn</span>
+        <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full bg-surface-container-lowest px-4 text-label-md sm:w-auto font-extrabold text-secondary">Mời bạn</span>
       </Link>
 
-      <Link href="/dialogues" className="card-ink flex items-center gap-space-sm bg-tertiary-container p-space-sm text-on-tertiary-container transition-transform hover:-translate-y-0.5">
+      <Link href="/dialogues" className="card-ink flex flex-wrap items-center gap-space-sm bg-tertiary-container p-space-sm text-on-tertiary-container transition-transform hover:-translate-y-0.5">
         <span aria-hidden="true" className="text-3xl">💬</span>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-[10rem] flex-1">
           <span className="block text-label-lg font-extrabold">Hội thoại</span>
           <span className="block text-label-md">Nghe từng câu, xem pinyin, đóng vai một bên và ghi âm giọng bạn. Có bài dài cho mỗi cảnh.</span>
         </span>
-        <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-primary">Luyện nói</span>
+        <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full bg-surface-container-lowest px-4 text-label-md sm:w-auto font-extrabold text-primary">Luyện nói</span>
       </Link>
 
       {totalFading(fading) > 0 && (
-        <Link href={`/explore/${mostFadingScene(fading)}?rescue=1`} className="card-ink flex items-center gap-space-sm bg-primary-container p-space-sm text-on-primary-container transition-transform hover:-translate-y-0.5">
+        <Link href={`/explore/${mostFadingScene(fading)}?rescue=1`} className="card-ink flex flex-wrap items-center gap-space-sm bg-primary-container p-space-sm text-on-primary-container transition-transform hover:-translate-y-0.5">
           <span aria-hidden="true" className="anim-float text-3xl">👻</span>
-          <span className="min-w-0 flex-1">
+          <span className="min-w-[10rem] flex-1">
             <span className="block text-label-lg font-extrabold">{totalFading(fading)} từ đang phai ở {Object.keys(fading).length} cảnh</span>
             <span className="block text-label-md">Chạm để vào cảnh phai nhiều nhất và cứu chúng bằng một lượt nhiệm vụ ngắn.</span>
           </span>
-          <span className="shrink-0 rounded-full bg-surface-container-lowest px-3 py-1.5 text-label-md font-extrabold text-primary">Cứu ngay</span>
+          <span className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-full bg-surface-container-lowest px-4 text-label-md sm:w-auto font-extrabold text-primary">Cứu ngay</span>
         </Link>
       )}
 
