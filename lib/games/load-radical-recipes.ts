@@ -6,6 +6,7 @@ import { sinoVietForWord } from "@/lib/dictionary/sino-viet";
 import { cleanMeanings } from "@/lib/tools/build-hsk-rows";
 import type { HskLevel, HskRow } from "@/lib/tools/build-hsk-rows";
 import { getHskRows } from "@/lib/tools/hsk-vocab";
+import { RADICAL_NAMES } from "./radical-names";
 import { parsePair, pickStart, type Recipe } from "./radical-forge";
 
 /** `meaningLang` = "en" khi chưa có nghĩa Việt và tạm dùng nghĩa tiếng Anh của từ điển (giao diện gắn nhãn). */
@@ -73,9 +74,12 @@ export async function buildForgeData(getRows: (level: HskLevel) => Promise<HskRo
     todo = [...next].filter((c) => !known.has(c));
   }
   const picked = pickStart(recipes);
-  await fillMissingInfo([...new Set(picked.recipes.map((r) => r.out))].filter((c) => !info[c]), info);
+  // Mọi mảnh hiện ra (bộ ban đầu, hai mảnh của công thức, chữ đích) đều nên có pinyin: tra từ điển cho những mảnh chưa có, mảnh nào từ điển không có (bộ thủ như 亻 扌 艹) lấy từ bảng bộ thủ.
+  const pieces = new Set([...picked.start, ...picked.recipes.flatMap((r) => [r.a, r.b, r.out])]);
+  await fillMissingInfo([...pieces].filter((c) => !info[c]), info);
+  for (const c of pieces) if (!info[c] && RADICAL_NAMES[c]) info[c] = { pinyin: RADICAL_NAMES[c].pinyin, sinoViet: null, meaning: RADICAL_NAMES[c].meaning, meaningLang: "vi" };
   return { start: picked.start, recipes: picked.recipes, info };
 }
 
 /** Cache một ngày: dữ liệu từ điển ít đổi và phép dựng cần hàng chục truy vấn. */
-export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v6"], { revalidate: 86400 });
+export const loadRadicalRecipes = unstable_cache(() => buildForgeData(getHskRows), ["radical-forge-v7"], { revalidate: 86400 });
