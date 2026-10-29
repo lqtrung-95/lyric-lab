@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { GameWord } from "./game-word";
 import { fallSpeed, initSquadron, levelOf, stepSquadron } from "./squadron-engine";
 import { SHIP_Y, type Enemy, type SquadronState } from "./squadron-types";
-import { makeWave } from "./squadron-wave";
+import { confusability, makeWave } from "./squadron-wave";
 
 const POOL: GameWord[] = ["猫:māo:con mèo", "狗:gǒu:con chó", "鱼:yú:con cá", "鸟:niǎo:con chim", "水:shuǐ:nước", "火:huǒ:lửa", "山:shān:núi", "人:rén:người"].map((l) => { const [han, pinyin, meaning] = l.split(":"); return { han, pinyin, meaning }; });
 const still = { dir: 0 as const, targetX: null, fire: false };
@@ -90,8 +90,8 @@ describe("chơi", () => {
     s = stepSquadron(aim(s, correct(s)), 0.001, still, POOL, Math.random);
     expect(s.kills).toBe(1); expect(s.score).toBe(300);
   });
-  it("combo chia hết cho ba thả vật phẩm; nhặt vật phẩm có tác dụng", () => {
-    const s0 = withWave({ combo: 2 });
+  it("combo chia hết cho năm thả vật phẩm; nhặt vật phẩm có tác dụng", () => {
+    const s0 = withWave({ combo: 4 });
     const s1 = stepSquadron(aim(s0, correct(s0)), 0.01, still, POOL, () => 0);
     expect(s1.pickups).toHaveLength(1);
     const s2 = stepSquadron({ ...s1, pickups: [{ id: 5, kind: "spread", x: s1.shipX, y: SHIP_Y }] }, 0.01, still, POOL, Math.random);
@@ -104,8 +104,8 @@ describe("chơi", () => {
   });
   it("hết mạng thì kết thúc, đủ cấp thì lên cấp", () => {
     expect(stepSquadron({ ...withWave(), lives: 0, enemies: [], question: null, waveGap: 9 }, 0.01, still, POOL, Math.random).over).toBe(true);
-    expect(levelOf(0)).toBe(1); expect(levelOf(4)).toBe(2);
-    expect(fallSpeed(30)).toBeLessThanOrEqual(0.17);
+    expect(levelOf(0)).toBe(1); expect(levelOf(3)).toBe(2);
+    expect(fallSpeed(30)).toBeLessThanOrEqual(0.3);
   });
   it("chỉ bắn khi bấm nút, và cách nhau một nhịp", () => {
     const idle = stepSquadron({ ...initSquadron(), waveGap: 9 }, 0.1, still, POOL, Math.random);
@@ -121,3 +121,22 @@ describe("chơi", () => {
     expect(s.question).not.toBeNull(); expect(s.enemies.length).toBeGreaterThanOrEqual(3);
   });
 });
+
+describe("độ khó", () => {
+  it("tốc độ rơi tăng theo cấp và có trần", () => {
+    expect(fallSpeed(5)).toBeGreaterThan(fallSpeed(1));
+    expect(fallSpeed(99)).toBeLessThanOrEqual(0.3);
+    expect(fallSpeed(1)).toBeGreaterThanOrEqual(0.1);
+  });
+  it("từ cấp 4 mỗi đợt có 5 máy bay, cấp đầu 4", () => {
+    expect(makeWave(POOL, seq([0.3, 0.5, 0.7]), 0, "", 1, 1)!.enemies).toHaveLength(4);
+    expect(makeWave(POOL, seq([0.3, 0.5, 0.7]), 0, "", 1, 4)!.enemies.length).toBeGreaterThanOrEqual(4);
+  });
+  it("độ dễ nhầm: cùng pinyin không dấu và chung chữ Hán cao hơn chữ không liên quan", () => {
+    const mk = (han: string, pinyin: string): GameWord => ({ han, pinyin, meaning: han });
+    const ans = mk("图书", "tú shū");
+    expect(confusability(ans, mk("土书", "tǔ shū"))).toBeGreaterThan(confusability(ans, mk("大", "dà")));
+    expect(confusability(ans, mk("图书馆", "tú shū guǎn"))).toBeGreaterThan(confusability(ans, mk("水果", "shuǐ guǒ")));
+  });
+});
+

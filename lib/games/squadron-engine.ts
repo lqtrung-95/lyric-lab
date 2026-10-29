@@ -2,17 +2,17 @@ import type { GameWord } from "./game-word";
 import { makeWave } from "./squadron-wave";
 import { BOOM_SECONDS, ENEMY_H, LIVES, REVEAL_SECONDS, SHIP_Y, STRIKES_PER_LIFE, WRONG_PENALTY, halfWidth, type Enemy, type PowerKind, type SquadronInput, type SquadronState } from "./squadron-types";
 
-const KILLS_PER_LEVEL = 4;
+const KILLS_PER_LEVEL = 3;
 const FIRE_GAP = 0.25;
 const BULLET_SPEED = 1.15;
 const KEY_SPEED = 0.9;
 const FOLLOW_SPEED = 2.4;
-const WAVE_GAP = 0.9;
+const WAVE_GAP = 0.7;
 const PICKUPS: PowerKind[] = ["spread", "shield", "slow"];
 
 export const levelOf = (kills: number): number => 1 + Math.floor(kills / KILLS_PER_LEVEL);
 /** Tốc độ rơi của máy bay (phần chiều cao sân mỗi giây), nhanh dần theo cấp. */
-export const fallSpeed = (level: number): number => Math.min(0.17, 0.07 + 0.009 * (level - 1));
+export const fallSpeed = (level: number): number => Math.min(0.3, 0.1 + 0.014 * (level - 1));
 
 export const initSquadron = (): SquadronState => ({
   shipX: 0.5, enemies: [], bullets: [], pickups: [], booms: [], question: null, asked: 0, lastHan: "", fire: 0, waveGap: 0.6, spread: 0, slow: 0, shield: false,
@@ -52,7 +52,7 @@ function rightKill(s: SquadronState, e: Enemy, rng: () => number): void {
   const level = levelOf(s.kills);
   if (level > s.level) s.levelUp = 1.6;
   s.level = level;
-  if (s.combo % 3 === 0) s.pickups.push({ id: s.nextId++, kind: PICKUPS[Math.floor(rng() * PICKUPS.length)], x: 0.12 + rng() * 0.76, y: 0 });
+  if (s.combo % 5 === 0) s.pickups.push({ id: s.nextId++, kind: PICKUPS[Math.floor(rng() * PICKUPS.length)], x: 0.12 + rng() * 0.76, y: 0 });
 }
 
 function moveShip(s: SquadronState, dt: number, input: SquadronInput): void {
@@ -97,7 +97,7 @@ function resolveBottom(s: SquadronState): void {
 function collectPickups(s: SquadronState): void {
   s.pickups = s.pickups.filter((p) => {
     if (Math.abs(p.x - s.shipX) < 0.1 && p.y > SHIP_Y - 0.08 && p.y < 1) {
-      if (p.kind === "spread") s.spread = 8; else if (p.kind === "slow") s.slow = 7; else s.shield = true;
+      if (p.kind === "spread") s.spread = 6; else if (p.kind === "slow") s.slow = 5; else s.shield = true;
       s.got += 1;
       return false;
     }
@@ -126,7 +126,7 @@ export function stepSquadron(state: SquadronState, dt: number, input: SquadronIn
   collectPickups(s);
   if (s.lives <= 0) { s.over = true; return s; }
   if (!s.question && s.waveGap <= 0) {
-    const wave = makeWave(pool, rng, s.asked, s.lastHan, s.nextId);
+    const wave = makeWave(pool, rng, s.asked, s.lastHan, s.nextId, s.level);
     if (wave) { s.question = wave.question; s.enemies = wave.enemies; s.nextId = wave.nextId; s.asked += 1; s.lastHan = wave.question.answer.han; }
   }
   return s;
