@@ -19,6 +19,10 @@ const serverEnvSchema = z.object({
   // biến này thì tính năng vẫn chạy bình thường (bỏ qua BytePlus, dùng các model khác).
   BYTE_PLUS_API_KEY: z.string().min(1).optional(),
   BYTE_PLUS_MODEL_ID: z.string().min(1).optional(),
+  // API Deploy (tương thích OpenAI, https://docs.deploy.com): đứng đầu chuỗi model của công cụ "Tên tiếng Trung" (lib/names/name-summary-models.ts) và dùng cho các script sinh nghĩa Việt.
+  // Thiếu khóa thì bỏ qua Deploy, các model khác vẫn chạy. DEPLOY_MODEL đổi tên model (mặc định xem lib/analysis/deploy-chat.ts).
+  DEPLOY_API_KEY: z.string().min(1).optional(),
+  DEPLOY_MODEL: z.string().min(1).optional(),
   YOUTUBE_DATA_API_KEY: z.string().min(1),
   // Khóa Google AI Studio (Gemini API), nhiều khóa ngăn cách bằng dấu phẩy hoặc xuống dòng: dùng đầu tiên cho giải nghĩa từ/câu khi bấm và dịch lại dòng video bị báo sai.
   GEMINI_API_KEYS: z.string().min(1).optional(),

@@ -1,5 +1,5 @@
 // Gọi API Deploy (https://docs.deploy.com), tương thích OpenAI: `POST {base}/chat/completions`, khóa Bearer.
-// Chỉ dùng cho script sinh nghĩa tiếng Việt hàng loạt (scripts/gloss-hsk-vocab.mts), không nằm trong chuỗi model của pipeline phân tích bài hát.
+// Dùng cho script sinh nghĩa tiếng Việt hàng loạt (scripts/gloss-hsk-vocab.mts) và đứng đầu chuỗi model của công cụ Tên tiếng Trung (tiền tố `deploy:` trong createChatRouter); không nằm trong chuỗi model của pipeline phân tích bài hát.
 // `reasoning_effort: "none"` tắt bước "nghĩ" của model: nhanh và rẻ hơn nhiều cho việc dịch ngắn.
 import { createCompatChat, type ChatFn } from "./groq-chat";
 

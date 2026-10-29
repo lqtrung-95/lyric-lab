@@ -3,7 +3,7 @@ import { NAME_PINYIN } from "@/lib/names/name-data";
 import { lookupTermEntry } from "@/lib/lookup/server-lookup";
 import { createChat } from "@/lib/analysis/server-deps";
 import { getServerEnv } from "@/lib/env/server-env";
-import { EXPLAIN_MODELS } from "@/lib/lookup/explain-term";
+import { nameSummaryModels } from "@/lib/names/name-summary-models";
 import { fallbackSummary, summarizeName } from "@/lib/names/name-summary";
 import { InMemoryRateLimiter } from "@/lib/rate-limit/in-memory-rate-limiter";
 
@@ -42,8 +42,9 @@ async function summaryFor(request: Request, han: string, parts: ReturnType<typeo
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   if (!ipLimiter.tryConsume(ip)) return fallbackSummary(parts);
   try {
+    const env = getServerEnv();
     const out = await Promise.race([
-      summarizeName(parts, createChat(getServerEnv()), EXPLAIN_MODELS),
+      summarizeName(parts, createChat(env), nameSummaryModels(env)),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), SUMMARY_TIMEOUT_MS)),
     ]);
     if (!out) return fallbackSummary(parts);

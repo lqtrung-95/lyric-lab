@@ -16,6 +16,7 @@ import { PROMPT_VERSION } from "./build-analysis-prompt";
 import { createDeepSeekChat } from "./deepseek-chat";
 import { createGeminiChat, parseGeminiKeys } from "./gemini-chat";
 import { createGroqChat } from "./groq-chat";
+import { createDeployChat } from "./deploy-chat";
 import { createChatRouter, createOpenRouterChat } from "./openrouter-chat";
 import { buildLinePinyin, withSubwordEntries } from "./build-line-pinyin";
 import { simplifyDeep } from "./simplify-analysis";
@@ -35,7 +36,7 @@ const FAST_FAIL_LIMITS = { maxRetries: 1, maxWaitSec: 8 };
  */
 export function createChat(env: {
   GROQ_API_KEY: string; FALLBACK_LLM_API_KEY?: string; OPENROUTER_API_KEY?: string; DEEPSEEK_API_KEY?: string;
-  BYTE_PLUS_API_KEY?: string; BYTE_PLUS_MODEL_ID?: string; GEMINI_API_KEYS?: string;
+  BYTE_PLUS_API_KEY?: string; BYTE_PLUS_MODEL_ID?: string; GEMINI_API_KEYS?: string; DEPLOY_API_KEY?: string;
 }) {
   const deepseek = env.DEEPSEEK_API_KEY ? createDeepSeekChat(env.DEEPSEEK_API_KEY, FAST_FAIL_LIMITS) : undefined;
   const openrouter = env.OPENROUTER_API_KEY ? createOpenRouterChat(env.OPENROUTER_API_KEY, FAST_FAIL_LIMITS) : undefined;
@@ -48,7 +49,9 @@ export function createChat(env: {
   const groq = createGroqChat(env.GROQ_API_KEY, fetch, undefined, groqFallback || openrouter ? FAST_FAIL_LIMITS : {});
   const geminiKeys = parseGeminiKeys(env.GEMINI_API_KEYS);
   const gemini = geminiKeys.length > 0 ? createGeminiChat(geminiKeys) : undefined;
-  return createChatRouter(groq, groqFallback, openrouter, deepseek, byteplus, gemini);
+  // Deploy chờ ngắn khi lỗi/quá tải để kịp rớt sang model kế tiếp trong hạn chót của route.
+  const deploy = env.DEPLOY_API_KEY ? createDeployChat(env.DEPLOY_API_KEY, { maxRetries: 1, maxWaitSec: 8, timeoutMs: 15_000 }) : undefined;
+  return createChatRouter(groq, groqFallback, openrouter, deepseek, byteplus, gemini, deploy);
 }
 
 /**

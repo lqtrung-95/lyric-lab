@@ -10,6 +10,7 @@ Schema kiểm tra ở `lib/env/server-env.ts` (chuỗi rỗng bị coi như chư
 
 | Biến | Bắt buộc | Dùng cho |
 |---|---|---|
+| `DEPLOY_API_KEY`, `DEPLOY_MODEL` | không | API Deploy (tương thích OpenAI): đứng ĐẦU chuỗi model của công cụ Tên tiếng Trung (`lib/names/name-summary-models.ts`, tiền tố `deploy:`) và dùng cho script sinh nghĩa Việt. **Phải đặt thêm ở Vercel** thì production mới dùng; thiếu thì bỏ qua Deploy, công cụ vẫn chạy bằng chuỗi Gemini/Groq/OpenRouter. `DEPLOY_MODEL` đổi tên model (mặc định `deepseek-ai/deepseek-v4.1-flash-1017`) |
 | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Có | Client Supabase (công khai theo thiết kế) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Có | Ghi DB ở server, bỏ qua RLS. Tuyệt đối không lộ ra client |
 | `GROQ_API_KEY` | Có | Model Groq (dự phòng phân tích; chính cho giải nghĩa khi bấm) |

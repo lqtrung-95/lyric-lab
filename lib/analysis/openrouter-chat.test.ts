@@ -38,3 +38,13 @@ describe("withGroqFallback", () => {
     expect(withGroqFallback(["a", "b"])).toEqual(["groq-fallback:a", "groq-fallback:b"]);
   });
 });
+
+describe("tiền tố deploy:", () => {
+  it("đi API Deploy với tên model đã cắt tiền tố; thiếu khóa thì báo lỗi rõ", async () => {
+    const deploy = vi.fn().mockResolvedValue("ok");
+    const chat = createChatRouter(vi.fn(), undefined, undefined, undefined, undefined, undefined, deploy);
+    expect(await chat({ model: "deploy:deepseek-ai/x", system: "s", user: "u" })).toBe("ok");
+    expect(deploy).toHaveBeenCalledWith(expect.objectContaining({ model: "deepseek-ai/x" }));
+    await expect(createChatRouter(vi.fn())({ model: "deploy:x", system: "s", user: "u" })).rejects.toThrow("DEPLOY_API_KEY");
+  });
+});
