@@ -58,5 +58,12 @@ describe("kịch bản pet", () => {
     expect(pet).toContain("đanh đá");
     expect(pet).toContain("không xúc phạm");
     expect(buildRoleplayPrompt(findScenario("cafe")!, req)).not.toContain("đanh đá");
+    expect(pet).not.toContain("Trời ơi, ");
+  });
+  it("linh vật: kiểu trêu đổi theo số lượt, tình huống thường không có", () => {
+    const pets = (n: number) => buildRoleplayPrompt(findScenario("pet")!, { ...req, scenarioId: "pet", history: Array.from({ length: n }, () => ({ role: "ai" as const, zh: "你好" })) });
+    expect(pets(1)).not.toBe(pets(2));
+    expect(pets(1)).toContain("KIỂU NHẬN XÉT LƯỢT NÀY");
+    expect(buildRoleplayPrompt(findScenario("cafe")!, req)).not.toContain("KIỂU NHẬN XÉT");
   });
 });

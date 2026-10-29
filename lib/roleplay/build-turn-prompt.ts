@@ -15,15 +15,29 @@ const LEVEL_RULE: Record<number, string> = {
 
 /** Giọng đanh đá cho linh vật: chê thẳng và trêu vui, nhưng không xúc phạm. Áp cho cả lời đáp (replyVi) lẫn lời sửa (issue). */
 const SASSY_RULE =
-  "GIỌNG ĐIỆU: bạn đanh đá, hay cà khịa và trêu người học như một người bạn thân tinh nghịch, nhưng luôn vui vẻ và đáng yêu (có thể dùng 'hứ', 'trời ơi', 'haizz'). " +
+  "GIỌNG ĐIỆU: bạn đanh đá, hay cà khịa và trêu người học như một người bạn thân tinh nghịch, nhưng luôn vui vẻ và đáng yêu. " +
+  "ĐA DẠNG: mỗi lời nhận xét phải mở đầu và kết thúc khác nhau, tuyệt đối không lặp lại cách mở đầu của lần trước; KHÔNG dùng 'Trời ơi' (nếu thật cần thì tối đa một lần cả buổi). " +
   "Khi người học nói sai hoặc dùng từ chưa tự nhiên (kể cả lỗi nhỏ về từ dùng hay trật tự từ) thì PHẢI trả feedback: 'issue' nói thẳng và trêu một câu ngắn bằng tiếng Việt rồi chỉ ra lỗi, 'better' là câu đúng. Nói đúng thì khen ngắn kiểu miễn cưỡng, không cần feedback. " +
   "Tuyệt đối không xúc phạm cá nhân, không chê ngoại hình, gia đình, giới tính hay chuyện nhạy cảm, không tục. ";
+
+/** Mỗi lượt gợi một kiểu trêu khác nhau (xoay theo số lượt đã nói) để lời nhận xét không lặp một khuôn. */
+export const SASSY_FLAVORS = [
+  "mỉa mai nhẹ như cô giáo khó tính",
+  "than thở kiểu bà cụ non",
+  "ngạc nhiên giả vờ, hỏi vặn lại",
+  "so sánh hài hước với một món ăn hoặc đồ vật",
+  "thở dài rồi dạy kiểu đàn chị",
+  "trêu kiểu bạn thân chí cốt, thẳng thừng",
+  "giả vờ xỉu rồi hồi sinh để sửa",
+  "chấm điểm đùa như giám khảo cuộc thi",
+];
 
 /** Prompt một lượt trò chuyện: vai AI, trình độ, lịch sử hội thoại và câu vừa nói của người học. */
 export function buildRoleplayPrompt(s: Scenario, req: RoleplayRequest): string {
   const talk = req.history.map((l) => `${l.role === "ai" ? "AI" : "Người học"}: ${l.zh}`).join("\n");
+  const flavor = s.sassy ? `\nKIỂU NHẬN XÉT LƯỢT NÀY (chỉ gợi ý giọng, không chép nguyên): ${SASSY_FLAVORS[req.history.length % SASSY_FLAVORS.length]}.\n` : "";
   return `TÌNH HUỐNG: ${s.title}. Bạn là ${s.aiRole}. Mục tiêu của người học: ${s.goal}.\n` +
-    `TRÌNH ĐỘ: ${LEVEL_RULE[req.level]}. Tuyệt đối không dùng từ khó hơn trình độ này.\n\n` +
+    `TRÌNH ĐỘ: ${LEVEL_RULE[req.level]}. Tuyệt đối không dùng từ khó hơn trình độ này.\n${flavor}\n` +
     `HỘI THOẠI TỪ ĐẦU:\n${talk}\n\nLỜI NGƯỜI HỌC:\n"""\n${req.userText}\n"""\n\n` +
     'Trả về JSON {"reply": "...", "replyVi": "...", "tips": ["..."], "feedback": null}. ' +
     "reply: lời đáp của bạn bằng chữ Hán, 1 câu (tối đa 2 câu rất ngắn), đúng vai, tiếp nối tự nhiên và thường kết bằng một câu hỏi hoặc gợi ý để người học nói tiếp; nếu người học lạc đề thì nhẹ nhàng kéo về tình huống. " +
