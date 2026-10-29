@@ -4,7 +4,7 @@ const CARDS = [
   {
     emoji: "🧭", title: "Khám phá: học từ bằng cách đi dạo",
     body: "Bước vào quán ăn, bệnh viện, tiệm may, trạm chuyển phát… Chạm đồ vật để nghe và học tên tiếng Trung, làm nhiệm vụ cho nhân vật dẫn đường, phá một vụ án bằng tiếng Trung, rồi đi trọn một hành trình trong ngày qua nhiều cảnh và đóng dấu vào hộ chiếu.",
-    chips: ["60 cảnh", "Hành trình trong ngày", "Hộ chiếu", "Phá án"], href: "/explore", cta: "Vào Khám phá", accent: true,
+    chips: ["66 cảnh", "Hành trình trong ngày", "Hộ chiếu", "Phá án"], href: "/explore", cta: "Vào Khám phá", accent: true,
   },
   {
     emoji: "🐾", title: "Bạn nhỏ đồng hành: nuôi pet bằng việc học",

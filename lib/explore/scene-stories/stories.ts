@@ -2,6 +2,7 @@ import { NEW_VENUE_STORIES } from "./stories-new-venues";
 import { VENUES_2_STORIES } from "./stories-venues-2";
 import { TECH_TRADE_STORIES } from "./stories-tech-trade";
 import { CULTURE_LIFE_STORIES } from "./stories-culture-life";
+import { TOWN_LIFE_STORIES } from "./stories-town-life";
 import { DAILY_SERVICES_STORIES } from "./stories-daily-services";
 import { PLACE_FUN_STORIES } from "./stories-places-fun";
 import { SERVICE_STORIES } from "./stories-services";
@@ -18,6 +19,7 @@ export const SCENE_STORIES: Record<string, SceneStory> = {
   ...TECH_TRADE_STORIES,
   ...DAILY_SERVICES_STORIES,
   ...CULTURE_LIFE_STORIES,
+  ...TOWN_LIFE_STORIES,
   restaurant: {
     title: { zh: "小明的第一碗面", vi: "Bát mì đầu tiên của Tiểu Minh" },
     lines: [

@@ -24,6 +24,7 @@ import { VENUE12_SPRITES } from "./flat-venue12";
 import { VENUE13_SPRITES } from "./flat-venue13";
 import { VENUE14_SPRITES } from "./flat-venue14";
 import { VENUE15_SPRITES } from "./flat-venue15";
+import { VENUE16_SPRITES } from "./flat-venue16";
 import { VENUE5_FUN_FARM_SPRITES } from "./flat-venue5-fun-farm";
 import { VENUE5_LAUNDRY_TOY_SPRITES } from "./flat-venue5-laundry-toys";
 import { NEW_FUN_SPRITES } from "./flat-new-fun";
@@ -44,7 +45,7 @@ import { SMALL_SPRITES } from "./flat-small";
 const BASE: Record<string, FlatSprite> = {
   ...FURNITURE_SPRITES, ...SMALL_SPRITES, ...FOOD_SPRITES, ...PROP_SPRITES, ...STORY_SPRITES, ...CHARACTER_SPRITES, ...ANIMAL_SPRITES, ...MARKET_SPRITES, ...STATION_SPRITES,
   ...HOSPITAL_SPRITES, ...PARK_SPRITES, ...SCHOOL_SPRITES, ...SHOP_SPRITES, ...HOTEL_SPRITES, ...AIRPORT_SPRITES, ...PLACE_SPRITES, ...VENUE_SPRITES,
-  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES, ...VENUE7_SPRITES, ...VENUE8_SPRITES, ...VENUE9_SPRITES, ...VENUE10_SPRITES, ...VENUE11_SPRITES, ...VENUE12_SPRITES, ...VENUE13_SPRITES, ...VENUE14_SPRITES, ...VENUE15_SPRITES,
+  ...NEW_HOME_SPRITES, ...NEW_TRANS_SPRITES, ...NEW_LEARN_SPRITES, ...NEW_WORK_SPRITES, ...NEW_FUN_SPRITES, ...VENUE2A_SPRITES, ...VENUE2B_SPRITES, ...VENUE2C_SPRITES, ...VENUE3_SPRITES, ...VENUE4_ZOO_SPRITES, ...VENUE4_SHOP_SPRITES, ...VENUE5_FUN_FARM_SPRITES, ...VENUE5_LAUNDRY_TOY_SPRITES, ...VENUE6_SPRITES, ...VENUE7_SPRITES, ...VENUE8_SPRITES, ...VENUE9_SPRITES, ...VENUE10_SPRITES, ...VENUE11_SPRITES, ...VENUE12_SPRITES, ...VENUE13_SPRITES, ...VENUE14_SPRITES, ...VENUE15_SPRITES, ...VENUE16_SPRITES,
 };
 
 /** Một từ khác nhau dùng chung hình: id mới → hình có sẵn (ví dụ "bệnh giường" dùng hình giường). Giữ mỗi cảnh có từ riêng mà không phải vẽ lại. */
@@ -63,6 +64,7 @@ const ALIASES: Record<string, string> = {
   software: "laptop", requirement: "note", workstation: "table", bigscreen: "tv", projectorbeam: "projector", staffcard: "idcard",
   voiceassistant: "speaker", touchscreen: "tablet", cargoship: "boat", tariff: "note", importgoods: "parcel", freight: "cash", sample: "woodbox", shelving: "shelf",
   hygrometer: "thermometer", plasticfilm: "sheetcloth", compostbin: "bucket", handcart: "cart",
+  stopsign: "signboard", linemap: "timetable", buscard: "roomcard", priorityseat: "seat", stopbell: "bell", change: "coinpurse", busdoor: "door", shelter: "pavilion", ledboard: "blackboard", oden: "soup", riceball: "rice", bento: "lunchbox", cupnoodle: "instantnoodles", drink: "juice", snack: "chips", gum: "candy", lighter: "matches", checkout: "basket", coolercase: "fridge", microwave: "oven", autodoor: "door", crayons: "pens", bib: "apron", napmat: "picnicmat", littlechair: "plasticstool", picturebook: "fairytale", sticker: "stickynotes", waterCup: "cup", slide: "ladder", sandpit: "sandcastle", cubby: "locker", toothcup: "cup", basin: "bucket", hotkettle: "kettle", powerstrip: "socket", phonestand: "phonecase", coolmat: "picnicmat", doorcard: "idcard", shoecabinet: "locker", dormstairs: "ladder", gate: "securitygate", signpost: "signboard", wildflower: "flower", pinetree: "tree", stonestep: "brick", sunrise: "sun", cloudsea: "cottoncandy", trailmap: "map", restpavilion: "pavilion", brook: "pond", foldfan: "fan", waterSleeve: "ribbon", jinghu: "guqin", opcostume: "cape", headdress: "hairpin", subtitlescreen: "screen", makeupmirror: "mirror", audience: "bench",
   swimgoggles: "goggles", bathtowel: "towel", firealarm: "bell", firesuit: "coat", turntable: "ladder",
 };
 
