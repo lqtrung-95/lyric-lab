@@ -1,6 +1,6 @@
 # Linh vật đồng hành (Pet) — bản thử nhỏ
 
-Trạng thái: ĐÃ DUYỆT (2026-10-29). Bước 1 (logic, test, repo, migration) và bước 2 (hình rồng, nhận nuôi, thẻ trang chủ) xong; chờ duyệt hình rồng trước khi vẽ 4 loài còn lại và sang bước 3. Mục tiêu: thêm lý do quay lại mỗi ngày + cảm giác sở hữu, KHÔNG thêm game mới. Bản thử chỉ 1 pet, 3 giai đoạn, nối vào XP/chuỗi ngày có sẵn. Xem rồi mới quyết định mở rộng.
+Trạng thái: ĐÃ DUYỆT, "làm hết" (2026-10-29). Xong: logic, lưu trữ, 5 loài × 3 giai đoạn × 3 tâm trạng có hoạt ảnh, nhận nuôi, thẻ trang chủ. Còn lại: xem mục "Việc còn lại". Mục tiêu: thêm lý do quay lại mỗi ngày + cảm giác sở hữu, KHÔNG thêm game mới. Bản thử chỉ 1 pet, 3 giai đoạn, nối vào XP/chuỗi ngày có sẵn. Xem rồi mới quyết định mở rộng.
 
 ## Nguyên tắc
 - Không đếm XP hai lần: "thức ăn" của pet = XP đã có trong sổ cái (`lib/game`, suy ra từ bảng sự kiện). Pet chỉ đọc, không ghi XP.
@@ -45,3 +45,17 @@ Chưa có dữ liệu thật, nên dùng chỉ số đã có: tỉ lệ người
 - Loài: rồng, mèo, cún, gấu trúc, cú (con vật dễ thương nào cũng được).
 - Ngưỡng 300/1500 XP: ước lượng 15 phút/ngày ≈ 40–60 XP → giai đoạn 2 sau ~1 tuần, giai đoạn 3 sau ~1 tháng.
 - Pet "thích" bài hát: để sau bản thử.
+
+## Việc còn lại (làm tiếp, theo thứ tự; mỗi mục commit riêng, kiểm tra trong trình duyệt trước khi sang mục sau)
+Gợi ý dùng lại: `components/layout/use-game-summary.ts` (XP/cấp/chuỗi), `components/streak/use-streak.ts` (todayItems, dailyGoal, week), `components/review/use-review-summary.ts` + `lib/user-data/review-repo.ts` (`loadReviewSession`: hàng đợi thẻ có `term, pinyin, meaning`), `lib/feedback/sfx-notes.ts` + `lib/game/reward-sound.ts` (tiếng thưởng), `lib/games/arcade-sfx.ts` (`sfx.pop`, `sfx.levelUp`, `SoundToggle`), `playChinese` (phát âm TTS có cache).
+
+1. **Tiến hóa + phụ kiện (bước 3).** Nhớ giai đoạn đã thấy ở localStorage; lên giai đoạn mới thì phát tiếng (`levelup`) và hiện chữ "tiến hóa!" một lần. Vẽ phụ kiện lên hình: khăn (chuỗi 7), mũ thư sinh (30), vương miện (100; vương miện thay mũ). Mọi loài dùng chung `headY = giai đoạn 1 ? 62 : 52`, đầu cao ~28, nên một bộ phụ kiện chung neo theo `headY` là đủ. Mở rộng `PetSprite` thêm prop `accessories`, truyền `unlockedAccessories(streak.longest)`.
+2. **Chạm vào pet (A).** Bấm hình: nảy (thêm lớp `pet-tap` trong `PET_CSS`), `sfx.pop`, bóng thoại ngắn tiếng Việt theo tâm trạng/dịp. Giới hạn số lần nói mỗi ngày; công tắc tắt tiếng; hình là `<button>` thật, vùng bấm ≥ 44 px (CLAUDE.md quy tắc 9), có nhãn cho trình đọc màn hình.
+3. **Bóng thoại mang một từ cần ôn (A).** Mở rộng `ReviewSummary` (`use-review-summary.ts`) kèm vài thẻ đầu hàng đợi (`term, pinyin, meaning`) để không gọi Supabase lần hai. Bấm vào thì phát âm. Pinyin lấy từ thẻ đã lưu (nguồn từ điển).
+4. **Phản ứng theo sự kiện (A).** Dùng `rewardSoundFor` / thay đổi `GameSummary` để pet reo khi lên cấp, tăng chuỗi, đạt mục tiêu; buồn nhẹ khi mất chuỗi (có bù chuỗi, không dùng chữ nặng nề).
+5. **Cho pet ăn thẻ (B).** Mini ôn ngay trong thẻ pet (1–3 thẻ đến hạn), dùng chính `useReviewSession` / `saveGrade` để XP và lịch FSRS vẫn tính như ôn thường; pet "ăn" và nhai khi ôn xong. Không tạo nguồn XP mới.
+6. **Pet bắt chước phát âm (B).** Dùng phần chấm phát âm có sẵn (`app/api/pronunciation-assess`, `lib/pronunciation`, `lib/speaking`); pet phát âm mẫu bằng TTS rồi phản ứng theo điểm. Cần micro, có đường lui khi bị từ chối quyền.
+7. **Quà từ bài hát (B).** Nghe hết một bài (sự kiện `songsCompleted` trong `lib/game/aggregate-activity.ts`) thì pet đưa một câu/từ trong bài đó (lời chỉ lấy từ nguồn có sẵn, không để LLM viết lời; không đưa lời bài hát có thật vào repo hay fixture).
+8. **Nói chuyện với pet (C).** Dùng engine nhập vai (`lib/roleplay`: `scenarios.ts`, `build-turn-prompt.ts`, `roleplay-turn.ts`, `app/api/roleplay`): thêm kịch bản "pet" nói tiếng Trung đơn giản theo HSK của người dùng, sửa lỗi nhẹ bằng tiếng Việt. Bắt buộc: giới hạn lượt mỗi ngày (tốn hạn mức AI), lọc nội dung, pinyin từ từ điển, không đưa key AI xuống client (quy tắc 4), rà câu tiếng Trung bởi người bản ngữ trước khi ra mắt rộng. Làm sau cùng, chỉ khi các mục trên được dùng thật.
+
+Mỗi mục xong: thêm test cho phần logic thuần, chạy `npx vitest run`, `npx tsc --noEmit` (bỏ qua lỗi types tự sinh cũ của Next), `npx eslint`, cập nhật `docs/handoff-and-status.md` (+ 3 tài liệu còn lại nếu đổi kiến trúc, biến môi trường, quy ước), rồi commit kiểu Conventional Commits.
