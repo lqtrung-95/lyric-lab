@@ -92,3 +92,12 @@ describe("gắn nhãn ngữ pháp", () => {
     expect(detectGrammar("la la la")).toEqual([]);
   });
 });
+
+describe("thẻ ôn ngữ pháp", () => {
+  it("khoá thẻ không trùng giữa các mẫu", async () => {
+    const { grammarSavedItem } = await import("./grammar-saved");
+    const keys = GRAMMAR_PATTERNS.map((p) => grammarSavedItem(p).key);
+    expect(new Set(keys).size).toBe(keys.length);
+    expect(grammarSavedItem(grammarById("ba")!)).toMatchObject({ type: "grammar", term: "把", videoId: "" });
+  });
+});
