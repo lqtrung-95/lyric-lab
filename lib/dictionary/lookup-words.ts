@@ -61,7 +61,7 @@ export function pickPrimaryEntry(entries: DictWordRow[]): DictWordRow | null {
   if (override) {
     // Cùng cách đọc có thể có nhiều mục (vd. 和 hé: mục nghĩa thật và mục "old variant of 和[he2]"): ưu tiên mục không phải biến thể.
     const sameReading = entries.filter((e) => pinyinKey(e.pinyin) === pinyinKey(override));
-    const forced = sameReading.find((e) => !VARIANT.test(e.meanings[0] ?? "")) ?? sameReading[0];
+    const forced = sameReading.find((e) => !VARIANT.test(e.meanings[0] ?? "") && !SURNAME_PINYIN.test(e.pinyin)) ?? sameReading[0];
     if (forced) return forced;
   }
   const nonVariant = entries.filter((e) => !VARIANT.test(e.meanings[0] ?? ""));

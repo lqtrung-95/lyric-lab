@@ -7,6 +7,9 @@ export const HSK_LEVELS = [1, 2, 3, 4, 5, 6] as const;
 export type HskLevel = (typeof HSK_LEVELS)[number];
 export const isHskLevel = (n: number): n is HskLevel => (HSK_LEVELS as readonly number[]).includes(n);
 
+/** Nghĩa Việt của một từ (bảng `dict_word_vi`) và cách đọc đã chọn (pinyin của từ điển; null = để chọn tự động). */
+export interface VietnameseGloss { meaning: string; reading: string | null }
+
 export interface HskRow {
   word: string;
   pinyin: string;
@@ -35,13 +38,17 @@ export function cleanMeanings(meanings: string[]): string[] {
  * Dựng bảng từ vựng của một cấp từ các dòng từ điển cùng cấp: gom theo từ (từ nhiều âm hoặc có mục biến thể chỉ lấy một mục chính qua `pickPrimaryEntry`),
  * xếp theo độ thường gặp (số thứ tự nhỏ = thường gặp hơn; thiếu thì xuống cuối, rồi theo chữ).
  */
-export function buildHskRows(rows: DictWordRow[], sinoViet: ReadonlyMap<string, string[]>, vietnamese: ReadonlyMap<string, string> = new Map()): HskRow[] {
+export function buildHskRows(rows: DictWordRow[], sinoViet: ReadonlyMap<string, string[]>, vietnamese: ReadonlyMap<string, VietnameseGloss> = new Map()): HskRow[] {
   const byWord = new Map<string, DictWordRow[]>();
   for (const r of rows) byWord.set(r.simplified, [...(byWord.get(r.simplified) ?? []), r]);
   const picked = [...byWord.values()].flatMap((group) => {
-    const entry = pickPrimaryEntry(group);
+    // Cách đọc đã được chọn và lưu cùng nghĩa Việt (AI chọn trong các mục từ điển) thắng cách chọn tự động.
+    const chosen = vietnamese.get(group[0].simplified)?.reading;
+    const key = chosen?.replace(/\s+/g, "").toLowerCase();
+    const fixed = key ? group.filter((e) => e.pinyin.replace(/\s+/g, "").toLowerCase() === key) : [];
+    const entry = fixed.length > 0 ? pickPrimaryEntry(fixed) : pickPrimaryEntry(group);
     return entry ? [entry] : [];
   });
   picked.sort((a, b) => (a.frequency ?? Infinity) - (b.frequency ?? Infinity) || a.simplified.localeCompare(b.simplified, "zh"));
-  return picked.map((e) => ({ word: e.simplified, pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sinoViet), meanings: cleanMeanings(e.meanings), meaningVi: vietnamese.get(e.simplified) ?? null }));
+  return picked.map((e) => ({ word: e.simplified, pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sinoViet), meanings: cleanMeanings(e.meanings), meaningVi: vietnamese.get(e.simplified)?.meaning ?? null }));
 }

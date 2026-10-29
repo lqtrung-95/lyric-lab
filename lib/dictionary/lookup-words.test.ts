@@ -46,6 +46,11 @@ describe("pickPrimaryEntry cách đọc thông dụng", () => {
     const real: DictWordRow = { ...row("和", "hé", 1), meanings: ["and; together with"] };
     expect(pickPrimaryEntry([variant, real])?.meanings[0]).toBe("and; together with");
   });
+  it("cách đọc ghi đè trùng chữ với mục họ người (Hé) thì lấy mục thường", () => {
+    const surname: DictWordRow = { ...row("和", "Hé", 1), meanings: ["surname He"] };
+    const real: DictWordRow = { ...row("和", "hé", 1), meanings: ["and; together with"] };
+    expect(pickPrimaryEntry([surname, real])?.meanings[0]).toBe("and; together with");
+  });
   it("mục họ người có cấp nhưng còn mục thường chưa gắn cấp thì chọn mục thường", () => {
     expect(pickPrimaryEntry([row("也", "Yě", 1), row("也", "yě", null)])?.pinyin).toBe("yě");
   });

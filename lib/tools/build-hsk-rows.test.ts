@@ -22,9 +22,17 @@ describe("cleanMeanings", () => {
 
 describe("buildHskRows nghĩa tiếng Việt", () => {
   it("gắn nghĩa Việt theo từ giản thể; từ chưa có thì null", () => {
-    const rows = buildHskRows([row("学生", "學生", "xué sheng", ["student"]), row("深", "深", "shēn", ["deep"])], READINGS, new Map([["学生", "học sinh"]]));
+    const rows = buildHskRows([row("学生", "學生", "xué sheng", ["student"]), row("深", "深", "shēn", ["deep"])], READINGS, new Map([["学生", { meaning: "học sinh", reading: null }]]));
     expect(rows.find((r) => r.word === "学生")?.meaningVi).toBe("học sinh");
     expect(rows.find((r) => r.word === "深")?.meaningVi).toBeNull();
+  });
+});
+
+describe("buildHskRows cách đọc đã chọn", () => {
+  it("cách đọc lưu cùng nghĩa Việt thắng cách chọn tự động; không khớp thì chọn như cũ", () => {
+    const rows = [row("和", "和", "hú", ["mahjong"]), row("和", "和", "hé", ["and"])];
+    expect(buildHskRows(rows, READINGS, new Map([["和", { meaning: "và", reading: "hé" }]]))[0]).toMatchObject({ pinyin: "hé", meaningVi: "và" });
+    expect(buildHskRows(rows, READINGS, new Map([["和", { meaning: "và", reading: "xyz" }]]))[0].pinyin).toBe("hé");
   });
 });
 

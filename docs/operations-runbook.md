@@ -328,8 +328,9 @@ Chạy tay migration `supabase/migrations/20261029000002_user_pet.sql` (tạo `u
 
 ## Nghĩa tiếng Việt cho từ vựng HSK (trang `/tu-vung-hsk`)
 
-1. Chạy `supabase/migrations/20261029000003_dict_word_vi.sql` trong Supabase SQL Editor (tạo bảng `dict_word_vi`; chưa chạy thì trang vẫn dựng, chỉ hiện nghĩa tiếng Anh).
+1. Chạy `supabase/migrations/20261029000003_dict_word_vi.sql` trong Supabase SQL Editor (tạo bảng `dict_word_vi`, có cột `reading` = cách đọc AI chọn; chạy lại được và tự thêm cột nếu bảng đã tạo từ bản đầu; chưa chạy thì trang vẫn dựng, chỉ hiện nghĩa tiếng Anh).
 2. Thêm vào `.env.local` (không commit): `DEPLOY_API_KEY=...` (khóa API Deploy, tương thích OpenAI, `https://api-cdn.deploy.com/api/v1`), tuỳ chọn `DEPLOY_MODEL` (mặc định `deepseek-ai/deepseek-v4.1-flash-1017`; tài liệu Deploy cũng ghi `deepseek-ai/deepseek-v4.1-flash`, thử tên kia nếu báo lỗi model).
 3. Chạy thử (không ghi DB, 40 từ): `NODE_OPTIONS=--experimental-websocket npx tsx --conditions=react-server --env-file=.env.local scripts/gloss-hsk-vocab.mts --level 1`. Xem mẫu in ra, thấy ổn thì chạy thật theo từng cấp: `--level 1 --limit 100000 --apply`, rồi `--level 2`... hoặc `--level all`.
+Với chữ nhiều âm (和, 会, 要, 看, 吧, 没...), AI chọn cách đọc thông dụng nhất TRONG các mục từ điển (pinyin vẫn của từ điển, lưu ở cột `reading`) và viết nghĩa cho cách đọc đó; trang dùng cách đọc này thay cho cách chọn tự động. Bản sinh trước khi có cột `reading` được sinh lại tự động ở lần chạy sau.
 4. Từ đã có nghĩa trong bảng thì bỏ qua (`--force` để sinh lại); bản `reviewed = true` không bao giờ bị ghi đè. Bảng sửa tay `lib/courses/hsk1-gloss-overrides.ts` luôn thắng AI (HSK 1). Nghĩa AI sinh chưa rà: sửa trực tiếp trong bảng và đặt `reviewed = true`. Dữ liệu trang được nhớ 1 ngày (`unstable_cache` key `hsk-rows-v2`), nên sau khi ghi có thể chờ tối đa 1 ngày hoặc bump key.
 
