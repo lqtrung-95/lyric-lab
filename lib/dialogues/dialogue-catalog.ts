@@ -8,9 +8,10 @@ import { SCENE_DIALOGUES_C } from "./scene-dialogues-c";
 import { SCENE_DIALOGUES_D } from "./scene-dialogues-d";
 import { SCENE_DIALOGUES_E } from "./scene-dialogues-e";
 import { SCENE_DIALOGUES_F } from "./scene-dialogues-f";
+import { SCENE_DIALOGUES_G } from "./scene-dialogues-g";
 import type { DialogueDef } from "./dialogue-types";
 
-const SCENE_DIALOGUES = [...SCENE_DIALOGUES_A, ...SCENE_DIALOGUES_B, ...SCENE_DIALOGUES_C, ...SCENE_DIALOGUES_D, ...SCENE_DIALOGUES_E, ...SCENE_DIALOGUES_F];
+const SCENE_DIALOGUES = [...SCENE_DIALOGUES_A, ...SCENE_DIALOGUES_B, ...SCENE_DIALOGUES_C, ...SCENE_DIALOGUES_D, ...SCENE_DIALOGUES_E, ...SCENE_DIALOGUES_F, ...SCENE_DIALOGUES_G];
 const WRITTEN_SCENES = new Set(SCENE_DIALOGUES.map((d) => d.sceneId));
 
 /** Cảnh chưa có bài dài thì dùng tạm hội thoại ngắn của chính cảnh đó (đổi sang dạng chung, tiêu đề lấy theo tên cảnh). */

@@ -547,4 +547,58 @@ export const SCENE_CONVERSATIONS: Record<string, SceneConversation> = {
       { who: 1, zh: "好的,我先去帮爸爸贴春联。", vi: "Vâng, con đi giúp bố dán câu đối trước." },
     ],
   },
+  "busstop": {
+    speakers: ["Hành khách", "Tài xế"],
+    lines: [
+      { who: 0, zh: "师傅,到火车站吗?", vi: "Bác tài, xe có đến ga tàu không?" },
+      { who: 1, zh: "到,上车吧,请刷卡。", vi: "Có, lên xe đi, xin quẹt thẻ." },
+      { who: 0, zh: "我只有硬币,可以吗?", vi: "Tôi chỉ có tiền xu, được không?" },
+      { who: 1, zh: "可以,投进那个箱子里。", vi: "Được, bỏ vào cái hộp kia." },
+    ],
+  },
+  "convenience": {
+    speakers: ["Thu ngân", "Khách"],
+    lines: [
+      { who: 0, zh: "欢迎光临!这个便当要加热吗?", vi: "Xin chào quý khách! Cơm hộp này có hâm nóng không?" },
+      { who: 1, zh: "要,谢谢。再来一瓶饮料。", vi: "Có, cảm ơn. Cho thêm một chai đồ uống." },
+      { who: 0, zh: "一共二十块。要袋子吗?", vi: "Tổng hai mươi tệ. Có cần túi không?" },
+      { who: 1, zh: "不用,我自己有。", vi: "Không cần, tôi có túi rồi." },
+    ],
+  },
+  "kindergarten": {
+    speakers: ["Cô giáo", "Bé"],
+    lines: [
+      { who: 0, zh: "小朋友们,该午睡了。", vi: "Các bạn nhỏ, đến giờ ngủ trưa rồi." },
+      { who: 1, zh: "老师,我想先喝水。", vi: "Cô ơi, con muốn uống nước trước." },
+      { who: 0, zh: "好,去拿你的水杯吧。", vi: "Được, đi lấy cốc nước của con đi." },
+      { who: 1, zh: "谢谢老师!喝完我就睡觉。", vi: "Cảm ơn cô! Uống xong con đi ngủ ngay." },
+    ],
+  },
+  "dormitory": {
+    speakers: ["Quản lý", "Sinh viên"],
+    lines: [
+      { who: 0, zh: "同学,你的门禁卡呢?", vi: "Bạn sinh viên, thẻ ra vào của em đâu?" },
+      { who: 1, zh: "对不起,我忘在宿舍了。", vi: "Xin lỗi, em để quên trong ký túc xá." },
+      { who: 0, zh: "下次别忘了,十一点就锁门了。", vi: "Lần sau đừng quên, mười một giờ là khóa cổng rồi." },
+      { who: 1, zh: "好的,谢谢阿姨!", vi: "Vâng, cảm ơn cô!" },
+    ],
+  },
+  "mountain": {
+    speakers: ["Du khách", "Hướng dẫn viên"],
+    lines: [
+      { who: 0, zh: "师傅,山顶还有多远?", vi: "Bác ơi, đỉnh núi còn bao xa?" },
+      { who: 1, zh: "还有一公里,走石阶大概半小时。", vi: "Còn một cây số, đi bậc thang đá chừng nửa tiếng." },
+      { who: 0, zh: "那我们在前面的凉亭休息一下吧。", vi: "Vậy chúng ta nghỉ ở cái chòi phía trước một lát nhé." },
+      { who: 1, zh: "好,慢慢走,小心脚下。", vi: "Được, đi chậm, cẩn thận dưới chân." },
+    ],
+  },
+  "opera": {
+    speakers: ["Khán giả", "Nghệ sĩ"],
+    lines: [
+      { who: 0, zh: "您的脸谱画得真漂亮!", vi: "Mặt nạ vẽ của bác đẹp thật!" },
+      { who: 1, zh: "谢谢,画一次要两个小时呢。", vi: "Cảm ơn, vẽ một lần mất hai tiếng đấy." },
+      { who: 0, zh: "红色代表什么?", vi: "Màu đỏ tượng trưng cho điều gì?" },
+      { who: 1, zh: "红色代表忠勇,黑色代表正直。", vi: "Màu đỏ tượng trưng cho trung dũng, màu đen là chính trực." },
+    ],
+  },
 };

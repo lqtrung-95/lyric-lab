@@ -14,4 +14,5 @@ export const COOP_PLACES: Record<string, { zh: string; vi: string }> = {
   ailab: { zh: "人工智能实验室", vi: "Phòng thí nghiệm AI" }, port: { zh: "港口", vi: "Cảng xuất nhập khẩu" }, greenhouse: { zh: "温室", vi: "Nhà kính" }, petshop: { zh: "宠物店", vi: "Tiệm thú cưng" },
   tailor: { zh: "裁缝店", vi: "Tiệm may" }, photostudio: { zh: "照相馆", vi: "Tiệm ảnh" }, dental: { zh: "牙科诊所", vi: "Phòng khám nha khoa" }, construction: { zh: "工地", vi: "Công trường" },
   breakfast: { zh: "早餐店", vi: "Quán điểm tâm" }, nightmarket: { zh: "夜市", vi: "Chợ đêm" }, teahouse: { zh: "茶馆", vi: "Trà quán" }, tcm: { zh: "中医馆", vi: "Phòng khám Đông y" }, calligraphy: { zh: "书法教室", vi: "Lớp thư pháp" }, courier: { zh: "快递站", vi: "Trạm chuyển phát" }, ktv: { zh: "歌厅", vi: "Quán hát karaoke" }, newyear: { zh: "老家", vi: "Nhà đón Tết ở quê" },
+  busstop: { zh: "公交站", vi: "Trạm xe buýt" }, convenience: { zh: "便利店", vi: "Cửa hàng tiện lợi" }, kindergarten: { zh: "幼儿园", vi: "Trường mẫu giáo" }, dormitory: { zh: "宿舍", vi: "Ký túc xá" }, mountain: { zh: "山上", vi: "Trên núi" }, opera: { zh: "戏院", vi: "Nhà hát kịch" },
 };
