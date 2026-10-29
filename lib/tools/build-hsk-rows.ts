@@ -50,5 +50,5 @@ export function buildHskRows(rows: DictWordRow[], sinoViet: ReadonlyMap<string, 
     return entry ? [entry] : [];
   });
   picked.sort((a, b) => (a.frequency ?? Infinity) - (b.frequency ?? Infinity) || a.simplified.localeCompare(b.simplified, "zh"));
-  return picked.map((e) => ({ word: e.simplified, pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sinoViet), meanings: cleanMeanings(e.meanings), meaningVi: vietnamese.get(e.simplified)?.meaning ?? null }));
+  return picked.map((e) => ({ word: e.simplified, pinyin: e.pinyin, sinoViet: sinoVietForWord(e.traditional, sinoViet, e.simplified), meanings: cleanMeanings(e.meanings), meaningVi: vietnamese.get(e.simplified)?.meaning ?? null }));
 }

@@ -14,3 +14,20 @@ describe("sinoVietForWord", () => {
 describe("sinoVietForWord, chữ có âm thông dụng ghi đè", () => {
   it("好 lấy âm hảo dù Unihan liệt kê hiếu trước", () => expect(sinoVietForWord("好", new Map([["好", ["hiếu", "hảo"]]]))).toBe("hảo"));
 });
+
+describe("sinoVietForWord, chữ Unihan thiếu", () => {
+  const t = new Map([["情", ["tình"]], ["况", ["huống"]], ["要", ["yếu", "yêu"]]]);
+  it("chữ phồn thể thiếu thì dùng chữ giản thể cùng vị trí (情況 ← 情况)", () => {
+    expect(sinoVietForWord("情況", t)).toBeNull();
+    expect(sinoVietForWord("情況", t, "情况")).toBe("tình huống");
+  });
+  it("chữ thiếu cả hai dạng thì lấy bảng bổ sung (需要 → nhu yếu)", () => {
+    expect(sinoVietForWord("需要", t)).toBe("nhu yếu");
+  });
+  it("chữ khẩu ngữ không có âm Hán Việt thì vẫn null", () => {
+    expect(sinoVietForWord("她", t)).toBeNull();
+  });
+  it("độ dài giản/phồn khác nhau thì không ghép theo vị trí", () => {
+    expect(sinoVietForWord("情況", t, "情况况")).toBeNull();
+  });
+});

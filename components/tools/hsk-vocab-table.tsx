@@ -95,9 +95,9 @@ export function HskVocabTable({ level, rows }: { level: number; rows: HskRow[] }
           </thead>
           <tbody className="divide-y divide-outline-variant/40">
             {shown.map((r) => (
-              <tr key={r.word} className={`align-top ${known.has(r.word) ? "bg-primary-container/20" : ""}`}>
-                <td className="px-3 py-3"><input type="checkbox" aria-label={`Đã biết từ ${r.word}`} className="h-6 w-6 accent-[var(--color-primary)]" checked={known.has(r.word)} onChange={() => toggle(r.word)} /></td>
-                <td className="px-4 py-3"><span className="flex items-center gap-2"><span lang="zh" className="font-serif text-headline-md leading-tight text-on-surface">{r.word}</span><PronounceButton text={r.word} className="size-9" /></span><span className="block text-label-md text-primary">{r.pinyin}</span></td>
+              <tr key={r.word} className={`align-middle ${known.has(r.word) ? "bg-primary-container/20" : ""}`}>
+                <td className="px-3 py-3"><input type="checkbox" aria-label={`Đã biết từ ${r.word}`} className="block h-6 w-6 accent-[var(--color-primary)]" checked={known.has(r.word)} onChange={() => toggle(r.word)} /></td>
+                <td className="px-4 py-3"><span className="flex items-center gap-2"><span><span lang="zh" className="block font-serif text-headline-md leading-tight text-on-surface">{r.word}</span><span className="block text-label-md text-primary">{r.pinyin}</span></span><PronounceButton text={r.word} className="size-9" /></span></td>
                 <td className="px-4 py-3 text-body-md font-medium uppercase tracking-wide text-on-surface">{r.sinoViet ?? <span className="font-normal text-on-surface-variant">—</span>}</td>
                 <td className="px-4 py-3 text-body-md text-on-surface-variant">
                   {r.meaningVi ? <><span className="font-medium text-on-surface">{r.meaningVi}</span>{showEnglish && <span lang="en" className="block text-label-md">{r.meanings.join("; ")}</span>}</> : <span lang="en">{r.meanings.join("; ")}</span>}
