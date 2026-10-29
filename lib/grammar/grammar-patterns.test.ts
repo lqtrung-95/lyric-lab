@@ -126,3 +126,14 @@ describe("nhận diện mẫu: không gắn nhầm", () => {
     expect(ids("我一到家就打电话")).toContain("yi-jiu");
   });
 });
+
+describe("gộp thống kê giữa thiết bị", () => {
+  it("lấy số lớn hơn từng trường, gộp lặp lại không đếm đôi", async () => {
+    const { mergeStats } = await import("./grammar-stats");
+    const a = { ba: { right: 3, wrong: 1, last: 10 } };
+    const b = { ba: { right: 2, wrong: 4, last: 20 }, bi: { right: 1, wrong: 0, last: 5 } };
+    const m = mergeStats(a, b);
+    expect(m).toEqual({ ba: { right: 3, wrong: 4, last: 20 }, bi: { right: 1, wrong: 0, last: 5 } });
+    expect(mergeStats(m, b)).toEqual(m);
+  });
+});
