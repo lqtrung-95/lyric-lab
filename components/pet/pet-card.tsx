@@ -44,7 +44,9 @@ export function PetCard() {
   const [feeding, setFeeding] = useState(false);
   const [echoing, setEchoing] = useState(false);
   const [chatting, setChatting] = useState(false);
-  const [editing, setEditing] = useState(false);
+  // Bản nháp khi đang đổi tên/loài: thẻ hiển thị ngay theo bản nháp để xem trước, chỉ lưu khi bấm Lưu.
+  const [draft, setDraft] = useState<{ species: PetSpecies; name: string } | null>(null);
+  const editing = draft !== null;
   const echoWord = review?.peek[0] ?? null;
   const { gift, take } = usePetGift();
   const [chewKey, setChewKey] = useState(0);
@@ -70,6 +72,8 @@ export function PetCard() {
 
   const goal = dailyGoalProgress(streak?.todayItems ?? 0, streak?.dailyGoal ?? 0);
   const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
+  const shown: Pet = draft ? { ...pet, species: draft.species, name: cleanPetName(draft.name) ?? pet.name } : pet;
+  const previewing = draft !== null && (shown.species !== pet.species || shown.name !== pet.name);
   const nextStage = (STAGE_NAMES[growth.stage] ?? "").toLowerCase();
   const accessories = unlockedAccessories(streak?.longest ?? 0);
   // Dữ liệu game/chuỗi chưa tải xong thì chưa có ảnh chụp (không phản ứng với số tạm thời).
@@ -77,11 +81,12 @@ export function PetCard() {
   const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
     <section aria-labelledby="pet-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      <PetTouch pet={pet} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />
+      <PetTouch pet={shown} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />
       <div className="min-w-[14rem] flex-1">
-        <h2 id="pet-heading" className="text-headline-md">{pet.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[pet.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
+        <h2 id="pet-heading" className="text-headline-md">{shown.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[shown.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
-        <p role="status" className="mt-1 text-body-md">{MOOD_TEXT[mood](pet.name)}</p>
+        <p role="status" className="mt-1 text-body-md">{MOOD_TEXT[mood](shown.name)}</p>
+        {previewing && <p className="mt-1 inline-block rounded-full border-2 border-dashed border-ink px-3 py-0.5 text-label-md font-bold">Xem trước, chưa lưu</p>}
         {growth.maxed ? (
           <p className="mt-2 text-label-md font-bold text-secondary">{pet.name} đã trưởng thành!</p>
         ) : (
@@ -96,7 +101,7 @@ export function PetCard() {
             {(review?.total ?? 0) > 0 && <Button3d type="button" variant="bright" onClick={() => { sfx.petBlip(); setFeeding(true); }}>Cho {pet.name} ăn thẻ</Button3d>}
             <Button3d type="button" onClick={() => { sfx.petBlip(); fx("tap"); setChatting(true); }}>Nói chuyện với {pet.name}</Button3d>
             {echoWord && <Button3d type="button" onClick={() => { sfx.petBlip(); setEchoing(true); }}>Tập nói cùng {pet.name}</Button3d>}
-            <button type="button" onClick={() => { sfx.petBlip(); setEditing(true); }} className="min-h-11 rounded-full px-3 text-label-md font-bold text-on-surface-variant underline">Đổi tên / đổi bạn nhỏ</button>
+            <button type="button" onClick={() => { sfx.petBlip(); setDraft({ species: pet.species, name: pet.name }); }} className="min-h-11 rounded-full px-3 text-label-md font-bold text-on-surface-variant underline">Đổi tên / đổi bạn nhỏ</button>
           </div>
         )}
       </div>
@@ -115,7 +120,7 @@ export function PetCard() {
           </div>
         </div>
       )}
-      {editing && <PetEdit pet={pet} onSave={(next) => { adopt(next); sfx.petAdopt(); fx("adopt"); setEditing(false); }} onClose={() => { sfx.petBlip(); setEditing(false); }} />}
+      {draft && <PetEdit pet={pet} draft={draft} onDraft={setDraft} onSave={(next) => { adopt(next); sfx.petAdopt(); fx("adopt"); setDraft(null); }} onClose={() => { sfx.petBlip(); setDraft(null); }} />}
       {chatting && <PetChat name={pet.name} onClose={() => { sfx.petBlip(); setChatting(false); }} />}
       {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={(tier: EchoTier) => fx(tier === "great" ? "cheer" : tier === "good" ? "tap" : "try")} onClose={() => { sfx.petBlip(); setEchoing(false); }} />}
       {feeding && <PetFeed name={pet.name} onEat={() => { setChewKey((k) => k + 1); fx("crunch"); }} onFull={() => fx("full")} onClose={() => { sfx.petBlip(); setFeeding(false); }} />}
