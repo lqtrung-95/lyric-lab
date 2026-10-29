@@ -8,7 +8,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Gần với “đem / lấy B mà làm gì”: 我把书放在桌子上 (tôi đem sách đặt lên bàn). Tiếng Việt ít cần cấu trúc này nhưng tiếng Trung dùng rất nhiều.",
     mistakes: [{ wrong: "我把书看。", right: "我把书看完了。", why: "Động từ sau 把 phải có thêm thành phần (kết quả, 了, nơi chốn…)." }],
     examples: [{ zh: "我|把|书|放|在|桌子|上。", vi: "Tôi đặt sách lên bàn." }, { zh: "请|把|门|关|上。", vi: "Làm ơn đóng cửa lại." }, { zh: "他|把|作业|做|完|了。", vi: "Anh ấy đã làm xong bài tập." }],
-    detect: "把.{1,8}[^，。]",
+    detect: "(?<![一二两三几])把(?![握手戏柄])",
   },
   {
     id: "bei", level: L, title: "Câu bị động với 被", pattern: "B 被 (A) + động từ + thành phần khác", key: ["被"],
@@ -16,7 +16,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “bị / được”. Chú ý: 被 hay mang sắc thái bất lợi, khác với “được” của tiếng Việt.",
     mistakes: [{ wrong: "杯子被打破。", right: "杯子被打破了。", why: "Sau động từ bị động cần thành phần khác như 了 hay kết quả." }],
     examples: [{ zh: "我的|手机|被|偷|了。", vi: "Điện thoại của tôi bị trộm mất rồi." }, { zh: "杯子|被|他|打破|了。", vi: "Cái ly bị anh ấy làm vỡ rồi." }, { zh: "他|被|老师|表扬|了。", vi: "Anh ấy được cô giáo khen." }],
-    detect: "被",
+    detect: "被(?![子窝单])",
   },
   {
     id: "lian-dou", level: L, title: "连…也 / 都…", pattern: "连 A 也 / 都 + động từ", key: ["连", "也", "都"],
@@ -24,7 +24,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “ngay cả… cũng…”: 连他都不知道 (ngay cả anh ấy cũng không biết).",
     mistakes: [{ wrong: "连他不知道。", right: "连他都不知道。", why: "Cần 也 hoặc 都 ở phía sau để hoàn thiện mẫu." }],
     examples: [{ zh: "他|连|名字|都|忘|了。", vi: "Ngay cả tên anh ấy cũng quên." }, { zh: "我|连|一|口|水|也|没|喝。", vi: "Tôi chưa uống nổi một ngụm nước." }, { zh: "这|个|连|孩子|都|会。", vi: "Cái này đến trẻ con cũng biết." }],
-    detect: "连.+[也都]",
+    detect: "连(?![忙续接着])[^，。]{1,8}[也都]",
   },
   {
     id: "yuelaiyue", level: L, title: "越来越…", pattern: "越来越 + tính từ / động từ", key: ["越来越"],
@@ -40,7 +40,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “càng… càng…”.",
     mistakes: [{ wrong: "他越说很快。", right: "他越说越快。", why: "Vế sau cũng cần 越, không dùng 很." }],
     examples: [{ zh: "他|越|说|越|快。", vi: "Anh ấy càng nói càng nhanh." }, { zh: "歌|越|听|越|好听。", vi: "Bài hát càng nghe càng hay." }, { zh: "雨|越|下|越|大。", vi: "Mưa càng rơi càng to." }],
-    detect: "越(?!来).+越",
+    detect: "越(?!来)[^，。]{1,6}越",
   },
   {
     id: "suiran-danshi", level: L, title: "虽然…但是…", pattern: "虽然 A，但是 / 可是 B", key: ["虽然", "但是"],
@@ -64,7 +64,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “chỉ có… mới…”.",
     mistakes: [{ wrong: "只有你来，就开始。", right: "只有你来，才开始。", why: "只有 đi với 才, 只要 mới đi với 就." }],
     examples: [{ zh: "只有|多|练习，|才|能|说|好。", vi: "Chỉ có luyện nhiều mới nói tốt được." }, { zh: "只有|你，|才|知道|答案。", vi: "Chỉ có bạn mới biết đáp án." }, { zh: "只有|休息|好，|才|有|精神。", vi: "Phải nghỉ ngơi tốt mới có tinh thần." }],
-    detect: "只有",
+    detect: "只有[^。]{1,10}才",
   },
   {
     id: "budan-erqie", level: L, title: "不但…而且…", pattern: "不但 A，而且 B", key: ["不但", "而且"],
@@ -88,7 +88,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “vừa… là… ngay”, “hễ… là…”.",
     mistakes: [{ wrong: "我一到家，才打电话。", right: "我一到家，就打电话。", why: "一…就… đi với 就, không dùng 才." }],
     examples: [{ zh: "我|一|到|家，|就|给|你|打|电话。", vi: "Vừa về đến nhà là tôi gọi cho bạn." }, { zh: "他|一|喝|酒|就|脸红。", vi: "Anh ấy hễ uống rượu là đỏ mặt." }, { zh: "一|下课，|学生|们|就|跑|出去|了。", vi: "Vừa tan học là học sinh chạy ra ngoài." }],
-    detect: "一.{1,6}就",
+    detect: "一(?![个些点起直定样切会])[^，。]{1,5}就",
   },
   {
     id: "geng-hai", level: L, title: "更 / 还: hơn nữa", pattern: "A 比 B 更 / 还 + tính từ", key: ["更", "还"],
@@ -96,7 +96,7 @@ export const HSK3_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “còn… hơn”, “càng”.",
     mistakes: [{ wrong: "今天比昨天很冷。", right: "今天比昨天更冷。", why: "Với 比 dùng 更/还, không dùng 很." }],
     examples: [{ zh: "今天|比|昨天|更|冷。", vi: "Hôm nay còn lạnh hơn hôm qua." }, { zh: "他|比|我|还|忙。", vi: "Anh ấy còn bận hơn tôi." }, { zh: "这|首|歌|比|那|首|更|好听。", vi: "Bài này còn hay hơn bài kia." }],
-    detect: "比.{1,6}[更还]",
+    detect: "(?<![对相攀类])比[^，。]{1,6}[更还]",
   },
   {
     id: "dui-ganxingqu", level: L, title: "对…感兴趣", pattern: "A 对 B 感兴趣", key: ["对", "感兴趣"],

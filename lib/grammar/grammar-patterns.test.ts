@@ -101,3 +101,28 @@ describe("thẻ ôn ngữ pháp", () => {
     expect(grammarSavedItem(grammarById("ba")!)).toMatchObject({ type: "grammar", term: "把", videoId: "" });
   });
 });
+
+describe("nhận diện mẫu: không gắn nhầm", () => {
+  const ids = (t: string) => detectGrammar(t, 10).map((p) => p.id);
+  it("bỏ qua nghĩa khác của chữ cùng hình", () => {
+    expect(ids("我们来比较一下")).not.toContain("bi");
+    expect(ids("他拿起一把伞")).not.toContain("ba");
+    expect(ids("盖上被子睡觉")).not.toContain("bei");
+    expect(ids("连忙跑过去")).not.toContain("lian-dou");
+    expect(ids("离开这里")).not.toContain("li");
+    expect(ids("既然你来了")).not.toContain("ji-you");
+    expect(ids("从来没有")).not.toContain("cong-dao");
+    expect(ids("他还给我钱")).not.toContain("hai");
+    expect(ids("一个人在家")).not.toContain("yi-jiu");
+  });
+  it("vẫn nhận đúng khi dùng mẫu thật", () => {
+    expect(ids("今天比昨天冷")).toContain("bi");
+    expect(ids("请把门关上")).toContain("ba");
+    expect(ids("他被老师表扬了")).toContain("bei");
+    expect(ids("他连名字都忘了")).toContain("lian-dou");
+    expect(ids("火车快要开了")).toContain("yao-le");
+    expect(ids("他唱得很好")).toContain("de-complement");
+    expect(ids("只有多练习才能说好")).toContain("zhiyou-cai");
+    expect(ids("我一到家就打电话")).toContain("yi-jiu");
+  });
+});

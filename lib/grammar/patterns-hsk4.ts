@@ -16,7 +16,7 @@ export const HSK4_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “vừa… vừa…”, “không những… mà còn…” (văn viết hơn).",
     mistakes: [{ wrong: "这个菜既好吃又贵得多。", right: "这个菜既好吃又便宜。", why: "A và B phải cùng kiểu (cùng ưu hoặc cùng khuyết)." }],
     examples: [{ zh: "这|个|菜|既|好吃|又|便宜。", vi: "Món này vừa ngon vừa rẻ." }, { zh: "她|既|聪明|又|漂亮。", vi: "Cô ấy vừa thông minh vừa xinh." }, { zh: "他|既|会|唱，|又|会|跳。", vi: "Anh ấy vừa biết hát vừa biết nhảy." }],
-    detect: "既.+又",
+    detect: "既(?!然)[^，。]{1,8}又",
   },
   {
     id: "shenzhi", level: L, title: "甚至: thậm chí", pattern: "A，甚至 B (còn hơn)", key: ["甚至"],
