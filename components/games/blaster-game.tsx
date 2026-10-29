@@ -29,7 +29,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
   useGameLoop((dt) => setS((cur) => stepBlaster(cur, dt, words, Math.random)), started && !s.over);
   useBlasterSound(s, started);
-  const { saved } = useArcadeScore("blaster", s.over, (sec) => (s.kills > 0 ? arcadeRound(s.score, s.kills, s.kills + s.missed.length, sec) : null));
+  const { saved, xp } = useArcadeScore("blaster", s.over, (sec) => (s.kills > 0 ? arcadeRound(s.score, s.kills, s.kills + s.missed.length, sec) : null));
 
   function onType(value: string) {
     const clean = value.toLowerCase().replace(/[^a-z]/g, "");
@@ -43,6 +43,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   if (s.over) {
     return (
       <PracticeSummary
+        xp={saved ? xp : undefined}
         title="Hạm đội bị phá rồi, thử lại nhé"
         stats={[{ label: "Điểm", value: String(s.score) }, { label: "Từ đã bắn", value: String(s.kills) }, { label: "Combo dài nhất", value: String(s.bestCombo) }, { label: "Cấp", value: String(s.level) }]}
         missed={s.missed.map((w, i) => ({ key: `${w.han}-${i}`, term: w.han, pinyin: w.pinyin, meaning: w.meaning ?? "" }))}
@@ -53,7 +54,6 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   return (
     <div>
       <GameKeyframes />
-      {saved && <p role="status" className="mb-2 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
       <div onClick={() => inputRef.current?.focus()} className={`relative isolate h-[min(68vh,540px)] min-h-[380px] select-none overflow-hidden rounded-3xl border border-white/10 bg-[#040816] ${s.shake > 0 ? "bz-shake" : ""}`}>
         <BlasterScene s={s} showPinyin={hints.pinyin} showMeaning={hints.meaning} />
         <div className="absolute inset-x-3 top-3 z-10 flex flex-wrap items-center justify-between gap-2">

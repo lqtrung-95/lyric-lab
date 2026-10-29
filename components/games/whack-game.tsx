@@ -35,7 +35,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   const endAt = useRef(0);
   const roundStart = useRef(0);
   const win = windowMs(g.played);
-  const { saved } = useArcadeScore("whack", phase === "over", () => (g.hits > 0 ? arcadeRound(g.score, g.hits, g.played, WHACK_SECONDS) : null));
+  const { saved, xp } = useArcadeScore("whack", phase === "over", () => (g.hits > 0 ? arcadeRound(g.score, g.hits, g.played, WHACK_SECONDS) : null));
 
   function advance(c: Play, hit: boolean, points: number): Play {
     const combo = hit ? c.combo + 1 : 0;
@@ -83,6 +83,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   if (phase === "over") {
     return (
       <PracticeSummary
+        xp={saved ? xp : undefined}
         title="Hết giờ!"
         stats={[{ label: "Điểm", value: String(g.score) }, { label: "Đập đúng", value: `${g.hits}/${g.played}` }, { label: "Combo dài nhất", value: String(g.best) }]}
         missed={g.missed.map((w, i) => ({ key: `${w.han}-${i}`, term: w.han, pinyin: w.pinyin, meaning: w.meaning ?? "" }))}
@@ -92,7 +93,6 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   }
   return (
     <div>
-      {saved && <p role="status" className="mb-2 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
       <GameKeyframes />
       <div className="flex flex-wrap items-center justify-between gap-2 text-label-lg font-extrabold">
         <span>🔨 {g.score}</span>

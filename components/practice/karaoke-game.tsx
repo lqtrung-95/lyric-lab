@@ -9,6 +9,7 @@ import type { PracticeOutcome } from "@/lib/practice/practice-grade";
 import { answerPoints } from "@/lib/practice/scoring";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { ClozeLine } from "./cloze-line";
+import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { PracticeSummary } from "./practice-summary";
 import { playSfx } from "@/lib/feedback/sfx";
 
@@ -120,6 +121,7 @@ export function KaraokeGame({ videoId, title, steps, poolTerms, live, showHints,
   if (done) {
     return (
       <PracticeSummary
+        xp={practiceRoundXp(correct, steps.length)}
         title={`Xong bài “${title}”`}
         stats={[{ label: "Điểm", value: String(score) }, { label: "Đúng", value: `${correct}/${steps.length}` }]}
         missed={missed.map((c) => ({ key: c.item_key, term: c.term, pinyin: c.pinyin, meaning: c.meaning }))}

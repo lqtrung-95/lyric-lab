@@ -448,6 +448,7 @@ describe.skipIf(!enabled)("phòng thi đấu: vòng đời và RLS", () => {
       "video_translation_reports.user_id", // on delete set null: báo cáo giữ lại cho quản trị, chỉ mất liên kết người báo
       "video_reports.user_id", // on delete set null: báo cáo giữ lại cho quản trị, chỉ mất liên kết người báo
       "user_explore_state.user_id", // tiến độ Khám phá/phá án: không gộp trong hàm gộp tài khoản vì bản gốc vẫn nằm ở trình duyệt và được gộp lại với bản trên tài khoản đích khi vào Khám phá (xem useRemoteSync và merge-explore-state); dòng của tài khoản ẩn danh xóa theo tài khoản
+      "user_pet.user_id", // linh vật: không gộp trong hàm gộp tài khoản vì bản gốc vẫn nằm ở trình duyệt (localStorage) và use-pet tự đẩy lên tài khoản đích nếu tài khoản đó chưa có pet; dòng của tài khoản ẩn danh xóa theo tài khoản
     ]);
     const { data, error } = await service.rpc("tables_referencing_users");
     expect(error).toBeNull();

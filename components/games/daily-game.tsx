@@ -31,7 +31,7 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
   }, [blob, todayKey, answerSyls]);
   const won = rows.some((r) => isSolved(r.marks));
   const over = won || rows.length >= DAILY_TRIES;
-  const { saved } = useArcadeScore("daily", justWon, (sec) => arcadeRound(dailyPoints(rows.length), 1, 1, sec));
+  const { saved, xp } = useArcadeScore("daily", justWon, (sec) => arcadeRound(dailyPoints(rows.length), 1, 1, sec));
 
   if (!answer || !answerSyls) return <p role="alert" className="rounded-2xl bg-surface-container-low p-space-lg text-center text-body-md text-on-surface-variant">Chưa tải được từ của hôm nay. Thử tải lại trang nhé.</p>;
 
@@ -97,7 +97,7 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
             <span className="text-body-lg text-primary">{answer.pinyin}</span>{answer.meaning && <span className="text-body-md text-on-surface-variant">· {answer.meaning}</span>}
             <PronounceButton text={answer.han} />
           </p>
-          {saved && <p role="status" className="mt-1 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
+          {saved && <p role="status" className="mt-1 text-label-md font-bold text-secondary">Đã ghi +{xp} XP luyện tập.</p>}
           <button type="button" onClick={() => void share()} className="mt-space-sm min-h-12 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary hover:brightness-110">{copied ? "Đã chép kết quả ✓" : "Chia sẻ kết quả"}</button>
           <p className="mt-2 text-body-sm text-on-surface-variant">Từ mới xuất hiện lúc 0 giờ (giờ Việt Nam).</p>
         </section>

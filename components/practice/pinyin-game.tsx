@@ -7,6 +7,7 @@ import { pickPracticeCards } from "@/lib/practice/pick-practice-cards";
 import { outcomeFromPinyin, pinyinPoints, type PracticeOutcome } from "@/lib/practice/practice-grade";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 import { NoteStaff, type NoteState } from "./note-staff";
+import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { PracticeSummary } from "./practice-summary";
 import { playSfx } from "@/lib/feedback/sfx";
 
@@ -97,6 +98,7 @@ export function PinyinGame({ cards, grade, onRoundEnd }: Props) {
   if (finished) {
     return (
       <PracticeSummary
+        xp={practiceRoundXp(correct, deck.length)}
         title={challenge && lives <= 0 ? "Hết mạng rồi, thử lại nhé" : "Xong lượt gõ pinyin"}
         stats={[{ label: "Điểm", value: String(score) }, { label: "Đúng", value: `${correct}/${deck.length}` }, { label: "Combo dài nhất", value: String(best) }, { label: "Từ đã chơi", value: String(Math.min(index, deck.length)) }]}
         missed={missed.map((c) => ({ key: c.item_key, term: c.term, pinyin: c.pinyin, meaning: c.meaning }))}

@@ -35,7 +35,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
     if (s.lives < lives.current) { if (s.over) sfx.gameOver(); else sfx.miss(); }
     lives.current = s.lives;
   }, [s.lives, s.over]);
-  const { saved } = useArcadeScore("rain", s.over, (sec) => (s.cleared > 0 ? arcadeRound(s.score, s.cleared, s.cleared + s.missed.length, sec) : null));
+  const { saved, xp } = useArcadeScore("rain", s.over, (sec) => (s.cleared > 0 ? arcadeRound(s.score, s.cleared, s.cleared + s.missed.length, sec) : null));
 
   function tap(lane: number) {
     setS((cur) => {
@@ -60,6 +60,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   if (s.over) {
     return (
       <PracticeSummary
+        xp={saved ? xp : undefined}
         title="Hết mạng rồi, chơi lại nhé"
         stats={[{ label: "Điểm", value: String(s.score) }, { label: "Hàng đúng", value: String(s.cleared) }, { label: "Combo dài nhất", value: String(s.bestCombo) }, { label: "Cấp", value: String(s.level) }]}
         missed={s.missed.map((w, i) => ({ key: `${w.han}-${i}`, term: w.han, pinyin: w.pinyin, meaning: w.meaning ?? "" }))}
@@ -71,7 +72,6 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
   return (
     <div>
       <GameKeyframes />
-      {saved && <p role="status" className="mb-2 text-label-md font-bold text-secondary">Đã ghi điểm luyện tập.</p>}
       <div className={`relative isolate h-[min(72vh,600px)] min-h-[420px] touch-manipulation select-none overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#1a0b3a] to-[#311a6b] ${s.shake > 0 ? "ring-4 ring-red-500" : ""}`}>
         <div className="absolute inset-x-0 top-0 z-10 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-b from-black/60 to-transparent p-3">
           <span className={chip}>🎵 {s.score}</span>

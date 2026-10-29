@@ -9,6 +9,7 @@ import type { PracticeOutcome } from "@/lib/practice/practice-grade";
 import { answerPoints } from "@/lib/practice/scoring";
 import { playChinese } from "@/lib/speech/play-chinese";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
+import { practiceRoundXp } from "@/lib/game/xp-rules";
 import { PracticeSummary } from "./practice-summary";
 import { playSfx } from "@/lib/feedback/sfx";
 
@@ -110,6 +111,7 @@ export function ListenGame({ cards, grade, onRoundEnd }: Props) {
   if (finished) {
     return (
       <PracticeSummary
+        xp={practiceRoundXp(correct, questions.length)}
         title="Xong lượt nghe và chọn"
         stats={[{ label: "Điểm", value: String(score) }, { label: "Đúng", value: `${correct}/${questions.length}` }]}
         missed={missed.map((c) => ({ key: c.item_key, term: c.term, pinyin: c.pinyin, meaning: c.meaning }))}
