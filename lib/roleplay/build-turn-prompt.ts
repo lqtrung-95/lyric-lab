@@ -18,7 +18,7 @@ const SASSY_RULE =
   "GIỌNG ĐIỆU: bạn đanh đá, hay cà khịa và trêu người học như một người bạn thân tinh nghịch, nhưng luôn vui vẻ và đáng yêu. " +
   "ĐA DẠNG: mỗi lời nhận xét phải mở đầu và kết thúc khác nhau, tuyệt đối không lặp lại cách mở đầu của lần trước; KHÔNG dùng 'Trời ơi' (nếu thật cần thì tối đa một lần cả buổi). " +
   "Khi người học nói sai hoặc dùng từ chưa tự nhiên (kể cả lỗi nhỏ về từ dùng hay trật tự từ) thì PHẢI trả feedback: 'issue' nói thẳng và trêu một câu ngắn bằng tiếng Việt rồi chỉ ra lỗi, 'better' là câu đúng. Nói đúng thì khen ngắn kiểu miễn cưỡng, không cần feedback. " +
-  "Tuyệt đối không xúc phạm cá nhân, không chê ngoại hình, gia đình, giới tính hay chuyện nhạy cảm, không tục. ";
+  "Dù giọng đanh đá, 'issue' và 'replyVi' VẪN PHẢI viết bằng tiếng Việt (không viết nhận xét bằng tiếng Trung). Tuyệt đối không xúc phạm cá nhân, không chê ngoại hình, gia đình, giới tính hay chuyện nhạy cảm, không tục. ";
 
 /** Mỗi lượt gợi một kiểu trêu khác nhau (xoay theo số lượt đã nói) để lời nhận xét không lặp một khuôn. */
 export const SASSY_FLAVORS = [
@@ -43,7 +43,7 @@ export function buildRoleplayPrompt(s: Scenario, req: RoleplayRequest): string {
     "reply: lời đáp của bạn bằng chữ Hán, 1 câu (tối đa 2 câu rất ngắn), đúng vai, tiếp nối tự nhiên và thường kết bằng một câu hỏi hoặc gợi ý để người học nói tiếp; nếu người học lạc đề thì nhẹ nhàng kéo về tình huống. " +
     "replyVi: nghĩa tiếng Việt của reply. " +
     "tips: 0-2 câu mẫu ngắn (chữ Hán, đúng trình độ) mà người học có thể nói tiếp, chỉ gợi ý khi câu của bạn đặt ra một câu hỏi. " +
-    'feedback: null nếu câu người học đúng và tự nhiên; chỉ khi có lỗi ngữ pháp/từ dùng không tự nhiên rõ ràng mới trả {"issue": "giải thích ngắn bằng tiếng Việt (1 câu)", "better": "câu sửa lại bằng chữ Hán"}. ' +
+    'feedback: null nếu câu người học đúng và tự nhiên; chỉ khi có lỗi ngữ pháp/từ dùng không tự nhiên rõ ràng mới trả {"issue": "giải thích ngắn bằng TIẾNG VIỆT (1 câu, viết bằng chữ Latinh, chỉ được trích vài chữ Hán để chỉ lỗi)", "better": "câu sửa lại bằng chữ Hán"}. ' +
     (s.sassy ? SASSY_RULE : "Không sửa lỗi nhỏ về dấu câu hay cách nói thân mật. ") +
     "Không dùng pinyin, không dùng ngôn ngữ nào khác ngoài chữ Hán và tiếng Việt.";
 }
