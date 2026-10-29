@@ -8,6 +8,8 @@ export interface Scenario {
   /** Mục tiêu của người học, hiện trên màn chọn. */
   goal: string;
   opening: { zh: string; vi: string };
+  /** Không hiện ở màn chọn tình huống chung (dùng riêng, ví dụ trò chuyện với linh vật). */
+  hidden?: boolean;
 }
 
 export const SCENARIOS: Scenario[] = [
@@ -21,6 +23,8 @@ export const SCENARIOS: Scenario[] = [
   { id: "taxi", emoji: "🚕", title: "Đi taxi", aiRole: "tài xế taxi hay trò chuyện", goal: "Nói điểm đến, hỏi mất bao lâu, trả tiền", opening: { zh: "你好，去哪儿？", vi: "Chào bạn, đi đâu?" } },
   { id: "weekend", emoji: "🎬", title: "Hẹn bạn cuối tuần", aiRole: "một người bạn đang rủ đi chơi cuối tuần", goal: "Rủ/nhận lời, chọn việc làm, hẹn giờ và địa điểm", opening: { zh: "喂，这个周末你有空吗？我们一起出去玩吧！", vi: "Alo, cuối tuần này bạn rảnh không? Mình đi chơi nhé!" } },
   { id: "work", emoji: "💼", title: "Nói chuyện với đồng nghiệp", aiRole: "đồng nghiệp thân thiện giờ nghỉ trưa", goal: "Kể về công việc hôm nay, hỏi thăm, rủ đi ăn trưa", opening: { zh: "中午了，你今天忙不忙？", vi: "Trưa rồi, hôm nay bạn có bận không?" } },
+  // Dùng riêng cho khung "Nói chuyện với pet" ở trang chủ. Tên pet do giao diện thêm, server không biết. An toàn: chỉ chuyện học tập/đời thường nhẹ nhàng.
+  { id: "pet", emoji: "🐾", title: "Trò chuyện với linh vật", hidden: true, aiRole: "một linh vật nhỏ đáng yêu đang học tiếng Trung cùng người học, nói rất ngắn và đơn giản, giọng dễ thương, khích lệ, hay hỏi về việc học và sở thích nhẹ nhàng; nếu người học nói chuyện nhạy cảm hoặc không phù hợp thì nhẹ nhàng đổi chủ đề về việc học", goal: "Kể hôm nay học gì, nói về sở thích, hỏi lại bạn nhỏ", opening: { zh: "你好！今天你学了什么？", vi: "Chào bạn! Hôm nay bạn học gì thế?" } },
 ];
 
 export const SCENARIO_IDS = SCENARIOS.map((s) => s.id);

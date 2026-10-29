@@ -1,0 +1,48 @@
+"use client";
+
+import { useState } from "react";
+import { useChatAccount } from "@/components/chat/use-chat-account";
+import { MicIntro } from "@/components/speaking/mic-intro";
+import { RoleplayChat } from "@/components/speaking/roleplay-chat";
+import { signInGoogle } from "@/lib/auth/account-client";
+import { findScenario } from "@/lib/roleplay/scenarios";
+import { MAX_ROLEPLAY_TURNS } from "@/lib/roleplay/turn-schema";
+import type { MicCheck } from "@/lib/speaking/vad-recorder";
+import { useLearnerState } from "@/lib/user-state/use-learner-state";
+
+const PET_SCENARIO = findScenario("pet")!;
+
+/**
+ * Nói chuyện với pet bằng tiếng Trung đơn giản: dùng lại nguyên engine nhập vai (`/api/roleplay/turn`, kịch bản ẩn `pet`).
+ * An toàn/chi phí do server lo: chỉ tài khoản đã đăng ký, hạn mức `roleplay` theo ngày (chung với Trò chuyện tự do), tối đa
+ * `MAX_ROLEPLAY_TURNS` lượt mỗi buổi, lời người học bị coi là dữ liệu chứ không phải chỉ thị, pinyin từ từ điển, khóa AI chỉ ở server.
+ * Trình độ lấy từ cấp HSK của người học (kẹp 1–4). Micro lỗi thì chuyển sang gõ chữ.
+ */
+export function PetChat({ name, onClose }: { name: string; onClose: () => void }) {
+  const registered = useChatAccount();
+  const learner = useLearnerState();
+  const [mic, setMic] = useState<MicCheck | null>(null);
+  const level = Math.min(4, Math.max(1, learner.state.level));
+
+  let body;
+  if (registered === undefined) body = <p role="status" className="text-body-md text-on-surface-variant">Đang kiểm tra tài khoản…</p>;
+  else if (!registered) {
+    body = (
+      <div>
+        <p className="text-body-md font-bold">Nói chuyện với {name} cần đăng nhập Google</p>
+        <p className="mt-1 text-body-md text-on-surface-variant">Mỗi lượt nói dùng AI nên chỉ mở cho tài khoản đã đăng ký.</p>
+        <button type="button" onClick={() => void signInGoogle()} className="mt-2 min-h-11 rounded-full bg-primary px-5 text-label-md font-bold text-on-primary hover:brightness-110">Đăng nhập bằng Google</button>
+      </div>
+    );
+  } else if (mic === null) {
+    body = <MicIntro title={`🐾 Nói chuyện với ${name}`} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời, rồi micro tự bật: bạn nói bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} />;
+  } else {
+    body = <RoleplayChat scenario={PET_SCENARIO} level={level} typingOnly={mic !== "ok"} onExit={onClose} />;
+  }
+  return (
+    <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm" role="group" aria-label={`Nói chuyện với ${name}`}>
+      {body}
+      <button type="button" onClick={onClose} className="mt-2 min-h-11 rounded-full px-4 text-label-md font-medium text-on-surface-variant hover:bg-surface-container-high">Đóng</button>
+    </div>
+  );
+}

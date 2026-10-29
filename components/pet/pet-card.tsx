@@ -20,6 +20,7 @@ import { sfx } from "@/lib/games/arcade-sfx";
 import type { PetBurst, PetBurstKind } from "@/lib/pet/pet-burst";
 import type { EchoTier } from "@/lib/pet/pet-echo";
 import { PetBurstFx } from "./pet-burst-fx";
+import { PetChat } from "./pet-chat";
 import { PetEcho } from "./pet-echo";
 import { PetFeed } from "./pet-feed";
 import { usePetEvolution } from "./use-pet-evolution";
@@ -40,6 +41,7 @@ export function PetCard() {
   const review = useReviewSummary();
   const [feeding, setFeeding] = useState(false);
   const [echoing, setEchoing] = useState(false);
+  const [chatting, setChatting] = useState(false);
   const echoWord = review?.peek[0] ?? null;
   const { gift, take } = usePetGift();
   const [chewKey, setChewKey] = useState(0);
@@ -85,9 +87,10 @@ export function PetCard() {
           </div>
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
-        {!feeding && !echoing && (
+        {!feeding && !echoing && !chatting && (
           <div className="mt-space-sm flex flex-wrap gap-2">
             {(review?.total ?? 0) > 0 && <Button3d type="button" variant="bright" onClick={() => { sfx.petBlip(); setFeeding(true); }}>Cho {pet.name} ăn thẻ</Button3d>}
+            <Button3d type="button" onClick={() => { sfx.petBlip(); fx("tap"); setChatting(true); }}>Nói chuyện với {pet.name}</Button3d>
             {echoWord && <Button3d type="button" onClick={() => { sfx.petBlip(); setEchoing(true); }}>Tập nói cùng {pet.name}</Button3d>}
           </div>
         )}
@@ -107,6 +110,7 @@ export function PetCard() {
           </div>
         </div>
       )}
+      {chatting && <PetChat name={pet.name} onClose={() => { sfx.petBlip(); setChatting(false); }} />}
       {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={(tier: EchoTier) => fx(tier === "great" ? "cheer" : tier === "good" ? "tap" : "try")} onClose={() => { sfx.petBlip(); setEchoing(false); }} />}
       {feeding && <PetFeed name={pet.name} onEat={() => { setChewKey((k) => k + 1); fx("crunch"); }} onFull={() => fx("full")} onClose={() => { sfx.petBlip(); setFeeding(false); }} />}
     </section>
