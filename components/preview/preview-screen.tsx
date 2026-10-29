@@ -11,6 +11,7 @@ import { shiftLines } from "@/lib/listen/lyric-offset";
 import { useLyricOffset } from "@/lib/user-state/use-lyric-offset";
 import { itemKey, type SavedItem } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
+import { SongScenesCard } from "@/components/explore/song-scenes-card";
 import { SongReportBanner } from "@/components/admin/song-report-banner";
 import { ComprehensionBanner } from "./comprehension-banner";
 import { computeComprehension } from "@/lib/preview/comprehension";
@@ -133,6 +134,7 @@ export function PreviewScreen({ analysis, song, wordStats }: PreviewScreenProps)
                   saved={savedKeys.has(itemKey(item))} onPlay={play} onToggleSave={save} onKnown={markAsKnown} />
               ))
             )}
+            <SongScenesCard items={analysis.items} lines={analysis.lines} />
           </section>
         </div>
       </div>

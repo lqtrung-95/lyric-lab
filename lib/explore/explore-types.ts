@@ -59,7 +59,7 @@ export interface SceneExit {
 }
 
 /** Kiểu nền và nhạc của cảnh. */
-export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park" | "school" | "shop" | "hotel" | "airport" | "library" | "supermarket" | "beach" | "office" | "kitchen" | "bakery" | "museum" | "stadium" | "bank" | "cinema" | "gym" | "salon" | "postoffice" | "pharmacy" | "phoneshop" | "hotpot" | "zoo" | "flowershop" | "garage" | "bubbletea" | "funfair" | "farm" | "laundry" | "toyshop" | "police" | "subway" | "camping" | "lab" | "cafe" | "bookstore" | "pool" | "firestation" | "datacenter" | "devroom" | "ailab" | "port" | "greenhouse" | "petshop" | "tailor" | "photostudio" | "dental" | "construction";
+export type SceneTheme = "room" | "eatery" | "market" | "station" | "hospital" | "park" | "school" | "shop" | "hotel" | "airport" | "library" | "supermarket" | "beach" | "office" | "kitchen" | "bakery" | "museum" | "stadium" | "bank" | "cinema" | "gym" | "salon" | "postoffice" | "pharmacy" | "phoneshop" | "hotpot" | "zoo" | "flowershop" | "garage" | "bubbletea" | "funfair" | "farm" | "laundry" | "toyshop" | "police" | "subway" | "camping" | "lab" | "cafe" | "bookstore" | "pool" | "firestation" | "datacenter" | "devroom" | "ailab" | "port" | "greenhouse" | "petshop" | "tailor" | "photostudio" | "dental" | "construction" | "breakfast" | "nightmarket" | "teahouse" | "tcm" | "calligraphy" | "courier" | "ktv" | "newyear";
 
 /** Hội thoại mẫu giữa hai người trong một cảnh: `who` là chỉ số trong `speakers`. */
 export interface SceneConversation {
