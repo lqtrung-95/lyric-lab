@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { hasExistingSession } from "@/lib/auth/ensure-anonymous-session";
 import { DUE_COUNT_EVENT } from "@/lib/review/due-count-event";
+import { peekReviewWords, type PetReviewWord } from "@/lib/pet/pet-review-word";
 import { loadReviewSession } from "@/lib/user-data/review-repo";
 
 export interface ReviewSummary {
@@ -11,6 +12,8 @@ export interface ReviewSummary {
   cardCount: number;
   newPerDay: number;
   newStartedToday: number;
+  /** Vài thẻ đầu hàng đợi (cho linh vật nhắc từ), lấy từ cùng lần tải này để không gọi Supabase lần hai. */
+  peek: PetReviewWord[];
 }
 
 // Huy hiệu ở nav và bảng "Hôm nay" cùng cần số liệu này: gộp các lần tải đang chạy để chỉ hỏi Supabase một lần.
@@ -19,8 +22,8 @@ function fetchSummary(): Promise<ReviewSummary | null> {
   inflight ??= (async () => {
     try {
       if (!(await hasExistingSession())) return null;
-      const { total, cardCount, newPerDay, newStartedToday } = await loadReviewSession();
-      return { total, cardCount, newPerDay, newStartedToday };
+      const { total, cardCount, newPerDay, newStartedToday, queue } = await loadReviewSession();
+      return { total, cardCount, newPerDay, newStartedToday, peek: peekReviewWords(queue) };
     } catch {
       return null; // Chỉ là thông tin phụ: lỗi mạng thì không hiện.
     } finally {
