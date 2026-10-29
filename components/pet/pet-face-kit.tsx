@@ -26,9 +26,9 @@ export function Eyes({ mood, cx, y, r = 8, gap = 28 }: { mood: PetMood; cx: numb
 
 /** Miệng: vui = cười há có lưỡi, đói = chữ "o" nhỏ, ngủ = nét ngang. */
 export function Mouth({ mood, cx, y }: { mood: PetMood; cx: number; y: number }) {
-  if (mood === "happy") return <g><path d={`M${cx - 6} ${y}q6 10 12 0z`} fill={DARK} /><ellipse cx={cx} cy={y + 3.6} rx="3.2" ry="1.7" fill="#ff7a8a" /></g>;
-  if (mood === "hungry") return <ellipse cx={cx} cy={y + 3} rx="3" ry="3.6" fill={DARK} />;
-  return <path d={`M${cx - 3} ${y + 2}h6`} stroke={DARK} strokeWidth="3" strokeLinecap="round" />;
+  if (mood === "happy") return <g><path d={`M${cx - 7.5} ${y}q7.5 13 15 0z`} fill={DARK} /><ellipse cx={cx} cy={y + 4.8} rx="4.1" ry="2.1" fill="#ff7a8a" /></g>;
+  if (mood === "hungry") return <ellipse cx={cx} cy={y + 3.5} rx="3.8" ry="4.6" fill={DARK} />;
+  return <path d={`M${cx - 3.5} ${y + 2.5}h7`} stroke={DARK} strokeWidth="3" strokeLinecap="round" />;
 }
 
 export function Cheeks({ cx, y, gap = 52 }: { cx: number; y: number; gap?: number }) {
