@@ -2,60 +2,98 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { RubyLine } from "@/components/ui/ruby-text";
+import { WordTapPanel } from "@/components/speaking/word-tap-panel";
+import { RubyChars, RubyLine } from "@/components/ui/ruby-text";
+import { alignPinyin } from "@/lib/pinyin/align-ruby";
+import type { ReplyToken } from "@/lib/roleplay/segment-reply";
 import type { LevelBand } from "@/lib/dialogues/dialogue-types";
-import { playChinese, playChineseSequence, stopChinese } from "@/lib/speech/play-chinese";
-import type { ReadingDef } from "@/lib/readings/reading-types";
+import { playChineseSequence, stopChinese } from "@/lib/speech/play-chinese";
+import { allSentences, type ReadingDef } from "@/lib/readings/reading-types";
 
 const chip = "inline-flex min-h-11 items-center rounded-full border-2 border-ink px-4 text-label-md font-bold";
 
 /**
- * Trình đọc một truyện ngắn: chữ Hán có pinyin (từ từ điển), nghe từng câu hoặc cả bài, bật/tắt nghĩa Việt, rồi câu hỏi đọc hiểu.
- * Nghĩa Việt ẩn mặc định để người học tự đoán trước; bấm "Nghĩa" ở từng câu để xem riêng câu đó.
+ * Trình đọc một truyện ngắn dạng ĐOẠN VĂN liền mạch: chữ Hán có pinyin (từ từ điển), từ nào cũng bấm được để tra và lưu thẻ ôn, nghe từng đoạn hoặc cả bài
+ * (câu đang đọc được tô nền), nghĩa Việt ẩn mặc định để người học tự đoán trước (bật cả bài, hoặc bấm "Nghĩa" ở từng đoạn), rồi câu hỏi đọc hiểu.
  */
-export function ReadingPlayer({ reading, pinyin, level }: { reading: ReadingDef; pinyin: Record<string, string>; level: LevelBand | null }) {
+export function ReadingPlayer({ reading, pinyin, tokens, level }: { reading: ReadingDef; pinyin: Record<string, string>; tokens: Record<string, ReplyToken[]>; level: LevelBand | null }) {
   const [showPinyin, setShowPinyin] = useState(true);
   const [showAllVi, setShowAllVi] = useState(false);
   const [open, setOpen] = useState<ReadonlySet<number>>(new Set());
-  const [reading_, setReadingIdx] = useState(-1);
+  const [playing, setPlaying] = useState(-1);
+  const [tapped, setTapped] = useState<string | null>(null);
   useEffect(() => () => stopChinese(), []);
 
-  const toggle = (i: number) => setOpen((o) => { const n = new Set(o); if (!n.delete(i)) n.add(i); return n; });
-  const playAll = () => {
-    if (reading_ >= 0) { stopChinese(); return; }
-    void playChineseSequence(reading.sentences.map((s) => s.zh), setReadingIdx);
+  // Chỉ số câu toàn bài của câu đầu mỗi đoạn, để tô đúng câu đang đọc khi nghe cả bài hay một đoạn.
+  const starts = reading.paragraphs.reduce<number[]>((acc, p, i) => [...acc, i === 0 ? 0 : acc[i - 1] + reading.paragraphs[i - 1].length], []);
+  const flat = allSentences(reading);
+  const play = (from: number, to: number) => {
+    if (playing >= 0) { stopChinese(); return; }
+    void playChineseSequence(flat.slice(from, to).map((s) => s.zh), (i) => setPlaying(i < 0 ? -1 : from + i));
   };
+  const toggle = (i: number) => setOpen((o) => { const n = new Set(o); if (!n.delete(i)) n.add(i); return n; });
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md pb-56">
       <Link href="/readings" className="inline-flex min-h-11 w-fit items-center text-label-md font-bold underline">← Tất cả truyện</Link>
       <header>
         <h1 lang="zh-Hans" className="font-serif text-headline-lg"><span aria-hidden="true">{reading.emoji}</span> {reading.title.zh}</h1>
         <p className="text-body-md text-on-surface-variant">{reading.title.vi}{level ? ` · HSK ${level >= 6 ? "6+" : level}` : ""}</p>
       </header>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Tùy chọn đọc">
-        <button type="button" onClick={playAll} className={`${chip} bg-primary-container text-on-primary-container`}>{reading_ >= 0 ? "Dừng" : "Nghe cả bài"}</button>
+        <button type="button" onClick={() => play(0, flat.length)} className={`${chip} bg-primary-container text-on-primary-container`}>{playing >= 0 ? "Dừng" : "Nghe cả bài"}</button>
         <button type="button" aria-pressed={showPinyin} onClick={() => setShowPinyin((v) => !v)} className={`${chip} ${showPinyin ? "bg-secondary-container" : "bg-surface-container-lowest"}`}>Pinyin</button>
         <button type="button" aria-pressed={showAllVi} onClick={() => setShowAllVi((v) => !v)} className={`${chip} ${showAllVi ? "bg-secondary-container" : "bg-surface-container-lowest"}`}>Nghĩa Việt</button>
       </div>
-      <ol className="flex flex-col gap-2">
-        {reading.sentences.map((s, i) => {
-          const vi = showAllVi || open.has(i);
+      <p className="text-body-sm text-on-surface-variant">Bấm vào một từ (gạch chân chấm) để xem nghĩa và lưu thẻ ôn.</p>
+      <article className="card-ink flex flex-col gap-space-md p-space-md">
+        {reading.paragraphs.map((para, pi) => {
+          const vi = showAllVi || open.has(pi);
+          const from = starts[pi];
           return (
-            <li key={i} className={`card-ink p-space-sm ${i === reading_ ? "bg-primary-container" : ""}`} aria-current={i === reading_ ? "true" : undefined}>
-              <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.1]"><RubyLine zh={s.zh} pinyin={pinyin[s.zh]} show={showPinyin} /></p>
-              {vi && <p className="text-body-md text-on-surface-variant">{s.vi}</p>}
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <button type="button" onClick={() => { stopChinese(); void playChinese(s.zh); }} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-bold">Nghe</button>
-                {!showAllVi && <button type="button" aria-pressed={open.has(i)} onClick={() => toggle(i)} className="min-h-11 rounded-full px-3 text-label-md font-bold underline">{open.has(i) ? "Ẩn nghĩa" : "Nghĩa"}</button>}
-                {i === reading_ && <span className="text-label-md font-extrabold">đang đọc</span>}
+            <section key={pi} aria-label={`Đoạn ${pi + 1}`} className="flex flex-col gap-2">
+              <p lang="zh-Hans" className="text-body-lg font-bold leading-[2.6]">
+                {para.map((s, si) => (
+                  <span key={si} aria-current={from + si === playing ? "true" : undefined} className={`rounded-md ${from + si === playing ? "bg-primary-container" : ""}`}>
+                    <Sentence zh={s.zh} pinyin={showPinyin ? pinyin[s.zh] : undefined} tokens={tokens[s.zh] ?? []} active={tapped} onWord={setTapped} />
+                  </span>
+                ))}
+              </p>
+              {vi && <p className="text-body-md text-on-surface-variant">{para.map((s) => s.vi).join(" ")}</p>}
+              <div className="flex flex-wrap items-center gap-2">
+                <button type="button" onClick={() => play(from, from + para.length)} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-bold">{playing >= 0 ? "Dừng" : "Nghe đoạn"}</button>
+                {!showAllVi && <button type="button" aria-pressed={open.has(pi)} onClick={() => toggle(pi)} className="min-h-11 rounded-full px-3 text-label-md font-bold underline">{open.has(pi) ? "Ẩn nghĩa" : "Nghĩa đoạn này"}</button>}
               </div>
-            </li>
+            </section>
           );
         })}
-      </ol>
+      </article>
       <Quiz reading={reading} />
+      {tapped && (
+        <div className="fixed inset-x-3 bottom-20 z-40 mx-auto max-w-xl md:bottom-6">
+          <WordTapPanel key={tapped} term={tapped} onLooked={() => undefined} onClose={() => setTapped(null)} />
+        </div>
+      )}
     </div>
+  );
+}
+
+/** Một câu chia theo từ: từ có chữ Hán là nút bấm tra nghĩa; pinyin (nếu bật) nằm ngay dưới từng chữ. Không tách được từ thì hiện câu thường. */
+function Sentence({ zh, pinyin, tokens, active, onWord }: { zh: string; pinyin: string | undefined; tokens: ReplyToken[]; active: string | null; onWord: (t: string) => void }) {
+  if (tokens.length === 0) return <RubyLine zh={zh} pinyin={pinyin} show={!!pinyin} />;
+  const py = pinyin ? alignPinyin(zh, pinyin) : null;
+  const starts = tokens.reduce<number[]>((acc, t, i) => [...acc, i === 0 ? 0 : acc[i - 1] + Array.from(tokens[i - 1].text).length], []);
+  return (
+    <>
+      {tokens.map((t, i) => {
+        const inner = py ? <RubyChars text={t.text} py={py} offset={starts[i]} /> : t.text;
+        if (!t.han) return <span key={i}>{inner}</span>;
+        return (
+          <button key={i} type="button" onClick={() => onWord(t.text)} aria-label={`Tra từ ${t.text}`} aria-pressed={active === t.text}
+            className={`mx-px inline rounded-md px-0.5 underline decoration-dotted decoration-2 underline-offset-[6px] hover:bg-primary-container/60 ${active === t.text ? "bg-secondary-container" : ""}`}>{inner}</button>
+        );
+      })}
+    </>
   );
 }
 

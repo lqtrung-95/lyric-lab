@@ -9,5 +9,5 @@ export default async function ReadingPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const detail = /^[a-z0-9-]{1,60}$/.test(id) ? await loadReading(id) : null;
   if (!detail) notFound();
-  return <ReadingPlayer key={detail.reading.id} reading={detail.reading} pinyin={detail.pinyin} level={detail.level} />;
+  return <ReadingPlayer key={detail.reading.id} reading={detail.reading} pinyin={detail.pinyin} tokens={detail.tokens} level={detail.level} />;
 }
