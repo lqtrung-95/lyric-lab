@@ -1,6 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useGrammarStats } from "@/components/grammar/use-grammar-stats";
+import { grammarById } from "@/lib/grammar/grammar-patterns";
+import { weakPatternIds } from "@/lib/grammar/grammar-stats";
 import { useState } from "react";
 import { useGameSummary } from "@/components/layout/use-game-summary";
 import { useStreak } from "@/components/streak/use-streak";
@@ -63,6 +66,7 @@ export function PetCard() {
   const now = useNow();
   const { adventure, setAdventure } = usePetAdventure();
   const { taught } = usePetTaught();
+  const { stats: grammarStats } = useGrammarStats();
   const [seenBack, setSeenBack] = useState<string | null>(null);
   // Hiệu ứng hạt + tiếng cho tương tác ngoài hình pet (cho ăn, tập nói, quà, nhận nuôi, tiến hóa).
   const [extra, setExtra] = useState<PetBurst | null>(null);
@@ -92,6 +96,7 @@ export function PetCard() {
   const today = now ? (streak?.week.find((d) => d.isToday)?.day ?? null) : null;
   const away = phase === "away";
   const forgot = forgottenCount(taught, now);
+  const weakGrammar = grammarById(weakPatternIds(grammarStats, 1)[0] ?? "") ?? null;
   const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
   const shown: Pet = draft ? { ...pet, species: draft.species, name: cleanPetName(draft.name) ?? pet.name } : pet;
   const previewing = draft !== null && (shown.species !== pet.species || shown.name !== pet.name);
@@ -118,6 +123,7 @@ export function PetCard() {
           </div>
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
+        {weakGrammar && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} thấy bạn hay sai mẫu “{weakGrammar.title}”. <Link href={`/grammar/${weakGrammar.id}`} className="inline-flex min-h-11 items-center underline">Ôn lại nhé</Link></p>}
         {forgot > 0 && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} đang quên {forgot} từ bạn đã dạy. Dạy lại nhé!</p>}
         {!feeding && !echoing && !chatting && !editing && !teaching && !homing && !away && (
           <div className="mt-space-sm flex flex-wrap gap-2">

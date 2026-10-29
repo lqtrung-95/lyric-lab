@@ -27,6 +27,14 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
     ],
   },
   {
+    id: "grammar", title: "Ngữ pháp", blurb: "Mẫu câu thông dụng theo cấp HSK, kèm bài tập và thi cuối cấp",
+    modes: [
+      { href: "/grammar", label: "Mẫu câu theo cấp", desc: "Công thức, lỗi hay sai, ví dụ có giọng đọc và bài tập", icon: "list_alt" },
+      { href: "/grammar/test/1", label: "Thi HSK 1", desc: "12 câu trộn: xếp từ, điền chỗ trống, chọn câu đúng", icon: "quiz" },
+      { href: "/grammar/test/2", label: "Thi HSK 2", desc: "Đo xem bạn nắm các mẫu cấp 2 đến đâu", icon: "quiz" },
+    ],
+  },
+  {
     id: "speak", title: "Nói và phản xạ", blurb: "Mở miệng nhiều hơn: nói nhanh, nói tự nhiên, nói đúng",
     modes: [
       { href: "/review/speak-reflex", label: "Hỏi nhanh – Đáp nhanh", desc: "Nghe câu hỏi, nói đáp ngay trong 8 giây", icon: "mic" },

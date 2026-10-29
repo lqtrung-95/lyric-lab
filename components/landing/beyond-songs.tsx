@@ -27,13 +27,23 @@ const CARDS = [
     chips: ["Thứ tự nét", "Ghép bộ thủ", "Từ khó"], href: "/review/write", cta: "Tập viết",
   },
   {
+    emoji: "🧩", title: "Ngữ pháp: mẫu câu theo cấp HSK",
+    body: "49 mẫu thông dụng từ HSK 1 đến HSK 4: công thức, so sánh với tiếng Việt, lỗi hay sai và ví dụ có giọng đọc. Luyện bằng xếp từ, điền chỗ trống, chọn câu đúng; thi cuối mỗi cấp, lưu mẫu vào thẻ ôn, và khi nghe bài hát câu nào dùng mẫu quen thì có nhãn ngay dưới lời.",
+    chips: ["49 mẫu", "Bài tập", "Thi cuối cấp", "Nhãn trong lời"], href: "/grammar", cta: "Học ngữ pháp",
+  },
+  {
+    emoji: "⚔️", title: "Thi đấu với bạn bè",
+    body: "Tạo phòng, gửi mã cho bạn và đấu gõ pinyin 1–1 xem ai nhanh hơn, hoặc so điểm luyện tập trên bảng xếp hạng. Thắng thua chỉ để vui, không ảnh hưởng lịch ôn của bạn.",
+    chips: ["Đấu 1–1", "Phòng mời bạn", "Xếp hạng"], href: "/room", cta: "Vào phòng đấu",
+  },
+  {
     emoji: "🛠️", title: "Công cụ miễn phí, không cần đăng ký",
     body: "Đổi tên Việt sang tên tiếng Trung kèm thẻ ảnh để khoe, bảng pinyin có hình vị trí đặt lưỡi cho người Việt, kiểm tra ngữ pháp bằng AI, đổi giản thể và phồn thể, giấy tập viết chữ Hán và nhiều công cụ khác.",
     chips: ["Tên tiếng Trung", "Hình đặt lưỡi", "Ngữ pháp AI", "In giấy tập viết"], href: "/tools", cta: "Xem công cụ",
   },
 ];
 
-/** Khối "Ngoài bài hát": sáu tính năng ngoài lõi bài hát (Khám phá, Bạn nhỏ đồng hành, Truyện ngắn, Hội thoại, Viết chữ, Công cụ), mỗi thẻ có một nút vào thẳng. */
+/** Khối "Ngoài bài hát": tám tính năng ngoài lõi bài hát (Khám phá, Bạn nhỏ đồng hành, Truyện ngắn, Hội thoại, Viết chữ, Ngữ pháp, Thi đấu, Công cụ), mỗi thẻ có một nút vào thẳng. */
 export function BeyondSongs() {
   return (
     <section id="beyond-songs" aria-labelledby="beyond-heading" className="mt-24 scroll-mt-24">
