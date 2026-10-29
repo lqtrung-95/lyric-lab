@@ -317,6 +317,7 @@ Tranh cảnh Khám phá vẽ bằng SVG trong code (`components/explore/art/flat
 ## Game vui: migration
 
 - Chạy `supabase/migrations/20261028000003_arcade_game_modes.sql` trong Supabase SQL Editor (thêm chế độ điểm `blaster`, `rain`, `whack`, `daily`, `duel` vào `practice_scores_mode_check`). Chưa chạy thì game vẫn chơi được, chỉ điểm XP bị bỏ qua.
+- Chạy `supabase/migrations/20261029000002_user_pet.sql` trong Supabase SQL Editor (tạo bảng `user_pet`, RLS theo chủ sở hữu). Chưa chạy thì pet chỉ lưu ở trình duyệt.
 - Đấu 1–1 dùng Supabase Realtime (broadcast + presence), không cần bảng mới. Kho từ chung phụ thuộc bảng `dict_words`; tra lỗi thì các trang Hán tự mỗi ngày và Đấu 1–1 báo chưa tải được từ.
 
 ### Làm sạch nghĩa thẻ đã lưu (`scripts/clean-saved-meanings.mts`)
