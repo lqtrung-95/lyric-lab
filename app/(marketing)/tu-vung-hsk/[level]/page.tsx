@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/seo/site-url";
 import { HSK_LEVELS, isHskLevel } from "@/lib/tools/build-hsk-rows";
 import { getHskRows } from "@/lib/tools/hsk-vocab";
 
-// Dựng khi có người truy cập (không đọc DB lúc build); cấp ngoài 1–6 trả 404; dữ liệu được nhớ 1 ngày trong `getHskRows`.
+// Dựng khi có người truy cập (không đọc DB lúc build); cấp ngoài 1–6 trả 404; dữ liệu được nhớ 1 giờ trong `getHskRows`.
 export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ level: string }> };

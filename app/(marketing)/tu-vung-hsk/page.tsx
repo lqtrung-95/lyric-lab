@@ -4,7 +4,7 @@ import { SITE_URL } from "@/lib/seo/site-url";
 import { HSK_LEVELS } from "@/lib/tools/build-hsk-rows";
 import { getHskRows } from "@/lib/tools/hsk-vocab";
 
-// Dựng khi có người truy cập (không đọc DB lúc build, để DB trục trặc không làm hỏng deploy); dữ liệu được nhớ 1 ngày trong `getHskRows`.
+// Dựng khi có người truy cập (không đọc DB lúc build, để DB trục trặc không làm hỏng deploy); dữ liệu được nhớ 1 giờ trong `getHskRows`.
 export const dynamic = "force-dynamic";
 
 const TITLE = "Từ vựng HSK 1–6 có pinyin và âm Hán Việt | SongHanzi";

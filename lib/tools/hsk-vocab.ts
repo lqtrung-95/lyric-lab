@@ -26,8 +26,8 @@ async function loadHskRows(level: HskLevel): Promise<HskRow[]> {
   return buildHskRows(rows, sinoViet, vietnamese);
 }
 
-// Từ điển ít đổi: nhớ kết quả 1 ngày (qua mọi yêu cầu) để không truy vấn hàng nghìn dòng mỗi lần mở trang; `cache` của React gộp lần gọi của metadata và trang trong cùng một lần dựng.
-const loadCached = unstable_cache(loadHskRows, ["hsk-rows-v6"], { revalidate: 86400 });
+// Từ điển ít đổi: nhớ kết quả 1 giờ (qua mọi yêu cầu) để không truy vấn hàng nghìn dòng mỗi lần mở trang; `cache` của React gộp lần gọi của metadata và trang trong cùng một lần dựng.
+const loadCached = unstable_cache(loadHskRows, ["hsk-rows-v7"], { revalidate: 3600 });
 
 /** Từ vựng của một cấp HSK từ từ điển trong Supabase (dữ liệu công khai, chỉ đọc), kèm âm Hán Việt. */
 export const getHskRows = cache((level: HskLevel): Promise<HskRow[]> => loadCached(level));
