@@ -9,13 +9,13 @@ export const metadata: Metadata = { title: "Truyện ngắn", robots: { index: f
 export default async function ReadingsPage() {
   const items = await loadReadingSummaries();
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-space-md">
+    <div className="flex w-full flex-col gap-space-md">
       <ListenSwitch current="readings" />
       <header>
         <h1 className="text-headline-lg">Truyện ngắn</h1>
         <p className="text-body-md text-on-surface-variant">Đọc truyện ngắn có pinyin, nghe từng câu và trả lời vài câu hỏi để kiểm tra mình hiểu bao nhiêu.</p>
       </header>
-      <ul className="grid gap-space-sm sm:grid-cols-2">
+      <ul className="grid gap-space-sm sm:grid-cols-2 lg:grid-cols-3">
         {items.map((r) => (
           <li key={r.id}>
             <Link href={`/readings/${r.id}`} className="card-ink flex min-h-11 items-center gap-space-sm p-space-md hover:brightness-105">

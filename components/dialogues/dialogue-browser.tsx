@@ -34,7 +34,7 @@ export function DialogueBrowser({ dialogues }: { dialogues: DialogueSummary[] })
         {DIALOGUE_TOPICS.map((t) => <button key={t.id} type="button" aria-pressed={topic === t.id} onClick={() => setTopic(t.id)} className={chip(topic === t.id)}>{t.emoji} {t.label}</button>)}
       </div>
       <p role="status" className="text-label-lg text-on-surface-variant">{shown.length} hội thoại</p>
-      <ul className="grid gap-space-sm sm:grid-cols-2">
+      <ul className="grid gap-space-sm sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((d) => (
           <li key={d.id}>
             <Link href={`/dialogues/${d.id}`} className="card-ink flex h-full items-start gap-space-sm bg-surface-container-lowest p-space-sm transition-transform hover:-translate-y-0.5">
