@@ -27,6 +27,9 @@ export const roleplayOutputSchema = z.object({
   replyVi: z.string().trim().min(1).max(200).refine(mostlyVietnamese, "replyVi phải là tiếng Việt"),
   /** Tối đa 2 mẫu câu người học có thể nói tiếp (chữ Hán). */
   tips: z.array(z.string().trim().min(1).max(40)).max(2).default([]),
-  feedback: z.object({ issue: z.string().trim().min(1).max(160).refine(mostlyVietnamese, "issue phải là tiếng Việt"), better: z.string().trim().min(1).max(80) }).nullable().default(null),
+  feedback: z.object({ issue: z.string().trim().min(1).max(160).refine(mostlyVietnamese, "issue phải là tiếng Việt"), better: z.string().trim().min(1).max(80),
+    /** Nghĩa tiếng Việt của `better`, để lưu thành thẻ; thiếu hay sai ngôn ngữ thì bỏ chứ không làm hỏng cả lượt. */
+    betterVi: z.string().trim().min(1).max(160).refine(mostlyVietnamese).optional().catch(undefined),
+  }).nullable().default(null),
 });
 export type RoleplayOutput = z.infer<typeof roleplayOutputSchema>;

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyChars, RubyLine } from "@/components/ui/ruby-text";
 import { alignPinyin } from "@/lib/pinyin/align-ruby";
+import { fixSavedItem } from "@/lib/roleplay/fix-card";
 import { itemKey } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useWordGameScore } from "@/components/practice/use-word-game-score";
@@ -59,7 +60,8 @@ function ThinkingBubble({ said }: { said: string }) {
   );
 }
 
-function Bubble({ m, showPinyin, onWord, active }: { m: Msg; showPinyin: boolean; onWord?: (term: string) => void; active?: string | null }) {
+/** `reviewing`: đang xem lại sau buổi nói. Lời sửa đã có ở mục "Nên nói lại" nên ở đây chỉ đánh dấu câu có gợi ý, không nhắc lại nội dung. */
+function Bubble({ m, showPinyin, onWord, active, reviewing = false }: { m: Msg; showPinyin: boolean; onWord?: (term: string) => void; active?: string | null; reviewing?: boolean }) {
   const ai = m.role === "ai";
   const tappable = ai && onWord && m.tokens && m.tokens.length > 0;
   return (
@@ -73,12 +75,23 @@ function Bubble({ m, showPinyin, onWord, active }: { m: Msg; showPinyin: boolean
         </div>
         {m.vi && <p className="text-body-sm text-on-surface-variant">{m.vi}</p>}
       </div>
-      {m.feedback && (
+      {m.feedback && reviewing && <p className="text-label-sm font-bold text-on-surface-variant">✎ Câu này có gợi ý sửa ở mục “Nên nói lại”</p>}
+      {m.feedback && !reviewing && (
         <p className="max-w-[85%] rounded-xl bg-tertiary-container px-3 py-2 text-body-sm text-on-tertiary-container">
           <span className="font-extrabold">Gợi ý sửa: </span>{m.feedback.issue} <span lang="zh-Hans" className="font-bold">{m.feedback.better}</span>
         </p>
       )}
     </li>
+  );
+}
+
+/** Lưu câu đã sửa thành thẻ ôn (loại "grammar", chỉ ôn ở màn Ôn thẻ). */
+function SaveFixButton({ f }: { f: NonNullable<Msg["feedback"]> }) {
+  const { state, toggleSaved } = useLearnerState();
+  const item = fixSavedItem(f);
+  const saved = state.saved.some((x) => x.key === item.key);
+  return (
+    <button type="button" aria-pressed={saved} onClick={() => toggleSaved(item)} className={`min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-bold ${saved ? "bg-secondary-container" : "bg-primary-container"}`}>{saved ? "✓ Đã lưu câu này" : "Lưu câu này"}</button>
   );
 }
 
@@ -134,12 +147,19 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
         {fixes.length > 0 && (
           <section aria-label="Câu nên nói lại">
             <h3 className="text-label-lg font-extrabold">Nên nói lại cho đúng</h3>
-            <ul className="mt-1 space-y-2">
-              {fixes.map((m) => (
-                <li key={m.id} className="rounded-xl bg-surface-container-lowest px-3 py-2">
-                  <p className="text-body-md"><span className="text-on-surface-variant">Bạn nói: </span><span lang="zh-Hans" className="line-through opacity-70">{m.zh}</span></p>
-                  <p className="flex flex-wrap items-center gap-2 text-body-lg"><span className="text-on-surface-variant">Nên nói: </span><span lang="zh-Hans" className="font-bold"><RubyLine zh={m.feedback!.better} pinyin={m.feedback!.pinyin} show /></span><PronounceButton text={m.feedback!.better} /></p>
-                  <p className="text-body-md text-on-surface-variant">{m.feedback!.issue}</p>
+            <ul className="mt-1 space-y-3">
+              {fixes.map((m, n) => (
+                <li key={m.id} className="overflow-hidden rounded-2xl border-2 border-ink bg-surface-container-lowest">
+                  <p className="border-b-2 border-ink/15 px-3 py-2 text-body-md"><span className="text-label-md font-bold text-on-surface-variant">Bạn nói · câu {n + 1}: </span><span lang="zh-Hans" className="line-through opacity-70">{m.zh}</span></p>
+                  <div className="space-y-1 bg-secondary-container px-3 py-2 text-on-secondary-container">
+                    <p className="text-label-md font-bold">Nên nói</p>
+                    <p className="flex flex-wrap items-center gap-2 text-body-lg"><span lang="zh-Hans" className="font-bold"><RubyLine zh={m.feedback!.better} pinyin={m.feedback!.pinyin} show /></span><PronounceButton text={m.feedback!.better} /></p>
+                    {m.feedback!.betterVi && <p className="text-body-md">{m.feedback!.betterVi}</p>}
+                  </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
+                    <p className="min-w-0 flex-1 text-body-md text-on-surface-variant">{m.feedback!.issue}</p>
+                    <SaveFixButton f={m.feedback!} />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -153,7 +173,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
         )}
         <section aria-label="Xem lại cuộc trò chuyện">
           <h3 className="text-label-lg font-extrabold">Xem lại cuộc trò chuyện</h3>
-          <ul className="mt-1 flex flex-col gap-2">{s.msgs.map((m) => <Bubble key={m.id} m={m} showPinyin />)}</ul>
+          <ul className="mt-1 flex flex-col gap-2">{s.msgs.map((m) => <Bubble key={m.id} m={m} showPinyin reviewing />)}</ul>
         </section>
         <button type="button" onClick={onExit} className="min-h-11 w-fit rounded-full bg-primary px-6 text-label-md font-medium text-on-primary hover:brightness-110">{exitLabel}</button>
       </div>
