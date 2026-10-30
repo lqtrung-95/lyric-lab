@@ -28,17 +28,29 @@ function TappableLine({ m, showPinyin, onWord, active }: { m: Msg; showPinyin: b
   const tokens = m.tokens ?? [];
   // Vị trí chữ đầu của từng từ trong câu (để lấy đúng pinyin từng chữ), tính trước để không gán lại biến trong lúc vẽ.
   const starts = tokens.reduce<number[]>((acc, t, i) => [...acc, i === 0 ? 0 : acc[i - 1] + Array.from(tokens[i - 1].text).length], []);
+  // Dấu câu dính vào từ đứng trước (không cho xuống dòng một mình ở đầu dòng): gom thành nhóm không ngắt.
+  const PUNCT = /^[\s，。！？、；：,.!?…"”’)）]+$/;
+  const groups = tokens.reduce<number[][]>((acc, t, i) => {
+    if (acc.length > 0 && !t.han && PUNCT.test(t.text)) acc[acc.length - 1].push(i);
+    else acc.push([i]);
+    return acc;
+  }, []);
   return (
     <>
-      {tokens.map((t, i) => {
-        const at = starts[i];
-        const inner = py ? <RubyChars text={t.text} py={py} offset={at} /> : t.text;
-        if (!t.han) return <span key={i}>{inner}</span>;
-        return (
-          <button key={i} type="button" onClick={() => onWord(t.text)} aria-label={`Tra từ ${t.text}`} aria-pressed={active === t.text}
-            className={`mx-px inline rounded-md px-0.5 underline decoration-dotted decoration-2 underline-offset-[6px] hover:bg-primary-container/60 ${active === t.text ? "bg-primary-container" : ""}`}>{inner}</button>
-        );
-      })}
+      {groups.map((g) => (
+        <span key={g[0]} className="whitespace-nowrap">
+          {g.map((i) => {
+            const t = tokens[i];
+            const at = starts[i];
+            const inner = py ? <RubyChars text={t.text} py={py} offset={at} /> : t.text;
+            if (!t.han) return <span key={i}>{inner}</span>;
+            return (
+              <button key={i} type="button" onClick={() => onWord(t.text)} aria-label={`Tra từ ${t.text}`} aria-pressed={active === t.text}
+                className={`mx-px inline rounded-md px-0.5 underline decoration-dotted decoration-2 underline-offset-[6px] hover:bg-primary-container/60 ${active === t.text ? "bg-primary-container" : ""}`}>{inner}</button>
+            );
+          })}
+        </span>
+      ))}
     </>
   );
 }
@@ -66,7 +78,7 @@ function Bubble({ m, showPinyin, onWord, active, reviewing = false }: { m: Msg; 
   const tappable = ai && onWord && m.tokens && m.tokens.length > 0;
   return (
     <li className={`flex flex-col gap-1 ${ai ? "items-start" : "items-end"}`}>
-      <div className={`max-w-[85%] rounded-2xl border-2 border-ink px-space-sm py-2 ${ai ? "bg-surface-container-lowest" : "bg-primary-container"}`}>
+      <div className={`max-w-[94%] rounded-2xl border-2 border-ink px-space-sm py-2 sm:max-w-[85%] ${ai ? "bg-surface-container-lowest" : "bg-primary-container"}`}>
         <div className="flex items-center gap-2">
           <p lang="zh-Hans" className={`text-body-lg font-bold ${showPinyin && ai ? "leading-[2.2]" : ""}`}>
             {tappable ? <TappableLine m={m} showPinyin={showPinyin} onWord={onWord} active={active ?? null} /> : <RubyLine zh={m.zh} pinyin={m.pinyin} show={showPinyin && ai} />}
