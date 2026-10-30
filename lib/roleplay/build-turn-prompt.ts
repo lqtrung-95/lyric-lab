@@ -43,7 +43,7 @@ export function buildRoleplayPrompt(s: Scenario, req: RoleplayRequest): string {
     "reply: lời đáp của bạn bằng chữ Hán, 1 câu (tối đa 2 câu rất ngắn), đúng vai, tiếp nối tự nhiên và thường kết bằng một câu hỏi hoặc gợi ý để người học nói tiếp; nếu người học lạc đề thì nhẹ nhàng kéo về tình huống. " +
     "replyVi: nghĩa tiếng Việt của reply. " +
     "tips: 0-2 câu mẫu ngắn (chữ Hán, đúng trình độ) mà người học có thể nói tiếp, chỉ gợi ý khi câu của bạn đặt ra một câu hỏi. " +
-    'feedback: null nếu câu người học đúng và tự nhiên; chỉ khi có lỗi ngữ pháp/từ dùng không tự nhiên rõ ràng mới trả {"issue": "giải thích ngắn bằng TIẾNG VIỆT (1 câu, viết bằng chữ Latinh, chỉ được trích vài chữ Hán để chỉ lỗi)", "better": "câu sửa lại bằng chữ Hán"}. ' +
+    'feedback: null nếu câu người học đúng và tự nhiên; chỉ khi có lỗi ngữ pháp/từ dùng không tự nhiên rõ ràng mới trả {"issue": "giải thích ngắn bằng TIẾNG VIỆT (1 câu, viết bằng chữ Latinh, chỉ được trích vài chữ Hán để chỉ lỗi)", "better": "câu sửa lại bằng chữ Hán, nguyên một câu hoàn chỉnh người học có thể nói lại", "betterVi": "nghĩa tiếng Việt của better"}. ' +
     (s.sassy ? SASSY_RULE : "Không sửa lỗi nhỏ về dấu câu hay cách nói thân mật. ") +
     "Không dùng pinyin, không dùng ngôn ngữ nào khác ngoài chữ Hán và tiếng Việt.";
 }

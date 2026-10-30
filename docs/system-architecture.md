@@ -292,3 +292,5 @@ Nội dung tĩnh tự viết (không LLM, không DB): `patterns-hsk1..4.ts` → 
 Bổ sung ngữ pháp: thống kê gộp tài khoản qua `user_grammar_stats` (một dòng mỗi người, JSON `stats`, RLS theo chủ sở hữu, trình duyệt ghi thẳng như `user_pet`); `useGrammarStats` đọc localStorage trước rồi gộp bằng `mergeStats` khi có phiên. Cảnh Khám phá gắn mẫu ngữ pháp bằng `detectGrammar` trên câu hay dùng và hội thoại (`scene-grammar.tsx`), không thêm dữ liệu vào định nghĩa cảnh.
 
 Nhận diện giọng (`/api/speech/transcribe`): chữ Azure trả về đi qua `smoothTranscript` trước khi ra client, vì Azure chấm câu theo từng chỗ ngừng; một lượt nói luôn được coi là một ý.
+
+Nói với AI: `feedback` của lượt trả có `betterVi` (tùy chọn). Thẻ ôn do người học lưu từ câu sửa dùng `type:"grammar"`; pool của các game (`loadPracticeCards`) chỉ lấy `kind=vocab`.

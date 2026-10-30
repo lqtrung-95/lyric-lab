@@ -1,6 +1,7 @@
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { Icon } from "@/components/ui/icon";
 import type { ReviewContext, ReviewLine } from "@/lib/review/review-context-types";
+import { isSentenceTerm } from "@/lib/roleplay/fix-card";
 import { levelLabel } from "@/lib/preview/preview-format";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
 
@@ -15,7 +16,8 @@ interface FlashCardProps {
 
 /** Thẻ ôn (S7): mặt trước chỉ có chữ Hán để tự nhớ; mặt sau hiện pinyin, Hán Việt, nghĩa và câu hát chứa từ. */
 export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: FlashCardProps) {
-  const kind = card.kind === "grammar" ? "Ngữ pháp" : "Từ vựng";
+  const sentence = card.kind === "grammar" && isSentenceTerm(card.term);
+  const kind = sentence ? "Câu đã sửa" : card.kind === "grammar" ? "Ngữ pháp" : "Từ vựng";
   return (
     <div className="w-full max-w-[720px] card-ink overflow-hidden">
       <div className="flex items-center justify-between gap-3 border-b-2 border-ink/20 bg-surface-container-low px-6 py-4">
@@ -39,8 +41,8 @@ export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: Fl
 
       <div className="flex flex-col items-center px-6 pb-8 pt-8 text-center sm:px-12">
         <div className="flex items-center gap-3">
-          <h2 lang="zh" className="font-serif text-[56px] font-medium leading-tight tracking-wide text-on-surface sm:text-[72px]">{card.term}</h2>
-          {card.kind === "vocab" && <PronounceButton text={card.term} />}
+          <h2 lang="zh" className={`font-serif font-medium leading-tight tracking-wide text-on-surface ${sentence ? "text-[28px] sm:text-[36px]" : "text-[56px] sm:text-[72px]"}`}>{card.term}</h2>
+          {(card.kind === "vocab" || sentence) && <PronounceButton text={card.term} />}
         </div>
 
         {!flipped ? (
