@@ -20,7 +20,7 @@ export function HudBar() {
       <div className="flex h-16 items-center justify-between gap-3 px-gutter md:px-6">
         <Link href="/app" aria-label="SongHanzi, về Hôm nay" className="flex min-h-11 items-center gap-2 md:hidden">
           <LogoMark size={32} />
-          <span className="text-headline-md font-extrabold tracking-tight text-on-surface max-[380px]:hidden">Song<span className="text-primary">Hanzi</span></span>
+          <span className="text-headline-md font-extrabold tracking-tight text-on-surface max-[480px]:hidden">Song<span className="text-primary">Hanzi</span></span>
         </Link>
         <div className="flex items-center gap-1.5 md:ml-auto">
           <HudChips />

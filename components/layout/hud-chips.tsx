@@ -6,7 +6,7 @@ import { useDueCount } from "@/components/review/use-due-count";
 import { useStreak } from "@/components/streak/use-streak";
 import { useGameSummary } from "./use-game-summary";
 
-const CHIP = "inline-flex h-9 items-center gap-1.5 rounded-full border-2 border-outline-variant bg-surface-container-lowest px-3 text-label-md font-bold text-on-surface";
+const CHIP = "inline-flex h-9 items-center gap-1.5 rounded-full border-2 border-outline-variant bg-surface-container-lowest px-2.5 text-label-md font-bold text-on-surface sm:px-3";
 
 /**
  * Các chỉ số nhỏ ở thanh trên (HUD): chuỗi ngày, số thẻ cần ôn, cấp độ. Chỉ hiện khi có dữ liệu thật (chuỗi 0 và 0 thẻ thì ẩn, cấp chỉ hiện khi API game hóa trả về),
