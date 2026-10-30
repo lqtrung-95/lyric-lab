@@ -1,5 +1,6 @@
 "use client";
 
+import type { PetTone } from "@/lib/roleplay/pet-tone";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { recordFluency } from "@/lib/speaking/fluency-stats";
 import { playAndWait, stopChinese } from "@/lib/speaking/play-and-wait";
@@ -37,7 +38,7 @@ async function fetchTurn(body: unknown): Promise<{ ok: true; data: TurnResponse 
  * Điều phối một buổi trò chuyện: AI nói (đọc to) → micro tự bật → người học nói (hoặc gõ) → gọi AI đáp → lặp tới `MAX_ROLEPLAY_TURNS` lượt hoặc khi người học kết thúc.
  * Ghi chỉ số lưu loát khi buổi kết thúc. Lượt nói không nghe rõ không gọi AI (không tốn hạn mức trò chuyện).
  */
-export function useRoleplaySession(scenario: Scenario, level: number, openingPinyin: string | undefined, typingOnly: boolean) {
+export function useRoleplaySession(scenario: Scenario, level: number, openingPinyin: string | undefined, typingOnly: boolean, tone?: PetTone) {
   const [msgs, setMsgs] = useState<Msg[]>([{ id: 0, role: "ai", zh: scenario.opening.zh, vi: scenario.opening.vi, pinyin: openingPinyin }]);
   const [status, setStatus] = useState<Status>("ai_speaking");
   const [error, setError] = useState<SessionError | null>(null);
@@ -70,7 +71,7 @@ export function useRoleplaySession(scenario: Scenario, level: number, openingPin
     setPending(text);
     setStatus("thinking");
     const history = msgsRef.current.map((m) => ({ role: m.role, zh: m.zh }));
-    const res = await fetchTurn({ scenarioId: scenario.id, level, history, userText: text });
+    const res = await fetchTurn({ scenarioId: scenario.id, level, history, userText: text, ...(scenario.tonal && tone ? { tone } : {}) });
     if (!res.ok) { setError(res.error); setStatus("your_turn"); return; }
     setPending(null);
     const { data } = res;

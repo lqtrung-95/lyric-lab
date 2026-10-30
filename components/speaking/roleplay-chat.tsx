@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyChars, RubyLine } from "@/components/ui/ruby-text";
 import { alignPinyin } from "@/lib/pinyin/align-ruby";
+import type { PetTone } from "@/lib/roleplay/pet-tone";
 import { fixSavedItem } from "@/lib/roleplay/fix-card";
 import { itemKey } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
@@ -124,8 +125,8 @@ function LookedRow({ w }: { w: TappedWord }) {
 }
 
 /** Buổi trò chuyện tự do với AI đóng vai: nghe → nói (micro tự bật) → AI đáp, tối đa 8 lượt. Có Pinyin, gợi ý câu nói tiếp, lời sửa nhẹ sau mỗi lượt. */
-export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExit, exitLabel = "Chọn tình huống khác", summaryModal = false }: { scenario: Scenario; level: number; openingPinyin?: string; typingOnly: boolean; onExit: () => void; exitLabel?: string; /** Hiện tổng kết cuối buổi trong hộp thoại (nói chuyện với linh vật) thay vì thay nội dung trang. */ summaryModal?: boolean }) {
-  const s = useRoleplaySession(scenario, level, openingPinyin, typingOnly);
+export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, tone, onExit, exitLabel = "Chọn tình huống khác", summaryModal = false }: { scenario: Scenario; level: number; openingPinyin?: string; typingOnly: boolean; /** Giọng nhận xét (chỉ linh vật). */ tone?: PetTone; onExit: () => void; exitLabel?: string; /** Hiện tổng kết cuối buổi trong hộp thoại (nói chuyện với linh vật) thay vì thay nội dung trang. */ summaryModal?: boolean }) {
+  const s = useRoleplaySession(scenario, level, openingPinyin, typingOnly, tone);
   const [showPinyin, setShowPinyin] = useState(false);
   const [showTips, setShowTips] = useState(false);
   const [tapped, setTapped] = useState<string | null>(null);

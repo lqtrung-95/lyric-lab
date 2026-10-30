@@ -179,3 +179,4 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Đổi regex `detect` của mẫu ngữ pháp thì thêm câu dương và âm vào test "nhận diện mẫu: không gắn nhầm". Số đếm thống kê chỉ tăng; muốn thêm thao tác giảm/xóa phải đổi cách gộp (`mergeStats` lấy số lớn hơn).
 - Pool thẻ cho game luyện từ chỉ gồm thẻ `vocab`. Loại thẻ mới (câu, khung ngữ pháp) dùng `grammar` để không lọt vào game; muốn vào game phải cố ý mở lọc ở `practice-repo.ts`.
 - Thêm cấp ngữ pháp mới: mở `GrammarLevel`/`GRAMMAR_LEVELS`, `isGrammarLevel` và thêm file `patterns-hskN.ts` vào `grammar-patterns.ts`; nhớ số mẫu ở landing và nhóm "Ngữ pháp" ở `review-modes.ts`.
+- Thêm giọng nhận xét mới cho pet: thêm vào `PET_TONES`/`PET_TONE_INFO` (`pet-tone.ts`) và `TONE_RULE`; mọi giọng phải ghép `TONE_COMMON` (tiếng Việt, không xúc phạm cá nhân) và có test trong `roleplay-turn.test.ts`.
