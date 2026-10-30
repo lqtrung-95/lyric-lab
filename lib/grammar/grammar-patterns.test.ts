@@ -10,7 +10,7 @@ const rng = () => 0.37;
 describe("dữ liệu mẫu ngữ pháp", () => {
   it("id không trùng, đủ nội dung, mỗi cấp có mẫu", () => {
     expect(new Set(GRAMMAR_PATTERNS.map((p) => p.id)).size).toBe(GRAMMAR_PATTERNS.length);
-    for (const l of [1, 2, 3, 4]) expect(GRAMMAR_PATTERNS.filter((p) => p.level === l).length).toBeGreaterThanOrEqual(8);
+    for (const l of [1, 2, 3, 4, 5, 6]) expect(GRAMMAR_PATTERNS.filter((p) => p.level === l).length, `HSK ${l}`).toBeGreaterThanOrEqual(l >= 6 ? 5 : 8);
     for (const p of GRAMMAR_PATTERNS) {
       expect(/^[a-z0-9-]+$/.test(p.id), p.id).toBe(true);
       expect(p.examples.length, p.id).toBeGreaterThanOrEqual(3);
@@ -114,6 +114,9 @@ describe("nhận diện mẫu: không gắn nhầm", () => {
     expect(ids("从来没有")).not.toContain("cong-dao");
     expect(ids("他还给我钱")).not.toContain("hai");
     expect(ids("一个人在家")).not.toContain("yi-jiu");
+    expect(ids("他以前认为这样不对")).not.toContain("yi-wei");
+    expect(ids("所以我认为很好")).not.toContain("yi-wei");
+    expect(ids("非常好，不可以")).not.toContain("fei-buke");
   });
   it("vẫn nhận đúng khi dùng mẫu thật", () => {
     expect(ids("今天比昨天冷")).toContain("bi");
@@ -124,6 +127,9 @@ describe("nhận diện mẫu: không gắn nhầm", () => {
     expect(ids("他唱得很好")).toContain("de-complement");
     expect(ids("只有多练习才能说好")).toContain("zhiyou-cai");
     expect(ids("我一到家就打电话")).toContain("yi-jiu");
+    expect(ids("他以老师为榜样")).toContain("yi-wei");
+    expect(ids("这件事非你去不可")).toContain("fei-buke");
+    expect(ids("孩子都会，何况你呢")).toContain("hekuang");
   });
 });
 

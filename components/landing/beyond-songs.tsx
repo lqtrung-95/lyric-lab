@@ -28,8 +28,8 @@ const CARDS = [
   },
   {
     emoji: "🧩", title: "Ngữ pháp: mẫu câu theo cấp HSK",
-    body: "49 mẫu thông dụng từ HSK 1 đến HSK 4: công thức, so sánh với tiếng Việt, lỗi hay sai và ví dụ có giọng đọc. Luyện bằng xếp từ, điền chỗ trống, chọn câu đúng; thi cuối mỗi cấp, lưu mẫu vào thẻ ôn, và khi nghe bài hát câu nào dùng mẫu quen thì có nhãn ngay dưới lời.",
-    chips: ["49 mẫu", "Bài tập", "Thi cuối cấp", "Nhãn trong lời"], href: "/grammar", cta: "Học ngữ pháp",
+    body: "63 mẫu thông dụng từ HSK 1 đến HSK 6: công thức, so sánh với tiếng Việt, lỗi hay sai và ví dụ có giọng đọc. Luyện bằng xếp từ, điền chỗ trống, chọn câu đúng; thi cuối mỗi cấp, lưu mẫu vào thẻ ôn, và khi nghe bài hát câu nào dùng mẫu quen thì có nhãn ngay dưới lời.",
+    chips: ["63 mẫu", "Bài tập", "Thi cuối cấp", "Nhãn trong lời"], href: "/grammar", cta: "Học ngữ pháp",
   },
   {
     emoji: "⚔️", title: "Thi đấu với bạn bè",

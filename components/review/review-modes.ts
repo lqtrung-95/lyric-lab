@@ -32,6 +32,8 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
       { href: "/grammar", label: "Mẫu câu theo cấp", desc: "Công thức, lỗi hay sai, ví dụ có giọng đọc và bài tập", icon: "list_alt" },
       { href: "/grammar/test/1", label: "Thi HSK 1", desc: "12 câu trộn: xếp từ, điền chỗ trống, chọn câu đúng", icon: "quiz" },
       { href: "/grammar/test/2", label: "Thi HSK 2", desc: "Đo xem bạn nắm các mẫu cấp 2 đến đâu", icon: "quiz" },
+      { href: "/grammar/test/5", label: "Thi HSK 5", desc: "Mẫu văn viết: 何况, 反而, 不得不, 既然…就…", icon: "quiz" },
+      { href: "/grammar/test/6", label: "Thi HSK 6", desc: "Mẫu nâng cao: 凡是, 以…为…, 非…不可", icon: "quiz" },
     ],
   },
   {
