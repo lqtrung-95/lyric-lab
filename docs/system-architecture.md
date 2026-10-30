@@ -294,3 +294,5 @@ Bổ sung ngữ pháp: thống kê gộp tài khoản qua `user_grammar_stats` (
 Nhận diện giọng (`/api/speech/transcribe`): chữ Azure trả về đi qua `smoothTranscript` trước khi ra client, vì Azure chấm câu theo từng chỗ ngừng; một lượt nói luôn được coi là một ý.
 
 Nói với AI: `feedback` của lượt trả có `betterVi` (tùy chọn). Thẻ ôn do người học lưu từ câu sửa dùng `type:"grammar"`; pool của các game (`loadPracticeCards`) chỉ lấy `kind=vocab`.
+
+Giọng nhận xét của pet: `roleplayRequestSchema.tone` (enum 4 giá trị) → `TONE_RULE` trong `build-turn-prompt.ts`. Lời người học vẫn là dữ liệu, không phải chỉ thị; tone chỉ chọn trong bảng cố định ở server.

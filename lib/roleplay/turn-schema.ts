@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PET_TONES } from "./pet-tone";
 import { SCENARIO_IDS } from "./scenarios";
 
 export const MAX_ROLEPLAY_TURNS = 8;
@@ -12,6 +13,8 @@ export const roleplayRequestSchema = z.object({
   /** Các lượt trước (gồm câu mở đầu của AI), không kể câu vừa nói. */
   history: z.array(lineSchema).max(MAX_ROLEPLAY_TURNS * 2 + 1),
   userText: z.string().trim().min(2).max(MAX_LINE_CHARS),
+  /** Giọng nhận xét của linh vật (chỉ nhận bốn giá trị cố định); các tình huống khác bỏ qua. */
+  tone: z.enum(PET_TONES).optional(),
 });
 export type RoleplayRequest = z.infer<typeof roleplayRequestSchema>;
 

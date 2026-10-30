@@ -5,12 +5,31 @@ import { useChatAccount } from "@/components/chat/use-chat-account";
 import { MicIntro } from "@/components/speaking/mic-intro";
 import { RoleplayChat } from "@/components/speaking/roleplay-chat";
 import { signInGoogle } from "@/lib/auth/account-client";
+import { useLocalJson } from "@/components/pet/use-local-json-store";
+import { DEFAULT_PET_TONE, PET_TONE_EVENT, PET_TONE_INFO, PET_TONE_KEY, PET_TONES, parsePetTone, type PetTone } from "@/lib/roleplay/pet-tone";
 import { findScenario } from "@/lib/roleplay/scenarios";
 import { MAX_ROLEPLAY_TURNS } from "@/lib/roleplay/turn-schema";
 import type { MicCheck } from "@/lib/speaking/vad-recorder";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 
 const PET_SCENARIO = findScenario("pet")!;
+
+/** Chọn giọng nhận xét của bạn nhỏ trước khi vào buổi nói; nhớ ở thiết bị này. */
+function ToneSelect({ tone, onChange }: { tone: PetTone; onChange: (t: PetTone) => void }) {
+  return (
+    <fieldset className="mb-space-sm">
+      <legend className="text-label-lg font-extrabold">Giọng nhận xét của bạn nhỏ</legend>
+      <div className="mt-1 grid gap-2 sm:grid-cols-2">
+        {PET_TONES.map((t) => (
+          <button key={t} type="button" aria-pressed={tone === t} onClick={() => onChange(t)} className={`min-h-11 cursor-pointer rounded-2xl border-2 border-ink px-3 py-2 text-left ${tone === t ? "bg-primary-container shadow-[0_3px_0_var(--shadow-ink)]" : "bg-surface-container-lowest hover:brightness-105"}`}>
+            <span className="block text-label-lg font-extrabold">{PET_TONE_INFO[t].emoji} {PET_TONE_INFO[t].label}</span>
+            <span className="block text-label-sm text-on-surface-variant">{PET_TONE_INFO[t].desc}</span>
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
 
 /**
  * Nói chuyện với pet bằng tiếng Trung đơn giản: dùng lại nguyên engine nhập vai (`/api/roleplay/turn`, kịch bản ẩn `pet`).
@@ -34,6 +53,7 @@ export function PetChat({ name, onClose }: { name: string; onClose: () => void }
     return () => { live = false; };
   }, [registered]);
   const level = Math.min(4, Math.max(1, learner.state.level));
+  const [tone, setTone] = useLocalJson<PetTone>(PET_TONE_KEY, PET_TONE_EVENT, parsePetTone, DEFAULT_PET_TONE);
 
   let body;
   if (registered === undefined) body = <p role="status" className="text-body-md text-on-surface-variant">Đang kiểm tra tài khoản…</p>;
@@ -46,12 +66,12 @@ export function PetChat({ name, onClose }: { name: string; onClose: () => void }
       </div>
     );
   } else if (mic === null) {
-    body = <MicIntro title={`🐾 Nói chuyện với ${name}`} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời hỏi một ngày của bạn thế nào, rồi micro tự bật: bạn kể bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Bấm vào từ trong câu của bạn nhỏ để tra nghĩa hoặc lưu thẻ ôn. Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} />;
+    body = <div><ToneSelect tone={tone} onChange={setTone} /><MicIntro title={`🐾 Nói chuyện với ${name}`} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời hỏi một ngày của bạn thế nào, rồi micro tự bật: bạn kể bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Bấm vào từ trong câu của bạn nhỏ để tra nghĩa hoặc lưu thẻ ôn. Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} /></div>;
   } else if (openingPinyin === undefined) {
     // Chờ pinyin một lát rồi mới vào buổi nói: câu mở đầu chỉ đọc pinyin lúc khởi tạo.
     body = <p role="status" className="text-body-md text-on-surface-variant">Đang chuẩn bị…</p>;
   } else {
-    body = <RoleplayChat scenario={PET_SCENARIO} level={level} openingPinyin={openingPinyin || undefined} typingOnly={mic !== "ok"} onExit={onClose} exitLabel="Xong" summaryModal />;
+    body = <RoleplayChat scenario={PET_SCENARIO} level={level} openingPinyin={openingPinyin || undefined} typingOnly={mic !== "ok"} tone={tone} onExit={onClose} exitLabel="Xong" summaryModal />;
   }
   return (
     <div className="basis-full rounded-2xl bg-surface-container-low p-space-sm" role="group" aria-label={`Nói chuyện với ${name}`}>

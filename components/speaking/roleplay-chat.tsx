@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyChars, RubyLine } from "@/components/ui/ruby-text";
 import { alignPinyin } from "@/lib/pinyin/align-ruby";
+import type { PetTone } from "@/lib/roleplay/pet-tone";
 import { fixSavedItem } from "@/lib/roleplay/fix-card";
 import { itemKey } from "@/lib/user-state/learner-state";
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
@@ -124,8 +125,8 @@ function LookedRow({ w }: { w: TappedWord }) {
 }
 
 /** Buổi trò chuyện tự do với AI đóng vai: nghe → nói (micro tự bật) → AI đáp, tối đa 8 lượt. Có Pinyin, gợi ý câu nói tiếp, lời sửa nhẹ sau mỗi lượt. */
-export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExit, exitLabel = "Chọn tình huống khác", summaryModal = false }: { scenario: Scenario; level: number; openingPinyin?: string; typingOnly: boolean; onExit: () => void; exitLabel?: string; /** Hiện tổng kết cuối buổi trong hộp thoại (nói chuyện với linh vật) thay vì thay nội dung trang. */ summaryModal?: boolean }) {
-  const s = useRoleplaySession(scenario, level, openingPinyin, typingOnly);
+export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, tone, onExit, exitLabel = "Chọn tình huống khác", summaryModal = false }: { scenario: Scenario; level: number; openingPinyin?: string; typingOnly: boolean; /** Giọng nhận xét (chỉ linh vật). */ tone?: PetTone; onExit: () => void; exitLabel?: string; /** Hiện tổng kết cuối buổi trong hộp thoại (nói chuyện với linh vật) thay vì thay nội dung trang. */ summaryModal?: boolean }) {
+  const s = useRoleplaySession(scenario, level, openingPinyin, typingOnly, tone);
   const [showPinyin, setShowPinyin] = useState(false);
   const [showTips, setShowTips] = useState(false);
   const [tapped, setTapped] = useState<string | null>(null);
@@ -165,8 +166,13 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
                   <p className="border-b-2 border-ink/15 px-3 py-2 text-body-md"><span className="text-label-md font-bold text-on-surface-variant">Bạn nói · câu {n + 1}: </span><span lang="zh-Hans" className="line-through opacity-70">{m.zh}</span></p>
                   <div className="space-y-1 bg-secondary-container px-3 py-2 text-on-secondary-container">
                     <p className="text-label-md font-bold">Nên nói</p>
-                    <p className="flex flex-wrap items-center gap-2 text-body-lg"><span lang="zh-Hans" className="font-bold"><RubyLine zh={m.feedback!.better} pinyin={m.feedback!.pinyin} show /></span><PronounceButton text={m.feedback!.better} /></p>
+                    <p className="flex flex-wrap items-center gap-2 text-body-lg"><span lang="zh-Hans" className="font-bold">
+                      {m.feedback!.tokens?.length
+                        ? <TappableLine m={{ id: m.id, role: "ai", zh: m.feedback!.better, pinyin: m.feedback!.pinyin, tokens: m.feedback!.tokens }} showPinyin onWord={setTapped} active={tapped} />
+                        : <RubyLine zh={m.feedback!.better} pinyin={m.feedback!.pinyin} show />}
+                    </span><PronounceButton text={m.feedback!.better} /></p>
                     {m.feedback!.betterVi && <p className="text-body-md">{m.feedback!.betterVi}</p>}
+                    {m.feedback!.tokens?.length ? <p className="text-label-sm opacity-80">Bấm vào một từ để tra nghĩa và lưu thẻ</p> : null}
                   </div>
                   <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                     <p className="min-w-0 flex-1 text-body-md text-on-surface-variant">{m.feedback!.issue}</p>
@@ -175,6 +181,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, onExi
                 </li>
               ))}
             </ul>
+            {tapped && <div className="mt-2"><WordTapPanel key={tapped} term={tapped} onLooked={onLooked} onClose={() => setTapped(null)} /></div>}
           </section>
         )}
         {looked.length > 0 && (
