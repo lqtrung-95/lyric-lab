@@ -176,3 +176,4 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Mẫu mới thêm vào `patterns-hsk{n}.ts`: `id` kebab-case duy nhất, `key` là các từ khoá thật sự xuất hiện trong ví dụ (đúng nguyên một đoạn giữa hai dấu "|" để bài điền chỗ trống che được), ví dụ ≥3 câu và lỗi hay gặp ≥1. Tự viết, không chép lời bài hát hay sách (quy tắc 7). `detect` chỉ khi mẫu đủ đặc trưng (nhiều phần hoặc chữ ít gặp); chữ quá phổ biến để trống.
 - Khoá thẻ ôn lấy từ `grammarCardTerm` (khung mẫu); hai mẫu không được cho cùng khoá (đã có test); đổi khoá một mẫu là làm mất thẻ đã lưu của người dùng.
 - Trạng thái học ngữ pháp ở thiết bị dùng `useGrammarStats`, không đọc `localStorage` rải rác.
+- Đổi regex `detect` của mẫu ngữ pháp thì thêm câu dương và âm vào test "nhận diện mẫu: không gắn nhầm". Số đếm thống kê chỉ tăng; muốn thêm thao tác giảm/xóa phải đổi cách gộp (`mergeStats` lấy số lớn hơn).

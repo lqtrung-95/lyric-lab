@@ -46,3 +46,15 @@ export function levelProgress(stats: GrammarStats, patterns: readonly GrammarPat
     total: patterns.length,
   };
 }
+
+/** Gộp hai bản thống kê (trình duyệt và tài khoản): lấy số lớn hơn của từng trường. Số đếm chỉ tăng nên cách này không đếm đôi khi gộp lặp lại. */
+export function mergeStats(a: GrammarStats, b: GrammarStats): GrammarStats {
+  const out: GrammarStats = { ...a };
+  for (const [id, s] of Object.entries(b)) {
+    const c = out[id];
+    out[id] = c ? { right: Math.max(c.right, s.right), wrong: Math.max(c.wrong, s.wrong), last: Math.max(c.last, s.last) } : s;
+  }
+  return out;
+}
+
+export const sameStats = (a: GrammarStats, b: GrammarStats): boolean => JSON.stringify(a) === JSON.stringify(b);

@@ -16,7 +16,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “A hơn B”, nhưng đặt 比 trước B và tính từ đứng cuối: 我比他高 (tôi so với anh ấy cao).",
     mistakes: [{ wrong: "我比他很高。", right: "我比他高。", why: "Câu so sánh với 比 không dùng 很; muốn nhấn mức độ thì dùng 得多 hoặc 一点儿." }],
     examples: [{ zh: "我|比|他|高。", vi: "Tôi cao hơn anh ấy." }, { zh: "今天|比|昨天|冷。", vi: "Hôm nay lạnh hơn hôm qua." }, { zh: "这|个|比|那|个|贵|一点儿。", vi: "Cái này đắt hơn cái kia một chút." }],
-    detect: "比(?![如较赛])",
+    detect: "(?<![对相攀类])比(?![如较赛起特])",
   },
   {
     id: "yibian", level: L, title: "一边…一边…", pattern: "A 一边 V1，一边 V2", key: ["一边"],
@@ -48,7 +48,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “nói tiếng Trung giỏi”, nhưng tiếng Trung đặt “giỏi” sau 得 chứ không đặt trực tiếp sau động từ.",
     mistakes: [{ wrong: "他跑很快。", right: "他跑得很快。", why: "Cần 得 để nối động từ với phần đánh giá." }],
     examples: [{ zh: "她|唱|得|很|好。", vi: "Cô ấy hát rất hay." }, { zh: "他|说|得|太|快|了。", vi: "Anh ấy nói nhanh quá." }, { zh: "你|写|得|真|漂亮。", vi: "Bạn viết đẹp thật." }],
-    detect: "[唱说跑写做吃走学玩]得",
+    detect: "[唱说跑写做吃走学玩]得[很太真好不多快慢非特更十]",
   },
   {
     id: "jiu-cai", level: L, title: "就 và 才", pattern: "… 就 … (sớm, nhanh) / … 才 … (muộn, chậm)", key: ["就", "才"],
@@ -56,7 +56,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "就 ≈ “đã… rồi, ngay”; 才 ≈ “mãi mới, chỉ mới”. Tiếng Việt thường chỉ dùng ngữ điệu, tiếng Trung phải chọn 就 hay 才.",
     mistakes: [{ wrong: "我八点就起床，太晚了。", right: "我八点才起床，太晚了。", why: "Việc diễn ra muộn hơn kỳ vọng thì dùng 才." }],
     examples: [{ zh: "他|六|点|就|起床|了。", vi: "Sáu giờ anh ấy đã dậy rồi." }, { zh: "他|十|点|才|起床。", vi: "Mười giờ anh ấy mới dậy." }, { zh: "我|一|看|就|懂。", vi: "Tôi vừa nhìn là hiểu." }],
-    detect: "[点天年岁].?[就才]",
+    detect: "[一二三四五六七八九十两几\\d][点天年岁个][就才]",
   },
   {
     id: "li", level: L, title: "离: cách", pattern: "A 离 B + (rất) xa / gần", key: ["离"],
@@ -64,7 +64,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “từ A đến B cách bao xa”, nhưng 离 đặt trước điểm mốc: 学校离我家很近 (trường cách nhà tôi rất gần).",
     mistakes: [{ wrong: "我家从学校很近。", right: "我家离学校很近。", why: "Nói khoảng cách dùng 离, còn 从 dùng cho điểm xuất phát." }],
     examples: [{ zh: "我|家|离|学校|很|近。", vi: "Nhà tôi cách trường rất gần." }, { zh: "这儿|离|机场|远|吗？", vi: "Chỗ này cách sân bay xa không?" }, { zh: "离|春节|还|有|三|天。", vi: "Còn ba ngày nữa là Tết." }],
-    detect: "离.{1,6}[远近]",
+    detect: "离(?!开)[^，。]{1,6}[远近]",
   },
   {
     id: "cong-dao", level: L, title: "从…到…", pattern: "从 A 到 B", key: ["从", "到"],
@@ -72,7 +72,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “từ… đến…”, cùng thứ tự.",
     mistakes: [{ wrong: "从九点到五点工作我。", right: "我从九点到五点工作。", why: "Cụm 从…到… đứng trước động từ chính, sau chủ ngữ." }],
     examples: [{ zh: "我|从|家|到|公司|要|半|小时。", vi: "Từ nhà đến công ty tôi mất nửa tiếng." }, { zh: "他|从|早上|到|晚上|都|在|工作。", vi: "Từ sáng đến tối anh ấy đều làm việc." }, { zh: "从|一|到|十，|你|会|数|吗？", vi: "Từ một đến mười, bạn đếm được không?" }],
-    detect: "从.+到",
+    detect: "从(?![来前此而])[^，。]{1,8}到",
   },
   {
     id: "yao-le", level: L, title: "要…了: sắp", pattern: "要 / 快要 / 就要 + động từ + 了", key: ["要", "了"],
@@ -80,7 +80,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “sắp… rồi”: 火车要开了 (tàu sắp chạy rồi).",
     mistakes: [{ wrong: "天快要黑。", right: "天快要黑了。", why: "Mẫu 要…了 cần có 了 ở cuối câu." }],
     examples: [{ zh: "火车|要|开|了。", vi: "Tàu sắp chạy rồi." }, { zh: "天|快|要|黑|了。", vi: "Trời sắp tối rồi." }, { zh: "他|就|要|毕业|了。", vi: "Anh ấy sắp tốt nghiệp rồi." }],
-    detect: "(?:快|就)?要.{1,6}了",
+    detect: "(?:快要|就要|马上要)[^，。]{0,6}了",
   },
   {
     id: "rang-jiao", level: L, title: "让 / 叫: bảo, để", pattern: "A 让 / 叫 B + động từ", key: ["让", "叫"],
@@ -88,7 +88,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “bảo / để / cho phép”: 妈妈让我早点睡 (mẹ bảo tôi ngủ sớm).",
     mistakes: [{ wrong: "老师让做作业我。", right: "老师让我做作业。", why: "Người bị sai bảo phải đứng ngay sau 让." }],
     examples: [{ zh: "妈妈|让|我|早|点|睡。", vi: "Mẹ bảo tôi ngủ sớm." }, { zh: "老师|叫|我们|回答|问题。", vi: "Cô giáo gọi chúng tôi trả lời câu hỏi." }, { zh: "请|让|我|看|一|下。", vi: "Cho tôi xem một chút." }],
-    detect: "让.{1,3}[^，。]",
+    detect: "让[我你他她们大]",
   },
   {
     id: "hai", level: L, title: "还: vẫn, còn", pattern: "A 还 + động từ / tính từ", key: ["还"],
@@ -96,7 +96,7 @@ export const HSK2_PATTERNS: GrammarPattern[] = [
     vsVi: "Giống “vẫn còn / còn nữa”. Chú ý 还 đọc huán khi nghĩa là “trả lại”.",
     mistakes: [{ wrong: "他还是在睡觉。", right: "他还在睡觉。", why: "还 là “vẫn”; 还是 là “hay là” dùng khi lựa chọn." }],
     examples: [{ zh: "他|还|在|睡觉。", vi: "Anh ấy vẫn đang ngủ." }, { zh: "我|还|想|吃|一|个。", vi: "Tôi còn muốn ăn một cái nữa." }, { zh: "现在|还|早。", vi: "Bây giờ vẫn còn sớm." }],
-    detect: "还(?!是)",
+    detect: "还(?![是给钱])",
   },
   {
     id: "ruguo-jiu", level: L, title: "如果…就…", pattern: "如果 (điều kiện)，(就) kết quả", key: ["如果", "就"],
