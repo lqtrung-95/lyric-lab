@@ -1,4 +1,5 @@
 import "server-only";
+import { smoothTranscript } from "./smooth-transcript";
 
 export class TranscribeUnavailableError extends Error {
   constructor(message: string) {
@@ -10,7 +11,7 @@ export class TranscribeUnavailableError extends Error {
 interface AzureSimple { RecognitionStatus?: string; DisplayText?: string }
 
 /**
- * Nhận diện lời nói tiếng Trung tự do (không câu mẫu) bằng Azure Speech REST (WAV 16 kHz mono). Trả chữ nghe được, rỗng khi không nghe thấy giọng.
+ * Nhận diện lời nói tiếng Trung tự do (không câu mẫu) bằng Azure Speech REST (WAV 16 kHz mono). Trả chữ nghe được (đã làm mượt chỗ ngập ngừng, xem `smoothTranscript`), rỗng khi không nghe thấy giọng.
  * Âm thanh chỉ chuyển tiếp, không lưu. Lỗi mạng/quota ném `TranscribeUnavailableError`.
  */
 export async function transcribeWithAzure(wav: Uint8Array, key: string, region: string, fetchFn: typeof fetch = fetch): Promise<string> {
@@ -28,5 +29,5 @@ export async function transcribeWithAzure(wav: Uint8Array, key: string, region: 
   if (!res.ok) throw new TranscribeUnavailableError(`Azure Speech trả ${res.status}`);
   const json = (await res.json().catch(() => null)) as AzureSimple | null;
   if (!json || json.RecognitionStatus !== "Success") return "";
-  return (json.DisplayText ?? "").trim();
+  return smoothTranscript(json.DisplayText ?? "");
 }

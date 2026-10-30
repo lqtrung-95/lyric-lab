@@ -38,7 +38,7 @@ export function buildRoleplayPrompt(s: Scenario, req: RoleplayRequest): string {
   const flavor = s.sassy ? `\nKIỂU NHẬN XÉT LƯỢT NÀY (chỉ gợi ý giọng, không chép nguyên): ${SASSY_FLAVORS[req.history.length % SASSY_FLAVORS.length]}.\n` : "";
   return `TÌNH HUỐNG: ${s.title}. Bạn là ${s.aiRole}. Mục tiêu của người học: ${s.goal}.\n` +
     `TRÌNH ĐỘ: ${LEVEL_RULE[req.level]}. Tuyệt đối không dùng từ khó hơn trình độ này.\n${flavor}\n` +
-    `HỘI THOẠI TỪ ĐẦU:\n${talk}\n\nLỜI NGƯỜI HỌC:\n"""\n${req.userText}\n"""\n\n` +
+    `HỘI THOẠI TỪ ĐẦU:\n${talk}\n\nLỜI NGƯỜI HỌC (có thể do nhận diện giọng nói: dấu câu, chỗ ngắt và tiếng đệm như 嗯/呃 không đáng tin, tuyệt đối không coi câu cụt hay dấu chấm lạ là lỗi, hãy hiểu cả đoạn như một ý liền):\n"""\n${req.userText}\n"""\n\n` +
     'Trả về JSON {"reply": "...", "replyVi": "...", "tips": ["..."], "feedback": null}. ' +
     "reply: lời đáp của bạn bằng chữ Hán, 1 câu (tối đa 2 câu rất ngắn), đúng vai, tiếp nối tự nhiên và thường kết bằng một câu hỏi hoặc gợi ý để người học nói tiếp; nếu người học lạc đề thì nhẹ nhàng kéo về tình huống. " +
     "replyVi: nghĩa tiếng Việt của reply. " +
