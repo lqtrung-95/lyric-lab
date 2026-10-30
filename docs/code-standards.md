@@ -178,3 +178,4 @@ Mỗi migration `create or replace function public.merge_user_data` phải sao �
 - Trạng thái học ngữ pháp ở thiết bị dùng `useGrammarStats`, không đọc `localStorage` rải rác.
 - Đổi regex `detect` của mẫu ngữ pháp thì thêm câu dương và âm vào test "nhận diện mẫu: không gắn nhầm". Số đếm thống kê chỉ tăng; muốn thêm thao tác giảm/xóa phải đổi cách gộp (`mergeStats` lấy số lớn hơn).
 - Pool thẻ cho game luyện từ chỉ gồm thẻ `vocab`. Loại thẻ mới (câu, khung ngữ pháp) dùng `grammar` để không lọt vào game; muốn vào game phải cố ý mở lọc ở `practice-repo.ts`.
+- Thêm cấp ngữ pháp mới: mở `GrammarLevel`/`GRAMMAR_LEVELS`, `isGrammarLevel` và thêm file `patterns-hskN.ts` vào `grammar-patterns.ts`; nhớ số mẫu ở landing và nhóm "Ngữ pháp" ở `review-modes.ts`.

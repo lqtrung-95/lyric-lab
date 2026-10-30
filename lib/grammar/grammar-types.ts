@@ -1,5 +1,5 @@
-export type GrammarLevel = 1 | 2 | 3 | 4;
-export const GRAMMAR_LEVELS: readonly GrammarLevel[] = [1, 2, 3, 4];
+export type GrammarLevel = 1 | 2 | 3 | 4 | 5 | 6;
+export const GRAMMAR_LEVELS: readonly GrammarLevel[] = [1, 2, 3, 4, 5, 6];
 
 export interface GrammarExample {
   /** Câu tiếng Trung, các từ ngăn bằng "|" (dùng để xếp câu và điền chỗ trống; bỏ "|" là câu đọc bình thường). */
