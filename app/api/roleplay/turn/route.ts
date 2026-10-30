@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const llmMs = Date.now() - started;
     const pinyin = await annotatePinyin([out.reply, ...out.tips, ...(out.feedback ? [out.feedback.better] : [])]);
     console.info(JSON.stringify({ event: "roleplay_turn", scenario: parsed.data.scenarioId, level: parsed.data.level, model: out.model, llmMs, ms: Date.now() - started }));
-    return Response.json({ reply: out.reply, replyVi: out.replyVi, tips: out.tips, feedback: out.feedback, pinyin, tokens: segmentReply(out.reply) });
+    return Response.json({ reply: out.reply, replyVi: out.replyVi, tips: out.tips, feedback: out.feedback ? { ...out.feedback, tokens: segmentReply(out.feedback.better) } : null, pinyin, tokens: segmentReply(out.reply) });
   } catch (error) {
     if (consumed && (error as { code?: string })?.code !== "rate_limited") await refundUsage(user, "roleplay");
     if (error instanceof RoleplayError) return Response.json({ error: error.code }, { status: error.code === "rate_limited" ? 429 : 502 });

@@ -12,7 +12,7 @@ import { useSpeakTurn } from "./use-speak-turn";
 /** Tối đa một lượt nói (giây): đủ cho câu dài có lúc ngừng suy nghĩ; micro vẫn tự dừng sau 3 giây im lặng (`CONVERSATION_VAD`) và người học bấm dừng được bất cứ lúc nào. */
 const MAX_SPEAK_SEC = 30;
 
-export interface Feedback { issue: string; better: string; betterVi?: string; pinyin?: string }
+export interface Feedback { issue: string; better: string; betterVi?: string; pinyin?: string; /** Câu sửa chia theo từ, để bấm tra/lưu từ ở màn tổng kết. */ tokens?: ReplyToken[] }
 export interface Tip { zh: string; pinyin?: string }
 /** Một từ của câu đáp (jieba, từ server): từ có chữ Hán bấm được để tra nghĩa/lưu thẻ. */
 export interface ReplyToken { text: string; han: boolean }
@@ -20,7 +20,7 @@ export interface Msg { id: number; role: "ai" | "user"; zh: string; vi?: string;
 export type Status = "ai_speaking" | "your_turn" | "thinking" | "ended";
 export type SessionError = "rate_limited" | "account_required" | "failed" | "no_speech";
 
-interface TurnResponse { reply: string; replyVi: string; tips: string[]; feedback: { issue: string; better: string; betterVi?: string } | null; pinyin: Record<string, string>; tokens?: ReplyToken[] }
+interface TurnResponse { reply: string; replyVi: string; tips: string[]; feedback: { issue: string; better: string; betterVi?: string; tokens?: ReplyToken[] } | null; pinyin: Record<string, string>; tokens?: ReplyToken[] }
 
 async function fetchTurn(body: unknown): Promise<{ ok: true; data: TurnResponse } | { ok: false; error: SessionError }> {
   try {
