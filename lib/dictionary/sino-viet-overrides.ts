@@ -17,7 +17,7 @@ const TABLE = `
 红紅:hồng 白:bạch 黑:hắc 黄黃:hoàng 绿綠:lục 蓝藍:lam
 爱愛:ái 欢歡:hoan 怕:phạ 忙:mang 工:công 作:tác 事:sự 国國:quốc 美:mỹ 英:anh 法:pháp 德:đức
 时時:thời 间間:gian 年:niên 今:kim 明:minh 早:tảo 晚:vãn 昨:tạc 春:xuân 夏:hạ 秋:thu 冬:đông 夜:dạ 朝:triều
-我:ngã 你:nễ 他:tha 们們:môn 的:đích 了:liễu 在:tại 有:hữu 不:bất 是:thị 也:dã 就:tựu 都:đô 和:hòa 与與:dữ
+我:ngã 他:tha 们們:môn 的:đích 了:liễu 在:tại 有:hữu 不:bất 是:thị 也:dã 就:tựu 都:đô 和:hòa 与與:dữ
 对對:đối 没沒:một 很:ngận 还還:hoàn 会會:hội 能:năng 可:khả 以:dĩ 为為:vi 要:yếu 想:tưởng 去:khứ 来來:lai 做:tố 吃:cật 喝:hát 给給:cấp 请請:thỉnh 问問:vấn 叫:khiếu 让讓:nhượng 用:dụng
 得:đắc 觉覺:giác 参參:tham 发發:phát 假:giả 量:lượng 数數:số 难難:nan 切:thiết 省:tỉnh 宿:túc 台臺:đài 调調:điều 盛:thịnh 传傳:truyền 种種:chủng 将將:tương 角:giác 度:độ 曲:khúc 降:giáng 磨:ma 模:mô 恶惡:ác 薄:bạc 倒:đảo 分:phân 号號:hiệu 划劃:hoạch 禁:cấm 系係:hệ 相:tương 应應:ứng 载載:tái 转轉:chuyển
 习習:tập 经經:kinh 济濟:tế 现現:hiện 实實:thực 开開:khai 关關:quan 动動:động 业業:nghiệp 体體:thể 点點:điểm 钟鐘:chung 气氣:khí 张張:trương 总總:tổng 种:chủng 过過:quá 进進:tiến 远遠:viễn 近:cận 送:tống 选選:tuyển 通:thông 道:đạo 街:nhai 城:thành 市:thị 乡鄉:hương 村:thôn 区區:khu 图圖:đồ 园園:viên
