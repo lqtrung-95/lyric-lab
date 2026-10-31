@@ -1,5 +1,6 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
+import { orderSinoViet } from "@/lib/dictionary/sino-viet-overrides";
 import { toSimplifiedChinese } from "@/lib/text/to-simplified-chinese";
 import { parseDecomposition } from "./hanzi-structure";
 import type { ComponentRef, HanziInfoView } from "./hanzi-info-types";
@@ -38,7 +39,7 @@ export async function loadHanziInfo(chars: string[]): Promise<{ ready: boolean; 
   }
   const sv = await sb.from("dict_hanzi_sino_viet").select("hanzi,readings").in("hanzi", [...needed]);
   const readings = new Map((sv.data ?? []).map((r) => [r.hanzi as string, r.readings as string[]]));
-  const lookup = (c: string) => readings.get(c) ?? readings.get(toSimplifiedChinese(c)) ?? [];
+  const lookup = (c: string) => orderSinoViet(c, readings.get(c) ?? readings.get(toSimplifiedChinese(c)) ?? []);
   const byChar = new Map(rows.map((r) => [r.hanzi, buildHanziInfoView(r, lookup)]));
   return { ready: true, items: unique.map((c) => byChar.get(c)).filter((x): x is HanziInfoView => !!x) };
 }

@@ -21,6 +21,8 @@ const SUPPLEMENT_SINO_VIET: Record<string, string> = {
   別: "biệt", 幫: "bang", 話: "thoại", 詞: "từ", 紙: "chỉ", 辦: "biện", 陰: "âm", 煙: "yên", 絕: "tuyệt", 鮮: "tiên", 濕: "thấp", 閱: "duyệt", 嘗: "thường", 戲: "hí",
 };
 
+import { overrideSinoViet } from "./sino-viet-overrides";
+
 export function sinoVietForWord(word: string, readings: ReadonlyMap<string, string[]>, simplified?: string): string | null {
   const parts: string[] = [];
   // Chữ phồn thể không có trong bảng thì thử chữ giản thể cùng vị trí (như 況 thiếu mà 况 có "huống"), rồi tới bảng bổ sung.
@@ -30,7 +32,7 @@ export function sinoVietForWord(word: string, readings: ReadonlyMap<string, stri
     i++;
     if (!/\p{Script=Han}/u.test(ch)) return null;
     const simp = simpChars?.[i];
-    const r = COMMON_SINO_VIET[ch] ?? readings.get(ch)?.[0] ?? (simp ? readings.get(simp)?.[0] : undefined) ?? SUPPLEMENT_SINO_VIET[ch] ?? (simp ? SUPPLEMENT_SINO_VIET[simp] : undefined);
+    const r = COMMON_SINO_VIET[ch] ?? overrideSinoViet(ch) ?? (simp ? overrideSinoViet(simp) : undefined) ?? readings.get(ch)?.[0] ?? (simp ? readings.get(simp)?.[0] : undefined) ?? SUPPLEMENT_SINO_VIET[ch] ?? (simp ? SUPPLEMENT_SINO_VIET[simp] : undefined);
     if (!r) return null;
     parts.push(r);
   }
