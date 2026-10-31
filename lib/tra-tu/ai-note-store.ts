@@ -1,7 +1,7 @@
 import "server-only";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 
-export type AiNoteKind = "meaning" | "etymology";
+export type AiNoteKind = "meaning" | "etymology" | "relations";
 
 /** Bản ghi AI đã lưu (bảng `dict_word_ai_notes`); `tableReady` false khi bảng chưa tạo (migration do người dùng chạy tay) để giao diện ẩn nút nhờ AI. */
 export async function readAiNote(term: string, kind: AiNoteKind, version: string): Promise<{ row: { data: unknown; model: string } | null; tableReady: boolean }> {

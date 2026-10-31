@@ -9,6 +9,7 @@ import { WordPractice } from "@/components/tra-tu/word-practice";
 import { WordHeader } from "@/components/tra-tu/word-header";
 import { WordMeanings } from "@/components/tra-tu/word-meanings";
 import { WordNoteCard } from "@/components/tra-tu/word-note-card";
+import { WordRelationsCard } from "@/components/tra-tu/word-relations-card";
 import type { ExampleSentence } from "@/lib/courses/course-types";
 import { loadTermSentences } from "@/lib/courses/load-term-sentences";
 import { loadCompounds } from "@/lib/tra-tu/load-compounds";
@@ -19,6 +20,7 @@ import { loadWordMap } from "@/lib/tra-tu/load-word-map";
 import { loadWordDetail } from "@/lib/tra-tu/load-word-detail";
 import { savedItemForDetail } from "@/lib/tra-tu/saved-item-for-detail";
 import { readWordNote } from "@/lib/tra-tu/word-note-store";
+import { enrichRelations, readWordRelations } from "@/lib/tra-tu/word-relations-store";
 
 import { EtymologyBlock } from "./etymology-block";
 
@@ -38,8 +40,9 @@ export default async function WordPage({ params }: { params: Params }) {
   const detail = HAN_TERM.test(term) ? await loadWordDetail(term) : null;
   if (!detail) redirect(`/dictionary?q=${encodeURIComponent(term.slice(0, 80))}`);
 
-  const [note, sentences, compounds, pool] = await Promise.all([
+  const [note, rel, sentences, compounds, pool] = await Promise.all([
     readWordNote(detail.simplified).catch(() => ({ stored: null, tableReady: false })),
+    readWordRelations(detail.simplified).catch(() => ({ raw: null, tableReady: false, model: null })),
     loadTermSentences([detail.simplified], 6).catch(() => ({})),
     loadCompounds(detail.simplified),
     loadPracticePool(detail.hskLevel),
@@ -48,19 +51,22 @@ export default async function WordPage({ params }: { params: Params }) {
   const info = (await loadHanziInfo([firstHan])).items[0];
   const mapGroups = await loadWordMap(detail.simplified, compounds, info);
   const examples = (sentences as Record<string, ExampleSentence[]>)[detail.simplified] ?? [];
+  const relations = rel.raw ? await enrichRelations(rel.raw, detail.simplified) : null;
+  const hasViMeaning = !!detail.gloss || !!note.stored;
   const cardItem = savedItemForDetail(detail, examples[0], note.stored?.note.gloss ?? null);
 
   return (
     <div className="mx-auto max-w-3xl space-y-space-md">
       <WordHeader detail={detail}><SaveCardButton term={detail.simplified} item={cardItem} /></WordHeader>
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
-      <WordMeanings readings={detail.readings} />
+      <WordRelationsCard term={detail.simplified} initial={relations} canAskAi={rel.tableReady} />
+      <WordMeanings readings={detail.readings} defaultOpen={!hasViMeaning} />
+      <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
       <WordPractice term={detail.simplified} examples={examples} pool={pool} scene={findExploreScene(detail.simplified)} />
+      <CompoundWords term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} words={compounds} />
       <WordMap term={detail.simplified} groups={mapGroups} />
       <StrokeSection term={detail.simplified} />
       <EtymologyBlock term={detail.simplified} />
-      <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
-      <CompoundWords term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} words={compounds} />
     </div>
   );
 }

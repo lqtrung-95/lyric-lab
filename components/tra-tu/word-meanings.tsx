@@ -2,11 +2,15 @@ import { formatMeanings } from "@/lib/tra-tu/format-meanings";
 import type { WordReading } from "@/lib/tra-tu/types";
 
 /** Nghĩa tiếng Anh theo từng cách đọc (CC-CEDICT) và lượng từ. Từ nhiều âm có một khối cho mỗi cách đọc. */
-export function WordMeanings({ readings }: { readings: WordReading[] }) {
+export function WordMeanings({ readings, defaultOpen = false }: { readings: WordReading[]; /** Mở sẵn khi chưa có nghĩa tiếng Việt nào để người học có gì mà đọc. */ defaultOpen?: boolean }) {
   const multi = readings.length > 1;
   return (
-    <section aria-label="Nghĩa tiếng Anh" className="card-ink space-y-space-sm bg-surface-container-lowest p-space-md">
-      <h2 className="text-headline-sm font-extrabold">Nghĩa (tiếng Anh, từ CC-CEDICT)</h2>
+    <details open={defaultOpen} className="card-ink group bg-surface-container-lowest p-space-md">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 text-headline-sm font-extrabold [&::-webkit-details-marker]:hidden">
+        <span>Nghĩa tiếng Anh <span className="text-label-md font-medium text-on-surface-variant">(CC-CEDICT)</span></span>
+        <span aria-hidden="true" className="text-label-md font-bold text-primary group-open:hidden">Xem</span><span aria-hidden="true" className="hidden text-label-md font-bold text-primary group-open:inline">Ẩn</span>
+      </summary>
+      <div className="mt-space-sm space-y-space-sm">
       {readings.map((r) => {
         const { senses, classifiers } = formatMeanings(r.meanings);
         return (
@@ -23,6 +27,7 @@ export function WordMeanings({ readings }: { readings: WordReading[] }) {
           </div>
         );
       })}
-    </section>
+      </div>
+    </details>
   );
 }
