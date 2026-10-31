@@ -362,3 +362,6 @@ Chạy `supabase/migrations/20261031000003_dict_word_ai_notes_relations.sql` tro
 
 ## Rà âm Hán Việt
 `npx tsx --env-file=.env.local scripts/dictionary/audit-hanviet.mts` đọc `dict_hanzi_sino_viet` + `dict_words` và ghi 3 tệp vào `data-cache/`: `hanviet-audit-khac-bang.csv` (âm đầu trong DB khác bảng chuẩn, rà trước; script cũng in ra màn hình), `hanviet-audit-nhieu-am-hsk123.csv` (chữ HSK 1–3 nhiều âm chưa có trong bảng chuẩn), `hanviet-audit-thieu.csv` (không có âm ở dạng phồn lẫn giản). Chữ được tính theo cách app tra (phồn trước, thiếu thì giản cùng vị trí). Sửa bằng cách thêm `chữ:âm` vào `lib/dictionary/sino-viet-overrides.ts` (không cần chạy lại import).
+
+## Luyện từ đã lưu: migration
+Chạy `supabase/migrations/20261031000004_practice_mode_drill.sql` (thêm chế độ `drill` vào `practice_scores_mode_check`) trong Supabase SQL Editor; chạy lại được. Chưa chạy thì luyện từ đã lưu vẫn dùng, chỉ không ghi điểm XP. Báo cáo tuần và Điểm yếu không cần migration mới.

@@ -8,10 +8,16 @@ import { WordMap } from "@/components/tra-tu/word-map";
 import { WordPractice } from "@/components/tra-tu/word-practice";
 import { WordHeader } from "@/components/tra-tu/word-header";
 import { WordMeanings } from "@/components/tra-tu/word-meanings";
+import { WordRelated } from "@/components/tra-tu/word-related";
+import { WordPersonalNote } from "@/components/tra-tu/word-personal-note";
 import { WordNoteCard } from "@/components/tra-tu/word-note-card";
 import { WordRelationsCard } from "@/components/tra-tu/word-relations-card";
 import type { ExampleSentence } from "@/lib/courses/course-types";
 import { loadTermSentences } from "@/lib/courses/load-term-sentences";
+import { loadRadicalChars } from "@/lib/radicals/load-radical-chars";
+import { radicalByChar } from "@/lib/radicals/radicals-core";
+import { ENTRIES } from "@/lib/radicals/radicals";
+import { loadSoundAlikes } from "@/lib/tra-tu/load-sound-alikes";
 import { loadCompounds } from "@/lib/tra-tu/load-compounds";
 import { findExploreScene } from "@/lib/tra-tu/find-explore-scene";
 import { loadPracticePool } from "@/lib/tra-tu/load-practice-pool";
@@ -51,6 +57,13 @@ export default async function WordPage({ params }: { params: Params }) {
   const info = (await loadHanziInfo([firstHan])).items[0];
   const mapGroups = await loadWordMap(detail.simplified, compounds, info);
   const examples = (sentences as Record<string, ExampleSentence[]>)[detail.simplified] ?? [];
+  const mainPinyin = detail.readings[0]?.pinyin ?? "";
+  const rad = info ? radicalByChar(info.radical.char) : undefined;
+  const radEntry = rad ? ENTRIES[rad.num - 1] : null;
+  const [sounds, radChars] = await Promise.all([
+    loadSoundAlikes(detail.simplified, mainPinyin),
+    radEntry ? loadRadicalChars(radEntry).catch(() => []) : Promise.resolve([]),
+  ]);
   const relations = rel.raw ? await enrichRelations(rel.raw, detail.simplified) : null;
   const hasViMeaning = !!detail.gloss || !!note.stored;
   const cardItem = savedItemForDetail(detail, examples[0], note.stored?.note.gloss ?? null);
@@ -59,11 +72,13 @@ export default async function WordPage({ params }: { params: Params }) {
     <div className="mx-auto max-w-3xl space-y-space-md">
       <WordHeader detail={detail}><SaveCardButton term={detail.simplified} item={cardItem} /></WordHeader>
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
+      <WordPersonalNote term={detail.simplified} />
       <WordRelationsCard term={detail.simplified} initial={relations} canAskAi={rel.tableReady} />
       <WordMeanings readings={detail.readings} defaultOpen={!hasViMeaning} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
       <WordPractice term={detail.simplified} examples={examples} pool={pool} scene={findExploreScene(detail.simplified)} />
       <CompoundWords term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} words={compounds} />
+      <WordRelated same={sounds.same} otherTone={sounds.otherTone} radical={[...detail.simplified].length === 1 ? radEntry : null} radicalChars={radChars} char={detail.simplified} />
       <WordMap term={detail.simplified} groups={mapGroups} />
       <StrokeSection term={detail.simplified} />
       <EtymologyBlock term={detail.simplified} />

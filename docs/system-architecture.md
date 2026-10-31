@@ -304,3 +304,5 @@ Nội dung tĩnh (`radicals-core.ts` 214 bộ, `radicals-rich.ts` nội dung đ�
 Lộ trình HSK: màn kết quả chặng gợi ý cảnh (`suggestScenes`: trùng ≥2 từ) và ngữ pháp (`suggestGrammar`: `detectGrammar` trên câu thật `UnitWord.examples`, cấp ≤ cấp khóa + 1); cấp khóa đọc từ slug (`courseLevel`, `hsk-3` → 3).
 
 Tra từ — từ liên quan: `word-relations.ts` (schema, prompt, `cleanRelationWords`), `word-relations-store.ts` (đọc/ghi đệm, `enrichRelations` lọc theo từ điển). Model chỉ cho chữ Hán; mọi pinyin/nghĩa hiển thị đến từ từ điển (quy tắc 2).
+
+Bảy tính năng học tập bổ sung: xem `docs/handoff-and-status.md` mục "BẢY TÍNH NĂNG MỚI". Điểm kiến trúc: logic thuần ở `lib/report`, `lib/review/weak-summary.ts`, `lib/review/saved-drills.ts`, `lib/roleplay/objectives.ts`, `lib/words/word-notes.ts` (đều có test); trang chỉ ghép dữ liệu hiện có (thẻ, thống kê ngữ pháp/bộ thủ, nhật ký chấm, lượt luyện). Không thêm bảng mới ngoài ràng buộc chế độ `drill`.

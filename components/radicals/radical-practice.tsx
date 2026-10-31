@@ -15,9 +15,9 @@ type Source = TopicId | "all" | "weak" | "unknown";
 const opt = "min-h-14 cursor-pointer rounded-2xl border-2 border-ink bg-surface-container-lowest px-4 py-2 text-left text-body-lg font-bold shadow-[0_3px_0_var(--shadow-ink)] hover:brightness-105 active:translate-y-0.5 active:shadow-none disabled:cursor-default";
 
 /** Luyện bộ thủ: 10 câu trộn bốn kiểu (tên và nghĩa, bộ theo nghĩa, bộ của một chữ, chữ chứa bộ); ghi đúng/sai theo từng bộ và cộng điểm luyện tập. */
-export function RadicalPractice({ initialTopic }: { initialTopic: TopicId | null }) {
+export function RadicalPractice({ initialTopic, initialSource }: { initialTopic: TopicId | null; initialSource?: "weak" | "unknown" | null }) {
   const { progress, record } = useRadicalProgress();
-  const [source, setSource] = useState<Source>(initialTopic ?? "all");
+  const [source, setSource] = useState<Source>(initialTopic ?? initialSource ?? "all");
   const [drills, setDrills] = useState<RadicalDrill[] | null>(null);
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);

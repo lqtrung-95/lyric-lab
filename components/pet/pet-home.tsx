@@ -1,5 +1,9 @@
 "use client";
 
+import { useGrammarStats } from "@/components/grammar/use-grammar-stats";
+import { useRadicalProgress } from "@/components/radicals/use-radical-progress";
+import { isMastered } from "@/lib/grammar/grammar-stats";
+import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useExploreProgress } from "@/components/explore/use-explore-progress";
 import { Icon } from "@/components/ui/icon";
@@ -54,10 +58,13 @@ export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: 
   const [state, write] = useLocalJson(KEY, EVENT, parseHomeState, emptyHomeState);
   const [weekly, writeWeekly] = useLocalJson(WEEKLY_KEY, WEEKLY_EVENT, parseWeekly, emptyWeekly);
   const [editing, setEditing] = useState<HomeSlotId | null>(null);
+  const { stats: grammarStats } = useGrammarStats();
+  const { progress: radicalProgress } = useRadicalProgress();
+  const learner = useLearnerState();
   const now = useNow();
   const week = mondayOf(now);
   const { streakLongest, level, daysTogether, daysStudied } = base;
-  const stats: HomeStats = useMemo(() => ({ streakLongest, level, daysTogether, stage, visited: ex.visited, goldStamps: ex.goldStamps, journeys: ex.journeys, weeksDone: weekly.claimed.length }), [streakLongest, level, daysTogether, stage, ex.visited, ex.goldStamps, ex.journeys, weekly.claimed.length]);
+  const stats: HomeStats = useMemo(() => ({ streakLongest, level, daysTogether, stage, visited: ex.visited, goldStamps: ex.goldStamps, journeys: ex.journeys, weeksDone: weekly.claimed.length, grammarMastered: Object.values(grammarStats).filter(isMastered).length, radicalsKnown: radicalProgress.known.length, cardsSaved: learner.state.saved.length }), [streakLongest, level, daysTogether, stage, ex.visited, ex.goldStamps, ex.journeys, weekly.claimed.length, grammarStats, radicalProgress.known.length, learner.state.saved.length]);
   const rows = weeklyRows(weekly, week, daysStudied);
   const claimable = canClaim(weekly, week, daysStudied);
   const placed = useMemo(() => resolvePlacement(state.placed, stats), [state.placed, stats]);
