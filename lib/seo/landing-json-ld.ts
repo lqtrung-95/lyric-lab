@@ -11,6 +11,8 @@ export function landingJsonLd(description: string) {
     applicationCategory: "EducationalApplication",
     operatingSystem: "Web",
     inLanguage: "vi",
+    image: `${SITE_URL}/songhanzi-mark.png`,
+    publisher: { "@type": "Organization", name: "SongHanzi", url: SITE_URL, logo: { "@type": "ImageObject", url: `${SITE_URL}/songhanzi-mark.png`, width: 512, height: 512 } },
     featureList: [
       "Chọn từ vựng và ngữ pháp đáng học từ lời bài hát, kèm pinyin và âm Hán Việt",
       "Nghe với lời chạy theo nhạc, tra nghĩa theo ngữ cảnh câu",

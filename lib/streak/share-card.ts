@@ -1,3 +1,4 @@
+import { drawBrandMark, loadBrandMark } from "@/lib/share/brand-mark";
 import { SITE_URL } from "@/lib/seo/site-url";
 import type { StreakData } from "./load-streak";
 
@@ -19,6 +20,7 @@ function roundRect(c: CanvasRenderingContext2D, x: number, y: number, w: number,
  */
 export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWords" | "weekCount">): Promise<Blob> {
   await document.fonts.ready;
+  const brand = await loadBrandMark();
   // Chữ 歌 trang trí dùng font chữ Hán đã chia mảnh: yêu cầu tải đúng mảnh trước khi vẽ (xem ghi chú ở lib/share/line-card.ts).
   await document.fonts.load('700 760px "Noto Sans SC"', "歌").catch(() => undefined);
   const canvas = document.createElement("canvas");
@@ -61,7 +63,8 @@ export async function renderShareCard(d: Pick<StreakData, "current" | "learnedWo
   c.textAlign = "left";
   c.fillStyle = INK;
   c.font = `600 44px ${serif}`;
-  c.fillText("SongHanzi", 90, 150);
+  const off = drawBrandMark(c, brand, 90, 150);
+  c.fillText("SongHanzi", 90 + off, 150);
 
   c.fillStyle = MUTED;
   c.font = `400 42px ${sans}`;

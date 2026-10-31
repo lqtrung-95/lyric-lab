@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { normalizeChallengeCode } from "@/lib/challenges/challenge-code";
 import { getChallengeInfo } from "@/lib/challenges/challenge-repo";
+import { loadBrandMarkDataUrl } from "@/lib/seo/brand-mark";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { loadOgFonts } from "@/lib/streak/og-fonts";
 
@@ -18,7 +19,7 @@ const MUTED = "#5c4a3a";
  */
 export async function GET(_req: Request, ctx: { params: Promise<{ code: string }> }) {
   const code = normalizeChallengeCode((await ctx.params).code);
-  const [info, fonts] = await Promise.all([code ? getChallengeInfo(code, null).catch(() => null) : null, loadOgFonts()]);
+  const [info, fonts, mark] = await Promise.all([code ? getChallengeInfo(code, null).catch(() => null) : null, loadOgFonts(), loadBrandMarkDataUrl()]);
   const best = info?.standings[0]?.points;
   const headline = info ? `${info.creatorName.length > 18 ? `${info.creatorName.slice(0, 17)}…` : info.creatorName} thách bạn!` : "Thử thách điền lời";
 
@@ -30,7 +31,11 @@ export async function GET(_req: Request, ctx: { params: Promise<{ code: string }
         <div style={{ position: "absolute", right: 56, bottom: 40, display: "flex", fontSize: 300, fontWeight: 700, color: "rgba(148, 74, 0, 0.07)", fontFamily: "serif-bold", lineHeight: 1 }}>歌</div>
         <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "44px 80px 48px", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", fontSize: 40, fontWeight: 700, color: INK, fontFamily: "serif-bold" }}>SongHanzi</div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
+              {mark && <img src={mark} width={64} height={64} alt="" style={{ marginRight: 18 }} />}
+              <div style={{ display: "flex", fontSize: 40, fontWeight: 700, color: INK, fontFamily: "serif-bold" }}>SongHanzi</div>
+            </div>
             <div style={{ display: "flex", padding: "10px 24px", borderRadius: 999, background: "rgba(148, 74, 0, 0.1)", fontSize: 24, fontWeight: 700, color: PRIMARY, letterSpacing: 3 }}>THỬ THÁCH</div>
           </div>
 
