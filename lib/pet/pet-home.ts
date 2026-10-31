@@ -17,6 +17,10 @@ export interface HomeStats {
   journeys: number;
   /** Số tuần đã nhận huy hiệu mục tiêu tuần. */
   weeksDone: number;
+  /** Số mẫu ngữ pháp đã nắm, bộ thủ đã biết, thẻ đã lưu (từ việc học thật, tính lại mỗi lần). */
+  grammarMastered: number;
+  radicalsKnown: number;
+  cardsSaved: number;
 }
 export type HomeStatKey = keyof HomeStats;
 
@@ -52,6 +56,10 @@ export const HOME_ITEMS: readonly HomeItem[] = [
   { id: "globe", label: "Quả địa cầu", kind: "small", need: { stat: "visited", at: 5 }, how: "Ghé 5 cảnh ở Khám phá" },
   { id: "teapot", label: "Ấm trà nhỏ", kind: "small", need: { stat: "weeksDone", at: 2 }, how: "Nhận 2 huy hiệu mục tiêu tuần" },
   { id: "inkset", label: "Bộ bút nghiên", kind: "small", need: { stat: "visited", at: 10 }, how: "Ghé 10 cảnh ở Khám phá" },
+  { id: "grammarboard", label: "Bảng ngữ pháp", kind: "wall", need: { stat: "grammarMastered", at: 5 }, how: "Nắm 5 mẫu ngữ pháp" },
+  { id: "bookstack", label: "Chồng sách", kind: "floor", need: { stat: "cardsSaved", at: 50 }, how: "Lưu 50 thẻ ôn" },
+  { id: "notebook", label: "Sổ tay", kind: "small", need: { stat: "cardsSaved", at: 20 }, how: "Lưu 20 thẻ ôn" },
+  { id: "radicalstamp", label: "Con dấu bộ thủ", kind: "small", need: { stat: "radicalsKnown", at: 20 }, how: "Biết 20 bộ thủ" },
 ];
 
 export const HOME_SLOTS = [
@@ -64,7 +72,7 @@ export const HOME_SLOTS = [
 ] as const satisfies readonly { id: string; kind: HomeItemKind; label: string }[];
 export type HomeSlotId = (typeof HOME_SLOTS)[number]["id"];
 
-export const emptyStats = (): HomeStats => ({ streakLongest: 0, level: 1, stage: 1, daysTogether: 0, visited: 0, goldStamps: 0, journeys: 0, weeksDone: 0 });
+export const emptyStats = (): HomeStats => ({ streakLongest: 0, level: 1, stage: 1, daysTogether: 0, visited: 0, goldStamps: 0, journeys: 0, weeksDone: 0, grammarMastered: 0, radicalsKnown: 0, cardsSaved: 0 });
 
 export function itemUnlocked(item: HomeItem, stats: HomeStats): boolean {
   return !item.need || stats[item.need.stat] >= item.need.at;

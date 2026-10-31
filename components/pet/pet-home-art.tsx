@@ -202,6 +202,40 @@ const ART: Record<string, ReactNode> = {
       <g transform="rotate(30 46 28)"><rect x="44" y="4" width="4" height="34" rx="2" fill={WOOD} /><path d="M44 36h4l-2 10z" fill={INK} /></g>
     </g>
   ),
+  grammarboard: (
+    <g>
+      <rect x="6" y="10" width="52" height="40" rx="4" fill={WOOD_DARK} />
+      <rect x="10" y="14" width="44" height="32" rx="2" fill="#27553a" />
+      <text x="32" y="30" textAnchor="middle" fontSize="12" fontWeight="800" fill={CREAM} fontFamily="serif">把 比 被</text>
+      <rect x="15" y="34" width="14" height="3" rx="1.5" fill={CREAM} opacity="0.8" /><rect x="32" y="34" width="17" height="3" rx="1.5" fill={GOLD} />
+      <rect x="14" y="50" width="36" height="4" rx="2" fill={WOOD} /><rect x="20" y="52" width="6" height="2" fill={CREAM} /><rect x="38" y="52" width="9" height="2" fill={RED} />
+    </g>
+  ),
+  bookstack: (
+    <g>
+      <ellipse cx="32" cy="60" rx="24" ry="3.5" fill="#3a2b2b" opacity="0.14" />
+      <rect x="8" y="42" width="48" height="14" rx="2" fill={BLUE} /><rect x="8" y="48" width="48" height="2.5" fill={CREAM} opacity="0.7" />
+      <rect x="12" y="28" width="42" height="14" rx="2" fill={RED} /><rect x="12" y="34" width="42" height="2.5" fill={CREAM} opacity="0.7" />
+      <rect x="10" y="14" width="40" height="14" rx="2" fill={GREEN} /><rect x="10" y="20" width="40" height="2.5" fill={CREAM} opacity="0.7" />
+    </g>
+  ),
+  notebook: (
+    <g>
+      <ellipse cx="32" cy="58" rx="18" ry="3" fill="#3a2b2b" opacity="0.14" />
+      <rect x="14" y="8" width="36" height="48" rx="4" fill={GOLD_DARK} />
+      <rect x="18" y="8" width="32" height="48" rx="3" fill={GOLD} />
+      <rect x="22" y="18" width="24" height="3" rx="1.5" fill={WOOD_DARK} opacity="0.5" /><rect x="22" y="26" width="20" height="3" rx="1.5" fill={WOOD_DARK} opacity="0.5" /><rect x="22" y="34" width="22" height="3" rx="1.5" fill={WOOD_DARK} opacity="0.5" />
+      {[14, 24, 34, 44].map((y) => <circle key={y} cx="16" cy={y} r="2.4" fill={CREAM} />)}
+    </g>
+  ),
+  radicalstamp: (
+    <g>
+      <ellipse cx="32" cy="58" rx="18" ry="3" fill="#3a2b2b" opacity="0.14" />
+      <rect x="14" y="40" width="36" height="14" rx="3" fill={RED} />
+      <rect x="24" y="22" width="16" height="20" rx="3" fill={WOOD} /><rect x="22" y="16" width="20" height="8" rx="4" fill={WOOD_DARK} />
+      <text x="32" y="51" textAnchor="middle" fontSize="11" fontWeight="800" fill={CREAM} fontFamily="serif">部首</text>
+    </g>
+  ),
 };
 
 export function HomeItemArt({ id, className, box }: { id: string; className?: string; /** Đặt trong một SVG lớn hơn: toạ độ và cạnh. */ box?: { x: number; y: number; s: number } }) {

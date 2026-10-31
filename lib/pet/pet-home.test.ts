@@ -86,3 +86,16 @@ describe("placeItem", () => {
     expect(next.floorR).toBeUndefined();
   });
 });
+
+describe("đồ mở khóa nhờ việc học (ngữ pháp, bộ thủ, thẻ)", () => {
+  it("mở đúng ngưỡng", () => {
+    expect(itemUnlocked(byId("grammarboard"), stats({ grammarMastered: 4 }))).toBe(false);
+    expect(itemUnlocked(byId("grammarboard"), stats({ grammarMastered: 5 }))).toBe(true);
+    expect(itemUnlocked(byId("notebook"), stats({ cardsSaved: 20 }))).toBe(true);
+    expect(itemUnlocked(byId("bookstack"), stats({ cardsSaved: 49 }))).toBe(false);
+    expect(itemProgress(byId("radicalstamp"), stats({ radicalsKnown: 8 }))).toEqual({ have: 8, need: 20 });
+  });
+  it("newlyUnlocked báo đồ mới mở", () => {
+    expect(newlyUnlocked([], stats({ radicalsKnown: 20 })).map((i) => i.id)).toEqual(["radicalstamp"]);
+  });
+});
