@@ -34,17 +34,15 @@ type SideLink = (typeof SECONDARY_LINKS)[number];
 const pick = (...hrefs: string[]): SideLink[] => hrefs.map((h) => SECONDARY_LINKS.find((l) => l.href === h)!);
 
 /**
- * Lối vào phụ ở thanh bên máy tính, gom thành nhóm có tiêu đề cho dễ quét: "Học thêm" và "Của bạn" luôn hiện, "Khác" gập sẵn. Hồ sơ, Cài đặt và Góp ý nằm ở menu avatar trên thanh đầu
+ * Lối vào phụ ở thanh bên máy tính, gom thành nhóm có tiêu đề cho dễ quét: một nhóm "Học thêm" (Ngữ pháp, Bộ thủ, Tra từ, Công cụ); không lập nhóm chỉ có một mục. Hồ sơ, Báo cáo tuần, Cài đặt và Góp ý nằm ở menu avatar trên thanh đầu
  * (`ACCOUNT_LINKS`), không lặp lại ở đây. Điện thoại và máy tính bảng vẫn dùng danh sách phẳng `SECONDARY_LINKS` trong bảng Menu.
  */
-export const SIDE_GROUPS: { id: string; title: string; links: SideLink[]; collapsible?: boolean }[] = [
-  { id: "learn", title: "Học thêm", links: pick("/grammar", "/radicals", "/dictionary") },
-  { id: "mine", title: "Của bạn", links: pick("/report") },
-  { id: "more", title: "Khác", links: pick("/tools"), collapsible: true },
+export const SIDE_GROUPS: { id: string; title: string; links: SideLink[] }[] = [
+  { id: "learn", title: "Học thêm", links: pick("/grammar", "/radicals", "/dictionary", "/tools") },
 ];
 
-/** Mục tài khoản ở menu avatar (thanh đầu, màn lg trở lên). */
-export const ACCOUNT_LINKS: SideLink[] = pick("/profile", "/settings", "/feedback");
+/** Mục cá nhân và tài khoản ở menu avatar (thanh đầu, màn lg trở lên). */
+export const ACCOUNT_LINKS: SideLink[] = pick("/profile", "/report", "/settings", "/feedback");
 
 const within = (prefix: string, pathname: string) => pathname === prefix || pathname.startsWith(`${prefix}/`);
 

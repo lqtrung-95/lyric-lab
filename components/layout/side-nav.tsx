@@ -75,17 +75,10 @@ export function SideNav() {
           ))
         ) : (
           SIDE_GROUPS.map((g) => (
-            g.collapsible ? (
-              <details key={g.id} className="group mt-1">
-                <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between px-3 text-label-sm font-bold uppercase tracking-wider text-on-surface-variant [&::-webkit-details-marker]:hidden">{g.title}<Icon name="expand_more" size={18} className="transition-transform group-open:rotate-180" /></summary>
-                <SideLinks links={g.links} pathname={pathname} />
-              </details>
-            ) : (
-              <div key={g.id} className="mt-1 first:mt-0">
-                <p className="flex min-h-9 items-center px-3 text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">{g.title}</p>
-                <SideLinks links={g.links} pathname={pathname} />
-              </div>
-            )
+            <div key={g.id} className="mt-1 first:mt-0">
+              <p className="flex min-h-9 items-center px-3 text-label-sm font-bold uppercase tracking-wider text-on-surface-variant">{g.title}</p>
+              <SideLinks links={g.links} pathname={pathname} />
+            </div>
           ))
         )}
       </nav>
