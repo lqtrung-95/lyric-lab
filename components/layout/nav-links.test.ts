@@ -28,8 +28,7 @@ describe("nhóm lối vào phụ", () => {
     expect(new Set(placed).size).toBe(placed.length);
     expect([...placed].sort()).toEqual(SECONDARY_LINKS.map((l) => l.href).sort());
   });
-  it("mỗi nhóm có tiêu đề và ít nhất một mục; chỉ nhóm Khác gập được", () => {
-    for (const g of SIDE_GROUPS) { expect(g.title.length).toBeGreaterThan(0); expect(g.links.length).toBeGreaterThan(0); }
-    expect(SIDE_GROUPS.filter((g) => g.collapsible).map((g) => g.id)).toEqual(["more"]);
+  it("mỗi nhóm có tiêu đề và ít nhất hai mục (nhóm một mục thì gộp vào nơi khác, không lập nhóm riêng)", () => {
+    for (const g of SIDE_GROUPS) { expect(g.title.length).toBeGreaterThan(0); expect(g.links.length, g.id).toBeGreaterThanOrEqual(2); }
   });
 });
