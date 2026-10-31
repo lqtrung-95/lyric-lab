@@ -296,3 +296,7 @@ Nhận diện giọng (`/api/speech/transcribe`): chữ Azure trả về đi qua
 Nói với AI: `feedback` của lượt trả có `betterVi` (tùy chọn). Thẻ ôn do người học lưu từ câu sửa dùng `type:"grammar"`; pool của các game (`loadPracticeCards`) chỉ lấy `kind=vocab`.
 
 Giọng nhận xét của pet: `roleplayRequestSchema.tone` (enum 4 giá trị) → `TONE_RULE` trong `build-turn-prompt.ts`. Lời người học vẫn là dữ liệu, không phải chỉ thị; tone chỉ chọn trong bảng cố định ở server.
+
+## Bộ thủ (`lib/radicals`, `components/radicals`, `app/(main)/radicals`)
+
+Nội dung tĩnh (`radicals-core.ts` 214 bộ, `radicals-rich.ts` nội dung đầy đủ cho 107 bộ, `radicals.ts` ghép chủ đề và tìm kiếm). `radical-drills.ts` sinh bài tập từ chính dữ liệu (bộ gây nhầm ưu tiên cùng số nét/chủ đề); chữ ví dụ không được trùng giữa các bộ (có test) để bài "chữ nào chứa bộ" chỉ có một đáp án. Danh sách chữ chứa bộ do `load-radical-chars.ts` đọc `dict_hanzi_info` (cột `radical` có cả dạng biến thể như 亻) rồi tra `dict_words`/`dict_word_vi`, cache 30 phút; lỗi thì dùng chữ ví dụ viết tay. Tiến độ gộp tài khoản như thống kê ngữ pháp (`user_radical_progress`, hợp các bộ đã biết + số lớn hơn từng trường).

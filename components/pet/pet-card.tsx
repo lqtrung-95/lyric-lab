@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRadicalProgress } from "@/components/radicals/use-radical-progress";
+import { radicalOfDay } from "@/lib/radicals/radicals";
 import { useGrammarStats } from "@/components/grammar/use-grammar-stats";
 import { grammarById } from "@/lib/grammar/grammar-patterns";
 import { weakPatternIds } from "@/lib/grammar/grammar-stats";
@@ -67,6 +69,7 @@ export function PetCard() {
   const { adventure, setAdventure } = usePetAdventure();
   const { taught } = usePetTaught();
   const { stats: grammarStats } = useGrammarStats();
+  const { progress: radicalProgress } = useRadicalProgress();
   const [seenBack, setSeenBack] = useState<string | null>(null);
   // Hiệu ứng hạt + tiếng cho tương tác ngoài hình pet (cho ăn, tập nói, quà, nhận nuôi, tiến hóa).
   const [extra, setExtra] = useState<PetBurst | null>(null);
@@ -96,6 +99,7 @@ export function PetCard() {
   const today = now ? (streak?.week.find((d) => d.isToday)?.day ?? null) : null;
   const away = phase === "away";
   const forgot = forgottenCount(taught, now);
+  const dayRadical = now ? radicalOfDay(Math.floor(now / 86_400_000), radicalProgress.known) : null;
   const weakGrammar = grammarById(weakPatternIds(grammarStats, 1)[0] ?? "") ?? null;
   const mood = streak ? petMood(goal, daysSinceStudy(streak)) : "hungry";
   const shown: Pet = draft ? { ...pet, species: draft.species, name: cleanPetName(draft.name) ?? pet.name } : pet;
@@ -124,6 +128,7 @@ export function PetCard() {
         )}
         {accessories.length > 0 && <p className="mt-1 text-label-md text-on-surface-variant">Phụ kiện đã mở: {accessories.map((a) => a.label).join(", ")}</p>}
         {weakGrammar && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} thấy bạn hay sai mẫu “{weakGrammar.title}”. <Link href={`/grammar/${weakGrammar.id}`} className="inline-flex min-h-11 items-center underline">Ôn lại nhé</Link></p>}
+        {dayRadical && !weakGrammar && !teaching && <p className="mt-1 text-label-md text-on-surface-variant">Bộ thủ hôm nay: <Link href={`/radicals/${dayRadical.num}`} className="inline-flex min-h-11 items-center font-bold text-secondary underline"><span lang="zh-Hans" className="mr-1 font-serif text-lg">{dayRadical.char}</span>Bộ {dayRadical.name} ({dayRadical.meaning})</Link></p>}
         {forgot > 0 && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} đang quên {forgot} từ bạn đã dạy. Dạy lại nhé!</p>}
         {!feeding && !echoing && !chatting && !editing && !teaching && !homing && !away && (
           <div className="mt-space-sm flex flex-wrap gap-2">

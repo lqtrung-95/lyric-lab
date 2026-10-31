@@ -14,6 +14,8 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
       { href: "/review/match", label: "Ghép cặp", desc: "Nối chữ Hán với nghĩa càng nhanh càng tốt", icon: "shuffle" },
       { href: "/review/pinyin", label: "Gõ pinyin", desc: "Nhìn chữ Hán, gõ pinyin có dấu thanh", icon: "keyboard" },
       { href: "/review/hard", label: "Từ khó", desc: "Luyện riêng các từ bạn hay quên nhất", icon: "local_fire_department" },
+      { href: "/radicals/practice", label: "Luyện bộ thủ", desc: "Nhận ra tên, nghĩa và chữ chứa bộ trong 214 bộ Khang Hy", icon: "quiz" },
+      { href: "/radicals", label: "Học bộ thủ", desc: "214 bộ thủ: nghĩa, Hán Việt, nét viết, mẹo nhớ", icon: "translate" },
       { href: "/review/write", label: "Viết chữ Hán", desc: "Nghe nghĩa, viết từng nét theo thứ tự", icon: "brush" },
     ],
   },
