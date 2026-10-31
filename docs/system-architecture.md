@@ -300,3 +300,5 @@ Giọng nhận xét của pet: `roleplayRequestSchema.tone` (enum 4 giá trị) 
 ## Bộ thủ (`lib/radicals`, `components/radicals`, `app/(main)/radicals`)
 
 Nội dung tĩnh (`radicals-core.ts` 214 bộ, `radicals-rich.ts` nội dung đầy đủ cho 107 bộ, `radicals.ts` ghép chủ đề và tìm kiếm). `radical-drills.ts` sinh bài tập từ chính dữ liệu (bộ gây nhầm ưu tiên cùng số nét/chủ đề); chữ ví dụ không được trùng giữa các bộ (có test) để bài "chữ nào chứa bộ" chỉ có một đáp án. Danh sách chữ chứa bộ do `load-radical-chars.ts` đọc `dict_hanzi_info` (cột `radical` có cả dạng biến thể như 亻) rồi tra `dict_words`/`dict_word_vi`, cache 30 phút; lỗi thì dùng chữ ví dụ viết tay. Tiến độ gộp tài khoản như thống kê ngữ pháp (`user_radical_progress`, hợp các bộ đã biết + số lớn hơn từng trường).
+
+Lộ trình HSK: màn kết quả chặng gợi ý cảnh (`suggestScenes`: trùng ≥2 từ) và ngữ pháp (`suggestGrammar`: `detectGrammar` trên câu thật `UnitWord.examples`, cấp ≤ cấp khóa + 1); cấp khóa đọc từ slug (`courseLevel`, `hsk-3` → 3).

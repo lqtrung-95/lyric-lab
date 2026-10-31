@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Icon } from "@/components/ui/icon";
@@ -18,6 +19,9 @@ import { savedItemFor, UnitLearnStep } from "./unit-learn-step";
 import { UnitListenStep } from "./unit-listen-step";
 import { UnitQuizStep } from "./unit-quiz-step";
 import { useUnit } from "./use-unit";
+
+/** Gợi ý cảnh và ngữ pháp ở màn kết quả: nạp riêng vì kéo theo danh sách cảnh và thư viện mẫu. */
+const UnitNextSteps = dynamic(() => import("./unit-next-steps"), { ssr: false });
 
 type Step = "learn" | "listen" | "quiz" | "result";
 const STEPS: { id: Exclude<Step, "result">; label: string }[] = [
@@ -109,6 +113,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
           {result.added > 0 && <p className="mt-1 text-body-md text-on-surface-variant" data-testid="unit-result-added">Đã thêm {result.added} từ làm sai vào bộ ôn.</p>}
           {result.missed > 0 && <p className="mt-1 text-body-sm text-on-surface-variant">{result.missed} từ làm sai chưa có câu thật trong video nên chưa lưu được thẻ.</p>}
           {!result.saved && <p className="mt-1 text-body-sm text-on-surface-variant">Chưa ghi nhớ được tiến độ lần này (mất kết nối?).</p>}
+          {result.passed && <UnitNextSteps slug={slug} words={detail.words} isReview={isReview} />}
           <div className="mt-space-md flex flex-wrap justify-center gap-2">
             <button type="button" onClick={() => { setStep("learn"); setResult(null); }} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container"><Icon name="replay" size={20} /> {isReview ? "Làm lại bài" : "Học lại chặng"}</button>
             {result.passed && hasNext && <Link href={`/courses/${slug}/${detail.unit.idx + 1}`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary">Chặng tiếp theo <Icon name="arrow_forward" size={20} /></Link>}
