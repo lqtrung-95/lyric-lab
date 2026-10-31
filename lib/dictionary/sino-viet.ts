@@ -11,7 +11,7 @@ const COMMON_SINO_VIET: Record<string, string> = { 好: "hảo" };
 
 // Bảng bổ sung cho chữ thông dụng mà Unihan không có âm Hán Việt (đo trên từ vựng HSK 1–6: 需 nhu, 别 biệt, 话 thoại... làm cả từ như 需要, 别人, 电话 bị để trống).
 // Khóa theo chữ giản thể hoặc phồn thể; chỉ thêm chữ có âm Hán Việt thông dụng, chắc chắn; chữ khẩu ngữ/vay mượn không có âm Hán Việt (她, 咖, 啡, 咱...) thì để trống.
-const SUPPLEMENT_SINO_VIET: Record<string, string> = {
+export const SUPPLEMENT_SINO_VIET: Record<string, string> = {
   需: "nhu", 别: "biệt", 帮: "bang", 假: "giả", 昨: "tạc", 话: "thoại", 词: "từ", 纸: "chỉ", 办: "biện", 阴: "âm", 烟: "yên", 绝: "tuyệt", 却: "khước", 率: "suất",
   伞: "tản", 鲜: "tiên", 巨: "cự", 湿: "thấp", 聊: "liêu", 阅: "duyệt", 析: "tích", 尝: "thường", 戏: "hí", 犹: "do", 肤: "phu", 肩: "kiên", 肠: "tràng", 卧: "ngọa",
   骂: "mạ", 赔: "bồi", 辅: "phụ", 软: "nhuyễn", 醉: "túy", 锁: "tỏa", 幕: "mạc", 艳: "diễm", 岛: "đảo", 宅: "trạch", 允: "doãn", 剑: "kiếm", 吊: "điếu", 咨: "tư",
