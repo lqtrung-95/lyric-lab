@@ -45,3 +45,59 @@ describe("orderSinoViet", () => {
     expect(orderSinoViet("龘", ["đạp"])).toEqual(["đạp"]);
   });
 });
+
+import { modernizeTone, WORD_SINO_VIET_OVERRIDES } from "./sino-viet-overrides";
+
+describe("chuẩn hóa dấu thanh", () => {
+  it("đổi kiểu cũ sang kiểu mới, giữ quý/quỹ", () => {
+    expect(modernizeTone("hoà")).toBe("hòa");
+    expect(modernizeTone("thuỷ")).toBe("thủy");
+    expect(modernizeTone("hoạ")).toBe("họa");
+    expect(modernizeTone("quý")).toBe("quý");
+    expect(modernizeTone("quỹ")).toBe("quỹ");
+    expect(modernizeTone("nhân")).toBe("nhân");
+    expect(modernizeTone("khoái")).toBe("khoái");
+    expect(modernizeTone("hoài")).toBe("hoài");
+    expect(modernizeTone("loạn")).toBe("loạn");
+    expect(modernizeTone("hoàn")).toBe("hoàn");
+    expect(modernizeTone("thuỵ")).toBe("thụy");
+    expect(modernizeTone("toạ")).toBe("tọa");
+  });
+  it("áp vào âm ghép của từ", () => {
+    expect(sinoVietForWord("水", new Map([["水", ["thuỷ"]]]))).toBe("thủy");
+    expect(sinoVietForWord("龘龘", new Map([["龘", ["hoà"]]]))).toBe("hòa hòa");
+  });
+});
+
+describe("âm của từ khác âm chuẩn từng chữ", () => {
+  it("校长 hiệu trưởng, 少年 thiếu niên, 会计 cối kế; từ thường vẫn ghép theo chữ", () => {
+    const rd = new Map([["校", ["hiệu"]], ["長", ["trường"]], ["少", ["thiếu"]], ["年", ["niên"]]]);
+    expect(sinoVietForWord("校長", rd)).toBe("hiệu trưởng");
+    expect(sinoVietForWord("少年", rd)).toBe("thiếu niên");
+    expect(sinoVietForWord("会计", rd)).toBe("cối kế");
+    expect(sinoVietForWord("長年", rd)).toBe("trường niên");
+    expect(WORD_SINO_VIET_OVERRIDES.size).toBeGreaterThan(40);
+  });
+  it("chữ 载 và 划 không còn bị đè (载 tải/tái, 划 hoa/hoạch tùy từ)", () => {
+    expect(overrideSinoViet("载")).toBeUndefined();
+    expect(overrideSinoViet("划")).toBeUndefined();
+    expect(overrideSinoViet("劃")).toBe("hoạch");
+  });
+});
+
+describe("sửa theo lần rà thứ hai (chữ HSK 1–3)", () => {
+  it("âm chuẩn thay âm Nôm/hiếm đứng đầu trong dữ liệu", () => {
+    const dirty = new Map<string, string[]>([["候", ["hầu", "hậu"]], ["本", ["bổn", "bản"]], ["菜", ["cải", "thái"]], ["筆", ["bất", "bút"]], ["慣", ["quen", "quán"]], ["餐", ["xun", "xan"]], ["推", ["suy", "thôi"]], ["晴", ["tạnh", "tình"]]]);
+    for (const [w, r] of [["候", "hậu"], ["本", "bản"], ["菜", "thái"], ["筆", "bút"], ["慣", "quán"], ["餐", "xan"], ["推", "thôi"], ["晴", "tình"]]) expect(sinoVietForWord(w, dirty), w).toBe(r);
+  });
+  it("từ ghép: 旅行 lữ hành (không phải 'lữ hàng'), 使馆 sứ quán, 银行 vẫn theo âm dữ liệu", () => {
+    const rd = new Map<string, string[]>([["旅", ["lữ"]], ["行", ["hàng", "hành"]], ["銀", ["ngân"]]]);
+    expect(sinoVietForWord("旅行", rd)).toBe("lữ hành");
+    expect(sinoVietForWord("銀行", rd)).toBe("ngân hàng");
+    expect(sinoVietForWord("使館", new Map())).toBe("sứ quán");
+  });
+  it("chữ thiếu trong dữ liệu lấy âm từ bảng bổ sung", () => {
+    expect(sinoVietForWord("筷", new Map())).toBe("khoái");
+    expect(sinoVietForWord("這", new Map())).toBe("giá");
+  });
+});

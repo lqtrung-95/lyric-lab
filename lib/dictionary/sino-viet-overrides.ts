@@ -19,10 +19,49 @@ const TABLE = `
 时時:thời 间間:gian 年:niên 今:kim 明:minh 早:tảo 晚:vãn 昨:tạc 春:xuân 夏:hạ 秋:thu 冬:đông 夜:dạ 朝:triều
 我:ngã 他:tha 们們:môn 的:đích 了:liễu 在:tại 有:hữu 不:bất 是:thị 也:dã 就:tựu 都:đô 和:hòa 与與:dữ
 对對:đối 没沒:một 很:ngận 还還:hoàn 会會:hội 能:năng 可:khả 以:dĩ 为為:vi 要:yếu 想:tưởng 去:khứ 来來:lai 做:tố 吃:cật 喝:hát 给給:cấp 请請:thỉnh 问問:vấn 叫:khiếu 让讓:nhượng 用:dụng
-得:đắc 觉覺:giác 参參:tham 发發:phát 假:giả 量:lượng 数數:số 难難:nan 切:thiết 省:tỉnh 宿:túc 台臺:đài 调調:điều 盛:thịnh 传傳:truyền 种種:chủng 将將:tương 角:giác 度:độ 曲:khúc 降:giáng 磨:ma 模:mô 恶惡:ác 薄:bạc 倒:đảo 分:phân 号號:hiệu 划劃:hoạch 禁:cấm 系係:hệ 相:tương 应應:ứng 载載:tái 转轉:chuyển
+得:đắc 觉覺:giác 参參:tham 发發:phát 假:giả 量:lượng 数數:số 难難:nan 切:thiết 省:tỉnh 宿:túc 台臺:đài 调調:điều 盛:thịnh 传傳:truyền 种種:chủng 将將:tương 角:giác 度:độ 曲:khúc 降:giáng 磨:ma 模:mô 恶惡:ác 薄:bạc 倒:đảo 分:phân 号號:hiệu 劃:hoạch 禁:cấm 系係:hệ 相:tương 应應:ứng 转轉:chuyển
 习習:tập 经經:kinh 济濟:tế 现現:hiện 实實:thực 开開:khai 关關:quan 动動:động 业業:nghiệp 体體:thể 点點:điểm 钟鐘:chung 气氣:khí 张張:trương 总總:tổng 种:chủng 过過:quá 进進:tiến 远遠:viễn 近:cận 送:tống 选選:tuyển 通:thông 道:đạo 街:nhai 城:thành 市:thị 乡鄉:hương 村:thôn 区區:khu 图圖:đồ 园園:viên
 钱:tiền 银銀:ngân 铁鐵:thiết 铜銅:đồng 药藥:dược 病:bệnh 医醫:y 痛:thống 脸臉:kiểm 眼:nhãn 鼻:tị 牙:nha 腿:thoái 脑腦:não 血:huyết 骨:cốt
+候:hậu 哪:na 姐:tỷ 媽妈:ma 本:bản 正:chính 淨净:tịnh 菜:thái 跑:bào 錯错:thác 使:sử 句:cú 夠够:cấu 它:tha 帶带:đới 慣惯:quán 掉:điệu 推:thôi 晴:tình 板闆:bản 檢检:kiểm 筆笔:bút 計计:kế 響响:hưởng 須须:tu 餃饺:giảo 餐:xan
+任:nhiệm 員员:viên 唸:niệm 希:hy 恐:khủng 抓:trảo 拍:phách 播:bá 據据:cứ 斷断:đoạn 暖:noãn 標标:tiêu 營营:doanh 箱:tương 蘋苹:bình 較较:giảo 遍:biến
 `;
+
+/**
+ * Từ có âm Hán Việt KHÁC âm chuẩn của từng chữ (chữ nhiều âm đổi theo nghĩa): 校长 hiệu trưởng (không phải "hiệu trường"), 少年 thiếu niên (không phải "thiểu niên").
+ * Cú pháp `từ(giản),từ(phồn):âm_nối_bằng_gạch_dưới`. Thêm khi gặp từ ghép bị ghép sai âm; chỉ thêm từ chắc chắn.
+ */
+const WORD_TABLE = `
+少年:thiếu_niên 少女:thiếu_nữ 青少年:thanh_thiếu_niên 年少:niên_thiếu 少爷,少爺:thiếu_gia
+爱好,愛好:ái_hiếu 好奇:hiếu_kỳ 好学,好學:hiếu_học 会计,會計:cối_kế
+将军,將軍:tướng_quân 大将,大將:đại_tướng 上将,上將:thượng_tướng 将领,將領:tướng_lĩnh
+间接,間接:gián_tiếp 间谍,間諜:gián_điệp 相貌:tướng_mạo 照相:chiếu_tướng 首相:thủ_tướng 相声,相聲:tướng_thanh
+投降:đầu_hàng 传记,傳記:truyện_ký 自传,自傳:tự_truyện 小传,小傳:tiểu_truyện
+校长,校長:hiệu_trưởng 市长,市長:thị_trưởng 部长,部長:bộ_trưởng 长大,長大:trưởng_đại 成长,成長:thành_trưởng 班长,班長:ban_trưởng 长辈,長輩:trưởng_bối
+旅行:lữ_hành 行动,行動:hành_động 行为,行為:hành_vi 步行:bộ_hành 进行,進行:tiến_hành 流行:lưu_hành 发行,發行:phát_hành 执行,執行:chấp_hành 实行,實行:thực_hành 行李:hành_lý 行人:hành_nhân 自行车,自行車:tự_hành_xa
+大使:đại_sứ 使者:sứ_giả 使命:sứ_mệnh 使馆,使館:sứ_quán 公使:công_sứ 更加:cánh_gia 贸易,貿易:mậu_dịch 交易:giao_dịch
+队长,隊長:đội_trưởng 院长,院長:viện_trưởng 家长,家長:gia_trưởng 首长,首長:thủ_trưởng 生长,生長:sinh_trưởng 增长,增長:tăng_trưởng
+`;
+const parseWords = (): Map<string, string> => {
+  const m = new Map<string, string>();
+  for (const pair of WORD_TABLE.split(/\s+/).filter(Boolean)) {
+    const [keys, reading] = pair.split(":");
+    for (const k of keys.split(",")) m.set(k, reading.replaceAll("_", " "));
+  }
+  return m;
+};
+export const WORD_SINO_VIET_OVERRIDES: ReadonlyMap<string, string> = parseWords();
+
+/**
+ * Chuẩn hóa vị trí dấu thanh kiểu cũ của dữ liệu nguồn sang kiểu hiện đại để cả app viết một kiểu (thuỷ → thủy, hoà → hòa, quỹ giữ nguyên): oà/oá/oả/oã/oạ → òa/óa/ỏa/õa/ọa
+ * và uý/uỳ/uỷ/uỹ/uỵ → úy/ùy/ủy/ũy/ụy, trừ sau "q" (quý, quỹ: "qu" là phụ âm đầu nên dấu nằm ở y).
+ */
+// Chỉ đổi ở âm tiết MỞ (không có chữ cái nào theo sau): hoà → hòa nhưng "hoài", "khoái", "loạn", "hoàn" giữ nguyên vì dấu đã đúng chỗ.
+const OPEN_SYLLABLE = "(?!\\p{L})";
+const OLD_TONE: [RegExp, string][] = [
+  ["oà", "òa"], ["oá", "óa"], ["oả", "ỏa"], ["oã", "õa"], ["oạ", "ọa"],
+  ["(?<!q)uý", "úy"], ["(?<!q)uỳ", "ùy"], ["(?<!q)uỷ", "ủy"], ["(?<!q)uỹ", "ũy"], ["(?<!q)uỵ", "ụy"],
+].map(([from, to]) => [new RegExp(`${from}${OPEN_SYLLABLE}`, "gu"), to]);
+export const modernizeTone = (s: string): string => OLD_TONE.reduce((acc, [re, to]) => acc.replace(re, to), s.normalize("NFC"));
 
 /** Các cặp `[các chữ, âm]` đã tách (xuất ra để test kiểm tra trùng và định dạng). */
 export const OVERRIDE_PAIRS: [string, string][] = TABLE.split(/\s+/).filter(Boolean).map((p) => p.split(":") as [string, string]);
@@ -41,5 +80,5 @@ export const overrideSinoViet = (char: string): string | undefined => SINO_VIET_
 /** Đưa âm chuẩn (nếu có) lên đầu danh sách âm của một chữ, giữ các âm còn lại theo thứ tự cũ và bỏ trùng. */
 export function orderSinoViet(char: string, readings: readonly string[]): string[] {
   const o = SINO_VIET_OVERRIDES.get(char);
-  return o ? [o, ...readings.filter((r) => r !== o)] : [...readings];
+  return (o ? [o, ...readings.filter((r) => r !== o)] : [...readings]).map(modernizeTone);
 }
