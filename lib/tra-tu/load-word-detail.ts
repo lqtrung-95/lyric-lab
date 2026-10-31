@@ -1,6 +1,7 @@
 import "server-only";
 import { lookupWords } from "@/lib/dictionary/lookup-words";
 import { sinoVietForWord } from "@/lib/dictionary/sino-viet";
+import { orderSinoViet } from "@/lib/dictionary/sino-viet-overrides";
 import { createSupabaseServiceClient } from "@/lib/supabase/service-client";
 import { toSimplifiedChinese } from "@/lib/text/to-simplified-chinese";
 import { loadGlossIndex } from "./load-search-indexes";
@@ -32,7 +33,7 @@ export async function loadWordDetail(term: string): Promise<WordDetail | null> {
     hskLevel: levels.length ? Math.min(...levels) : null,
     chars: simpChars.map((hanzi, i) => {
       const traditional = tradChars.length === simpChars.length ? tradChars[i] : hanzi;
-      return { hanzi, traditional, sinoViet: readingsOf.get(traditional) ?? readingsOf.get(hanzi) ?? [] };
+      return { hanzi, traditional, sinoViet: orderSinoViet(hanzi, orderSinoViet(traditional, readingsOf.get(traditional) ?? readingsOf.get(hanzi) ?? [])) };
     }),
     gloss: glosses?.glosses.get(simplified) ?? null,
   };

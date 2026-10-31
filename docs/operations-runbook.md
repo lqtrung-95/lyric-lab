@@ -359,3 +359,6 @@ Chạy `supabase/migrations/20261031000001_user_radical_progress.sql` (tiến đ
 
 ## Tra từ: migration từ đồng nghĩa/trái nghĩa
 Chạy `supabase/migrations/20261031000003_dict_word_ai_notes_relations.sql` trong Supabase SQL Editor (chạy lại được) để `dict_word_ai_notes` nhận loại `relations`. Đổi prompt thì tăng `WORD_RELATIONS_PROMPT_VERSION` (bản cũ tự bị bỏ qua).
+
+## Rà âm Hán Việt
+`npx tsx scripts/dictionary/audit-hanviet.mts` đọc `dict_hanzi_sino_viet` + `dict_words` (cần `.env.local`) và ghi `data-cache/hanviet-audit.csv` các chữ HSK thiếu âm, có âm đầu khác bảng chuẩn, hoặc nhiều âm chưa có trong bảng. Sửa bằng cách thêm `chữ:âm` vào `lib/dictionary/sino-viet-overrides.ts` (không cần chạy lại import).
