@@ -11,6 +11,7 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { useWordGameScore } from "@/components/practice/use-word-game-score";
 import type { Scenario } from "@/lib/roleplay/scenarios";
 import { MAX_ROLEPLAY_TURNS } from "@/lib/roleplay/turn-schema";
+import { ObjectivesPanel } from "./objectives-panel";
 import { RoleplaySummaryModal } from "./roleplay-summary-modal";
 import { SpeakBox } from "./speak-box";
 import { WordTapPanel, type TappedWord } from "./word-tap-panel";
@@ -156,6 +157,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, tone,
             <div key={k} className="rounded-xl bg-surface-container-lowest px-3 py-2"><dt className="text-label-md text-on-surface-variant">{k}</dt><dd className="text-headline-md font-extrabold">{v}</dd></div>
           ))}
         </dl>
+        {!scenario.tonal && <ObjectivesPanel scenarioId={scenario.id} userLines={userLines.map((m) => m.zh)} compact />}
         <p role="status" className="text-body-lg font-bold">{fixes.length === 0 ? "Không có câu nào cần sửa, bạn nói rất tự nhiên!" : `${fixes.length} câu có thể nói lại cho chuẩn hơn.`}</p>
         {fixes.length > 0 && (
           <section aria-label="Câu nên nói lại">
@@ -209,6 +211,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, tone,
           <button type="button" onClick={s.end} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-extrabold">Kết thúc</button>
         </div>
       </div>
+      {!scenario.tonal && <ObjectivesPanel scenarioId={scenario.id} userLines={s.msgs.filter((m) => m.role === "user").map((m) => m.zh)} />}
       <ul className="flex flex-col gap-2" aria-live="polite">{s.msgs.map((m) => <Bubble key={m.id} m={m} showPinyin={showPinyin} onWord={setTapped} active={tapped} />)}</ul>
       {tapped && <WordTapPanel key={tapped} term={tapped} onLooked={onLooked} onClose={() => setTapped(null)} />}
       {s.pending && s.status === "thinking" && <ThinkingBubble said={s.pending} />}
