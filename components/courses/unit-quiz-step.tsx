@@ -104,7 +104,9 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
       {done && (
         <div role="status" className="space-y-space-sm">
           {isChoice && (wasCorrect ? <p className="text-body-lg font-bold">Chính xác!</p> : <AnswerCard word={words.find((w) => w.term === q.answer)} />)}
-          {!isChoice && !wasCorrect && q.kind !== "order" && q.kind !== "type" && <AnswerCard word={words.find((w) => w.term === q.answer)} />}
+          {/* Ghép cặp: chỉ hiện các cặp bạn ghép nhầm (chữ nào ghép đúng thì không nhắc lại), không phải "từ chính" của câu. */}
+          {q.kind === "match" && !wasCorrect && <MismatchCards words={(answered?.wrong ?? []).flatMap((t) => words.find((w) => w.term === t) ?? [])} />}
+          {!isChoice && !wasCorrect && q.kind !== "order" && q.kind !== "type" && q.kind !== "match" && <AnswerCard word={words.find((w) => w.term === q.answer)} />}
           {!isChoice && wasCorrect && (q.kind === "match" || q.kind === "tf") && <p className="text-body-lg font-bold">Chính xác!</p>}
           <button type="button" onClick={next} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container">
             {i + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp"} <Icon name="arrow_forward" size={20} />
@@ -115,13 +117,24 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
   );
 }
 
-/** Khi trả lời sai: hiện đúng từ cần nhớ (chữ, pinyin, nghĩa) và một câu thật chứa từ đó để gắn vào ngữ cảnh. */
-function AnswerCard({ word }: { word: UnitWord | undefined }) {
+/** Ghép cặp sai: một thẻ cho mỗi từ bạn đã ghép nhầm (đúng các từ đó, không phải từ nào khác trong câu). */
+function MismatchCards({ words }: { words: UnitWord[] }) {
+  if (words.length === 0) return <p className="text-body-lg">Chưa đúng.</p>;
+  return (
+    <div className="space-y-2" data-testid="mismatch-cards">
+      <p className="text-body-lg font-bold">Chưa đúng. Các từ bạn ghép nhầm:</p>
+      {words.map((w) => <AnswerCard key={w.term} word={w} heading={null} />)}
+    </div>
+  );
+}
+
+/** Khi trả lời sai: hiện đúng từ cần nhớ (chữ, pinyin, nghĩa) và một câu thật chứa từ đó để gắn vào ngữ cảnh. `heading` null thì bỏ dòng tiêu đề (dùng khi nhiều thẻ dưới một tiêu đề chung). */
+function AnswerCard({ word, heading = "Chưa đúng. Đáp án là:" }: { word: UnitWord | undefined; heading?: string | null }) {
   if (!word) return <p className="text-body-lg">Chưa đúng.</p>;
   const ex = word.examples.find((e) => e.text.includes(word.term));
   return (
     <div className="card-ink p-space-sm" data-testid="answer-card">
-      <p className="text-body-lg font-bold">Chưa đúng. Đáp án là:</p>
+      {heading && <p className="text-body-lg font-bold">{heading}</p>}
       <p className="mt-1 flex flex-wrap items-baseline gap-x-3">
         <span lang="zh-Hans" className="font-serif text-3xl">{word.term}</span>
         <span className="text-body-md text-primary">{word.pinyin}</span>
