@@ -1,4 +1,5 @@
 // Thẻ chia sẻ kết quả thử thách 绕口令: vẽ PNG ngay trên trình duyệt (đúng font của trang). Chỉ chứa câu dân gian và điểm, không có dữ liệu cá nhân.
+import { drawBrandMark, loadBrandMark } from "@/lib/share/brand-mark";
 import { SITE_URL } from "@/lib/seo/site-url";
 
 const W = 1080, H = 1350;
@@ -14,6 +15,7 @@ export function wrapChars(text: string, perLine: number): string[] {
 
 export async function renderTwisterCard(d: { han: string; score: number; title: string }): Promise<Blob> {
   await document.fonts.ready;
+  const brand = await loadBrandMark();
   await document.fonts.load('700 64px "Noto Sans SC"', d.han).catch(() => undefined);
   const canvas = document.createElement("canvas");
   canvas.width = W; canvas.height = H;
@@ -26,7 +28,7 @@ export async function renderTwisterCard(d: { han: string; score: number; title: 
   bar.addColorStop(0, PRIMARY); bar.addColorStop(1, SECONDARY);
   c.fillStyle = bar; c.fillRect(0, 0, W, 14);
 
-  c.fillStyle = INK; c.font = `600 44px ${serif}`; c.fillText("SongHanzi", 90, 150);
+  c.fillStyle = INK; c.font = `600 44px ${serif}`; const off = drawBrandMark(c, brand, 90, 150); c.fillText("SongHanzi", 90 + off, 150);
   c.fillStyle = MUTED; c.font = `400 42px ${sans}`; c.fillText(d.title, 90, 230);
 
   c.fillStyle = PRIMARY; c.font = `700 300px ${serif}`; c.fillText(String(d.score), 90, 560);

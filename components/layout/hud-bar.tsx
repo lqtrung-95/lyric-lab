@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { LogoMark } from "@/components/brand/logo-mark";
 import { ChatNavLink } from "@/components/chat/chat-nav-link";
-import { Icon } from "@/components/ui/icon";
+import { AvatarMenu } from "./avatar-menu";
+import { HeaderSearch } from "./header-search";
 import { HeaderOverflowMenu } from "./header-overflow-menu";
 import { useSidebarCollapsed } from "./use-sidebar-collapsed";
 import { HudChips } from "./hud-chips";
@@ -22,14 +23,13 @@ export function HudBar() {
           <LogoMark size={32} />
           <span className="text-headline-md font-extrabold tracking-tight text-on-surface max-[480px]:hidden">Song<span className="text-primary">Hanzi</span></span>
         </Link>
+        <HeaderSearch />
         <div className="flex items-center gap-1.5 md:ml-auto">
           <HudChips />
           <ChatNavLink />
           <HeaderOverflowMenu hideFrom="lg" />
           <span className="hidden lg:inline-flex"><ThemeToggle /></span>
-          <Link href="/settings" aria-label="Cài đặt và tài khoản" className="hidden h-11 w-11 items-center justify-center lg:flex">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-ink bg-primary-container text-on-primary-container"><Icon name="person" size={20} /></span>
-          </Link>
+          <AvatarMenu />
         </div>
       </div>
     </header>

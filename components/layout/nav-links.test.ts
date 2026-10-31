@@ -19,3 +19,17 @@ describe("isNavActive", () => {
     expect(isNavActive("/library", "/libraryx")).toBe(false);
   });
 });
+
+import { ACCOUNT_LINKS, SECONDARY_LINKS, SIDE_GROUPS } from "./nav-links";
+
+describe("nhóm lối vào phụ", () => {
+  it("mọi lối vào phụ nằm đúng một nơi: một nhóm ở thanh bên hoặc menu avatar", () => {
+    const placed = [...SIDE_GROUPS.flatMap((g) => g.links), ...ACCOUNT_LINKS].map((l) => l.href);
+    expect(new Set(placed).size).toBe(placed.length);
+    expect([...placed].sort()).toEqual(SECONDARY_LINKS.map((l) => l.href).sort());
+  });
+  it("mỗi nhóm có tiêu đề và ít nhất một mục; chỉ nhóm Khác gập được", () => {
+    for (const g of SIDE_GROUPS) { expect(g.title.length).toBeGreaterThan(0); expect(g.links.length).toBeGreaterThan(0); }
+    expect(SIDE_GROUPS.filter((g) => g.collapsible).map((g) => g.id)).toEqual(["more"]);
+  });
+});

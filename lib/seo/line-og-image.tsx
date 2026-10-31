@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { balancedWrapText } from "@/lib/share/wrap-text";
 import { loadCjkGlyphFont, loadOgFonts } from "@/lib/streak/og-fonts";
+import { loadBrandMarkDataUrl } from "./brand-mark";
 import { MARKETING_OG_SIZE } from "./marketing-og-image";
 import { fetchOgThumbnail } from "./og-thumbnail";
 
@@ -59,7 +60,7 @@ export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
   const hanLines = layout.han, pinyinLines = layout.pinyin, translationLines = layout.translation;
   const meta = [clip(d.title, 46), d.artist ? clip(d.artist, 26) : ""].filter(Boolean).join(" · ");
   const cjk = [...new Set(`${hanLines.join("")}${meta}`.match(NON_LATIN) ?? [])].join("");
-  const [fonts, cjkFont] = await Promise.all([loadOgFonts().catch(() => []), cjk ? loadCjkGlyphFont(cjk).then((f) => [f]).catch(() => []) : Promise.resolve([])]);
+  const [fonts, cjkFont, mark] = await Promise.all([loadOgFonts().catch(() => []), cjk ? loadCjkGlyphFont(cjk).then((f) => [f]).catch(() => []) : Promise.resolve([]), loadBrandMarkDataUrl()]);
   const block = (children: string[], style: Record<string, string | number>) => (
     <div style={{ display: "flex", flexDirection: "column", ...style }}>
       {children.map((l, i) => <div key={i} style={{ display: "flex" }}>{l}</div>)}
@@ -72,7 +73,11 @@ export async function renderLineOgImage(d: LineOgData): Promise<ImageResponse> {
         <div style={{ display: "flex", width: "100%", height: 12, background: `linear-gradient(90deg, ${PRIMARY}, ${SECONDARY})` }} />
         <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "40px 88px 44px" }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <div style={{ display: "flex", fontSize: 38, fontWeight: 700, fontFamily: "serif-bold", color: INK }}>SongHanzi</div>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
+              {mark && <img src={mark} width={56} height={56} alt="" style={{ marginRight: 16 }} />}
+              <div style={{ display: "flex", fontSize: 38, fontWeight: 700, fontFamily: "serif-bold", color: INK }}>SongHanzi</div>
+            </div>
             {!thumb && <div style={{ display: "flex", fontSize: 26, color: MUTED, fontFamily: "sans, serif-cjk" }}>{meta}</div>}
           </div>
           <div style={{ display: "flex", flexDirection: "column", flex: 1, justifyContent: "center" }}>

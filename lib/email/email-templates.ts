@@ -27,7 +27,7 @@ function layout({ siteUrl, heading, body, cta, unsubscribeUrl, why }: Layout): s
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">
 <table role="presentation" width="100%" style="max-width:520px;background:#ffffff;border-radius:20px;overflow:hidden" cellpadding="0" cellspacing="0">
 <tr><td style="height:6px;background:linear-gradient(90deg,${PRIMARY},#3b6931)"></td></tr>
-<tr><td style="padding:28px 28px 8px;font-family:Georgia,serif;font-size:22px;font-weight:700">SongHanzi</td></tr>
+<tr><td style="padding:28px 28px 8px;font-family:Georgia,serif;font-size:22px;font-weight:700"><img src="${esc(siteUrl)}/songhanzi-mark-96.png" width="36" height="36" alt="" style="vertical-align:middle;border:0;margin-right:10px">SongHanzi</td></tr>
 <tr><td style="padding:8px 28px 0;font-family:Georgia,serif;font-size:24px;font-weight:700;line-height:1.3">${esc(heading)}</td></tr>
 <tr><td style="padding:12px 28px 4px;font-size:16px;line-height:1.6;color:${MUTED}">${body}</td></tr>
 <tr><td style="padding:20px 28px 28px"><a href="${esc(cta.href)}" style="display:inline-block;background:${PRIMARY};color:#ffffff;text-decoration:none;font-weight:600;font-size:16px;padding:14px 28px;border-radius:999px">${esc(cta.label)}</a></td></tr>

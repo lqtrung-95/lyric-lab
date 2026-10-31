@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { loadBrandMarkDataUrl } from "@/lib/seo/brand-mark";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { loadOgFonts } from "@/lib/streak/og-fonts";
 import { getStreakShare } from "./get-streak-share";
@@ -14,7 +15,7 @@ const MUTED = "#5c4a3a";
 
 export default async function Image({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
-  const [share, fonts] = await Promise.all([getStreakShare(token), loadOgFonts()]);
+  const [share, fonts, mark] = await Promise.all([getStreakShare(token), loadOgFonts(), loadBrandMarkDataUrl()]);
 
   return new ImageResponse(
     (
@@ -22,7 +23,11 @@ export default async function Image({ params }: { params: Promise<{ token: strin
         <div style={{ display: "flex", width: "100%", height: 14, background: `linear-gradient(90deg, ${PRIMARY}, ${SECONDARY})` }} />
         <div style={{ display: "flex", flexDirection: "column", flex: 1, padding: "76px 90px 90px", position: "relative" }}>
           <div style={{ position: "absolute", right: -40, bottom: -40, fontSize: 760, fontWeight: 700, color: "rgba(148, 74, 0, 0.06)", fontFamily: "serif-bold" }}>歌</div>
-          <div style={{ display: "flex", fontSize: 44, fontWeight: 700, color: INK, fontFamily: "serif-bold" }}>SongHanzi</div>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse (satori) không dùng next/image */}
+            {mark && <img src={mark} width={72} height={72} alt="" style={{ marginRight: 20 }} />}
+            <div style={{ display: "flex", fontSize: 44, fontWeight: 700, color: INK, fontFamily: "serif-bold" }}>SongHanzi</div>
+          </div>
           <div style={{ display: "flex", marginTop: 30, fontSize: 42, color: MUTED }}>Chuỗi ngày học tiếng Trung qua bài hát</div>
           <div style={{ display: "flex", marginTop: 80, fontSize: 300, fontWeight: 700, color: PRIMARY, fontFamily: "serif-bold", lineHeight: 1 }}>{share?.currentStreak ?? 0}</div>
           <div style={{ display: "flex", fontSize: 64, fontWeight: 600, color: INK }}>ngày liên tiếp</div>

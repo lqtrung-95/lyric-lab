@@ -1,3 +1,4 @@
+import { drawBrandMark, loadBrandMark } from "@/lib/share/brand-mark";
 import { videoThumbnailUrl } from "@/lib/youtube/video-thumbnail";
 import { isValidVideoId } from "@/lib/youtube/parse-video-id";
 import { balancedWrapText } from "./wrap-text";
@@ -45,6 +46,7 @@ export interface LineCardData {
 export async function renderLineCard(d: LineCardData): Promise<Blob> {
   const thumbnail = loadThumbnail(d.videoId); // tải song song với font
   await document.fonts.ready;
+  const brand = await loadBrandMark();
   const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
@@ -85,7 +87,8 @@ export async function renderLineCard(d: LineCardData): Promise<Blob> {
   c.textAlign = "left";
   c.fillStyle = INK;
   c.font = `600 44px ${serif}`;
-  c.fillText("SongHanzi", left, 150);
+  const off = drawBrandMark(c, brand, left, 150);
+  c.fillText("SongHanzi", left + off, 150);
 
   // Ba khối (chữ Hán, pinyin, bản dịch) cách nhau đúng một khoảng GAP và cả cụm được căn giữa trong vùng giữa tiêu đề và đường kẻ chân thẻ,
   // nên thẻ cân đối dù câu ngắn hay dài. Mỗi khối ngắt dòng cân bằng để không có dòng cuối chỉ một, hai chữ.
