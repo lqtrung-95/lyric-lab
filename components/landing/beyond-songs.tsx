@@ -37,13 +37,18 @@ const CARDS = [
     chips: ["Đấu 1–1", "Phòng mời bạn", "Xếp hạng"], href: "/room", cta: "Vào phòng đấu",
   },
   {
+    emoji: "🧱", title: "Bộ thủ: 214 bộ Khang Hy",
+    body: "Học bộ thủ theo bảy chủ đề (người, thiên nhiên, động vật, hành động…), mỗi bộ có âm Hán Việt, nghĩa, thứ tự nét, mẹo nhớ và các chữ chứa bộ. Luyện bằng bài nhận tên, nhận bộ của một chữ, chọn chữ chứa bộ; theo dõi tiến độ, bộ hay nhầm và lưu bộ vào thẻ ôn.",
+    chips: ["214 bộ", "Mẹo nhớ", "Hán Việt", "Bài luyện"], href: "/radicals", cta: "Học bộ thủ",
+  },
+  {
     emoji: "🛠️", title: "Công cụ miễn phí, không cần đăng ký",
     body: "Đổi tên Việt sang tên tiếng Trung kèm thẻ ảnh để khoe, bảng pinyin có hình vị trí đặt lưỡi cho người Việt, kiểm tra ngữ pháp bằng AI, đổi giản thể và phồn thể, giấy tập viết chữ Hán và nhiều công cụ khác.",
     chips: ["Tên tiếng Trung", "Hình đặt lưỡi", "Ngữ pháp AI", "In giấy tập viết"], href: "/tools", cta: "Xem công cụ",
   },
 ];
 
-/** Khối "Ngoài bài hát": tám tính năng ngoài lõi bài hát (Khám phá, Bạn nhỏ đồng hành, Truyện ngắn, Hội thoại, Viết chữ, Ngữ pháp, Thi đấu, Công cụ), mỗi thẻ có một nút vào thẳng. */
+/** Khối "Ngoài bài hát": chín tính năng ngoài lõi bài hát (Khám phá, Bạn nhỏ đồng hành, Truyện ngắn, Hội thoại, Viết chữ, Ngữ pháp, Thi đấu, Bộ thủ, Công cụ), mỗi thẻ có một nút vào thẳng. */
 export function BeyondSongs() {
   return (
     <section id="beyond-songs" aria-labelledby="beyond-heading" className="mt-24 scroll-mt-24">

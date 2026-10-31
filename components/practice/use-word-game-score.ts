@@ -6,7 +6,7 @@ import type { PracticeMode } from "@/lib/practice/scoring";
 import { roundDurationSec, wordGamePoints } from "@/lib/practice/round-timer";
 import { submitRoundScore } from "@/lib/practice/submit-score";
 
-interface Args { mode: Extract<PracticeMode, "truth" | "truthduo" | "order" | "reflex" | "fiveword" | "roleplay" | "daily" | "duel" | "write">; done: boolean; correct: number; total: number; duo?: boolean; /** Điểm tính sẵn (các bài Nói phản xạ chấm theo mức, không phải 100 mỗi câu đúng). */ points?: number }
+interface Args { mode: Extract<PracticeMode, "truth" | "truthduo" | "order" | "reflex" | "fiveword" | "roleplay" | "daily" | "duel" | "write" | "radical">; done: boolean; correct: number; total: number; duo?: boolean; /** Điểm tính sẵn (các bài Nói phản xạ chấm theo mức, không phải 100 mỗi câu đúng). */ points?: number }
 
 /**
  * Ghi điểm XP một lần khi người chơi làm xong lượt (có ít nhất một câu đúng): điểm 100 mỗi câu đúng, chơi cùng bạn nhân 1,5; thời lượng đo từ lúc vào trang.

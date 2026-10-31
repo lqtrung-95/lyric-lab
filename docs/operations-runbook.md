@@ -353,3 +353,6 @@ Nội dung nằm trong mã nguồn, chỉ cần deploy. Câu thật trên trang 
 
 ## Ngữ pháp: migration thống kê
 Chạy `supabase/migrations/20261029000005_user_grammar_stats.sql` trong Supabase SQL Editor (chạy lại được). Chưa chạy thì thống kê ngữ pháp chỉ lưu ở trình duyệt, không báo lỗi.
+
+## Bộ thủ: migration
+Chạy `supabase/migrations/20261031000001_user_radical_progress.sql` (tiến độ theo tài khoản) và `20261031000002_practice_mode_radical.sql` (thêm chế độ `radical` vào `practice_scores_mode_check` để luyện bộ thủ được tính XP) trong Supabase SQL Editor; chạy lại được. Chưa chạy thì trang vẫn dùng, chỉ không đồng bộ tiến độ/không ghi điểm. Danh sách chữ chứa bộ cần bảng `dict_hanzi_info` đã nạp (xem script `import-hanzi-info`).

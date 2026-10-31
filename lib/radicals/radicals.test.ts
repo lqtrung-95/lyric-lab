@@ -50,3 +50,44 @@ describe("tìm bộ thủ", () => {
   });
   it("rỗng trả hết", () => { expect(searchRadicals("  ")).toHaveLength(214); });
 });
+
+describe("bài tập bộ thủ", () => {
+  it("chữ ví dụ không trùng giữa các bộ (để bài 'chữ nào chứa bộ' không có hai đáp án đúng)", () => {
+    const owner = new Map<string, string>();
+    for (const [k, v] of Object.entries(RICH)) for (const c of v.chars) { expect(owner.has(c), `${c}: ${owner.get(c)} và ${k}`).toBe(false); owner.set(c, k); }
+  });
+  it("mọi bộ sinh được bài nghĩa và bài ngược; bộ có nội dung sinh thêm bài nhận bộ", async () => {
+    const { meaningDrill, reverseDrill, whichDrill, containsDrill } = await import("./radical-drills");
+    const rng = () => 0.42;
+    for (const e of ENTRIES) {
+      for (const d of [meaningDrill(e, ENTRIES, rng), reverseDrill(e, ENTRIES, rng)]) {
+        expect(d.options, `${d.kind} ${e.char}`).toContain(d.answer);
+        expect(new Set(d.options).size, `${d.kind} ${e.char}`).toBe(4);
+      }
+      if (e.rich) for (const d of [whichDrill(e, ENTRIES, rng), containsDrill(e, ENTRIES, rng)]) {
+        expect(d, `rich ${e.char}`).not.toBeNull();
+        expect(d!.options).toContain(d!.answer);
+        expect(new Set(d!.options).size).toBe(4);
+      }
+    }
+  });
+  it("bộ bài giới hạn số câu và xen các bộ", async () => {
+    const { buildRadicalDrills } = await import("./radical-drills");
+    const ds = buildRadicalDrills(ENTRIES.slice(0, 40), 10, () => 0.3);
+    expect(ds).toHaveLength(10);
+    expect(new Set(ds.map((d) => d.num)).size).toBe(10);
+  });
+});
+
+describe("bộ của ngày", () => {
+  it("cùng ngày cùng bộ, bỏ qua bộ đã biết, luôn trả bộ có nội dung", async () => {
+    const { radicalOfDay } = await import("./radicals");
+    const a = radicalOfDay(100);
+    expect(radicalOfDay(100).num).toBe(a.num);
+    expect(a.rich).not.toBeNull();
+    expect(radicalOfDay(100, [a.num]).num).not.toBe(a.num);
+    expect(radicalOfDay(-3).rich).not.toBeNull();
+    const all = ENTRIES.filter((e) => e.rich).map((e) => e.num);
+    expect(radicalOfDay(5, all).rich).not.toBeNull();
+  });
+});

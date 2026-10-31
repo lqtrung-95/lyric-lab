@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { HanziInfoView, ComponentRef, StoredEtymologyNote } from "@/lib/tra-tu/hanzi-info-types";
 import { ETYMOLOGY_LABEL } from "@/lib/tra-tu/hanzi-structure";
+import { radicalByChar } from "@/lib/radicals/radicals-core";
 import { EtymologyAiNote } from "./etymology-ai-note";
 import { wordHref } from "./word-result-row";
 
@@ -34,7 +35,7 @@ export function EtymologySection({ items, notes, canAskAi }: { items: HanziInfoV
               <span className="text-body-md">{it.sinoViet.length > 0 && <>Hán Việt: <b>{it.sinoViet.join(", ")}</b></>}{it.definition && <span className="block text-on-surface-variant">{it.definition}</span>}</span>
             </div>
             <dl className="space-y-space-sm">
-              <Row label="Bộ thủ"><Part c={it.radical} /></Row>
+              <Row label="Bộ thủ"><Part c={it.radical} />{(() => { const r = radicalByChar(it.radical.char); return r ? <Link href={`/radicals/${r.num}`} className="inline-flex min-h-11 items-center text-label-md font-bold text-primary underline">Xem bộ {r.name}</Link> : null; })()}</Row>
               {it.components.length > 0 && <Row label={`Cấu tạo${it.layoutLabel ? ` (${it.layoutLabel})` : ""}`}>{it.components.map((c, i) => <span key={`${c.char}${i}`} className="inline-flex items-center gap-2">{i > 0 && <span aria-hidden="true">+</span>}<Part c={c} /></span>)}</Row>}
               {e && <Row label="Kiểu chữ"><span><b>{ETYMOLOGY_LABEL[e.type].name}</b>: {ETYMOLOGY_LABEL[e.type].meaning}.</span></Row>}
               {e?.semantic && <Row label="Phần chỉ nghĩa"><Part c={e.semantic} /></Row>}

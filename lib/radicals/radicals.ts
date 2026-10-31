@@ -33,3 +33,11 @@ export function searchRadicals(q: string, list: readonly RadicalEntry[] = ENTRIE
   if (!k) return [...list];
   return list.filter((e) => e.char.includes(q.trim()) || e.variants.some((v) => v === q.trim()) || String(e.num) === k || [e.pinyin, e.name, e.meaning].some((f) => fold(f).includes(k)));
 }
+
+/** Bộ của ngày: xoay qua các bộ có nội dung đầy đủ mà người học chưa biết (đã biết hết thì xoay qua tất cả bộ có nội dung), cùng một ngày thì cùng một bộ. */
+export function radicalOfDay(day: number, known: readonly number[] = []): RadicalEntry {
+  const rich = ENTRIES.filter((e) => e.rich);
+  const fresh = rich.filter((e) => !known.includes(e.num));
+  const list = fresh.length > 0 ? fresh : rich;
+  return list[((day % list.length) + list.length) % list.length];
+}
