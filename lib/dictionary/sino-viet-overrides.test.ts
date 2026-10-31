@@ -78,3 +78,20 @@ describe("âm của từ khác âm chuẩn từng chữ", () => {
     expect(overrideSinoViet("劃")).toBe("hoạch");
   });
 });
+
+describe("sửa theo lần rà thứ hai (chữ HSK 1–3)", () => {
+  it("âm chuẩn thay âm Nôm/hiếm đứng đầu trong dữ liệu", () => {
+    const dirty = new Map<string, string[]>([["候", ["hầu", "hậu"]], ["本", ["bổn", "bản"]], ["菜", ["cải", "thái"]], ["筆", ["bất", "bút"]], ["慣", ["quen", "quán"]], ["餐", ["xun", "xan"]], ["推", ["suy", "thôi"]], ["晴", ["tạnh", "tình"]]]);
+    for (const [w, r] of [["候", "hậu"], ["本", "bản"], ["菜", "thái"], ["筆", "bút"], ["慣", "quán"], ["餐", "xan"], ["推", "thôi"], ["晴", "tình"]]) expect(sinoVietForWord(w, dirty), w).toBe(r);
+  });
+  it("từ ghép: 旅行 lữ hành (không phải 'lữ hàng'), 使馆 sứ quán, 银行 vẫn theo âm dữ liệu", () => {
+    const rd = new Map<string, string[]>([["旅", ["lữ"]], ["行", ["hàng", "hành"]], ["銀", ["ngân"]]]);
+    expect(sinoVietForWord("旅行", rd)).toBe("lữ hành");
+    expect(sinoVietForWord("銀行", rd)).toBe("ngân hàng");
+    expect(sinoVietForWord("使館", new Map())).toBe("sứ quán");
+  });
+  it("chữ thiếu trong dữ liệu lấy âm từ bảng bổ sung", () => {
+    expect(sinoVietForWord("筷", new Map())).toBe("khoái");
+    expect(sinoVietForWord("這", new Map())).toBe("giá");
+  });
+});

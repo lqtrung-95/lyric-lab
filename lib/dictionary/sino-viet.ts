@@ -19,6 +19,12 @@ export const SUPPLEMENT_SINO_VIET: Record<string, string> = {
   赞: "tán", 辩: "biện", 迅: "tấn", 酸: "toan", 夹: "giáp", 糟: "tao", 糕: "cao", 罚: "phạt", 团: "đoàn", 录: "lục", 场: "trường", 刚: "cương", 饿: "ngạ", 摆: "bãi",
   鸡: "kê", 赖: "lại", 脏: "tạng", 挡: "đáng", 当: "đương", 袜: "mạt", 碗: "uyển",
   別: "biệt", 幫: "bang", 話: "thoại", 詞: "từ", 紙: "chỉ", 辦: "biện", 陰: "âm", 煙: "yên", 絕: "tuyệt", 鮮: "tiên", 濕: "thấp", 閱: "duyệt", 嘗: "thường", 戲: "hí",
+  這: "giá", 这: "giá", 着: "trước", 睛: "tinh", 筷: "khoái", 并: "tịnh", 並: "tịnh", 晒: "sái", 曬: "sái", 騙: "phiến", 骗: "phiến", 仲: "trọng", 伺: "tứ", 侃: "khản", 俘: "phu", 剃: "thế", 剏: "sáng", 垻: "bá", 塼: "chuyên",
+  媚: "mị", 嬉: "hi", 履: "lý", 岡: "cương", 冈: "cương", 岳: "nhạc", 巔: "điên", 巅: "điên", 拓: "thác", 搾: "trá", 榨: "trá", 撼: "hám", 晝: "trú", 昼: "trú", 殻: "xác", 渣: "tra", 溯: "tố", 瓣: "biện", 畸: "cơ", 疇: "trù", 畴: "trù",
+  痒: "dưỡng", 癢: "dưỡng", 瘓: "hoán", 痪: "hoán", 瘤: "lựu", 癮: "ẩn", 瘾: "ẩn", 睜: "tranh", 睁: "tranh", 矚: "chúc", 瞩: "chúc", 稼: "giá", 窯: "diêu", 窑: "diêu", 竣: "tuấn", 粘: "niêm", 粽: "tống", 紊: "vấn",
+  繽: "tân", 缤: "tân", 纖: "tiêm", 纤: "tiêm", 纜: "lãm", 缆: "lãm", 翅: "sí", 聳: "tủng", 耸: "tủng", 聾: "lung", 聋: "lung", 肇: "triệu", 肪: "phương", 胚: "phôi", 脂: "chi", 膀: "bàng", 膊: "bạc", 膩: "nị", 腻: "nị", 臊: "tao",
+  芯: "tâm", 茲: "tư", 兹: "tư", 藹: "ái", 蔼: "ái", 袱: "phục", 裔: "duệ", 覆: "phúc", 訝: "nhạ", 讶: "nhạ", 賃: "nhẫm", 赁: "nhẫm", 輻: "phúc", 辐: "phúc", 辮: "biện", 辫: "biện", 迪: "địch", 逗: "đậu", 醇: "thuần", 醞: "uẩn", 酝: "uẩn",
+  采: "thái", 鈔: "sao", 钞: "sao", 銹: "tú", 锈: "tú", 鎊: "bảng", 镑: "bảng", 鑄: "chú", 铸: "chú", 阱: "tỉnh", 隕: "vẫn", 陨: "vẫn", 靶: "bả", 韌: "nhận", 韧: "nhận", 飃: "phiêu", 馱: "đà", 驮: "đà", 騐: "nghiệm", 鯊: "sa", 鲨: "sa",
 };
 
 import { modernizeTone, overrideSinoViet, WORD_SINO_VIET_OVERRIDES } from "./sino-viet-overrides";
