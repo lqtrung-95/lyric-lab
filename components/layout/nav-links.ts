@@ -22,6 +22,7 @@ export const NAV_LINKS: NavLink[] = [
 export const SECONDARY_LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/grammar", label: "Ngữ pháp", icon: "list_alt" },
   { href: "/radicals", label: "Bộ thủ", icon: "translate" },
+  { href: "/report", label: "Báo cáo tuần", icon: "leaderboard" },
   { href: "/dictionary", label: "Tra từ", icon: "dictionary" },
   { href: "/profile", label: "Hồ sơ và huy hiệu", icon: "emoji_events" },
   { href: "/tools", label: "Công cụ", icon: "build" },
