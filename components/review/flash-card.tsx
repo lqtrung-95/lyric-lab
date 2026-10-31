@@ -1,6 +1,7 @@
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { Icon } from "@/components/ui/icon";
 import type { ReviewContext, ReviewLine } from "@/lib/review/review-context-types";
+import { useWordNotes } from "@/components/tra-tu/use-word-notes";
 import { isSentenceTerm } from "@/lib/roleplay/fix-card";
 import { levelLabel } from "@/lib/preview/preview-format";
 import type { ReviewCard } from "@/lib/user-data/review-repo";
@@ -16,6 +17,8 @@ interface FlashCardProps {
 
 /** Thẻ ôn (S7): mặt trước chỉ có chữ Hán để tự nhớ; mặt sau hiện pinyin, Hán Việt, nghĩa và câu hát chứa từ. */
 export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: FlashCardProps) {
+  const { notes } = useWordNotes();
+  const myNote = card.kind === "vocab" ? notes[card.term] : undefined;
   const sentence = card.kind === "grammar" && isSentenceTerm(card.term);
   const kind = sentence ? "Câu đã sửa" : card.kind === "grammar" ? "Ngữ pháp" : "Từ vựng";
   return (
@@ -58,6 +61,7 @@ export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: Fl
               )}
             </p>
             <p className="mt-4 rounded-full bg-surface-container px-5 py-2 text-body-lg font-medium text-on-surface">{card.meaning}</p>
+            {myNote && <p className="mt-3 max-w-md rounded-2xl border-2 border-dashed border-outline-variant px-4 py-2 text-body-md text-on-surface-variant"><span className="font-bold text-on-surface">Ghi chú của bạn: </span>{myNote}</p>}
             {line && <ContextBlock card={card} line={line} context={context} onReplay={onReplay} />}
           </div>
         )}

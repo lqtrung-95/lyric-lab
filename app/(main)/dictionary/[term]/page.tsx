@@ -9,6 +9,7 @@ import { WordPractice } from "@/components/tra-tu/word-practice";
 import { WordHeader } from "@/components/tra-tu/word-header";
 import { WordMeanings } from "@/components/tra-tu/word-meanings";
 import { WordRelated } from "@/components/tra-tu/word-related";
+import { WordPersonalNote } from "@/components/tra-tu/word-personal-note";
 import { WordNoteCard } from "@/components/tra-tu/word-note-card";
 import { WordRelationsCard } from "@/components/tra-tu/word-relations-card";
 import type { ExampleSentence } from "@/lib/courses/course-types";
@@ -71,6 +72,7 @@ export default async function WordPage({ params }: { params: Params }) {
     <div className="mx-auto max-w-3xl space-y-space-md">
       <WordHeader detail={detail}><SaveCardButton term={detail.simplified} item={cardItem} /></WordHeader>
       <WordNoteCard term={detail.simplified} approvedGloss={detail.gloss} initial={note.stored} canAskAi={note.tableReady} />
+      <WordPersonalNote term={detail.simplified} />
       <WordRelationsCard term={detail.simplified} initial={relations} canAskAi={rel.tableReady} />
       <WordMeanings readings={detail.readings} defaultOpen={!hasViMeaning} />
       <ExampleSentences term={detail.simplified} forms={[detail.simplified, ...detail.traditionalForms]} examples={examples} />
