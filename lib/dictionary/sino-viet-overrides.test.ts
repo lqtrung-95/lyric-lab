@@ -56,6 +56,12 @@ describe("chuẩn hóa dấu thanh", () => {
     expect(modernizeTone("quý")).toBe("quý");
     expect(modernizeTone("quỹ")).toBe("quỹ");
     expect(modernizeTone("nhân")).toBe("nhân");
+    expect(modernizeTone("khoái")).toBe("khoái");
+    expect(modernizeTone("hoài")).toBe("hoài");
+    expect(modernizeTone("loạn")).toBe("loạn");
+    expect(modernizeTone("hoàn")).toBe("hoàn");
+    expect(modernizeTone("thuỵ")).toBe("thụy");
+    expect(modernizeTone("toạ")).toBe("tọa");
   });
   it("áp vào âm ghép của từ", () => {
     expect(sinoVietForWord("水", new Map([["水", ["thuỷ"]]]))).toBe("thủy");

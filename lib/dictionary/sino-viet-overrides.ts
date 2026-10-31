@@ -55,10 +55,12 @@ export const WORD_SINO_VIET_OVERRIDES: ReadonlyMap<string, string> = parseWords(
  * Chuẩn hóa vị trí dấu thanh kiểu cũ của dữ liệu nguồn sang kiểu hiện đại để cả app viết một kiểu (thuỷ → thủy, hoà → hòa, quỹ giữ nguyên): oà/oá/oả/oã/oạ → òa/óa/ỏa/õa/ọa
  * và uý/uỳ/uỷ/uỹ/uỵ → úy/ùy/ủy/ũy/ụy, trừ sau "q" (quý, quỹ: "qu" là phụ âm đầu nên dấu nằm ở y).
  */
+// Chỉ đổi ở âm tiết MỞ (không có chữ cái nào theo sau): hoà → hòa nhưng "hoài", "khoái", "loạn", "hoàn" giữ nguyên vì dấu đã đúng chỗ.
+const OPEN_SYLLABLE = "(?!\\p{L})";
 const OLD_TONE: [RegExp, string][] = [
-  [/oà/g, "òa"], [/oá/g, "óa"], [/oả/g, "ỏa"], [/oã/g, "õa"], [/oạ/g, "ọa"],
-  [/(?<!q)uý/g, "úy"], [/(?<!q)uỳ/g, "ùy"], [/(?<!q)uỷ/g, "ủy"], [/(?<!q)uỹ/g, "ũy"], [/(?<!q)uỵ/g, "ụy"],
-];
+  ["oà", "òa"], ["oá", "óa"], ["oả", "ỏa"], ["oã", "õa"], ["oạ", "ọa"],
+  ["(?<!q)uý", "úy"], ["(?<!q)uỳ", "ùy"], ["(?<!q)uỷ", "ủy"], ["(?<!q)uỹ", "ũy"], ["(?<!q)uỵ", "ụy"],
+].map(([from, to]) => [new RegExp(`${from}${OPEN_SYLLABLE}`, "gu"), to]);
 export const modernizeTone = (s: string): string => OLD_TONE.reduce((acc, [re, to]) => acc.replace(re, to), s.normalize("NFC"));
 
 /** Các cặp `[các chữ, âm]` đã tách (xuất ra để test kiểm tra trùng và định dạng). */
