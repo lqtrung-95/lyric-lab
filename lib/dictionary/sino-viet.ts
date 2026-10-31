@@ -21,9 +21,11 @@ export const SUPPLEMENT_SINO_VIET: Record<string, string> = {
   別: "biệt", 幫: "bang", 話: "thoại", 詞: "từ", 紙: "chỉ", 辦: "biện", 陰: "âm", 煙: "yên", 絕: "tuyệt", 鮮: "tiên", 濕: "thấp", 閱: "duyệt", 嘗: "thường", 戲: "hí",
 };
 
-import { overrideSinoViet } from "./sino-viet-overrides";
+import { modernizeTone, overrideSinoViet, WORD_SINO_VIET_OVERRIDES } from "./sino-viet-overrides";
 
 export function sinoVietForWord(word: string, readings: ReadonlyMap<string, string[]>, simplified?: string): string | null {
+  const whole = WORD_SINO_VIET_OVERRIDES.get(word) ?? (simplified ? WORD_SINO_VIET_OVERRIDES.get(simplified) : undefined);
+  if (whole) return whole;
   const parts: string[] = [];
   // Chữ phồn thể không có trong bảng thì thử chữ giản thể cùng vị trí (như 況 thiếu mà 况 có "huống"), rồi tới bảng bổ sung.
   const simpChars = simplified && [...simplified].length === [...word].length ? [...simplified] : null;
@@ -36,5 +38,5 @@ export function sinoVietForWord(word: string, readings: ReadonlyMap<string, stri
     if (!r) return null;
     parts.push(r);
   }
-  return parts.length ? parts.join(" ") : null;
+  return parts.length ? modernizeTone(parts.join(" ")) : null;
 }

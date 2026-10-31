@@ -45,3 +45,36 @@ describe("orderSinoViet", () => {
     expect(orderSinoViet("龘", ["đạp"])).toEqual(["đạp"]);
   });
 });
+
+import { modernizeTone, WORD_SINO_VIET_OVERRIDES } from "./sino-viet-overrides";
+
+describe("chuẩn hóa dấu thanh", () => {
+  it("đổi kiểu cũ sang kiểu mới, giữ quý/quỹ", () => {
+    expect(modernizeTone("hoà")).toBe("hòa");
+    expect(modernizeTone("thuỷ")).toBe("thủy");
+    expect(modernizeTone("hoạ")).toBe("họa");
+    expect(modernizeTone("quý")).toBe("quý");
+    expect(modernizeTone("quỹ")).toBe("quỹ");
+    expect(modernizeTone("nhân")).toBe("nhân");
+  });
+  it("áp vào âm ghép của từ", () => {
+    expect(sinoVietForWord("水", new Map([["水", ["thuỷ"]]]))).toBe("thủy");
+    expect(sinoVietForWord("龘龘", new Map([["龘", ["hoà"]]]))).toBe("hòa hòa");
+  });
+});
+
+describe("âm của từ khác âm chuẩn từng chữ", () => {
+  it("校长 hiệu trưởng, 少年 thiếu niên, 会计 cối kế; từ thường vẫn ghép theo chữ", () => {
+    const rd = new Map([["校", ["hiệu"]], ["長", ["trường"]], ["少", ["thiếu"]], ["年", ["niên"]]]);
+    expect(sinoVietForWord("校長", rd)).toBe("hiệu trưởng");
+    expect(sinoVietForWord("少年", rd)).toBe("thiếu niên");
+    expect(sinoVietForWord("会计", rd)).toBe("cối kế");
+    expect(sinoVietForWord("長年", rd)).toBe("trường niên");
+    expect(WORD_SINO_VIET_OVERRIDES.size).toBeGreaterThan(40);
+  });
+  it("chữ 载 và 划 không còn bị đè (载 tải/tái, 划 hoa/hoạch tùy từ)", () => {
+    expect(overrideSinoViet("载")).toBeUndefined();
+    expect(overrideSinoViet("划")).toBeUndefined();
+    expect(overrideSinoViet("劃")).toBe("hoạch");
+  });
+});
