@@ -11,6 +11,7 @@ export const REVIEW_GROUPS: ReviewGroup[] = [
   {
     id: "remember", title: "Nhớ từ vựng", blurb: "Củng cố từ đã lưu bằng game ngắn",
     modes: [
+      { href: "/review/saved-drills", label: "Luyện từ đã lưu", desc: "10 câu trắc nghiệm tự tạo từ thẻ bạn đã lưu: nghĩa, chữ, pinyin", icon: "quiz" },
       { href: "/review/match", label: "Ghép cặp", desc: "Nối chữ Hán với nghĩa càng nhanh càng tốt", icon: "shuffle" },
       { href: "/review/pinyin", label: "Gõ pinyin", desc: "Nhìn chữ Hán, gõ pinyin có dấu thanh", icon: "keyboard" },
       { href: "/review/weak", label: "Điểm yếu của bạn", desc: "Gom từ khó, ngữ pháp, bộ thủ hay sai và gợi ý việc nên làm trước", icon: "local_fire_department" },
