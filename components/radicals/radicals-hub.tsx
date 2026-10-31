@@ -86,7 +86,7 @@ export function RadicalsHub() {
       <p role="status" className="text-label-md text-on-surface-variant">{list.length} bộ{topic !== "all" ? ` · ${TOPICS.find((t) => t.id === topic)?.title}` : ""}</p>
       {list.length === 0 && <p className="text-body-md text-on-surface-variant">Không có bộ nào khớp bộ lọc.</p>}
       {view === "grid" ? (
-        <ul className="grid grid-cols-2 gap-space-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">{list.map((e) => <li key={e.num}><RadicalTile e={e} known={known.has(e.num)} /></li>)}</ul>
+        <ul className="grid grid-cols-2 gap-space-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">{list.map((e) => <li key={e.num} className="h-full"><RadicalTile e={e} known={known.has(e.num)} /></li>)}</ul>
       ) : (
         <ul className="flex flex-col gap-2">
           {list.map((e) => (
