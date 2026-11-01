@@ -15,7 +15,8 @@ import { listUnitProgress, saveUnitProgress } from "@/lib/user-data/unit-progres
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { PetMini } from "@/components/pet/pet-mini";
 import { CelebrationBurst } from "./celebration-burst";
-import { savedItemFor, UnitLearnStep } from "./unit-learn-step";
+import { cardsToAdd } from "@/lib/courses/unit-card";
+import { UnitLearnStep } from "./unit-learn-step";
 import { UnitListenStep } from "./unit-listen-step";
 import { UnitQuizStep } from "./unit-quiz-step";
 import { useUnit } from "./use-unit";
@@ -37,7 +38,7 @@ const STEPS: { id: Exclude<Step, "result">; label: string }[] = [
 export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
   const unit = useUnit(slug, idx);
   const [step, setStep] = useState<Step>("learn");
-  const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; first: boolean; added: number; missed: number } | null>(null);
+  const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; first: boolean; added: number } | null>(null);
   const { state: learner, toggleSaved } = useLearnerState();
   const [prev, setPrev] = useState<UnitProgress | undefined>();
   const unitId = unit.status === "ready" ? unit.detail.unit.id : null;
@@ -69,14 +70,13 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
   async function finish(percent: number, passed: boolean, wrongTerms: string[], rightTerms: string[]) {
     recordQuizOutcome(wrongTerms, rightTerms.filter((t) => !wrongTerms.includes(t))); // từ hay sai được ưu tiên ở chặng ôn tổng hợp
     const saved = await saveUnitProgress(detail.unit.id, prev, { status: passed ? "completed" : "in_progress", score: percent });
-    // Từ làm sai vào bộ ôn (thẻ ôn cần câu thật làm nguồn nên từ chưa có câu thì chỉ đếm là "chưa lưu được").
+    // Đạt chặng học thì cả chặng vào bộ ôn (từ biết rồi cũng cần được nhắc lại đúng lúc); chưa đạt hoặc chặng ôn tổng hợp thì chỉ các từ làm sai. Từ chưa có câu thật vẫn có thẻ (không có nguồn).
     const have = new Set(learner.saved.map((x) => x.key));
-    const items = wrongTerms.map((t) => detail.words.find((w) => w.term === t)).map((w) => (w ? savedItemFor(w) : null));
-    const fresh = items.filter((x): x is NonNullable<typeof x> => x !== null && !have.has(x.key));
+    const fresh = cardsToAdd(detail.words, wrongTerms, passed && !isReview, have);
     fresh.forEach((x) => toggleSaved(x));
     if (passed) playSfx("complete");
     if (saved && passed) refreshGameSummary(); // cập nhật cấp/XP ở thanh trên
-    setResult({ percent, passed, saved, first: prev?.status !== "completed", added: fresh.length, missed: items.filter((x) => x === null).length });
+    setResult({ percent, passed, saved, first: prev?.status !== "completed", added: fresh.length });
     setStep("result");
   }
 
@@ -110,8 +110,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
           <p className="font-serif text-headline-lg">{result.percent}%</p>
           <p className="mt-1 text-body-lg">{result.passed ? (detail.unit.kind === "final" ? `Hoàn thành ${detail.course.title}! Giỏi lắm.` : isReview ? "Ôn tập xong! Giỏi lắm." : "Hoàn thành chặng! Giỏi lắm.") : `Chưa đạt ${PASS_PERCENT}%. Ôn lại các từ rồi thử lần nữa nhé.`}</p>
           {result.passed && result.saved && result.first && <p className="mt-2 inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-md font-extrabold text-on-primary-container" data-testid="unit-result-xp">+{unitXp(result.percent)} XP <span className="font-medium">(lần hoàn thành đầu, có hạn mức mỗi ngày)</span></p>}
-          {result.added > 0 && <p className="mt-1 text-body-md text-on-surface-variant" data-testid="unit-result-added">Đã thêm {result.added} từ làm sai vào bộ ôn.</p>}
-          {result.missed > 0 && <p className="mt-1 text-body-sm text-on-surface-variant">{result.missed} từ làm sai chưa có câu thật trong video nên chưa lưu được thẻ.</p>}
+          {result.added > 0 && <p className="mt-1 text-body-md text-on-surface-variant" data-testid="unit-result-added">{result.passed && !isReview ? `Đã thêm ${result.added} từ của chặng vào bộ ôn: các từ sẽ được nhắc lại đúng lúc sắp quên.` : `Đã thêm ${result.added} từ làm sai vào bộ ôn.`}</p>}
           {!result.saved && <p className="mt-1 text-body-sm text-on-surface-variant">Chưa ghi nhớ được tiến độ lần này (mất kết nối?).</p>}
           {result.passed && <UnitNextSteps slug={slug} words={detail.words} isReview={isReview} />}
           <div className="mt-space-md flex flex-wrap justify-center gap-2">

@@ -112,9 +112,15 @@ test("chặng 1: làm quen → nghe câu thật → kiểm tra 15 câu → kết
     await expect(page.getByText(new RegExp(`Câu ${i + 1}/15`))).toBeVisible();
     await answerQuestion(page);
     answerCards += await page.getByTestId("answer-card").count();
-    await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
+    await page.getByRole("button", { name: /Câu tiếp|Xem kết quả|Làm lại \d+ câu sai/ }).click();
   }
   expect(answerCards).toBeGreaterThan(0);
+  // Câu làm sai được hỏi lại một lượt (không tính điểm) trước khi hiện kết quả.
+  for (let guard = 0; guard < 20 && (await page.getByTestId("unit-result").count()) === 0; guard++) {
+    await expect(page.getByText(/Làm lại các câu sai/)).toBeVisible();
+    await answerQuestion(page);
+    await page.getByRole("button", { name: /Câu tiếp|Xem kết quả/ }).click();
+  }
   const result = page.getByTestId("unit-result");
   await expect(result).toBeVisible();
   await expect(result).toContainText("%");

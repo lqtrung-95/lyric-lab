@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
-import { wordLabel, buildUnitQuiz, gradeQuiz, QUIZ_LENGTH, UNIT_QUIZ_KINDS, type QuizKind } from "@/lib/courses/build-unit-quiz";
+import { wordLabel, buildUnitQuiz, gradeQuiz, QUIZ_LENGTH, UNIT_QUIZ_KINDS, type QuizKind, type QuizQuestion } from "@/lib/courses/build-unit-quiz";
 import { QuizMatchQuestion } from "./quiz-match-question";
 import { QuizOrderQuestion } from "./quiz-order-question";
 import type { QuizResult } from "./quiz-result";
@@ -25,7 +25,11 @@ const HAN_OPTIONS: QuizKind[] = ["term", "listen", "cloze"];
  * Báo điểm và danh sách từ làm sai khi xong (để màn chặng tự thêm các từ đó vào bộ ôn).
  */
 export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KINDS, onFinish }: { words: UnitWord[]; length?: number; kinds?: QuizKind[]; onFinish: (percent: number, passed: boolean, wrongTerms: string[], rightTerms: string[]) => void }) {
-  const questions = useMemo(() => buildUnitQuiz(words, Math.random, length, kinds), [words, length, kinds]);
+  const mainQuestions = useMemo(() => buildUnitQuiz(words, Math.random, length, kinds), [words, length, kinds]);
+  // Cuối bài: các câu làm sai lần đầu được hỏi lại một lượt (như Duolingo). Lượt làm lại KHÔNG tính vào điểm, chỉ để nhớ đáp án đúng.
+  const [retry, setRetry] = useState<QuizQuestion[]>([]);
+  const [failed, setFailed] = useState<QuizQuestion[]>([]);
+  const questions = useMemo(() => [...mainQuestions, ...retry], [mainQuestions, retry]);
   const [wrong, setWrong] = useState<string[]>([]);
   const [streak, setStreak] = useState(0);
   const [right, setRight] = useState<string[]>([]);
@@ -35,6 +39,8 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
   const [answered, setAnswered] = useState<QuizResult | null>(null);
   const [correct, setCorrect] = useState(0);
   const q = questions[i];
+  const mainLen = mainQuestions.length;
+  const isRetry = i >= mainLen;
 
   if (!q) return <p role="status" className="text-body-md text-on-surface-variant">Chặng này chưa đủ từ để kiểm tra.</p>;
 
@@ -43,6 +49,8 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
   const wasCorrect = isChoice ? picked === q.answer : answered?.correct === true;
 
   function record(r: QuizResult) {
+    if (isRetry) { if (r.correct) setStreak((n) => n + 1); else setStreak(0); return; }
+    if (!r.correct) setFailed((f) => [...f, q]);
     if (r.correct) { setCorrect((c) => c + 1); setStreak((n) => n + 1); } else setStreak(0);
     setRight((cur) => [...new Set([...cur, ...r.right])]);
     setWrong((cur) => [...new Set([...cur, ...r.wrong])]);
@@ -58,7 +66,9 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
     record(r);
   }
   function next() {
-    if (i + 1 >= questions.length) { const g = gradeQuiz(correct, questions.length); onFinish(g.percent, g.passed, wrong, right); return; }
+    // Hết lượt chính mà còn câu sai: mở lượt làm lại các câu đó trước khi báo kết quả.
+    if (i + 1 === mainLen && retry.length === 0 && failed.length > 0) { setRetry(failed); setI(i + 1); setPicked(null); setAnswered(null); return; }
+    if (i + 1 >= questions.length) { const g = gradeQuiz(correct, mainLen); onFinish(g.percent, g.passed, wrong, right); return; }
     setI(i + 1);
     setPicked(null);
     setAnswered(null);
@@ -67,7 +77,7 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
   return (
     <div className="space-y-space-md">
       <p className="flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant" aria-live="polite">
-        <span>Câu {i + 1}/{questions.length} · đúng {correct}</span>
+        {isRetry ? <span className="font-bold text-secondary">Làm lại các câu sai {i - mainLen + 1}/{retry.length} (không tính điểm)</span> : <span>Câu {i + 1}/{mainLen} · đúng {correct}</span>}
         {streak >= 2 && <span key={streak} className="anim-note-pop rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">🔥 {streak} câu liên tiếp</span>}
       </p>
       <p className="text-body-lg font-medium">{PROMPTS[q.kind]}</p>
@@ -109,7 +119,7 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
           {!isChoice && !wasCorrect && q.kind !== "order" && q.kind !== "type" && q.kind !== "match" && <AnswerCard word={words.find((w) => w.term === q.answer)} />}
           {!isChoice && wasCorrect && (q.kind === "match" || q.kind === "tf") && <p className="text-body-lg font-bold">Chính xác!</p>}
           <button type="button" onClick={next} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container">
-            {i + 1 >= questions.length ? "Xem kết quả" : "Câu tiếp"} <Icon name="arrow_forward" size={20} />
+            {i + 1 >= questions.length && !(i + 1 === mainLen && failed.length > 0) ? "Xem kết quả" : i + 1 === mainLen && failed.length > 0 ? `Làm lại ${failed.length} câu sai` : "Câu tiếp"} <Icon name="arrow_forward" size={20} />
           </button>
         </div>
       )}
