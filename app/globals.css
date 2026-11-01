@@ -237,8 +237,8 @@
   /* Biến --font-* do next/font đặt trên <html>. Chữ Hán rơi về Noto Sans SC (link Google Fonts) khi Plus Jakarta Sans không có glyph. */
   /* Thiết kế mới dùng MỘT họ chữ: Plus Jakarta Sans (đủ dấu tiếng Việt) cho giao diện và tiêu đề, Noto Sans SC cho chữ Hán. `font-serif` được giữ làm tên lớp cũ
      nhưng giờ cùng họ sans (tiêu đề đậm). */
-  --font-sans-stack: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-serif-stack: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-sans-stack: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Color Emoji", sans-serif;
+  --font-serif-stack: var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Noto Color Emoji", sans-serif;
 }
 
 /* Giữ thanh cuộn của panel nghe gọn và cùng tông với bảng màu sáng/tối. */

@@ -19,3 +19,11 @@ export function iconFontUrl(): string {
   const icons = [...ICON_NAMES].sort().join(",");
   return `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=${icons}&display=block`;
 }
+
+/**
+ * Font Noto Color Emoji: mọi máy (Mac, Windows, Android) vẽ cùng một bộ emoji thay vì bộ riêng của hệ điều hành, và Windows cũ không còn ô vuông cho emoji mới.
+ * Google cắt theo unicode-range (mỗi mảnh ~65 KB, chỉ tải mảnh có emoji đang hiển thị) và chọn định dạng hợp với trình duyệt; không tải được thì tự rơi về emoji hệ thống.
+ */
+export function emojiFontUrl(): string {
+  return "https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap";
+}
