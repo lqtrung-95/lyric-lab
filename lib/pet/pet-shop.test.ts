@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EMPTY_SHOP, SHOP_ITEMS, buyItem, outfitIds, parseShop, toggleEquip, xuBalance, xuEarned } from "./pet-shop";
+import { EMPTY_SHOP, SHOP_ITEMS, accessoryLabel, buyItem, claimWeeklyXu, openChest, openSeasons, outfitIds, parseShop, seasonOpen, toggleEquip, xuBalance, xuEarned } from "./pet-shop";
 
 describe("xu", () => {
   it("1 xu mỗi 10 XP, không âm, trừ phần đã tiêu", () => {
@@ -50,5 +50,49 @@ describe("outfitIds", () => {
     const s = buyItem(buyItem(EMPTY_SHOP, "cap", 9999)!, "bowtie", 9999)!;
     expect(outfitIds(["scarf", "hat", "crown"], s)).toEqual(["cap", "bowtie"]);
     expect(outfitIds(["scarf", "hat"], EMPTY_SHOP)).toEqual(["scarf", "hat"]);
+  });
+});
+
+describe("mùa lễ", () => {
+  it("Tết, Trung thu, Noel mở đúng khoảng ngày", () => {
+    expect(seasonOpen("tet", new Date(2027, 0, 20))).toBe(true); // 17 ngày trước mùng 1
+    expect(seasonOpen("tet", new Date(2027, 0, 1))).toBe(false);
+    expect(seasonOpen("tet", new Date(2027, 1, 20))).toBe(true); // 14 ngày sau
+    expect(seasonOpen("tet", new Date(2027, 1, 25))).toBe(false);
+    expect(seasonOpen("trungthu", new Date(2027, 8, 10))).toBe(true);
+    expect(seasonOpen("trungthu", new Date(2027, 7, 1))).toBe(false);
+    expect(seasonOpen("noel", new Date(2026, 11, 14))).toBe(false);
+    expect(seasonOpen("noel", new Date(2026, 11, 15))).toBe(true);
+    expect(seasonOpen("noel", new Date(2027, 0, 2))).toBe(false);
+    expect(openSeasons(new Date(2026, 11, 20))).toEqual(["noel"]);
+  });
+  it("món mùa chỉ mua được trong mùa; đã mua thì đeo quanh năm", () => {
+    const winter = new Date(2026, 11, 20), summer = new Date(2027, 5, 1);
+    expect(buyItem(EMPTY_SHOP, "santahat", 9999, summer)).toBeNull();
+    const s = buyItem(EMPTY_SHOP, "santahat", 9999, winter)!;
+    expect(s.owned).toEqual(["santahat"]);
+    expect(toggleEquip(toggleEquip(s, "santahat"), "santahat").equipped.head).toBe("santahat");
+  });
+});
+
+describe("xu thưởng", () => {
+  it("rương mỗi ngày một lần, 2–8 xu, cộng vào số dư", () => {
+    const a = openChest(EMPTY_SHOP, "2026-11-02", 0)!;
+    expect(a.xu).toBe(2);
+    expect(openChest(a.state, "2026-11-02", 0.5)).toBeNull();
+    const b = openChest(a.state, "2026-11-03", 0.999)!;
+    expect(b.xu).toBe(8);
+    expect(xuBalance(0, b.state)).toBe(10);
+    expect(openChest(EMPTY_SHOP, "x", Number.NaN)!.xu).toBe(2);
+  });
+  it("thưởng tuần 20 xu, mỗi tuần một lần", () => {
+    const a = claimWeeklyXu(EMPTY_SHOP, "2026-11-02")!;
+    expect(xuBalance(0, a)).toBe(20);
+    expect(claimWeeklyXu(a, "2026-11-02")).toBeNull();
+    expect(claimWeeklyXu(a, "")).toBeNull();
+  });
+  it("tên phụ kiện", () => {
+    expect(accessoryLabel("cap")).toBe("Mũ lưỡi trai");
+    expect(accessoryLabel("scarf")).toBe("Khăn quàng");
   });
 });

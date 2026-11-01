@@ -6,6 +6,7 @@ import { useState } from "react";
 import { sfx } from "@/lib/games/arcade-sfx";
 import type { PetBurst, PetBurstKind } from "@/lib/pet/pet-burst";
 import { PET_SPECIES_LABELS } from "@/lib/pet/pet-logic";
+import { accessoryLabel } from "@/lib/pet/pet-shop";
 import { VISIT_GIFTS, VISIT_GREETINGS, type PetVisit } from "@/lib/pet/pet-visit";
 import { PetBurstFx } from "./pet-burst-fx";
 import { PetSprite } from "./pet-sprite";
@@ -27,6 +28,13 @@ export function PetVisitScene({ visit }: { visit: PetVisit }) {
     setLine(`${from} tặng ${visit.name} ${g}! ${visit.name} cảm ơn nhiều lắm!`);
     setTapKey((k) => k + 1); fx("gift"); sfx.petGift();
   };
+  const worn = visit.accessories.map(accessoryLabel);
+  const compliment = () => {
+    const from = mine ? mine.pet.name : "Bạn";
+    const item = worn.length > 0 ? worn[tapKey % worn.length] : null;
+    setLine(item ? `${from} khen: “${visit.name} đeo ${item} đẹp quá!” ${visit.name} đỏ mặt luôn.` : `${from} khen ${visit.name} dễ thương quá!`);
+    setTapKey((k) => k + 1); fx("cheer"); sfx.petCheer();
+  };
   const chips = [{ l: "Cấp", v: String(visit.level) }, ...(visit.streak > 0 ? [{ l: "Chuỗi ngày", v: String(visit.streak) }] : []), { l: "Giai đoạn", v: `${visit.stage}/3` }];
   return (
     <section aria-labelledby="visit-title" className="mx-auto max-w-xl rounded-3xl border-4 border-ink bg-surface-container-lowest p-space-md text-center">
@@ -47,7 +55,10 @@ export function PetVisitScene({ visit }: { visit: PetVisit }) {
           </div>
         )}
       </div>
+      {worn.length > 0 && <p className="mt-space-sm text-label-md text-on-surface-variant">{visit.name} đang đeo: <span className="font-bold text-on-surface">{worn.join(", ")}</span></p>}
+      {mine && mine.view.accessories.length > 0 && <p className="text-label-sm text-on-surface-variant">{mine.pet.name} đang đeo: {mine.view.accessories.map(accessoryLabel).join(", ")}</p>}
       <ul className="mt-space-sm flex flex-wrap justify-center gap-2">{chips.map((c) => <li key={c.l} className="rounded-xl border-2 border-ink px-3 py-1"><span className="block text-base font-extrabold">{c.v}</span><span className="text-label-md text-on-surface-variant">{c.l}</span></li>)}</ul>
+      <button type="button" onClick={compliment} className="mt-space-sm cursor-pointer min-h-11 rounded-full border-2 border-ink bg-secondary-container px-4 text-label-md font-extrabold text-on-secondary-container">Khen {visit.name}</button>
       <div className="mt-space-sm" role="group" aria-label={`Tặng quà cho ${visit.name}`}>
         <p className="text-label-md font-bold">Tặng quà cho {visit.name}:</p>
         <div className="mt-1 flex justify-center gap-2">{VISIT_GIFTS.map((g) => <button key={g} type="button" onClick={() => gift(g)} aria-label={`Tặng ${g}`} className="min-h-12 min-w-12 rounded-full border-2 border-ink bg-surface-container-low "><EmojiIcon e={g} size={30} /></button>)}</div>

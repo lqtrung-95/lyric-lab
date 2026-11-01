@@ -15,6 +15,7 @@ import { listUnitProgress, saveUnitProgress } from "@/lib/user-data/unit-progres
 import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { PetMini } from "@/components/pet/pet-mini";
 import { CelebrationBurst } from "./celebration-burst";
+import { themeOutfit } from "@/lib/pet/pet-theme";
 import { cardsToAdd } from "@/lib/courses/unit-card";
 import { isLevelId, isLevelUnlocked, levelById, passedLevels, UNIT_LEVELS, withLevelScore, type LevelId } from "@/lib/courses/unit-levels";
 import { UnitLevelList } from "./unit-level-list";
@@ -132,7 +133,7 @@ export function UnitScreen({ slug, idx, mode, level = 1 }: { slug: string; idx: 
       {step === "result" && result && (
         <div className="card-ink relative overflow-hidden p-space-lg text-center" data-testid="unit-result">
           {result.passed && <CelebrationBurst />}
-          {result.passed && <PetMini cheer className="mx-auto mb-1 size-20" />}
+          {result.passed && <PetMini cheer theme={themeOutfit(detail.unit.title, detail.unit.topic)} className="mx-auto mb-1 size-20" />}
           <p className="font-serif text-headline-lg">{result.percent}%</p>
           <p className="mt-1 text-body-lg">{result.passed ? (detail.unit.kind === "final" ? `Hoàn thành ${detail.course.title}! Giỏi lắm.` : isReview ? "Ôn tập xong! Giỏi lắm." : runLevel ? `Qua cấp ${lv.id} (${lv.name})! Bạn có thêm một sao cho chặng này.` : "Hoàn thành chặng! Giỏi lắm.") : runLevel && lv.speaking ? `Chưa qua cấp nói: cần nói ít nhất ${lv.minAttempts ?? 2} câu và đúng từ ${lv.pass}%. Bỏ qua câu không bị tính sai, thử lại khi bạn sẵn sàng.` : `Chưa đạt ${runLevel ? lv.pass : PASS_PERCENT}%. Ôn lại các từ rồi thử lần nữa nhé.`}</p>
           {result.passed && result.saved && result.first && <p className="mt-2 inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-md font-extrabold text-on-primary-container" data-testid="unit-result-xp">+{unitXp(result.percent)} XP <span className="font-medium">(lần hoàn thành đầu, có hạn mức mỗi ngày)</span></p>}

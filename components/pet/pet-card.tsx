@@ -182,7 +182,7 @@ const NO_WORDS: PetReviewWord[] = [];
 const BUBBLE = "rounded-2xl border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold shadow-[0_2px_0_var(--shadow-ink)]";
 
 function PetTouch({ pet, stage, mood, accessories, words, snapshot, chewKey, extra }: { pet: Pet; stage: PetStage; mood: PetMood; accessories: string[]; words: PetReviewWord[]; snapshot: PetSnapshot | null; chewKey: number; extra: PetBurst | null }) {
-  const { tapKey, bubble, burst, tap } = usePetTalk(mood, pet.name, words, snapshot);
+  const { tapKey, bubble, burst, tap } = usePetTalk(mood, pet.name, words, snapshot, accessories);
   return (
     <div className="relative shrink-0">
       <button type="button" onClick={tap} aria-label={`Chạm vào ${pet.name}`} className="cursor-pointer block rounded-full">

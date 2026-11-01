@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { themeOutfit } from "@/lib/pet/pet-theme";
 import { PetMini } from "@/components/pet/pet-mini";
 import { Icon } from "@/components/ui/icon";
 import { mapHeight, nodePositions, roadPath } from "@/lib/courses/path-geometry";
@@ -55,7 +56,7 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
                 {needsReview(u) && <span aria-hidden="true" title="Cần ôn" className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border-2 border-ink bg-error-container"><Icon name="schedule" size={14} /></span>}
                 {current && <span aria-hidden="true" className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-sm font-black">Đang học</span>}
               </button>
-              {current && <span className={`absolute top-1/2 -translate-y-1/2 ${labelRight ? "right-full mr-2" : "left-full ml-2"}`}><PetMini className="size-12" /></span>}
+              {current && <span className={`absolute top-1/2 -translate-y-1/2 ${labelRight ? "right-full mr-2" : "left-full ml-2"}`}><PetMini theme={themeOutfit(u.title, u.topic)} className="size-12" /></span>}
               {showTopic && <span aria-hidden="true" className={`pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full border-2 border-[var(--ink-soft)] bg-surface-container-lowest px-3 py-1 text-label-md font-extrabold text-on-surface-variant sm:block ${labelRight ? "left-full ml-3" : "right-full mr-3"}`}>{u.topic}</span>}
             </li>
           );

@@ -27,6 +27,81 @@ export function PetAccessories({ ids, stage }: { ids: readonly string[]; stage: 
           <path d={`M78 ${y + 33}l6 18l8 -4l-5 -16z`} fill={RED_DARK} />
         </g>
       )}
+      {ids.includes("tetcharm") && (
+        <g>
+          <path d={`M42 ${y + 24}q18 14 36 0`} stroke={GOLD} strokeWidth="3" strokeLinecap="round" fill="none" />
+          <rect x="51" y={y + 33} width="18" height="23" rx="3" fill={RED} stroke={RED_DARK} strokeWidth="1.500" />
+          <path d={`M51 ${y + 39}q9 7 18 0`} fill="none" stroke={RED_DARK} strokeWidth="1.500" />
+          <circle cx="60" cy={y + 46} r="4.500" fill={GOLD} /><path d={`M57.500 ${y + 46}h5`} stroke={GOLD_DARK} strokeWidth="1.500" />
+        </g>
+      )}
+      {ids.includes("noelscarf") && (
+        <g>
+          <path d={`M30 ${y + 26}q30 16 60 0l-2 9q-28 12 -56 0z`} fill={RED} />
+          <path d={`M42 ${y + 31}l3 8M54 ${y + 34}l3 8M66 ${y + 34}l3 8M78 ${y + 31}l3 8`} stroke={WHITE} strokeWidth="3" />
+          <path d={`M78 ${y + 33}l6 18l8 -4l-5 -16z`} fill={RED_DARK} />
+          <path d={`M80 ${y + 41}l5 -1.500M82 ${y + 46}l5 -1.500`} stroke={WHITE} strokeWidth="2" />
+        </g>
+      )}
+      {ids.includes("stethoscope") && (
+        <g>
+          <path d={`M42 ${y + 22}c-4 26 10 32 18 32s22 -6 18 -32`} stroke="#5b6472" strokeWidth="4" strokeLinecap="round" fill="none" />
+          <circle cx="60" cy={y + 56} r="6" fill="#cfd6e0" stroke="#5b6472" strokeWidth="2.500" />
+        </g>
+      )}
+      {ids.includes("necktie") && (
+        <g>
+          <path d={`M46 ${y + 26}l14 8l14 -8l-3 12l-11 -4l-11 4z`} fill={WHITE} opacity="0.9" />
+          <rect x="55.500" y={y + 30} width="9" height="7" rx="2" fill={BLUE} />
+          <path d={`M56 ${y + 37}h8l4 20l-8 6l-8 -6z`} fill={BLUE} />
+          <path d={`M54 ${y + 45}l12 -3M53 ${y + 51}l14 -3`} stroke={SKY} strokeWidth="2" />
+        </g>
+      )}
+      {ids.includes("chefhat") && (
+        <g fill={WHITE} stroke="#d8dde6" strokeWidth="1.800">
+          <circle cx="46" cy={y - 38} r="11" /><circle cx="60" cy={y - 44} r="13" /><circle cx="74" cy={y - 38} r="11" />
+          <path d={`M42 ${y - 36}h36v14a4 4 0 0 1 -4 4h-28a4 4 0 0 1 -4 -4z`} />
+          <path d={`M42 ${y - 25}h36`} stroke="#d8dde6" />
+        </g>
+      )}
+      {ids.includes("sunhat") && (
+        <g>
+          <ellipse cx="60" cy={y - 20} rx="36" ry="9" fill="#f0c97a" stroke="#d1a24e" strokeWidth="2" />
+          <path d={`M40 ${y - 22}c0 -24 40 -24 40 0z`} fill="#f7d98f" stroke="#d1a24e" strokeWidth="2" />
+          <path d={`M40 ${y - 26}h40`} stroke={BLUE} strokeWidth="5" />
+        </g>
+      )}
+      {ids.includes("gradcap") && (
+        <g>
+          <path d={`M44 ${y - 30}v12q16 9 32 0v-12z`} fill="#2f3441" />
+          <path d={`M60 ${y - 50}l34 13l-34 13l-34 -13z`} fill="#3a4052" stroke="#2b2b3a" strokeWidth="1.500" strokeLinejoin="round" />
+          <path d={`M90 ${y - 38}v16`} stroke={GOLD} strokeWidth="2.500" strokeLinecap="round" />
+          <circle cx="90" cy={y - 20} r="3.200" fill={GOLD} />
+        </g>
+      )}
+      {ids.includes("tethat") && (
+        <g>
+          <path d={`M37 ${y - 17}c-2 -28 44 -28 46 0z`} fill="#b3202a" />
+          <rect x="37" y={y - 25} width="46" height="7" fill={GOLD} />
+          <circle cx="60" cy={y - 33} r="4" fill={GOLD} stroke={GOLD_DARK} strokeWidth="1.500" />
+        </g>
+      )}
+      {ids.includes("moonears") && (
+        <g>
+          <ellipse cx="45" cy={y - 46} rx="7" ry="17" fill={WHITE} stroke="#d8dde6" strokeWidth="2" transform={`rotate(-10 45 ${y - 46})`} />
+          <ellipse cx="75" cy={y - 46} rx="7" ry="17" fill={WHITE} stroke="#d8dde6" strokeWidth="2" transform={`rotate(10 75 ${y - 46})`} />
+          <ellipse cx="45" cy={y - 45} rx="3" ry="11" fill={PINK} opacity="0.7" transform={`rotate(-10 45 ${y - 45})`} />
+          <ellipse cx="75" cy={y - 45} rx="3" ry="11" fill={PINK} opacity="0.7" transform={`rotate(10 75 ${y - 45})`} />
+          <path d={`M36 ${y - 22}q24 -9 48 0`} stroke={GOLD} strokeWidth="4" strokeLinecap="round" fill="none" />
+        </g>
+      )}
+      {ids.includes("santahat") && (
+        <g>
+          <path d={`M36 ${y - 18}c4 -26 30 -34 52 -30c-8 6 -6 18 -4 30z`} fill={RED} />
+          <rect x="34" y={y - 24} width="52" height="9" rx="4.500" fill={WHITE} />
+          <circle cx="90" cy={y - 46} r="6" fill={WHITE} />
+        </g>
+      )}
       {ids.includes("bandana") && (
         <g>
           <path d={`M32 ${y + 22}q28 14 56 0l-28 26z`} fill={BLUE} />
@@ -136,6 +211,14 @@ export function PetBackItems({ ids, stage }: { ids: readonly string[]; stage: Pe
         <g>
           <path d={`M34 ${y + 26}L14 ${y + 82}q46 16 92 0L86 ${y + 26}z`} fill={RED} />
           <path d={`M34 ${y + 26}L14 ${y + 82}q12 4 26 6z`} fill={RED_DARK} opacity="0.5" />
+        </g>
+      )}
+      {ids.includes("starlantern") && (
+        <g>
+          <path d={`M88 ${y + 28}L100 ${y + 6}`} stroke={INK} strokeWidth="1.500" />
+          <path d={`M100 ${y - 12}l4 8 9 1.500 -6.500 6 1.800 9 -8.300 -4.500 -8.300 4.500 1.800 -9 -6.500 -6 9 -1.500z`} fill={GOLD} stroke={GOLD_DARK} strokeWidth="2" strokeLinejoin="round" />
+          <circle cx="100" cy={y + 2} r="3" fill={WHITE} opacity="0.8" />
+          <path d={`M95 ${y + 14}v6M100 ${y + 15}v8M105 ${y + 14}v6`} stroke={RED} strokeWidth="2" strokeLinecap="round" />
         </g>
       )}
       {ids.includes("wings") && (

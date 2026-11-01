@@ -18,6 +18,8 @@ import type { Pet, PetMood, PetStage } from "@/lib/pet/pet-logic";
 import { HomeItemArt } from "./pet-home-art";
 import { PetSprite } from "./pet-sprite";
 import { useNow } from "./use-now";
+import { usePetShop } from "./use-pet-shop";
+import { WEEKLY_XU, claimWeeklyXu } from "@/lib/pet/pet-shop";
 import { useLocalJson } from "./use-local-json-store";
 
 const KEY = "lyric-lab-pet-home";
@@ -68,6 +70,7 @@ export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: 
   const stats: HomeStats = useMemo(() => ({ streakLongest, level, daysTogether, stage, visited: ex.visited, goldStamps: ex.goldStamps, journeys: ex.journeys, weeksDone: weekly.claimed.length, grammarMastered: Object.values(grammarStats).filter(isMastered).length, radicalsKnown: radicalProgress.known.length, cardsSaved: learner.state.saved.length }), [streakLongest, level, daysTogether, stage, ex.visited, ex.goldStamps, ex.journeys, weekly.claimed.length, grammarStats, radicalProgress.known.length, learner.state.saved.length]);
   const rows = weeklyRows(weekly, week, daysStudied);
   const claimable = canClaim(weekly, week, daysStudied);
+  const [shop, setShop] = usePetShop();
   const placed = useMemo(() => resolvePlacement(state.placed, stats), [state.placed, stats]);
   const fresh = ex.ready ? newlyUnlocked(state.seen, stats) : [];
   const freshKey = fresh.map((i) => i.id).join(",");
@@ -176,7 +179,7 @@ export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: 
             ))}
           </ul>
           {claimable
-            ? <button type="button" onClick={() => { sfx.petCheer(); onFx("evolve"); writeWeekly(claimWeek(weekly, week)); }} className="mt-2 min-h-11 rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-extrabold">Nhận huy hiệu tuần</button>
+            ? <button type="button" onClick={() => { sfx.petCheer(); onFx("evolve"); writeWeekly(claimWeek(weekly, week)); const paid = claimWeeklyXu(shop, week); if (paid) setShop(paid); }} className="mt-2 min-h-11 rounded-full border-2 border-ink bg-primary-container px-4 text-label-md font-extrabold">Nhận huy hiệu tuần (+{WEEKLY_XU} xu)</button>
             : weekly.claimed.includes(week) && <p role="status" className="mt-1 text-label-md font-bold text-secondary">Đã nhận huy hiệu tuần này. Hẹn bạn tuần sau!</p>}
         </section>
 
