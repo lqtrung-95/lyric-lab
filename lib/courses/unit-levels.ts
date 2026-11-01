@@ -60,6 +60,12 @@ export const isLevelUnlocked = (id: LevelId, passed: readonly LevelId[]): boolea
 /** Số sao (số cấp đã qua, 0–5). Chặng đủ 5 sao là "huyền thoại" (vàng). */
 export const starsOf = (p: UnitProgress | undefined): number => passedLevels(p).length;
 
+/** Cấp nên làm tiếp: cấp đầu tiên chưa qua mà đã mở. null khi đã qua đủ 5 cấp. */
+export function nextLevel(p: UnitProgress | undefined): UnitLevel | null {
+  const passed = passedLevels(p);
+  return UNIT_LEVELS.find((l) => !passed.includes(l.id) && isLevelUnlocked(l.id, passed)) ?? null;
+}
+
 /** `stepState` mới sau khi làm xong một cấp (giữ điểm cao nhất, giữ các trường khác). Cấp 1 không lưu ở đây. */
 export function withLevelScore(stepState: Record<string, unknown> | undefined, id: LevelId, percent: number): Record<string, unknown> {
   const base = stepState ?? {};

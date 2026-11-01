@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
 import type { UnitProgress } from "./course-types";
-import { UNIT_LEVELS, isLevelUnlocked, levelScores, passedLevels, starsOf, withLevelScore } from "./unit-levels";
+import { UNIT_LEVELS, isLevelUnlocked, levelScores, passedLevels, nextLevel, starsOf, withLevelScore } from "./unit-levels";
 
 const prog = (o: Partial<UnitProgress> = {}): UnitProgress => ({ unitId: "u", status: "completed", bestScore: 80, stepState: {}, completedAt: "x", ...o });
+
+describe("nextLevel", () => {
+  it("cấp đầu tiên chưa qua mà đã mở; null khi đủ 5 cấp", () => {
+    expect(nextLevel(prog())?.id).toBe(2);
+    expect(nextLevel(prog({ stepState: { levels: { "2": 90 } } }))?.id).toBe(3);
+    expect(nextLevel(prog({ stepState: { levels: { "2": 90, "3": 90, "4": 60, "5": 90 } } }))).toBeNull();
+    expect(nextLevel(prog({ status: "in_progress" }))?.id).toBe(1);
+  });
+});
 
 describe("cấp của chặng", () => {
   it("năm cấp, id 1–5, cấp nói có bỏ qua được", () => {
