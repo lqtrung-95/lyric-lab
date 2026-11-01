@@ -4,6 +4,7 @@ import Link from "next/link";
 import { wordLabel } from "@/lib/courses/build-unit-quiz";
 import { playChinese } from "@/lib/speech/play-chinese";
 import { Icon } from "@/components/ui/icon";
+import { UnitLevelList } from "./unit-level-list";
 import type { MapUnit } from "./use-course-map";
 import { useUnit } from "./use-unit";
 
@@ -63,6 +64,18 @@ function HskUnitCard({ slug, unit, total }: { slug: string; unit: MapUnit; total
         <Icon name={done ? "replay" : "play_arrow"} filled size={22} />{done ? `Học lại chặng ${unit.idx}` : unit.progress ? `Tiếp tục chặng ${unit.idx}` : `Vào chặng ${unit.idx}`}
       </Link>
       {unit.progress && <p className="mt-2 text-center text-label-md font-bold text-on-surface-variant">{done ? "Đã hoàn thành" : "Đang học"} · điểm cao nhất {unit.progress.bestScore}%</p>}
+      {done && (
+        <div className="mt-space-md">
+          <h3 className="mb-1 text-label-md font-extrabold uppercase tracking-wide text-on-surface-variant">Các cấp của chặng</h3>
+          <UnitLevelList slug={slug} idx={unit.idx} progress={unit.progress} />
+        </div>
+      )}
+      {done && unit.strength && unit.strength.strengthPct !== null && (
+        <div className="mt-space-sm rounded-2xl bg-surface-container-low p-space-sm text-center">
+          <p className="text-label-md font-bold">Độ nhớ ước tính: {unit.strength.strengthPct}%{unit.strength.fading > 0 ? ` · ${unit.strength.fading} từ sắp quên` : ""}</p>
+          <Link href={`/courses/${slug}/${unit.idx}?mode=review`} className={`mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-full border-2 border-ink px-4 text-label-md font-extrabold ${unit.strength.needsReview ? "bg-primary-container" : "bg-surface-container-lowest"}`}><Icon name="replay" size={18} />Ôn nhanh 10 câu</Link>
+        </div>
+      )}
     </section>
   );
 }

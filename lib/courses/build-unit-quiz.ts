@@ -1,7 +1,8 @@
 import { chunkSentence } from "./quiz-extra";
 import type { UnitWord } from "./unit-types";
 
-export type QuizKind = "meaning" | "term" | "listen" | "pinyin" | "cloze" | "match" | "order" | "type" | "tf";
+/** `say`: đọc to một từ; `recall`: nhìn nghĩa, nói từ tiếng Trung; `shadow`: nhại một câu thật. Ba kiểu nói chỉ có ở cấp "Nói" của chặng. */
+export type QuizKind = "meaning" | "term" | "listen" | "pinyin" | "cloze" | "match" | "order" | "type" | "tf" | "say" | "recall" | "shadow";
 export interface QuizOption { term: string; label: string }
 export interface QuizQuestion {
   kind: QuizKind;
@@ -138,4 +139,20 @@ export function buildUnitQuiz(words: UnitWord[], random: Random = Math.random, l
 export function gradeQuiz(correct: number, total: number): { percent: number; passed: boolean } {
   const percent = total === 0 ? 0 : Math.round((100 * correct) / total);
   return { percent, passed: percent >= PASS_PERCENT };
+}
+
+/**
+ * Bộ câu nói của cấp "Nói": mỗi từ một câu, xoay ba kiểu (đọc to từ, nhìn nghĩa nói từ, nhại câu thật). "Nhại câu thật" cần từ có câu ví dụ (không có thì đổi sang đọc to từ).
+ * Tối đa `length` câu, không lặp từ. `prompt` là thứ hiện cho người học (từ, nghĩa hoặc câu), `answer` luôn là từ cần nói.
+ */
+export function buildSpeakingQuiz(words: UnitWord[], random: Random = Math.random, length = 5): QuizQuestion[] {
+  const usable = words.filter((w) => w.pinyin);
+  const kinds: QuizKind[] = ["say", "recall", "shadow"];
+  return shuffled(usable, random).slice(0, length).map((w, i): QuizQuestion => {
+    const example = w.examples.find((e) => e.text.includes(w.term));
+    const kind: QuizKind = kinds[i % kinds.length] === "shadow" && !example ? "say" : kinds[i % kinds.length];
+    if (kind === "recall") return { kind, term: w.term, prompt: wordLabel(w), options: [], answer: w.term };
+    if (kind === "shadow" && example) return { kind, term: w.term, prompt: example.text, hint: example.translation, options: [], answer: w.term };
+    return { kind: "say", term: w.term, prompt: w.term, hint: wordLabel(w), options: [], answer: w.term };
+  });
 }

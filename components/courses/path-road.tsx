@@ -4,9 +4,11 @@ import { useEffect, useRef } from "react";
 import { PetMini } from "@/components/pet/pet-mini";
 import { Icon } from "@/components/ui/icon";
 import { mapHeight, nodePositions, roadPath } from "@/lib/courses/path-geometry";
+import { starsOf } from "@/lib/courses/unit-levels";
 import type { MapUnit } from "./use-course-map";
 
 const isDone = (u: MapUnit) => u.progress?.status === "completed";
+const needsReview = (u: MapUnit) => isDone(u) && u.strength?.needsReview === true;
 const reviewIcon = (u: MapUnit) => (u.kind === "final" ? "emoji_events" : "quiz");
 
 /**
@@ -40,10 +42,12 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
           return (
             <li key={u.id} ref={current ? currentRef : undefined} className="absolute" style={{ left: `${p.x}%`, top: p.y, transform: "translate(-50%, -50%)" }}>
               <button type="button" onClick={() => onSelect(u.idx)} aria-pressed={selected}
-                aria-label={`${review ? "" : "Chặng "}${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}`}
+                aria-label={`${review ? "" : "Chặng "}${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}${done ? `, ${starsOf(u.progress)} trên 5 sao` : ""}${needsReview(u) ? `, cần ôn (${u.strength!.fading} từ sắp quên)` : ""}`}
                 style={{ width: size, height: size }}
                 className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-ink text-body-lg font-black shadow-[0_4px_0_var(--shadow-ink)] transition-transform active:translate-y-1 active:shadow-none motion-reduce:transition-none ${done ? "bg-secondary text-on-secondary" : current ? "bg-primary-container text-on-primary-container" : review ? "bg-tertiary-container text-on-tertiary-container" : "bg-surface-container-lowest text-on-surface"} ${selected ? "ring-4 ring-primary/60 ring-offset-2 ring-offset-surface" : ""}`}>
                 {done ? <Icon name="check" size={28} /> : current ? <Icon name="star" size={32} filled /> : review ? <Icon name={reviewIcon(u)} size={28} filled /> : u.idx}
+                {done && starsOf(u.progress) > 1 && <span aria-hidden="true" className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-1.5 text-[10px] font-black leading-4 text-primary">{"★".repeat(starsOf(u.progress))}</span>}
+                {needsReview(u) && <span aria-hidden="true" title="Cần ôn" className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border-2 border-ink bg-error-container"><Icon name="schedule" size={14} /></span>}
                 {current && <span aria-hidden="true" className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-sm font-black">Đang học</span>}
               </button>
               {current && <span className={`absolute top-1/2 -translate-y-1/2 ${labelRight ? "right-full mr-2" : "left-full ml-2"}`}><PetMini className="size-12" /></span>}

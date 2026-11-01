@@ -28,7 +28,7 @@ export function FlashCard({ card, flipped, line, context, onFlip, onReplay }: Fl
           <span className="rounded-full border-2 border-ink/30 bg-surface-container px-3 py-1 text-on-surface-variant">{kind}</span>
           <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-on-surface-variant">{levelLabel(card.hsk_level)}</span>
           {/* Thẻ không có câu nguồn hiện chỉ được tạo từ thẻ từ ở cảnh Khám phá. */}
-          {card.kind === "vocab" && !card.video_id && <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-on-surface-variant">Từ cảnh Khám phá</span>}
+          {card.kind === "vocab" && !card.video_id && <span className="rounded-full bg-surface-container-high px-2.5 py-1 text-on-surface-variant">Từ chưa có câu nguồn</span>}
         </div>
         <button
           type="button"
