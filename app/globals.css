@@ -427,6 +427,28 @@ html.fonts-ready .material-symbols-outlined { opacity: 1; animation: none; trans
   .anim-note-in, .anim-note-pop, .anim-note-shake { animation: none; }
 }
 
+/* Làm bài trong chặng: câu mới trượt vào, thanh tiến độ chạy mượt, khung kết quả nảy lên, dấu ✓/✗ bật ra. Tắt khi giảm chuyển động. */
+@keyframes quiz-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes feedback-pop {
+  0% { opacity: 0; transform: scale(0.9) translateY(6px); }
+  60% { transform: scale(1.03); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.anim-quiz-in { animation: quiz-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.anim-feedback-pop { animation: feedback-pop 0.32s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.anim-badge-pop { animation: badge-pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .anim-quiz-in, .anim-feedback-pop, .anim-badge-pop { animation: none; }
+}
+
 /* Nhân vật trong cảnh Khám phá: nhún khi đi, nhảy khi đúng, lắc đầu khi sai. Tắt khi giảm chuyển động. */
 @keyframes walk-bob {
   0%, 100% { transform: translateY(0) rotate(-2deg); }
