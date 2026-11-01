@@ -37,6 +37,9 @@ import { adventurePhase, canStartAdventure } from "@/lib/pet/pet-adventure";
 import { daysTogether } from "@/lib/pet/pet-share";
 import { PetFeed } from "./pet-feed";
 import { PetHome } from "./pet-home";
+import { PetShop } from "./pet-shop";
+import { usePetShop } from "./use-pet-shop";
+import { outfitIds } from "@/lib/pet/pet-shop";
 import { usePetEvolution } from "./use-pet-evolution";
 import { usePetTalk } from "./use-pet-talk";
 
@@ -65,6 +68,8 @@ export function PetCard() {
   const [teaching, setTeaching] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [homing, setHoming] = useState(false);
+  const [shopping, setShopping] = useState(false);
+  const [shop] = usePetShop();
   const now = useNow();
   const { adventure, setAdventure } = usePetAdventure();
   const { taught } = usePetTaught();
@@ -106,13 +111,14 @@ export function PetCard() {
   const previewing = draft !== null && (shown.species !== pet.species || shown.name !== pet.name);
   const nextStage = (STAGE_NAMES[growth.stage] ?? "").toLowerCase();
   const accessories = unlockedAccessories(streak?.longest ?? 0);
+  const outfit = outfitIds(accessories.map((a) => a.id), shop);
   // Dữ liệu game/chuỗi chưa tải xong thì chưa có ảnh chụp (không phản ứng với số tạm thời).
   // Không cần useMemo: `usePetTalk` so từng trường chứ không so địa chỉ đối tượng.
   const homeBase = { streakLongest: streak?.longest ?? 0, level: game?.level.n ?? 1, daysTogether: daysTogether(pet.adoptedAt, now), daysStudied: streak?.weekCount ?? 0 };
   const snapshot: PetSnapshot | null = game && streak ? { level: game.level.n, streak: game.streak.current, mood } : null;
   return (
     <section aria-labelledby="pet-heading" className="pet-ui card-ink flex flex-wrap items-center gap-x-space-md gap-y-space-sm p-space-md">
-      {away && adventure ? <AwayPlaceholder title={adventure.title} /> : <PetTouch pet={shown} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />}
+      {away && adventure ? <AwayPlaceholder title={adventure.title} /> : <PetTouch pet={shown} stage={growth.stage} mood={mood} accessories={outfit} words={review?.peek ?? NO_WORDS} snapshot={snapshot} chewKey={chewKey} extra={extra} />}
       <div className="min-w-[14rem] flex-1">
         <h2 id="pet-heading" className="text-headline-md">{shown.name} <span className="text-label-md font-bold text-on-surface-variant">· {PET_SPECIES_LABELS[shown.species]} · {(STAGE_NAMES[growth.stage - 1] ?? "").toLowerCase()}</span></h2>
         {evolved && <p role="status" className="mt-1 inline-block rounded-full bg-primary-container px-3 py-0.5 text-label-md font-extrabold">Tiến hóa! {pet.name} đã lên giai đoạn {(STAGE_NAMES[evolved - 1] ?? "").toLowerCase()}</p>}
@@ -130,13 +136,14 @@ export function PetCard() {
         {weakGrammar && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} thấy bạn hay sai mẫu “{weakGrammar.title}”. <Link href={`/grammar/${weakGrammar.id}`} className="inline-flex min-h-11 items-center underline">Ôn lại nhé</Link></p>}
         {dayRadical && !weakGrammar && !teaching && <p className="mt-1 text-label-md text-on-surface-variant">Bộ thủ hôm nay: <Link href={`/radicals/${dayRadical.num}`} className="inline-flex min-h-11 items-center font-bold text-secondary underline"><span lang="zh-Hans" className="mr-1 font-serif text-lg">{dayRadical.char}</span>Bộ {dayRadical.name} ({dayRadical.meaning})</Link></p>}
         {forgot > 0 && !teaching && <p role="status" className="mt-1 text-label-md font-bold text-secondary">{pet.name} đang quên {forgot} từ bạn đã dạy. Dạy lại nhé!</p>}
-        {!feeding && !echoing && !chatting && !editing && !teaching && !homing && !away && (
+        {!feeding && !echoing && !chatting && !editing && !teaching && !homing && !shopping && !away && (
           <div className="mt-space-sm flex flex-wrap gap-2">
             {(review?.total ?? 0) > 0 && <Button3d type="button" variant="bright" onClick={() => { sfx.petBlip(); setFeeding(true); }}>Cho {pet.name} ăn thẻ</Button3d>}
             <Button3d type="button" onClick={() => { sfx.petBlip(); fx("tap"); setChatting(true); }}>Nói chuyện với {pet.name}</Button3d>
             <Button3d type="button" onClick={() => { sfx.petBlip(); setTeaching(true); }}>Dạy {pet.name}</Button3d>
             {echoWord && <Button3d type="button" onClick={() => { sfx.petBlip(); setEchoing(true); }}>Tập nói cùng {pet.name}</Button3d>}
             <Button3d type="button" onClick={() => { sfx.petBlip(); setHoming(true); }}>Nhà của {pet.name}</Button3d>
+            <Button3d type="button" onClick={() => { sfx.petBlip(); setShopping(true); }}>Cửa hàng</Button3d>
             <Button3d type="button" variant="tertiary" onClick={() => { sfx.petBlip(); setSharing(true); }}>Khoe {pet.name}</Button3d>
             <button type="button" onClick={() => { sfx.petBlip(); setDraft({ species: pet.species, name: pet.name }); }} className="min-h-11 rounded-full px-3 text-label-md font-bold text-on-surface-variant underline">Đổi tên / đổi bạn nhỏ</button>
           </div>
@@ -158,9 +165,10 @@ export function PetCard() {
         </div>
       )}
       <PetAdventure name={pet.name} species={pet.species} adventure={adventure} now={now} today={today} canGo={canStartAdventure(goalDone, adventure, today ?? "")} onChange={setAdventure} onFx={fx} />
-      {homing && <PetHome pet={shown} stage={growth.stage} mood={mood} accessories={accessories.map((a) => a.id)} base={homeBase} onFx={fx} onClose={() => { sfx.petBlip(); setHoming(false); }} />}
+      {homing && <PetHome pet={shown} stage={growth.stage} mood={mood} accessories={outfit} base={homeBase} onFx={fx} onClose={() => { sfx.petBlip(); setHoming(false); }} />}
+      {shopping && <PetShop pet={shown} stage={growth.stage} mood={mood} totalXp={game?.xp.total ?? 0} streakAccessories={accessories.map((a) => a.id)} onFx={fx} onClose={() => { sfx.petBlip(); setShopping(false); }} />}
       {teaching && <PetTeach name={pet.name} onReact={fx} onClose={() => { sfx.petBlip(); setTeaching(false); }} />}
-      {sharing && <PetShareCard pet={pet} stage={growth.stage} accessories={accessories.map((a) => a.id)} stats={{ level: game?.level.n ?? 1, streak: game?.streak.current ?? 0, xpSince: Math.max(0, (game?.xp.total ?? 0) - pet.baseXp), daysTogether: daysTogether(pet.adoptedAt, now), taughtWords: taught.length }} onClose={() => setSharing(false)} />}
+      {sharing && <PetShareCard pet={pet} stage={growth.stage} accessories={outfit} stats={{ level: game?.level.n ?? 1, streak: game?.streak.current ?? 0, xpSince: Math.max(0, (game?.xp.total ?? 0) - pet.baseXp), daysTogether: daysTogether(pet.adoptedAt, now), taughtWords: taught.length }} onClose={() => setSharing(false)} />}
       {draft && <PetEdit pet={pet} draft={draft} onDraft={setDraft} onSave={(next) => { adopt(next); sfx.petAdopt(); fx("adopt"); setDraft(null); }} onClose={() => { sfx.petBlip(); setDraft(null); }} />}
       {chatting && <PetChat name={pet.name} onClose={() => { sfx.petBlip(); setChatting(false); }} />}
       {echoing && echoWord && <PetEcho name={pet.name} word={echoWord} onReact={(tier: EchoTier) => fx(tier === "great" ? "cheer" : tier === "good" ? "tap" : "try")} onClose={() => { sfx.petBlip(); setEchoing(false); }} />}

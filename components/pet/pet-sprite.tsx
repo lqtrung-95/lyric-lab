@@ -7,7 +7,7 @@ import { Penguin } from "./pet-art-penguin";
 import { Rabbit } from "./pet-art-rabbit";
 import { Fox } from "./pet-art-fox";
 import { Panda } from "./pet-art-panda";
-import { PetAccessories } from "./pet-accessories";
+import { PetAccessories, PetBackItems } from "./pet-accessories";
 
 /** Loài đã có hình. Hình phẳng kiểu hoạt hình: không viền, màu tươi, mắt to có chấm sáng. */
 export const PET_SPECIES_READY: readonly PetSpecies[] = ["dragon", "panda", "cat", "dog", "owl", "rabbit", "fox", "penguin"];
@@ -54,6 +54,7 @@ export function PetSprite({ species, stage, mood, accessories = [], tapKey = 0, 
         <g key={tapKey} className={tapKey > 0 ? "pet-tap" : undefined}>
         <g key={chewKey} className={chewKey > 0 ? "pet-chew" : undefined}>
         <g className={`pet-body pet-body-${mood}`}>
+          <PetBackItems ids={accessories} stage={stage} />
           {species === "dragon" && <Dragon stage={stage} mood={mood} />}
           {species === "panda" && <Panda stage={stage} mood={mood} />}
           {species === "cat" && <Cat stage={stage} mood={mood} />}
