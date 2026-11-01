@@ -3,4 +3,6 @@ export interface QuizResult {
   correct: boolean;
   right: string[];
   wrong: string[];
+  /** Câu nói đã bỏ qua: không tính đúng cũng không tính sai. */
+  skipped?: boolean;
 }

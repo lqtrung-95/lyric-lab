@@ -117,3 +117,30 @@ describe("gradeQuiz", () => {
     expect(gradeQuiz(0, 0)).toEqual({ percent: 0, passed: false });
   });
 });
+
+import { buildSpeakingQuiz } from "./build-unit-quiz";
+
+describe("bộ câu nói", () => {
+  const mk = (term: string, ex: boolean) => ({ term, pinyin: "x", sinoViet: null, hskLevel: 3, gloss: `nghĩa ${term}`, meanings: [], examples: ex ? [{ videoId: "v", lineIdx: 0, start: 0, end: 1, text: `这是${term}。`, pinyin: "", translation: "đây là", quality: 1 }] : [] });
+  const words = ["猫", "狗", "鱼", "鸟", "马", "牛"].map((t, i) => mk(t, i % 2 === 0));
+  it("tối đa 5 câu, mỗi từ một lần, đáp án là từ cần nói", () => {
+    const q = buildSpeakingQuiz(words, () => 0.4, 5);
+    expect(q).toHaveLength(5);
+    expect(new Set(q.map((x) => x.term)).size).toBe(5);
+    for (const x of q) expect(x.answer).toBe(x.term);
+  });
+  it("nhại câu thật cần câu ví dụ, không có thì đổi sang đọc to từ", () => {
+    const q = buildSpeakingQuiz(words.map((w) => ({ ...w, examples: [] })), () => 0.4, 6);
+    expect(q.every((x) => x.kind !== "shadow")).toBe(true);
+    const withEx = buildSpeakingQuiz(words.map((w) => mk(w.term, true)), () => 0.4, 6);
+    expect(withEx.some((x) => x.kind === "shadow" && x.prompt.includes(x.term))).toBe(true);
+  });
+  it("nhìn nghĩa nói từ hiện nghĩa tiếng Việt, đọc to hiện chữ Hán kèm nghĩa gợi ý", () => {
+    const q = buildSpeakingQuiz(words, () => 0.4, 6);
+    expect(q.find((x) => x.kind === "recall")!.prompt).toMatch(/^nghĩa /);
+    const say = q.find((x) => x.kind === "say")!;
+    expect(say.prompt).toBe(say.term);
+    expect(say.hint).toMatch(/^nghĩa /);
+  });
+  it("ít hơn 1 từ có pinyin thì rỗng", () => { expect(buildSpeakingQuiz([], () => 0.5)).toEqual([]); });
+});

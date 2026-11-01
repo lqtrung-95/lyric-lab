@@ -16,6 +16,8 @@ import { useLearnerState } from "@/lib/user-state/use-learner-state";
 import { PetMini } from "@/components/pet/pet-mini";
 import { CelebrationBurst } from "./celebration-burst";
 import { cardsToAdd } from "@/lib/courses/unit-card";
+import { isLevelId, isLevelUnlocked, levelById, passedLevels, UNIT_LEVELS, withLevelScore, type LevelId } from "@/lib/courses/unit-levels";
+import { UnitLevelList } from "./unit-level-list";
 import { UnitLearnStep } from "./unit-learn-step";
 import { UnitListenStep } from "./unit-listen-step";
 import { UnitQuickReview } from "./unit-quick-review";
@@ -36,18 +38,21 @@ const STEPS: { id: Exclude<Step, "result">; label: string }[] = [
  * Màn một chặng của lộ trình: chặng học là làm quen từ → nghe trong câu thật → kiểm tra; chặng ôn tổng hợp (ôn nhóm chặng, kiểm tra cuối cấp) chỉ có bài kiểm tra.
  * Kết quả lưu vào tiến độ (điểm cao nhất, hoàn thành từ 70%); từ làm sai (có câu thật làm nguồn) tự vào bộ thẻ ôn.
  */
-export function UnitScreen({ slug, idx, mode }: { slug: string; idx: number; /** "review": ôn nhanh một chặng đã học (không học lại, không đổi trạng thái hoàn thành). */ mode?: "review" }) {
+export function UnitScreen({ slug, idx, mode, level = 1 }: { slug: string; idx: number; /** "review": ôn nhanh một chặng đã học (không học lại, không đổi trạng thái hoàn thành). */ mode?: "review"; /** Cấp của chặng (1–5): cấp 1 là luồng đầy đủ; cấp 2–5 vào thẳng bài kiểm tra riêng của cấp. */ level?: number }) {
+  const lv = levelById(isLevelId(level) ? level : 1)!;
+  const levelRun = lv.id > 1;
   const unit = useUnit(slug, idx);
-  const [step, setStep] = useState<Step>("learn");
-  const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; first: boolean; added: number } | null>(null);
+  const [step, setStep] = useState<Step>(levelRun ? "quiz" : "learn");
+  const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; first: boolean; added: number; level: LevelId } | null>(null);
   const { state: learner, toggleSaved } = useLearnerState();
   const [prev, setPrev] = useState<UnitProgress | undefined>();
+  const [prevReady, setPrevReady] = useState(false);
   const unitId = unit.status === "ready" ? unit.detail.unit.id : null;
 
   useEffect(() => {
     if (!unitId) return;
     let cancelled = false;
-    void listUnitProgress().then((all) => { if (!cancelled) setPrev(all.find((p) => p.unitId === unitId)); });
+    void listUnitProgress().then((all) => { if (!cancelled) { setPrev(all.find((p) => p.unitId === unitId)); setPrevReady(true); } });
     return () => { cancelled = true; };
   }, [unitId]);
 
@@ -67,26 +72,45 @@ export function UnitScreen({ slug, idx, mode }: { slug: string; idx: number; /**
   const hasNext = detail.unit.idx < detail.unit.total;
 
   const isReview = detail.unit.kind !== "hsk";
+  const runLevel = levelRun && !isReview;
+  const passedBefore = passedLevels(prev);
   if (mode === "review" && !isReview) return <UnitQuickReview slug={slug} detail={detail} />;
 
   async function finish(percent: number, passed: boolean, wrongTerms: string[], rightTerms: string[]) {
     recordQuizOutcome(wrongTerms, rightTerms.filter((t) => !wrongTerms.includes(t))); // từ hay sai được ưu tiên ở chặng ôn tổng hợp
-    const saved = await saveUnitProgress(detail.unit.id, prev, { status: passed ? "completed" : "in_progress", score: percent });
+    // Cấp 2–5: chỉ ghi điểm của cấp vào `stepState.levels`, không đổi trạng thái hoàn thành hay điểm cấp 1 của chặng.
+    const saved = runLevel
+      ? await saveUnitProgress(detail.unit.id, prev, { status: prev?.status ?? "in_progress", score: prev?.bestScore ?? 0, stepState: passed ? withLevelScore(prev?.stepState, lv.id, percent) : prev?.stepState })
+      : await saveUnitProgress(detail.unit.id, prev, { status: passed ? "completed" : "in_progress", score: percent });
     // Đạt chặng học thì cả chặng vào bộ ôn (từ biết rồi cũng cần được nhắc lại đúng lúc); chưa đạt hoặc chặng ôn tổng hợp thì chỉ các từ làm sai. Từ chưa có câu thật vẫn có thẻ (không có nguồn).
     const have = new Set(learner.saved.map((x) => x.key));
-    const fresh = cardsToAdd(detail.words, wrongTerms, passed && !isReview, have);
+    const fresh = cardsToAdd(detail.words, wrongTerms, passed && !isReview && !runLevel, have);
     fresh.forEach((x) => toggleSaved(x));
     if (passed) playSfx("complete");
     if (saved && passed) refreshGameSummary(); // cập nhật cấp/XP ở thanh trên
-    setResult({ percent, passed, saved, first: prev?.status !== "completed", added: fresh.length });
+    setResult({ percent, passed, saved, first: prev?.status !== "completed" && !runLevel, added: fresh.length, level: lv.id });
     setStep("result");
   }
+
+  if (runLevel && !prevReady) return <p role="status" className="py-space-lg text-body-md text-on-surface-variant">Đang tải…</p>;
+  if (runLevel && !isLevelUnlocked(lv.id, passedBefore)) {
+    return (
+      <div className="mx-auto max-w-3xl space-y-space-md">
+        <p className="card-ink p-space-md text-body-lg">Cấp {lv.id} ({lv.name}) chưa mở. Hãy qua các cấp trước của chặng này nhé.</p>
+        <UnitLevelList slug={slug} idx={detail.unit.idx} progress={prev} />
+        <Link href={`/courses?course=${slug}`} className="inline-flex min-h-11 items-center text-label-md font-bold text-primary underline">Về lộ trình</Link>
+      </div>
+    );
+  }
+  // Cấp tiếp theo mở ngay sau lượt này (nếu vừa qua cấp), để gợi ý đi tiếp.
+  const passedNow = result?.passed && runLevel ? [...new Set([...passedBefore, lv.id])] : result?.passed && !isReview ? [...new Set([...passedBefore, 1 as LevelId])] : passedBefore;
+  const nextLevel = UNIT_LEVELS.find((l) => l.id > (result?.level ?? lv.id) && isLevelUnlocked(l.id, passedNow) && !passedNow.includes(l.id));
 
   return (
     <div className="mx-auto max-w-3xl space-y-space-md">
       <Link href={`/courses?course=${slug}`} className="inline-flex min-h-11 items-center gap-1 text-label-md font-medium text-primary hover:underline"><Icon name="arrow_back" size={18} /> Lộ trình {detail.course.title}</Link>
       <header>
-        <p className="text-label-md text-on-surface-variant">{detail.unit.kind === "final" ? "Kiểm tra cuối cấp" : detail.unit.kind === "checkpoint" ? "Ôn tập" : "Chặng"} {detail.unit.idx}/{detail.unit.total}</p>
+        <p className="text-label-md text-on-surface-variant">{detail.unit.kind === "final" ? "Kiểm tra cuối cấp" : detail.unit.kind === "checkpoint" ? "Ôn tập" : "Chặng"} {detail.unit.idx}/{detail.unit.total}{runLevel ? ` · Cấp ${lv.id}: ${lv.name}` : ""}</p>
         <h1 className="font-serif text-headline-lg-mobile md:text-headline-lg">{detail.unit.title}</h1>
         {isCourseInDevelopment(slug) && <p className="mt-1 inline-block rounded-full border-2 border-ink/40 bg-surface-container-high px-2 text-label-sm font-bold text-on-surface-variant">Khóa đang phát triển: nghĩa tiếng Việt chưa được rà soát</p>}
       </header>
@@ -104,20 +128,22 @@ export function UnitScreen({ slug, idx, mode }: { slug: string; idx: number; /**
       )}
       {!isReview && step === "learn" && <UnitLearnStep words={detail.words} onNext={() => setStep("listen")} />}
       {step === "listen" && <UnitListenStep words={detail.words} onNext={() => setStep("quiz")} />}
-      {step === "quiz" && <UnitQuizStep words={detail.words} length={detail.unit.quizLength} kinds={isReview ? REVIEW_QUIZ_KINDS : UNIT_QUIZ_KINDS} onFinish={(p, ok, wrong, right) => void finish(p, ok, wrong, right)} />}
+      {step === "quiz" && <UnitQuizStep words={detail.words} length={runLevel ? lv.length : detail.unit.quizLength} kinds={isReview ? REVIEW_QUIZ_KINDS : runLevel ? lv.kinds : UNIT_QUIZ_KINDS} passAt={runLevel ? lv.pass : PASS_PERCENT} speaking={runLevel && lv.speaking === true} minAttempts={lv.minAttempts} onFinish={(p, ok, wrong, right) => void finish(p, ok, wrong, right)} />}
       {step === "result" && result && (
         <div className="card-ink relative overflow-hidden p-space-lg text-center" data-testid="unit-result">
           {result.passed && <CelebrationBurst />}
           {result.passed && <PetMini cheer className="mx-auto mb-1 size-20" />}
           <p className="font-serif text-headline-lg">{result.percent}%</p>
-          <p className="mt-1 text-body-lg">{result.passed ? (detail.unit.kind === "final" ? `Hoàn thành ${detail.course.title}! Giỏi lắm.` : isReview ? "Ôn tập xong! Giỏi lắm." : "Hoàn thành chặng! Giỏi lắm.") : `Chưa đạt ${PASS_PERCENT}%. Ôn lại các từ rồi thử lần nữa nhé.`}</p>
+          <p className="mt-1 text-body-lg">{result.passed ? (detail.unit.kind === "final" ? `Hoàn thành ${detail.course.title}! Giỏi lắm.` : isReview ? "Ôn tập xong! Giỏi lắm." : runLevel ? `Qua cấp ${lv.id} (${lv.name})! Bạn có thêm một sao cho chặng này.` : "Hoàn thành chặng! Giỏi lắm.") : runLevel && lv.speaking ? `Chưa qua cấp nói: cần nói ít nhất ${lv.minAttempts ?? 2} câu và đúng từ ${lv.pass}%. Bỏ qua câu không bị tính sai, thử lại khi bạn sẵn sàng.` : `Chưa đạt ${runLevel ? lv.pass : PASS_PERCENT}%. Ôn lại các từ rồi thử lần nữa nhé.`}</p>
           {result.passed && result.saved && result.first && <p className="mt-2 inline-block rounded-full border-2 border-ink bg-primary-container px-3 py-0.5 text-label-md font-extrabold text-on-primary-container" data-testid="unit-result-xp">+{unitXp(result.percent)} XP <span className="font-medium">(lần hoàn thành đầu, có hạn mức mỗi ngày)</span></p>}
           {result.added > 0 && <p className="mt-1 text-body-md text-on-surface-variant" data-testid="unit-result-added">{result.passed && !isReview ? `Đã thêm ${result.added} từ của chặng vào bộ ôn: các từ sẽ được nhắc lại đúng lúc sắp quên.` : `Đã thêm ${result.added} từ làm sai vào bộ ôn.`}</p>}
           {!result.saved && <p className="mt-1 text-body-sm text-on-surface-variant">Chưa ghi nhớ được tiến độ lần này (mất kết nối?).</p>}
-          {result.passed && <UnitNextSteps slug={slug} words={detail.words} isReview={isReview} />}
+          {!isReview && <div className="mt-space-md text-left"><UnitLevelList slug={slug} idx={detail.unit.idx} progress={prev} extraPassed={passedNow.filter((l) => !passedBefore.includes(l))} currentLevel={result.level} /></div>}
+          {result.passed && !runLevel && <UnitNextSteps slug={slug} words={detail.words} isReview={isReview} />}
           <div className="mt-space-md flex flex-wrap justify-center gap-2">
-            <button type="button" onClick={() => { setStep("learn"); setResult(null); }} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container"><Icon name="replay" size={20} /> {isReview ? "Làm lại bài" : "Học lại chặng"}</button>
-            {result.passed && hasNext && <Link href={`/courses/${slug}/${detail.unit.idx + 1}`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary">Chặng tiếp theo <Icon name="arrow_forward" size={20} /></Link>}
+            <button type="button" onClick={() => { setStep("learn"); setResult(null); }} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container"><Icon name="replay" size={20} /> {isReview ? "Làm lại bài" : runLevel ? "Làm lại cấp này" : "Học lại chặng"}</button>
+            {nextLevel && <Link href={`/courses/${slug}/${detail.unit.idx}?level=${nextLevel.id}`} className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-ink bg-primary-container px-6 text-label-md font-extrabold">Cấp {nextLevel.id}: {nextLevel.name} <Icon name="arrow_forward" size={20} /></Link>}
+            {result.passed && hasNext && !runLevel && <Link href={`/courses/${slug}/${detail.unit.idx + 1}`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-primary px-6 text-label-md font-semibold text-on-primary">Chặng tiếp theo <Icon name="arrow_forward" size={20} /></Link>}
             <Link href={`/courses?course=${slug}`} className="inline-flex min-h-12 items-center rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container">Về lộ trình</Link>
           </div>
         </div>
