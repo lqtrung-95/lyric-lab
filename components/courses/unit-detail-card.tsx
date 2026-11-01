@@ -4,6 +4,7 @@ import Link from "next/link";
 import { wordLabel } from "@/lib/courses/build-unit-quiz";
 import { playChinese } from "@/lib/speech/play-chinese";
 import { Icon } from "@/components/ui/icon";
+import { nextLevel, passedLevels } from "@/lib/courses/unit-levels";
 import { UnitLevelList } from "./unit-level-list";
 import type { MapUnit } from "./use-course-map";
 import { useUnit } from "./use-unit";
@@ -35,6 +36,8 @@ function ReviewUnitCard({ slug, unit, total }: { slug: string; unit: MapUnit; to
 function HskUnitCard({ slug, unit, total }: { slug: string; unit: MapUnit; total: number }) {
   const state = useUnit(slug, unit.idx);
   const done = unit.progress?.status === "completed";
+  const next = done ? nextLevel(unit.progress) : null;
+  const nPassed = passedLevels(unit.progress).length;
   const words = state.status === "ready" ? state.detail.words.slice(0, FOCUS_WORDS) : [];
   const examples = state.status === "ready" ? state.detail.words.filter((w) => w.examples.length > 0).length : 0;
   return (
@@ -60,10 +63,15 @@ function HskUnitCard({ slug, unit, total }: { slug: string; unit: MapUnit; total
           </li>
         ))}
       </ul>
-      <Link href={`/courses/${slug}/${unit.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg">
-        <Icon name={done ? "replay" : "play_arrow"} filled size={22} />{done ? `Học lại chặng ${unit.idx}` : unit.progress ? `Tiếp tục chặng ${unit.idx}` : `Vào chặng ${unit.idx}`}
-      </Link>
-      {unit.progress && <p className="mt-2 text-center text-label-md font-bold text-on-surface-variant">{done ? "Đã hoàn thành" : "Đang học"} · điểm cao nhất {unit.progress.bestScore}%</p>}
+      {next ? (
+        <>
+          <Link href={`/courses/${slug}/${unit.idx}?level=${next.id}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg"><Icon name="play_arrow" filled size={22} />Tiếp tục: Cấp {next.id} – {next.name}</Link>
+          <Link href={`/courses/${slug}/${unit.idx}`} className="mt-2 inline-flex min-h-11 w-full items-center justify-center gap-1 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-extrabold"><Icon name="replay" size={18} />Học lại chặng {unit.idx}</Link>
+        </>
+      ) : (
+        <Link href={`/courses/${slug}/${unit.idx}`} className="btn-3d btn-3d-bright mt-space-md w-full text-body-lg"><Icon name={done ? "replay" : "play_arrow"} filled size={22} />{done ? `Học lại chặng ${unit.idx}` : unit.progress ? `Tiếp tục chặng ${unit.idx}` : `Vào chặng ${unit.idx}`}</Link>
+      )}
+      {unit.progress && <p className="mt-2 text-center text-label-md font-bold text-on-surface-variant">{done ? `Đã qua ${nPassed}/5 cấp` : "Đang học"} · điểm cao nhất {unit.progress.bestScore}%</p>}
       {done && (
         <div className="mt-space-md">
           <h3 className="mb-1 text-label-md font-extrabold uppercase tracking-wide text-on-surface-variant">Các cấp của chặng</h3>

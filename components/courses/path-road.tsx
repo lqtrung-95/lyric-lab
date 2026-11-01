@@ -8,6 +8,8 @@ import { starsOf } from "@/lib/courses/unit-levels";
 import type { MapUnit } from "./use-course-map";
 
 const isDone = (u: MapUnit) => u.progress?.status === "completed";
+/** Chặng học đã qua cấp 1 nhưng chưa đủ 5 cấp: màu nhạt + chấm tiến độ; chỉ đủ 5 cấp mới ✓ xanh đậm. Chặng ôn tổng hợp chỉ có 1 cấp nên xong là đủ. */
+const isFull = (u: MapUnit) => isDone(u) && (u.kind !== "hsk" || starsOf(u.progress) >= 5);
 const needsReview = (u: MapUnit) => isDone(u) && u.strength?.needsReview === true;
 const reviewIcon = (u: MapUnit) => (u.kind === "final" ? "emoji_events" : "quiz");
 
@@ -33,6 +35,8 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
         {units.map((u, i) => {
           const p = points[i];
           const done = isDone(u);
+          const full = isFull(u);
+          const stars = starsOf(u.progress);
           const current = u.idx === currentIdx;
           const selected = u.idx === selectedIdx;
           const review = u.kind !== "hsk";
@@ -42,11 +46,12 @@ export function PathRoad({ units, currentIdx, selectedIdx, onSelect }: { units: 
           return (
             <li key={u.id} ref={current ? currentRef : undefined} className="absolute" style={{ left: `${p.x}%`, top: p.y, transform: "translate(-50%, -50%)" }}>
               <button type="button" onClick={() => onSelect(u.idx)} aria-pressed={selected}
-                aria-label={`${review ? "" : "Chặng "}${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}${done ? `, ${starsOf(u.progress)} trên 5 sao` : ""}${needsReview(u) ? `, cần ôn (${u.strength!.fading} từ sắp quên)` : ""}`}
+                aria-label={`${review ? "" : "Chặng "}${u.idx}: ${u.title}${done ? ", đã xong" : current ? ", chặng tiếp theo" : ""}${done && u.kind === "hsk" ? `, đã qua ${stars} trên 5 cấp` : ""}${needsReview(u) ? `, cần ôn (${u.strength!.fading} từ sắp quên)` : ""}`}
                 style={{ width: size, height: size }}
-                className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-ink text-body-lg font-black shadow-[0_4px_0_var(--shadow-ink)] transition-transform active:translate-y-1 active:shadow-none motion-reduce:transition-none ${done ? "bg-secondary text-on-secondary" : current ? "bg-primary-container text-on-primary-container" : review ? "bg-tertiary-container text-on-tertiary-container" : "bg-surface-container-lowest text-on-surface"} ${selected ? "ring-4 ring-primary/60 ring-offset-2 ring-offset-surface" : ""}`}>
+                className={`relative flex items-center justify-center rounded-2xl border-[2.5px] border-ink text-body-lg font-black shadow-[0_4px_0_var(--shadow-ink)] transition-transform active:translate-y-1 active:shadow-none motion-reduce:transition-none ${full ? "bg-secondary text-on-secondary" : done ? "bg-secondary-container text-on-secondary-container" : current ? "bg-primary-container text-on-primary-container" : review ? "bg-tertiary-container text-on-tertiary-container" : "bg-surface-container-lowest text-on-surface"} ${selected ? "ring-4 ring-primary/60 ring-offset-2 ring-offset-surface" : ""}`}>
                 {done ? <Icon name="check" size={28} /> : current ? <Icon name="star" size={32} filled /> : review ? <Icon name={reviewIcon(u)} size={28} filled /> : u.idx}
-                {done && starsOf(u.progress) > 1 && <span aria-hidden="true" className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-1.5 text-[10px] font-black leading-4 text-primary">{"★".repeat(starsOf(u.progress))}</span>}
+                {done && u.kind === "hsk" && !full && <span aria-hidden="true" className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 gap-0.5 rounded-full border-2 border-ink bg-surface-container-lowest px-1.5 py-1">{[1, 2, 3, 4, 5].map((n) => <span key={n} className={`size-2 rounded-full border border-ink ${n <= stars ? "bg-secondary" : "bg-surface-container-high"}`} />)}</span>}
+                {full && u.kind === "hsk" && <span aria-hidden="true" className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-tertiary-container px-1.5 text-[10px] font-black leading-4">★★★★★</span>}
                 {needsReview(u) && <span aria-hidden="true" title="Cần ôn" className="absolute -right-2 -top-2 flex size-6 items-center justify-center rounded-full border-2 border-ink bg-error-container"><Icon name="schedule" size={14} /></span>}
                 {current && <span aria-hidden="true" className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border-2 border-ink bg-surface-container-lowest px-2 text-label-sm font-black">Đang học</span>}
               </button>
