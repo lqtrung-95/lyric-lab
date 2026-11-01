@@ -1,5 +1,6 @@
 "use client";
 
+import { SceneIcon } from "./scene-icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { AnalyzedLine, PreviewItem } from "@/lib/analysis/analysis-types";
@@ -12,14 +13,12 @@ import { scenesForSong, songTermSet, type SongSceneMatch } from "@/lib/explore/s
  */
 export function SongScenesCard({ items, lines, className = "" }: { items: readonly PreviewItem[]; lines: readonly AnalyzedLine[]; className?: string }) {
   const [matches, setMatches] = useState<SongSceneMatch[] | null>(null);
-  const [emoji, setEmoji] = useState<Record<string, string>>({});
 
   useEffect(() => {
     let live = true;
-    Promise.all([import("@/lib/explore/scenes"), import("@/lib/explore/town-layout")]).then(([{ SCENES }, { SCENE_EMOJI }]) => {
+    import("@/lib/explore/scenes").then(({ SCENES }) => {
       if (!live) return;
       const found = scenesForSong(songTermSet(items, lines), Object.values(SCENES), loadProgress(window.localStorage));
-      setEmoji(SCENE_EMOJI);
       setMatches(found);
     }).catch(() => { if (live) setMatches([]); });
     return () => { live = false; };
@@ -34,7 +33,7 @@ export function SongScenesCard({ items, lines, className = "" }: { items: readon
         {matches.map((m) => (
           <li key={m.sceneId}>
             <Link href={`/explore/${m.sceneId}`} className="flex min-h-14 items-center gap-3 rounded-xl border-2 border-ink bg-surface-container-lowest p-2 hover:bg-surface-container-low">
-              <span aria-hidden="true" className="text-2xl">{emoji[m.sceneId] ?? "🏙️"}</span>
+              <SceneIcon id={m.sceneId} size={32} />
               <span className="min-w-0 flex-1">
                 <span className="block text-label-lg font-extrabold">{m.title}</span>
                 <span lang="zh" className="block truncate text-body-md">{m.terms.join("、")}</span>

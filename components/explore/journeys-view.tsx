@@ -1,5 +1,7 @@
 "use client";
 
+import { SceneIcon } from "./scene-icon";
+import { InkIcon } from "./ink-icon";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -7,7 +9,6 @@ import { RubyLine } from "@/components/ui/ruby-text";
 import type { ExploreProgress } from "@/lib/explore/explore-progress";
 import { JOURNEYS, journeyStatus, type Journey, type JourneyStatus } from "@/lib/explore/journeys";
 import { SCENES } from "@/lib/explore/scenes";
-import { SCENE_EMOJI } from "@/lib/explore/town-layout";
 
 /** Pinyin (từ từ điển, qua server) của tên và câu hướng dẫn; tải khi mở tab, lỗi thì bỏ qua (chỉ thiếu dòng pinyin). */
 function useJourneyPinyin(): Record<string, string> {
@@ -44,7 +45,7 @@ function JourneyCard({ j, st, pinyin }: { j: Journey; st: JourneyStatus; pinyin:
             <li key={`${s.sceneId}-${i}`}>
               <Link href={`/explore/${s.sceneId}`} aria-current={isCurrent ? "step" : undefined}
                 className={`flex min-h-14 items-center gap-3 rounded-xl border-2 p-2 transition-colors hover:bg-surface-container-low ${isCurrent ? "border-ink bg-primary-container" : ss.done ? "border-ink/40 bg-secondary-container/50" : "border-ink/25 bg-surface-container-lowest"}`}>
-                <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-xl">{ss.done ? "✅" : SCENE_EMOJI[s.sceneId]}</span>
+                <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-xl">{ss.done ? <InkIcon name="solved" size={28} /> : <SceneIcon id={s.sceneId} size={30} />}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block text-label-lg font-extrabold">Chặng {i + 1}: {scene?.title}{isCurrent ? " · đang ở đây" : ""}</span>
                   <span lang="zh-Hans" className="block text-body-md font-bold leading-[2.1]"><RubyLine zh={s.zh} pinyin={pinyin[s.zh]} show={!!pinyin[s.zh]} /></span>

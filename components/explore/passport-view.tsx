@@ -1,5 +1,6 @@
 "use client";
 
+import { SceneIcon } from "./scene-icon";
 import Link from "next/link";
 import { useMemo } from "react";
 import { ProgressBar } from "@/components/ui/progress-bar";
@@ -7,7 +8,7 @@ import type { ExploreProgress } from "@/lib/explore/explore-progress";
 import { completedJourneys, JOURNEYS } from "@/lib/explore/journeys";
 import { newScenesToday, nextDestination, passportSummary, sceneStamp, STAMP_LABELS, STAMP_MEDALS, type SceneStamp, type StampTier } from "@/lib/explore/passport";
 import { SCENES } from "@/lib/explore/scenes";
-import { SCENE_EMOJI, TOWN_DISTRICTS } from "@/lib/explore/town-layout";
+import { TOWN_DISTRICTS } from "@/lib/explore/town-layout";
 
 const RING: Record<StampTier, string> = { 0: "#b9ad9c", 1: "#b9772f", 2: "#8f9bab", 3: "#e0a800" };
 const TILT = [-4, 3, -2, 5, -5, 2];
@@ -73,7 +74,7 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
 
       {destScene && dest && (
         <Link href={`/explore/${destScene.id}`} className="card-ink flex items-center gap-space-sm bg-primary-container p-space-sm text-on-primary-container transition-transform hover:-translate-y-0.5">
-          <span aria-hidden="true" className="text-3xl">{SCENE_EMOJI[destScene.id]}</span>
+          <SceneIcon id={destScene.id} size={44} />
           <span className="min-w-0 flex-1">
             <span className="block text-label-md font-bold">Điểm đến gợi ý</span>
             <span className="block text-label-lg font-extrabold">{destScene.title}</span>
@@ -97,7 +98,7 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
                     className="group flex min-h-11 flex-col items-center gap-0.5 rounded-xl text-center focus-visible:outline-2 focus-visible:outline-primary">
                     <span className={`relative flex size-16 items-center justify-center rounded-full bg-white/80 transition-transform group-hover:scale-105 ${st.tier === 0 ? "border-4 border-dashed" : "border-[5px]"}`}
                       style={{ borderColor: RING[st.tier], transform: st.tier > 0 ? `rotate(${TILT[i % TILT.length]}deg)` : undefined }}>
-                      <span aria-hidden="true" className={`text-2xl ${st.tier === 0 ? "opacity-30 brightness-0" : ""}`}>{st.tier === 0 ? "?" : SCENE_EMOJI[id]}</span>
+                      {st.tier === 0 ? <span aria-hidden="true" className="text-2xl opacity-30 brightness-0">?</span> : <SceneIcon id={id} size={36} />}
                       {st.tier > 0 && <span aria-hidden="true" className="absolute -bottom-2 -right-2 text-xl">{STAMP_MEDALS[st.tier]}</span>}
                     </span>
                     <span className="px-0.5 text-[11px] font-extrabold leading-tight text-[#4a2e1b]">{s.title}</span>

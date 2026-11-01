@@ -1,9 +1,10 @@
 "use client";
 
+import { SceneIcon } from "./scene-icon";
 import { InkIcon, type InkIconName } from "./ink-icon";
 import Link from "next/link";
 import { SCENES } from "@/lib/explore/scenes";
-import { SCENE_EMOJI, TOWN_DISTRICTS } from "@/lib/explore/town-layout";
+import { TOWN_DISTRICTS } from "@/lib/explore/town-layout";
 import { STAMP_MEDALS, STAMP_LABELS, type StampTier } from "@/lib/explore/passport";
 import type { CaseSummary } from "./explore-hub";
 
@@ -54,7 +55,7 @@ export function TownMap({ cases, learned, fading, caseState, lastScene, tiers = 
                       <Link href={`/explore/${id}`} aria-label={`${s.title}, ${n}/${s.objects.length} từ đã học${tiers[id] ? `, dấu ${STAMP_LABELS[tiers[id]]}` : ""}${fading[id] ? `, ${fading[id]} từ đang phai` : ""}`}
                         className="group flex min-h-[5.5rem] flex-col items-center overflow-hidden rounded-xl border-2 border-ink bg-white text-center transition-transform hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-primary">
                         <span className="h-2.5 w-full" style={{ background: d.roof }} />
-                        <span aria-hidden="true" className={`mt-1 text-2xl transition ${foggy ? "opacity-35 brightness-0" : ""}`}>{SCENE_EMOJI[id]}</span>
+                        <SceneIcon id={id} size={40} className={`mt-1 transition ${foggy ? "opacity-35 brightness-0" : ""}`} />
                         <span className="px-1 text-[11px] font-extrabold leading-tight text-[#4a2e1b]">{s.title}</span>
                         <span className="mx-2 mb-1.5 mt-auto h-1.5 w-[calc(100%-1rem)] overflow-hidden rounded-full bg-[#4a2e1b]/15">
                           <span className="block h-full rounded-full" style={{ width: `${(n / s.objects.length) * 100}%`, background: d.roof }} />
