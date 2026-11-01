@@ -1,6 +1,7 @@
 "use client";
 
 import { EmojiIcon } from "@/components/ui/emoji-icon";
+import { SceneIcon } from "@/components/explore/scene-icon";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
@@ -32,14 +33,14 @@ export function DialogueBrowser({ dialogues }: { dialogues: DialogueSummary[] })
       </div>
       <div role="group" aria-label="Lọc theo chủ đề" className="flex flex-wrap gap-2">
         <button type="button" aria-pressed={topic === null} onClick={() => setTopic(null)} className={chip(topic === null)}>Mọi chủ đề</button>
-        {DIALOGUE_TOPICS.map((t) => <button key={t.id} type="button" aria-pressed={topic === t.id} onClick={() => setTopic(t.id)} className={chip(topic === t.id)}>{t.emoji} {t.label}</button>)}
+        {DIALOGUE_TOPICS.map((t) => <button key={t.id} type="button" aria-pressed={topic === t.id} onClick={() => setTopic(t.id)} className={chip(topic === t.id)}><EmojiIcon e={t.emoji} /> {t.label}</button>)}
       </div>
       <p role="status" className="text-label-lg text-on-surface-variant">{shown.length} hội thoại</p>
       <ul className="grid gap-space-sm sm:grid-cols-2 lg:grid-cols-3">
         {shown.map((d) => (
           <li key={d.id}>
             <Link href={`/dialogues/${d.id}`} className="card-ink flex h-full items-start gap-space-sm bg-surface-container-lowest p-space-sm transition-transform hover:-translate-y-0.5">
-              <EmojiIcon e={emoji(d.topic)} size={36} />
+              {d.sceneId ? <SceneIcon id={d.sceneId} size={40} /> : <EmojiIcon e={emoji(d.topic)} size={36} />}
               <span className="min-w-0">
                 <span className="block text-body-lg font-extrabold">{d.title.vi}</span>
                 {d.title.zh && <span lang="zh-Hans" className="block text-body-md font-bold text-on-surface-variant">{d.title.zh}</span>}
