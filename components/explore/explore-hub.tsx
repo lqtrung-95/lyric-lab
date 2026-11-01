@@ -81,7 +81,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
       </div>
 
       <Link href="/explore/coop" className="card-ink flex flex-wrap items-center gap-space-sm bg-secondary-container p-space-sm text-on-secondary-container transition-transform hover:-translate-y-0.5">
-        <span aria-hidden="true" className="flex gap-1"><InkIcon name="case" size={36} /><InkIcon name="case" size={36} /></span>
+        <span aria-hidden="true" className="flex gap-1"><InkIcon name="case" size={52} /><InkIcon name="case" size={52} className="-ml-4" /></span>
         <span className="min-w-[10rem] flex-1">
           <span className="block text-label-lg font-extrabold">Phá án cùng bạn</span>
           <span className="block text-label-md">Hai người một vụ án, mỗi người một nửa số cảnh. Manh mối là riêng: báo nhau bằng tiếng Trung rồi cùng buộc tội. Thưởng XP x1,5.</span>
@@ -100,7 +100,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
 
       {totalFading(fading) > 0 && (
         <Link href={`/explore/${mostFadingScene(fading)}?rescue=1`} className="card-ink flex flex-wrap items-center gap-space-sm bg-primary-container p-space-sm text-on-primary-container transition-transform hover:-translate-y-0.5">
-          <span aria-hidden="true" className="anim-float"><InkIcon name="ghost" size={40} /></span>
+          <span aria-hidden="true" className="anim-float"><InkIcon name="ghost" size={52} /></span>
           <span className="min-w-[10rem] flex-1">
             <span className="block text-label-lg font-extrabold">{totalFading(fading)} từ đang phai ở {Object.keys(fading).length} cảnh</span>
             <span className="block text-label-md">Chạm để vào cảnh phai nhiều nhất và cứu chúng bằng một lượt nhiệm vụ ngắn.</span>

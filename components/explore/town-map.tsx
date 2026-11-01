@@ -31,7 +31,7 @@ export function TownMap({ cases, learned, fading, caseState, lastScene, tiers = 
 
   return (
     <div className="flex flex-col gap-space-md">
-      <p className="text-label-md text-on-surface-variant">Đã ghé {visited}/{Object.keys(SCENES).length} nơi trong thị trấn. Chạm vào một tòa nhà để vào cảnh; chạm ghim <InkIcon name="case" size={16} className="inline-block align-text-bottom" /> để mở vụ án bắt đầu ở đó.</p>
+      <p className="text-label-md text-on-surface-variant">Đã ghé {visited}/{Object.keys(SCENES).length} nơi trong thị trấn. Chạm vào một tòa nhà để vào cảnh; chạm ghim <InkIcon name="case" size={26} className="inline-block align-middle" /> để mở vụ án bắt đầu ở đó.</p>
       <div className="grid gap-space-sm lg:grid-cols-2">
         {TOWN_DISTRICTS.map((d) => {
           const total = d.scenes.reduce((n, id) => n + (SCENES[id]?.objects.length ?? 0), 0);
@@ -39,7 +39,7 @@ export function TownMap({ cases, learned, fading, caseState, lastScene, tiers = 
           return (
             <section key={d.id} aria-label={d.name} className="rounded-2xl border-[3px] border-ink p-space-sm shadow-[0_3px_0_rgba(74,46,27,0.25)]" style={{ background: d.ground }}>
               <header className="mb-2 flex items-center justify-between gap-2" style={{ color: "#4a2e1b" }}>
-                <h2 className="flex items-center gap-1.5 text-label-lg font-extrabold"><InkIcon name={d.id as InkIconName} size={26} />{d.name}</h2>
+                <h2 className="flex items-center gap-1.5 text-label-lg font-extrabold"><InkIcon name={d.id as InkIconName} size={34} />{d.name}</h2>
                 <span className="rounded-full border-2 border-ink bg-white/70 px-2 text-label-md font-extrabold">{got}/{total} từ</span>
               </header>
               <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
@@ -61,13 +61,13 @@ export function TownMap({ cases, learned, fading, caseState, lastScene, tiers = 
                         </span>
                       </Link>
                       {(tiers[id] ?? 0) > 0 && <span aria-hidden="true" className="pointer-events-none absolute -bottom-1.5 -left-1 text-base drop-shadow">{STAMP_MEDALS[tiers[id]]}</span>}
-                      {fading[id] > 0 && <span aria-hidden="true" className="anim-float pointer-events-none absolute -left-1 -top-2"><InkIcon name="ghost" size={22} /></span>}
-                      {lastScene === id && <span className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-ink bg-primary-container px-1.5 text-[10px] font-extrabold leading-4 text-on-primary-container"><span className="inline-flex items-center gap-0.5"><InkIcon name="pin" size={12} />Bạn ở đây</span></span>}
+                      {fading[id] > 0 && <span aria-hidden="true" className="anim-float pointer-events-none absolute -left-1 -top-2"><InkIcon name="ghost" size={32} /></span>}
+                      {lastScene === id && <span className="pointer-events-none absolute -bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full border-2 border-ink bg-primary-container py-0.5 pl-1 pr-2 text-[11px] font-extrabold leading-4 text-on-primary-container shadow-[0_2px_0_rgba(74,46,27,0.3)]"><InkIcon name="pin" size={18} />Bạn ở đây</span>}
                       {pins.map((c, i) => (
                         <Link key={c.id} href={`/explore/cases/${c.id}`} aria-label={`Vụ án: ${c.title}${caseState[c.id]?.solved ? " (đã giải)" : ""}`}
-                          className="absolute -right-1.5 flex size-7 items-center justify-center rounded-full border-2 border-ink bg-white shadow-[0_2px_0_rgba(74,46,27,0.3)] hover:scale-110"
-                          style={{ top: `${-8 + i * 22}px`, outline: `3px solid ${DIFF_DOT[c.difficulty] ?? "#999"}` }}>
-                          <InkIcon name={caseState[c.id]?.solved ? "solved" : "case"} size={18} />
+                          className="absolute -right-2 flex size-10 items-center justify-center rounded-full border-2 border-ink bg-white shadow-[0_2px_0_rgba(74,46,27,0.3)] hover:scale-110"
+                          style={{ top: `${-12 + i * 32}px`, outline: `3px solid ${DIFF_DOT[c.difficulty] ?? "#999"}` }}>
+                          <InkIcon name={caseState[c.id]?.solved ? "solved" : "case"} size={34} />
                         </Link>
                       ))}
                     </li>
