@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { checkMic, type MicCheck } from "@/lib/speaking/vad-recorder";
 
-interface Props { title: string; steps: string[]; startLabel?: string; onStart: (mic: MicCheck) => void }
+interface Props { title: React.ReactNode; steps: string[]; startLabel?: string; onStart: (mic: MicCheck) => void }
 
 const NOTE: Record<Exclude<MicCheck, "ok">, string> = {
   denied: "Micro đang bị chặn nên bài này sẽ chuyển sang gõ chữ. Muốn nói, hãy bật quyền micro cho trang trong cài đặt trình duyệt rồi tải lại.",

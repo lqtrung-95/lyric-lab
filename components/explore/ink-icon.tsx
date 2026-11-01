@@ -1,0 +1,33 @@
+import type { ReactElement } from "react";
+
+export type InkIconName = "ghost" | "case" | "solved" | "pin" | "home" | "food" | "shopping" | "services" | "culture" | "tech" | "travel" | "fun";
+
+const INK = "#2b2118";
+const W = "#fff", RED = "#e8553d", BRN = "#7a4a2a";
+const S = { stroke: INK, strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
+
+/**
+ * Biểu tượng vẽ tay (SVG, nét mực + tô phẳng) cho các điểm nhấn của màn Khám phá: ma phai, ghim vụ án, khu phố. Thay emoji vì emoji do hệ điều hành
+ * vẽ (Apple, Windows, Android đều khác nhau) còn đây giống nhau trên mọi máy và khớp phong cách viền mực. Trang trí: luôn `aria-hidden`, chữ nghĩa nằm ở nhãn cạnh bên.
+ * Emoji của từng cảnh (SCENE_EMOJI) vẫn dùng font emoji Noto thống nhất (xem `emojiFontUrl`).
+ */
+const SHAPES: Record<InkIconName, ReactElement> = {
+  ghost: <><path d="M6 28V14a10 10 0 0 1 20 0v14l-3.3-3-3.4 3-3.3-3-3.3 3-3.4-3z" fill="#fff" {...S} /><circle cx="12.5" cy="14" r="1.9" fill={INK} /><circle cx="19.5" cy="14" r="1.9" fill={INK} /><ellipse cx="16" cy="19" rx="2.2" ry="2.8" fill="#f08aa0" stroke={INK} strokeWidth="1.5" /></>,
+  case: <><path d="M2.5 31.5c0-6.5 5-9 13.5-9s13.5 2.5 13.5 9z" fill="#c8a27a" {...S} /><path d="m9 23.5 6.5-1.5-1.5 8.5zM23 23.5 16.5 22 18 30.5z" fill="#dcb88e" stroke={INK} strokeWidth="1.6" strokeLinejoin="round" /><path d="m16 23.5-1.8 1.8L16 30l1.8-4.7z" fill={RED} stroke={INK} strokeWidth="1.4" strokeLinejoin="round" /><ellipse cx="16" cy="15.5" rx="6.8" ry="7.4" fill="#ffd9b0" {...S} /><ellipse cx="13" cy="16.2" rx="1.15" ry="1.55" fill={INK} /><ellipse cx="19" cy="16.2" rx="1.15" ry="1.55" fill={INK} /><circle cx="13.4" cy="15.6" r="0.5" fill={W} /><circle cx="19.4" cy="15.6" r="0.5" fill={W} /><circle cx="10.6" cy="18.4" r="1.4" fill="#ff9fae" opacity="0.8" /><circle cx="21.4" cy="18.4" r="1.4" fill="#ff9fae" opacity="0.8" /><path d="M10.8 14.2l3.2-.9M21.2 14.2l-3.2-.9" stroke={INK} strokeWidth="1.5" strokeLinecap="round" /><path d="M12.3 19.2q3.7-2.3 7.4 0q-3.7 2.2-7.4 0z" fill="#4a3c35" stroke={INK} strokeWidth="1" strokeLinejoin="round" /><ellipse cx="16" cy="11" rx="12.5" ry="3" fill="#3b2f2a" {...S} /><path d="M9 10.8C8.6 2.6 23.4 2.6 23 10.8z" fill="#4a3c35" {...S} /><path d="M9.1 9.6q6.9 2.6 13.8 0" fill="none" stroke="#e0a93b" strokeWidth="2.4" strokeLinecap="round" /><circle cx="24.3" cy="24" r="5.6" fill="#dff1ff" {...S} /><path d="M21.6 22a3.4 3.4 0 0 1 2.4-1.6" fill="none" stroke={W} strokeWidth="1.8" strokeLinecap="round" /><path d="m28.4 28 2.8 3" {...S} strokeWidth="3.6" stroke={BRN} /></>,
+  solved: <><circle cx="16" cy="16" r="12" fill="#5fb04a" {...S} /><path d="m10 16.5 4.2 4.2L22.5 12" fill="none" stroke="#fff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" /></>,
+  pin: <><path d="M16 29S6 19.5 6 12.5a10 10 0 0 1 20 0C26 19.5 16 29 16 29z" fill="#ef5f4a" {...S} /><circle cx="16" cy="12.5" r="3.6" fill="#fff" stroke={INK} strokeWidth="1.8" /></>,
+  home: <><rect x="7" y="14" width="18" height="14" rx="1.5" fill="#fff3dc" {...S} /><path d="M3.5 15.5 16 4l12.5 11.5z" fill="#e08a3c" {...S} /><rect x="13" y="20" width="6" height="8" rx="1" fill="#a8693a" stroke={INK} strokeWidth="1.8" /></>,
+  food: <><path d="M4 15h24a12 11 0 0 1-24 0z" fill="#fff" {...S} /><path d="M10 4l7 9M15 3l5 10" fill="none" {...S} /><path d="M7 19h18" fill="none" stroke="#e45f3f" strokeWidth="2.2" strokeLinecap="round" /></>,
+  shopping: <><path d="M12 11V9a4 4 0 0 1 8 0v2" fill="none" {...S} /><path d="M6 11h20l-1.5 17h-17z" fill="#8bc34a" {...S} /><circle cx="12.5" cy="16" r="1.2" fill={INK} /><circle cx="19.5" cy="16" r="1.2" fill={INK} /></>,
+  services: <><path d="M3.5 12 16 4l12.5 8z" fill="#3f86c4" {...S} /><path d="M7 14v10M13 14v10M19 14v10M25 14v10" fill="none" {...S} strokeWidth="2.6" /><rect x="3.5" y="25" width="25" height="3.5" rx="1" fill="#d6e6f7" {...S} /></>,
+  culture: <><path d="M2.5 12 16 5l13.5 7L16 19z" fill="#8062b8" {...S} /><path d="M8 16v6c3 3 13 3 16 0v-6" fill="#b9a2e8" {...S} /><path d="M29 13v8" fill="none" {...S} /></>,
+  tech: <><rect x="6" y="7" width="20" height="14" rx="2" fill="#dfe3f7" {...S} /><path d="M3 25h26" fill="none" {...S} strokeWidth="3" /><path d="m12 12 3 2-3 2M17.5 16.5H21" fill="none" stroke="#4a5fc4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></>,
+  travel: <><rect x="6" y="4" width="20" height="21" rx="6" fill="#2f9a90" {...S} /><rect x="9.5" y="8" width="13" height="8" rx="2" fill="#d4ece8" stroke={INK} strokeWidth="1.8" /><circle cx="11.5" cy="20.5" r="1.4" fill="#fff" /><circle cx="20.5" cy="20.5" r="1.4" fill="#fff" /><path d="m9 29 3-4M23 29l-3-4" fill="none" {...S} /></>,
+  fun: <><circle cx="16" cy="13" r="9" fill="#fff" {...S} /><path d="M16 4v18M7 13h18M9.6 6.6l12.8 12.8M22.4 6.6 9.6 19.4" fill="none" stroke={INK} strokeWidth="1.4" /><circle cx="16" cy="13" r="2" fill="#f4b740" stroke={INK} strokeWidth="1.5" /><path d="m10 29 6-16 6 16" fill="none" {...S} /></>,
+};
+
+export const INK_ICON_NAMES = Object.keys(SHAPES) as InkIconName[];
+
+export function InkIcon({ name, size = 24, className }: { name: InkIconName; size?: number; className?: string }) {
+  return <svg aria-hidden="true" focusable="false" viewBox="0 0 32 32" width={size} height={size} className={className}>{SHAPES[name]}</svg>;
+}

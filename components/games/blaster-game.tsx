@@ -1,5 +1,7 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
+import { Hearts } from "./hearts";
 import { useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { arcadeRound } from "@/lib/games/arcade-score";
@@ -26,8 +28,8 @@ export function BlasterGame({ words }: { words: GameWord[] }) {
   return (
     <div>
       <div role="group" aria-label="Chế độ chơi" className="mb-space-sm flex flex-wrap gap-2">
-        {([["squadron", "✈️ Phi đội", "Lái tàu, bắn đúng chữ theo nghĩa hoặc pinyin"], ["type", "⌨️ Gõ pinyin", "Nhìn chữ, gõ pinyin để bắn"]] as const).map(([m, label, hint]) => (
-          <button key={m} type="button" aria-pressed={mode === m} title={hint} onClick={() => pick(m)} className={`min-h-11 rounded-full border-2 px-4 text-label-lg font-bold ${mode === m ? "border-ink bg-primary-container" : "border-outline-variant bg-surface-container-lowest"}`}>{label}</button>
+        {([["squadron", "✈️|Phi đội", "Lái tàu, bắn đúng chữ theo nghĩa hoặc pinyin"], ["type", "⌨️|Gõ pinyin", "Nhìn chữ, gõ pinyin để bắn"]] as const).map(([m, label, hint]) => (
+          <button key={m} type="button" aria-pressed={mode === m} title={hint} onClick={() => pick(m)} className={`min-h-11 rounded-full border-2 px-4 text-label-lg font-bold ${mode === m ? "border-ink bg-primary-container" : "border-outline-variant bg-surface-container-lowest"}`}>{label.includes("|") ? <><EmojiIcon e={label.split("|")[0]} /> {label.split("|")[1]}</> : label}</button>
         ))}
       </div>
       {mode === "squadron" ? <SquadronGame key={run} words={words} onAgain={again} /> : <Round key={run} words={words} onAgain={again} />}
@@ -70,10 +72,10 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
       <div onClick={() => inputRef.current?.focus()} className={`relative isolate h-[min(68vh,540px)] min-h-[380px] select-none overflow-hidden rounded-3xl border border-white/10 bg-[#040816] ${s.shake > 0 ? "bz-shake" : ""}`}>
         <BlasterScene s={s} showPinyin={hints.pinyin} showMeaning={hints.meaning} />
         <div className="absolute inset-x-3 top-3 z-10 flex flex-wrap items-center justify-between gap-2">
-          <span className={chip}>🏆 {s.score}</span>
+          <span className={chip}><EmojiIcon e="🏆" /> {s.score}</span>
           <span className={chip}>Cấp {s.level}</span>
-          <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join(" ")}</span>
-          {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}>🔥 Combo ×{s.combo}</span>}
+          <span className={chip} aria-label={`${s.lives} mạng`}><Hearts lives={s.lives} max={LIVES} /></span>
+          {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}><EmojiIcon e="🔥" /> Combo ×{s.combo}</span>}
           <SoundToggle className={`${chip} min-h-11 min-w-11`} />
           <HintToggles dark />
         </div>

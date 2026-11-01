@@ -1,5 +1,6 @@
 "use client";
 
+import { InkIcon } from "./ink-icon";
 import type { SceneDetail } from "@/lib/explore/explore-types";
 import { Button3d } from "@/components/ui/button-3d";
 import { ArtSprite } from "./art/art-sprite";
@@ -86,7 +87,7 @@ export function ExploreScene({ scene, story }: { scene: SceneDetail; story?: Sto
         <div className="flex flex-wrap items-center gap-space-sm">
           <Button3d variant="secondary" disabled={!c.ready || !c.canQuest} onClick={c.startQuest}>Nhận nhiệm vụ</Button3d>
           {c.canQuest && c.fadedWords.length > 0 && (
-            <Button3d variant="primary" onClick={c.startRescue}>👻 Cứu {c.fadedWords.length} từ đang phai</Button3d>
+            <Button3d variant="primary" onClick={c.startRescue}><InkIcon name="ghost" size={26} /> Cứu {c.fadedWords.length} từ đang phai</Button3d>
           )}
           {!c.canQuest && <p className="text-label-md text-on-surface-variant">Học ít nhất {MIN_WORDS_FOR_QUEST} từ để mở nhiệm vụ (hoặc đến gặp {scene.npc.name}).</p>}
         </div>

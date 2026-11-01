@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useState } from "react";
 import type { QuizQuestion } from "@/lib/courses/build-unit-quiz";
 import { playSfx } from "@/lib/feedback/sfx";
@@ -44,7 +45,7 @@ export function QuizOrderQuestion({ q, onDone }: { q: QuizQuestion; onDone: (r: 
         <div role="status" className="space-y-1">
           <p className="text-body-lg font-bold">{checked ? "Chính xác!" : "Chưa đúng. Câu đúng là:"}</p>
           <p className="flex flex-wrap items-center gap-2"><span lang="zh-Hans" className="font-serif text-2xl">{q.prompt}</span>
-            <button type="button" onClick={() => void playChinese(q.prompt)} aria-label="Nghe câu" className="inline-flex size-11 items-center justify-center rounded-full bg-surface-container-high text-primary">🔊</button></p>
+            <button type="button" onClick={() => void playChinese(q.prompt)} aria-label="Nghe câu" className="inline-flex size-11 items-center justify-center rounded-full bg-surface-container-high text-primary"><EmojiIcon e="🔊" size={26} /></button></p>
         </div>
       )}
     </div>

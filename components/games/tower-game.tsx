@@ -1,5 +1,7 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
+import { Hearts } from "./hearts";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { usePetView } from "@/components/pet/use-pet-view";
@@ -66,10 +68,10 @@ export function TowerGame({ words }: { words: GameWord[] }) {
       <GameKeyframes />
       <style>{`@media (prefers-reduced-motion: no-preference){@keyframes tw-rush{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-6px) rotate(6deg)}}.tw-rush{animation:tw-rush .18s linear infinite}}`}</style>
       <div className="mb-space-sm flex flex-wrap items-center gap-2">
-        <span className={chip}>🏆 {s.score}</span>
+        <span className={chip}><EmojiIcon e="🏆" /> {s.score}</span>
         <span className={chip}>Đợt {s.wave}</span>
-        <span className={chip} aria-label={`${s.lives} trên ${LIVES} tim`}>{Array.from({ length: LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join("")}</span>
-        <span className={chip} title="Đủ 5 combo, pet bắn cả đàn">⭐ {sinceSuper}/5{s.combo >= 2 ? ` · combo ×${s.combo}` : ""}</span>
+        <span className={chip} aria-label={`${s.lives} trên ${LIVES} tim`}><Hearts lives={s.lives} max={LIVES} /></span>
+        <span className={chip} title="Đủ 5 combo, pet bắn cả đàn"><EmojiIcon e="⭐" /> {sinceSuper}/5{s.combo >= 2 ? ` · combo ×${s.combo}` : ""}</span>
         <SoundToggle className={`${chip} min-h-11 min-w-11`} />
       </div>
       <div className="relative isolate aspect-[16/10] w-full select-none overflow-hidden rounded-3xl border-2 border-ink">

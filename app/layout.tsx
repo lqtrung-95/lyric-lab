@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { NavigationProgress } from "@/components/layout/navigation-progress";
 import { SITE_URL } from "@/lib/seo/site-url";
 import { CjkFontLoader } from "@/components/layout/cjk-font-loader";
-import { iconFontUrl } from "@/lib/ui/google-fonts-url";
+import { emojiFontUrl, iconFontUrl } from "@/lib/ui/google-fonts-url";
 import "./globals.css";
 
 // Font tự host (tải lúc build, phục vụ cùng domain): không phụ thuộc CDN lúc chạy và luôn có bộ glyph tiếng Việt.
@@ -42,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="stylesheet" href={iconFontUrl()} />
+        <link rel="stylesheet" href={emojiFontUrl()} />
       </head>
       <body className="min-h-dvh">
         {/* Liên kết bỏ qua thanh điều hướng cho người dùng bàn phím và trình đọc màn hình (WCAG 2.4.1). */}

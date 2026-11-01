@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
@@ -100,7 +101,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
     <div>
       <GameKeyframes />
       <div className="flex flex-wrap items-center justify-between gap-2 text-label-lg font-extrabold">
-        <span>🔨 {g.score}</span>
+        <span><EmojiIcon e="🔨" /> {g.score}</span>
         <GamePet event={petEv} />
         <SoundToggle className="min-h-11 min-w-11 rounded-full bg-surface-container-low text-xl" />
         <HintToggles />

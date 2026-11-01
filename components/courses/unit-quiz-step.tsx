@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useMemo, useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { wordLabel, buildSpeakingQuiz, buildUnitQuiz, gradeQuiz, PASS_PERCENT, QUIZ_LENGTH, UNIT_QUIZ_KINDS, type QuizKind, type QuizQuestion } from "@/lib/courses/build-unit-quiz";
@@ -92,7 +93,7 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
       </div>
       <p className="flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant" aria-live="polite">
         {isRetry ? <span className="font-bold text-secondary">Làm lại các câu sai {i - mainLen + 1}/{retry.length} (không tính điểm)</span> : <span>Câu {i + 1}/{mainLen} · đúng {correct}</span>}
-        {streak >= 2 && <span key={streak} className="anim-note-pop rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">🔥 {streak} câu liên tiếp</span>}
+        {streak >= 2 && <span key={streak} className="anim-note-pop rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container"><EmojiIcon e="🔥" /> {streak} câu liên tiếp</span>}
       </p>
       <div key={i} className="anim-quiz-in space-y-space-md">
       {PROMPTS[q.kind] && <p className="text-body-lg font-medium">{PROMPTS[q.kind]}</p>}
