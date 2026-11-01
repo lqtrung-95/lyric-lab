@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useEffect } from "react";
 import { sfx } from "@/lib/games/arcade-sfx";
 import { burstParticles, burstSound, type PetBurst } from "@/lib/pet/pet-burst";
@@ -39,7 +40,7 @@ export function PetBurstFx({ burst, species, silent = false }: { burst: PetBurst
     <span aria-hidden="true" key={burst.key} className="pointer-events-none absolute inset-0 overflow-visible">
       <style>{FX_CSS}</style>
       {burstParticles(burst.kind).map((p, i) => (
-        <span key={i} className="pet-particle" style={{ fontSize: `${p.sizeRem}rem`, ["--dx" as string]: `${p.dx}px`, ["--dy" as string]: `${p.dy}px`, ["--delay" as string]: `${p.delayMs}ms` }}>{p.glyph}</span>
+        <span key={i} className="pet-particle" style={{ fontSize: `${p.sizeRem}rem`, ["--dx" as string]: `${p.dx}px`, ["--dy" as string]: `${p.dy}px`, ["--delay" as string]: `${p.delayMs}ms` }}><EmojiIcon e={p.glyph} size={Math.round(p.sizeRem * 16)} /></span>
       ))}
     </span>
   );

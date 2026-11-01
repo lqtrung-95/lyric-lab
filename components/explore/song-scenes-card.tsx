@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { SceneIcon } from "./scene-icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -27,7 +28,7 @@ export function SongScenesCard({ items, lines, className = "" }: { items: readon
   if (!matches || matches.length === 0) return null;
   return (
     <section aria-label="Học tiếp ở Khám phá" className={`card-ink flex flex-col gap-2 p-space-sm ${className}`}>
-      <h2 className="flex items-center gap-2 text-label-lg font-extrabold"><span aria-hidden="true">🧭</span>Học tiếp ở Khám phá</h2>
+      <h2 className="flex items-center gap-2 text-label-lg font-extrabold"><EmojiIcon e="🧭" size={24} />Học tiếp ở Khám phá</h2>
       <p className="text-body-sm text-on-surface-variant">Bài này có từ trùng với các cảnh sau. Vào cảnh để chạm đồ vật, nghe và luyện những từ đó.</p>
       <ul className="flex flex-col gap-2">
         {matches.map((m) => (

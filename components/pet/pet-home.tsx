@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useGrammarStats } from "@/components/grammar/use-grammar-stats";
 import { useRadicalProgress } from "@/components/radicals/use-radical-progress";
 import { isMastered } from "@/lib/grammar/grammar-stats";
@@ -149,7 +150,7 @@ export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: 
           <section aria-label={`Chọn đồ cho ${slot.label}`} className="rounded-2xl bg-surface-container-low p-space-sm">
             <h3 className="text-label-lg font-extrabold">{slot.label}</h3>
             <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3">
-              <button type="button" aria-pressed={curValue === AUTO} onClick={() => choose(slot.id, AUTO)} className={chip(curValue === AUTO)}>✨ Tự chọn món mới nhất</button>
+              <button type="button" aria-pressed={curValue === AUTO} onClick={() => choose(slot.id, AUTO)} className={chip(curValue === AUTO)}><EmojiIcon e="✨" /> Tự chọn món mới nhất</button>
               <button type="button" aria-pressed={curValue === ""} onClick={() => choose(slot.id, "")} className={chip(curValue === "")}>⬜ Để trống</button>
               {options.map((o) => {
                 const elsewhere = HOME_SLOTS.find((x) => x.id !== slot.id && placed[x.id] === o.id);
@@ -189,7 +190,7 @@ export function PetHome({ pet, stage, mood, accessories, base, onFx, onClose }: 
                 <li key={it.id} className="flex items-center gap-2 rounded-xl border-2 border-ink bg-surface-container-lowest p-2">
                   <HomeItemArt id={it.id} className={`size-12 shrink-0 ${open ? "" : "opacity-30 grayscale"}`} />
                   <div className="min-w-0">
-                    <p className="text-label-md font-bold">{open ? it.label : "🔒 " + it.label}</p>
+                    <p className="text-label-md font-bold">{open ? it.label : <><EmojiIcon e="🔒" /> {it.label}</>}</p>
                     {!open && <p className="text-label-sm text-on-surface-variant">{it.how}{pr ? ` (${pr.have}/${pr.need})` : ""}</p>}
                   </div>
                 </li>

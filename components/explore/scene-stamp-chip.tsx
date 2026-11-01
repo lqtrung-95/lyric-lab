@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useEffect, useMemo, useState } from "react";
 import { CelebrationBurst } from "@/components/courses/celebration-burst";
 import type { ExploreProgress } from "@/lib/explore/explore-progress";
@@ -39,7 +40,7 @@ export function SceneStampChip({ scene, title, progress, now, ready }: { scene: 
   return (
     <div className="relative">
       <p className="inline-flex flex-wrap items-center gap-x-2 rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-bold">
-        <span aria-hidden="true">{st.tier > 0 ? STAMP_MEDALS[st.tier] : "🛂"}</span>
+        <span aria-hidden="true"><EmojiIcon e={st.tier > 0 ? STAMP_MEDALS[st.tier] : "🛂"} size={22} /></span>
         <span>Dấu: {STAMP_LABELS[st.tier]}</span>
         <span className="font-medium text-on-surface-variant">· {st.learned}/{st.total} từ</span>
       </p>
@@ -47,7 +48,7 @@ export function SceneStampChip({ scene, title, progress, now, ready }: { scene: 
       {celebrate && (
         <div role="status" className="relative mt-1">
           <CelebrationBurst />
-          <p className="inline-block rounded-full bg-primary-container px-3 py-1 text-label-lg font-extrabold text-on-primary-container">{STAMP_MEDALS[celebrate]} Đóng dấu {STAMP_LABELS[celebrate]} cho {title}!</p>
+          <p className="inline-block rounded-full bg-primary-container px-3 py-1 text-label-lg font-extrabold text-on-primary-container"><EmojiIcon e={STAMP_MEDALS[celebrate]} size={24} /> Đóng dấu {STAMP_LABELS[celebrate]} cho {title}!</p>
         </div>
       )}
     </div>

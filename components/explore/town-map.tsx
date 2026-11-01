@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { SceneIcon } from "./scene-icon";
 import { InkIcon, type InkIconName } from "./ink-icon";
 import Link from "next/link";
@@ -61,7 +62,7 @@ export function TownMap({ cases, learned, fading, caseState, lastScene, tiers = 
                           <span className="block h-full rounded-full" style={{ width: `${(n / s.objects.length) * 100}%`, background: d.roof }} />
                         </span>
                       </Link>
-                      {(tiers[id] ?? 0) > 0 && <span aria-hidden="true" className="pointer-events-none absolute -bottom-1.5 -left-1 text-base drop-shadow">{STAMP_MEDALS[tiers[id]]}</span>}
+                      {(tiers[id] ?? 0) > 0 && <span aria-hidden="true" className="pointer-events-none absolute -bottom-1.5 -left-1 drop-shadow"><EmojiIcon e={STAMP_MEDALS[tiers[id]]} size={22} /></span>}
                       {fading[id] > 0 && <span aria-hidden="true" className="anim-float pointer-events-none absolute -left-1 -top-2"><InkIcon name="ghost" size={32} /></span>}
                       {lastScene === id && <span className="pointer-events-none absolute -bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-full border-2 border-ink bg-primary-container py-0.5 pl-1 pr-2 text-[11px] font-extrabold leading-4 text-on-primary-container shadow-[0_2px_0_rgba(74,46,27,0.3)]"><InkIcon name="pin" size={18} />Bạn ở đây</span>}
                       {pins.map((c, i) => (

@@ -1,3 +1,4 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import Link from "next/link";
 import type { UnitProgress } from "@/lib/courses/course-types";
 import { UNIT_LEVELS, isLevelUnlocked, levelScores, passedLevels } from "@/lib/courses/unit-levels";
@@ -17,7 +18,7 @@ export function UnitLevelList({ slug, idx, progress, extraPassed = [], currentLe
         const body = (
           <>
             <span aria-hidden="true" className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-surface text-label-md font-extrabold">{done ? <Icon name="check" size={16} /> : open ? l.id : <Icon name="block" size={14} />}</span>
-            <span className="min-w-0 flex-1"><span className="block text-label-lg font-extrabold">Cấp {l.id}: {l.name}{l.id === 5 ? " ⭐" : ""}</span><span className="block text-label-sm text-on-surface-variant">{open ? l.blurb : `Qua cấp ${l.id === 3 || l.id === 4 ? 2 : l.id === 5 ? 3 : 1} để mở`}</span></span>
+            <span className="min-w-0 flex-1"><span className="block text-label-lg font-extrabold">Cấp {l.id}: {l.name}{l.id === 5 && <> <EmojiIcon e="⭐" /></>}</span><span className="block text-label-sm text-on-surface-variant">{open ? l.blurb : `Qua cấp ${l.id === 3 || l.id === 4 ? 2 : l.id === 5 ? 3 : 1} để mở`}</span></span>
             {score !== undefined && <span className="shrink-0 text-label-md font-bold">{score}%</span>}
           </>
         );

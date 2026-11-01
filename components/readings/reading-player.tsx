@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { WordTapPanel } from "@/components/speaking/word-tap-panel";
@@ -40,7 +41,7 @@ export function ReadingPlayer({ reading, pinyin, tokens, level }: { reading: Rea
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-space-md pb-56">
       <Link href="/readings" className="inline-flex min-h-11 w-fit items-center text-label-md font-bold underline">← Tất cả truyện</Link>
       <header>
-        <h1 lang="zh-Hans" className="font-serif text-headline-lg"><span aria-hidden="true">{reading.emoji}</span> {reading.title.zh}</h1>
+        <h1 lang="zh-Hans" className="font-serif text-headline-lg"><EmojiIcon e={reading.emoji} size={36} /> {reading.title.zh}</h1>
         <p className="text-body-md text-on-surface-variant">{reading.title.vi}{level ? ` · HSK ${level >= 6 ? "6+" : level}` : ""}</p>
       </header>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Tùy chọn đọc">

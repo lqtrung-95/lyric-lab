@@ -1,3 +1,4 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import Link from "next/link";
 
 const CARDS = [
@@ -57,7 +58,7 @@ export function BeyondSongs() {
       <ul className="mt-space-lg grid gap-space-md lg:grid-cols-3">
         {CARDS.map((c) => (
           <li key={c.title} className={`card-ink flex flex-col p-space-md ${c.accent ? "!bg-secondary-container text-on-secondary-container" : ""}`}>
-            <span aria-hidden="true" className="text-4xl">{c.emoji}</span>
+            <span aria-hidden="true"><EmojiIcon e={c.emoji} size={52} /></span>
             <h3 className="mt-space-sm font-serif text-headline-md text-on-surface">{c.title}</h3>
             <p className="mt-2 text-body-md text-on-surface-variant">{c.body}</p>
             <ul className="mt-space-sm flex flex-wrap gap-1.5">

@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { InkIcon } from "./ink-icon";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -90,7 +91,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
       </Link>
 
       <Link href="/dialogues" className="card-ink flex flex-wrap items-center gap-space-sm bg-tertiary-container p-space-sm text-on-tertiary-container transition-transform hover:-translate-y-0.5">
-        <span aria-hidden="true" className="text-3xl">💬</span>
+        <span aria-hidden="true"><EmojiIcon e="💬" size={40} /></span>
         <span className="min-w-[10rem] flex-1">
           <span className="block text-label-lg font-extrabold">Hội thoại</span>
           <span className="block text-label-md">Nghe từng câu, xem pinyin, đóng vai một bên và ghi âm giọng bạn. Có bài dài cho mỗi cảnh.</span>
@@ -146,7 +147,7 @@ export function ExploreHub({ cases }: { cases: CaseSummary[] }) {
                 <div className="flex-1 px-space-sm py-2">
                   <h2 className="text-label-lg font-extrabold leading-tight">{s.title}</h2>
                   <p className="text-label-md text-on-surface-variant">{learned[s.id] ?? 0}/{s.objects.length} từ đã học</p>
-                  {fading[s.id] > 0 && <p className="mt-0.5 inline-block rounded-full bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">👻 {fading[s.id]} từ phai</p>}
+                  {fading[s.id] > 0 && <p className="mt-0.5 inline-block rounded-full bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container"><InkIcon name="ghost" size={18} /> {fading[s.id]} từ phai</p>}
                 </div>
               </Link>
             </li>

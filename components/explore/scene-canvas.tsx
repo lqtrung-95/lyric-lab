@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import type { ReactNode } from "react";
 import { ArtSprite } from "./art/art-sprite";
 import { FLAT_SPRITES } from "./art/flat/flat-sprites";
@@ -111,7 +112,7 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
                 {o.term}{mark === "faded" && <span className="ml-1 text-primary" title="Sắp quên: ôn lại để làm sáng">↻</span>}
               </span>
             )}
-            {!hideLabels && mark === "new" && !near && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 animate-pulse text-base">✨</span>}
+            {!hideLabels && mark === "new" && !near && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 animate-pulse"><EmojiIcon e="✨" size={22} /></span>}
           </button>
         );
       })}
@@ -141,8 +142,8 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
         >
           <span className={`block ${nearId === exitId(e) && !e.locked ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
           {nearId === exitId(e) && !e.locked && <KeyChip />}
-          <span className={`${LABEL} bg-surface-container-lowest text-on-surface ${nearId === exitId(e) ? "" : "max-sm:hidden"}`}>{e.locked ? "🔒 " : ""}{e.label}</span>
-          {e.locked && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 text-sm sm:hidden">🔒</span>}
+          <span className={`${LABEL} bg-surface-container-lowest text-on-surface ${nearId === exitId(e) ? "" : "max-sm:hidden"}`}>{e.locked && <><EmojiIcon e="🔒" /> </>}{e.label}</span>
+          {e.locked && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 text-sm sm:hidden"><EmojiIcon e="🔒" size={18} /></span>}
         </button>
       ))}
       {extras.map((e) => {
@@ -164,7 +165,7 @@ export function SceneCanvas({ theme, objects, npc, decor, exits, extras = [], ma
             {e.kind === "npc" && <span aria-hidden="true" className="pointer-events-none absolute -bottom-[5%] left-[4%] right-[4%] h-[12%] rounded-[50%] bg-[rgba(74,46,27,0.22)]" style={{ zIndex: -1 }} />}
             <span className={`block ${near ? "drop-shadow-[0_0_8px_rgba(230,126,34,1)]" : hinted ? "animate-pulse drop-shadow-[0_0_10px_rgba(80,160,220,1)]" : ""}`}><ArtSprite sprite={FLAT_SPRITES[e.sprite]} /></span>
             {near && <KeyChip />}
-            {hinted && !near && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 animate-pulse text-base">🔎</span>}
+            {hinted && !near && <span aria-hidden="true" className="pointer-events-none absolute -right-1 -top-2 animate-pulse"><EmojiIcon e="🔎" size={22} /></span>}
             {!hidden && <span className={`${LABEL} bg-tertiary-container text-on-tertiary-container ${near ? "" : "max-sm:hidden"}`}>{spot ? "✓ " : ""}{e.label}</span>}
           </button>
         );

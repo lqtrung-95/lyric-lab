@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useEffect, useState } from "react";
 import { useChatAccount } from "@/components/chat/use-chat-account";
 import { MicIntro } from "@/components/speaking/mic-intro";
@@ -22,7 +23,7 @@ function ToneSelect({ tone, onChange }: { tone: PetTone; onChange: (t: PetTone) 
       <div className="mt-1 grid gap-2 sm:grid-cols-2">
         {PET_TONES.map((t) => (
           <button key={t} type="button" aria-pressed={tone === t} onClick={() => onChange(t)} className={`min-h-11 cursor-pointer rounded-2xl border-2 border-ink px-3 py-2 text-left ${tone === t ? "bg-primary-container shadow-[0_3px_0_var(--shadow-ink)]" : "bg-surface-container-lowest hover:brightness-105"}`}>
-            <span className="block text-label-lg font-extrabold">{PET_TONE_INFO[t].emoji} {PET_TONE_INFO[t].label}</span>
+            <span className="block text-label-lg font-extrabold"><EmojiIcon e={PET_TONE_INFO[t].emoji} /> {PET_TONE_INFO[t].label}</span>
             <span className="block text-label-sm text-on-surface-variant">{PET_TONE_INFO[t].desc}</span>
           </button>
         ))}
@@ -66,7 +67,7 @@ export function PetChat({ name, onClose }: { name: string; onClose: () => void }
       </div>
     );
   } else if (mic === null) {
-    body = <div><ToneSelect tone={tone} onChange={setTone} /><MicIntro title={`🐾 Nói chuyện với ${name}`} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời hỏi một ngày của bạn thế nào, rồi micro tự bật: bạn kể bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Bấm vào từ trong câu của bạn nhỏ để tra nghĩa hoặc lưu thẻ ôn. Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} /></div>;
+    body = <div><ToneSelect tone={tone} onChange={setTone} /><MicIntro title={<><EmojiIcon e="🐾" /> Nói chuyện với {name}</>} onStart={setMic} steps={[`Mục tiêu: ${PET_SCENARIO.goal}.`, `${name} mở lời hỏi một ngày của bạn thế nào, rồi micro tự bật: bạn kể bằng tiếng Trung đơn giản. Tối đa ${MAX_ROLEPLAY_TURNS} lượt.`, "Bấm vào từ trong câu của bạn nhỏ để tra nghĩa hoặc lưu thẻ ôn. Câu của bạn nhỏ do AI tạo nên có thể chưa thật tự nhiên; Pinyin lấy từ từ điển."]} /></div>;
   } else if (openingPinyin === undefined) {
     // Chờ pinyin một lát rồi mới vào buổi nói: câu mở đầu chỉ đọc pinyin lúc khởi tạo.
     body = <p role="status" className="text-body-md text-on-surface-variant">Đang chuẩn bị…</p>;

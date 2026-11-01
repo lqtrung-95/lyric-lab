@@ -1,3 +1,4 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import type { GameWord } from "@/lib/games/game-word";
 
 const signSize = (han: string): string => (han.length <= 2 ? "text-2xl sm:text-3xl" : han.length <= 4 ? "text-lg sm:text-xl" : "text-sm sm:text-base");
@@ -24,7 +25,7 @@ export function WhackHole({ word, index, fx, flash, disabled, onHit }: Props) {
       <span aria-hidden="true" className={`absolute inset-x-[2%] bottom-[7%] h-[24%] rounded-[50%] border-t-4 shadow-[0_5px_0_rgba(0,0,0,.35)] ${flash ? "border-red-300 bg-red-700" : "border-[#8d6238] bg-[#6a4322]"}`} />
       {fx && (
         <>
-          <span aria-hidden="true" className="bz-hammer pointer-events-none absolute left-1/2 top-[30%] z-10 text-4xl">🔨</span>
+          <span aria-hidden="true" className="bz-hammer pointer-events-none absolute left-1/2 top-[30%] z-10"><EmojiIcon e="🔨" size={48} /></span>
           <span aria-hidden="true" className="bz-float pointer-events-none absolute left-1/2 top-[8%] z-10 text-lg font-extrabold text-yellow-200 [text-shadow:0_2px_0_#000]">+{fx.points}</span>
         </>
       )}

@@ -1,5 +1,7 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
+import { Hearts } from "./hearts";
 import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { arcadeRound } from "@/lib/games/arcade-score";
@@ -75,20 +77,20 @@ export function SquadronGame({ words, onAgain }: { words: GameWord[]; onAgain: (
       </p>
       {/* Một hàng cố định: điểm, cấp, mạng, nhầm và combo. Các vật phẩm đang có (đạn rẽ, làm chậm, khiên) và nút loa nằm trong sân (góc dưới), để hàng này không bị dồn xuống dòng và làm sân nhảy. */}
       <div className="mx-auto mb-space-sm flex max-w-[520px] flex-nowrap items-center justify-between gap-1 sm:gap-1.5">
-        <span className={chip}>🏆 {s.score}</span>
+        <span className={chip}><EmojiIcon e="🏆" /> {s.score}</span>
         <span className={chip}>Cấp {s.level}</span>
-        <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join("")}</span>
+        <span className={chip} aria-label={`${s.lives} mạng`}><Hearts lives={s.lives} max={LIVES} /></span>
         <span className={chip} title="Nhầm 3 lần trong một đợt thì mất 1 mạng" aria-label={`${s.strikes} trên 3 lần nhầm`}>✗ {s.strikes}/3</span>
-        {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-primary`}>🔥 ×{s.combo}</span>}
+        {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-primary`}><EmojiIcon e="🔥" /> ×{s.combo}</span>}
       </div>
       <div onPointerMove={aim} onPointerDown={press} onPointerUp={release} onPointerCancel={release} className={`relative isolate mx-auto aspect-[3/4] w-full max-w-[520px] cursor-crosshair touch-none select-none overflow-hidden rounded-3xl border border-white/10 bg-[#040816] ${s.shake > 0 ? "bz-shake" : ""}`}>
         <SquadronScene s={s} />
         <div className="absolute bottom-1 right-1 z-20"><SoundToggle className={`${chip} flex min-h-11 min-w-11 items-center justify-center bg-black/50 text-white`} /></div>
         {(s.spread > 0 || s.slow > 0 || s.shield) && (
           <div aria-label="Vật phẩm đang có" className="pointer-events-none absolute bottom-2 left-2 z-20 flex items-center gap-1">
-            {s.spread > 0 && <span className={`${chip} bg-black/60 text-white`}>{POWER_ICON.spread.icon} {Math.ceil(s.spread)}s</span>}
-            {s.slow > 0 && <span className={`${chip} bg-black/60 text-white`}>{POWER_ICON.slow.icon} {Math.ceil(s.slow)}s</span>}
-            {s.shield && <span className={`${chip} bg-black/60 text-white`}>{POWER_ICON.shield.icon}</span>}
+            {s.spread > 0 && <span className={`${chip} bg-black/60 text-white`}><EmojiIcon e={POWER_ICON.spread.icon} /> {Math.ceil(s.spread)}s</span>}
+            {s.slow > 0 && <span className={`${chip} bg-black/60 text-white`}><EmojiIcon e={POWER_ICON.slow.icon} /> {Math.ceil(s.slow)}s</span>}
+            {s.shield && <span className={`${chip} bg-black/60 text-white`}><EmojiIcon e={POWER_ICON.shield.icon} /></span>}
           </div>
         )}
         {!started && (
@@ -101,7 +103,7 @@ export function SquadronGame({ words, onAgain }: { words: GameWord[]; onAgain: (
       </div>
       <button type="button" disabled={!active} onPointerDown={() => { firing.current = true; }} onPointerUp={release} onPointerLeave={release} onPointerCancel={release} onClick={(e) => { if (e.detail === 0) { firing.current = true; setTimeout(release, 120); } }}
         className="mx-auto mt-space-sm flex min-h-14 w-full max-w-[520px] touch-none select-none items-center justify-center gap-2 rounded-2xl border-2 border-ink bg-primary-container text-lg font-extrabold shadow-[0_4px_0_0_var(--ink)] active:translate-y-1 active:shadow-none disabled:opacity-60">
-        💥 Bắn <span className="text-label-md font-semibold text-on-surface-variant">(Space)</span>
+        <EmojiIcon e="💥" /> Bắn <span className="text-label-md font-semibold text-on-surface-variant">(Space)</span>
       </button>
     </div>
   );

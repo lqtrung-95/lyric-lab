@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { refreshGameSummary } from "@/components/layout/use-game-summary";
 import { Button3d } from "@/components/ui/button-3d";
@@ -104,7 +105,7 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
     <section aria-label={`Câu chuyện ở ${sceneTitle}`} className="card-ink flex flex-col gap-space-sm p-space-md">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-label-md font-extrabold text-primary">📖 Câu chuyện ở {sceneTitle}</p>
+          <p className="text-label-md font-extrabold text-primary"><EmojiIcon e="📖" /> Câu chuyện ở {sceneTitle}</p>
           <h2 lang="zh-Hans" className="text-headline-md">{story.title.zh}</h2>
           {showVi && <p className="text-body-sm text-on-surface-variant">{story.title.vi}</p>}
         </div>
@@ -180,7 +181,7 @@ export function SceneStoryCard({ sceneTitle, story, words, marks, pinyin, onPick
 
       {done && quiz && (
         <div role="status" className="flex flex-col gap-2 rounded-2xl border-2 border-ink bg-secondary-container p-space-sm text-on-secondary-container">
-          <p className="text-headline-md font-extrabold">🎉 Xong! {firstTry}/{quiz.length} câu đúng ngay lần đầu</p>
+          <p className="text-headline-md font-extrabold"><EmojiIcon e="🎉" size={30} /> Xong! {firstTry}/{quiz.length} câu đúng ngay lần đầu</p>
           <p className="text-body-md">Các từ bạn điền đúng đã sáng lại trong tiến độ, và lượt làm này được tính XP như một lượt nhiệm vụ.</p>
           <Button3d variant="primary" onClick={start}>Làm lại với câu khác</Button3d>
         </div>

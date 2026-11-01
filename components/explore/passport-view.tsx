@@ -1,5 +1,7 @@
 "use client";
 
+import { InkIcon, type InkIconName } from "./ink-icon";
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { SceneIcon } from "./scene-icon";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -53,13 +55,13 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <p className="text-label-md font-bold text-on-surface-variant">Danh hiệu của bạn</p>
-            <h2 className="text-headline-md">🛂 {sum.title}</h2>
+            <h2 className="text-headline-md"><EmojiIcon e="🛂" size={30} /> {sum.title}</h2>
           </div>
           <p className="text-label-lg font-extrabold">Đã ghé {sum.visited}/{sum.total} cảnh</p>
         </div>
         <ul aria-label="Số dấu theo bậc" className="flex flex-wrap gap-2 text-label-md font-bold">
-          {([1, 2, 3] as StampTier[]).map((t) => <li key={t} className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-0.5">{STAMP_MEDALS[t]} {STAMP_LABELS[t]}: {sum.byTier[t]}</li>)}
-          <li className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-0.5">🧳 Hành trình: {journeysDone}/{JOURNEYS.length}</li>
+          {([1, 2, 3] as StampTier[]).map((t) => <li key={t} className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-0.5"><EmojiIcon e={STAMP_MEDALS[t]} /> {STAMP_LABELS[t]}: {sum.byTier[t]}</li>)}
+          <li className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-0.5"><EmojiIcon e="🧳" /> Hành trình: {journeysDone}/{JOURNEYS.length}</li>
         </ul>
         {sum.next && (
           <div>
@@ -86,7 +88,7 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
 
       {TOWN_DISTRICTS.map((d) => (
         <section key={d.id} aria-label={d.name} className="rounded-2xl border-[3px] border-ink p-space-sm" style={{ background: d.ground }}>
-          <h3 className="mb-2 flex items-center gap-1.5 text-label-lg font-extrabold text-[#4a2e1b]"><span aria-hidden="true" className="text-xl">{d.emoji}</span>{d.name}</h3>
+          <h3 className="mb-2 flex items-center gap-1.5 text-label-lg font-extrabold text-[#4a2e1b]"><InkIcon name={d.id as InkIconName} size={28} />{d.name}</h3>
           <ul className="grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
             {d.scenes.map((id, i) => {
               const s = SCENES[id];
@@ -99,7 +101,7 @@ export function PassportView({ progress, now, lastScene }: { progress: ExplorePr
                     <span className={`relative flex size-16 items-center justify-center rounded-full bg-white/80 transition-transform group-hover:scale-105 ${st.tier === 0 ? "border-4 border-dashed" : "border-[5px]"}`}
                       style={{ borderColor: RING[st.tier], transform: st.tier > 0 ? `rotate(${TILT[i % TILT.length]}deg)` : undefined }}>
                       {st.tier === 0 ? <span aria-hidden="true" className="text-2xl opacity-30 brightness-0">?</span> : <SceneIcon id={id} size={36} />}
-                      {st.tier > 0 && <span aria-hidden="true" className="absolute -bottom-2 -right-2 text-xl">{STAMP_MEDALS[st.tier]}</span>}
+                      {st.tier > 0 && <span aria-hidden="true" className="absolute -bottom-2 -right-2"><EmojiIcon e={STAMP_MEDALS[st.tier]} size={26} /></span>}
                     </span>
                     <span className="px-0.5 text-[11px] font-extrabold leading-tight text-[#4a2e1b]">{s.title}</span>
                     <span className="text-[10px] font-bold text-[#4a2e1b]/70">{stampNote(st)}</span>

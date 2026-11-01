@@ -1,3 +1,4 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ListenSwitch } from "@/components/layout/listen-switch";
@@ -19,7 +20,7 @@ export default async function ReadingsPage() {
         {items.map((r) => (
           <li key={r.id}>
             <Link href={`/readings/${r.id}`} className="card-ink flex min-h-11 items-center gap-space-sm p-space-md hover:brightness-105">
-              <span aria-hidden="true" className="text-3xl">{r.emoji}</span>
+              <span aria-hidden="true"><EmojiIcon e={r.emoji} size={40} /></span>
               <span className="min-w-0 flex-1">
                 <span lang="zh-Hans" className="block font-serif text-headline-sm font-bold">{r.title.zh}</span>
                 <span className="block text-body-md">{r.title.vi}</span>

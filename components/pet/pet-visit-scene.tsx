@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import Link from "next/link";
 import { useState } from "react";
 import { sfx } from "@/lib/games/arcade-sfx";
@@ -49,7 +50,7 @@ export function PetVisitScene({ visit }: { visit: PetVisit }) {
       <ul className="mt-space-sm flex flex-wrap justify-center gap-2">{chips.map((c) => <li key={c.l} className="rounded-xl border-2 border-ink px-3 py-1"><span className="block text-base font-extrabold">{c.v}</span><span className="text-label-md text-on-surface-variant">{c.l}</span></li>)}</ul>
       <div className="mt-space-sm" role="group" aria-label={`Tặng quà cho ${visit.name}`}>
         <p className="text-label-md font-bold">Tặng quà cho {visit.name}:</p>
-        <div className="mt-1 flex justify-center gap-2">{VISIT_GIFTS.map((g) => <button key={g} type="button" onClick={() => gift(g)} aria-label={`Tặng ${g}`} className="min-h-12 min-w-12 rounded-full border-2 border-ink bg-surface-container-low text-2xl">{g}</button>)}</div>
+        <div className="mt-1 flex justify-center gap-2">{VISIT_GIFTS.map((g) => <button key={g} type="button" onClick={() => gift(g)} aria-label={`Tặng ${g}`} className="min-h-12 min-w-12 rounded-full border-2 border-ink bg-surface-container-low "><EmojiIcon e={g} size={30} /></button>)}</div>
       </div>
       <div className="mt-space-md">
         {mine === null && <p className="mb-2 text-body-md">Bạn cũng muốn có một bạn nhỏ như {visit.name}? Học càng đều, bạn nhỏ càng lớn.</p>}

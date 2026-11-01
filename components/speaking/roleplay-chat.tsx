@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useState } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { RubyChars, RubyLine } from "@/components/ui/ruby-text";
@@ -205,7 +206,7 @@ export function RoleplayChat({ scenario, level, openingPinyin, typingOnly, tone,
   return (
     <div className="flex flex-col gap-space-md">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-label-lg font-extrabold">{scenario.emoji} {scenario.title} · HSK {level} · lượt {Math.min(s.turns + 1, MAX_ROLEPLAY_TURNS)}/{MAX_ROLEPLAY_TURNS}</p>
+        <p className="text-label-lg font-extrabold"><EmojiIcon e={scenario.emoji} /> {scenario.title} · HSK {level} · lượt {Math.min(s.turns + 1, MAX_ROLEPLAY_TURNS)}/{MAX_ROLEPLAY_TURNS}</p>
         <div className="flex gap-1.5">
           <button type="button" aria-pressed={showPinyin} onClick={() => setShowPinyin((v) => !v)} className={`min-h-11 rounded-full border-2 border-ink px-4 text-label-md font-extrabold ${showPinyin ? "bg-primary text-on-primary" : "bg-surface-container-lowest"}`}>Pinyin</button>
           <button type="button" onClick={s.end} className="min-h-11 rounded-full border-2 border-ink bg-surface-container-lowest px-4 text-label-md font-extrabold">Kết thúc</button>

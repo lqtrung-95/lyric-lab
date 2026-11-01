@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { SceneIcon } from "./scene-icon";
 import { InkIcon } from "./ink-icon";
 import Link from "next/link";
@@ -27,12 +28,12 @@ function JourneyCard({ j, st, pinyin }: { j: Journey; st: JourneyStatus; pinyin:
     <li className="card-ink flex flex-col gap-space-sm p-space-md">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
-          <h2 className="text-headline-md"><span aria-hidden="true">{j.emoji}</span> {j.title.vi}</h2>
+          <h2 className="text-headline-md"><EmojiIcon e={j.emoji} size={30} /> {j.title.vi}</h2>
           <p lang="zh-Hans" className="text-label-md font-bold leading-[2.1]"><RubyLine zh={j.title.zh} pinyin={pinyin[j.title.zh]} show={!!pinyin[j.title.zh]} /></p>
           <p className="text-body-sm text-on-surface-variant">{j.blurb}</p>
         </div>
         {st.complete
-          ? <span className="rounded-full border-2 border-ink bg-secondary-container px-3 py-1 text-label-md font-extrabold text-on-secondary-container">🎖 Hoàn thành</span>
+          ? <span className="rounded-full border-2 border-ink bg-secondary-container px-3 py-1 text-label-md font-extrabold text-on-secondary-container"><EmojiIcon e="🎖" /> Hoàn thành</span>
           : <span className="rounded-full border-2 border-ink bg-surface-container-lowest px-3 py-1 text-label-md font-extrabold">{st.doneCount}/{j.steps.length} chặng</span>}
       </div>
       <ProgressBar value={st.doneCount} max={j.steps.length} label={`Tiến độ hành trình ${j.title.vi}`} size="sm" tone={st.complete ? "success" : "primary"} />

@@ -1,5 +1,7 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
+import { Hearts } from "./hearts";
 import { useEffect, useRef, useState } from "react";
 import { PracticeSummary } from "@/components/practice/practice-summary";
 import { PronounceButton } from "@/components/ui/pronounce-button";
@@ -74,10 +76,10 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
       <GameKeyframes />
       <div className={`relative isolate h-[min(72vh,600px)] min-h-[420px] touch-manipulation select-none overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-[#1a0b3a] to-[#311a6b] ${s.shake > 0 ? "ring-4 ring-red-500" : ""}`}>
         <div className="absolute inset-x-0 top-0 z-10 flex flex-wrap items-center justify-between gap-2 bg-gradient-to-b from-black/60 to-transparent p-3">
-          <span className={chip}>🎵 {s.score}</span>
+          <span className={chip}><EmojiIcon e="🎵" /> {s.score}</span>
           <span className={chip}>Cấp {s.level}</span>
-          <span className={chip} aria-label={`${s.lives} mạng`}>{Array.from({ length: RAIN_LIVES }, (_, i) => (i < s.lives ? "❤️" : "🖤")).join(" ")}</span>
-          {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}>🔥 Combo ×{s.combo}</span>}
+          <span className={chip} aria-label={`${s.lives} mạng`}><Hearts lives={s.lives} max={RAIN_LIVES} /></span>
+          {s.combo >= 2 && <span key={s.combo} className={`${chip} bz-pop text-amber-300`}><EmojiIcon e="🔥" /> Combo ×{s.combo}</span>}
           <SoundToggle className={`${chip} min-h-11 min-w-11`} />
           <HintToggles dark />
         </div>
@@ -114,7 +116,7 @@ function Round({ words, onAgain }: { words: GameWord[]; onAgain: () => void }) {
                 <button key={k} type="button" aria-pressed={s.base === DIFFICULTY[k]} onClick={() => setS(initRain(DIFFICULTY[k]))} className={`min-h-11 rounded-full border-2 px-5 text-sm font-extrabold ${s.base === DIFFICULTY[k] ? "border-amber-300 bg-amber-300 text-slate-900" : "border-white/40 text-white"}`}>{label}</button>
               ))}
             </div>
-            <button type="button" aria-pressed={music} onClick={() => setMusic((v) => !v)} className="min-h-11 rounded-full border-2 border-white/40 px-5 text-sm font-bold text-white">🎵 Nhạc {music ? "BẬT" : "TẮT"}</button>
+            <button type="button" aria-pressed={music} onClick={() => setMusic((v) => !v)} className="min-h-11 rounded-full border-2 border-white/40 px-5 text-sm font-bold text-white"><EmojiIcon e="🎵" /> Nhạc {music ? "BẬT" : "TẮT"}</button>
             <button type="button" onClick={() => setStarted(true)} className="min-h-12 rounded-full bg-amber-300 px-8 text-base font-extrabold text-slate-900 hover:brightness-110">Bắt đầu</button>
           </div>
         )}

@@ -1,3 +1,4 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { PetBurstFx } from "@/components/pet/pet-burst-fx";
 import { PetSprite } from "@/components/pet/pet-sprite";
 import type { PetBurst } from "@/lib/pet/pet-burst";
@@ -25,7 +26,7 @@ function MonsterView({ m, front, index }: { m: Monster; front: boolean; index: n
     <div className="absolute z-[6] -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: `${mapX(m.x)}%`, top: `${laneY(m.lane)}%` }}>
       {front && !m.rush && <span aria-hidden="true" className="bz-sway block text-xl leading-none text-amber-500 drop-shadow">▼</span>}
       <div className={m.rush ? "tw-rush" : "bz-sway"} style={{ animationDelay: `${-(index % 5) * 0.2}s` }}>
-        <span aria-hidden="true" className={`block text-5xl leading-none drop-shadow-[0_3px_2px_rgba(0,0,0,.35)] sm:text-6xl ${m.rush ? "saturate-200" : ""}`}>{SKIN[m.skin % SKIN.length]}</span>
+        <span aria-hidden="true" className={`block text-5xl leading-none drop-shadow-[0_3px_2px_rgba(0,0,0,.35)] sm:text-6xl ${m.rush ? "saturate-200" : ""}`}><EmojiIcon e={SKIN[m.skin % SKIN.length]} size={64} /></span>
       </div>
       <span aria-hidden="true" className="mx-auto -mt-1 block h-2 w-10 rounded-full bg-black/25 blur-[2px]" />
       <span lang="zh-Hans" className={`mt-1 block whitespace-nowrap rounded-xl border-2 px-2 font-serif text-xl font-bold leading-snug sm:text-2xl ${m.rush ? "border-red-500 bg-red-100 text-red-800" : front ? "border-amber-500 bg-amber-100 text-slate-900 shadow-[0_0_16px_rgba(245,158,11,.95)]" : "border-slate-500/40 bg-white/90 text-slate-900"}`}>{m.word.han}</span>
@@ -43,7 +44,7 @@ export function TowerScene({ s, species, stage, mood, accessories, burst }: { s:
   return (
     <>
       <div aria-hidden="true" className="absolute inset-0" style={{ backgroundImage: GRASS }} />
-      {DECOR.map(([e, x, y, k], i) => <span key={i} aria-hidden="true" className="absolute -translate-x-1/2 -translate-y-1/2 leading-none opacity-90" style={{ left: `${x}%`, top: `${y}%`, fontSize: `${k * 1.15}rem` }}>{e}</span>)}
+      {DECOR.map(([e, x, y, k], i) => <span key={i} aria-hidden="true" className="absolute -translate-x-1/2 -translate-y-1/2 leading-none opacity-90" style={{ left: `${x}%`, top: `${y}%`, fontSize: `${k * 1.15}rem` }}><EmojiIcon e={e} size={Math.round(k * 28)} /></span>)}
       {Array.from({ length: LANES }, (_, lane) => (
         <div key={lane} aria-hidden="true" className="absolute inset-x-0 h-[23%] -translate-y-1/2 border-y-4 border-[#b39562]/70 bg-gradient-to-b from-[#e3cc99] to-[#d4b87d]" style={{ top: `${laneY(lane)}%` }}>
           <div className="absolute inset-x-0 top-1/2 h-1 -translate-y-1/2 opacity-80" style={{ backgroundImage: DIRT_CENTER }} />
@@ -66,7 +67,7 @@ export function TowerScene({ s, species, stage, mood, accessories, burst }: { s:
         </div>
       ))}
       <div className="absolute z-10 -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: `${PET_X}%`, top: "50%" }}>
-        <span aria-hidden="true" className="block text-3xl leading-none">🚩</span>
+        <span aria-hidden="true" className="block leading-none"><EmojiIcon e="🚩" size={36} /></span>
         <span className="relative mt-1 block">
           <span aria-hidden="true" className={`absolute inset-x-1 -bottom-1 h-5 rounded-full border-4 border-[#7d7260] bg-[#a8a090] ${front ? "shadow-[0_0_18px_4px_rgba(251,191,36,.55)]" : ""}`} />
           <PetSprite species={species} stage={stage} mood={mood} accessories={accessories} bare className="relative size-24 sm:size-32" />

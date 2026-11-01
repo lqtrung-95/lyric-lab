@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useState } from "react";
 import { useChatAccount } from "@/components/chat/use-chat-account";
 import { signInGoogle } from "@/lib/auth/account-client";
@@ -31,7 +32,7 @@ export function RoleplayPractice({ openingPinyin }: { openingPinyin: Record<stri
   if (scenario && mic !== null) {
     return <RoleplayChat key={run} scenario={scenario} level={level} openingPinyin={openingPinyin[scenario.opening.zh]} typingOnly={mic !== "ok"} onExit={() => { setScenario(null); setMic(null); setRun((r) => r + 1); }} />;
   }
-  if (scenario) return <MicIntro title={`${scenario.emoji} ${scenario.title}`} onStart={setMic} steps={[`Mục tiêu: ${scenario.goal}.`, "AI mở lời, rồi micro tự bật: bạn nói câu trả lời của mình, không có kịch bản.", "Sau mỗi lượt AI đáp, có gợi ý sửa nhẹ nếu bạn nói chưa chuẩn. Tối đa 8 lượt."]} />;
+  if (scenario) return <MicIntro title={<><EmojiIcon e={scenario.emoji} /> {scenario.title}</>} onStart={setMic} steps={[`Mục tiêu: ${scenario.goal}.`, "AI mở lời, rồi micro tự bật: bạn nói câu trả lời của mình, không có kịch bản.", "Sau mỗi lượt AI đáp, có gợi ý sửa nhẹ nếu bạn nói chưa chuẩn. Tối đa 8 lượt."]} />;
   return (
     <div className="flex flex-col gap-space-md">
       <fieldset>
@@ -46,7 +47,7 @@ export function RoleplayPractice({ openingPinyin }: { openingPinyin: Record<stri
         {SCENARIOS.filter((s) => !s.hidden).map((s) => (
           <li key={s.id} className="flex">
             <button type="button" onClick={() => setScenario(s)} className="flex min-h-20 w-full items-center gap-3 rounded-xl border-2 border-ink bg-surface-container-lowest p-space-sm text-left hover:bg-surface-container-low">
-              <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-2xl">{s.emoji}</span>
+              <span aria-hidden className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-surface-container-low "><EmojiIcon e={s.emoji} size={32} /></span>
               <span className="min-w-0"><span className="block text-label-lg font-extrabold">{s.title}</span><span className="block text-body-sm text-on-surface-variant">{s.goal}</span></span>
             </button>
           </li>

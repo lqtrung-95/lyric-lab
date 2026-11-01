@@ -1,3 +1,4 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { PARTICLES, ShipSprite, StarBackdrop } from "./blaster-backdrop";
 import { BOOM_SECONDS, ENEMY_H, SHIP_Y, type Enemy, type PowerKind, type SquadronState } from "@/lib/games/squadron-types";
 
@@ -30,7 +31,7 @@ export function SquadronScene({ s }: { s: SquadronState }) {
       {s.slow > 0 && <div aria-hidden="true" className="absolute inset-0 bg-sky-400/10" />}
       {s.bullets.map((b) => <span key={b.id} aria-hidden="true" className="absolute z-[5] h-5 w-1 -translate-x-1/2 rounded-full bg-gradient-to-t from-cyan-300 to-white shadow-[0_0_8px_#22d3ee]" style={{ left: `${b.x * 100}%`, top: `${b.y * 100}%` }} />)}
       {s.enemies.map((e) => <EnemyPlane key={e.id} e={e} reveal={s.revealLeft > 0} />)}
-      {s.pickups.map((p) => <span key={p.id} aria-hidden="true" className="bz-sway absolute z-[6] flex size-9 -translate-x-1/2 items-center justify-center rounded-full border-2 border-amber-300 bg-slate-900/80 text-lg shadow-[0_0_14px_rgba(251,191,36,.8)]" style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}>{POWER_ICON[p.kind].icon}</span>)}
+      {s.pickups.map((p) => <span key={p.id} aria-hidden="true" className="bz-sway absolute z-[6] flex size-9 -translate-x-1/2 items-center justify-center rounded-full border-2 border-amber-300 bg-slate-900/80 text-lg shadow-[0_0_14px_rgba(251,191,36,.8)]" style={{ left: `${p.x * 100}%`, top: `${p.y * 100}%` }}><EmojiIcon e={POWER_ICON[p.kind].icon} size={22} /></span>)}
       {s.booms.map((b) => (
         <div key={b.id} aria-hidden="true" className="pointer-events-none absolute z-[7]" style={{ left: `${b.x * 100}%`, top: `${(b.y + ENEMY_H / 2) * 100}%`, opacity: Math.min(1, (BOOM_SECONDS - b.age) * 3) }}>
           <span className={`bz-ring absolute left-0 top-0 size-20 rounded-full border-4 ${b.good ? "border-amber-300" : "border-red-500"}`} />

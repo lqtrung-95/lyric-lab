@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useSyncExternalStore } from "react";
 import { isArcadeMuted, setArcadeMuted, subscribeArcadeSound } from "@/lib/games/arcade-sfx";
 
@@ -8,7 +9,7 @@ export function SoundToggle({ className = "" }: { className?: string }) {
   const muted = useSyncExternalStore(subscribeArcadeSound, isArcadeMuted, () => false);
   return (
     <button type="button" aria-pressed={!muted} aria-label={muted ? "Bật âm thanh" : "Tắt âm thanh"} onClick={(e) => { e.stopPropagation(); setArcadeMuted(!muted); }} className={className}>
-      {muted ? "🔇" : "🔊"}
+      <EmojiIcon e={muted ? "🔇" : "🔊"} size={26} />
     </button>
   );
 }

@@ -6,7 +6,7 @@ export type PetBurstSound = "chirp" | "cheer" | "happy" | "sad" | "crunch" | "gi
 
 interface Spec { glyphs: readonly string[]; count: number; sound: PetBurstSound; /** Bay lên (true) hay rơi xuống (false). */ rise: boolean }
 
-const SPECS: Record<PetBurstKind, Spec> = {
+export const SPECS: Record<PetBurstKind, Spec> = {
   tap: { glyphs: ["❤️", "💖"], count: 5, sound: "chirp", rise: true },
   cheer: { glyphs: ["⭐", "✨"], count: 9, sound: "cheer", rise: true },
   goal: { glyphs: ["🎉", "⭐", "✨"], count: 11, sound: "happy", rise: true },

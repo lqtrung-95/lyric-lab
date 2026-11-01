@@ -1,3 +1,5 @@
+import { EmojiIcon } from "@/components/ui/emoji-icon";
+
 const PIECES = ["🎉", "⭐", "✨", "🎊", "⭐", "✨", "🎉", "🎊"];
 
 /**
@@ -7,7 +9,7 @@ export function CelebrationBurst() {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 flex justify-around overflow-hidden">
       {PIECES.map((p, i) => (
-        <span key={i} className="celebrate-piece text-2xl motion-reduce:hidden" style={{ animationDelay: `${i * 90}ms` }}>{p}</span>
+        <span key={i} className="celebrate-piece text-2xl motion-reduce:hidden" style={{ animationDelay: `${i * 90}ms` }}><EmojiIcon e={p} size={28} /></span>
       ))}
     </div>
   );

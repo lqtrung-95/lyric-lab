@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { PronounceButton } from "@/components/ui/pronounce-button";
 import { arcadeRound } from "@/lib/games/arcade-score";
@@ -62,7 +63,7 @@ export function DailyGame({ bank, todayKey }: { bank: GameWord[]; todayKey: stri
     <div className="flex flex-col gap-space-md">
       <div className="flex flex-wrap items-center justify-between gap-2 text-label-lg font-extrabold">
         <span>Ngày #{dayNumber(todayKey)}</span>
-        <span>🔥 Chuỗi {streak} · Thắng {wins}/{played}</span>
+        <span><EmojiIcon e="🔥" /> Chuỗi {streak} · Thắng {wins}/{played}</span>
       </div>
       {answer.meaning && (
         <div className="flex flex-wrap items-center gap-2">

@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import { useState } from "react";
 import { Button3d } from "@/components/ui/button-3d";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -21,7 +22,7 @@ export function usePetAdventure() {
 export function AwayPlaceholder({ title }: { title: string }) {
   return (
     <div aria-hidden="true" className="flex size-28 shrink-0 flex-col items-center justify-center rounded-full bg-surface-container text-center" title={title}>
-      <span className="text-3xl">🧳</span>
+      <EmojiIcon e="🧳" size={40} />
       <span className="text-label-md font-bold">Đi chơi</span>
     </div>
   );

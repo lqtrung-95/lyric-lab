@@ -1,5 +1,6 @@
 "use client";
 
+import { EmojiIcon } from "@/components/ui/emoji-icon";
 import Link from "next/link";
 import { useMemo } from "react";
 import type { ExploreProgress } from "@/lib/explore/explore-progress";
@@ -17,7 +18,7 @@ export function JourneyBanner({ sceneId, words, progress }: { sceneId: string; w
     <div className="flex flex-col gap-2">
       {items.map(({ journey, index, st, step }) => (
         <section key={`${journey.id}-${index}`} aria-label={`Hành trình ${journey.title.vi}`} className="card-ink flex flex-col gap-1 bg-secondary-container p-space-sm text-on-secondary-container">
-          <p className="text-label-md font-extrabold">{journey.emoji} Hành trình “{journey.title.vi}” · chặng {index + 1}/{journey.steps.length}</p>
+          <p className="text-label-md font-extrabold"><EmojiIcon e={journey.emoji} /> Hành trình “{journey.title.vi}” · chặng {index + 1}/{journey.steps.length}</p>
           <p className="text-body-md">{step.vi}</p>
           <ul className="flex flex-wrap gap-1.5" aria-label="Từ mục tiêu">
             {step.targets.map((id) => {
