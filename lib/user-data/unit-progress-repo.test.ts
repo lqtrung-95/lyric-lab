@@ -13,3 +13,23 @@ describe("mergeProgress", () => {
     expect(mergeProgress(undefined, { status: "in_progress", score: 0, stepState: { step: 2 } }, now)).toMatchObject({ status: "in_progress", completedAt: null, stepState: { step: 2 } });
   });
 });
+
+import { mergeProgressStates } from "./unit-progress-repo";
+
+describe("mergeProgressStates", () => {
+  const base = { unitId: "u", status: "in_progress" as const, bestScore: 40, stepState: {}, completedAt: null };
+  it("chỉ tăng: hoàn thành, điểm và điểm từng cấp lấy mức cao nhất", () => {
+    const a = { ...base, status: "completed" as const, bestScore: 80, completedAt: "t", stepState: { levels: { "2": 70 } } };
+    const b = { ...base, bestScore: 90, stepState: { levels: { "2": 60, "3": 85 } } };
+    const m = mergeProgressStates(a, b)!;
+    expect(m.status).toBe("completed");
+    expect(m.bestScore).toBe(90);
+    expect(m.stepState.levels).toEqual({ "2": 70, "3": 85 });
+    expect(m.completedAt).toBe("t");
+  });
+  it("thiếu một bên thì trả bên còn lại", () => {
+    expect(mergeProgressStates(undefined, base)).toBe(base);
+    expect(mergeProgressStates(base, undefined)).toBe(base);
+    expect(mergeProgressStates(undefined, undefined)).toBeUndefined();
+  });
+});
