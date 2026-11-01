@@ -5,6 +5,7 @@ import type { PetBurst, PetBurstKind } from "@/lib/pet/pet-burst";
 import type { PetMood } from "@/lib/pet/pet-logic";
 import { petReactionFor, petReactionLine, type PetReaction, type PetSnapshot } from "@/lib/pet/pet-reaction";
 import { pickReviewWord, type PetReviewWord } from "@/lib/pet/pet-review-word";
+import { accessoryLine } from "@/lib/pet/pet-accessory-lines";
 import { pickPetLine, spendSpeech, type PetSpeechBudget } from "@/lib/pet/pet-speech";
 
 const BUDGET_KEY = "lyric-lab-pet-speech";
@@ -30,7 +31,7 @@ export type PetBubble = { kind: "line"; text: string } | { kind: "word"; word: P
  * (2) Sự kiện: khi `snapshot` đổi (lên cấp, tăng chuỗi, đạt mục tiêu, mất chuỗi) pet nảy, bắn hạt kèm tiếng riêng (`burst`) và nói một câu;
  * không tính vào hạn mức chạm vì sự kiện hiếm và là phản hồi cho việc người dùng vừa làm.
  */
-export function usePetTalk(mood: PetMood, name: string, words: readonly PetReviewWord[] = [], snapshot: PetSnapshot | null = null) {
+export function usePetTalk(mood: PetMood, name: string, words: readonly PetReviewWord[] = [], snapshot: PetSnapshot | null = null, accessories: readonly string[] = []) {
   const [tapKey, setTapKey] = useState(0);
   const [bubble, setBubble] = useState<PetBubble | null>(null);
   const [burst, setBurst] = useState<PetBurst | null>(null);
@@ -64,8 +65,10 @@ export function usePetTalk(mood: PetMood, name: string, words: readonly PetRevie
     try { localStorage.setItem(BUDGET_KEY, JSON.stringify(next)); } catch { /* không lưu được: hạn mức chỉ có tác dụng trong phiên */ }
     // Lần chạm lẻ (khi pet không ngủ) mang theo một từ đang cần ôn; lần chẵn nói câu động viên.
     const word = mood !== "sleepy" && next.count % 2 === 1 ? pickReviewWord(words, (next.count - 1) / 2) : null;
-    setBubble(word ? { kind: "word", word } : { kind: "line", text: pickPetLine(mood, name, next.count - 1) });
-  }, [mood, name, words]);
+    // Cứ vài câu động viên lại có một câu nói về món đồ pet đang đeo (nếu có).
+    const worn = !word && next.count % 3 === 0 && mood !== "sleepy" ? accessoryLine(accessories, next.count / 3 - 1) : null;
+    setBubble(word ? { kind: "word", word } : { kind: "line", text: worn ?? pickPetLine(mood, name, next.count - 1) });
+  }, [mood, name, words, accessories]);
 
   return { tapKey, bubble, burst, tap };
 }

@@ -1,3 +1,4 @@
+import { SHOP_IDS } from "./pet-shop";
 import { PET_ACCESSORIES, PET_SPECIES, cleanPetName, type PetSpecies, type PetStage } from "./pet-logic";
 
 /**
@@ -7,7 +8,7 @@ import { PET_ACCESSORIES, PET_SPECIES, cleanPetName, type PetSpecies, type PetSt
 export interface PetVisit { species: PetSpecies; name: string; stage: PetStage; accessories: string[]; level: number; streak: number }
 
 type Params = Pick<URLSearchParams, "get">;
-const ACCESSORY_IDS = new Set(PET_ACCESSORIES.map((a) => a.id));
+const ACCESSORY_IDS = new Set([...PET_ACCESSORIES.map((a) => a.id), ...SHOP_IDS]);
 const int = (v: string | null, min: number, max: number): number | null => {
   const n = Number(v);
   return v !== null && v !== "" && Number.isInteger(n) && n >= min && n <= max ? n : null;
