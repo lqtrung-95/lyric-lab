@@ -87,10 +87,14 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
 
   return (
     <div className="space-y-space-md">
+      <div role="progressbar" aria-label="Tiến độ bài" aria-valuemin={0} aria-valuemax={questions.length} aria-valuenow={i + (done ? 1 : 0)} className="h-3 overflow-hidden rounded-full border-2 border-ink bg-surface-container-high">
+        <div className={`h-full rounded-full transition-[width] duration-500 ease-out motion-reduce:transition-none ${isRetry ? "bg-secondary" : "bg-primary"}`} style={{ width: `${((i + (done ? 1 : 0)) / questions.length) * 100}%` }} />
+      </div>
       <p className="flex flex-wrap items-center gap-x-3 text-body-md text-on-surface-variant" aria-live="polite">
         {isRetry ? <span className="font-bold text-secondary">Làm lại các câu sai {i - mainLen + 1}/{retry.length} (không tính điểm)</span> : <span>Câu {i + 1}/{mainLen} · đúng {correct}</span>}
         {streak >= 2 && <span key={streak} className="anim-note-pop rounded-full border-2 border-ink bg-primary-container px-2 text-label-md font-extrabold text-on-primary-container">🔥 {streak} câu liên tiếp</span>}
       </p>
+      <div key={i} className="anim-quiz-in space-y-space-md">
       {PROMPTS[q.kind] && <p className="text-body-lg font-medium">{PROMPTS[q.kind]}</p>}
       {q.kind === "match" && <QuizMatchQuestion key={i} pairs={q.pairs ?? []} onDone={finishOther} />}
       {q.kind === "order" && <QuizOrderQuestion key={i} q={q} onDone={finishOther} />}
@@ -123,13 +127,14 @@ export function UnitQuizStep({ words, length = QUIZ_LENGTH, kinds = UNIT_QUIZ_KI
         })}
       </div>
       </>)}
+      </div>
       {done && (
-        <div role="status" className="space-y-space-sm">
-          {isChoice && (wasCorrect ? <p className="text-body-lg font-bold">Chính xác!</p> : <AnswerCard word={words.find((w) => w.term === q.answer)} />)}
+        <div role="status" className="anim-feedback-pop space-y-space-sm">
+          {isChoice && (wasCorrect ? <p className="flex items-center gap-2 text-body-lg font-bold"><span aria-hidden="true" className="anim-badge-pop flex size-8 items-center justify-center rounded-full border-2 border-ink bg-secondary text-on-secondary"><Icon name="check" size={20} /></span>Chính xác!</p> : <AnswerCard word={words.find((w) => w.term === q.answer)} />)}
           {/* Ghép cặp: chỉ hiện các cặp bạn ghép nhầm (chữ nào ghép đúng thì không nhắc lại), không phải "từ chính" của câu. */}
           {q.kind === "match" && !wasCorrect && <MismatchCards words={(answered?.wrong ?? []).flatMap((t) => words.find((w) => w.term === t) ?? [])} />}
           {!isChoice && !wasCorrect && !answered?.skipped && q.kind !== "order" && q.kind !== "type" && q.kind !== "match" && <AnswerCard word={words.find((w) => w.term === q.answer)} />}
-          {!isChoice && wasCorrect && (q.kind === "match" || q.kind === "tf") && <p className="text-body-lg font-bold">Chính xác!</p>}
+          {!isChoice && wasCorrect && (q.kind === "match" || q.kind === "tf") && <p className="flex items-center gap-2 text-body-lg font-bold"><span aria-hidden="true" className="anim-badge-pop flex size-8 items-center justify-center rounded-full border-2 border-ink bg-secondary text-on-secondary"><Icon name="check" size={20} /></span>Chính xác!</p>}
           <button type="button" onClick={next} className="inline-flex min-h-12 items-center gap-2 rounded-full border border-outline-variant px-5 text-label-md font-medium hover:bg-surface-container">
             {i + 1 >= questions.length && !(i + 1 === mainLen && failed.length > 0) ? "Xem kết quả" : i + 1 === mainLen && failed.length > 0 ? `Làm lại ${failed.length} câu sai` : "Câu tiếp"} <Icon name="arrow_forward" size={20} />
           </button>

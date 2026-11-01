@@ -30,12 +30,21 @@ export function subscribeSfx(onChange: () => void): () => void {
 }
 
 let ctx: AudioContext | null = null;
+// Số câu đúng liên tiếp (dùng chung mọi kiểu câu hỏi, không cần truyền qua props). Sai, hết bài, hoặc ngừng lâu thì về 0.
+let combo = 0;
+let lastAt = 0;
+const COMBO_GAP_MS = 25_000;
 
 /**
  * Phát một hiệu ứng. Bỏ qua khi: đang tắt, tab không hiển thị, hoặc đang có giọng đọc tiếng Trung (tránh lẫn với giọng mẫu). Chỉ gọi sau thao tác của người dùng
  * (trình duyệt chặn tự phát); mọi lỗi âm thanh đều nuốt im vì đây chỉ là phần thưởng thêm.
  */
 export function playSfx(kind: SfxKind): void {
+  const now = Date.now();
+  if (now - lastAt > COMBO_GAP_MS) combo = 0;
+  let step = 0;
+  if (kind === "correct") { step = combo; combo += 1; lastAt = now; }
+  else if (kind === "wrong" || kind === "complete" || kind === "fail" || kind === "perfect") { combo = 0; lastAt = now; }
   try {
     if (!readSfxEnabled() || document.visibilityState === "hidden" || isChineseAudioBusy()) return;
     const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -43,7 +52,7 @@ export function playSfx(kind: SfxKind): void {
     ctx ??= new Ctor();
     if (ctx.state === "suspended") void ctx.resume();
     const t0 = ctx.currentTime;
-    for (const n of sfxNotes(kind)) {
+    for (const n of sfxNotes(kind, step)) {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = n.type;
@@ -55,6 +64,19 @@ export function playSfx(kind: SfxKind): void {
       osc.connect(gain).connect(ctx.destination);
       osc.start(t0 + n.at);
       osc.stop(t0 + n.at + n.dur + 0.02);
+      if (n.bell) {
+        // Bồi âm quãng tám cao tắt nhanh hơn: tiếng "ting" như chuông nhỏ thay vì tiếng bíp trần.
+        const o2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        o2.type = "sine";
+        o2.frequency.value = n.freq * 2;
+        g2.gain.setValueAtTime(0, t0 + n.at);
+        g2.gain.linearRampToValueAtTime(n.gain * 0.35, t0 + n.at + 0.01);
+        g2.gain.exponentialRampToValueAtTime(0.0001, t0 + n.at + n.dur * 0.6);
+        o2.connect(g2).connect(ctx.destination);
+        o2.start(t0 + n.at);
+        o2.stop(t0 + n.at + n.dur + 0.02);
+      }
     }
   } catch { /* âm thanh là phần thưởng thêm: lỗi thì thôi */ }
 }

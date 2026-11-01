@@ -86,7 +86,7 @@ export function UnitScreen({ slug, idx, mode, level = 1 }: { slug: string; idx: 
     const have = new Set(learner.saved.map((x) => x.key));
     const fresh = cardsToAdd(detail.words, wrongTerms, passed && !isReview && !runLevel, have);
     fresh.forEach((x) => toggleSaved(x));
-    if (passed) playSfx("complete");
+    playSfx(passed ? (percent === 100 ? "perfect" : "complete") : "fail");
     if (saved && passed) refreshGameSummary(); // cập nhật cấp/XP ở thanh trên
     setResult({ percent, passed, saved, first: prev?.status !== "completed" && !runLevel, added: fresh.length, level: lv.id });
     setStep("result");
