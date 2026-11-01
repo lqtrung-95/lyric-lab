@@ -18,6 +18,7 @@ import { CelebrationBurst } from "./celebration-burst";
 import { cardsToAdd } from "@/lib/courses/unit-card";
 import { UnitLearnStep } from "./unit-learn-step";
 import { UnitListenStep } from "./unit-listen-step";
+import { UnitQuickReview } from "./unit-quick-review";
 import { UnitQuizStep } from "./unit-quiz-step";
 import { useUnit } from "./use-unit";
 
@@ -35,7 +36,7 @@ const STEPS: { id: Exclude<Step, "result">; label: string }[] = [
  * Màn một chặng của lộ trình: chặng học là làm quen từ → nghe trong câu thật → kiểm tra; chặng ôn tổng hợp (ôn nhóm chặng, kiểm tra cuối cấp) chỉ có bài kiểm tra.
  * Kết quả lưu vào tiến độ (điểm cao nhất, hoàn thành từ 70%); từ làm sai (có câu thật làm nguồn) tự vào bộ thẻ ôn.
  */
-export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
+export function UnitScreen({ slug, idx, mode }: { slug: string; idx: number; /** "review": ôn nhanh một chặng đã học (không học lại, không đổi trạng thái hoàn thành). */ mode?: "review" }) {
   const unit = useUnit(slug, idx);
   const [step, setStep] = useState<Step>("learn");
   const [result, setResult] = useState<{ percent: number; passed: boolean; saved: boolean; first: boolean; added: number } | null>(null);
@@ -66,6 +67,7 @@ export function UnitScreen({ slug, idx }: { slug: string; idx: number }) {
   const hasNext = detail.unit.idx < detail.unit.total;
 
   const isReview = detail.unit.kind !== "hsk";
+  if (mode === "review" && !isReview) return <UnitQuickReview slug={slug} detail={detail} />;
 
   async function finish(percent: number, passed: boolean, wrongTerms: string[], rightTerms: string[]) {
     recordQuizOutcome(wrongTerms, rightTerms.filter((t) => !wrongTerms.includes(t))); // từ hay sai được ưu tiên ở chặng ôn tổng hợp

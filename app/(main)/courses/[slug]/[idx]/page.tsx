@@ -4,9 +4,10 @@ import { UnitScreen } from "@/components/courses/unit-screen";
 
 export const metadata: Metadata = { title: "Học theo lộ trình", robots: { index: false } };
 
-export default async function UnitPage({ params }: { params: Promise<{ slug: string; idx: string }> }) {
+export default async function UnitPage({ params, searchParams }: { params: Promise<{ slug: string; idx: string }>; searchParams: Promise<{ mode?: string | string[] }> }) {
   const { slug, idx } = await params;
+  const { mode } = await searchParams;
   const n = Number(idx);
   if (!/^[a-z0-9-]{1,40}$/.test(slug) || !Number.isInteger(n) || n < 1) notFound();
-  return <UnitScreen slug={slug} idx={n} />;
+  return <UnitScreen slug={slug} idx={n} mode={mode === "review" ? "review" : undefined} />;
 }

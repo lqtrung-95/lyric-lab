@@ -22,6 +22,7 @@ export function CourseMap({ slug }: { slug: string }) {
   const next = state.units.find((u) => u.progress?.status !== "completed");
   const current = next ?? state.units[state.units.length - 1];
   const selected = state.units.find((u) => u.idx === (picked ?? current.idx)) ?? current;
+  const fading = state.units.filter((u) => u.progress?.status === "completed" && u.strength?.needsReview);
   const percent = state.units.length ? Math.round((100 * done) / state.units.length) : 0;
 
   return (
@@ -45,6 +46,12 @@ export function CourseMap({ slug }: { slug: string }) {
           )}
         </div>
       </header>
+      {fading.length > 0 && (
+        <section aria-labelledby="map-fading" className="card-ink flex flex-wrap items-center justify-between gap-space-sm !bg-error-container p-space-md">
+          <div className="min-w-0 flex-1"><h2 id="map-fading" className="flex items-center gap-2 text-headline-sm font-extrabold"><Icon name="schedule" size={22} /> {fading.length} chặng cần ôn</h2><p className="text-body-md">Một số từ ở các chặng đã học sắp quên (chặng có dấu đồng hồ trên bản đồ). Ôn nhanh 10 câu là nhớ lâu hơn.</p></div>
+          <Link href={`/courses/${slug}/${fading[0].idx}?mode=review`} className="btn-3d btn-3d-primary inline-flex min-h-12 items-center gap-1 px-5 font-extrabold">Ôn chặng {fading[0].idx} <Icon name="arrow_forward" size={20} /></Link>
+        </section>
+      )}
       <div className="grid grid-cols-[minmax(0,1fr)] gap-space-md lg:grid-cols-[minmax(0,1fr)_22rem]">
         <section aria-label="Bản đồ các chặng" className="card-ink overflow-hidden bg-surface-container-low px-2 py-space-md">
           <PathRoad units={state.units} currentIdx={current.idx} selectedIdx={selected.idx} onSelect={setPicked} />
