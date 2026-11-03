@@ -117,6 +117,7 @@ Tăng hậu tố `revN` trong `analysisCache` (`lib/analysis/server-deps.ts`) r�
 1. Xác định nguồn đúng (id LRCLIB hoặc caption). 2. Xoá/thay `song_analyses` hiện hành của bài. 3. Chạy lại phân tích (script hoặc mở bài). 4. Bump `revN`.
 
 ### Nạp video luyện nghe (kho Video, tách khỏi bài hát)
+**Thêm nguồn mới (VD-04):** ở `/admin/videos` dùng "Tìm video CC" (từ khóa, ví dụ `中文听力`, `Mandarin podcast`) hoặc nhập tên kênh; kênh nào muốn quét lại thì bật "Theo dõi" ở danh sách Kênh nguồn rồi bấm "Tìm video mới của N kênh đang theo dõi". Cần chạy một lần migration `20261101000001_video_sources_watching.sql`. Hạn mức: mỗi lần tìm CC = 100 đơn vị YouTube Data API (mặc định 10.000/ngày); nạp theo kênh chỉ tốn khoảng 2–3 đơn vị. Hết hạn mức thì chờ sang ngày mới (giờ Thái Bình Dương).
 **Cách chính: nút nạp ở `/admin/videos`** (nhập tên kênh, "Tìm video", "Nạp N video"; chạy trên server nên không bị chặn IP máy bạn; video vào ở trạng thái Nháp). Script bên dưới là phương án dự phòng.
 Migration `20261006000003_video_lessons.sql` (chạy tay, một lần) tạo `video_sources` và `video_lessons`. Script `scripts/ingest-video-source.mts` đưa video của một kênh vào kho ở trạng thái `draft`: chỉ nhận video **nhúng được** và có phụ đề tiếng Trung **do người làm** (bỏ phụ đề tự động); chia từ bằng jieba, pinyin và level từ từ điển. Không tải audio/video và không in nội dung phụ đề.
 ```

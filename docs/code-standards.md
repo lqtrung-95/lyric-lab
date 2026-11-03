@@ -58,6 +58,11 @@ Bổ sung cho [`CLAUDE.md`](../CLAUDE.md) (quy tắc bắt buộc) và `~/.claud
 - Khóa của `outputFileTracingIncludes` là glob: tuyến động viết `/api/x/**`, không viết `[param]`.
 - Danh sách `in(...)` với chữ Hán phải chia lô (≤100 mục): mỗi chữ mã hóa 9 ký tự URL.
 
+## Nguồn video (admin)
+
+- Mọi đường chọn video để nạp (kênh, tìm CC, kênh theo dõi) phải trả `PlanVideo` qua `buildPlanVideos` và chạy trong cùng hàng đợi nạp; đừng tạo hàng đợi thứ hai. Hàm gọi `search.list` tốn 100 đơn vị hạn mức: chỉ gọi khi admin bấm, không gọi tự động hay trong vòng lặp.
+- `ensureSource` chỉ ghi `owned` khi là `true` (upsert không được tắt cờ đã đặt). Cột mới của `video_sources` mà API quản trị đọc phải có nhánh báo `migration_missing` (mã Postgres `42703`) thay vì lỗi 500.
+
 ## Test
 
 - **Vitest** cho logic: tokenizer, bộ lọc level, validate vị trí, FSRS, chọn bản LRCLIB, parser, rate-limit… Không dùng dữ liệu giả để "qua build"; test phải kiểm tra hành vi thật.
