@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
 import { SKIP_LABEL, type QueueStatus } from "@/lib/video/ingest-queue";
+import type { SearchDuration } from "@/lib/video/video-discovery";
 import { useVideoIngest } from "./use-video-ingest";
+import { VideoSourcesPanel } from "./video-sources-panel";
 
 function StatusText({ status }: { status: QueueStatus }) {
   switch (status.state) {
@@ -23,15 +25,19 @@ function StatusText({ status }: { status: QueueStatus }) {
 export function VideoIngestPanel({ onIngested }: { onIngested: () => void }) {
   const [handle, setHandle] = useState("");
   const [owned, setOwned] = useState(false);
+  const [query, setQuery] = useState("");
+  const [duration, setDuration] = useState<SearchDuration>("medium");
+  /** Chỉ nạp theo tên kênh mới có ô "Đây là kênh của tôi"; tìm CC và kênh theo dõi luôn không phải kênh của chủ dự án. */
+  const [channelMode, setChannelMode] = useState(true);
   const ingest = useVideoIngest(onIngested);
   const { summary, items } = ingest;
   const hasFailed = summary.failed > 0;
 
   return (
     <section aria-labelledby="ingest-heading" className="rounded-2xl bg-surface-container-lowest p-space-md shadow-sm">
-      <h2 id="ingest-heading" className="font-serif text-headline-md text-on-surface">Nạp video từ kênh YouTube</h2>
-      <p className="mt-1 text-body-md text-on-surface-variant">Nhập tên kênh rồi bấm tìm. Chỉ nạp video nhúng được và có phụ đề tiếng Trung do người làm; video mới vào ở trạng thái Nháp.</p>
-      <form onSubmit={(e) => { e.preventDefault(); void ingest.find(handle); }} className="mt-space-sm flex flex-wrap items-center gap-2">
+      <h2 id="ingest-heading" className="font-serif text-headline-md text-on-surface">Nạp video từ YouTube</h2>
+      <p className="mt-1 text-body-md text-on-surface-variant">Nhập tên kênh, hoặc tìm video giấy phép Creative Commons, rồi bấm tìm. Chỉ nạp video nhúng được và có phụ đề tiếng Trung do người làm; video mới vào ở trạng thái Nháp.</p>
+      <form onSubmit={(e) => { e.preventDefault(); setChannelMode(true); void ingest.find(handle); }} className="mt-space-sm flex flex-wrap items-center gap-2">
         <label className="min-w-0 flex-1">
           <span className="sr-only">Tên kênh YouTube</span>
           <input value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="@ChineseGlow" autoComplete="off" disabled={ingest.running}
@@ -46,22 +52,42 @@ export function VideoIngestPanel({ onIngested }: { onIngested: () => void }) {
         Đây là kênh của tôi
       </label>
 
+      <form onSubmit={(e) => { e.preventDefault(); setChannelMode(false); void ingest.search(query, duration); }} className="mt-space-sm flex flex-wrap items-center gap-2">
+        <label className="min-w-0 flex-1">
+          <span className="sr-only">Từ khóa tìm video Creative Commons</span>
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Tìm video CC: 中文听力, Mandarin podcast…" autoComplete="off" disabled={ingest.running}
+            className="min-h-11 w-full min-w-48 rounded-full bg-surface-container-high px-4 text-body-md text-on-surface outline-none ring-2 ring-transparent focus:ring-primary" />
+        </label>
+        <label>
+          <span className="sr-only">Thời lượng</span>
+          <select value={duration} onChange={(e) => setDuration(e.target.value as SearchDuration)} disabled={ingest.running} className="min-h-11 rounded-full bg-surface-container-high px-4 text-label-md text-on-surface">
+            <option value="medium">4–20 phút</option>
+            <option value="long">Trên 20 phút</option>
+          </select>
+        </label>
+        <button type="submit" disabled={ingest.finding || ingest.running || query.trim() === ""} className="min-h-11 rounded-full bg-surface-container-high px-5 text-label-md font-semibold text-on-surface disabled:opacity-50">
+          {ingest.finding ? "Đang tìm…" : "Tìm video CC"}
+        </button>
+      </form>
+      <p className="mt-1 text-label-sm text-on-surface-variant">Mỗi lần tìm CC tốn 100 đơn vị hạn mức YouTube (mặc định 10.000 mỗi ngày). Video CC vẫn phải có phụ đề tiếng Trung do người làm mới được nạp; nhớ ghi chú giấy phép ở kênh nguồn bên dưới.</p>
+      <VideoSourcesPanel busy={ingest.finding || ingest.running} reloadKey={ingest.summary.done} onRunWatched={() => { setChannelMode(false); void ingest.findWatched(); }} />
+
       {ingest.message && <p role="alert" className="mt-1 rounded-xl bg-error-container p-3 text-label-md text-on-error-container">{ingest.message}</p>}
 
       {ingest.plan && (
         <div className="mt-space-sm">
           <p className="text-label-md text-on-surface-variant">
-            {ingest.plan.channel.title}: {ingest.plan.videos.length} video gần đây, {ingest.plan.videos.filter((v) => v.exists).length} đã có, {items.length} có thể nạp.
+            {ingest.plan.label}: {ingest.plan.videos.length} video, {ingest.plan.videos.filter((v) => v.exists).length} đã có, {items.length} có thể nạp.
           </p>
           {items.length > 0 && (
             <div className="mt-1 flex flex-wrap items-center gap-2">
               {summary.waiting > 0 && !ingest.running && (
-                <button type="button" onClick={() => void ingest.run(owned)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">
+                <button type="button" onClick={() => void ingest.run(channelMode && owned)} className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary px-5 text-label-md font-semibold text-on-primary hover:brightness-110">
                   <Icon name="add" size={18} />Nạp {summary.waiting} video
                 </button>
               )}
               {hasFailed && !ingest.running && (
-                <button type="button" onClick={() => void ingest.run(owned, true)} className="inline-flex min-h-11 items-center rounded-full bg-surface-container-high px-5 text-label-md font-semibold text-on-surface">Thử lại video lỗi</button>
+                <button type="button" onClick={() => void ingest.run(channelMode && owned, true)} className="inline-flex min-h-11 items-center rounded-full bg-surface-container-high px-5 text-label-md font-semibold text-on-surface">Thử lại video lỗi</button>
               )}
               {ingest.running && (
                 <button type="button" onClick={ingest.stop} className="inline-flex min-h-11 items-center rounded-full bg-surface-container-high px-5 text-label-md font-semibold text-on-surface">Dừng sau video này</button>

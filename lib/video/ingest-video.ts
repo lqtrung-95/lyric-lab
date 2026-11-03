@@ -28,7 +28,8 @@ export interface IngestDeps {
 /** Tạo (hoặc cập nhật) bản ghi nguồn của kênh và trả id. */
 export async function ensureSource(sb: SupabaseClient, channel: { id: string; title: string }, owned: boolean): Promise<string> {
   const { data, error } = await sb.from("video_sources")
-    .upsert({ youtube_ref: channel.id, title: channel.title, owned, human_zh_captions: true }, { onConflict: "youtube_ref" }).select("id").single();
+    // Chỉ ghi `owned` khi là kênh của chủ dự án: nạp lại kênh đó từ danh sách theo dõi (owned = false) không được tắt cờ đã đặt.
+    .upsert({ youtube_ref: channel.id, title: channel.title, ...(owned ? { owned: true } : {}) }, { onConflict: "youtube_ref" }).select("id").single();
   if (error) throw new Error(`Ghi video_sources lỗi: ${error.message}`);
   return data.id as string;
 }

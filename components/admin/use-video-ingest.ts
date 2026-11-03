@@ -3,10 +3,17 @@
 import { useCallback, useRef, useState } from "react";
 import type { SkipReason } from "@/lib/video/ingest-video";
 import { MAX_BLOCKED_IN_ROW, RETRY_WAITS_MS, summarizeQueue, type QueueStatus } from "@/lib/video/ingest-queue";
+import type { PlanVideo } from "@/lib/video/plan-videos";
+import type { SearchDuration } from "@/lib/video/video-discovery";
 
-export interface PlanVideo { videoId: string; title: string; durationSec: number; embeddable: boolean; exists: boolean }
+export type { PlanVideo };
 export interface QueueItem { video: PlanVideo; status: QueueStatus }
-interface Plan { channel: { id: string; title: string }; videos: PlanVideo[] }
+/** Danh sách chờ nạp: `label` là nguồn của nó (tên kênh, từ khóa tìm, hoặc các kênh theo dõi). */
+interface Plan { label: string; videos: PlanVideo[] }
+
+const WATCHED_RECENT = 30;
+const waiting = (videos: PlanVideo[]): QueueItem[] => videos.filter((v) => !v.exists && v.embeddable).map((video) => ({ video, status: { state: "waiting" } }));
+const postJson = (url: string, body: unknown) => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
 type IngestResult =
   | { ok: true; outcome: { kind: "ingested"; lineCount: number; translatedLineCount: number } | { kind: "skipped"; reason: SkipReason } }
@@ -39,27 +46,56 @@ export function useVideoIngest(onIngested: () => void) {
 
   const setStatus = useCallback((videoId: string, status: QueueStatus) => setItems((list) => list.map((i) => (i.video.videoId === videoId ? { ...i, status } : i))), []);
 
-  const find = useCallback(async (handle: string) => {
+  /** Chạy một bước lấy danh sách; lỗi thì hiện `onError(mã lỗi)`. */
+  const load = useCallback(async (fetchPlan: () => Promise<Plan>) => {
     setFinding(true);
     setMessage(null);
     setPlan(null);
     setItems([]);
     try {
-      const res = await fetch("/api/admin/videos/ingest/plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ handle }) });
-      if (!res.ok) {
-        const code = ((await res.json().catch(() => ({}))) as { error?: string }).error;
-        setMessage(code === "invalid_handle" ? "Tên kênh chưa hợp lệ." : code === "channel_not_found" ? "Không tìm thấy kênh này." : "Chưa tìm được video, thử lại sau nhé.");
-        return;
-      }
-      const p = (await res.json()) as Plan;
+      const p = await fetchPlan();
       setPlan(p);
-      setItems(p.videos.filter((v) => !v.exists && v.embeddable).map((video) => ({ video, status: { state: "waiting" } })));
-    } catch {
-      setMessage("Chưa tìm được video, thử lại sau nhé.");
+      setItems(waiting(p.videos));
+    } catch (e) {
+      setMessage((e as Error).message || "Chưa tìm được video, thử lại sau nhé.");
     } finally {
       setFinding(false);
     }
   }, []);
+
+  const find = useCallback((handle: string) => load(async () => {
+    const res = await postJson("/api/admin/videos/ingest/plan", { handle });
+    if (!res.ok) {
+      const code = ((await res.json().catch(() => ({}))) as { error?: string }).error;
+      throw new Error(code === "invalid_handle" ? "Tên kênh chưa hợp lệ." : code === "channel_not_found" ? "Không tìm thấy kênh này." : "");
+    }
+    const p = (await res.json()) as { channel: { title: string }; videos: PlanVideo[] };
+    return { label: p.channel.title, videos: p.videos };
+  }), [load]);
+
+  const search = useCallback((query: string, duration: SearchDuration) => load(async () => {
+    const res = await postJson("/api/admin/videos/search", { query, duration });
+    if (!res.ok) {
+      const code = ((await res.json().catch(() => ({}))) as { error?: string }).error;
+      throw new Error(code === "quota" ? "Đã hết hạn mức YouTube Data API hôm nay (mỗi lần tìm tốn 100 đơn vị). Thử lại vào ngày mai." : code === "invalid_query" ? "Từ khóa chưa hợp lệ." : "");
+    }
+    return { label: `Creative Commons, "${query}"`, videos: ((await res.json()) as { videos: PlanVideo[] }).videos };
+  }), [load]);
+
+  /** Gom video chưa nạp của mọi kênh đang theo dõi (mỗi kênh vài chục video gần nhất) vào một hàng đợi. */
+  const findWatched = useCallback(() => load(async () => {
+    const list = await fetch("/api/admin/video-sources", { cache: "no-store" });
+    if (!list.ok) throw new Error("");
+    const channels = ((await list.json()) as { sources: { channelId: string; watching: boolean }[] }).sources.filter((s) => s.watching);
+    if (channels.length === 0) throw new Error("Chưa theo dõi kênh nào.");
+    const videos = new Map<string, PlanVideo>();
+    for (const c of channels) {
+      const res = await postJson("/api/admin/videos/ingest/plan", { channelId: c.channelId, limit: WATCHED_RECENT });
+      if (!res.ok) throw new Error("Chưa quét được hết các kênh, thử lại sau nhé.");
+      for (const v of ((await res.json()) as { videos: PlanVideo[] }).videos) videos.set(v.videoId, v);
+    }
+    return { label: `${channels.length} kênh đang theo dõi`, videos: [...videos.values()] };
+  }), [load]);
 
   const run = useCallback(async (owned: boolean, onlyFailed = false) => {
     cancelled.current = false;
@@ -95,5 +131,5 @@ export function useVideoIngest(onIngested: () => void) {
   }, [items, onIngested, setStatus]);
 
   const stop = useCallback(() => { cancelled.current = true; }, []);
-  return { plan, items, finding, running, message, summary: summarizeQueue(items), find, run, stop };
+  return { plan, items, finding, running, message, summary: summarizeQueue(items), find, search, findWatched, run, stop };
 }

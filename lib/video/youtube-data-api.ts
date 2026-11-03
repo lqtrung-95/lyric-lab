@@ -28,6 +28,18 @@ async function call(path: string, params: Record<string, string>, key: string) {
   return json;
 }
 
+/** Tìm video theo `params` của `buildCcSearchParams`: trả mã video và trang kế (nếu còn). Tốn 100 đơn vị hạn mức mỗi lần gọi. */
+export async function searchVideoIds(params: Record<string, string>, key: string): Promise<{ ids: string[]; nextPageToken: string | null }> {
+  const json = await call("search", params, key);
+  const ids = (json.items ?? []).flatMap((i: { id?: { videoId?: string } }) => (i.id?.videoId ? [i.id.videoId] : []));
+  return { ids, nextPageToken: json.nextPageToken ?? null };
+}
+
+export async function resolveChannelById(id: string, key: string): Promise<ChannelInfo | null> {
+  const c = (await call("channels", { part: "contentDetails,snippet", id }, key)).items?.[0];
+  return c ? { id: c.id, title: c.snippet.title, uploadsPlaylistId: c.contentDetails.relatedPlaylists.uploads } : null;
+}
+
 export async function resolveChannelByHandle(handle: string, key: string): Promise<ChannelInfo | null> {
   const c = (await call("channels", { part: "contentDetails,snippet", forHandle: handle }, key)).items?.[0];
   return c ? { id: c.id, title: c.snippet.title, uploadsPlaylistId: c.contentDetails.relatedPlaylists.uploads } : null;

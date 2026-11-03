@@ -308,3 +308,7 @@ Tra từ — từ liên quan: `word-relations.ts` (schema, prompt, `cleanRelatio
 Bảy tính năng học tập bổ sung: xem `docs/handoff-and-status.md` mục "BẢY TÍNH NĂNG MỚI". Điểm kiến trúc: logic thuần ở `lib/report`, `lib/review/weak-summary.ts`, `lib/review/saved-drills.ts`, `lib/roleplay/objectives.ts`, `lib/words/word-notes.ts` (đều có test); trang chỉ ghép dữ liệu hiện có (thẻ, thống kê ngữ pháp/bộ thủ, nhật ký chấm, lượt luyện). Không thêm bảng mới ngoài ràng buộc chế độ `drill`.
 
 Lộ trình HSK mở rộng: mỗi chặng có 5 cấp (`unit-levels.ts`, điểm ở `step_state.levels`), đạt chặng đưa cả từ vào thẻ ôn (`unit-card.ts`), độ bền chặng tính từ đường quên FSRS (`srs/retrievability.ts`, `unit-strength.ts`) và bài ôn nhanh `?mode=review` chấm vào lịch FSRS. Cấp nói dùng lại dịch vụ chấm phát âm và nhận diện giọng sẵn có (không thêm API).
+
+## Nguồn video luyện nghe (kho Video)
+
+Video vào kho qua `ingestVideo` (`lib/video/ingest-video.ts`) với ba cách chọn video ở trang quản trị: theo tên kênh (`POST /api/admin/videos/ingest/plan` với `handle` hoặc `channelId`), theo từ khóa Creative Commons (`POST /api/admin/videos/search`, hàm thuần `buildCcSearchParams` ở `lib/video/video-discovery.ts`), hoặc gom các kênh `video_sources.watching = true`. Cả ba trả cùng dạng `PlanVideo` (`lib/video/plan-videos.ts`) và dùng chung hàng đợi nạp phía client (`components/admin/use-video-ingest.ts`, mỗi video một lần gọi `POST /api/admin/videos/ingest`). Quản lý kênh: `GET/PATCH /api/admin/video-sources`.
