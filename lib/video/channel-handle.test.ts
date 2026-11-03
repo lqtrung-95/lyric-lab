@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CaptionError } from "@/lib/captions/caption-errors";
 import { isTransientCaptionError, normalizeChannelHandle } from "./channel-handle";
 
 describe("normalizeChannelHandle", () => {
@@ -14,10 +15,14 @@ describe("normalizeChannelHandle", () => {
 });
 
 describe("isTransientCaptionError", () => {
+  it("nhận lỗi YouTube đòi đăng nhập (chặn bot từ IP cloud) là lỗi tạm", () => {
+    expect(isTransientCaptionError(new CaptionError("blocked", "Video không phát được (LOGIN_REQUIRED): Sign in to confirm you're not a bot"))).toBe(true);
+  });
   it("nhận lỗi 429 và lỗi tải phụ đề thất bại, bỏ qua lỗi khác", () => {
     expect(isTransientCaptionError(new Error("YouTube từ chối tải caption (429)"))).toBe(true);
     expect(isTransientCaptionError(new Error("Tải caption thất bại"))).toBe(true);
     expect(isTransientCaptionError(new Error("Không có phụ đề"))).toBe(false);
+    expect(isTransientCaptionError(new CaptionError("no_caption", "Video không phát được (UNPLAYABLE)"))).toBe(false);
     expect(isTransientCaptionError(undefined)).toBe(false);
   });
 });
