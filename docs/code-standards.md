@@ -58,6 +58,10 @@ Bổ sung cho [`CLAUDE.md`](../CLAUDE.md) (quy tắc bắt buộc) và `~/.claud
 - Khóa của `outputFileTracingIncludes` là glob: tuyến động viết `/api/x/**`, không viết `[param]`.
 - Danh sách `in(...)` với chữ Hán phải chia lô (≤100 mục): mỗi chữ mã hóa 9 ký tự URL.
 
+## Trang động công khai và bot
+
+- Trang động nặng, công khai, tự dẫn sang nhiều trang cùng loại (vd. `/dictionary/[term]`) phải vào `disallow` của `app/robots.ts`; `noindex` một mình không đủ vì bot vẫn tải trang và đi theo liên kết, ăn hạn mức Fluid Active CPU của Hobby. Trang có câu lấy từ bài hát lại càng không để bot đi qua.
+
 ## Nguồn video (admin)
 
 - Mọi đường chọn video để nạp (kênh, tìm CC, kênh theo dõi) phải trả `PlanVideo` qua `buildPlanVideos` và chạy trong cùng hàng đợi nạp; đừng tạo hàng đợi thứ hai. Hàm gọi `search.list` tốn 100 đơn vị hạn mức: chỉ gọi khi admin bấm, không gọi tự động hay trong vòng lặp.
